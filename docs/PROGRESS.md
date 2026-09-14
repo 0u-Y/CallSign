@@ -52,6 +52,7 @@
 - 2026-09-14: 수정 커밋 `584373a`의 GitHub Actions run `34835227152`에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
 - 2026-09-14: Vercel 프로젝트 `0u-ys-projects/callsign`을 GitHub 저장소와 연결하고 `https://callsign-rouge.vercel.app`에 PUBLIC UI PREVIEW를 배포했다. 루트와 8개 깊은 route의 익명 HTTP 200, 보안 헤더, asset immutable cache를 확인했다.
 - 2026-09-14: 호스팅된 `/demo` 네 장면을 Chromium에서 실행해 승인/거절 결과를 관측하고, 로컬 전용 `/receiver`의 `/demo` 이동, 390px 가로 overflow 0, 콘솔 오류 0건을 확인했다.
+- 2026-09-14: GitHub 자동 배포에서 Vercel이 binary가 누락된 `pnpm 11.13.0`을 명시적으로 차단하는 로그를 확인했다. 현재 유지되는 11.x `pnpm 11.27.0`으로 packageManager와 witness Dockerfile 핀을 통일했다.
 
 ## In progress
 

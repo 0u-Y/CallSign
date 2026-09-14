@@ -1,7 +1,7 @@
 FROM node:22.22.0-bookworm-slim
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
-RUN corepack enable && corepack prepare pnpm@11.13.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.27.0 --activate
 WORKDIR /app
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
 COPY packages/protocol/package.json packages/protocol/package.json

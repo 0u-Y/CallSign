@@ -19,7 +19,7 @@
 
 ## 실행
 
-요구 도구: Node 22, pnpm 11.13, Docker, Foundry, Playwright Chromium. Ubuntu/Linux amd64에서 실제 검증했습니다.
+요구 도구: Node 22, pnpm 11.27, Docker, Foundry, Playwright Chromium. Ubuntu/Linux amd64에서 실제 검증했습니다.
 
 ```bash
 pnpm setup
