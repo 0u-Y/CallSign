@@ -27,3 +27,17 @@ test("primary demo action remains keyboard reachable at 200% page scale", async 
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/demo$/);
 });
+
+test("demo makes the role flow and exact rejection point visible", async ({ page }) => {
+  await page.goto("/demo");
+
+  await page.getByRole("button", { name: "이 장면 실행" }).click();
+  await expect(page.locator(".journey-verdict")).toHaveText("승인 확인");
+  await expect(page.locator(".journey-status")).toHaveText(["확인됨", "확인됨", "확인됨", "별도 권한"]);
+
+  await page.locator(".scene-rail button").nth(1).click();
+  await expect(page.locator(".journey-verdict")).toHaveText("실행 대기");
+  await page.getByRole("button", { name: "이 장면 실행" }).click();
+  await expect(page.locator(".journey-verdict")).toHaveText("흐름 차단");
+  await expect(page.locator(".journey-status")).toHaveText(["확인됨", "여기서 차단", "여기서 차단", "별도 권한"]);
+});

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { AlertTriangle, ArrowRight, Building2, Check, ChevronDown, CircleDot, FileCheck2, Headphones, Landmark, Link2, Phone, PhoneOff, Play, Radio, RotateCcw, ShieldCheck, UserRoundCheck, X } from "lucide-react";
+import { AlertTriangle, ArrowRight, Building2, Check, ChevronDown, CircleDot, FileCheck2, Headphones, Landmark, Link2, LockKeyhole, Phone, PhoneOff, Play, Radio, RotateCcw, ShieldCheck, UserRoundCheck, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { CompactSign } from "jose";
-import { canonicalBytes, generateEd25519KeyPair, randomId } from "@callsign/protocol";
+import { canonicalBytes, contactAuthorizationSchema, generateEd25519KeyPair, randomId, signPayload, verifyPayload, type ContactAuthorization } from "@callsign/protocol";
 import { MonotonicStateGuard, verifyStateBundle, type StateSnapshot, type TrustBundle } from "@callsign/verifier";
 import { api, demoLogin } from "../lib/api.js";
 import { generateBrowserSigningKey } from "../lib/browserKeys.js";
@@ -36,6 +36,15 @@ const scenes = [
 ] as const;
 
 type SceneId = typeof scenes[number]["id"];
+type JourneyStatus = "pending" | "checking" | "passed" | "blocked" | "separate";
+
+interface JourneyStep {
+  actor: string;
+  title: string;
+  detail: string;
+  status: JourneyStatus;
+  icon: "institution" | "gateway" | "receiver" | "official";
+}
 
 export function LandingPage() {
   return (
@@ -70,17 +79,20 @@ export function DemoPage() {
   const [state, setState] = useState<VerificationState>("CHECKING");
   const [reason, setReason] = useState("실행 전입니다. 아래 버튼은 실제 브라우저 verifier fixture를 호출합니다.");
   const [running, setRunning] = useState(false);
+  const [hasRun, setHasRun] = useState(false);
   const health = useQuery({ queryKey: ["health"], queryFn: () => api<{ status: string; profile: string }>("/health"), enabled: !publicPreview });
   const selected = scenes.find((item) => item.id === scene)!;
 
   async function run() {
     setRunning(true);
+    setHasRun(false);
     setState("CHECKING");
     setReason("서명과 필드, witness threshold, freshness를 확인하고 있습니다.");
     try {
       const result = await runPreviewFixture(scene);
       setState(result.state);
       setReason(result.reason);
+      setHasRun(true);
     } catch (error) {
       setState("UNAVAILABLE");
       setReason(error instanceof Error ? error.message : "검증을 실행하지 못했습니다.");
@@ -89,7 +101,7 @@ export function DemoPage() {
     }
   }
 
-  useEffect(() => { setState("CHECKING"); setReason("장면을 선택했습니다. 실제 검증 fixture를 실행해 결과를 확인하세요."); }, [scene]);
+  useEffect(() => { setState("CHECKING"); setHasRun(false); setReason("장면을 선택했습니다. 실제 검증 fixture를 실행해 결과를 확인하세요."); }, [scene]);
 
   return (
     <div className="demo-page">
@@ -104,15 +116,66 @@ export function DemoPage() {
         <div><h1>{selected.title}</h1><p>{selected.summary}</p></div>
         <button className="button primary" onClick={run} disabled={running}>{running ? <><RotateCcw className="spin" size={18} />검증 중</> : <><Play size={18} />이 장면 실행</>}</button>
       </section>
+      <ContactJourney scene={scene} running={running} hasRun={hasRun} state={state} />
       <div className="demo-stage">
         <div className="route-column">
           <EvidenceSwitchboard state={state} />
           <details className="reason-panel"><summary>왜 이런 결과인가요?<ChevronDown size={18} /></summary><p>{reason}</p><p className="technical-note">이 화면의 빠른 재현은 브라우저 안에서 실제 Ed25519와 3-of-4 검증 함수를 실행하는 합성 fixture입니다. Besu LIVE 통합 결과와 구분합니다.</p></details>
         </div>
-        <ReceiverCard state={state} />
+        <ReceiverCard
+          state={state}
+          {...(publicPreview
+            ? { onOfficial: () => document.getElementById("journey-official")?.scrollIntoView({ behavior: "smooth", block: "center" }) }
+            : {})}
+        />
       </div>
     </div>
   );
+}
+
+function ContactJourney({ scene, running, hasRun, state }: { scene: SceneId; running: boolean; hasRun: boolean; state: VerificationState }) {
+  const steps = getJourneySteps(scene).map((step) => ({ ...step, status: running ? (step.status === "separate" ? "separate" : "checking") : hasRun ? step.status : "pending" as JourneyStatus }));
+  const statusLabel: Record<JourneyStatus, string> = { pending: "실행 전", checking: "검증 중", passed: "확인됨", blocked: "여기서 차단", separate: "별도 권한" };
+  const icons = { institution: <Landmark />, gateway: <Headphones />, receiver: <ShieldCheck />, official: <FileCheck2 /> };
+  const verdict = !hasRun ? "장면을 실행하면 각 역할 사이에서 통과하거나 차단된 지점이 표시됩니다." : state === "REJECTED" ? "검증 조건을 충족하지 못한 단계에서 흐름을 멈췄습니다." : "기관 승인과 현재 권한을 확인했습니다. 실제 통화 연결 확인은 LIVE 환경에서 이어집니다.";
+  return <section className="contact-journey" aria-labelledby="journey-title" aria-live="polite">
+    <div className="journey-heading"><div><h2 id="journey-title">이번 연락이 확인되는 흐름</h2><p>{verdict}</p></div><span className={`journey-verdict ${hasRun && state === "REJECTED" ? "blocked" : hasRun ? "passed" : "pending"}`}>{hasRun ? state === "REJECTED" ? "흐름 차단" : "승인 확인" : "실행 대기"}</span></div>
+    <ol className="journey-steps">
+      {steps.map((step, index) => <li className={`journey-step ${step.status}`} id={step.icon === "official" ? "journey-official" : undefined} key={`${scene}-${step.actor}`}>
+        <div className="journey-role">{icons[step.icon]}<span>{step.actor}</span></div>
+        <h3>{step.title}</h3><p>{step.detail}</p>
+        <span className="journey-status">{step.status === "passed" ? <Check /> : step.status === "blocked" ? <X /> : step.status === "checking" ? <RotateCcw className="spin" /> : step.status === "separate" ? <LockKeyhole /> : <CircleDot />}{statusLabel[step.status]}</span>
+        {index < steps.length - 1 && <ArrowRight className="journey-arrow" aria-hidden="true" />}
+      </li>)}
+    </ol>
+  </section>;
+}
+
+function getJourneySteps(scene: SceneId): JourneyStep[] {
+  if (scene === "copy") return [
+    { actor: "모의 A시청", title: "Alice에게 승인서 발급", detail: "기관 서명은 유효하지만 수신 대상은 Alice로 고정됩니다.", status: "passed", icon: "institution" },
+    { actor: "공격 발신자", title: "승인서를 Bob에게 복사", detail: "다른 수신 세션에 기존 증명을 그대로 전달합니다.", status: "blocked", icon: "gateway" },
+    { actor: "Bob의 수신 화면", title: "대상 불일치로 거절", detail: "recipientId와 세션 문맥이 달라 인증 표시를 만들지 않습니다.", status: "blocked", icon: "receiver" },
+    { actor: "공식 업무", title: "전화 증명으로 접근 불가", detail: "별도 로그인과 업무 소유자 검사는 그대로 유지됩니다.", status: "separate", icon: "official" },
+  ];
+  if (scene === "revoked") return [
+    { actor: "모의 A시청", title: "과거 승인서 확인", detail: "승인서 서명 자체는 유효해도 현재 권한과 다시 대조합니다.", status: "passed", icon: "institution" },
+    { actor: "공동 인증망", title: "위임 취소 확인", detail: "3개 witness가 같은 상태에서 revoked=true를 증언합니다.", status: "blocked", icon: "gateway" },
+    { actor: "수신자 화면", title: "인증 표시 철회", detail: "통화는 유지하되 더 이상 승인된 연락으로 표시하지 않습니다.", status: "blocked", icon: "receiver" },
+    { actor: "공식 업무", title: "기관을 직접 재확인", detail: "검증된 디렉터리에서 기관을 선택해 별도 경로로 이동합니다.", status: "separate", icon: "official" },
+  ];
+  if (scene === "recovery") return [
+    { actor: "공동 운영자", title: "2-of-3 복구 승인", detail: "정지된 기관을 서로 다른 두 승인자가 새 epoch로 복구합니다.", status: "passed", icon: "institution" },
+    { actor: "위탁센터 C", title: "새 위임으로 발신", detail: "과거 위임은 되살리지 않고 epoch 3의 새 위임만 사용합니다.", status: "passed", icon: "gateway" },
+    { actor: "수신자 화면", title: "새 승인만 확인", detail: "복구된 기관과 새 위임의 epoch가 일치할 때 승인으로 표시합니다.", status: "passed", icon: "receiver" },
+    { actor: "공식 업무", title: "별도 로그인 유지", detail: "기관 복구와 관계없이 업무 객체 권한을 다시 검사합니다.", status: "separate", icon: "official" },
+  ];
+  return [
+    { actor: "모의 A시청", title: "Alice 연락 승인", detail: "수신자·목적·만료를 정한 승인서를 기관 키로 서명합니다.", status: "passed", icon: "institution" },
+    { actor: "위탁센터 C", title: "등록된 키로 발신", detail: "현재 epoch의 위임과 목적 범위를 상태 증언으로 확인합니다.", status: "passed", icon: "gateway" },
+    { actor: "Alice의 수신 화면", title: "기관 승인 확인", detail: "승인서·수신 대상·현재 권한이 모두 맞을 때만 표시합니다.", status: "passed", icon: "receiver" },
+    { actor: "공식 업무", title: "다시 로그인해 처리", detail: "민감한 서류는 전화 증명과 분리해 소유자 권한을 검사합니다.", status: "separate", icon: "official" },
+  ];
 }
 
 export function ReceiverPage() {
@@ -422,8 +485,17 @@ function ReceiverCard({ state, message, interactive = false, onAccept, onOfficia
 }
 
 async function runPreviewFixture(scene: SceneId): Promise<{ state: VerificationState; reason: string }> {
-  if (scene === "copy") return { state: "REJECTED", reason: "Alice용 recipientId와 nonce가 Bob 세션에 일치하지 않아 RECIPIENT_MISMATCH로 거절됐습니다." };
   const now = Math.floor(Date.now() / 1000);
+  const approvalKey = await generateEd25519KeyPair();
+  const authorization: ContactAuthorization = {
+    protocol: "callsign", version: 1, type: "ContactAuthorization", networkId: "20260914", registryAddress: "0x1111111111111111111111111111111111111111",
+    authorizationId: randomId("auth"), institutionId: "inst_mock_a_city_01HZZZZZZZZZZZZZZZZ", epoch: scene === "recovery" ? "3" : "1",
+    delegationId: scene === "recovery" ? "delegation_new_01HZZZZZZZZZZZZZZZZZ" : "delegation_01HZZZZZZZZZZZZZZZZZZZ", recipientId: ALICE_ID,
+    purposeCode: "DOCUMENT_SUPPLEMENT", officialTaskOpaqueId: randomId("task"), issuedAt: now, notBefore: now, expiresAt: now + 600,
+  };
+  const authorizationJws = await signPayload(authorization, approvalKey);
+  const verifiedAuthorization = await verifyPayload(authorizationJws, approvalKey.publicKey, { type: authorization.type, kid: approvalKey.kid, schema: contactAuthorizationSchema });
+  if (scene === "copy" && verifiedAuthorization.recipientId !== "recipient_bob_01HZZZZZZZZZZZZZZZZZZZZZZZZ") return { state: "REJECTED", reason: "유효한 Alice 승인서를 실제로 검증했지만 Bob의 recipientId와 세션 문맥에는 사용할 수 없어 RECIPIENT_MISMATCH로 거절됐습니다." };
   const base: StateSnapshot = {
     protocol: "callsign", version: 1, type: "SignedStateSnapshot", networkId: "20260914", genesisHash: `0x${"11".repeat(32)}`,
     registryAddress: "0x1111111111111111111111111111111111111111", policyVersion: "1", blockNumber: scene === "recovery" ? "44" : "42", blockHash: `0x${(scene === "recovery" ? "44" : "22").repeat(32)}`,

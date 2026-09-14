@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T10:48:16.862Z",
+  "generatedAt": "2026-09-14T11:50:45.487Z",
   "environment": {
     "os": "linux",
     "arch": "x64",
@@ -62,7 +62,7 @@
       "label": "두 브라우저 WebRTC 전송 결합·원장 취소",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4538B, 취소 표시 6691ms",
+      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4564B, 취소 표시 4442ms",
       "evidence": "artifacts/webrtc-run.json"
     },
     {
@@ -70,7 +70,7 @@
       "label": "반응형·주요 제품 브라우저 시험",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "11건 통과, 0건 실패, 83083ms",
+      "observation": "12건 통과, 0건 실패, 73157ms",
       "evidence": "artifacts/playwright-results.json"
     },
     {
@@ -78,7 +78,7 @@
       "label": "대표 화면 다중 viewport 캡처·육안 검수",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "14개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS",
+      "observation": "18개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS",
       "evidence": "artifacts/screenshots/"
     },
     {
@@ -111,7 +111,7 @@
       "label": "공동 복구 UI의 실제 EIP-712 트랜잭션",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "qbft-live-eip712-recovery-v1, 승인자 2명, epoch 5→6→7",
+      "observation": "qbft-live-eip712-recovery-v1, 승인자 2명, epoch 9→10→11",
       "evidence": "artifacts/governance-run.json",
       "scope": "관리자·정지키 교체; 승인용 Ed25519 키는 데모에서 유지"
     },
