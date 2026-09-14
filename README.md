@@ -1,5 +1,7 @@
 # CallSign · 블록체인 기반 기관 발신 인증 서비스
 
+[![CI](https://github.com/0u-Y/CallSign/actions/workflows/ci.yml/badge.svg)](https://github.com/0u-Y/CallSign/actions/workflows/ci.yml)
+
 기관이 **이 연락을 승인했는지**, 승인된 발신 종단과 **현재 브라우저 연결이 같은지**, 통화 중 **위험한 요구가 있는지**, 민감한 후속 업무가 **공식 로그인 경로로 이어지는지**를 나누어 검증하는 TEAM Signal의 해커톤 개념검증입니다. 실제 기관·정부·통신사 연동 서비스가 아닙니다.
 
 ![실제 3-of-4 원장 상태와 WebRTC 연결 확인 화면](artifacts/screenshots/receiver-connected-live.png)

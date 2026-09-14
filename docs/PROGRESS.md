@@ -46,6 +46,8 @@
 - 2026-09-14: 약 30초 LIVE 녹화를 다시 만들고 연결 확인·규칙 위험 안내·원장 취소 뒤 인증 철회 프레임을 직접 검수했다.
 - 2026-09-14: 공동 운영 API와 UI를 실제 원장에 연결했다. demo operator가 기관을 정지하고, 서로 다른 승인자 2명이 각 역할 세션에서 EIP-712 서명한 뒤 Besu `recoverInstitution`을 실행해 Active 전환과 epoch 증가를 확인했다.
 - 2026-09-14: 공동 복구의 중복 signer·비승인 역할·확정 뒤 추가 서명을 거절하는 통합 시험과 실제 QBFT 브라우저 E2E를 추가했다. 데스크톱·390px 캡처를 열어 가로 넘침과 상태 문구를 검수했다.
+- 2026-09-14: 전체 회귀 시험을 Foundry 5/5, Vitest 20/20, API 통합 10/10, Playwright 11/11로 통과했다. 시험 보고서는 PASS 12·FAIL 0·BLOCKED 0·NOT-RUN 3이다.
+- 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다. 커밋 `11a99f8` 기준 CI를 확인 중이다.
 
 ## In progress
 
@@ -53,7 +55,7 @@
 
 ## Next
 
-- secret/대용량 파일을 다시 점검하고 공개 GitHub 선택 제출 저장소에 최신 구현을 push한 뒤 비로그인 접근과 CI를 확인한다.
+- GitHub Actions CI 완료 결과를 확인하고 선택 제출 기록에 반영한다.
 - P1 C1/C2/B 비교 하네스와 P2 native QBFT proof는 현재 P0 회귀 시험 이후 별도 확장한다.
 
 ## Environment constraints

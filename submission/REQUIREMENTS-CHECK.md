@@ -15,4 +15,4 @@
 - PPTX에서 같은 PDF로 변환: PASS (`pnpm submission:build`의 LibreOffice 변환 결과)
 - 16:9·폰트·잘림·여백 육안 검수: PASS (`submission/rendered-pages/page-01.png`~`page-11.png`)
 - 팀 정보: TEAM Signal · 양영우·이가은 · p10 반영. 대표자 연락처는 제출 폼 입력 대기
-- 선택 제출: 공개 GitHub 소스코드 1건. URL은 저장소 생성 후 외부 접근 확인 필요
+- 선택 제출: 공개 GitHub 소스코드 1건 (`https://github.com/0u-Y/CallSign`). 2026-09-14 19:48 KST 비로그인 HTTPS 접근 HTTP 200 확인
