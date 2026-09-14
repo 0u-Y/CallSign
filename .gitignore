@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.env
+.local/
+.impeccable/
+playwright-report/
+test-results/
+artifacts/traces/
+artifacts/videos/
+artifacts/demo-video/page@*.webm
+*.log
+!artifacts/foundry-results.log
+contracts/cache/
+contracts/out/
+infra/compose/volumes/

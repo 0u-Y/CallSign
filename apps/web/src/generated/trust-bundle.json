@@ -1,0 +1,54 @@
+{
+  "networkId": "20260914",
+  "genesisHash": "0xc6de8cb347b6b77fbbe3025c3bc439ca7446742008b14878e8fad909a56ea0fa",
+  "registryAddress": "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
+  "policyVersion": "1",
+  "witnessThreshold": 3,
+  "witnessPublicKeys": [
+    {
+      "witnessId": "witness-1",
+      "kid": "witness-1-7USzP-koFS9c7k5Z",
+      "jwk": {
+        "crv": "Ed25519",
+        "x": "7USzP-koFS9c7k5ZxHd-q5PLuEIMhOskJbvV6vuafg4",
+        "kty": "OKP"
+      }
+    },
+    {
+      "witnessId": "witness-2",
+      "kid": "witness-2-2gMr7BwZcES_6pWQ",
+      "jwk": {
+        "crv": "Ed25519",
+        "x": "2gMr7BwZcES_6pWQ30yuQd3HUScYILOz3YnPuXl4PHo",
+        "kty": "OKP"
+      }
+    },
+    {
+      "witnessId": "witness-3",
+      "kid": "witness-3-22jy1Mgk0l71VXmB",
+      "jwk": {
+        "crv": "Ed25519",
+        "x": "22jy1Mgk0l71VXmBGp3O4e2JAGdcvl4zd2ts4Z1wC1U",
+        "kty": "OKP"
+      }
+    },
+    {
+      "witnessId": "witness-4",
+      "kid": "witness-4-PyY9BjmMPHwICcNx",
+      "jwk": {
+        "crv": "Ed25519",
+        "x": "PyY9BjmMPHwICcNxCzngBtPjrtuYZwh5ZxzX1y7Uxxk",
+        "kty": "OKP"
+      }
+    }
+  ],
+  "enrollmentPublicKey": {
+    "crv": "Ed25519",
+    "x": "IpA3jbzUk2BENdPj8VhapOMe2uXhlwF2aUZbarwdDR4",
+    "kty": "OKP"
+  },
+  "enrollmentKid": "U7w-QpGtKUbTEjkVAsX4XA",
+  "supportedProtocolVersions": [
+    1
+  ]
+}

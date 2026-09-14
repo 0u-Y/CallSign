@@ -1,0 +1,44 @@
+{
+  "name": "callsign",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.13.0",
+  "engines": {
+    "node": ">=22.0.0 <23"
+  },
+  "scripts": {
+    "setup": "bash scripts/setup.sh",
+    "doctor": "bash scripts/doctor.sh",
+    "dev": "concurrently -k -n api,web -c blue,green \"pnpm --filter @callsign/api dev\" \"pnpm --filter @callsign/web dev\"",
+    "build": "pnpm -r --if-present build",
+    "test": "vitest run --reporter=verbose --reporter=json --outputFile.json=artifacts/vitest-results.json",
+    "test:contracts": "bash -o pipefail -c 'forge test -vvv | tee artifacts/foundry-results.log'",
+    "test:integration": "bash scripts/test-integration.sh",
+    "test:witness-failover": "bash scripts/test-witness-failover.sh",
+    "test:e2e": "playwright test",
+    "test:benchmark": "tsx scripts/benchmark-verifier.ts",
+    "demo:up": "bash scripts/demo-up.sh",
+    "demo:seed": "tsx scripts/seed.ts",
+    "ledger:deploy": "tsx scripts/deploy-registry.ts",
+    "trust:generate": "tsx scripts/generate-web-trust.ts",
+    "submission:build": "tsx scripts/generate-submission.ts && libreoffice --headless --convert-to pdf --outdir submission submission/CallSign_기획제안서.pptx",
+    "demo:record": "playwright test tests/e2e/demo-record.spec.ts --project=chromium",
+    "demo:down": "docker compose -f infra/compose/docker-compose.yml down",
+    "test:report": "tsx scripts/write-test-report.ts"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "5.6.1",
+    "@playwright/test": "1.63.0",
+    "@types/json-dup-key-validator": "1.0.2",
+    "@types/node": "24.7.0",
+    "@types/ws": "8.18.1",
+    "concurrently": "10.0.5",
+    "postgres": "3.4.9",
+    "pptxgenjs": "4.0.1",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "viem": "2.56.5",
+    "vitest": "5.0.0"
+  }
+}

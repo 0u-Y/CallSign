@@ -1,0 +1,41 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_DB: institutionproof
+          POSTGRES_USER: institutionproof
+          POSTGRES_PASSWORD: institutionproof_dev_only
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U institutionproof -d institutionproof"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.13.0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.22.2
+          cache: pnpm
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm tsx scripts/migrate.ts
+      - run: pnpm build
+      - run: pnpm test
+      - run: pnpm test:contracts
+      - run: pnpm test:integration

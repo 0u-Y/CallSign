@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-14T09:33:16.773Z",
+  "environment": {
+    "os": "linux",
+    "arch": "x64",
+    "node": "v22.22.2",
+    "browser": "Playwright Chromium 153",
+    "ledger": "Besu 26.8.1 ×4",
+    "database": "PostgreSQL 17"
+  },
+  "summary": {
+    "pass": 11,
+    "fail": 0,
+    "blocked": 1,
+    "notRun": 3
+  },
+  "checks": [
+    {
+      "id": "contracts",
+      "label": "Solidity 권한·epoch 상태 기계",
+      "status": "PASS",
+      "command": "pnpm test:contracts",
+      "observation": "5건 통과, 실패 0",
+      "evidence": "artifacts/foundry-results.log"
+    },
+    {
+      "id": "protocol-unit",
+      "label": "JCS/Ed25519 및 3-of-4 verifier",
+      "status": "PASS",
+      "command": "pnpm test",
+      "observation": "19건 통과, 0건 실패",
+      "evidence": "artifacts/vitest-results.json"
+    },
+    {
+      "id": "database-integration",
+      "label": "PostgreSQL consume·인증 권한 통합",
+      "status": "PASS",
+      "command": "pnpm test:integration",
+      "observation": "9건 통과, 0건 실패",
+      "evidence": "artifacts/integration-results.json"
+    },
+    {
+      "id": "qbft-readiness",
+      "label": "Besu QBFT 4노드 동일 상태·계약 코드",
+      "status": "PASS",
+      "command": "tsx scripts/check-ledger.ts",
+      "observation": "4노드 공통 높이 4385, registry 10878 bytes",
+      "evidence": "artifacts/ledger-readiness.json",
+      "scope": "동일 block/hash/code 관측; 네이티브 light-client 증명 아님"
+    },
+    {
+      "id": "witness-failover",
+      "label": "witness 임계값 장애",
+      "status": "PASS",
+      "command": "pnpm test:witness-failover",
+      "observation": "1개 중단 3서명, 2개 중단 HTTP 503",
+      "evidence": "artifacts/witness-failover.json"
+    },
+    {
+      "id": "webrtc-e2e",
+      "label": "두 브라우저 WebRTC 전송 결합·원장 취소",
+      "status": "PASS",
+      "command": "pnpm test:e2e",
+      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4584B, 취소 표시 6728ms",
+      "evidence": "artifacts/webrtc-run.json"
+    },
+    {
+      "id": "product-e2e",
+      "label": "반응형·주요 제품 브라우저 시험",
+      "status": "PASS",
+      "command": "pnpm test:e2e",
+      "observation": "10건 통과, 0건 실패, 74199ms",
+      "evidence": "artifacts/playwright-results.json"
+    },
+    {
+      "id": "design-review",
+      "label": "대표 화면 다중 viewport 캡처·육안 검수",
+      "status": "PASS",
+      "command": "pnpm test:e2e",
+      "observation": "12개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS",
+      "evidence": "artifacts/screenshots/"
+    },
+    {
+      "id": "submission-deck",
+      "label": "PPTX 원본과 11쪽 제출 PDF 렌더 검수",
+      "status": "PASS",
+      "command": "pnpm submission:build",
+      "observation": "PPTX/PDF 존재, 렌더 11/11쪽",
+      "evidence": "submission/rendered-pages/"
+    },
+    {
+      "id": "verifier-performance",
+      "label": "캐시 상태 verifier p95",
+      "status": "PASS",
+      "command": "pnpm test:benchmark",
+      "observation": "n=100, p95=3.11ms, 목표 ≤500ms",
+      "evidence": "artifacts/verifier-benchmark.json",
+      "scope": "네트워크 왕복 제외"
+    },
+    {
+      "id": "freshness-withdrawal-jitter",
+      "label": "monotonic deadline 이후 표시 철회 J≤1초",
+      "status": "NOT-RUN",
+      "command": "해당 없음",
+      "observation": "deadline 계산 단위 테스트는 PASS이나 UI timer jitter의 반복 표본 측정은 미실행",
+      "evidence": "docs/KNOWN-LIMITATIONS.md"
+    },
+    {
+      "id": "governance-live-ui",
+      "label": "공동 복구 UI의 실제 EIP-712 트랜잭션",
+      "status": "BLOCKED",
+      "command": "해당 없음",
+      "observation": "역할별 승인 기록 UX와 계약 테스트는 있으나 UI→Besu 실행 연결은 미완료",
+      "evidence": "docs/KNOWN-LIMITATIONS.md"
+    },
+    {
+      "id": "risk-assistant",
+      "label": "규칙 fallback·Ollama adapter",
+      "status": "PASS",
+      "command": "pnpm test",
+      "observation": "규칙 탐지·prompt injection·없는 evidenceSpan·비로컬 endpoint 거절 시험",
+      "evidence": "artifacts/vitest-results.json",
+      "scope": "인증 결과와 독립"
+    },
+    {
+      "id": "ollama-runtime",
+      "label": "로컬 Ollama 실제 모델 실행",
+      "status": "NOT-RUN",
+      "command": "해당 없음",
+      "observation": "모델을 자동 다운로드하지 않았으며 이번 환경에 선택 모델을 설정하지 않음",
+      "evidence": "docs/KNOWN-LIMITATIONS.md"
+    },
+    {
+      "id": "native-qbft-proof",
+      "label": "QBFT header + EIP-1186 네이티브 증명",
+      "status": "NOT-RUN",
+      "command": "해당 없음",
+      "observation": "P2 미구현; P0은 별도 witness 신뢰 프로파일",
+      "evidence": "docs/KNOWN-LIMITATIONS.md"
+    }
+  ]
+}

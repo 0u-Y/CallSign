@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-09-14T09:23:19Z",
+  "oneWitnessStopped": {
+    "status": "PASS",
+    "signatures": 3,
+    "blockNumber": "4379"
+  },
+  "twoWitnessesStopped": {
+    "status": "PASS",
+    "httpStatus": 503,
+    "error": "WITNESS_THRESHOLD_UNAVAILABLE"
+  }
+}

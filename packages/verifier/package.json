@@ -1,0 +1,14 @@
+{
+  "name": "@callsign/verifier",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@callsign/protocol": "workspace:*",
+    "jose": "6.2.12",
+    "zod": "4.6.5"
+  }
+}

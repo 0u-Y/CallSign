@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - services/*
+  - packages/*
+  - tooling/*
+allowBuilds:
+  # Vite/Vitest require esbuild's platform binary link step. No other package
+  # install scripts are approved by this workspace.
+  esbuild: true
+minimumReleaseAgeExclude:
+  - zod@4.6.5
