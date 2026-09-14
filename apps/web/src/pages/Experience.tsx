@@ -26,6 +26,7 @@ import {
   type TrustKeys,
 } from "../lib/rtc.js";
 import { StatusBadge, statusCopy, type VerificationState } from "../components/Status.js";
+import { publicPreview } from "../config.js";
 
 const scenes = [
   { id: "normal", title: "기관이 승인한 정상 연락", short: "정상 연락", summary: "세 개의 독립된 검증 결과가 실제 순서대로 연결됩니다." },
@@ -69,7 +70,7 @@ export function DemoPage() {
   const [state, setState] = useState<VerificationState>("CHECKING");
   const [reason, setReason] = useState("실행 전입니다. 아래 버튼은 실제 브라우저 verifier fixture를 호출합니다.");
   const [running, setRunning] = useState(false);
-  const health = useQuery({ queryKey: ["health"], queryFn: () => api<{ status: string; profile: string }>("/health") });
+  const health = useQuery({ queryKey: ["health"], queryFn: () => api<{ status: string; profile: string }>("/health"), enabled: !publicPreview });
   const selected = scenes.find((item) => item.id === scene)!;
 
   async function run() {
@@ -93,8 +94,8 @@ export function DemoPage() {
   return (
     <div className="demo-page">
       <div className="demo-topline">
-        <span className={`mode-tag ${health.data ? "live" : "preview"}`}><Radio size={14} />{health.data ? "LIVE · 로컬 API 연결" : "UI PREVIEW · API 확인 중"}</span>
-        <Link to="/receiver" className="text-link">두 창으로 실제 통화 열기<ArrowRight size={16} /></Link>
+        <span className={`mode-tag ${health.data ? "live" : "preview"}`}><Radio size={14} />{publicPreview ? "PUBLIC · UI PREVIEW" : health.data ? "LIVE · 로컬 API 연결" : "UI PREVIEW · API 확인 중"}</span>
+        {publicPreview ? <a href="https://github.com/0u-Y/CallSign#실행" className="text-link">LIVE 로컬 실행 안내<ArrowRight size={16} /></a> : <Link to="/receiver" className="text-link">두 창으로 실제 통화 열기<ArrowRight size={16} /></Link>}
       </div>
       <ol className="scene-rail" aria-label="핵심 데모 장면">
         {scenes.map((item, index) => <li key={item.id}><button className={scene === item.id ? "active" : ""} onClick={() => setScene(item.id)}><span>{index + 1}</span>{item.short}</button></li>)}

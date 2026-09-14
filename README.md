@@ -6,6 +6,10 @@
 
 ![실제 3-of-4 원장 상태와 WebRTC 연결 확인 화면](artifacts/screenshots/receiver-connected-live.png)
 
+## 공개 체험
+
+[Vercel 공개 UI preview](https://callsign-rouge.vercel.app/demo)에서 정상·사칭/복사·취소/만료·정지/복구 장면을 바로 실행할 수 있습니다. 공개 배포는 브라우저 내부의 실제 Ed25519 서명과 3-of-4 verifier fixture, 저장된 로컬 시험 결과를 사용하며 `PUBLIC · UI PREVIEW`로 표시합니다. PostgreSQL, Besu 4노드, witness 4개와 두 브라우저 WebRTC를 실행하는 LIVE 데모는 아래 localhost 절차로 재현합니다.
+
 ## 30초 이해
 
 1. 모의 기관 담당자가 Alice의 업무와 목적에 한정된 승인서를 발급합니다. 이때 브라우저 게이트웨이 키의 위임이 실제 QBFT 원장에 기록됩니다.
@@ -64,7 +68,7 @@ pnpm demo:down
 - 실제 통신사 SIP/RCD/STIR 연동, TURN을 둔 다중 장치·모바일 브라우저 검증
 - 복구 시 관리자·정지키는 교체하지만 실행 중 issuer와의 정합성을 위해 승인용 Ed25519 키는 유지. 실제 운영용 키 회전·HSM 절차
 - 로컬 Ollama 모델의 실제 추론 실행. adapter와 규칙 fallback은 구현했지만 모델은 자동 다운로드하지 않았고 이번 결과에서는 NOT-RUN입니다.
-- 실제 기관 채택, 보안 인증, 전국 배포, 외부 공개 데모 URL
+- 실제 기관 채택, 보안 인증, 전국 배포, 외부 공개 **LIVE** 인프라
 
 ## 선택 제출
 

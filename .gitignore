@@ -4,6 +4,9 @@ coverage/
 .env
 .local/
 .impeccable/
+.vercel/
+.env*
+!.env.example
 playwright-report/
 test-results/
 artifacts/traces/

@@ -50,10 +50,12 @@
 - 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다. 커밋 `11a99f8` 기준 CI를 확인 중이다.
 - 2026-09-14: 첫 GitHub Actions에서 workflow PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
 - 2026-09-14: 수정 커밋 `584373a`의 GitHub Actions run `34835227152`에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
+- 2026-09-14: Vercel 프로젝트 `0u-ys-projects/callsign`을 GitHub 저장소와 연결하고 `https://callsign-rouge.vercel.app`에 PUBLIC UI PREVIEW를 배포했다. 루트와 8개 깊은 route의 익명 HTTP 200, 보안 헤더, asset immutable cache를 확인했다.
+- 2026-09-14: 호스팅된 `/demo` 네 장면을 Chromium에서 실행해 승인/거절 결과를 관측하고, 로컬 전용 `/receiver`의 `/demo` 이동, 390px 가로 overflow 0, 콘솔 오류 0건을 확인했다.
 
 ## In progress
 
-- P0와 제출 자료는 현재 검증 범위에서 완료했다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
+- P0와 제출 자료는 현재 검증 범위에서 완료했다. LIVE 인프라와 구분한 Vercel 공개 UI preview도 배포·검증했다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
 
 ## Next
 
@@ -64,7 +66,7 @@
 
 - 시스템 `chromium` 명령은 없지만 Playwright 관리 Chromium 153으로 실제 E2E를 수행했다.
 - 팀명·팀원·역할은 제공됐다. 대표자 연락처·팀원별 GitHub ID는 제공되지 않았으며 공개 파일에 추정하지 않는다.
-- 실제 기관·통신사 연동과 외부 공개 배포는 승인 범위 밖이다.
+- 실제 기관·통신사 연동은 승인 범위 밖이다. 외부 공개 Vercel UI preview 배포는 2026-09-14 사용자 지시로 승인됐다.
 
 ## Commands
 

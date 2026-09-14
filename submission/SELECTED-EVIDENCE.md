@@ -10,3 +10,5 @@
 - 구분: 실제 소스와 로컬 실행 결과. 공개 호스팅 서비스 데모나 완성 영상으로 표시하지 않음
 
 신청서 선택 제출란에는 위 GitHub URL 한 건만 적는다. 일반 출처 URL, 서비스 데모 URL, 영상 URL을 추가 선택 제출물로 나열하지 않는다.
+
+참고용 공개 UI preview `https://callsign-rouge.vercel.app`은 2026-09-14 익명 접근과 네 장면 실행을 확인했지만, Besu/WebRTC LIVE 인프라가 아닌 `PUBLIC · UI PREVIEW`이므로 현재 선택 제출 1건을 대체하지 않는다.
