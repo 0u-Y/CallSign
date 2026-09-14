@@ -15,7 +15,7 @@
 
 실행 증거는 `artifacts/screenshots/`의 PNG와 `artifacts/playwright-results.json`이다. 레이아웃 테스트 390/768/1440에서 `/`, `/demo`, `/receiver`의 `scrollWidth-clientWidth <= 1`을 확인했고, 공동 복구 완료 화면도 390px에서 같은 검사를 수행했다. 실제 캡처를 모두 열어 서체 대체, 겹침, 잘림, 상태 구분을 검토했다. 수신 화면의 위험 안내는 전화 인증 카드와 분리된 호박색 패널이며, 분석 전·규칙 분석·오류 상태를 텍스트로 구분한다.
 
-사용자 피드백으로 `/demo`를 결과 요약 화면에서 발표 진행 화면으로 교체했다. `presentation-demo-1440x900.png`에서는 정상 장면의 기관 승인, witness 3-of-4, DTLS/datachannel, 수락 전 0B→수락 후 증가, 공식 업무 분리를 한 화면에서 확인했다. `presentation-attack-390x844.png`에서는 기관명 사칭과 실제 `RECIPIENT_MISMATCH` 차단을 세로 구조로 검토했다. 모바일 측정값은 `scrollWidth=viewportWidth=390`, 브라우저 콘솔 오류 0건이다. 사건 상태는 색상뿐 아니라 `BROWSER LIVE`/`RECORDED LIVE`, 검사명, 결과 텍스트와 아이콘으로 구분한다.
+사용자 피드백으로 `/demo`를 다중 단계 콘솔에서 버튼 하나로 연속 실행되는 신호 흐름 화면으로 다시 교체했다. `presentation-demo-1440x900.png`에서는 기관 → 개별 승인서 → 위탁센터 → WebRTC → 수신자 → 공식 업무의 수평 경로, 아래 공동 인증망, 사칭 증명의 `RECIPIENT_MISMATCH` 차단 지점을 동시에 확인했다. `presentation-flow-390x844.png`에서는 같은 경로가 세로로 이어지고 주요 시작 버튼이 첫 화면에 노출되는지 검토했다. 데스크톱·모바일 모두 `scrollWidth=viewportWidth`, 브라우저 콘솔 오류 0건이다. witness는 실제 임계값과 맞게 W1–W3만 서명 상태, W4는 대기 상태로 표시한다.
 
 `artifacts/demo-video/CallSign-live-demo.webm`을 다시 녹화하고 1·8·12·16·18·23·28초 프레임을 직접 확인했다. 16초에는 실제 연결 확인, 28초에는 원장 위임 취소 뒤 인증 철회와 통화 유지가 보인다. 이 파일은 자동 시험의 약 30초 원본 증거이며 제출용 3분 내레이션 영상은 아니다.
 

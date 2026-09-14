@@ -8,7 +8,7 @@
 
 ## 공개 발표 데모
 
-[Vercel 발표 데모](https://callsign-rouge.vercel.app/demo)는 제안서의 3분 원고에 맞춰 정상 연락 → 사칭·증명 복사 → 권한 취소·rollback → 공동 복구를 한 단계씩 진행합니다. 기관, 위탁센터, 수신자, 공동 운영자와 실행 사건을 한 화면에서 보며 각 단계의 버튼을 발표자가 직접 누릅니다.
+[Vercel 발표 데모](https://callsign-rouge.vercel.app/demo)는 시작 버튼 하나로 정상 연락 → 사칭·증명 복사 → 권한 취소·rollback → 공동 복구를 연속 실행합니다. 기관 → 위탁센터 → 수신자 → 공식 업무의 신호선과 공동 인증망 상태가 실제 검사 완료 순서에 맞춰 한 화면에서 바뀝니다.
 
 ![기관 승인, 위탁 발신, 수신 검증과 실행 사건을 함께 보여주는 발표 화면](artifacts/screenshots/presentation-demo-1440x900.png)
 

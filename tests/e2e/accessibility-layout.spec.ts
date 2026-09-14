@@ -28,21 +28,14 @@ test("primary demo action remains keyboard reachable at 200% page scale", async 
   await expect(page).toHaveURL(/\/demo$/);
 });
 
-test("presentation demo executes approval, WebRTC, and copied-proof rejection step by step", async ({ page }) => {
+test("one-button presentation animates the full verified flow", async ({ page }) => {
   await page.goto("/demo");
 
-  await page.getByRole("button", { name: "연락 승인서 발급" }).click();
-  await expect(page.getByRole("heading", { name: "연락 승인 완료" })).toBeVisible();
-  await page.getByRole("button", { name: "승인된 통화 연결" }).click();
-  await expect(page.getByText("승인 상담 연결 확인")).toBeVisible();
-  await expect(page.getByText(/DTLS certificate, datachannel probe/)).toBeVisible();
-  await page.getByRole("button", { name: "Alice가 전화 받기" }).click();
-  await expect(page.locator(".phone-metric")).toContainText("수락 전 0B → 수락 후");
-
-  await page.locator(".presentation-scenes button").nth(1).click();
-  await page.getByRole("button", { name: "기관명을 사칭해 발신" }).click();
-  await expect(page.getByText("기관 발신 미확인")).toBeVisible();
-  await page.getByRole("button", { name: "Alice 증명을 Bob에게 복사" }).click();
-  await expect(page.locator(".phone-metric")).toHaveText("RECIPIENT_MISMATCH");
-  await expect(page.getByText(/실제 verifier가 거절/)).toBeVisible();
+  await page.getByRole("button", { name: /전체 흐름 자동 시연/ }).click();
+  await expect(page.getByText(/전체 흐름 검증 완료/)).toBeVisible({ timeout: 35_000 });
+  await expect(page.getByRole("button", { name: /처음부터 다시 보기/ })).toBeVisible();
+  await expect(page.locator(".act-stop.complete")).toHaveCount(4);
+  await expect(page.locator(".stage-readout")).toContainText("NEW EPOCH");
+  await expect(page.locator(".evidence-ribbon")).toContainText("새 권한으로 재연결");
+  await expect(page.locator(".evidence-ribbon")).toContainText(/audio [1-9][0-9]*B/);
 });
