@@ -49,14 +49,15 @@
 - 2026-09-14: 전체 회귀 시험을 Foundry 5/5, Vitest 20/20, API 통합 10/10, Playwright 11/11로 통과했다. 시험 보고서는 PASS 12·FAIL 0·BLOCKED 0·NOT-RUN 3이다.
 - 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다. 커밋 `11a99f8` 기준 CI를 확인 중이다.
 - 2026-09-14: 첫 GitHub Actions에서 workflow PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
+- 2026-09-14: 수정 커밋 `584373a`의 GitHub Actions run `34835227152`에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
 
 ## In progress
 
-- 전체 회귀 시험과 11쪽 제안서의 최신 실행 수치·공동 복구 증빙을 동기화하고 있다.
+- P0와 제출 자료는 현재 검증 범위에서 완료했다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
 
 ## Next
 
-- GitHub Actions CI 완료 결과를 확인하고 선택 제출 기록에 반영한다.
+- 팀 대표 연락처 등 비공개 제출 폼 입력값을 사용자가 최종 입력한다.
 - P1 C1/C2/B 비교 하네스와 P2 native QBFT proof는 현재 P0 회귀 시험 이후 별도 확장한다.
 
 ## Environment constraints
