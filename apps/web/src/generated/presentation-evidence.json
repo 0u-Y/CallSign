@@ -1,0 +1,28 @@
+{
+  "capturedAt": "2026-09-14T12:34:16.402Z",
+  "ledger": {
+    "profile": "qbft-4-node-plus-independent-witness-processes",
+    "commonHeight": "6912",
+    "commonBlockHash": "0x1faf376ac6ba2ccf686f728c05d5b732c2ea18cd32918571e28f31f8e114ad36",
+    "nodes": 4,
+    "witnesses": 4
+  },
+  "webrtc": {
+    "profile": "chromium-dtls-certificate-v1",
+    "browserContexts": 3,
+    "connectionVerificationMs": 11512,
+    "audioBytesBeforeAccept": 0,
+    "audioBytesAfterAccept": 4635,
+    "revocationDisplayWithdrawalMs": 6686,
+    "callPreservedAfterWithdrawal": true
+  },
+  "governance": {
+    "profile": "qbft-live-eip712-recovery-v1",
+    "initialEpoch": 11,
+    "suspendedEpoch": 12,
+    "recoveredEpoch": 13,
+    "distinctApproverSessions": ["approver_1", "approver_2"],
+    "suspendTransaction": "0x011d738c6d3a91fe0b4c0bd4745c5f79428ecd61183a7c0cc4ef48db993ed944",
+    "recoveryTransaction": "0xefedf4ef04a2eb201deb4ee1d32887513fb34b59d89253e5bb6101e1522450b1"
+  }
+}

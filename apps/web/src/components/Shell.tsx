@@ -17,8 +17,8 @@ export function Shell() {
         </nav>
       </header>
       {publicPreview && <aside className="public-preview-banner" aria-label="공개 배포 범위">
-        <strong>PUBLIC · UI PREVIEW</strong>
-        <span>브라우저 내 서명·검증 fixture를 체험할 수 있습니다. QBFT·WebRTC LIVE 실행은 <a href="https://github.com/0u-Y/CallSign#실행" target="_blank" rel="noreferrer">GitHub 실행 안내</a>에서 재현합니다.</span>
+        <strong>PUBLIC · PRESENTATION DEMO</strong>
+        <span>브라우저 암호·WebRTC는 지금 실행하고, Besu 거래는 로컬 LIVE 증거를 재생합니다. 전체 분리 환경은 <a href="https://github.com/0u-Y/CallSign#실행" target="_blank" rel="noreferrer">GitHub 실행 안내</a>에서 재현합니다.</span>
       </aside>}
       <main id="main"><Outlet /></main>
       <footer className="site-footer"><Brand compact /><p>모의 기관과 합성 데이터로 실행하는 해커톤 개념검증입니다. 정부·기관·통신사의 참여를 뜻하지 않습니다.</p></footer>

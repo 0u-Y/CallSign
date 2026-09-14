@@ -47,19 +47,23 @@
 - 2026-09-14: 공동 운영 API와 UI를 실제 원장에 연결했다. demo operator가 기관을 정지하고, 서로 다른 승인자 2명이 각 역할 세션에서 EIP-712 서명한 뒤 Besu `recoverInstitution`을 실행해 Active 전환과 epoch 증가를 확인했다.
 - 2026-09-14: 공동 복구의 중복 signer·비승인 역할·확정 뒤 추가 서명을 거절하는 통합 시험과 실제 QBFT 브라우저 E2E를 추가했다. 데스크톱·390px 캡처를 열어 가로 넘침과 상태 문구를 검수했다.
 - 2026-09-14: 전체 회귀 시험을 Foundry 5/5, Vitest 20/20, API 통합 10/10, Playwright 11/11로 통과했다. 시험 보고서는 PASS 12·FAIL 0·BLOCKED 0·NOT-RUN 3이다.
-- 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다. 커밋 `11a99f8` 기준 CI를 확인 중이다.
+- 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다.
 - 2026-09-14: 첫 GitHub Actions에서 workflow PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
-- 2026-09-14: 수정 커밋 `584373a`의 GitHub Actions run `34835227152`에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
+- 2026-09-14: GitHub Actions에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
 - 2026-09-14: Vercel 프로젝트 `0u-ys-projects/callsign`을 GitHub 저장소와 연결하고 `https://callsign-rouge.vercel.app`에 PUBLIC UI PREVIEW를 배포했다. 루트와 8개 깊은 route의 익명 HTTP 200, 보안 헤더, asset immutable cache를 확인했다.
 - 2026-09-14: 호스팅된 `/demo` 네 장면을 Chromium에서 실행해 승인/거절 결과를 관측하고, 로컬 전용 `/receiver`의 `/demo` 이동, 390px 가로 overflow 0, 콘솔 오류 0건을 확인했다.
 - 2026-09-14: GitHub 자동 배포에서 Vercel이 binary가 누락된 `pnpm 11.13.0`을 명시적으로 차단하는 로그를 확인했다. 현재 유지되는 11.x `pnpm 11.27.0`으로 packageManager와 witness Dockerfile 핀을 통일했다.
-- 2026-09-14: Vercel Git 자동 배포가 `c1d738a`에서 Ready가 되고 프로덕션 별칭을 갱신했다. CI의 별도 pnpm 버전 핀 충돌은 제거해 `package.json#packageManager`를 단일 기준으로 사용한다.
+- 2026-09-14: Vercel Git 자동 배포가 Ready가 되고 프로덕션 별칭을 갱신했다. CI의 별도 pnpm 버전 핀 충돌은 제거해 `package.json#packageManager`를 단일 기준으로 사용한다.
 - 2026-09-14: 공개 데모에서 역할별 연락 흐름이 한눈에 보이지 않는 피드백을 반영했다. 기관→위탁 발신자→수신자→공식 업무 4단계와 공격 차단 지점을 첫 결과 영역에 추가하고, 장면 실행 시 실제 Ed25519 승인서 검증과 recipient 불일치를 수행하도록 연결했다.
 - 2026-09-14: 정상·복사 공격 흐름을 1440×900과 390×844에서 직접 캡처해 검수했다. 정상은 `확인됨/확인됨/확인됨/별도 권한`, 복사는 `확인됨/여기서 차단/여기서 차단/별도 권한`, 모바일 overflow 0, 콘솔 오류 0이며 전체 Playwright 12/12와 Vitest 20/20이 PASS했다.
+- 2026-09-14: 단일 실행 버튼과 즉시 결과가 발표용 데모로 부족하다는 사용자 피드백을 반영해 `/demo`를 전면 교체했다. 제안서 3분 구간에 맞춘 4장면, 역할별 콘솔, 수신 전화, 실제 사건 stream, 발표 멘트와 다음 단계 제어를 한 화면에 구성했다.
+- 2026-09-14: 공개 발표 데모의 정상·사칭·취소·복구 장면을 끝까지 실행했다. 브라우저에서 실제 Ed25519, 3-of-4 verifier, WebRTC DTLS/datachannel loopback, 수락 후 audio bytes를 관측했고 `RECIPIENT_MISMATCH`, 취소 후 `STATE_ROLLBACK`, 새 epoch 복구를 확인했다. Besu·분리 브라우저 값은 저장된 LIVE 증거라고 명확히 표시한다.
+- 2026-09-14: 발표 데모 변경 뒤 Vitest 20/20과 Playwright 12/12를 다시 실행해 모두 통과했다. 정상 승인·WebRTC·오디오와 복사 증명의 `RECIPIENT_MISMATCH`를 단계별 E2E로 고정했다.
+- 2026-09-14: 저장소 로컬 Git 작성자를 GitHub 로그인 계정 `0u-Y`와 검증된 noreply 주소로 변경했다. 기존 커밋 작성자 메타데이터도 같은 계정으로 통일한다.
 
 ## In progress
 
-- P0와 제출 자료는 현재 검증 범위에서 완료했다. LIVE 인프라와 구분한 Vercel 공개 UI preview도 배포·검증했다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
+- P0와 제출 자료는 현재 검증 범위에서 완료했다. 브라우저 즉시 실행과 로컬 LIVE 증거를 구분한 Vercel 발표 데모도 배포·검증한다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
 
 ## Next
 

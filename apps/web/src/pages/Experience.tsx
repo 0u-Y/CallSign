@@ -27,6 +27,7 @@ import {
 } from "../lib/rtc.js";
 import { StatusBadge, statusCopy, type VerificationState } from "../components/Status.js";
 import { publicPreview } from "../config.js";
+import { PresentationDemo } from "./PresentationDemo.js";
 
 const scenes = [
   { id: "normal", title: "기관이 승인한 정상 연락", short: "정상 연락", summary: "세 개의 독립된 검증 결과가 실제 순서대로 연결됩니다." },
@@ -75,6 +76,10 @@ export function LandingPage() {
 }
 
 export function DemoPage() {
+  return <PresentationDemo />;
+}
+
+function LegacyDemoPage() {
   const [scene, setScene] = useState<SceneId>("normal");
   const [state, setState] = useState<VerificationState>("CHECKING");
   const [reason, setReason] = useState("실행 전입니다. 아래 버튼은 실제 브라우저 verifier fixture를 호출합니다.");

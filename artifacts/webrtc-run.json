@@ -1,11 +1,11 @@
 {
-  "checkedAt": "2026-09-14T11:50:20.038Z",
-  "runStartedAt": "2026-09-14T11:50:02.230Z",
+  "checkedAt": "2026-09-14T12:34:16.402Z",
+  "runStartedAt": "2026-09-14T12:33:55.987Z",
   "profile": "chromium-dtls-certificate-v1",
   "browserContexts": 3,
-  "connectionVerificationMs": 11127,
+  "connectionVerificationMs": 11512,
   "audioBytesBeforeAccept": 0,
-  "audioBytesAfterAccept": 4564,
-  "revocationDisplayWithdrawalMs": 4442,
+  "audioBytesAfterAccept": 4635,
+  "revocationDisplayWithdrawalMs": 6686,
   "callPreservedAfterWithdrawal": true
 }

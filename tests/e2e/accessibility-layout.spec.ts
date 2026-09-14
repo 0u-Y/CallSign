@@ -28,16 +28,21 @@ test("primary demo action remains keyboard reachable at 200% page scale", async 
   await expect(page).toHaveURL(/\/demo$/);
 });
 
-test("demo makes the role flow and exact rejection point visible", async ({ page }) => {
+test("presentation demo executes approval, WebRTC, and copied-proof rejection step by step", async ({ page }) => {
   await page.goto("/demo");
 
-  await page.getByRole("button", { name: "이 장면 실행" }).click();
-  await expect(page.locator(".journey-verdict")).toHaveText("승인 확인");
-  await expect(page.locator(".journey-status")).toHaveText(["확인됨", "확인됨", "확인됨", "별도 권한"]);
+  await page.getByRole("button", { name: "연락 승인서 발급" }).click();
+  await expect(page.getByRole("heading", { name: "연락 승인 완료" })).toBeVisible();
+  await page.getByRole("button", { name: "승인된 통화 연결" }).click();
+  await expect(page.getByText("승인 상담 연결 확인")).toBeVisible();
+  await expect(page.getByText(/DTLS certificate, datachannel probe/)).toBeVisible();
+  await page.getByRole("button", { name: "Alice가 전화 받기" }).click();
+  await expect(page.locator(".phone-metric")).toContainText("수락 전 0B → 수락 후");
 
-  await page.locator(".scene-rail button").nth(1).click();
-  await expect(page.locator(".journey-verdict")).toHaveText("실행 대기");
-  await page.getByRole("button", { name: "이 장면 실행" }).click();
-  await expect(page.locator(".journey-verdict")).toHaveText("흐름 차단");
-  await expect(page.locator(".journey-status")).toHaveText(["확인됨", "여기서 차단", "여기서 차단", "별도 권한"]);
+  await page.locator(".presentation-scenes button").nth(1).click();
+  await page.getByRole("button", { name: "기관명을 사칭해 발신" }).click();
+  await expect(page.getByText("기관 발신 미확인")).toBeVisible();
+  await page.getByRole("button", { name: "Alice 증명을 Bob에게 복사" }).click();
+  await expect(page.locator(".phone-metric")).toHaveText("RECIPIENT_MISMATCH");
+  await expect(page.getByText(/실제 verifier가 거절/)).toBeVisible();
 });

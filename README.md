@@ -6,13 +6,13 @@
 
 ![실제 3-of-4 원장 상태와 WebRTC 연결 확인 화면](artifacts/screenshots/receiver-connected-live.png)
 
-## 공개 체험
+## 공개 발표 데모
 
-[Vercel 공개 UI preview](https://callsign-rouge.vercel.app/demo)에서 정상·사칭/복사·취소/만료·정지/복구 장면을 바로 실행할 수 있습니다. 공개 배포는 브라우저 내부의 실제 Ed25519 서명과 3-of-4 verifier fixture, 저장된 로컬 시험 결과를 사용하며 `PUBLIC · UI PREVIEW`로 표시합니다. PostgreSQL, Besu 4노드, witness 4개와 두 브라우저 WebRTC를 실행하는 LIVE 데모는 아래 localhost 절차로 재현합니다.
+[Vercel 발표 데모](https://callsign-rouge.vercel.app/demo)는 제안서의 3분 원고에 맞춰 정상 연락 → 사칭·증명 복사 → 권한 취소·rollback → 공동 복구를 한 단계씩 진행합니다. 기관, 위탁센터, 수신자, 공동 운영자와 실행 사건을 한 화면에서 보며 각 단계의 버튼을 발표자가 직접 누릅니다.
 
-![기관 승인부터 공식 업무까지의 역할별 공개 데모 흐름](artifacts/screenshots/demo-flow-1440.png)
+![기관 승인, 위탁 발신, 수신 검증과 실행 사건을 함께 보여주는 발표 화면](artifacts/screenshots/presentation-demo-1440x900.png)
 
-각 장면의 상단 흐름도에서 기관 → 위탁 발신자 → 수신자 → 공식 업무 순서와 검증이 끊긴 정확한 지점을 먼저 확인할 수 있습니다. `이 장면 실행`은 장면 이름으로 결과를 정하지 않고, 브라우저에서 승인서 서명·수신 대상·3-of-4 상태 증언을 실제 검증합니다.
+`BROWSER LIVE` 단계는 현재 탭에서 실제 Ed25519 승인서 검증, 합성 3-of-4 witness quorum, WebRTC DTLS·datachannel loopback, 수락 후 생성 음원 바이트 증가를 실행합니다. `RECORDED LIVE` 단계는 이 저장소의 로컬 Besu 4노드·분리 브라우저 E2E에서 얻은 트랜잭션과 관측값입니다. 공개 Vercel이 원격 QBFT 노드에 연결된 것처럼 표시하지 않습니다. PostgreSQL, Besu 4노드, witness 4개와 별도 브라우저 WebRTC를 실행하는 전체 LIVE 데모는 아래 localhost 절차로 재현합니다.
 
 ## 30초 이해
 
