@@ -19,6 +19,8 @@ const privateKeys = {
   approver3: `0x${"33".repeat(32)}`,
   administrator: `0x${"44".repeat(32)}`,
   emergencyStopper: `0x${"55".repeat(32)}`,
+  recoveryAdministrator: `0x${"66".repeat(32)}`,
+  recoveryEmergencyStopper: `0x${"77".repeat(32)}`,
 } satisfies Record<string, Hex>;
 
 const accounts = Object.fromEntries(Object.entries(privateKeys).map(([role, key]) => [role, privateKeyToAccount(key)])) as Record<keyof typeof privateKeys, ReturnType<typeof privateKeyToAccount>>;
@@ -27,7 +29,7 @@ const deployer = createWalletClient({ account: accounts.deployer, chain, transpo
 
 try {
   const previous = JSON.parse(await readFile(deploymentPath, "utf8")) as { registryAddress: Hex; brand?: string };
-  if (previous.brand === "CallSign" && (await publicClient.getCode({ address: previous.registryAddress })) !== undefined) {
+  if (previous.brand === "CallSign governance v1" && (await publicClient.getCode({ address: previous.registryAddress })) !== undefined) {
     console.log(JSON.stringify({ reused: true, ...previous }));
     process.exit(0);
   }
@@ -41,7 +43,7 @@ const deployHash = await deployer.deployContract({ abi: artifact.abi, bytecode: 
 const deployed = await publicClient.waitForTransactionReceipt({ hash: deployHash });
 if (!deployed.contractAddress) throw new Error("REGISTRY_DEPLOYMENT_ADDRESS_MISSING");
 
-for (const account of [accounts.administrator, accounts.emergencyStopper]) {
+for (const account of [accounts.administrator, accounts.emergencyStopper, accounts.recoveryAdministrator, accounts.recoveryEmergencyStopper]) {
   const hash = await deployer.sendTransaction({ to: account.address, value: parseEther("2") });
   await publicClient.waitForTransactionReceipt({ hash });
 }
@@ -72,7 +74,7 @@ const registerHash = await deployer.writeContract({ address: deployed.contractAd
 await publicClient.waitForTransactionReceipt({ hash: registerHash });
 
 const genesis = await publicClient.getBlock({ blockNumber: 0n });
-const deployment = { brand: "CallSign", networkId: String(chain.id), genesisHash: genesis.hash, registryAddress: deployed.contractAddress, institutionId, deploymentBlock: String(deployed.blockNumber), deployTransaction: deployHash, registerTransaction: registerHash, approvers, administrator: accounts.administrator.address, emergencyStopper: accounts.emergencyStopper.address, approvalPublicKey };
+const deployment = { brand: "CallSign governance v1", networkId: String(chain.id), genesisHash: genesis.hash, registryAddress: deployed.contractAddress, institutionId, deploymentBlock: String(deployed.blockNumber), deployTransaction: deployHash, registerTransaction: registerHash, approvers, administrator: accounts.administrator.address, emergencyStopper: accounts.emergencyStopper.address, approvalPublicKey };
 await mkdir(dirname(deploymentPath), { recursive: true });
 await writeFile(deploymentPath, `${JSON.stringify(deployment, null, 2)}\n`, { mode: 0o600 });
 await writeFile(rolesPath, `${JSON.stringify({ privateKeys, addresses: Object.fromEntries(Object.entries(accounts).map(([role, account]) => [role, account.address])) }, null, 2)}\n`, { mode: 0o600 });

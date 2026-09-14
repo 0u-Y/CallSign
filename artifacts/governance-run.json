@@ -1,0 +1,16 @@
+{
+  "profile": "qbft-live-eip712-recovery-v1",
+  "browserContexts": 1,
+  "institutionId": "inst_mock_a_city_01HZZZZZZZZZZZZZZZZ",
+  "initialEpoch": 5,
+  "suspendedEpoch": 6,
+  "recoveredEpoch": 7,
+  "distinctApproverSessions": [
+    "approver_1",
+    "approver_2"
+  ],
+  "suspendTransaction": "0x35b3c4e6dee401e8f3afec9273f8ddc6be02cfeda877cc4568ae9a4e516b701e",
+  "recoveryTransaction": "0x7ed73aeb11fe8a80edae4f00908eabc752337676402c3aefa4c6b1df93e8696b",
+  "approvalKeyRotation": "preserved-in-demo",
+  "capturedAt": "2026-09-14T10:46:48.069Z"
+}

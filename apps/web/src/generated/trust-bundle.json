@@ -1,7 +1,7 @@
 {
   "networkId": "20260914",
   "genesisHash": "0xc6de8cb347b6b77fbbe3025c3bc439ca7446742008b14878e8fad909a56ea0fa",
-  "registryAddress": "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
+  "registryAddress": "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e",
   "policyVersion": "1",
   "witnessThreshold": 3,
   "witnessPublicKeys": [

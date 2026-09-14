@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T09:33:16.773Z",
+  "generatedAt": "2026-09-14T10:48:16.862Z",
   "environment": {
     "os": "linux",
     "arch": "x64",
@@ -10,9 +10,9 @@
     "database": "PostgreSQL 17"
   },
   "summary": {
-    "pass": 11,
+    "pass": 12,
     "fail": 0,
-    "blocked": 1,
+    "blocked": 0,
     "notRun": 3
   },
   "checks": [
@@ -29,7 +29,7 @@
       "label": "JCS/Ed25519 및 3-of-4 verifier",
       "status": "PASS",
       "command": "pnpm test",
-      "observation": "19건 통과, 0건 실패",
+      "observation": "20건 통과, 0건 실패",
       "evidence": "artifacts/vitest-results.json"
     },
     {
@@ -37,7 +37,7 @@
       "label": "PostgreSQL consume·인증 권한 통합",
       "status": "PASS",
       "command": "pnpm test:integration",
-      "observation": "9건 통과, 0건 실패",
+      "observation": "10건 통과, 0건 실패",
       "evidence": "artifacts/integration-results.json"
     },
     {
@@ -45,7 +45,7 @@
       "label": "Besu QBFT 4노드 동일 상태·계약 코드",
       "status": "PASS",
       "command": "tsx scripts/check-ledger.ts",
-      "observation": "4노드 공통 높이 4385, registry 10878 bytes",
+      "observation": "4노드 공통 높이 6912, registry 10878 bytes",
       "evidence": "artifacts/ledger-readiness.json",
       "scope": "동일 block/hash/code 관측; 네이티브 light-client 증명 아님"
     },
@@ -62,7 +62,7 @@
       "label": "두 브라우저 WebRTC 전송 결합·원장 취소",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4584B, 취소 표시 6728ms",
+      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4538B, 취소 표시 6691ms",
       "evidence": "artifacts/webrtc-run.json"
     },
     {
@@ -70,7 +70,7 @@
       "label": "반응형·주요 제품 브라우저 시험",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "10건 통과, 0건 실패, 74199ms",
+      "observation": "11건 통과, 0건 실패, 83083ms",
       "evidence": "artifacts/playwright-results.json"
     },
     {
@@ -78,7 +78,7 @@
       "label": "대표 화면 다중 viewport 캡처·육안 검수",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "12개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS",
+      "observation": "14개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS",
       "evidence": "artifacts/screenshots/"
     },
     {
@@ -94,7 +94,7 @@
       "label": "캐시 상태 verifier p95",
       "status": "PASS",
       "command": "pnpm test:benchmark",
-      "observation": "n=100, p95=3.11ms, 목표 ≤500ms",
+      "observation": "n=100, p95=1.72ms, 목표 ≤500ms",
       "evidence": "artifacts/verifier-benchmark.json",
       "scope": "네트워크 왕복 제외"
     },
@@ -109,10 +109,11 @@
     {
       "id": "governance-live-ui",
       "label": "공동 복구 UI의 실제 EIP-712 트랜잭션",
-      "status": "BLOCKED",
-      "command": "해당 없음",
-      "observation": "역할별 승인 기록 UX와 계약 테스트는 있으나 UI→Besu 실행 연결은 미완료",
-      "evidence": "docs/KNOWN-LIMITATIONS.md"
+      "status": "PASS",
+      "command": "pnpm test:e2e",
+      "observation": "qbft-live-eip712-recovery-v1, 승인자 2명, epoch 5→6→7",
+      "evidence": "artifacts/governance-run.json",
+      "scope": "관리자·정지키 교체; 승인용 Ed25519 키는 데모에서 유지"
     },
     {
       "id": "risk-assistant",

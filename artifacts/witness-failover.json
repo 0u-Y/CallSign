@@ -1,9 +1,9 @@
 {
-  "checkedAt": "2026-09-14T09:23:19Z",
+  "checkedAt": "2026-09-14T10:47:24Z",
   "oneWitnessStopped": {
     "status": "PASS",
     "signatures": 3,
-    "blockNumber": "4379"
+    "blockNumber": "6902"
   },
   "twoWitnessesStopped": {
     "status": "PASS",

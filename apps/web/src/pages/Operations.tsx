@@ -245,34 +245,68 @@ export function GatewayPage() {
 }
 
 export function GovernancePage() {
+  const institutionId = "inst_mock_a_city_01HZZZZZZZZZZZZZZZZ";
   const [proposalId, setProposalId] = useState("");
   const [signers, setSigners] = useState<string[]>([]);
-  const [message, setMessage] = useState("복구안은 운영자 세션에서 만들고, 승인자 세션 두 개가 각각 서명해야 합니다.");
+  const [ledgerState, setLedgerState] = useState<{ status: "Active" | "Suspended"; epoch: string } | null>(null);
+  const [transactionHash, setTransactionHash] = useState("");
+  const [message, setMessage] = useState("공동 운영 세션을 준비해 현재 원장 상태를 확인하세요.");
   const [busy, setBusy] = useState(false);
+
+  async function prepare() {
+    setBusy(true);
+    try {
+      await demoLogin("operator-demo");
+      const result = await api<{ state: { status: "Active" | "Suspended"; epoch: string } }>(`/governance/institutions/${institutionId}`);
+      setLedgerState(result.state);
+      setMessage(`원장 상태를 확인했습니다. ${result.state.status} · epoch ${result.state.epoch}`);
+    } catch (error) { setMessage(error instanceof Error ? error.message : "원장 상태 확인 실패"); }
+    finally { setBusy(false); }
+  }
+
+  async function suspend() {
+    setBusy(true);
+    try {
+      await demoLogin("operator-demo");
+      const result = await api<{ transactionHash: string; state: { status: "Active" | "Suspended"; epoch: string } }>(`/governance/institutions/${institutionId}/suspend`, { method: "POST", body: "{}" });
+      setLedgerState(result.state); setTransactionHash(result.transactionHash); setProposalId(""); setSigners([]);
+      setMessage(`긴급 정지가 원장에 확정됐습니다. epoch ${result.state.epoch}에서 복구안을 만드세요.`);
+    } catch (error) { setMessage(error instanceof Error ? error.message : "긴급 정지 실패"); }
+    finally { setBusy(false); }
+  }
 
   async function createProposal() {
     setBusy(true);
     try {
       await demoLogin("operator-demo");
-      const result = await api<{ proposal: { id: string } }>("/governance/proposals", { method: "POST", body: JSON.stringify({ action: "RECOVER", institutionId: "inst_mock_a_city_01HZZZZZZZZZZZZZZZZ", payload: { expectedEpoch: "2", action: "replace-separated-keys" } }) });
-      setProposalId(result.proposal.id); setSigners([]); setMessage("복구안을 만들었습니다. 승인자 1과 2가 각자 서명하세요.");
+      const result = await api<{ proposal: { id: string; payload: { expectedEpoch: string } } }>("/governance/proposals", { method: "POST", body: JSON.stringify({ action: "RECOVER", institutionId }) });
+      setProposalId(result.proposal.id); setSigners([]); setTransactionHash("");
+      setMessage(`epoch ${result.proposal.payload.expectedEpoch} 복구안을 만들었습니다. 승인자 1과 2가 각자 서명하세요.`);
     } catch (error) { setMessage(error instanceof Error ? error.message : "복구안 생성 실패"); }
     finally { setBusy(false); }
   }
+
   async function sign(index: 1 | 2 | 3) {
     if (!proposalId) return;
     setBusy(true);
     try {
       await demoLogin(`approver-${index}-demo`);
-      const result = await api<{ signerUserId: string; signerCount: number; status: string }>(`/governance/proposals/${proposalId}/sign`, { method: "POST", body: "{}" });
-      setSigners((current) => [...current, result.signerUserId]); setMessage(`승인자 ${index} 서명을 기록했습니다. 현재 ${result.signerCount}/2 · ${result.status}`);
+      const result = await api<{ signerUserId: string; signerCount: number; status: string; transactionHash?: string; state?: { status: "Active" | "Suspended"; epoch: string } }>(`/governance/proposals/${proposalId}/sign`, { method: "POST", body: "{}" });
+      setSigners((current) => [...current, result.signerUserId]);
+      if (result.status === "executed" && result.state && result.transactionHash) {
+        setLedgerState(result.state); setTransactionHash(result.transactionHash);
+        setMessage(`2-of-3 실제 EIP-712 복구가 원장에 확정됐습니다. Active · epoch ${result.state.epoch}`);
+      } else setMessage(`승인자 ${index}의 실제 EIP-712 서명을 기록했습니다. 현재 ${result.signerCount}/2`);
     } catch (error) { setMessage(error instanceof Error ? error.message : "서명 실패"); }
     finally { setBusy(false); }
   }
-  return <OperationsLayout title="공동 운영" description="긴급 정지 이후 복구는 서로 다른 승인자 2명의 명시적 동작이 필요합니다.">
-    <div className="governance-layout"><section className="proposal-panel"><div className="proposal-title"><div className="proposal-icon"><LockKeyhole /></div><div><span className="small-label">모의 A시청 · 복구</span><h2>새 관리자·승인키·정지키 등록</h2><p>expected epoch 2 → recovered epoch 3</p></div></div><button className="button primary" onClick={createProposal} disabled={busy}>{proposalId ? "복구안 다시 만들기" : "복구안 만들기"}</button><p className="inline-message">{message}</p></section>
-      <section className="approver-list" aria-label="공동 승인자"><h2>서명자 세션</h2>{[1, 2, 3].map((index) => { const signed = signers.some((value) => value.includes(`approver_${index}`)); return <article key={index}><span className={`avatar ${signed ? "signed" : ""}`}>{signed ? <Check /> : index}</span><div><strong>공동 승인자 {index}</strong><small>{signed ? "서명 기록됨" : "아직 서명하지 않음"}</small></div><button className="button secondary" onClick={() => sign(index as 1 | 2 | 3)} disabled={!proposalId || signed || busy}>이 세션으로 서명</button></article>; })}</section>
-    </div><p className="technical-note governance-note">이 콘솔은 서로 다른 로그인 세션의 동작을 기록합니다. 현재 API의 해시 기록은 역할 UX 검증용이며, 실제 EIP-712 서명 제출과 Besu 트랜잭션 실행 연결은 별도 진행 상태입니다.</p>
+
+  return <OperationsLayout title="공동 운영" description="긴급 정지 이후 복구는 서로 다른 승인자 2명의 실제 EIP-712 서명으로만 실행됩니다.">
+    <div className="session-bar"><div><span className={`session-dot ${ledgerState?.status === "Suspended" ? "warning" : ""}`} />{ledgerState ? `모의 A시청 · ${ledgerState.status} · epoch ${ledgerState.epoch}` : "원장 상태 확인 전"}</div><div className="button-row"><button className="button secondary" onClick={prepare} disabled={busy}>공동 운영 세션 준비</button><button className="button danger" onClick={suspend} disabled={busy || ledgerState?.status !== "Active"}>기관 긴급 정지</button></div></div>
+    <p className="inline-message" aria-live="polite">{message}</p>
+    <div className="governance-layout"><section className="proposal-panel"><div className="proposal-title"><div className="proposal-icon"><LockKeyhole /></div><div><span className="small-label">모의 A시청 · 복구</span><h2>관리키·정지키 교체 복구</h2><p>{ledgerState?.status === "Active" && proposalId ? `복구 완료 · current epoch ${ledgerState.epoch}` : ledgerState ? `expected epoch ${ledgerState.epoch} → recovered epoch ${Number(ledgerState.epoch) + 1}` : "정지 상태를 먼저 확인하세요"}</p></div></div><button className="button primary" onClick={createProposal} disabled={busy || ledgerState?.status !== "Suspended"}>{ledgerState?.status === "Active" && proposalId ? "복구 완료" : proposalId ? "복구안 다시 만들기" : "복구안 만들기"}</button>{transactionHash && <p className="transaction-proof"><Check size={17} />원장 transaction <code>{transactionHash}</code></p>}</section>
+      <section className="approver-list" aria-label="공동 승인자"><h2>서명자 세션</h2>{[1, 2, 3].map((index) => { const signed = signers.some((value) => value.includes(`approver_${index}`)); return <article key={index}><span className={`avatar ${signed ? "signed" : ""}`}>{signed ? <Check /> : index}</span><div><strong>공동 승인자 {index}</strong><small>{signed ? "EIP-712 서명 기록됨" : "아직 서명하지 않음"}</small></div><button className="button secondary" onClick={() => sign(index as 1 | 2 | 3)} disabled={!proposalId || signed || busy || ledgerState?.status !== "Suspended"}>이 세션으로 서명</button></article>; })}</section>
+    </div><p className="technical-note governance-note">각 버튼은 다른 역할의 HttpOnly 세션으로 전환해 별도 승인자 키의 EIP-712 서명을 생성합니다. 키가 한 로컬 데모 환경에 있다는 한계와 실제 독립 기관 운영은 구분합니다. 현재 복구는 관리자·정지키를 교체하고 승인용 Ed25519 키는 유지합니다.</p>
   </OperationsLayout>;
 }
 

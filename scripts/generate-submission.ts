@@ -197,7 +197,7 @@ function card(s: PptxGenJS.Slide, x: number, y: number, w: number, h: number, ti
     s.addText(body, { x: x + 0.2, y: 3.62, w: 2.3, h: 1.38, fontSize: 14.5, color: C.muted, margin: 0, fit: "shrink" });
   });
   s.addText("현재 구현", { x: 0.72, y: 6.08, w: 1.18, h: 0.28, fontSize: 14, bold: true, color: C.tealDark, margin: 0 });
-  s.addText("Besu 4노드 · witness 4개 · 계약 · 승인/소비 · 두 브라우저 WebRTC · 실제 취소 · 공식 업무 권한 · 규칙 기반 위험 안내", { x: 1.95, y: 6.04, w: 10.2, h: 0.35, fontSize: 14, color: C.muted, margin: 0, fit: "shrink" });
+  s.addText("Besu 4노드 · witness 4개 · 승인/소비 · 두 브라우저 WebRTC · 실제 취소·2-of-3 복구 · 공식 업무 권한 · 규칙 위험 안내", { x: 1.95, y: 6.04, w: 10.2, h: 0.35, fontSize: 14, color: C.muted, margin: 0, fit: "shrink" });
   note(s, "공식 일정: 접수 9.14 · OT/멘토링 시작 9.19 · 멘토링 ~11.5 · 본선 11.6–7 (blockhack.kr, 2026.09.14 확인).");
 }
 
@@ -225,7 +225,7 @@ function card(s: PptxGenJS.Slide, x: number, y: number, w: number, h: number, ti
   const s = slide("소스·자동 시험·실제 실행 화면으로 구현 범위를 증명합니다", "08  개발증빙 및 레퍼런스");
   s.addShape(pptx.ShapeType.roundRect, { x: 0.65, y: 2.0, w: 5.95, h: 4.36, fill: { color: C.navy }, line: { color: C.navy } });
   s.addText("실제 개발증빙", { x: 1.0, y: 2.35, w: 2.2, h: 0.34, fontSize: 21, bold: true, color: C.white, margin: 0 });
-  s.addText("• Foundry 계약 5/5\n• Vitest 프로토콜·위험 분석 19/19\n• PostgreSQL/API 통합 9/9\n• Playwright 10/10\n• QBFT 4노드 동일 block/code\n• witness 1개 중단 제공 / 2개 중단 503\n• 실제 WebRTC DTLS·audio·revoke 캡처", { x: 1.0, y: 2.95, w: 4.95, h: 2.4, fontSize: 14.3, color: "DCE9ED", margin: 0, fit: "shrink" });
+  s.addText("• Foundry 계약 5/5\n• Vitest 프로토콜·위험 분석 20/20\n• PostgreSQL/API 통합 10/10\n• Playwright 11/11\n• QBFT 4노드 동일 block/code\n• witness 1개 중단 제공 / 2개 중단 503\n• WebRTC·revoke·2-of-3 복구 LIVE 캡처", { x: 1.0, y: 2.95, w: 4.95, h: 2.4, fontSize: 14.3, color: "DCE9ED", margin: 0, fit: "shrink" });
   s.addText("선택 제출 · GitHub 소스코드 1건", { x: 1.0, y: 5.72, w: 4.6, h: 0.3, fontSize: 14, bold: true, color: "54D2C5", margin: 0 });
   s.addText("github.com/0u-Y/CallSign", { x: 1.0, y: 6.05, w: 4.6, h: 0.2, fontSize: 10.5, color: "DCE9ED", margin: 0 });
 

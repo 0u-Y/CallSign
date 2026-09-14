@@ -45,7 +45,7 @@ import {
   users,
   verifierEvents,
 } from "./schema.js";
-import { ensureLedgerDelegation, loadLedgerDeployment, revokeLedgerDelegation } from "./ledger.js";
+import { ensureLedgerDelegation, loadLedgerDeployment, realGovernanceLedger, revokeLedgerDelegation, type GovernanceLedger, type RecoveryRequestPayload } from "./ledger.js";
 import { analyzeTranscript } from "./risk.js";
 
 export interface ServerOptions {
@@ -55,11 +55,27 @@ export interface ServerOptions {
   keyDirectory: string;
   logger?: boolean;
   now?: () => number;
+  governanceLedger?: GovernanceLedger;
 }
 
 const FALLBACK_NETWORK_ID = "20260914";
 const FALLBACK_REGISTRY_ADDRESS = "0x1111111111111111111111111111111111111111";
 const INSTITUTION_ID = "inst_mock_a_city_01HZZZZZZZZZZZZZZZZ";
+const recoveryRequestSchema = z.object({
+  institutionId: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+  expectedEpoch: z.string().regex(/^\d+$/),
+  newAdministrator: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  newApprovalPublicKey: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+  newEmergencyStopper: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  nonce: z.string().regex(/^0x[0-9a-fA-F]{64}$/),
+  deadline: z.string().regex(/^\d+$/),
+}).strict();
+
+function ledgerHttpError(error: unknown): HttpError {
+  const code = error instanceof Error ? error.message : "LEDGER_OPERATION_FAILED";
+  const conflict = code.includes("NOT_ACTIVE") || code.includes("NOT_SUSPENDED") || code.includes("CONFLICT") || code.includes("FINALIZED");
+  return new HttpError(conflict ? 409 : 503, code);
+}
 
 export async function buildServer(options: ServerOptions): Promise<FastifyInstance> {
   const app = Fastify({ logger: options.logger ? { redact: ["req.headers.cookie", "req.headers.x-csrf-token", "body.signedJws"] } : false, bodyLimit: 32 * 1024 });
@@ -70,6 +86,7 @@ export async function buildServer(options: ServerOptions): Promise<FastifyInstan
   const networkId = ledger?.networkId ?? FALLBACK_NETWORK_ID;
   const registryAddress = ledger?.registryAddress ?? FALLBACK_REGISTRY_ADDRESS;
   const now = options.now ?? (() => Math.floor(Date.now() / 1000));
+  const governanceLedger = options.governanceLedger ?? realGovernanceLedger;
   await app.register(cookie);
   await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
   await app.register(websocket);
@@ -333,12 +350,28 @@ export async function buildServer(options: ServerOptions): Promise<FastifyInstan
     return { proposals: await db.select().from(governanceProposals).orderBy(desc(governanceProposals.createdAt)) };
   });
 
+  app.get("/governance/institutions/:institutionId", async (request) => {
+    const session = await sessionForRequest(db, request);
+    requireRole(session, "approver", "demo_operator");
+    const { institutionId } = z.object({ institutionId: z.string().min(16).max(128) }).strict().parse(request.params);
+    return { state: await governanceLedger.state(institutionId).catch((error) => { throw ledgerHttpError(error); }) };
+  });
+
+  app.post("/governance/institutions/:institutionId/suspend", async (request) => {
+    const session = await protectedWrite(db, request, options.webOrigin);
+    requireRole(session, "demo_operator");
+    if (!options.demoMode) throw new HttpError(404, "DEMO_CONTROL_DISABLED");
+    const { institutionId } = z.object({ institutionId: z.string().min(16).max(128) }).strict().parse(request.params);
+    return governanceLedger.suspend(institutionId).catch((error) => { throw ledgerHttpError(error); });
+  });
+
   app.post("/governance/proposals", async (request) => {
     const session = await protectedWrite(db, request, options.webOrigin);
     requireRole(session, "demo_operator");
     if (!options.demoMode) throw new HttpError(404, "DEMO_CONTROL_DISABLED");
-    const body = z.object({ action: z.enum(["REGISTER", "RECOVER"]), institutionId: z.string().min(16), payload: z.record(z.string(), z.unknown()) }).strict().parse(request.body);
-    const proposal = { id: randomId("proposal"), action: body.action, institutionId: body.institutionId, payload: body.payload, status: "collecting" };
+    const body = z.object({ action: z.literal("RECOVER"), institutionId: z.string().min(16).max(128) }).strict().parse(request.body);
+    const payload = await governanceLedger.createRecovery(body.institutionId, now()).catch((error) => { throw ledgerHttpError(error); });
+    const proposal = { id: randomId("proposal"), action: body.action, institutionId: body.institutionId, payload, status: "collecting" };
     await db.insert(governanceProposals).values(proposal);
     return { proposal };
   });
@@ -349,12 +382,16 @@ export async function buildServer(options: ServerOptions): Promise<FastifyInstan
     const { id } = z.object({ id: z.string() }).parse(request.params);
     const proposal = (await db.select().from(governanceProposals).where(eq(governanceProposals.id, id)).limit(1))[0];
     if (!proposal) throw new HttpError(404, "PROPOSAL_NOT_FOUND");
-    const signature = createHash("sha256").update(`${id}:${session.userId}:${JSON.stringify(proposal.payload)}`).digest("hex");
+    if (proposal.status !== "collecting") throw new HttpError(409, "PROPOSAL_ALREADY_FINALIZED");
+    const payload = recoveryRequestSchema.parse(proposal.payload) as RecoveryRequestPayload;
+    const signature = await governanceLedger.signRecovery(payload, session.userId).catch((error) => { throw ledgerHttpError(error); });
     const inserted = await db.insert(proposalSignatures).values({ proposalId: id, signerUserId: session.userId, signature }).onConflictDoNothing().returning();
     if (!inserted[0]) throw new HttpError(409, "SIGNER_ALREADY_COUNTED");
     const all = await db.select().from(proposalSignatures).where(eq(proposalSignatures.proposalId, id));
-    if (all.length >= 2) await db.update(governanceProposals).set({ status: "quorum-ready" }).where(eq(governanceProposals.id, id));
-    return { signerUserId: session.userId, signerCount: all.length, status: all.length >= 2 ? "quorum-ready" : "collecting", warning: "이 API 서명은 역할 분리 UX 증거이며 실제 EIP-712 실행은 원장 트랜잭션 단계에서 별도 수행됩니다." };
+    if (all.length < 2) return { signerUserId: session.userId, signerCount: all.length, status: "collecting" };
+    const executed = await governanceLedger.submitRecovery(payload, all.map((entry) => entry.signature as `0x${string}`)).catch((error) => { throw ledgerHttpError(error); });
+    await db.update(governanceProposals).set({ status: "executed", payload: { ...payload, execution: executed } }).where(eq(governanceProposals.id, id));
+    return { signerUserId: session.userId, signerCount: all.length, status: "executed", ...executed, warning: "각 승인자 세션은 서로 다른 EIP-712 서명을 만들었습니다. 데모 키가 한 로컬 환경에 저장된 한계는 별도로 표시합니다." };
   });
 
   app.get("/runs/:id", async (request) => runResponse(db, request));

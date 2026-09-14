@@ -209,6 +209,7 @@ p { color: var(--muted); }
 .session-bar { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 10px 8px 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
 .session-bar > div:first-child { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
 .session-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--teal); }
+.session-dot.warning { background: var(--amber); }
 .inline-message { min-height: 24px; margin: 12px 4px 24px; font-size: 13px; }
 .console-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; }
 .console-grid.wide-main { grid-template-columns: minmax(0, 1fr) 340px; }
@@ -247,6 +248,9 @@ p { color: var(--muted); }
 .avatar.signed { color: #fff; background: var(--teal); }
 .avatar svg { width: 18px; }
 .governance-note { margin: 18px 4px 0; }
+.transaction-proof { display: flex; align-items: flex-start; gap: 8px; margin: 18px 0 0; color: var(--teal-dark); font-size: 13px; }
+.transaction-proof svg { flex: 0 0 17px; margin-top: 2px; }
+.transaction-proof code { min-width: 0; overflow-wrap: anywhere; color: var(--muted); }
 
 .content-page { padding-top: 56px; }
 .evidence-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }

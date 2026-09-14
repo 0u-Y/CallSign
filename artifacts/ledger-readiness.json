@@ -1,16 +1,16 @@
 {
-  "checkedAt": "2026-09-14T09:23:26.919Z",
+  "checkedAt": "2026-09-14T10:47:40.695Z",
   "profile": "qbft-4-node-plus-independent-witness-processes",
   "nodeHeights": [
-    "4385",
-    "4385",
-    "4385",
-    "4385"
+    "6912",
+    "6912",
+    "6912",
+    "6912"
   ],
-  "commonHeight": "4385",
-  "commonBlockHash": "0xe13547781ac901c59a35dc72019ca680b40c15661ee392c262c01f47262e5d32",
+  "commonHeight": "6912",
+  "commonBlockHash": "0x1faf376ac6ba2ccf686f728c05d5b732c2ea18cd32918571e28f31f8e114ad36",
   "genesisHash": "0xc6de8cb347b6b77fbbe3025c3bc439ca7446742008b14878e8fad909a56ea0fa",
-  "registryAddress": "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853",
+  "registryAddress": "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e",
   "registryCodeBytes": 10878,
   "witnesses": [
     {
@@ -22,7 +22,7 @@
         "x": "7USzP-koFS9c7k5ZxHd-q5PLuEIMhOskJbvV6vuafg4",
         "kty": "OKP"
       },
-      "blockNumber": "4383",
+      "blockNumber": "6911",
       "rpcBoundary": "http://besu1:8545"
     },
     {
@@ -34,7 +34,7 @@
         "x": "2gMr7BwZcES_6pWQ30yuQd3HUScYILOz3YnPuXl4PHo",
         "kty": "OKP"
       },
-      "blockNumber": "4384",
+      "blockNumber": "6912",
       "rpcBoundary": "http://besu2:8545"
     },
     {
@@ -46,7 +46,7 @@
         "x": "22jy1Mgk0l71VXmBGp3O4e2JAGdcvl4zd2ts4Z1wC1U",
         "kty": "OKP"
       },
-      "blockNumber": "4383",
+      "blockNumber": "6912",
       "rpcBoundary": "http://besu3:8545"
     },
     {
@@ -58,7 +58,7 @@
         "x": "PyY9BjmMPHwICcNxCzngBtPjrtuYZwh5ZxzX1y7Uxxk",
         "kty": "OKP"
       },
-      "blockNumber": "4383",
+      "blockNumber": "6912",
       "rpcBoundary": "http://besu4:8545"
     }
   ]

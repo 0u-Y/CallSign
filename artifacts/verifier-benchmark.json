@@ -1,10 +1,10 @@
 {
-  "checkedAt": "2026-09-14T09:23:26.694Z",
+  "checkedAt": "2026-09-14T10:47:26.071Z",
   "profile": "cached-canonical-state-bundle-browser-compatible-verifier",
   "sampleCount": 100,
-  "p50Ms": 1.029201999999941,
-  "p95Ms": 3.105291999999963,
-  "maxMs": 9.278904000000011,
+  "p50Ms": 0.894835999999998,
+  "p95Ms": 1.717234999999988,
+  "maxMs": 5.388125000000002,
   "targetP95Ms": 500,
   "targetMet": true,
   "note": "네트워크 왕복을 제외하고 JCS payload 및 Ed25519 witness 4개를 실제 검증한 Node 22 측정값"

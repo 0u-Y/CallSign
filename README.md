@@ -49,6 +49,7 @@ pnpm demo:down
 - PostgreSQL unique constraint 기반 승인서 원자적 1회 소비와 동일 binding 멱등 재시도
 - 인증된 WebSocket signaling, 별도 브라우저 context 2개의 BUNDLE WebRTC, 수락 전 0 audio bytes와 수락 후 RTP 증가
 - 역할 세션·Origin/CSRF·공식 업무 객체 권한·WebSocket 방 접근 통제
+- 공동 운영 화면의 실제 긴급 정지와 서로 다른 승인자 2명의 EIP-712 서명, Besu 복구 트랜잭션·epoch 전환
 - 원장 `directoryHash`와 일치하는 고정 `/official` 디렉터리, 별도 로그인·객체 권한 검사
 - 동의한 합성 전사문의 규칙 기반 위험 신호 설명과 localhost 전용 Ollama structured-output adapter. 결과는 인증 상태와 독립
 - 한국어 반응형 UI와 390/768/1440px·200% 확대 Playwright 검수
@@ -59,7 +60,7 @@ pnpm demo:down
 
 - P2 네이티브 QBFT header/commit seal 및 EIP-1186 storage proof 검증
 - 실제 통신사 SIP/RCD/STIR 연동, TURN을 둔 다중 장치·모바일 브라우저 검증
-- 공동 운영 화면에서 수집한 서명을 실제 복구 트랜잭션으로 제출하는 통합 경로
+- 복구 시 관리자·정지키는 교체하지만 실행 중 issuer와의 정합성을 위해 승인용 Ed25519 키는 유지. 실제 운영용 키 회전·HSM 절차
 - 로컬 Ollama 모델의 실제 추론 실행. adapter와 규칙 fallback은 구현했지만 모델은 자동 다운로드하지 않았고 이번 결과에서는 NOT-RUN입니다.
 - 실제 기관 채택, 보안 인증, 전국 배포, 외부 공개 데모 URL
 
