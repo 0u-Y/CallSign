@@ -43,13 +43,14 @@ const BOB_ID = "recipient_bob_01HZZZZZZZZZZZZZZZZZZZZZZZZ";
 const TOTAL_STEPS = 14;
 
 const acts = [
-  { id: "normal", title: "정상 승인", result: "연결 확인" },
-  { id: "attack", title: "사칭·복사", result: "대상 불일치" },
-  { id: "revoke", title: "권한 취소", result: "인증 철회" },
-  { id: "recovery", title: "공동 복구", result: "새 권한 연결" },
+  { id: "normal", title: "승인된 정상 연락", result: "승인 → 연결 → 공식 업무" },
+  { id: "attack", title: "기관명 사칭·증명 복사", result: "두 공격을 각각 차단" },
+  { id: "revoke", title: "통화 중 위임 취소", result: "통화 유지 · 인증 철회" },
+  { id: "recovery", title: "기관 정지·공동 복구", result: "2-of-3 복구 · 새 위임" },
 ] as const;
 
 type ActId = typeof acts[number]["id"];
+type PlaybackPace = "presentation" | "fast";
 type NodeId = "institution" | "gateway" | "receiver" | "official";
 type Tone = "idle" | "working" | "pass" | "blocked";
 type LinkId = "approval" | "call" | "official";
@@ -106,6 +107,7 @@ const initialLedger: LedgerState = { title: "현재 권한 제공", detail: "Bes
 export function PresentationDemo() {
   const [running, setRunning] = useState(false);
   const [finished, setFinished] = useState(false);
+  const [playbackPace, setPlaybackPace] = useState<PlaybackPace>("presentation");
   const [step, setStep] = useState(0);
   const [activeAct, setActiveAct] = useState<ActId>("normal");
   const [completedActs, setCompletedActs] = useState<ActId[]>([]);
@@ -123,6 +125,7 @@ export function PresentationDemo() {
   const authorizationRef = useRef<SignedAuthorization | null>(null);
 
   const progress = Math.round((step / TOTAL_STEPS) * 100);
+  const activeActIndex = acts.findIndex((act) => act.id === activeAct);
   const visibleEvents = useMemo(() => events.slice(-4), [events]);
 
   useEffect(() => () => transportRef.current?.close(), []);
@@ -177,7 +180,7 @@ export function PresentationDemo() {
     setApprovals(0);
     setAudioBytes(0);
 
-    const dwell = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 80 : 620;
+    const dwell = playbackPace === "presentation" ? 3200 : 450;
     let guard = new MonotonicStateGuard();
     let observedAudioBytes = 0;
 
@@ -425,21 +428,40 @@ export function PresentationDemo() {
           <p>한 번 시작하면 실제 검사가 끝나는 순서대로 승인서, 권한 상태, 통화 연결과 공식 업무가 움직입니다.</p>
           <div className="flow-mode"><Radio />발표 데모 · BROWSER LIVE + RECORDED LIVE</div>
         </div>
-        <button className="flow-start" onClick={() => { void runDemo(); }} disabled={running}>
-          {running ? <><RefreshCw className="spin" /><span><strong>실제 검사 실행 중</strong><small>{progress}% · {step}/{TOTAL_STEPS}</small></span></> : finished ? <><RefreshCw /><span><strong>처음부터 다시 보기</strong><small>전체 흐름 재실행</small></span></> : <><Play /><span><strong>전체 흐름 자동 시연</strong><small>정상 → 공격 → 취소 → 복구</small></span></>}
-        </button>
+        <div className="flow-controls">
+          <label className="flow-pace">
+            <span>재생 속도</span>
+            <select value={playbackPace} onChange={(event) => setPlaybackPace(event.target.value as PlaybackPace)} disabled={running}>
+              <option value="presentation">발표 속도 · 약 50초</option>
+              <option value="fast">빠른 확인 · 약 15초</option>
+            </select>
+          </label>
+          <button className="flow-start" onClick={() => { void runDemo(); }} disabled={running}>
+            {running ? <><RefreshCw className="spin" /><span><strong>실제 검사 실행 중</strong><small>{progress}% · 검증 {step}/{TOTAL_STEPS}</small></span></> : finished ? <><RefreshCw /><span><strong>처음부터 다시 보기</strong><small>4개 시나리오 재실행</small></span></> : <><Play /><span><strong>전체 흐름 자동 시연</strong><small>4개 독립 시나리오 연속 실행</small></span></>}
+          </button>
+        </div>
       </header>
 
-      <section className="act-track" aria-label="데모 장면 진행 상태">
-        <div className="act-progress" aria-hidden="true"><span style={{ transform: `scaleX(${progress / 100})` }} /></div>
-        {acts.map((act, index) => {
-          const complete = completedActs.includes(act.id);
-          const active = activeAct === act.id && (running || finished);
-          return <div key={act.id} className={`act-stop ${complete ? "complete" : ""} ${active ? "active" : ""}`}>
-            <span>{complete ? <Check /> : index + 1}</span>
-            <div><strong>{act.title}</strong><small>{act.result}</small></div>
-          </div>;
-        })}
+      <section className="scenario-overview" aria-labelledby="scenario-overview-title">
+        <header className="scenario-heading">
+          <div>
+            <strong id="scenario-overview-title">4개 독립 시나리오</strong>
+            <span>한 업무의 4단계가 아니라, 서로 다른 상황을 차례로 검증합니다.</span>
+          </div>
+          <p><span>현재 시나리오</span><strong>{activeActIndex + 1} / {acts.length}</strong></p>
+        </header>
+        <div className="act-track" aria-label="독립 시나리오 진행 상태">
+          <div className="act-progress" aria-hidden="true"><span style={{ transform: `scaleX(${progress / 100})` }} /></div>
+          {acts.map((act, index) => {
+            const complete = completedActs.includes(act.id);
+            const active = activeAct === act.id && (running || finished);
+            return <div key={act.id} className={`act-stop ${complete ? "complete" : ""} ${active ? "active" : ""}`}>
+              <span className="scenario-number">{index + 1}</span>
+              <div className="scenario-copy"><small>시나리오 {index + 1}</small><strong>{act.title}</strong><em>{act.result}</em></div>
+              <span className="scenario-status">{complete ? <><Check />완료</> : active ? "진행 중" : "대기"}</span>
+            </div>;
+          })}
+        </div>
       </section>
 
       <section className={`signal-stage act-${activeAct}`} aria-live="polite">

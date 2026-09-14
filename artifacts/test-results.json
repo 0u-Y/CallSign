@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-09-14T13:05:32.503Z",
+  "generatedAt": "2026-09-14T13:59:09.318Z",
   "environment": {
     "os": "linux",
     "arch": "x64",
@@ -62,7 +62,7 @@
       "label": "두 브라우저 WebRTC 전송 결합·원장 취소",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4622B, 취소 표시 4391ms",
+      "observation": "chromium-dtls-certificate-v1, 수락 전 0B/후 4564B, 취소 표시 6669ms",
       "evidence": "artifacts/webrtc-run.json"
     },
     {
@@ -70,7 +70,7 @@
       "label": "반응형·주요 제품 브라우저 시험",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "12건 통과, 0건 실패, 87905ms",
+      "observation": "12건 통과, 0건 실패, 86275ms",
       "evidence": "artifacts/playwright-results.json"
     },
     {
@@ -111,7 +111,7 @@
       "label": "공동 복구 UI의 실제 EIP-712 트랜잭션",
       "status": "PASS",
       "command": "pnpm test:e2e",
-      "observation": "qbft-live-eip712-recovery-v1, 승인자 2명, epoch 13→14→15",
+      "observation": "qbft-live-eip712-recovery-v1, 승인자 2명, epoch 15→16→17",
       "evidence": "artifacts/governance-run.json",
       "scope": "관리자·정지키 교체; 승인용 Ed25519 키는 데모에서 유지"
     },

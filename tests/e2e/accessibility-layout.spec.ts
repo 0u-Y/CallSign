@@ -31,10 +31,16 @@ test("primary demo action remains keyboard reachable at 200% page scale", async 
 test("one-button presentation animates the full verified flow", async ({ page }) => {
   await page.goto("/demo");
 
+  await expect(page.getByText("4개 독립 시나리오", { exact: true })).toBeVisible();
+  await expect(page.getByText(/한 업무의 4단계가 아니라/)).toBeVisible();
+  await expect(page.locator(".scenario-number")).toHaveText(["1", "2", "3", "4"]);
+  await expect(page.getByLabel("재생 속도")).toHaveValue("presentation");
+  await page.getByLabel("재생 속도").selectOption("fast");
   await page.getByRole("button", { name: /전체 흐름 자동 시연/ }).click();
   await expect(page.getByText(/전체 흐름 검증 완료/)).toBeVisible({ timeout: 35_000 });
   await expect(page.getByRole("button", { name: /처음부터 다시 보기/ })).toBeVisible();
   await expect(page.locator(".act-stop.complete")).toHaveCount(4);
+  await expect(page.locator(".scenario-number")).toHaveText(["1", "2", "3", "4"]);
   await expect(page.locator(".stage-readout")).toContainText("NEW EPOCH");
   await expect(page.locator(".evidence-ribbon")).toContainText("새 권한으로 재연결");
   await expect(page.locator(".evidence-ribbon")).toContainText(/audio [1-9][0-9]*B/);
