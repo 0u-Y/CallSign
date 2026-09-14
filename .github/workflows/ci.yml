@@ -38,4 +38,4 @@ jobs:
       - run: pnpm build
       - run: pnpm test
       - run: pnpm test:contracts
-      - run: pnpm test:integration
+      - run: SKIP_DB_START=1 pnpm test:integration

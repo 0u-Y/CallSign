@@ -48,6 +48,7 @@
 - 2026-09-14: 공동 복구의 중복 signer·비승인 역할·확정 뒤 추가 서명을 거절하는 통합 시험과 실제 QBFT 브라우저 E2E를 추가했다. 데스크톱·390px 캡처를 열어 가로 넘침과 상태 문구를 검수했다.
 - 2026-09-14: 전체 회귀 시험을 Foundry 5/5, Vitest 20/20, API 통합 10/10, Playwright 11/11로 통과했다. 시험 보고서는 PASS 12·FAIL 0·BLOCKED 0·NOT-RUN 3이다.
 - 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다. 커밋 `11a99f8` 기준 CI를 확인 중이다.
+- 2026-09-14: 첫 GitHub Actions에서 workflow PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
 
 ## In progress
 
