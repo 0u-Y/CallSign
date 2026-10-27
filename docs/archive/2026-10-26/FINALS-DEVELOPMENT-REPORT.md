@@ -1,8 +1,9 @@
+> **과거 기록 — 2026-10-26.** 아래 구현 상태·검증 수치·Git 상태는 당시 기록이며 현재 상태가 아닙니다. 최신 설명은 [멘토링 자료](../../mentoring/README.md), 개발 현황은 [진행표](../../FINALS-IMPLEMENTATION-PLAN.md)를 따릅니다.
+
 # CallSign 본선 개발 통합 결과 보고서
 
 - 작성 기준: 2026-10-26 개발 작업 및 저장소에 남은 검증 기록.
 - 저장소: https://github.com/0u-Y/CallSign
-- 작업 디렉터리: `/home/ana/Desktop/yyw/CallSign`
 - 개발 시작 기준 커밋: `7aa26d90b9156c245e160283b1477360a6697cec`.
 - Git 상태: 개발 시작 시 작업 트리는 깨끗했다. 현재 개발 변경은 미커밋 상태이며 commit·push·배포는 하지 않았다.
 - 개발 환경: 사용자가 지정한 RAM 64GB 서버컴. 검증 기록의 실행 환경은 Linux x64, Node.js `v22.22.2`, pnpm `11.27.0`이다. 이후 GCP VM 이전을 준비한다.

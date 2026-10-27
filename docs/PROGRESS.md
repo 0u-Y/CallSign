@@ -4,7 +4,7 @@
 
 ## Understood as
 
-현재 `/home/ana/Desktop/yyw/institution-proof` 자체를 프로젝트 루트로 사용한다. 상위 저장소의 다른 미커밋 변경은 보존한다. P0의 실제 보안 연결과 11쪽 제출물을 우선 완성하고, P1/P2는 실행 결과에 따라 PASS/BLOCKED/NOT-RUN을 정확히 구분한다.
+당시 `institution-proof/`를 프로젝트 루트로 사용했다. 상위 저장소의 다른 미커밋 변경은 보존한다. P0의 실제 보안 연결과 11쪽 제출물을 우선 완성하고, P1/P2는 실행 결과에 따라 PASS/BLOCKED/NOT-RUN을 정확히 구분한다.
 
 2026-09-14 추가 입력은 공개 제품명을 **CallSign**, 팀명을 **TEAM Signal**, 팀 구성을 양영우·이가은 2인으로 확정한 것으로 이해한다. 선택 제출은 영상이 아니라 **공개 GitHub 소스코드 1건**으로 전환한다. 사용자가 제공한 제안서의 문제·선행사례·팀 이력을 반영하되, 저장소와 다른 기술 스택(Next.js/FastAPI), 미실행 AI, 3-of-4 공동 복구처럼 실제 구현과 충돌하는 표현은 현재 React/Fastify, 규칙 fallback/선택 Ollama, 2-of-3 복구로 정정한다.
 

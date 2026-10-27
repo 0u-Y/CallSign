@@ -61,6 +61,6 @@ TypeScript/pnpm, React/Vite, Fastify, PostgreSQL/Drizzle, Ed25519/JWS, Solidity/
 
 ## 문서와 증거
 
-[아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [설계 결정](docs/adr/0002-finals-offline.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [공식 표준](docs/STANDARDS.md) · [본선 추적표](docs/FINALS-IMPLEMENTATION-PLAN.md) · [4회차 멘토링/최종 보고서](submission/FINALS-ROUND4.md).
+[아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [설계 결정](docs/adr/0002-finals-offline.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [공식 표준](docs/STANDARDS.md) · [본선 추적표](docs/FINALS-IMPLEMENTATION-PLAN.md) · [멘토링 검토 자료](docs/mentoring/README.md).
 
 [2026-09-14 과거 시험 기록](docs/TEST-RESULTS.md)과 [기존 공개 발표 자료](submission/SELECTED-EVIDENCE.md)는 해당 시점의 환경에 한정됩니다. 과거 공개 URL의 현재 접근 여부, 현재 배포, 통화 성공, 처리량·장애 내성을 이번 개발에서 확인하지 않았습니다. 원격 저장소는 [0u-Y/CallSign](https://github.com/0u-Y/CallSign)입니다.

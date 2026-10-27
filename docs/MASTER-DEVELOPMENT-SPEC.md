@@ -20,14 +20,14 @@
 
 **개발 에이전트는 이 문서의 요구사항 ID를 작업 단위로 삼고, 실제 호출 경로와 검증 증거를 갖춰 완료해야 한다.** 목적은 기존 v1을 보존하면서 모의 금융기관 이상거래 연락의 업무 권한, 재사용 위임, 개별 승인, 실제 연결, 음성 위험 분석, 공동 운영을 연결하는 전체 시스템이다. Besu를 재사용하더라도 네트워크·원장 정합성·증명 검증·운영까지 개발 책임에 포함한다.
 
-- 저장소: <https://github.com/0u-Y/CallSign>, 조사 위치 `/home/ana/Desktop/yyw/CallSign`.
+- 저장소: <https://github.com/0u-Y/CallSign>. 경로는 저장소 루트를 기준으로 표기한다.
 - 최초 조사 HEAD: `7aa26d90b9156c245e160283b1477360a6697cec`. 당시에는 미커밋 변경이 있어 이 시작 커밋만으로 구현을 재현할 수 없었다. 이후 사용자의 명시적 커밋·push 요청에 따라 기능별로 보존했으며, 코드·시험 기준은 `ab0ec1cc55de26b9be832aa874d786beb9c8921c`다. 현재 문서 추가는 별도 커밋으로 관리한다. 당시 검증 artifact의 미커밋 표시는 그 실행 시점의 provenance로 보존한다.
 - 조사 근거는 코드·라우트·설정·시험 소스와 저장된 결과다. 이전 보고서의 ‘구현 완료’를 그대로 승계하지 않았다. 초기 명세 작성에서는 파일 읽기·검색·공식 문서 조사·문서 작성만 수행했다. 이후 사용자의 구현 요청으로 진행한 오프라인 개발은 §2.1에 별도 반영한다. 서비스·실환경 실행 제한은 그대로 유지한다.
 - 환경 목표: RAM 64GB 서버컴에서 개발 후 동일 소스·이미지·구조로 GCP VM 이전. 64GB는 실측 자원 요구나 병렬 부하 허가를 뜻하지 않는다.
 - [AGENTS.md](../AGENTS.md)의 제한을 유지한다. 별도 사용자 요청 전 Besu/Anvil/Hardhat, DB/witness/API/웹 전체 스택/Asterisk/TURN/Media Edge 기동, Compose up/down, 이미지 pull/build, migration·체인 초기화·계약 배포·seed, 통합·실통화·장애·부하 시험, STT/LLM 호출·모델 다운로드·추론, GCP 변경을 하지 않는다. 기존 프로세스·컨테이너·볼륨·키·증거를 변경/삭제하지 않고 다른 터미널·원격·CI로 우회하지 않는다.
 - 원본 PPTX의 slide XML을 읽어 기획 내용과 후속 변경을 대조했다. PDF·렌더·기존 영상의 존재와 문서상 provenance를 확인했으며 이번에 재생·렌더·시연 검증하지 않았다. **3회차 멘토링 원문과 최신 제출 양식은 원문 확인 필요**다.
 
-문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [결과 보고서](FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 snapshot, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 문서를 이번 작업에서 수정하거나 삭제하지 않는다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
+문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [과거 결과 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 snapshot, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 보고서·초안은 날짜별 archive에 보존하고, 원본 기획서와 시험 증거는 유지한다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
 
 ### 0.1 상태와 범위 읽는 법
 
@@ -1327,7 +1327,7 @@ endpoint는 attempt/역할별 단기 SIP credential이다. DB에는 SHA-256 dige
 ### SUBMISSION-001 —3회차 반영표·4회차 멘토링 요청
 
 - **①·②:** 멘토 의견을 발명하지 않고 개발 판단·증거·미결정을 연결한다.
-- **③·④:** 구현=부분 구현 / 검증=정적 검사 / 범위=기존 필수. `submission/FINALS-ROUND4.md` 초안, 멘토 원문 없음. 현재 표는 사용자 요구에 대한 판단이지 실제3회차 인용 아님.
+- **③·④:** 구현=부분 구현 / 검증=정적 검사 / 범위=기존 필수. `docs/archive/2026-10-26/FINALS-ROUND4.md`의 과거 초안, 멘토 원문 없음. 현재 표는 사용자 요구에 대한 판단이지 실제3회차 인용 아님.
 - **⑤·⑥·⑦:** 원문이 확보되면 내부 추적 기록에 요구ID·변경·증거를 연결한다. 멘토에게는 docs/mentoring의 다섯 주제와 실제 도입의 가장 큰 장애·우선 보완점 질문 하나만 전달한다. 채택/미채택 목록이나 추가 질문을 검토 폴더에 만들지 않는다. 개인정보는 동의된 제출 범위만.
 - **⑧·⑨:** 원문 확보→사실 인용→현재 코드 대조→판단·작업·증거 갱신→멘토링 자료. 원문 없으면 ‘원문 확인 필요’와 사용자 요구 근거를 유지, 빈칸을 추정 발언으로 채우지 않는다.
 - **⑩·⑪:** 본 명세 ID 전체, SUBMISSION-002. 반영표·변경대조·질문·남은 결정·제출양식 매핑 작성. 지금 원문이 없어도 나머지 개발을 막지 않는다.
@@ -1504,9 +1504,9 @@ native P2는 과거 전체 명세에 편입됐으나 **2026-10-27 후속 결정�
 | UI-001~007 | [Finals.tsx](../apps/web/src/pages/Finals.tsx), App/config/api/styles·Experience/Operations(v1) | legacy layout/evidence specs·DESIGN-QA(v1) | 완결된 역할 UX·official action·실제 render/a11y 필요 |
 | OPS-001~007 | [infra/deploy](../infra/deploy/compose.yml), [GCP](../infra/gcp/main.tf), deployment/prepare/provision/migrate/backup/restore scripts | finals-validation 정적 기록·RUNBOOK | image/VM/전체 backup/관측·key 관리격리·실제 운영 미검증 |
 | TEST-001~004 | [package.json](../package.json), vitest/playwright configs·restricted/offline·CI | [finals JSON](../artifacts/finals-light-results.json), TEST-RESULTS 역사 | 새 suite·격리·증거 불변 경로·현행 실환경 모두 필요 |
-| SUBMISSION-001~003 | [4회차 초안](../submission/FINALS-ROUND4.md), proposal PPTX/PDF·application/slides/pitch/demo/judge-qa·generate-submission.ts | REQUIREMENTS-CHECK/SELECTED-EVIDENCE/TEAM-INPUTS·기존 영상/캡처 | 멘토 원문/최신양식·현재 릴리스 보고/시연 증거 대기 |
+| SUBMISSION-001~003 | [과거 4회차 초안](archive/2026-10-26/FINALS-ROUND4.md), proposal PPTX/PDF·application/slides/pitch/demo/judge-qa·generate-submission.ts | REQUIREMENTS-CHECK/SELECTED-EVIDENCE/TEAM-INPUTS·기존 영상/캡처 | 멘토 원문/최신양식·현재 릴리스 보고/시연 증거 대기 |
 
-같은 사실을 다르게 적은 자료의 처리: 현재 구현은 코드와 이 명세 §3의 대조가 우선, 과거 결과는 생성 시점에 고정한다. 진행표·결과보고서의 넓은 완료 문구는 차기 갱신 시 위 ID별 상태로 좁힌다. 이번 작업은 이 파일만 작성하므로 다른 문서의 복사·삭제·상태 수정은 하지 않는다.
+같은 사실을 다르게 적은 자료의 처리: 현재 구현은 코드와 이 명세 §3을 대조하고 진행표의 ID별 상태를 따른다. 과거 결과는 생성 시점에 고정해 날짜별 archive에서 보존한다. 검토용 요약은 이 명세와 진행표를 참조하며 독립적인 완료 기준을 만들지 않는다.
 
 ## 17. 노드 실행 전 가능한 작업과 실행 승인 후 검증
 
