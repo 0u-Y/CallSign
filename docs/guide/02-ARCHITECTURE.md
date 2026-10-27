@@ -1,6 +1,6 @@
 # 02. 핵심 아키텍처
 
-[첫 페이지](README.md) · 이전: [서비스 개요](01-SERVICE-OVERVIEW.md) · 다음: [통화 처리 흐름](03-CALL-FLOW.md)
+[서비스 가이드](README.md) · 이전: [서비스 개요](01-SERVICE-OVERVIEW.md) · 다음: [통화 처리 흐름](03-CALL-FLOW.md)
 
 ## 전체 구조
 
@@ -16,7 +16,7 @@
 | PostgreSQL | 업무·소비 영수증·감사·세션·재처리 의도 저장 | SQL·저장소 코드. migration·권한·경합 미검증 |
 | 수신 웹·verifier | 서명·권한·세션·실제 연결을 직접 대조 | v2 직접 경로 화면 연결. v3 verifier는 호출부 연결·시험 보강 필요 |
 | Asterisk·PBX 제어 | 웹 SIP·DTLS-SRTP 음성 종단, 채널·브리지 결합 증언 | ARI 조회·mute·bridge와 JWS 코드, 브라우저 SIP 모듈. 전체 제품 경로 미완성 |
-| Besu 검증자 4개 | QBFT 합의와 권한 계약 실행 | 구성·계약 코드. 현재 worktree 실환경 미실행 |
+| Besu 검증자 4개 | QBFT 합의와 권한 계약 실행 | 구성·계약 코드. 현재 코드의 실환경 검증 미실행 |
 | Witness 4개 중 3개 | 각자 RPC 상태를 조회하고 같은 snapshot에 서명 | 집계·검증 코드와 fake 단위 시험 |
 | STT·규칙·LLM | 원격 오디오 전사, 정책 위반 근거 생성·갱신·철회 | v2 호출 경로와 v3 서버 경로 코드. 제공자 미호출 |
 
@@ -69,4 +69,4 @@ Issuer 코드가 원장 관리자·정지키도 읽는 기존 경계, 공유 ser
 
 한 서버에 Besu·Witness를 여러 개 둬도 전원·디스크·호스트 관리자 장애가 공유됩니다. 독립 기관 분산 운영의 증거는 아닙니다. GCP 실제 생성·배포·재시작·복원도 아직 검증하지 않았습니다.
 
-상세 근거: [ARCHITECTURE](../ARCHITECTURE.md), [MASTER 서비스·키·DB 경계](../MASTER-DEVELOPMENT-SPEC.md), [운영·복구 runbook](../RUNBOOK.md). 갱신 시 `finals-server.ts`, `service-routes.ts`, `asterisk.ts`와 실제 배포 구성을 다시 대조합니다.
+상세 근거: [ARCHITECTURE](../ARCHITECTURE.md), [MASTER 서비스·키·DB 경계](../MASTER-DEVELOPMENT-SPEC.md), [운영·복구 runbook](../RUNBOOK.md).

@@ -1,6 +1,6 @@
 # 03. 통화 처리 흐름
 
-[첫 페이지](README.md) · 이전: [아키텍처](02-ARCHITECTURE.md) · 다음: [신뢰·보안](04-TRUST-AND-SECURITY.md)
+[서비스 가이드](README.md) · 이전: [아키텍처](02-ARCHITECTURE.md) · 다음: [신뢰·보안](04-TRUST-AND-SECURITY.md)
 
 아래는 확정한 목표 흐름입니다. v3 업무·승인·소비·lease와 PBX 제어 API는 코드가 있지만, **PBX 화면·전체 사건 처리·자동 회수·배포 연결은 미완성**입니다. v2 직접 통화 화면과 새 흐름을 같은 완료 상태로 읽지 않습니다.
 
@@ -119,4 +119,4 @@ stateDiagram-v2
 | 로그아웃·세션 폐기 | live connection과 분석 작업 회수 | 기존 WS watcher 있음. PBX 별도 종료 감시 필요 |
 | 프로세스 재시작·백업 복원 | 소비·checkpoint·현재 세대 대조 전 새 연락 금지 | recovery gate SQL·검사 작성. 독립 최신성 anchor·검토된 해제 절차 미완성 |
 
-개발 근거: [프로토콜](../PROTOCOL.md), [MASTER CALL-001~006](../MASTER-DEVELOPMENT-SPEC.md#call-001), [service-authority.ts](../../services/api/src/service-authority.ts), [PBX 제어](../../services/api/src/asterisk.ts), [v3 수신 verifier](../../packages/verifier/src/service.ts). API 전체 목록과 내부 실행 명령은 검토 요약에 복사하지 않습니다.
+개발 근거: [프로토콜](../PROTOCOL.md), [MASTER CALL-001~006](../MASTER-DEVELOPMENT-SPEC.md#call-001), [service-authority.ts](../../services/api/src/service-authority.ts), [PBX 제어](../../services/api/src/asterisk.ts), [v3 수신 verifier](../../packages/verifier/src/service.ts).

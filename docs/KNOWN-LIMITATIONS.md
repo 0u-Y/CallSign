@@ -1,6 +1,6 @@
-# 본선 현재 한계
+# 현재 구현의 한계
 
-2026-10-27 최신 상태는 [서비스 이행 기록](FINALS-IMPLEMENTATION-PLAN.md#service-20261027)과 [멘토링 현황](mentoring/05-IMPLEMENTATION-STATUS.md)을 따른다. 아래 기존 v2 한계를 새 v3에서 해결 완료한 것으로 승계하지 않는다.
+2026-10-27 최신 상태는 [서비스 이행 기록](FINALS-IMPLEMENTATION-PLAN.md#service-20261027)과 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)을 따른다. 아래 기존 v2 한계를 새 v3에서 해결 완료한 것으로 승계하지 않는다.
 
 - 실제 PostgreSQL 권한/취소·소비 경합, Issuer/Sender 서비스 간 연결, Besu/witness, 브라우저 마이크/TURN, STT/LLM 제공자, GCP 이전은 미실행이다. 단위/정적 검사 결과만 [진행표](FINALS-IMPLEMENTATION-PLAN.md)에 기록한다.
 - PBX 기본 종단은 Asterisk다. 새 ARI 채널/Call-ID·mute/bridge·별도 JWS/SDK·SIP 브라우저 모듈은 부분 구현이며 역할 UI·ARI event/watchdog·자동 회수·실제 설정·배포·전체 시험이 없다. 기존 외부 Edge helper를 서버 완료로 보지 않는다. v2 직접 인증으로 PBX를 수락하지 않는다.

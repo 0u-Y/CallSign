@@ -12,7 +12,7 @@ v3 verifier는 Witness 관측 age<8초/미래 오차≤1초로 검사한다. 각
 
 v1/v2/v3는 별도 strict 진입점이며 자동 downgrade하지 않는다. 새 API는 `/v3`, UI/배포는 아직 v2다. SDK 파일 존재·타입 통과만으로 전체 연결 완료라고 보지 않는다. [현행 구현·검증 기록](FINALS-IMPLEMENTATION-PLAN.md#service-20261027).
 
-## 보존한 본선 v2
+## v2 프로파일
 
 v2 schema는 `packages/protocol/src/finals.ts`, 순수 수신 SDK는 `packages/verifier/src/finals.ts`다. 모든 CallSign 객체는 protocol=callsign/version=2/type와 networkId/registryAddress를 strict 검사한다. VC만 W3C VC 2.0/JOSE 표현을 사용한다. v1과 같은 type 이름이어도 버전/필드가 다르면 거절하고 fallback하지 않는다. v1은 별도 로컬 fixture 경로로 보존한다.
 
@@ -44,7 +44,7 @@ witness는 자기 chain ID/genesis와 지정 블록 hash를 검사하고 상태�
 
 ## v1 회귀 프로파일
 
-아래는 기존 회귀용 프로토콜이다. 본선 v2와 자동 혼용하지 않는다.
+아래는 기존 회귀용 프로토콜이다. v2와 자동 혼용하지 않는다.
 
 
 구현 기준은 `packages/protocol`과 `packages/verifier`다. JSON은 RFC 8785 JCS로 canonicalize하고 Ed25519 compact JWS(`alg=EdDSA`)로 서명한다. protected `typ=callsign/<type>+jws`, `kid`, payload의 `protocol=callsign`, `version=1`, `type`, `networkId`, `registryAddress`를 모두 검사한다. `none`, 알 수 없는 필드, 중복 JSON key, 32KiB 초과, 비 UTF-8 입력을 거절한다.

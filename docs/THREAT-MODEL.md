@@ -2,7 +2,7 @@
 
 기본 신뢰는 등록 URI·키·원장 상태이며 DID는 선택이다. v3는120초 시작 승인·갱신 lease·별도 PBX 증거를 분리한다. Asterisk가 양측 웹 통화의 신뢰 종단이다. [현황](FINALS-IMPLEMENTATION-PLAN.md#service-20261027)의 미연결 UI·worker·철회/PBX 회수·복원 경계를 구현 완료로 보지 않는다.
 
-## 보존한 본선 v2 신뢰 경계
+## v2 신뢰 경계
 
 소속 기관/수신자/할당 상담원/업무 목적을 바꾸는 IDOR, VC 복사, 폐기된 키/정책/epoch, 승인 재사용, 취소와 소비의 경합, 원장 RPC 하나의 거짓/지연, STT 수정과 늦은 LLM 응답을 방어 대상으로 둔다. 서버 객체 경계와 수신 SDK를 각각 검사한다. 테스트·코드는 [진행표](FINALS-IMPLEMENTATION-PLAN.md)에서 추적한다.
 

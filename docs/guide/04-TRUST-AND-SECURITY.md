@@ -1,6 +1,6 @@
 # 04. 신뢰·보안 설계
 
-[첫 페이지](README.md) · 이전: [통화 흐름](03-CALL-FLOW.md) · 다음: [구현 및 검증 현황](05-IMPLEMENTATION-STATUS.md)
+[서비스 가이드](README.md) · 이전: [통화 흐름](03-CALL-FLOW.md) · 다음: [구현 및 검증 현황](05-IMPLEMENTATION-STATUS.md)
 
 ## 누구를 신뢰해 무엇을 확인하는가
 

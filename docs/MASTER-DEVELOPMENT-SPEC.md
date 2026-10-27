@@ -1,8 +1,8 @@
 # CallSign 전체 개발 명세
 
-## 확정 서비스 결정 — 2026-10-27 사용자 후속 지시가 우선
+## 서비스 설계 원칙
 
-아래 본문의 이전 조사·설계안과 충돌하면 이 절을 적용한다. 기존 코드/증거를 보존하며 구현 상태는 진행표에서 따로 갱신한다.
+기본 서비스의 식별·권한·통화·분석·운영 경계다. 기존 v1/v2 코드와 증거는 보존하고, 현재 구현 상태는 개발 현황에서 관리한다.
 
 - 기본 서비스는 등록 기관 URI/콜센터 URI·등록 Ed25519 키와 VC 2.0 JOSE를 사용한다. DID는 선택 호환 기능이며 기본 발신의 필수 조회 경로가 아니다. 고객 DID/지갑은 요구하지 않는다.
 - 개별 연락의 연결 시작 유효기간은120초다. 최초 소비와 진행 통화 lease·현재 상태 freshness를 분리한다. 진행 중 만료/상태 확인 불가는 ‘사기/철회’가 아니다. 명시 철회는 종료, 확인 불가는 표시와 pause/종료/명시적 미확인 계속 선택을 제공한다.
@@ -175,7 +175,7 @@ sequenceDiagram
 | STT·AI | Deepgram/Anthropic 실제 호출 코드·revision·규칙, Ollama v1 보존 | fake 단위 검증. 전체 quota·한국어 품질·제공자 연결 미검증 |
 | 화면 | `/finals`, `/official` 실제 API 연결, v1 시연 보존 | 컴파일/정적 기록. 역할별 완결 UX·접근성·실사용 검증 필요 |
 | 운영·GCP | Compose/Dockerfile/Terraform/systemd·DB dump/restore 코드 | Compose/shell 정적 기록. 실제 이미지/VM/일관 backup 미검증 |
-| 제출물 | 기존 기획·v1 증거·4회차 초안 있음 | 현재 완성판 발표·영상·멘토 원문 대응·최종 릴리스 증거 없음 |
+| 외부 전달 산출물(서비스 완료 조건과 별도) | 기존 기획·v1 증거·과거 검토 초안 있음 | 현재 릴리스 설명·실환경 증거·실제 검토 원문 대응은 추가 작업 필요 |
 
 저장된 light 결과는 [finals-light-results.json](../artifacts/finals-light-results.json)의 **44/44, 10개 파일**이다. [finals-validation.json](../artifacts/finals-validation.json)은 Linux x64/Node 22.22.2/pnpm 11.27.0과 미커밋 worktree를 기록한다. 결과 시작 2026-10-26 18:26:56 KST, 요약 기록 18:28:05 KST다. 이 결과는 현재 파일 전체의 재현 가능한 릴리스 인증서가 아니다.
 
@@ -201,7 +201,7 @@ sequenceDiagram
 - AI-001~004: v3 서버 오디오·동의 generation·영속 quota 경로 추가. 새 UI·호출/삭제/제공자 계약·품질 실검증 미완성.
 - UI/OPS/GOVERNANCE의 기본 profile 전환·통화 강제 회수·재인증·권한 세분화·관리키 경계·worker·전체 배포는 여전히 코드 미구현이 있다. 실행 대기만으로 표시하지 않는다.
 
-아래 개별 요구의 ③·④가 과거 v2 조사 상태를 설명할 때 이 절의 후속 이행과 함께 읽는다. 자세한 완료 조건은 그대로 유지하며 helper/타입 통과를 전체 완료로 승계하지 않는다. 검토용 설명은 [멘토링 자료](mentoring/README.md)이며 별도 요구 기준을 만들지 않는다.
+아래 개별 요구의 ③·④가 과거 v2 조사 상태를 설명할 때 이 절의 후속 이행과 함께 읽는다. 자세한 완료 조건은 그대로 유지하며 helper/타입 통과를 전체 완료로 승계하지 않는다. 서비스 설명은 [가이드](guide/README.md)에 정리하며, 요구사항과 완료 기준은 이 명세를 따른다.
 
 
 ## 3. 우선 해결할 충돌·차단 요인
@@ -221,7 +221,7 @@ sequenceDiagram
 | `RegistryOperations.submit`는 RPC fallback+wait뿐, chain DB 재시도 worker 없음 | LEDGER-001~003. timeout은 실패 확정이 아니라 unknown/pending으로 보존한다. |
 | `NETWORK_ID` env와 compose의 hard-coded network-id 20260914, RPC `QBFT` 포함·host allowlist=* | 배포 manifest에서 불일치를 거절하고 관리 RPC를 분리한다. 내부망만으로 permissioning 완료라 하지 않는다. |
 | `generate-besu.sh`는 일부 기존 파일이 없으면 copy 경로로 진입 | 부분 손상에 자동 재생성/덮어쓰기 금지. CHAIN-001/OPS-003의 fail-closed 사전 검사 필요. |
-| `deploy-registry.ts`는 알려진 local demo 키·시청 기관·v1 key 경로 | 공개 본선 배포 도구가 아님. 안전한 새 기관 등록/배포 경로를 별도 완성한다. |
+| `deploy-registry.ts`는 알려진 local demo 키·시청 기관·v1 key 경로 | 공개 서비스 배포 도구가 아님. 안전한 새 기관 등록/배포 경로를 별도 완성한다. |
 | `scripts/restore.sh`의 빈 DB는 운영자 확인값이며 실제 빈 DB 조회는 없음 | OPS-005에서 대상 ID·빈 상태·manifest 검증을 강제한다. |
 | `scripts/backup.sh`는 DB dump만 제공 | 전체 DB·체인·키·trust 일관 snapshot/복원 검증은 미구현이다. |
 | 현행 light의 PG 시험은 저장소 primitive만, 미디어 시험도 일부 경로만 | v2 실제 권한 엔진 경합·권한 GRANT·두 방향 audio·장애·중단 검증 추가. |
@@ -1305,7 +1305,9 @@ endpoint는 attempt/역할별 단기 SIP credential이다. DB에는 SHA-256 dige
 - **⑩·⑪:** OPS-003, SUBMISSION-002/003. root/test scripts output directory 옵션·wx/no-overwrite·evidence collector·PDF/video provenance·tamper check·report generator 작성.
 - **⑫~⑮:** 같은 릴리스 source+증거 범위 재구성 가능, 날짜·환경 불일치/누락은 완료 표시 거절. TV-01/모든 후속TV, E-01~07. 이번 조사 HEAD만으로 전체 worktree 재현 가능하다고 쓰지 않는다.
 
-## 13. 멘토링·기획 변경·본선 제출물
+## 13. 기획 변경·외부 검토·발표 자료
+
+이 절의 SUBMISSION-001~003은 기존 요청에 따른 외부 전달 산출물이다. 기관 업무·권한·통화·분석·운영의 서비스 완료 조건과 구분한다. 특정 멘토링 회차나 대회 일정은 제품 기능의 우선순위·완료 판정을 대신하지 않는다. 기존 요구 ID와 원본 자료는 추적을 위해 보존한다.
 
 ### 13.1 원본 대비 확인한 변경
 
@@ -1328,7 +1330,7 @@ endpoint는 attempt/역할별 단기 SIP credential이다. DB에는 SHA-256 dige
 
 - **①·②:** 멘토 의견을 발명하지 않고 개발 판단·증거·미결정을 연결한다.
 - **③·④:** 구현=부분 구현 / 검증=정적 검사 / 범위=기존 필수. `docs/archive/2026-10-26/FINALS-ROUND4.md`의 과거 초안, 멘토 원문 없음. 현재 표는 사용자 요구에 대한 판단이지 실제3회차 인용 아님.
-- **⑤·⑥·⑦:** 원문이 확보되면 내부 추적 기록에 요구ID·변경·증거를 연결한다. 멘토에게는 docs/mentoring의 다섯 주제와 실제 도입의 가장 큰 장애·우선 보완점 질문 하나만 전달한다. 채택/미채택 목록이나 추가 질문을 검토 폴더에 만들지 않는다. 개인정보는 동의된 제출 범위만.
+- **⑤·⑥·⑦:** 원문이 확보되면 내부 추적 기록에 요구ID·변경·증거를 연결한다. 서비스 개요·구조·통화·보안·현황은 docs/guide에서 관리하고, 멘토링 질문은 docs/mentoring에만 둔다. 채택/미채택 목록이나 추가 질문을 검토 폴더에 만들지 않는다. 개인정보는 동의된 제출 범위만.
 - **⑧·⑨:** 원문 확보→사실 인용→현재 코드 대조→판단·작업·증거 갱신→멘토링 자료. 원문 없으면 ‘원문 확인 필요’와 사용자 요구 근거를 유지, 빈칸을 추정 발언으로 채우지 않는다.
 - **⑩·⑪:** 본 명세 ID 전체, SUBMISSION-002. 반영표·변경대조·질문·남은 결정·제출양식 매핑 작성. 지금 원문이 없어도 나머지 개발을 막지 않는다.
 - **⑫~⑮:** 모든 인용에 원문 provenance, 변경마다 ID와 검증 상태, 미검증/미완성 누락 없음. TV-01/문서 검토, E-01.4회차 양식/멘토 원문은 외부 정보 필요다.
@@ -1353,7 +1355,7 @@ endpoint는 attempt/역할별 단기 SIP credential이다. DB에는 SHA-256 dige
 - **⑤·⑥·⑦:** 정상/거절/복사공격/철회·정지/위험발화·경고수정/동의철회/키교체·복원 후 새 통화의 실제 run ID·source/image·환경·mode를 영상/캡처 metadata로 남김. consent/개인정보·key/cookie masking 필수.
 - **⑧·⑨:** 승인된 환경→TV 검증→대본 실행→화면/증거 동시 수집→편집본/원본 hash·재현순서. 실패·fixture 대체·skip을 숨기지 않고 영상에 표시, 녹화가 중단되면 새 run으로 기록.
 - **⑩·⑪:** TV-04~10, TEST-004, SUBMISSION-002. capture runner·양방향 stats overlay/증거 export·비식별 검수·실패 영상 보존·릴리스 묶음 작성. 이번에는 촬영/실통화/제공자 실행 금지다.
-- **⑫~⑮:** 본선 최종 run의 실제 연결/권한/AI·운영 변화가 artifact와 대조 가능하고 과거와 구분됨. E-01/04/05/06/07. 영상 성공만으로 성능·장애내성·AI 정확도를 입증하지 않는다.
+- **⑫~⑮:** 릴리스 검증 run의 실제 연결/권한/AI·운영 변화가 artifact와 대조 가능하고 과거와 구분됨. E-01/04/05/06/07. 영상 성공만으로 성능·장애내성·AI 정확도를 입증하지 않는다.
 
 ## 14. 의존관계와 권장 구현 순서
 
@@ -1377,7 +1379,7 @@ flowchart TD
   AI --> UI
   L --> O[운영·복원·릴리스]
   W --> O
-  UI --> V[환경별 검증과 본선 증거]
+  UI --> V[환경별 검증과 릴리스 증거]
   O --> V
 ```
 
@@ -1390,7 +1392,7 @@ flowchart TD
 |후속 확장| PROOF-001→002→003→004 | 고정 버전 native 증거 수집·검증·독립 벡터·P0/P2 profile 분리. Besu 실대조만 후속 실행 |
 |6| CALL-006/MEDIA/PBX | 직접 SDK/양방향·지원 probe·TURN, 실제 Edge 제어/미디어·PBX mapping·수신 UI 코드 |
 |7| AI/UI/DB-003~004 | consent→remote audio→STT/revision→rules/LLM→위험 UI·공식 후속 flow, quota/privacy/한국어 평가 |
-|8| OPS-001/004~007, TEST-002/003, SUBMISSION-001/002 | 전체 배포/env·관측·일관 backup/restore·GCP·수동 검증 경로·멘토링/보고서 준비 |
+|8| OPS-001/004~007, TEST-002/003, SUBMISSION-001/002 | 전체 배포/env·관측·일관 backup/restore·GCP·수동 검증 경로·릴리스 문서 준비 |
 |9| 사용자 실행 승인 뒤 TV-04→03 실제→05→06→07→08/09→10 | 격리된 실제 환경 증거·실패 보정·릴리스 source/image 고정·SUBMISSION-003 최종 캡처/영상 |
 
 이 표의 단계는 기능 누락 허가가 아니다. 예를 들어 PBX 구현이 어렵거나 credential이 없어도 코드·계약·fixture·운영 절차를 진행하고 실제 연결 시험만 보류한다. 단위 검증을 끝낸 모듈은 후속 실환경에서 결함이 드러나면 같은 ID로 재개한다.
