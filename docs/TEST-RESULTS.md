@@ -1,6 +1,6 @@
-> 과거 v1 기록(2026-09-14). 본선의 현재 구현·이번 검증은 [FINALS-IMPLEMENTATION-PLAN](FINALS-IMPLEMENTATION-PLAN.md)을 따른다. 아래 PASS를 2026-10-26의 재검증으로 해석하지 않는다.
+> **2026-09-14의 과거 기록:** 초기 시청 시연 코드의 실행 결과이다. 현재 서비스·공개 주소·배포 상태의 재검증 결과가 아니다. 최신 구현·검증은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 아래 실행 명령은 당시 이력이며 현재 실행 허가가 아니다.
 
-# Test results
+# 초기 시연 시험 결과
 
 생성 시각: 2026-09-14T13:59:09.318Z
 
@@ -8,8 +8,8 @@
 
 | 항목 | 상태 | 실행 명령 | 관측 | 증거 |
 |---|---|---|---|---|
-| Solidity 권한·epoch 상태 기계 | PASS | `pnpm test:contracts` | 5건 통과, 실패 0 | `artifacts/foundry-results.log` |
-| JCS/Ed25519 및 3-of-4 verifier | PASS | `pnpm test` | 20건 통과, 0건 실패 | `artifacts/vitest-results.json` |
+| Solidity 권한·권한 세대 상태 기계 | PASS | `pnpm test:contracts` | 5건 통과, 실패 0 | `artifacts/foundry-results.log` |
+| JCS/Ed25519 및 4개 중 3개 서명 verifier | PASS | `pnpm test` | 20건 통과, 0건 실패 | `artifacts/vitest-results.json` |
 | PostgreSQL consume·인증 권한 통합 | PASS | `pnpm test:integration` | 10건 통과, 0건 실패 | `artifacts/integration-results.json` |
 | Besu QBFT 4노드 동일 상태·계약 코드 | PASS | `tsx scripts/check-ledger.ts` | 4노드 공통 높이 6912, registry 10878 bytes (동일 block/hash/code 관측; 네이티브 light-client 증명 아님) | `artifacts/ledger-readiness.json` |
 | witness 임계값 장애 | PASS | `pnpm test:witness-failover` | 1개 중단 3서명, 2개 중단 HTTP 503 | `artifacts/witness-failover.json` |
@@ -17,13 +17,15 @@
 | 반응형·주요 제품 브라우저 시험 | PASS | `pnpm test:e2e` | 12건 통과, 0건 실패, 86275ms | `artifacts/playwright-results.json` |
 | 대표 화면 다중 viewport 캡처·육안 검수 | PASS | `pnpm test:e2e` | 21개 PNG, 390/768/1440 overflow와 200% keyboard 접근 PASS | `artifacts/screenshots/` |
 | PPTX 원본과 11쪽 제출 PDF 렌더 검수 | PASS | `pnpm submission:build` | PPTX/PDF 존재, 렌더 11/11쪽 | `submission/rendered-pages/` |
-| 캐시 상태 verifier p95 | PASS | `pnpm test:benchmark` | n=100, p95=1.72ms, 목표 ≤500ms (네트워크 왕복 제외) | `artifacts/verifier-benchmark.json` |
+| 캐시 상태 verifier p95 | PASS | `pnpm test:benchmark` | n=100, p95=1.72ms (네트워크 왕복 제외; 현재 네트워크 포함 500ms 목표와 직접 비교 불가) | `artifacts/verifier-benchmark.json` |
 | monotonic deadline 이후 표시 철회 J≤1초 | NOT-RUN | `해당 없음` | deadline 계산 단위 테스트는 PASS이나 UI timer jitter의 반복 표본 측정은 미실행 | `docs/KNOWN-LIMITATIONS.md` |
-| 공동 복구 UI의 실제 EIP-712 트랜잭션 | PASS | `pnpm test:e2e` | qbft-live-eip712-recovery-v1, 승인자 2명, epoch 15→16→17 (관리자·정지키 교체; 승인용 Ed25519 키는 데모에서 유지) | `artifacts/governance-run.json` |
-| 규칙 fallback·Ollama adapter | PASS | `pnpm test` | 규칙 탐지·prompt injection·없는 evidenceSpan·비로컬 endpoint 거절 시험 (인증 결과와 독립) | `artifacts/vitest-results.json` |
+| 공동 복구 UI의 실제 EIP-712 트랜잭션 | PASS | `pnpm test:e2e` | qbft-live-eip712-recovery-v1, 승인자 2명, 권한 세대 15→16→17 (관리자·정지키 교체; 승인용 Ed25519 키는 데모에서 유지) | `artifacts/governance-run.json` |
+| 규칙 대체 처리·Ollama adapter | PASS | `pnpm test` | 규칙 탐지·prompt injection·없는 evidenceSpan·비로컬 endpoint 거절 시험 (인증 결과와 독립) | `artifacts/vitest-results.json` |
 | 로컬 Ollama 실제 모델 실행 | NOT-RUN | `해당 없음` | 모델을 자동 다운로드하지 않았으며 이번 환경에 선택 모델을 설정하지 않음 | `docs/KNOWN-LIMITATIONS.md` |
-| QBFT header + EIP-1186 네이티브 증명 | NOT-RUN | `해당 없음` | P2 미구현; P0은 별도 witness 신뢰 프로파일 | `docs/KNOWN-LIMITATIONS.md` |
+| QBFT header + EIP-1186 네이티브 증명 | NOT-RUN | `해당 없음` | 체인 자체 증명 확장 미구현; 증언자 서명 검증 방식은 별도 witness 신뢰 프로파일 | `docs/KNOWN-LIMITATIONS.md` |
+
+p95는 시험 표본 95%가 그 이하인 지연값이다. JCS는 서명 전 JSON 정규화, verifier는 서명·권한 검증 모듈, epoch는 권한 세대다. 초기 형식 식별자와 도구명은 원본 증거와 대조하도록 유지한다.
 
 ## 해석
 
-PASS는 위 증거 파일이 존재하고 이번 환경의 실제 실행값을 만족한 항목만 뜻한다. witness 프로파일은 QBFT 합의 증명이 아니며, BLOCKED/NOT-RUN 항목은 제품 주장에 포함하지 않는다.
+PASS는 위 증거 파일에 남은 2026-09-14 실행 범위의 통과를 뜻한다. 현재 코드의 재검증 결과가 아니다. witness 프로파일은 QBFT 합의 증명이 아니며, BLOCKED/NOT-RUN 항목은 제품 주장에 포함하지 않는다.

@@ -1,6 +1,8 @@
-> **과거 기록 — 2026-10-26.** 아래 구현 상태·검증 수치·Git 상태는 당시 기록이며 현재 상태가 아닙니다. 최신 설명은 [멘토링 자료](../../mentoring/README.md), 개발 현황은 [진행표](../../FINALS-IMPLEMENTATION-PLAN.md)를 따릅니다.
+> **과거 기록 — 2026-10-26.** 아래 구현 상태·검증 수치·Git 상태는 당시 기록이며 현재 상태가 아닙니다. 최신 설명은 [서비스 가이드](../../guide/README.md), 개발 현황은 [진행표](../../FINALS-IMPLEMENTATION-PLAN.md)를 따릅니다.
 
-# CallSign 본선 개발 통합 결과 보고서
+이 보관 문서에서 ‘역할 분리 직접 통화 경로’는 기관·발신·플랫폼을 분리한 `version=2` 구현이다. ‘초기 시연 경로’는 `version=1` 시청 사례다. nonce는 일회성 난수, binding은 승인·현재 세션 결합, lease는 갱신형 통화 유지 허가, Witness는 원장 상태 증언자다. **본문의 ‘구현 완료’는 당시 작성자의 코드 작성 판정이며 현재 전체 기능 완료 판정이 아니다.** 이후 실제 호출 경로를 대조한 [현재 현황](../../guide/05-IMPLEMENTATION-STATUS.md)에서 미구현을 별도로 관리한다.
+
+# CallSign 2026-10-26 개발 결과 보관본
 
 - 작성 기준: 2026-10-26 개발 작업 및 저장소에 남은 검증 기록.
 - 저장소: https://github.com/0u-Y/CallSign
@@ -12,7 +14,7 @@
 
 ## 1. 현재 결과
 
-**기존 스택을 유지하면서 본선 v2의 직접 WebRTC 경로를 구성하는 코드·설정·테스트·문서를 추가했다. 가벼운 검사는 통과했지만, 전체 서비스를 기동한 통합 검증과 본선 배포는 아직 수행하지 않았다.**
+**기존 스택을 유지하면서 본선 역할 분리 직접 통화 경로의 직접 WebRTC 경로를 구성하는 코드·설정·테스트·문서를 추가했다. 가벼운 검사는 통과했지만, 전체 서비스를 기동한 통합 검증과 본선 배포는 아직 수행하지 않았다.**
 
 대표 시나리오는 **모의 금융기관의 이상거래 확인 연락**이다. 다음 세 판단을 분리한다.
 
@@ -20,7 +22,7 @@
 2. 위탁 발신자가 해당 업무를 수행할 권한을 갖고 있으며, 그 권한이 현재 통화 세션에 결합됐는가.
 3. 상대 음성에서 업무 목적을 벗어난 요구가 발견되는가.
 
-실제 금융기관·통신사와 연결된 서비스라는 주장은 하지 않는다. 기존 시청 사례, v1 fixture, 생성 음원 데모, 기획 PPTX/PDF와 과거 시험 증거는 보존했다.
+실제 금융기관·통신사와 연결된 서비스라는 주장은 하지 않는다. 기존 시청 사례, 초기 시연 경로 고정 시험 데이터, 생성 음원 데모, 기획 PPTX/PDF와 과거 시험 증거는 보존했다.
 
 | 구분 | 현재 결과 |
 |---|---|
@@ -28,7 +30,7 @@
 | 단위 검사 | 기존 회귀 포함 10개 파일, **44개 통과·0개 실패** |
 | 정적 검사 | 소스 위생, 타입, 웹 번들, Compose 설정, 셸 문법 검사 통과 |
 | PBX 경로 | 제어 adapter·매핑 검사 helper 작성. 실제 bridge와 PBX 수신 경로는 미완료 |
-| 추가 미구현 | 공유·영속 quota, 영속 rollback 기준, 장시간 승인 연장·자동 복구, 대규모 저장 운영 정책 |
+| 추가 미구현 | 공유·영속 사용 한도, 영속 rollback 기준, 장시간 승인 연장·자동 복구, 대규모 저장 운영 정책 |
 | 실환경 | DB·체인·서비스 연결·실통화·제공자·GCP 검증 대기 |
 
 이하의 **구현 완료**는 해당 개발 코드가 작성됐다는 뜻이다. 운영 완료나 실환경 통과를 뜻하지 않으며, adapter helper만 있는 PBX 전체 경로는 구현 완료로 분류하지 않았다.
@@ -97,7 +99,7 @@ Platform, Issuer, Sender는 같은 소스의 실행 역할을 나누어 별도 �
 
 **구현 상태: 선택한 프로파일 구현 완료. 검증 상태: 정적 검사 통과·단위 테스트 통과·실환경 검증 대기.**
 
-기존 승인 JSON을 VC로 이름만 바꾸지 않고 VC 객체를 별도로 만들었다. issuer, credentialSubject, 유효기간, 상태와 서비스 키·목적·정책·epoch·승인키 버전을 결합한다. VC JSON 자체를 compact JWS payload로 서명하는 프로파일이다.
+기존 승인 JSON을 VC로 이름만 바꾸지 않고 VC 객체를 별도로 만들었다. issuer, credentialSubject, 유효기간, 상태와 서비스 키·목적·정책·권한 세대·승인키 버전을 결합한다. VC JSON 자체를 compact JWS payload로 서명하는 프로파일이다.
 
 - VC 표현: VC 2.0 JSON, JOSE `alg=EdDSA`, `typ=vc+jwt`, `cty=vc`, 등록된 DID verification method의 `kid`.
 - 검증: 등록 기관/서비스 키, DID controller 및 assertion/authentication 관계, 목적·기간·상태·키 버전의 일치 검사.
@@ -125,17 +127,17 @@ Issuer가 업무·위임·수신자·목적·시도 상태를 확인하고 기�
 
 **구현 상태: 구현 완료. 검증 상태: 정적 검사 통과·단위 테스트 통과·실환경 검증 대기.**
 
-v2 strict schema를 추가하고 v1 schema/fixture는 보존했다. v1/v2 객체를 자동 혼용하거나 v1로 fallback하지 않는다.
+역할 분리 직접 통화 경로 strict schema를 추가하고 초기 시연 경로 schema/fixture는 보존했다. 초기 시연·역할 분리 직접 통화의 두 형식 객체를 자동 혼용하거나 초기 시연 경로로 fallback하지 않는다.
 
-승인은 업무·시도·수신자·정책·VC·발신 허가·브라우저 키·session·epoch·키 버전을 결합한다. binding에는 양측 SDP hash와 fingerprint, 수신자 nonce/키 hash, transport profile을 넣고 양측 세션키의 소유 증명을 검사한다.
+승인은 업무·시도·수신자·정책·VC·발신 허가·브라우저 키·session·권한 세대·키 버전을 결합한다. binding에는 양측 SDP hash와 fingerprint, 수신자 nonce/키 hash, transport profile을 넣고 양측 세션키의 소유 증명을 검사한다.
 
 소비 코드의 동작은 다음과 같다.
 
 - 최초 binding을 기관 행 잠금 안에서 고정하고 서명 영수증까지 함께 저장.
-- 동일 binding 재시도에는 저장된 동일 영수증 반환.
+- 동일 승인·세션 결합 재시도에는 저장된 동일 영수증 반환.
 - 다른 binding으로 재사용하면 거절.
 - 취소가 먼저 반영됐으면 소비 거절. 소비 뒤 취소되면 현재 상태 응답에서 철회 반영.
-- commit 뒤 응답 유실은 같은 binding 재시도로 복구하도록 구성.
+- commit 뒤 응답 유실은 같은 승인·세션 결합 재시도로 복구하도록 구성.
 - 발급과 소비 시 권한·철회·키 버전 상태 재검사.
 
 수신 SDK는 VC·허가·승인·영수증과 새 nonce에 대한 최대 5초 상태 서명을 검증한다. 실제 DTLS certificate와 datachannel 증거를 얻지 못하는 환경에서는 검증 완료로 표시하지 않는다.
@@ -148,13 +150,13 @@ v2 strict schema를 추가하고 v1 schema/fixture는 보존했다. v1/v2 객체
 
 **구현 상태: 구현 완료. 검증 상태: 정적 검사 통과·단위 테스트 통과·실환경 검증 대기.**
 
-재사용 위임과 개별 통화 승인을 분리했다. VC digest 문자열을 기존 계약의 위임 ID 입력에 연결하고, 정상 통화마다 새 위임 트랜잭션을 만들지 않는다.
+재사용 위임과 개별 통화 승인을 분리했다. VC 내용 해시 문자열을 기존 계약의 위임 ID 입력에 연결하고, 정상 통화마다 새 위임 트랜잭션을 만들지 않는다.
 
 각 witness는 자기 RPC에서 chain ID, genesis, 블록 hash와 기관/위임 관계를 확인한다. 집계기는 단일 RPC나 가장 낮은 높이에 의존하는 대신 witness별 후보 블록을 교차 검사하고, 동일 상태의 유효 서명 3개를 모으면 느린 나머지 요청을 취소한다.
 
-중복 signer/같은 키의 별칭, 다른 snapshot 혼합, rollback, 같은 높이의 다른 hash/상태, stale 증거를 검사한다. freshness는 블록 timestamp와 최초 monotonic deadline에 근거하며 새 서명 시각으로 오래된 상태의 수명을 늘리지 않는다. quorum 부족과 유효하지만 오래된 quorum은 오류를 구분한다. 실제 체인 정지 원인 진단을 완료했다는 뜻은 아니다. 현재 rollback guard는 메모리 범위이며, cold restart 이후 연속성을 보장할 영속 high-watermark는 미구현이다.
+중복 signer/같은 키의 별칭, 다른 특정 블록의 상태 묶음 혼합, rollback, 같은 높이의 다른 hash/상태, stale 증거를 검사한다. freshness는 블록 timestamp와 최초 monotonic deadline에 근거하며 새 서명 시각으로 오래된 상태의 수명을 늘리지 않는다. 정족수 부족과 유효하지만 오래된 quorum은 오류를 구분한다. 실제 체인 정지 원인 진단을 완료했다는 뜻은 아니다. 현재 rollback guard는 메모리 범위이며, 저장 상태를 다시 읽는 재시작 이후 연속성을 보장할 영속 high-watermark는 미구현이다.
 
-공동 복구 2-of-3과 witness 상태 증언 3-of-4는 별개다. 승인자는 자기 환경에서 자기 키 하나로 EIP-712 요청에 서명한다. 새 epoch/승인키를 원장 증언과 대조한 뒤 활성화하고, 구 VC·승인·시도를 무효화한다. 새 trust bundle과 웹 pin도 함께 갱신해야 한다.
+공동 복구 3명 중 2명 승인과 witness 상태 증언 4개 중 3개 서명는 별개다. 승인자는 자기 환경에서 자기 키 하나로 EIP-712 요청에 서명한다. 새 epoch/승인키를 원장 증언과 대조한 뒤 활성화하고, 구 VC·승인·시도를 무효화한다. 새 trust bundle과 웹 pin도 함께 갱신해야 한다.
 
 주요 파일: `witness-aggregate.ts`, `services/witness/src/server.ts`, `governance-v2.ts`, `scripts/sign-recovery.ts`, `packages/verifier/src/index.ts`.
 
@@ -170,7 +172,7 @@ PBX는 다음 부분까지만 작성했다.
 - `MediaEdgeAdapter`: HTTPS leg 생성 요청과 응답 schema.
 - `verifyPbxMapping`: edge·채널·시도·session·binding의 서버 간 매핑 검사.
 
-**실제 Media Edge 제품/bridge, SIP·RTP 연결 및 PBX 수신 UI/검증 경로는 미완료다.** 예정된 WebRTC 신뢰 종단은 Media Edge이며 PBX leg 증거를 상담원 개인 신원으로 취급하지 않는다. 현재 v2 직접 경로는 PBX profile을 정상 인증으로 수락하지 않는다.
+**실제 Media Edge 제품/bridge, SIP·RTP 연결 및 PBX 수신 UI/검증 경로는 미완료다.** 예정된 WebRTC 신뢰 종단은 Media Edge이며 PBX leg 증거를 상담원 개인 신원으로 취급하지 않는다. 현재 역할 분리 직접 통화는 PBX profile을 정상 인증으로 수락하지 않는다.
 
 주요 파일: `apps/web/src/lib/liveMedia.ts`, `finalsCall.ts`, `services/api/src/media.ts`.
 
@@ -180,7 +182,7 @@ PBX는 다음 부분까지만 작성했다.
 
 상대방 수신 stream만 동의 후 ingestion으로 보내고, Deepgram WSS → segment/revision → 목적 정책·규칙·선택 Anthropic 분석 → 근거 있는 위험 이벤트로 연결하는 코드를 작성했다. 기존 Ollama adapter도 보존했다.
 
-partial/final, segment ID, revision, 중복·역순 이벤트, 수정에 따른 경고 교체/철회, 늦은 LLM 응답, timeout·취소·backpressure와 요청 수 상한을 처리한다. 규칙 시험에는 “OTP를 알려주지 마세요”, 인용·자기정정과 비밀 유지 강요의 구분을 포함했다. 모든 한국어 표현이나 문맥을 해결한 것은 아니다.
+partial/final, segment ID, 수정 번호, 중복·역순 이벤트, 수정에 따른 경고 교체/철회, 늦은 LLM 응답, timeout·취소·backpressure와 요청 수 상한을 처리한다. 규칙 시험에는 “OTP를 알려주지 마세요”, 인용·자기정정과 비밀 유지 강요의 구분을 포함했다. 모든 한국어 표현이나 문맥을 해결한 것은 아니다.
 
 분석 결과의 근거가 해당 입력 원문에 있는지, 현재 revision인지 검사한다. LLM에 도구를 제공하지 않고 전사문을 불신 데이터로 전달한다. 동의 철회/연결 종료 때 분석을 중단하며 서버의 음성 영구 저장은 기본 비활성이다.
 
@@ -194,7 +196,7 @@ partial/final, segment ID, revision, 중복·역순 이벤트, 수정에 따른 
 
 `/finals`에 기관 담당자의 모의 업무 생성·할당·위임 관리, 상담원의 시도·허가·발신, 수신자의 검증·수락·음소거·종료·분석 동의, 공동 운영의 정지·복구·키 활성화를 API에 연결했다. `/official`은 본선 profile에서 별도 로그인·업무 소유권 검사 경로를 사용한다.
 
-인증/승인, 세션 결합, 분석 가능 여부와 위험 상태를 구분한다. 로딩·빈 목록·실패·재시도·권한 부족을 처리하고, API 미연결을 fixture 성공으로 대체하지 않는다. 기존 `/demo`는 명시적인 fixture·브라우저 loopback·과거 증거용으로 보존했다.
+인증/승인, 세션 결합, 분석 가능 여부와 위험 상태를 구분한다. 로딩·빈 목록·실패·재시도·권한 부족을 처리하고, API 미연결을 고정 시험 데이터 성공으로 대체하지 않는다. 기존 `/demo`는 명시적인 고정 시험 데이터·브라우저 loopback·과거 증거용으로 보존했다.
 
 주요 파일: `apps/web/src/pages/Finals.tsx`, `App.tsx`, `config.ts`, `lib/api.ts`, `styles.css`.
 
@@ -218,10 +220,10 @@ DB backup·새 빈 DB restore·rollback 절차를 작성했다. **backup helper�
 
 | 구분 | 경로 | 현재 정책 |
 |---|---|---|
-| light | `pnpm light`, `pnpm test:light` | 기본 허용. 최대 worker 2개. TCP/UDP/listen/fetch 실수 차단 |
+| light | `pnpm light`, `pnpm test:light` | 기본 허용. 최대 백그라운드 처리기 2개. TCP/UDP/listen/fetch 실수 차단 |
 | integration | `pnpm test:integration` | PostgreSQL 사용. 명시적 실행 승인 전 차단 |
 | chain | 계약·witness 장애 시험 | 명시적 chain 실행 승인 전 차단 |
-| media | `pnpm test:media`(v2), `test:e2e`(v1) | 명시적 media 실행 승인 전 차단 |
+| media | `pnpm test:media`(역할 분리 직접 통화 경로), `test:e2e`(초기 시연 경로) | 명시적 media 실행 승인 전 차단 |
 | performance | `pnpm test:benchmark` | 명시적 performance 실행 승인 전 차단 |
 
 일반 push/PR workflow는 light만 수행하도록 바꿨다. integration은 수동 workflow와 별도 environment 승인으로 분리했다. GitHub environment의 required reviewer 설정 자체는 운영자가 해야 하며 이번 작업에서 CI를 실행하지 않았다. 기존 무거운 시험을 삭제하지 않았다.
@@ -242,7 +244,7 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 
 | 실행 명령/검사 | 결과 | 해석 범위 |
 |---|---|---|
-| `pnpm install --frozen-lockfile --ignore-scripts` | 완료 | 기존 lockfile/cache 사용, lifecycle 생략. 모델/브라우저/이미지 다운로드 없음 |
+| `pnpm install --frozen-lockfile --ignore-scripts` | 완료 | 기존 lockfile/cache 사용, 생성·변경·종료 흐름 생략. 모델/브라우저/이미지 다운로드 없음 |
 | `pnpm light` | 통과 | 소스 위생·타입·외부 의존 없는 단위 테스트. 전체 ESLint 규칙 검사는 아님 |
 | `pnpm test:light --reporter=verbose --reporter=json --outputFile.json=artifacts/finals-light-results.json` | **44/44 통과** | 기존 회귀를 포함한 총44개. 실제 서비스 통합 시험이 아님 |
 | `VITE_PROTOCOL_PROFILE=finals pnpm --filter @callsign/web build` | 경고와 함께 통과 | 웹 번들/타입 검사. 브라우저 실행 결과는 아님 |
@@ -271,7 +273,7 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 | `tests/unit/witness.test.ts` | 1 | 통과 — fake witness 응답 |
 | **합계** | **44** | **실패 0** |
 
-검사한 오류에는 객체 접근 위반, VC 복사/서명 위조, v1/v2 혼동, 같은/다른 binding 재사용, 취소 전후 전이, 키 회전, status/receipt 변조, 미지원 transport, 부정/인용/수정 전사, 늦은 응답·동의 철회, backpressure와 중복 witness 키가 포함된다.
+검사한 오류에는 객체 접근 위반, VC 복사/서명 위조, 초기 시연·역할 분리 직접 통화의 두 형식 혼동, 같은/다른 승인·세션 결합 재사용, 취소 전후 전이, 키 회전, status/receipt 변조, 미지원 transport, 부정/인용/수정 전사, 늦은 응답·동의 철회, backpressure와 중복 witness 키가 포함된다.
 
 ### 경고와 증거 파일
 
@@ -288,10 +290,10 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 | 선택 | 이유와 한계 |
 |---|---|
 | 기존 스택·의존성 재사용 | 전면 재작성과 불필요한 프레임워크 도입을 피함 |
-| 기관 단위 JSONB 권위 경계 | 취소·소비·회전을 같은 잠금 경계로 단순화. 대규모 운영의 정규화·retention 설계는 별도 필요 |
+| 기관 단위 JSONB 권위 경계 | 취소·소비·회전을 같은 잠금 경계로 단순화. 대규모 운영의 정규화·보관·삭제 정책 설계는 별도 필요 |
 | Platform/Issuer/Sender 역할 분리 | 기관·서비스 개인키와 issuer 쓰기 권한의 접근 범위를 구분 |
 | VC와 개별 연락 승인 분리 | 재사용 위임과 1회 통화 권한을 혼동하지 않고 통화별 온체인 위임 생성 방지 |
-| v2 strict schema, 자동 fallback 없음 | v1 증거를 보존하면서 버전 혼동·다운그레이드 방지 |
+| 역할 분리 직접 통화 경로 strict schema, 자동 대체 처리 없음 | 초기 시연 경로 증거를 보존하면서 버전 혼동·다운그레이드 방지 |
 | 영수증까지 transaction에 저장 | commit 후 응답 유실 시 같은 결과 복구를 준비. 실제 DB 검증은 대기 |
 | 분산 witness 후보 + 최초 deadline | 단일 RPC/가장 느린 노드 의존을 줄이고 오래된 상태 재서명에 의한 연장 방지 |
 | 새 연결은 새 승인·재검증 | 재접속을 기존 연결 증거로 인증하는 오류 방지. 장시간 세션 연장은 미구현 |
@@ -305,10 +307,10 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 | 항목 | 현재 상태 | 다음에 필요한 작업 |
 |---|---|---|
 | 실제 PBX 통화 | **구현 중** | Media Edge/bridge 선정, SIP·RTP·signaling 연결, 별도 PBX 수신 검증과 UI |
-| 공유·영속 quota | **미착수** | 프로세스/재접속을 넘는 요청·비용 한도와 보관 정책. 현재 개별 제한만 있음 |
-| 영속 high-watermark | **미착수** | cold restart 뒤 rollback 방어 연속성 설계. 현재 메모리 guard와 시계/freshness에 의존 |
+| 공유·영속 사용 한도 | **미착수** | 프로세스/재접속을 넘는 요청·비용 한도와 보관 정책. 현재 개별 제한만 있음 |
+| 영속 최고 관측 상태 기록 | **미착수** | 저장 상태를 다시 읽는 재시작 뒤 rollback 방어 연속성 설계. 현재 메모리 guard와 시계/freshness에 의존 |
 | 장시간 승인 연장·자동 복구 | **미착수** | 현재 짧은 승인 만료 후 새 시도 필요. 연결 증거를 보존하는 연장/재검증 프로토콜 필요 |
-| 대규모 저장소 운영 | **미착수** | JSONB 행 크기·보관·감사 retention·잠금 대기·정규화 정책 |
+| 대규모 저장소 운영 | **미착수** | JSONB 행 크기·보관·감사 보관·삭제 정책·잠금 대기·정규화 정책 |
 | 범용 VC/네이티브 QBFT 증명 | **미착수/현재 프로파일 밖** | 범용 적합성·상호운용 시험, native header/storage proof는 별도 확장 |
 | OIDC·서비스·DB·체인·미디어 | **실환경 검증 대기** | 배포 환경과 계정으로 실제 동작/거절/장애 경로 확인 |
 | UI runtime·접근성 | **실환경 검증 대기** | 브라우저/모바일/반응형/키보드 및 실제 미디어 검사 |
@@ -327,7 +329,7 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 | 로그인 | OIDC issuer/JWKS/authorization/token URL, 일반·공식 업무의 별도 client ID/audience, 사전 등록 역할 계정. 현재 code flow는 S256 PKCE public client의 token authentication method `none` 사용 |
 | DB/서비스 인증 | migrator·issuer·auth LOGIN 계정과 권한, 서로 다른 서비스 token |
 | 서명/공동 운영 | 기관 승인키 버전, Sender 서비스키, witness별 키, 기관 관리자/정지키, 승인자별 개별 키 |
-| 원장/이미지 | 실제 network ID/genesis/registry/기관 metadata, 같은 소스 revision의 app/web image tag 또는 digest |
+| 원장/이미지 | 실제 network ID/genesis/registry/기관 metadata, 같은 소스 revision의 app/web image tag 또는 내용 해시 |
 | TURN/PBX | TURN 주소·secret·공인 IP·인증서·relay 범위, 실제 Asterisk/Media Edge 이미지·계정·종단 구성 |
 | STT/LLM | 선택 provider 계정/API key/model, 데이터 처리 동의·보관 설정, 과금 상한 |
 | GCP | 프로젝트·IAM/service account·zone·VM·VPC·디스크·운영자 CIDR·정확한 OS image |
@@ -338,15 +340,15 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 
 아래는 미래 절차다. 현재 실행 요청으로 취급하지 않는다.
 
-1. **배포 대상 확정:** 소스 revision, 로컬/GCP 대상, 새 배포인지 기존 배포 복원인지, 승인된 실행 범주를 정한다.
+1. **배포 대상 확정:** 소스 수정 번호, 로컬/GCP 대상, 새 배포인지 기존 배포 복원인지, 승인된 실행 범주를 정한다.
 2. **DB:** migration·별도 LOGIN/GRANT를 적용하고 권한 거절, 동시 소비/취소, commit 후 재시도와 rollback을 실제 PostgreSQL에서 검증한다.
 3. **서비스/로그인:** Issuer/Sender/Platform의 key mount·token·OIDC·할당 권한·공식 업무 별도 인증과 소유권을 확인한다.
-4. **원장:** 같은 QBFT 체인의 노드 4개와 witness 4개의 chain/genesis/block/state, VC digest 등록·철회, quorum 부족/stale/rollback, 새 승인키 복구를 확인한다.
+4. **원장:** 같은 QBFT 체인의 노드 4개와 witness 4개의 chain/genesis/block/state, VC 내용 해시 등록·철회, 정족수 부족/stale/rollback, 새 승인키 복구를 확인한다.
 5. **직접 통화:** 별도 기기 HTTPS/WSS에서 실제 마이크, 수락 전 0 audio, 수락 후 양방향 음성, 음소거·거절·종료·장치 오류·TURN relay·만료·재연결 정책을 확인한다.
 6. **음성 분석:** 별도 동의와 작은 예산으로 STT/LLM의 partial/final·수정·timeout·취소·동의 철회·지출/로그를 확인한다. 마이크 시험의 성공을 provider 시험 성공으로 보지 않는다.
 7. **PBX:** 실제 bridge 종단부터 완성·검토한 뒤 SIP/Media Edge와 별도 수신 검증을 시험한다.
 8. **운영:** 승인된 소규모 장애/부하, GCP 재시작, 일관 backup·새 환경 restore·호환 rollback을 검증한다.
-9. **증거 갱신:** 실제 실행 커밋, 환경, image digest, DB/chain/키 버전, browser/provider/model과 raw 결과를 기록한 뒤 보고서·발표 자료를 갱신한다.
+9. **증거 갱신:** 실제 실행 커밋, 환경, image 내용 해시, DB/chain/키 버전, browser/provider/model과 raw 결과를 기록한 뒤 보고서·발표 자료를 갱신한다.
 
 실행 범주는 `infrastructure`, `integration`, `chain`, `media`, `performance`로 구분하며 해당 사용자 승인 뒤에만 지정한다. 여러 범주는 명령별로 순서대로 적용한다. 운영 명령은 아래 원칙을 따른다.
 
@@ -373,7 +375,7 @@ README, 아키텍처, 프로토콜, 위협 모델, 알려진 한계, 공식 표�
 |---|---|
 | `AGENTS.md` | 다음 세션에서도 유지할 실행 제한 |
 | `docs/FINALS-IMPLEMENTATION-PLAN.md` | 요구 → 코드 → 시험 → 구현/검증 상태 |
-| `docs/ARCHITECTURE.md`, `docs/PROTOCOL.md` | 서비스·키·DB·통화 신뢰 경계, v1/v2 구분 |
+| `docs/ARCHITECTURE.md`, `docs/PROTOCOL.md` | 서비스·키·DB·통화 신뢰 경계, 초기 시연·역할 분리 직접 통화의 두 형식 구분 |
 | `docs/THREAT-MODEL.md`, `docs/KNOWN-LIMITATIONS.md` | 공격 경계, 미구현/미검증 사항 |
 | `docs/adr/0002-finals-offline.md` | 설계 선택과 이유 |
 | `docs/RUNBOOK.md` | 명령 인자/파일 위치, 승인 뒤 기동·키 회전·backup/restore·GCP 절차 |

@@ -1,40 +1,42 @@
-> 과거 v1 기록(2026-09-14). 본선의 현재 구현·이번 검증은 [FINALS-IMPLEMENTATION-PLAN](FINALS-IMPLEMENTATION-PLAN.md)을 따른다. 아래 PASS를 2026-10-26의 재검증으로 해석하지 않는다.
+> **2026-09-14의 과거 기록:** 초기 시청 시연의 개발·실행 이력이다. 현재 서비스·공개 주소·배포 상태의 재검증 결과가 아니다. 최신 구현·검증은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 아래 실행 명령은 당시 이력이며 현재 실행 허가가 아니다.
 
-# Progress
+# 초기 개발 진행 기록
 
-## Understood as
+## 당시 목표와 작업 범위
 
-당시 `institution-proof/`를 프로젝트 루트로 사용했다. 상위 저장소의 다른 미커밋 변경은 보존한다. P0의 실제 보안 연결과 11쪽 제출물을 우선 완성하고, P1/P2는 실행 결과에 따라 PASS/BLOCKED/NOT-RUN을 정확히 구분한다.
+초기 프로젝트 디렉터리 안에서 기존 사용자 변경을 보존하며 개발했다. 우선 목표는 증언자 서명을 이용한 직접 웹 통화 시연과 11쪽 기획서였다. 중앙 방식과의 비교 실험, 체인 자체 증명 검증은 후속 확장으로 남겼다. PASS는 통과, BLOCKED는 실행 차단, NOT-RUN은 미실행을 뜻한다.
 
-2026-09-14 추가 입력은 공개 제품명을 **CallSign**, 팀명을 **TEAM Signal**, 팀 구성을 양영우·이가은 2인으로 확정한 것으로 이해한다. 선택 제출은 영상이 아니라 **공개 GitHub 소스코드 1건**으로 전환한다. 사용자가 제공한 제안서의 문제·선행사례·팀 이력을 반영하되, 저장소와 다른 기술 스택(Next.js/FastAPI), 미실행 AI, 3-of-4 공동 복구처럼 실제 구현과 충돌하는 표현은 현재 React/Fastify, 규칙 fallback/선택 Ollama, 2-of-3 복구로 정정한다.
+2026-09-14 추가 입력은 공개 제품명을 **CallSign**, 팀명을 **TEAM Signal**, 팀 구성을 양영우·이가은 2인으로 확정한 것으로 이해한다. 선택 제출은 영상이 아니라 **공개 GitHub 소스코드 1건**으로 전환한다. 사용자가 제공한 제안서의 문제·선행사례·팀 이력을 반영하되, 저장소와 다른 기술 스택(Next.js/FastAPI), 미실행 AI, 4개 중 3개 서명 공동 복구처럼 실제 구현과 충돌하는 표현은 현재 React/Fastify, 규칙 fallback/선택 Ollama, 3명 중 2명 승인 복구로 정정한다.
 
-## Plan and verification gates
+용어: gateway는 발신 브라우저, issuer는 기관 승인 코드, epoch는 권한 세대, snapshot은 특정 블록의 상태 묶음이다. 고정 시험 데이터(fixture)·과거 녹화(RECORDED)·화면 미리보기(UI PREVIEW)·실행 중인 경로(LIVE)를 구별한다.
+
+## 당시 구현·검증 순서
 
 1. 저장소·도구·공식 API 확인 → 고정 버전, ADR, doctor 결과.
-2. 계약과 프로토콜 코어 → Foundry/Vitest 변조·권한·freshness 테스트.
+2. 계약과 프로토콜 코어 → Foundry/Vitest 변조·권한·상태 최신성 테스트.
 3. API, PostgreSQL 1회 소비, 인증 세션 → 통합 테스트와 권한 거절.
 4. 두 브라우저 WebRTC + signaling → 실제 datachannel/DTLS/audio stats E2E.
-5. 4-node Besu + 4 witness → 동일 블록 snapshot 3-of-4 검증과 장애 시험.
+5. Besu 검증자 4개 + 4 witness → 동일 블록 특정 블록의 상태 묶음 4개 중 3개 서명 검증과 장애 시험.
 6. 정상·공격 데모 UI → API/verifier 관측값만으로 상태 전이.
 7. 반응형/접근성/보안 QA → 390×844, 768×1024, 1440×900 캡처 검수.
 8. PPTX→PDF와 제출 문서 → 정확히 11쪽, 렌더 육안 검수, 요구 매핑.
 9. 깨끗한 재기동과 전체 테스트 → 실제 결과를 문서·JSON에 동기화.
 
-## Completed
+## 당시 수행 기록
 
 - 2026-09-14: 작업 루트가 비어 있음을 확인했다.
 - 2026-09-14: 상위 Git 저장소에 다른 프로젝트의 미커밋 변경이 있음을 확인하고 작업 범위를 현재 디렉터리로 제한했다.
 - 2026-09-14: Node 22.22.2, pnpm 11.13.0, Docker 29.1.2, Foundry 1.7.1, LibreOffice 24.2.7.2를 확인했다.
 - 2026-09-14: 제품 요구를 `PRODUCT.md`에 기록했다.
 - 2026-09-14: pnpm workspace, PostgreSQL compose, doctor/setup/migrate/seed 명령을 구성했다.
-- 2026-09-14: `InstitutionRegistry` 계약과 EIP-712 2-of-3 등록·복구, 위임·취소·정지·epoch 상태 기계를 구현했다. Foundry 5건 PASS.
+- 2026-09-14: `InstitutionRegistry` 계약과 EIP-712 3명 중 2명 승인 등록·복구, 위임·취소·정지·권한 세대 상태 기계를 구현했다. Foundry 5건 PASS.
 - 2026-09-14: JCS/Ed25519 signed objects, duplicate-key 선검사, SDP fingerprint 정규화와 순수 verifier를 구현했다.
-- 2026-09-14: 3-of-4 동일 snapshot 서명, freshness, monotonic deadline, rollback 방지 검증기를 구현했다.
+- 2026-09-14: 4개 중 3개 서명 동일 특정 블록의 상태 묶음 서명, 상태 최신성, monotonic deadline, rollback 방지 검증기를 구현했다.
 - 2026-09-14: Fastify 세션·CSRF·역할 검사, PostgreSQL 원자적 1회 consume, 공식 업무 객체 권한 검사를 구현했다.
 - 2026-09-14: 위험 분석 시험을 포함해 Vitest 19/19, PostgreSQL/API 통합 9/9, Foundry 5/5, 전체 TypeScript/Vite 빌드 PASS.
 - 2026-09-14: 한국어 랜딩, 데모, 수신자, 기관, 게이트웨이, 공동 운영, 근거, 비교, 공식 업무, 디자인 시스템 route를 구현했다. LIVE와 UI PREVIEW 표기를 분리했다.
 - 2026-09-14: Besu 26.8.1 QBFT 4노드가 2초 블록을 같은 genesis에서 생성하도록 구성하고, `InstitutionRegistry`를 배포해 네 RPC에서 동일 바이트코드를 확인했다.
-- 2026-09-14: 각자 지정된 Besu RPC 하나만 읽는 witness 4개와 브라우저에 고정되는 3-of-4 trust bundle을 구현했다. 1개 중단 시 3서명 제공, 2개 중단 시 503 fail-closed를 실제 확인했다.
+- 2026-09-14: 각자 지정된 Besu RPC 하나만 읽는 witness 4개와 브라우저에 고정되는 4개 중 3개 서명 trust bundle을 구현했다. 1개 중단 시 3서명 제공, 2개 중단 시 503 fail-closed를 실제 확인했다.
 - 2026-09-14: 두 Chromium context 사이 BUNDLE WebRTC, SDP 양측 fingerprint, 실제 remote DTLS certificate, 데이터채널 상호 서명 challenge, 1회 소비 영수증을 연결했다.
 - 2026-09-14: 수락 전 오디오 RTP 0 bytes와 수락 후 증가를 측정했다. 통화 중 실제 원장 위임 취소 후 약 3초 polling으로 인증 표시가 철회되고 통화는 유지되는 E2E를 구현했다.
 - 2026-09-14: 390×844, 768×1024, 1440×900에서 랜딩·데모·수신 화면의 가로 overflow 검사를 7개 브라우저 테스트 묶음으로 통과하고 11개 캡처를 직접 검토했다.
@@ -46,11 +48,11 @@
 - 2026-09-14: CallSign 도메인으로 새 레지스트리를 QBFT 원장에 배포하고 4개 노드의 동일 code 및 witness 4개 준비 상태를 확인했다.
 - 2026-09-14: CallSign PPTX에서 정확히 11쪽 PDF를 변환하고 11개 페이지 렌더를 모두 열어 검수했다.
 - 2026-09-14: 약 30초 LIVE 녹화를 다시 만들고 연결 확인·규칙 위험 안내·원장 취소 뒤 인증 철회 프레임을 직접 검수했다.
-- 2026-09-14: 공동 운영 API와 UI를 실제 원장에 연결했다. demo operator가 기관을 정지하고, 서로 다른 승인자 2명이 각 역할 세션에서 EIP-712 서명한 뒤 Besu `recoverInstitution`을 실행해 Active 전환과 epoch 증가를 확인했다.
+- 2026-09-14: 공동 운영 API와 UI를 실제 원장에 연결했다. demo operator가 기관을 정지하고, 서로 다른 승인자 2명이 각 역할 세션에서 EIP-712 서명한 뒤 Besu `recoverInstitution`을 실행해 Active 전환과 권한 세대 증가를 확인했다.
 - 2026-09-14: 공동 복구의 중복 signer·비승인 역할·확정 뒤 추가 서명을 거절하는 통합 시험과 실제 QBFT 브라우저 E2E를 추가했다. 데스크톱·390px 캡처를 열어 가로 넘침과 상태 문구를 검수했다.
 - 2026-09-14: 전체 회귀 시험을 Foundry 5/5, Vitest 20/20, API 통합 10/10, Playwright 11/11로 통과했다. 시험 보고서는 PASS 12·FAIL 0·BLOCKED 0·NOT-RUN 3이다.
 - 2026-09-14: 공개 GitHub `https://github.com/0u-Y/CallSign`의 `main`에 실제 소스와 증거를 push하고 비로그인 HTTPS 200 접근을 확인했다.
-- 2026-09-14: 첫 GitHub Actions에서 workflow PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
+- 2026-09-14: 첫 GitHub Actions에서 처리 절차 PostgreSQL service와 통합 스크립트의 Compose가 같은 55432 포트를 중복 점유하는 실패를 재현했다. `SKIP_DB_START=1`이면 기존 CI DB를 재사용하도록 수정하고 Docker 미호출·통합 10/10을 로컬 회귀 확인했다.
 - 2026-09-14: GitHub Actions에서 install·migration·build·Vitest·Foundry·integration 전 단계를 PASS로 확인했다.
 - 2026-09-14: Vercel 프로젝트 `0u-ys-projects/callsign`을 GitHub 저장소와 연결하고 `https://callsign-rouge.vercel.app`에 PUBLIC UI PREVIEW를 배포했다. 루트와 8개 깊은 route의 익명 HTTP 200, 보안 헤더, asset immutable cache를 확인했다.
 - 2026-09-14: 호스팅된 `/demo` 네 장면을 Chromium에서 실행해 승인/거절 결과를 관측하고, 로컬 전용 `/receiver`의 `/demo` 이동, 390px 가로 overflow 0, 콘솔 오류 0건을 확인했다.
@@ -59,29 +61,29 @@
 - 2026-09-14: 공개 데모에서 역할별 연락 흐름이 한눈에 보이지 않는 피드백을 반영했다. 기관→위탁 발신자→수신자→공식 업무 4단계와 공격 차단 지점을 첫 결과 영역에 추가하고, 장면 실행 시 실제 Ed25519 승인서 검증과 recipient 불일치를 수행하도록 연결했다.
 - 2026-09-14: 정상·복사 공격 흐름을 1440×900과 390×844에서 직접 캡처해 검수했다. 정상은 `확인됨/확인됨/확인됨/별도 권한`, 복사는 `확인됨/여기서 차단/여기서 차단/별도 권한`, 모바일 overflow 0, 콘솔 오류 0이며 전체 Playwright 12/12와 Vitest 20/20이 PASS했다.
 - 2026-09-14: 단일 실행 버튼과 즉시 결과가 발표용 데모로 부족하다는 사용자 피드백을 반영해 `/demo`를 전면 교체했다. 제안서 3분 구간에 맞춘 4장면, 역할별 콘솔, 수신 전화, 실제 사건 stream, 발표 멘트와 다음 단계 제어를 한 화면에 구성했다.
-- 2026-09-14: 공개 발표 데모의 정상·사칭·취소·복구 장면을 끝까지 실행했다. 브라우저에서 실제 Ed25519, 3-of-4 verifier, WebRTC DTLS/datachannel loopback, 수락 후 audio bytes를 관측했고 `RECIPIENT_MISMATCH`, 취소 후 `STATE_ROLLBACK`, 새 epoch 복구를 확인했다. Besu·분리 브라우저 값은 저장된 LIVE 증거라고 명확히 표시한다.
+- 2026-09-14: 공개 발표 데모의 정상·사칭·취소·복구 장면을 끝까지 실행했다. 브라우저에서 실제 Ed25519, 4개 중 3개 서명 verifier, WebRTC DTLS/datachannel loopback, 수락 후 audio bytes를 관측했고 `RECIPIENT_MISMATCH`, 취소 후 `STATE_ROLLBACK`, 새 권한 세대 복구를 확인했다. Besu·분리 브라우저 값은 저장된 LIVE 증거라고 명확히 표시한다.
 - 2026-09-14: 발표 데모 변경 뒤 Vitest 20/20과 Playwright 12/12를 다시 실행해 모두 통과했다. 정상 승인·WebRTC·오디오와 복사 증명의 `RECIPIENT_MISMATCH`를 단계별 E2E로 고정했다.
 - 2026-09-14: 저장소 로컬 Git 작성자와 `main`의 기존 커밋 작성자·커미터 메타데이터를 GitHub 로그인 계정 `0u-Y`와 검증된 noreply 주소로 통일했다. GitHub API에서 전체 이력이 `0u-Y` 계정에 연결됨을 확인했다.
 - 2026-09-14: Vercel 발표 데모를 새 흐름으로 배포하고 공개 Chromium에서 네 장면을 끝까지 실행했다. 정상 수락 오디오 0B→426B, 복사 공격 `RECIPIENT_MISMATCH`, 취소 rollback `STATE_ROLLBACK`, 복구 후 새 연결 426B를 관측했으며 콘솔 오류 0건, 390px 가로 overflow 0건이다.
-- 2026-09-14: 발표 흐름이 패널과 단계 버튼에 분산돼 한눈에 보이지 않는다는 피드백을 반영했다. `/demo`를 기관→승인서→위탁센터→WebRTC→수신자→공식 업무의 한 화면 신호도로 재구성하고, 시작 버튼 하나가 정상·공격·취소·복구를 실제 검사 완료 순서에 맞춰 자동 진행하도록 변경했다. 사칭은 연결선에서 차단되고, 취소는 통화를 유지한 채 인증선만 철회되며, 두 복구 승인 뒤 새 epoch 경로가 다시 연결된다.
+- 2026-09-14: 발표 흐름이 패널과 단계 버튼에 분산돼 한눈에 보이지 않는다는 피드백을 반영했다. `/demo`를 기관→승인서→위탁센터→WebRTC→수신자→공식 업무의 한 화면 신호도로 재구성하고, 시작 버튼 하나가 정상·공격·취소·복구를 실제 검사 완료 순서에 맞춰 자동 진행하도록 변경했다. 사칭은 연결선에서 차단되고, 취소는 통화를 유지한 채 인증선만 철회되며, 두 복구 승인 뒤 새 권한 세대 경로가 다시 연결된다.
 - 2026-09-14: 상단 1–4가 단일 절차의 네 단계처럼 보인다는 피드백을 반영했다. `4개 독립 시나리오` 제목과 설명, 현재 시나리오 N/4, 항목별 상황·결과·상태를 추가하고 완료 뒤에도 번호를 유지했다. 내부 실행 진행은 `검증 N/14`로 분리했으며 기본 재생을 약 50초 발표 속도로 늦추고 약 15초 빠른 확인 모드를 별도로 제공한다.
 
-## In progress
+## 당시 완료 범위와 남긴 확장
 
-- P0와 제출 자료는 현재 검증 범위에서 완료했다. 브라우저 즉시 실행과 로컬 LIVE 증거를 구분한 Vercel 발표 데모도 배포·검증했다. P1 비교 하네스와 P2 네이티브 상태 증명은 후속 범위다.
+- 증언자 서명 검증 방식과 제출 자료는 현재 검증 범위에서 완료했다. 브라우저 즉시 실행과 로컬 LIVE 증거를 구분한 Vercel 발표 데모도 배포·검증했다. 대안 비교 실험 비교 하네스와 체인 자체 증명 확장 네이티브 상태 증명은 후속 범위다.
 
-## Next
+## 당시 남긴 작업
 
 - 팀 대표 연락처 등 비공개 제출 폼 입력값을 사용자가 최종 입력한다.
-- P1 C1/C2/B 비교 하네스와 P2 native QBFT proof는 현재 P0 회귀 시험 이후 별도 확장한다.
+- 중앙 서버·기관별 서명 문서·원장 방식의 비교 시험 도구와 체인 자체 증명 확장 native QBFT proof는 현재 증언자 서명 검증 방식 회귀 시험 이후 별도 확장한다.
 
-## Environment constraints
+## 당시 환경·제약
 
 - 시스템 `chromium` 명령은 없지만 Playwright 관리 Chromium 153으로 실제 E2E를 수행했다.
 - 팀명·팀원·역할은 제공됐다. 대표자 연락처·팀원별 GitHub ID는 제공되지 않았으며 공개 파일에 추정하지 않는다.
 - 실제 기관·통신사 연동은 승인 범위 밖이다. 외부 공개 Vercel UI preview 배포는 2026-09-14 사용자 지시로 승인됐다.
 
-## Commands
+## 당시 실행 명령
 
 - `pnpm setup`
 - `pnpm demo:up`
