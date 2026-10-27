@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     strictPort: true,
     proxy: {
-      "/api": { target: "http://127.0.0.1:4100", changeOrigin: false, rewrite: (path) => path.replace(/^\/api/, "") },
+      "/api": { ws: true, target: "http://127.0.0.1:4100", changeOrigin: false, rewrite: (path) => path.replace(/^\/api/, "") },
       "/signaling": { target: "ws://127.0.0.1:4100", ws: true, changeOrigin: false },
     },
   },

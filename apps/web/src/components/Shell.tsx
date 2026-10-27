@@ -12,6 +12,7 @@ export function Shell() {
         <NavLink to="/" className="brand-link"><Brand /></NavLink>
         <nav aria-label="주요 탐색">
           <NavLink to="/demo" className={({ isActive }) => isActive || location.pathname === "/receiver" ? "active" : ""}>체험하기</NavLink>
+          {!publicPreview && <NavLink to="/finals">본선 업무</NavLink>}
           {!publicPreview && <NavLink to="/institution" className={() => operating ? "active" : ""}>기관 운영</NavLink>}
           <NavLink to="/evidence" className={({ isActive }) => isActive || location.pathname === "/compare" ? "active" : ""}>검증 근거</NavLink>
         </nav>

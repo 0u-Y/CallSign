@@ -5,7 +5,7 @@ let csrfToken = sessionStorage.getItem("ip_csrf") ?? "";
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
-  if (init.method && !["GET", "HEAD", "OPTIONS"].includes(init.method.toUpperCase()) && csrfToken) headers.set("x-csrf-token", csrfToken);
+  if (init.method && !["GET", "HEAD", "OPTIONS"].includes(init.method.toUpperCase()) && csrfToken && !headers.has("x-csrf-token")) headers.set("x-csrf-token", csrfToken);
   const response = await fetch(`/api${path}`, { ...init, headers, credentials: "include" });
   const value = await response.json().catch(() => ({}));
   if (!response.ok) throw new ApiError(response.status, value?.error?.code ?? "REQUEST_FAILED", value?.error?.message ?? "요청을 처리하지 못했습니다.");
@@ -33,4 +33,12 @@ export async function me(): Promise<SessionUser | null> {
 
 export class ApiError extends Error {
   constructor(public readonly status: number, public readonly code: string, message: string) { super(message); }
+}
+
+export function setCsrfToken(value: string): void { csrfToken = value; sessionStorage.setItem("ip_csrf", value); }
+
+export async function logoutSession(purpose: "work" | "official"): Promise<void> {
+  const session = await api<{ csrfToken: string }>(`/v2/auth/me?purpose=${purpose}`);
+  await api("/v2/auth/logout", { method: "POST", headers: { "x-csrf-token": session.csrfToken }, body: JSON.stringify({ purpose }) });
+  if (purpose === "work") { csrfToken = ""; sessionStorage.removeItem("ip_csrf"); }
 }

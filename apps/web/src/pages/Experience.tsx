@@ -231,7 +231,7 @@ export function ReceiverPage() {
     if (!authorization || !gateway || !trust) return;
     try {
       const verified = await verifyLedgerAuthorization(authorization, gateway.publicJwk, trust);
-      stateGuardRef.current.accept(verified, performance.now());
+      stateGuardRef.current.accept(stateGuardRef.current.limitDeadline(verified), performance.now());
       ledgerVerifiedRef.current = true;
       directoryHashRef.current = verified.snapshot.directoryHash;
       if (stateDeadlineRef.current !== null) window.clearTimeout(stateDeadlineRef.current);
