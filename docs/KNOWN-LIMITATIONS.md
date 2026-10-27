@@ -1,3 +1,20 @@
+# 본선 현재 한계
+
+2026-10-27 최신 상태는 [서비스 이행 기록](FINALS-IMPLEMENTATION-PLAN.md#service-20261027)과 [멘토링 현황](mentoring/05-IMPLEMENTATION-STATUS.md)을 따른다. 아래 기존 v2 한계를 새 v3에서 해결 완료한 것으로 승계하지 않는다.
+
+- 실제 PostgreSQL 권한/취소·소비 경합, Issuer/Sender 서비스 간 연결, Besu/witness, 브라우저 마이크/TURN, STT/LLM 제공자, GCP 이전은 미실행이다. 단위/정적 검사 결과만 [진행표](FINALS-IMPLEMENTATION-PLAN.md)에 기록한다.
+- PBX 기본 종단은 Asterisk다. 새 ARI 채널/Call-ID·mute/bridge·별도 JWS/SDK·SIP 브라우저 모듈은 부분 구현이며 역할 UI·ARI event/watchdog·자동 회수·실제 설정·배포·전체 시험이 없다. 기존 외부 Edge helper를 서버 완료로 보지 않는다. v2 직접 인증으로 PBX를 수락하지 않는다.
+- 원장 VC 등록/복구는 실제 실행하지 않았다. `RegistryOperations`는 별도 승인자 EIP-712 서명을 검증하고 전송하는 코드이며 외부 장애 내성/트랜잭션 재시도/최종성 보장은 미검증이다.
+- 기관 단위 JSONB aggregate는 작고 제한된 시연 규모를 위한 것이다. 보관 정책/용량 제한/행 잠금 대기/감사 retention과 DB 역할 권한의 운영 검증이 필요하다.
+- STT/LLM 호출별 시간/크기/요청 수는 제한하지만 계정 전체 월간 과금 한도와 다중 프로세스 공유 quota는 v2에 없고 v3에 SQL 예약 코드를 추가했으나 호출/프로세스 경합·실제 비용 검증은 없다. 제공자 콘솔 한도를 병행해야 한다. Deepgram 재접속은 새 stream과 재동의를 요구하며 누락 구간 복구를 보장하지 않는다.
+- 한국어 규칙은 부정/인용/자기정정의 일부 패턴을 보수적으로 처리한다. LLM·STT 정확도와 위험 탐지율은 측정하지 않았다. 경고 없음/분석 불가는 안전 판정이 아니다.
+- OIDC·HTTPS 도메인/키/trust bundle은 사전 준비가 필요하다. OIDC authorization-code/S256 PKCE·state/nonce·별도 client/audience 로그인 경로를 구현했으나 실제 IdP 통합은 미검증이다. pending state는 프로세스 메모리이므로 다중 인스턴스/재시작 시 다시 로그인해야 한다. 직접 ID token 입력은 개발 모드에서만 보이고 공개 배포 API에서는 차단된다.
+- 기존 v2 UI는 짧은 승인 만료에 통화를 종료한다. v3 시작120초/진행 lease API는 작성했으나 UI·양측 연결/갱신·재접속 복구는 미완성이다. v3 임시4시간 cap·lease30초는 운영 확정/실측값이 아니다.
+- v2 high-watermark는 메모리뿐이고 v3는 DB checkpoint/recovery gate 코드를 추가했다. 실제 PG·독립 외부 anchor·복원 gate 해제·전체 최신성 복구는 미구현/미검증이다. native header/storage proof는 기본 gate에서 제외한 미구현 확장이다.
+- GCP Terraform은 작성했으나 Terraform init/validate/plan/apply하지 않았다. Compose schema 정적 검증은 이미지의 존재·설정·기동을 보장하지 않는다. 기존 PBX overlay는 외부 Edge 전제가 남아 확정 Asterisk 구성으로 수정이 필요하다.
+
+## 기존 v1 한계 기록
+
 # Known limitations
 
 - `native-qbft` P2는 NOT-RUN이다. `eth_getProof` 응답 파싱, QBFT commit seal, validator quorum, stateRoot 연결을 구현 완료했다고 주장하지 않는다.

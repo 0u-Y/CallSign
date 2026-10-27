@@ -1,81 +1,66 @@
-# CallSign · 블록체인 기반 기관 발신 인증 서비스
+# CallSign · 기관 연락 승인과 통화 세션 검증
 
-[![CI](https://github.com/0u-Y/CallSign/actions/workflows/ci.yml/badge.svg)](https://github.com/0u-Y/CallSign/actions/workflows/ci.yml)
+CallSign은 **기관의 업무에 근거한 개별 연락 승인**, **위탁 발신자의 권한과 현재 통화 연결**, **음성에서 드러난 위험 요구**를 따로 검증하는 TEAM Signal의 개념검증입니다. 본선 대표 사례는 **모의 금융기관의 이상거래 확인 연락**입니다. 실제 금융기관·정부·통신사 연동 서비스가 아닙니다.
 
-기관이 **이 연락을 승인했는지**, 승인된 발신 종단과 **현재 브라우저 연결이 같은지**, 통화 중 **위험한 요구가 있는지**, 민감한 후속 업무가 **공식 로그인 경로로 이어지는지**를 나누어 검증하는 TEAM Signal의 해커톤 개념검증입니다. 실제 기관·정부·통신사 연동 서비스가 아닙니다.
+멘토링 검토는 [서비스 개요·구조·통화 흐름·보안·현황](docs/mentoring/README.md)에서 시작합니다.
 
-![실제 3-of-4 원장 상태와 WebRTC 연결 확인 화면](artifacts/screenshots/receiver-connected-live.png)
+## 현재 개발 상태
 
-## 공개 발표 데모
+2026-10-27 현재 인프라를 실행하지 않는 개발 단계입니다. 업무·위임 VC·분리 Issuer/Sender·v2 승인/소비·수신 SDK·마이크/STT·역할 화면·배포 코드를 추가했습니다. **전체 서비스가 통합 검증되거나 본선용으로 배포된 상태는 아닙니다.** 세부 구현 상태와 검증 결과는 [본선 진행·추적표](docs/FINALS-IMPLEMENTATION-PLAN.md)가 기준입니다.
 
-[Vercel 발표 데모](https://callsign-rouge.vercel.app/demo)는 시작 버튼 하나로 **서로 독립된 4개 시나리오**인 정상 연락 → 사칭·증명 복사 → 통화 중 권한 취소 → 기관 정지·공동 복구를 연속 실행합니다. 기본 `발표 속도`는 설명을 곁들일 수 있는 약 50초이고, 개발 확인용 약 15초 모드도 선택할 수 있습니다. 기관 → 위탁센터 → 수신자 → 공식 업무의 신호선과 공동 인증망 상태가 실제 검사 완료 순서에 맞춰 한 화면에서 바뀝니다.
+전체 목표와 완료 조건은 [개발 명세](docs/MASTER-DEVELOPMENT-SPEC.md)에서 관리합니다. 후속 구현에는 DB 세션의 용도 분리·로그아웃·토큰 재사용 차단, 업무/VC 반환 범위, 연결 권한 재검사와 분석 정리를 보완했습니다. 새 migration은 작성만 했으며 실제 DB·통화·제공자 검증은 대기입니다.
 
-![네 개의 독립 시나리오와 기관 승인, 위탁 발신, 수신 검증을 한 화면에 보여주는 발표 데모](artifacts/screenshots/demo-desktop.png)
+- `/finals`: 모의 CRM/FDS 업무 생성 → 상담원 할당 → 재사용 위임 → 짧은 발신 세션 허가 → 개별 승인 → 수신자의 서명·현재 연결 검증 → 수락 후 양방향 마이크 → 동의한 상대 음성 분석. 실제 API가 없으면 오류를 표시합니다.
+- `/demo`: 기존 발표용 브라우저 암호/WebRTC fixture와 저장된 과거 LIVE 증거. 본선 서비스의 성공 증거로 사용하지 않습니다.
+- 기존 시청 사례, v1 schema와 fixture, 제출 PPTX/PDF, `artifacts/`의 과거 증거는 보존합니다.
+- 확정 기본 경로는 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹입니다. URI 기반 v3 승인/lease·PBX 제어/증거·SIP 모듈은 추가했지만 기존 v2 화면·배포에서 전환 중입니다. 전체 PBX 연결·자동 회수·원장 worker는 미완성입니다. 본선 v2 수신 SDK는 PBX를 직접 WebRTC 인증으로 승인하지 않습니다.
+- 최신 light는 18개 파일82개 테스트 통과입니다. 단위·정적 범위이며 실제 DB·체인·통화·AI·GCP 성공을 뜻하지 않습니다. [현재 근거](artifacts/master-implementation-20261027-service.json).
 
-`BROWSER LIVE` 단계는 현재 탭에서 실제 Ed25519 승인서 검증, 합성 3-of-4 witness quorum, WebRTC DTLS·datachannel loopback, 수락 후 생성 음원 바이트 증가를 실행합니다. `RECORDED LIVE` 단계는 이 저장소의 로컬 Besu 4노드·분리 브라우저 E2E에서 얻은 트랜잭션과 관측값입니다. 공개 Vercel이 원격 QBFT 노드에 연결된 것처럼 표시하지 않습니다. PostgreSQL, Besu 4노드, witness 4개와 별도 브라우저 WebRTC를 실행하는 전체 LIVE 데모는 아래 localhost 절차로 재현합니다.
+## 가벼운 개발 절차
 
-## 30초 이해
-
-1. 모의 기관 담당자가 Alice의 업무와 목적에 한정된 승인서를 발급합니다. 이때 브라우저 게이트웨이 키의 위임이 실제 QBFT 원장에 기록됩니다.
-2. 두 브라우저가 WebRTC offer/answer를 교환합니다. 수신자는 Ed25519 승인·1회 소비 영수증·양측 SDP fingerprint·실제 remote DTLS certificate·datachannel 상호 challenge를 대조합니다.
-3. 각자 다른 Besu 노드 하나만 읽는 witness 4개 중 같은 snapshot에 서명한 3개 이상을 브라우저가 확인합니다. 위임이 취소되면 통화는 유지하고 인증 표시를 철회합니다.
-4. 서류는 전화 증명만으로 열지 않습니다. `/official`의 별도 세션과 task owner 검사에서 다시 권한을 확인합니다.
-
-## 실행
-
-요구 도구: Node 22, pnpm 11.27, Docker, Foundry, Playwright Chromium. Ubuntu/Linux amd64에서 실제 검증했습니다.
+Node 22, pnpm 11.27.0을 사용합니다. lifecycle script를 생략하면 브라우저·모델·컨테이너 설치를 시작하지 않습니다.
 
 ```bash
-pnpm setup
-pnpm demo:up
-pnpm demo:seed
-pnpm dev
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm light
 ```
 
-브라우저에서 `http://localhost:4173/receiver`를 열고 테스트 세션을 준비한 뒤, 새 창의 `/gateway`에서 키를 등록합니다. `/institution`에서 기관 세션을 준비하고 연락 승인서를 발급한 후 게이트웨이에서 통화를 시작합니다.
+`light`는 소스 충돌 표시·JavaScript 문법 검사(`lint`), TypeScript 검사, 네트워크 없는 단위 테스트입니다. ESLint 전체 규칙 검사는 도입하지 않았습니다. Vitest는 최대 worker 2개이고 DB 통합 테스트와 Playwright를 포함하지 않습니다. Fastify `inject`는 포트 없이 fake 요청을 처리합니다. 기존 시험 결과 파일은 덮어쓰지 않습니다.
 
-```bash
-pnpm test
-pnpm test:contracts
-pnpm test:integration
-pnpm test:witness-failover
-pnpm test:benchmark
-pnpm test:e2e
-pnpm demo:record
-pnpm test:report
-pnpm demo:down
+웹 번들 컴파일만 확인하려면 `pnpm --filter @callsign/web build`를 사용합니다. 서버는 실행하지 않습니다.
+
+## 구조와 실행 경계
+
+```text
+React/Vite 수신자·기관·상담원·공동 운영 화면
+       │ HTTPS/WSS + 역할 세션/CSRF
+       ▼
+Platform API (기관·서비스 개인키와 DB 계정 없음)
+       ├── Issuer Gateway (업무/승인/소비 DB, 기관 승인키)
+       └── Sender Agent (서비스 장기키, 브라우저 세션 공개키 허가)
+Issuer ── 서로 다른 3-of-4 witness ── Besu QBFT 4개
+브라우저 ↔ 직접 WebRTC (수락 전 track 미부착)
+상대 음성 → 동의 → Deepgram → revision → 정책/규칙/선택 LLM → 위험 근거
 ```
 
-`demo:down`은 볼륨을 지우지 않습니다. HTTP LAN 주소는 WebRTC secure context가 아니므로 기본 지원은 localhost입니다.
+TypeScript/pnpm, React/Vite, Fastify, PostgreSQL/Drizzle, Ed25519/JWS, Solidity/Besu를 유지합니다. 정상 연락마다 새 온체인 위임을 만들지 않습니다. 위임 VC digest를 한 번 원장 위임 ID에 연결하고 개별 통화는 오프체인 승인으로 처리합니다.
 
-`scripts/deploy-registry.ts`의 결정적 계정 키와 `.env.example`의 자격 증명은 재현 가능한 로컬 전용 공개 fixture입니다. 공개망 자산을 보내거나 운영 환경에서 재사용하면 안 됩니다. 실행 중 생성되는 issuer·witness 개인키와 세션 자료는 gitignored `.local/`에만 저장됩니다.
+## 이후 별도 승인 뒤 실행
 
-## 실제 구현 범위
+현재 `setup`, `dev`, `demo:*`, 통합·체인·미디어·성능 시험은 기본 차단됩니다. 실행 범주별 명시적 환경값과 절차는 [runbook](docs/RUNBOOK.md)에 있습니다. 이번 개발 중 차단을 해제하지 않았습니다.
 
-- Solidity 비업그레이드 권한 계약, EIP-712 2-of-3 등록·복구, 위임·취소·정지·epoch
-- Besu 26.8.1 QBFT 4노드, 2초 블록, 노드별 볼륨과 localhost RPC
-- 각자 지정 RPC 하나만 읽는 Ed25519 witness 4개와 브라우저 3-of-4/freshness/rollback 검증
-- JCS/Ed25519 승인서·enrollment·challenge·binding·영수증·session proof·transport transcript
-- PostgreSQL unique constraint 기반 승인서 원자적 1회 소비와 동일 binding 멱등 재시도
-- 인증된 WebSocket signaling, 별도 브라우저 context 2개의 BUNDLE WebRTC, 수락 전 0 audio bytes와 수락 후 RTP 증가
-- 역할 세션·Origin/CSRF·공식 업무 객체 권한·WebSocket 방 접근 통제
-- 공동 운영 화면의 실제 긴급 정지와 서로 다른 승인자 2명의 EIP-712 서명, Besu 복구 트랜잭션·epoch 전환
-- 원장 `directoryHash`와 일치하는 고정 `/official` 디렉터리, 별도 로그인·객체 권한 검사
-- 동의한 합성 전사문의 규칙 기반 위험 신호 설명과 localhost 전용 Ollama structured-output adapter. 결과는 인증 상태와 독립
-- 한국어 반응형 UI와 390/768/1440px·200% 확대 Playwright 검수
+| 경로 | 내용 | 자동 실행 |
+|---|---|---|
+| `pnpm light` | 타입·소스·작은 단위 테스트 | 일반 PR/push CI |
+| `pnpm test:integration` | PostgreSQL·API/권한·저장소 트랜잭션 | 승인된 수동 workflow만 |
+| `pnpm test:contracts`, `test:witness-failover` | 계약·Besu/witness/장애 | 별도 `chain` 승인 |
+| `pnpm test:media`, `test:e2e`, `demo:record` | 본선 v2/기존 v1 브라우저·미디어 후속 검증 | 별도 `media` 승인 |
+| `pnpm test:benchmark` | 성능 표본 | 별도 `performance` 승인 |
 
-최종 실행 결과는 [TEST-RESULTS](docs/TEST-RESULTS.md), 기계 판독본은 `artifacts/test-results.json`입니다. 편집 가능한 11쪽 제안서는 `submission/CallSign_기획제안서.pptx`, 같은 파일에서 변환한 제출본은 `submission/CallSign_기획제안서.pdf`입니다.
+본선 배포는 `infra/deploy/compose.yml`, GCP 준비는 `infra/gcp/`입니다. `.env.example`에는 비밀값이 없습니다. 사전 준비된 이미지·키·trust bundle·기존 체인 데이터로 기동하며 재시작 시 초기화·배포·seed를 실행하지 않습니다. PBX 선택 구성은 `compose.pbx.yml`에 따로 있습니다.
 
-## 아직 완료하지 않은 범위
+## 문서와 증거
 
-- P2 네이티브 QBFT header/commit seal 및 EIP-1186 storage proof 검증
-- 실제 통신사 SIP/RCD/STIR 연동, TURN을 둔 다중 장치·모바일 브라우저 검증
-- 복구 시 관리자·정지키는 교체하지만 실행 중 issuer와의 정합성을 위해 승인용 Ed25519 키는 유지. 실제 운영용 키 회전·HSM 절차
-- 로컬 Ollama 모델의 실제 추론 실행. adapter와 규칙 fallback은 구현했지만 모델은 자동 다운로드하지 않았고 이번 결과에서는 NOT-RUN입니다.
-- 실제 기관 채택, 보안 인증, 전국 배포, 외부 공개 **LIVE** 인프라
+[아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [설계 결정](docs/adr/0002-finals-offline.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [공식 표준](docs/STANDARDS.md) · [본선 추적표](docs/FINALS-IMPLEMENTATION-PLAN.md) · [4회차 멘토링/최종 보고서](submission/FINALS-ROUND4.md).
 
-## 선택 제출
-
-선택 제출은 공개 GitHub 소스코드 1건, [0u-Y/CallSign](https://github.com/0u-Y/CallSign)입니다. 외부 접근 확인 상태는 [SELECTED-EVIDENCE](submission/SELECTED-EVIDENCE.md)에 기록합니다.
-
-신뢰 모델과 정확한 보장 범위는 [아키텍처](docs/ARCHITECTURE.md), [프로토콜](docs/PROTOCOL.md), [위협 모델](docs/THREAT-MODEL.md), [한계](docs/KNOWN-LIMITATIONS.md), [실제 시험 결과](docs/TEST-RESULTS.md)에 있습니다.
+[2026-09-14 과거 시험 기록](docs/TEST-RESULTS.md)과 [기존 공개 발표 자료](submission/SELECTED-EVIDENCE.md)는 해당 시점의 환경에 한정됩니다. 과거 공개 URL의 현재 접근 여부, 현재 배포, 통화 성공, 처리량·장애 내성을 이번 개발에서 확인하지 않았습니다. 원격 저장소는 [0u-Y/CallSign](https://github.com/0u-Y/CallSign)입니다.

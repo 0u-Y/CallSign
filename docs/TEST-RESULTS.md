@@ -1,3 +1,5 @@
+> 과거 v1 기록(2026-09-14). 본선의 현재 구현·이번 검증은 [FINALS-IMPLEMENTATION-PLAN](FINALS-IMPLEMENTATION-PLAN.md)을 따른다. 아래 PASS를 2026-10-26의 재검증으로 해석하지 않는다.
+
 # Test results
 
 생성 시각: 2026-09-14T13:59:09.318Z

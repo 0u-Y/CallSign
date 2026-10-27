@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="900" viewBox="0 0 1360 900" role="img" aria-labelledby="title desc">
+<title id="title">CallSign 전체 구조와 구현 상태</title>
+<desc id="desc">업무와 승인, 역할별 서비스, PostgreSQL, 수신 검증기, Asterisk 목표 통화 경로, Besu와 Witness, 원격 음성 분석을 구분한다. 점선은 미연결 목표이며 실선도 실환경 검증 성공을 의미하지 않는다.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/></marker></defs>
+<rect width="1360" height="900" fill="#f8fafc"/>
+<g font-family="Noto Sans KR, Apple SD Gothic Neo, sans-serif" fill="#0f172a">
+<text x="40" y="45" font-size="25" font-weight="700">CallSign · 서비스와 신뢰 경계</text>
+<text x="40" y="78" font-size="16">2026-10-27 구현 스냅샷 · 화살표: 표기한 요청·결과 방향 / 실선: 코드 / 점선: 목표·제품 연결 미완성 · 실환경 모두 미검증</text>
+<rect x="25" y="110" width="315" height="475" rx="16" fill="#eef2ff" stroke="#c7d2fe"/><text x="43" y="140" font-size="17" font-weight="700">기관·콜센터 권위 경계</text>
+<rect x="45" y="160" width="275" height="75" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="59" y="188" font-size="15">모의 CRM/FDS 업무</text>
+<text x="59" y="211" font-size="15">고객·목적·할당 상담원</text>
+<rect x="45" y="275" width="275" height="85" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="59" y="303" font-size="15">Issuer Gateway · 기관 승인키</text>
+<text x="59" y="326" font-size="15">업무·VC·개별 승인·소비 검사</text>
+<text x="59" y="349" font-size="15">키: Ed25519, 버전·세대</text>
+<rect x="45" y="425" width="275" height="85" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="59" y="453" font-size="15">Sender Agent · 콜센터 키</text>
+<text x="59" y="476" font-size="15">요청별 challenge·브라우저키 서명</text>
+<text x="59" y="499" font-size="15">장기키를 브라우저에 전달하지 않음</text>
+<rect x="365" y="110" width="405" height="475" rx="16" fill="#eef2ff" stroke="#c7d2fe"/><text x="383" y="140" font-size="17" font-weight="700">플랫폼·영속 저장 경계</text>
+<rect x="385" y="160" width="365" height="80" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="399" y="188" font-size="15">Platform API · 요청 전달</text>
+<text x="399" y="211" font-size="15">기관/서비스 개인키·소비 DB 쓰기 없음</text>
+<rect x="385" y="300" width="365" height="95" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="399" y="328" font-size="15">PostgreSQL · 업무·고객·승인·영수증</text>
+<text x="399" y="351" font-size="15">별도 auth 세션·issuer 역할 계정</text>
+<text x="399" y="374" font-size="15">outbox·quota·checkpoint SQL 추가</text>
+<rect x="385" y="450" width="365" height="85" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="399" y="478" font-size="15">원장 작업·사건 처리 worker</text>
+<text x="399" y="501" font-size="15">목표: 제출·확정·재처리·철회 전파</text>
+<text x="399" y="524" font-size="15">현재 worker 미구현</text>
+<rect x="795" y="110" width="540" height="475" rx="16" fill="#eef2ff" stroke="#c7d2fe"/><text x="813" y="140" font-size="17" font-weight="700">브라우저·미디어 경계</text>
+<rect x="815" y="160" width="220" height="75" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="829" y="188" font-size="15">상담원 웹 · 단기키</text>
+<text x="829" y="211" font-size="15">할당 업무만 발신</text>
+<rect x="1090" y="160" width="225" height="75" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="1104" y="188" font-size="15">수신 웹 · verifier</text>
+<text x="1104" y="211" font-size="15">승인/연결/위험 분리</text>
+<rect x="860" y="315" width="410" height="100" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="874" y="343" font-size="15">Asterisk · SIP WSS / DTLS-SRTP 종단</text>
+<text x="874" y="366" font-size="15">PBX 제어·별도 증거키: ARI Call-ID·bridge</text>
+<text x="874" y="389" font-size="15">코드 부분 구현 / 화면·자동 회수 연결 필요</text>
+<rect x="860" y="475" width="410" height="65" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="874" y="503" font-size="15">기존 v2: 브라우저 직접 WebRTC 코드</text>
+<text x="874" y="526" font-size="15">새 기본 목표: 웹 ↔ Asterisk ↔ 웹</text>
+<rect x="25" y="635" width="615" height="225" rx="16" fill="#eef2ff" stroke="#c7d2fe"/><text x="43" y="665" font-size="17" font-weight="700">원장 경계 · 고객·통화 원문 미기록</text>
+<rect x="45" y="690" width="265" height="100" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="59" y="718" font-size="15">Besu QBFT 검증자 4개</text>
+<text x="59" y="741" font-size="15">기관·위임 digest·키·세대·철회</text>
+<text x="59" y="764" font-size="15">공동 관리 승인자 2-of-3</text>
+<rect x="335" y="690" width="285" height="100" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="349" y="718" font-size="15">Witness 3-of-4 · 각자 RPC/키</text>
+<text x="349" y="741" font-size="15">같은 블록·상태에 서명</text>
+<text x="349" y="764" font-size="15">별도 신뢰 계층, native proof 아님</text>
+<rect x="675" y="635" width="660" height="225" rx="16" fill="#eef2ff" stroke="#c7d2fe"/><text x="693" y="665" font-size="17" font-weight="700">동의 기반 분석 경계 · 원음 기본 미보관</text>
+<rect x="695" y="690" width="290" height="100" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="709" y="718" font-size="15">Issuer 오디오 ingestion</text>
+<text x="709" y="741" font-size="15">상대 remote stream만 수집</text>
+<text x="709" y="764" font-size="15">Deepgram STT · 전사 revision</text>
+<rect x="1010" y="690" width="305" height="100" rx="9" fill="white" stroke="#94a3b8"/>
+<text x="1024" y="718" font-size="15">목적 규칙 + Anthropic LLM</text>
+<text x="1024" y="741" font-size="15">발화·revision 근거·위험 안내</text>
+<text x="1024" y="764" font-size="15">외부 제공자 미호출 / 품질 미측정</text>
+<path d="M180 235 L180 275" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="188.0" y="247.0" font-size="13" fill="#334155">업무 검사</text>
+<path d="M320 310 L385 200" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="360.5" y="247.0" font-size="13" fill="#334155">승인 서명 응답</text>
+<path d="M320 465 L385 220" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="360.5" y="334.5" font-size="13" fill="#334155">서비스 서명 응답</text>
+<path d="M750 200 L815 200" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="790.5" y="192.0" font-size="13" fill="#334155">API 응답</text>
+<path d="M1035 200 L1090 200" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1070.5" y="192.0" font-size="13" fill="#334155">v2 직접 코드</text>
+<path d="M385 347 L320 347" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="360.5" y="339.0" font-size="13" fill="#334155">업무·영수증 조회 결과</text>
+<path d="M925 235 L925 315" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="933.0" y="267.0" font-size="13" fill="#334155">목표 음성</text>
+<path d="M1200 315 L1200 235" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="1208.0" y="267.0" font-size="13" fill="#334155">목표 음성</text>
+<path d="M568 395 L568 450" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="576.0" y="414.5" font-size="13" fill="#334155">outbox 의도</text>
+<path d="M568 535 L175 690" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="379.5" y="604.5" font-size="13" fill="#334155">관리 tx 제출 목표</text>
+<path d="M310 740 L335 740" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="330.5" y="732.0" font-size="13" fill="#334155">상태 조회 결과</text>
+<path d="M477 690 L477 610 L350 610 L350 335 L320 335" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="350" y="603" font-size="13" fill="#334155">Witness 상태 서명 → Issuer</text>
+<path d="M1200 585 L840 690" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1028.0" y="629.5" font-size="13" fill="#334155">원격 음성·동의</text>
+<path d="M985 740 L1010 740" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1005.5" y="732.0" font-size="13" fill="#334155">전사</text>
+<text x="45" y="835" font-size="14">같은 서버의 여러 노드는 독립 기관 운영을 입증하지 않음</text>
+<text x="695" y="835" font-size="14">제공자 보관 설정·계약 별도 확인 · AI가 통화를 자동 제어하지 않음</text>
+</g></svg>
