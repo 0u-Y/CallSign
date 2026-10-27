@@ -1,0 +1,42 @@
+{
+  "profile": "VC payload JCS / SHA-256 (not JWS digest)",
+  "credential": {
+    "@context": [
+      "https://www.w3.org/ns/credentials/v2",
+      {
+        "@vocab": "urn:callsign:v2:"
+      }
+    ],
+    "id": "urn:uuid:00000000-0000-4000-8000-000000000001",
+    "type": [
+      "VerifiableCredential",
+      "DelegationCredential"
+    ],
+    "issuer": "did:web:bank.example",
+    "validFrom": "2026-10-26T00:00:00.000Z",
+    "validUntil": "2026-10-26T01:00:00.000Z",
+    "credentialSubject": {
+      "id": "did:web:sender.example",
+      "institutionId": "mock-bank-institution",
+      "controller": "did:web:sender.example",
+      "serviceKeyVersion": 1,
+      "publicKey": {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo"
+      },
+      "purpose": "FRAUD_CONFIRMATION",
+      "policyHash": "c1d35d7fb9752b9994ee24791c47d1724504a0c80eedb780a06e7df00df36dc5"
+    },
+    "credentialStatus": {
+      "id": "urn:uuid:00000000-0000-4000-8000-000000000001",
+      "type": "CallSignRegistryStatus",
+      "registryAddress": "0x1111111111111111111111111111111111111111",
+      "networkId": "20260914",
+      "epoch": "1",
+      "approvalKeyVersion": 1
+    }
+  },
+  "canonical": "{\"@context\":[\"https://www.w3.org/ns/credentials/v2\",{\"@vocab\":\"urn:callsign:v2:\"}],\"credentialStatus\":{\"approvalKeyVersion\":1,\"epoch\":\"1\",\"id\":\"urn:uuid:00000000-0000-4000-8000-000000000001\",\"networkId\":\"20260914\",\"registryAddress\":\"0x1111111111111111111111111111111111111111\",\"type\":\"CallSignRegistryStatus\"},\"credentialSubject\":{\"controller\":\"did:web:sender.example\",\"id\":\"did:web:sender.example\",\"institutionId\":\"mock-bank-institution\",\"policyHash\":\"c1d35d7fb9752b9994ee24791c47d1724504a0c80eedb780a06e7df00df36dc5\",\"publicKey\":{\"crv\":\"Ed25519\",\"kty\":\"OKP\",\"x\":\"11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo\"},\"purpose\":\"FRAUD_CONFIRMATION\",\"serviceKeyVersion\":1},\"id\":\"urn:uuid:00000000-0000-4000-8000-000000000001\",\"issuer\":\"did:web:bank.example\",\"type\":[\"VerifiableCredential\",\"DelegationCredential\"],\"validFrom\":\"2026-10-26T00:00:00.000Z\",\"validUntil\":\"2026-10-26T01:00:00.000Z\"}",
+  "sha256": "fb1f6850e8b2d9e79df8e3417881273338e1f42815f5b7a5a6767fc5fd328826"
+}

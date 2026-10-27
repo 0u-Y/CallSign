@@ -1,0 +1,21 @@
+{
+  "profile": "RFC8785 / UTF-8 / SHA-256 lowercase hex",
+  "policy": {
+    "id": "mock-bank-fds",
+    "version": 1,
+    "purpose": "FRAUD_CONFIRMATION",
+    "allowedQuestions": [
+      "본인이 해당 거래를 시도했는지 여부",
+      "거래 시각과 가맹점 확인"
+    ],
+    "forbiddenRequests": [
+      "OTP",
+      "TRANSFER",
+      "REMOTE_CONTROL",
+      "SECRECY"
+    ],
+    "followUpPath": "/official"
+  },
+  "canonical": "{\"allowedQuestions\":[\"본인이 해당 거래를 시도했는지 여부\",\"거래 시각과 가맹점 확인\"],\"followUpPath\":\"/official\",\"forbiddenRequests\":[\"OTP\",\"TRANSFER\",\"REMOTE_CONTROL\",\"SECRECY\"],\"id\":\"mock-bank-fds\",\"purpose\":\"FRAUD_CONFIRMATION\",\"version\":1}",
+  "sha256": "c1d35d7fb9752b9994ee24791c47d1724504a0c80eedb780a06e7df00df36dc5"
+}

@@ -1,3 +1,4 @@
+if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "integration") throw new Error("INTEGRATION_EXECUTION_BLOCKED");
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildServer } from "../../services/api/src/server.js";
 import type { GovernanceLedger } from "../../services/api/src/ledger.js";

@@ -1,0 +1,46 @@
+{
+  "recordedAt": "2026-10-26T09:28:05.703Z",
+  "baselineCommit": "7aa26d90b9156c245e160283b1477360a6697cec",
+  "sourceState": "uncommitted worktree",
+  "environment": {
+    "node": "v22.22.2",
+    "platform": "linux",
+    "arch": "x64",
+    "pnpm": "11.27.0"
+  },
+  "implementationStatus": "direct-v2-path-code-added; PBX media bridge still incomplete",
+  "checks": {
+    "sourceSyntax": "PASS",
+    "typecheck": "PASS",
+    "unitTests": {
+      "status": "PASS",
+      "passed": 44,
+      "failed": 0,
+      "report": "artifacts/finals-light-results.json"
+    },
+    "webBundle": "PASS_WITH_WARNINGS",
+    "composeParsing": "PASS",
+    "composePlatformBoundary": "PASS",
+    "shellSyntax": "PASS",
+    "diffWhitespace": "PASS",
+    "executionGate": "BLOCKED_AS_EXPECTED_EXIT_78",
+    "uiStaticDetector": "NO_FINDINGS_NOT_A_BROWSER_TEST"
+  },
+  "notRun": [
+    "PostgreSQL/migrations/role grants/atomicity",
+    "Besu/contracts/witness runtime",
+    "service-to-service/OIDC integration",
+    "real microphone/WebRTC/TURN/PBX",
+    "STT/LLM providers/Ollama inference",
+    "Docker image build/pull",
+    "Terraform validate/plan/apply/GCP",
+    "failure injection/load/performance",
+    "GitHub CI/deployment"
+  ],
+  "warnings": [
+    "punycode deprecation/browser externalization",
+    "dynamic imports do not create separate chunks",
+    "web chunk above 500 KiB",
+    "no browser render or accessibility validation"
+  ]
+}
