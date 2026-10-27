@@ -1,10 +1,12 @@
-# 개발·배포·복구 runbook
+# 개발·배포·복구 운영 절차
 
 **현재 단계에서는 아래 실환경 명령을 실행하지 않는다.** 사용자 요청으로 해당 범주 실행이 명시적으로 승인된 뒤 운영자가 수행한다. 자동 차단은 보안 sandbox가 아니라 실수 방지 장치다. 기존 프로세스·키·볼륨·증거를 정리하거나 초기화하지 않는다.
 
-## v3 이행의 현재 차단점
+## 교환기 통화·유지 허가 전환에서 남은 구현
 
-새 `0003_service_runtime.sql`도 versioned runner 대상이지만 적용하지 않았다. 새 기관 provisioning만 empty-deployment gate를 ready로 만든다. 기존 기관은 복원/소비 이력 검토 전 blocked이며 임의 UPDATE로 해제하면 안 된다. 독립 anchor 검토·복구 해제 도구는 아직 없다. 새 v3 기본 화면·URI key/trust 준비·PBX 실제 설정/이미지·ARI 사건/회수·outbox worker도 미완성이다. 아래 명령은 보존한 v2 절차이며 새 Asterisk/lease 서비스 전체 배포의 완성 절차가 아니다. [현재 차이](FINALS-IMPLEMENTATION-PLAN.md#service-20261027).
+새 `0003_service_runtime.sql`도 versioned runner 대상이지만 적용하지 않았다. 새 기관 준비 시에만 초기 복구 상태를 `ready`로 만든다. 기존 기관은 승인 사용 이력 검토 전 `blocked`(발급·연결 차단)이며 SQL을 임의 수정해 해제하면 안 된다. 복원 대상 밖 최신 기준(anchor) 검토와 차단 해제 도구는 아직 없다. 새 통화 유지·PBX 경로 기본 화면·URI key/trust 준비·PBX 실제 설정/이미지·ARI 사건/회수·후속 작업 보관함 worker도 미완성이다. 아래 명령은 현재 화면·배포가 쓰는 직접 통화 형식(`version=2`)의 절차이며 새 Asterisk/lease 서비스 전체 배포의 완성 절차가 아니다. [현재 차이](FINALS-IMPLEMENTATION-PLAN.md#service-20261027).
+
+용어: migration은 DB 구조 변경 적용, provisioning은 새 기관·계정·키 준비, trust bundle은 미리 신뢰할 기관·공개키·체인 설정이다. manifest는 배포 구성 기록, image digest는 이미지 내용 해시, scope는 로그인 용도다. OIDC는 외부 로그인 표준, TURN은 음성 중계, ARI는 Asterisk 교환기 제어 인터페이스다. [전체 통신 용어](PROTOCOL.md#protocol-profiles).
 
 ## 지금 가능한 작업
 
@@ -17,14 +19,14 @@
 | 인프라 기동/정지/이전 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure` | `scripts/deployment.sh`, 역할별 서비스 실행 파일 |
 | DB 통합 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration` | `pnpm test:integration` |
 | 계약·원장 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain` | 계약/장애 시험, 개별 승인자 서명 도구 |
-| 미디어 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media` | `pnpm test:media`(v2), `pnpm test:e2e`(v1), `demo:record` |
+| 미디어 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media` | `pnpm test:media`(역할 분리 직접 통화 경로), `pnpm test:e2e`(초기 시연 경로), `demo:record` |
 | 성능 | `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=performance` | `pnpm test:benchmark` |
 
 범주값을 `.env.example`에 미리 설정하지 않는다. 직접 스크립트 실행과 Playwright/Vitest 통합 설정도 기본 거절한다. `media` E2E는 하위 dev 실행에 infrastructure 범주를 전달하므로, 스택 기동까지 승인된 뒤에만 실행한다. 체인/미디어/성능 CI 자동 실행은 없다. 수동 integration workflow는 GitHub `infrastructure-validation` environment의 required reviewers도 설정해야 한다.
 
 ## 새 배포 준비
 
-후속 인증 코드에는 `0002_session_scopes.sql`이 필요하다. **이번 작업에서는 적용하지 않았다.** 명시적 DB 실행 승인 뒤 versioned `scripts/migrate-finals.ts`를 사용한다. 기존 `scripts/migrate.ts`도 같은 runner로 연결해 v1과 v2가 공유하는 sessions schema를 맞춘다. 기존 세션은 `legacy`로 남으며 v2 서비스에서는 새로 로그인해야 한다. migration ledger가 없는 기존 v1 테이블은0000의 IF NOT EXISTS로 보존한다. 이미 수동으로 적용한 issuer_v2 구조가 있는데 ledger가 없다면 자동 stamp/삭제하지 말고 실제 DDL을 대조해 baseline을 검토한다.
+후속 인증 코드에는 `0002_session_scopes.sql`이 필요하다. **이번 작업에서는 적용하지 않았다.** 명시적 DB 실행 승인 뒤 versioned `scripts/migrate-finals.ts`를 사용한다. 기존 `scripts/migrate.ts`도 같은 runner로 연결해 초기 시연 경로과 역할 분리 직접 통화 경로가 공유하는 sessions schema를 맞춘다. 기존 세션은 `legacy`로 남으며 역할 분리 직접 통화 경로 서비스에서는 새로 로그인해야 한다. migration ledger가 없는 기존 초기 시연 경로 테이블은0000의 IF NOT EXISTS로 보존한다. 이미 수동으로 적용한 issuer_v2 구조가 있는데 ledger가 없다면 자동 stamp/삭제하지 말고 실제 DDL을 대조해 baseline을 검토한다.
 
 일반/공식 로그인은 별도 purpose·issuer/client/audience로 검사하고, 각 화면의 로그아웃은 해당 scope만 회수한다. 다른 scope는 유지한다. `GET /v2/auth/me?purpose=work|official`로 해당 CSRF를 얻고 `POST /v2/auth/logout`에 purpose와 그 CSRF를 보낸다. replay ledger는 별도라 logout 뒤 같은 ID token을 다시 쓸 수 없다. 실제 PG 시험에는 `tests/integration/finals-session-scopes.test.ts`가 추가됐고, `TEST_AUTH_DATABASE_URL`을 주지 않은 최소권한 항목은 NOT-RUN skip이다. 이 자격 증명은 이미 준비한 비관리자 auth LOGIN 계정이어야 하며 시험이 자동 생성하지 않는다.
 
@@ -32,9 +34,9 @@
 2. GCP 프로젝트·zone·64GB급 VM 종류·정확한 OS image·전용 service account·VPC·운영자 CIDR을 결정한다. Terraform init/plan/apply는 별도 승인 뒤 수행한다. `infra/gcp/main.tf`는 미실행이며 provider 검증도 아직 하지 않았다.
 3. `/srv/callsign`에 별도 persistent disk를 연결·mount한다. 기존 데이터가 있으면 포맷하지 않는다. OS login/IAM, SSH 범위, HTTPS DNS, TURN DNS/공인 IP/인증서와 relay 방화벽을 준비한다.
 4. **새 배포만** `scripts/prepare-finals.ts keys NEW_DIRECTORY`로 기관/서비스/witness 키를 준비한다. ISSUER_DID와 SERVICE_DID는 자신이 소유한 도메인이다. 기존 디렉터리는 거절한다. 계약 승인자 3명, 관리자, emergency stopper의 키는 각 소유자가 별도 환경에서 생성·관리한다. 과거 공개 demo 키는 재사용하지 않는다.
-5. 명시적 체인 초기화·새 계약 배포·2-of-3 기관 등록은 별도 관리 작업이다. 기존 v1 `demo:up`은 로컬 fixture bootstrap이므로 GCP/서비스 기동에 사용하지 않는다. 기관 등록은 `keccak256(UTF8 institutionId)`, 새 기관 승인 public key, epoch 1, 목적 mask 4의 금융 프로파일을 사용한다. genesis·계약 주소·network ID와 배포 트랜잭션을 기록한다.
+5. 명시적 체인 초기화·새 계약 배포·3명 중 2명 승인 기관 등록은 별도 관리 작업이다. 기존 초기 시연 경로 `demo:up`은 로컬 고정 시험 데이터 bootstrap이므로 GCP/서비스 기동에 사용하지 않는다. 기관 등록은 `keccak256(UTF8 institutionId)`, 새 기관 승인 public key, 권한 세대 1, 목적 mask 4의 금융 프로파일을 사용한다. genesis·계약 주소·network ID와 배포 트랜잭션을 기록한다.
 6. genesis/node 키는 `besu/`, 배포 metadata는 `deployment.json`, 기관키는 `issuer/approval-v1.json`, 서비스키는 `sender/key.json`, witness키는 `witness-keys/witness-N.json`이다. 기관 관리자키는 `admin/administrator.txt`, emergency/broadcast키는 `operator/emergency.txt`에 개별 mount한다. 파일 0600/디렉터리0700과 컨테이너 UID 읽기 권한을 설정한다. 승인자 개인키를 Issuer/Platform에 mount하지 않는다.
-7. `prepare-finals.ts trust DIRECTORY`는 공개 manifest와 deployment.json에서 새 trust bundle을 만들며 기존 파일을 덮어쓰지 않는다. 출력된 `VITE_FINALS_TRUST_SHA256`으로 웹 이미지를 빌드한다. 서비스 Dockerfile은 `VITE_PROTOCOL_PROFILE=finals`를 고정해 역할 화면과 `/official`을 v2 API에 연결한다. 호스트에서 웹만 빌드할 때도 이 환경값을 지정한다. 기관/서비스 did.json을 HTTPS에 게시하고 키 controller와 assertion/authentication을 확인한다.
+7. `prepare-finals.ts trust DIRECTORY`는 공개 manifest와 deployment.json에서 새 trust bundle을 만들며 기존 파일을 덮어쓰지 않는다. 출력된 `VITE_FINALS_TRUST_SHA256`으로 웹 이미지를 빌드한다. 서비스 Dockerfile은 `VITE_PROTOCOL_PROFILE=finals`를 고정해 역할 화면과 `/official`을 역할 분리 직접 통화 경로 API에 연결한다. 호스트에서 웹만 빌드할 때도 이 환경값을 지정한다. 기관/서비스 did.json을 HTTPS에 게시하고 키 controller와 assertion/authentication을 확인한다.
 8. migrator 계정으로 `scripts/migrate-finals.ts`를 한 번 적용한다. role group은 NOLOGIN이다. 각각 별도 LOGIN 계정을 만들고 `callsign_issuer`, `callsign_auth`만 부여한다. Platform/Sender에는 DB 계정을 주지 않는다. 실제 GRANT/REVOKE 검증은 필수다.
 9. OIDC issuer/JWKS/authorization/token URL, 일반/공식 업무의 서로 다른 client ID와 audience와 사전 등록 subject를 준비한다. 계정 ID는 `issuer|sub`다. accounts JSON은 id/displayName/role 배열이며 institution/gateway/recipient와 선택 approver를 가진다. `scripts/provision-finals.ts public-manifest.json accounts.json`은 새 기관/계정만 만들며 기존 객체를 덮어쓰지 않는다.
 10. 보호된 env 파일을 `.env.example` 기준으로 채운다. Platform/Sender 간 token, Sender/Issuer token은 서로 다르고 32자 이상이어야 한다. 실제 비밀값은 채팅·Git에 넣지 않는다. DB/trust/키를 준비하지 않은 상태를 readiness 성공으로 취급하지 않는다.
@@ -68,23 +70,23 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure pnpm tsx scripts/provision-fina
 ## 백업·복원·롤백
 
 - `scripts/backup.sh`는 새 보호 디렉터리에 DB dump와 checksum만 만든다. **체인/키까지 포함한 일관된 전체 백업이 아니다.** 운영자는 승인된 정지 시간에 전체 스택을 정상 정지한 후 Besu 각 볼륨, DB, deployment.json, trust manifest, 역할별 키와 env의 암호화 backup을 같은 checkpoint로 보관한다. 실행 중인 chain volume을 tar로 복사하지 않는다.
-- 복원은 새 VM/새 빈 DB/새 디스크에서 checksum, deployment ID, chain genesis, registry, epoch, issuer/witness 공개키를 대조한 뒤 수행한다. `scripts/restore.sh`는 새 빈 DB만 대상으로 하고 `--clean` 없이 실패 시 transaction을 되돌린다. 원본은 삭제하지 않는다. 같은 배포 복원은 키를 재발급하지 않는다.
+- 복원은 새 VM/새 빈 DB/새 디스크에서 checksum, deployment ID, chain genesis, registry, 권한 세대, issuer/witness 공개키를 대조한 뒤 수행한다. `scripts/restore.sh`는 새 빈 DB만 대상으로 하고 `--clean` 없이 실패 시 transaction을 되돌린다. 원본은 삭제하지 않는다. 같은 배포 복원은 키를 재발급하지 않는다.
 - 이미지 rollback은 이전 digest와 호환 DB schema에만 한다. 이 migration은 자동 down을 제공하지 않는다. DB 변경이 호환되지 않으면 검증한 backup을 새 DB에 복원하고 URL을 교체한다. 오래된 chain/취소 상태를 정상 상태로 되돌려 공개하면 안 된다. 최신 epoch/revocation과 재동기화하기 전 인증 표시를 열지 않는다.
-- domain 변경은 새 DID와 발급 VC·issuer/서비스 문서·trust hash·OIDC redirect/audience·Origin/TURN realm·HTTPS 인증서를 함께 재설정해야 한다. DNS 별칭만 바꾸고 기존 VC를 새 기관으로 취급하지 않는다.
+- 도메인 변경은 등록 기관 주소·발급 VC·신뢰 설정 해시·OIDC 로그인 복귀 주소/대상·Origin/TURN realm·HTTPS 인증서를 함께 검토한다. DID 호환 배포는 DID 식별자와 게시 문서도 변경한다. 기본 설계에서 DID 게시가 필수라는 뜻은 아니지만 현재 준비 도구에는 DID 전제가 남아 있다. DNS 별칭만 바꾸고 기존 VC를 새 기관으로 취급하지 않는다.
 
 ## 키 회전
 
-새 기관 approval-vN 파일을 별도 준비한다. 새 공개키를 포함한 recovery 요청을 승인자들이 읽고 각각 `scripts/sign-recovery.ts request.json ONE_KEY_PATH EXPECTED_TYPED_DATA_HASH`로 서명한다. 각 실행 환경에는 자기 승인키 하나만 둔다. UI는 digest와 수집한 서명을 보여주고 2-of-3 검증 후 제출한다. 새 epoch/키가 witness quorum에 나타난 뒤 `/v2/governance/activate-key`를 호출한다. 구 VC/승인/시도를 무효화한다. 새 공개키를 public-manifest.json의 `issuer/approval-vN` 항목에 기록한다. `APPROVAL_KEY_VERSION=N`으로 `prepare-finals.ts trust DIRECTORY NEW_TRUST_OUTPUT_PATH`를 호출해 기존 파일을 보존한 새 bundle을 만든다. `TRUST_BUNDLE_FILENAME`을 새 파일명으로 바꾸고, 새 DID 문서와 hash로 수신 앱을 배포·재시작한 후 새 VC를 발급한다. 구키·백업을 바로 삭제하지 않는다.
+새 기관 approval-vN 파일을 별도 준비한다. 새 공개키를 포함한 recovery 요청을 승인자들이 읽고 각각 `scripts/sign-recovery.ts request.json ONE_KEY_PATH EXPECTED_TYPED_DATA_HASH`로 서명한다. 각 실행 환경에는 자기 승인키 하나만 둔다. UI는 digest와 수집한 서명을 보여주고 3명 중 2명 승인 검증 후 제출한다. 새 epoch/키가 witness quorum에 나타난 뒤 `/v2/governance/activate-key`를 호출한다. 구 VC/승인/시도를 무효화한다. 새 공개키를 public-manifest.json의 `issuer/approval-vN` 항목에 기록한다. `APPROVAL_KEY_VERSION=N`으로 `prepare-finals.ts trust DIRECTORY NEW_TRUST_OUTPUT_PATH`를 호출해 기존 파일을 보존한 새 bundle을 만든다. `TRUST_BUNDLE_FILENAME`을 새 파일명으로 바꾸고, 새 DID 문서와 hash로 수신 앱을 배포·재시작한 후 새 VC를 발급한다. 구키·백업을 바로 삭제하지 않는다.
 
-## v2 미디어 자동 시험 (미실행)
+## 역할별 직접 통화 자동 시험: 작성했으나 미실행
 
-`playwright.finals.config.ts`는 서버를 자동 기동하지 않는다. 실제 v2 스택과 browser/microphone을 별도로 준비한 뒤 `pnpm test:media`를 사용한다. `CALLSIGN_MEDIA_ORIGIN`, 사전 로그인한 상담원/수신자의 Playwright storage 파일 경로(`CALLSIGN_MEDIA_GATEWAY_STORAGE`, `CALLSIGN_MEDIA_RECIPIENT_STORAGE`), 할당 업무 ID와 원장 등록 VC digest(`CALLSIGN_MEDIA_INTENT_ID`, `CALLSIGN_MEDIA_CREDENTIAL_DIGEST`)가 필요하다. 값이 없으면 NOT-RUN skip이며 PASS가 아니다. 이 시험은 실제 마이크 권한을 사용하고 STT 동의 버튼을 누르지 않아 유료 제공자는 호출하지 않는다. 해당 시험 코드는 native getStats에서 수락 전0/후 증가와 remote track 종료를 확인하지만 아직 실행하지 않았다. TURN relay·PBX·제공자 동의철회 측정은 아래 후속 검증에서 별도 추가한다.
+`playwright.finals.config.ts`는 서버를 자동 기동하지 않는다. 실제 역할 분리 직접 통화 경로 스택과 browser/microphone을 별도로 준비한 뒤 `pnpm test:media`를 사용한다. `CALLSIGN_MEDIA_ORIGIN`, 사전 로그인한 상담원/수신자의 Playwright storage 파일 경로(`CALLSIGN_MEDIA_GATEWAY_STORAGE`, `CALLSIGN_MEDIA_RECIPIENT_STORAGE`), 할당 업무 ID와 원장 등록 VC 내용 해시(`CALLSIGN_MEDIA_INTENT_ID`, `CALLSIGN_MEDIA_CREDENTIAL_DIGEST`)가 필요하다. 값이 없으면 NOT-RUN skip이며 PASS가 아니다. 이 시험은 실제 마이크 권한을 사용하고 STT 동의 버튼을 누르지 않아 유료 제공자는 호출하지 않는다. 해당 시험 코드는 native getStats에서 수락 전0/후 증가와 remote track 종료를 확인하지만 아직 실행하지 않았다. TURN relay·PBX·제공자 동의철회 측정은 아래 후속 검증에서 별도 추가한다.
 
 ## 승인 뒤 통합 검증 순서
 
-1. PostgreSQL migration·별도 계정 권한, 취소/소비 경합, crash 후 동일 영수증, 다른 binding 거절.
+1. PostgreSQL migration·별도 계정 권한, 취소/소비 경합, crash 후 동일 영수증, 다른 승인·세션 결합 거절.
 2. Issuer/Sender/OIDC의 인증·할당·키 mount·공식 업무 별도 audience와 객체 권한.
-3. Besu4·witness4의 같은 chain/genesis/block/payload, VC digest 등록·철회, stale/정지/rollback, 실제 새키 복구.
+3. Besu4·witness4의 같은 chain/genesis/block/payload, VC 내용 해시 등록·철회, stale/정지/rollback, 실제 새키 복구.
 4. 별도 기기의 HTTPS/WebRTC 마이크, 수락 전0 audio, 양방향 수락/음소거/거절/종료/장치오류, TURN relay/만료, 재연결 재검증.
 5. STT/provider 소량 시험, partial/final/수정/동의철회/요청상한, 실제 지출/민감 로그 검사.
 6. PBX는 선정한 bridge의 실제 signaling/RTP 종단부터 검토한다. adapter만으로 전체 경로 완료로 판단하지 않는다.

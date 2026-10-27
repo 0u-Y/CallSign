@@ -1,19 +1,16 @@
-# ADR 0001: 해커톤 데모 기반 구조
+# ADR 0001: 초기 시연의 기술 구조와 상태 검증
 
-- 상태: 채택
-- 날짜: 2026-09-14
+ADR은 설계 결정과 이유를 남기는 기록이다.
 
-## 결정
+- 상태: 당시 채택. 현재 키·서비스 분리는 [후속 결정](0002-finals-offline.md)을 함께 적용한다.
+- 결정일: 2026-09-14. 당시 실행 결과는 [과거 시험 기록](../TEST-RESULTS.md)이며 현재 서비스 성공을 뜻하지 않는다.
 
-TypeScript ESM pnpm workspace를 사용하고, UI와 검증기를 분리한다. API는 Fastify와 Drizzle/PostgreSQL, 계약은 Solidity/Foundry, 온체인 호출은 viem을 사용한다. P0 상태 검증은 브라우저가 고정 trust bundle의 Ed25519 키로 동일 canonical payload에 대한 서로 다른 3개 witness 서명을 검증하는 프로파일이다.
+## 결정과 이유
 
-## 이유
+TypeScript/pnpm 단일 저장소에서 화면과 서명 검증 모듈을 분리한다. API는 Fastify·Drizzle/PostgreSQL, 계약은 Solidity/Foundry, 원장 호출은 viem을 사용한다. 서버의 `verified: true` 표시를 그대로 믿지 않고 브라우저가 고정 신뢰 설정의 공개키로 **같은 블록·상태에 대한 서로 다른 증언자 3개 서명**을 확인한다. 과거 자료의 P0은 이 검증 방식을 뜻한다.
 
-단일 서버의 `verified: true`를 피하고, 서명 객체·시간 정책·권한 상태를 순수 함수로 시험할 수 있다. PostgreSQL unique constraint가 승인서 1회 소비의 authoritative 동시성 경계가 된다. Besu validator와 witness 키·프로세스를 분리해 합의와 상태 증언의 신뢰 가정을 구분한다.
+승인 ID의 최초 사용은 PostgreSQL 고유 제약·트랜잭션으로 결정한다. Besu의 합의 검증자와 상태 증언자는 키·프로세스·책임을 구별한다. 이 구조는 서명 변조·시간·상태 검사를 외부 서비스 없는 함수 시험으로도 확인할 수 있게 한다. 실제 DB 동시성과 원장·통화는 별도 환경에서 검증해야 한다.
 
-## 의도적으로 하지 않는 것
+## 신뢰와 한계
 
-- P0 witness profile을 네이티브 QBFT light client라고 부르지 않는다.
-- API, issuer, gateway가 같은 개인키를 공유하지 않는다.
-- UI scenario 이름으로 검증 결과를 결정하지 않는다.
-- 외부 공개 URL이나 실제 기관 협력을 가정하지 않는다.
+상태 증언자를 추가로 신뢰하는 방식이며 체인 자체를 직접 검증하는 경량 클라이언트가 아니다. 승인·발신·플랫폼 키를 공유하지 않고, 시나리오 이름으로 검증 결과를 정하지 않는다. 공개 서비스나 실제 기관 협력은 전제하지 않는다. 현재 기능 목표는 [제품 기준](../../PRODUCT.md)을 따른다.

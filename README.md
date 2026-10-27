@@ -16,9 +16,11 @@ CallSign은 기관과 위탁 콜센터의 연락 업무를 고객의 통화 세�
 
 ## 구현 상태
 
-기존 v2 Direct WebRTC 경로에 역할별 업무 화면·승인·소비·검증·마이크·상대 음성 분석 코드를 연결했습니다. 새 v3에는 등록 URI 기반 위임,120초 연결 시작 승인과 진행 lease, Asterisk 채널·브리지 증거와 서버 오디오 경로를 추가했습니다.
+현재 역할별 업무 화면은 **브라우저끼리 직접 통화하는 경로**에 연결돼 있습니다. 업무 할당·승인·일회 사용 기록·연결 검증·마이크·상대 음성 분석 코드가 있으며 실제 환경에서는 아직 검증하지 않았습니다.
 
-**전체 서비스는 개발 중입니다.** 기본 목표인 양측 웹↔Asterisk 통화로 전환하려면 v3 화면·verifier·PBX 사건 처리·자원 회수·원장 worker·복구 절차를 완성해야 합니다. DB·체인·PBX·브라우저 통화·외부 AI·GCP의 현재 통합 검증은 미실행입니다.
+추가 개발 중인 **Asterisk 교환기 경유 경로**는 등록 기관 주소와 키를 사용하고, 최초 연결을 시작하는 120초 승인과 진행 중 통화를 유지하는 갱신형 허가를 구분합니다. 채널·브리지 연결 증거와 서버 오디오 처리 코드도 추가했습니다. 화면 연결, 교환기 사건 처리와 자동 자원 정리, 원장 작업 재처리, 복구·배포 연결이 남아 있어 전체 서비스는 개발 중입니다.
+
+문서에 남긴 통신 형식 번호는 이 구현 차이를 구별하는 값입니다. 사용자에게 보여주는 제품 등급이나 별도 서비스가 아닙니다. [통신 형식과 용어](docs/PROTOCOL.md#protocol-profiles)를 참고하세요.
 
 - [구현·검증 현황](docs/guide/05-IMPLEMENTATION-STATUS.md): 코드·화면 연결·검증과 남은 작업
 - [MASTER 개발 명세](docs/MASTER-DEVELOPMENT-SPEC.md): 전체 요구사항과 완료 조건
@@ -33,7 +35,7 @@ pnpm install --frozen-lockfile --ignore-scripts
 pnpm light
 ```
 
-`light`는 소스 위생·JavaScript 문법, TypeScript, 네트워크 없는 단위 시험입니다. 최대 worker2이며 DB 통합·브라우저·외부 API는 실행하지 않습니다. `lint`는 전체 ESLint 규칙 검사가 아닙니다. 웹 번들만 컴파일하려면 `pnpm --filter @callsign/web build`를 사용합니다.
+`light`는 소스 위생·JavaScript 문법, TypeScript, 네트워크 없는 단위 시험입니다. 시험 동시 실행은 최대 2개이며 DB 통합·브라우저·외부 API는 실행하지 않습니다. `lint`는 전체 ESLint 규칙 검사가 아닙니다. 웹 번들만 컴파일하려면 `pnpm --filter @callsign/web build`를 사용합니다.
 
 실행 제한은 [AGENTS.md](AGENTS.md)를 따릅니다. 현재 단계에서 서비스·컨테이너·체인 기동, migration·계약 배포, 실제 통화·제공자 호출·GCP 변경을 실행하지 않습니다.
 
@@ -43,11 +45,11 @@ pnpm light
 - **Issuer Gateway:** 업무·개별 승인·소비·취소와 기관 승인키
 - **Sender Agent:** 콜센터 장기키와 요청별 세션 공개키 증명
 - **PostgreSQL:** 업무·세션·소비 영수증·감사와 재처리 의도
-- **Besu/Witness:** 권한 계약과 서로 다른 Witness3-of-4의 상태 증언
+- **Besu/Witness:** 권한 계약과 서로 다른 상태 증언자 4개 중 3개가 서명한 원장 상태
 - **Asterisk:** 목표 웹 통화의 SIP/WSS·음성 종단과 브리지
-- **음성 분석:** 상대 stream → 스트리밍 STT → revision·정책 규칙/LLM → 위험 근거
+- **음성 분석:** 상대 음성 → 스트리밍 STT(음성→문자 변환) → 전사 수정·정책 규칙/언어 모델 → 위험 근거
 
-서버컴과 GCP는 같은 소스·이미지·배포 구조를 사용하도록 준비합니다. 설정은 [infra/deploy](infra/deploy/compose.yml), GCP 구성은 [infra/gcp](infra/gcp/main.tf), 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. v3/PBX 배포 연결은 아직 남아 있습니다.
+서버컴과 GCP는 같은 소스·이미지·배포 구조를 사용하도록 준비합니다. 설정은 [infra/deploy](infra/deploy/compose.yml), GCP 구성은 [infra/gcp](infra/gcp/main.tf), 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 교환기 경유 통화의 배포 연결은 아직 남아 있습니다.
 
 통합·체인·미디어·성능 검증은 기본 차단되며 별도 실행 허가가 필요합니다. 일반 push/PR CI는 light만 실행합니다.
 
@@ -55,4 +57,4 @@ pnpm light
 
 [아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [표준](docs/STANDARDS.md) · [설계 결정](docs/adr/0002-finals-offline.md)
 
-기존 v1·시청 사례·fixture와 과거 시험·기획 자료는 보존합니다. `/finals`는 현재 v2 역할 화면이며 새 v3로 전환 중이고, `/demo`는 기존 fixture·시연 경로입니다. `finals` 경로명은 기존 실행 설정과의 호환을 위해 유지합니다. [과거 시험 기록](docs/TEST-RESULTS.md)과 [보관 문서](docs/archive/2026-10-26/)는 해당 시점의 기록입니다.
+초기 시청 사례·고정 시험 데이터와 과거 시험·기획 자료는 보존합니다. `/finals`는 현재 역할별 직접 통화 화면이며 교환기 경유 통화로 전환 중입니다. `/demo`는 고정 시험 데이터와 과거 증거를 사용하는 시연 화면입니다. `finals` 경로명은 기존 실행 설정과의 호환을 위해 유지합니다. [과거 시험 기록](docs/TEST-RESULTS.md)과 [보관 문서](docs/archive/2026-10-26/)는 해당 시점의 기록입니다.

@@ -1,77 +1,67 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-27(KST)**. 기능 코드·시험 기준은 `ab0ec1c`, 개발 문서의 최초 게시 커밋은 `40d490c`다. 두 커밋은 main에 push됐으며, 이 문서 정리는 기능 코드와 검증 결과를 변경하지 않는다. 서버컴에서 개발 중이고 GCP VM 이전은 미실행이다.
+기준일: **2026-10-27(KST)**. 기능 코드·시험 기준은 `ab0ec1c`, 최초 통합 문서 게시 커밋은 `40d490c`다. 이후 문서 정리는 기능 코드와 실행 결과를 바꾸지 않는다. 서버컴에서 개발 중이며 GCP 이전은 미실행이다.
 
-전체 요구·완료 조건은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 서비스 설명은 [가이드](guide/README.md), 이후 실행 절차는 [RUNBOOK](RUNBOOK.md)이다. **현재 서비스는 부분 구현이며, 실행 승인만 기다리는 전체 완료 상태가 아니다.**
+전체 요구·완료 조건은 [개발 명세](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [운영 절차](RUNBOOK.md)를 따른다. **코드 미구현이 남아 있어 서비스 전체가 실행 승인만 기다리는 상태는 아니다.**
 
 ## 실행 제한
 
-[AGENTS](../AGENTS.md)를 따른다. 사용자 별도 요청 전 DB·Besu·Witness·PBX·TURN·API/웹 스택·브라우저·마이크를 기동하지 않는다. 이미지 pull/build·migration 적용·체인 초기화/배포·실제 provider·모델·GCP·장애/부하 실행도 금지한다. 기존 프로세스·데이터·키·시험 증거는 보존한다. 기본 개발 검증은 네트워크 없는 `pnpm light`다.
+[작업 지침](../AGENTS.md)을 따른다. 별도 사용자 요청 전 DB·Besu·상태 증언자·교환기·TURN·API/웹 스택·브라우저·마이크를 기동하지 않는다. 이미지 다운로드/빌드·DB 구조 변경 적용·체인 초기화/배포·외부 AI·모델·GCP·장애/부하 시험도 실행하지 않는다. 기존 프로세스·데이터·키·증거는 보존한다. 기본 검증은 네트워크 없는 `pnpm light`다.
 
 <a id="service-20261027"></a>
 
-## 현재 구현과 남은 작업
+## 현재 구현과 남은 코드
 
-확정 설계는 등록 URI/키 기본·DID 선택, 기관→콜센터 업무 위임 VC,120초 연결 시작과 유지 lease 분리, 웹↔Asterisk PJSIP/WSS+ARI↔웹 기본이다. native proof는 기본 완료 gate에서 제외한 후속 확장이다. 이전 DID 필수·짧은 승인 만료 시 전체 통화 종료·별도 외부 Edge 설계는 현행 목표로 승계하지 않는다.
+확정 목표는 등록 기관 주소·키 기본, DID(분산 식별자) 선택, 기관→콜센터 업무 위임 VC(검증 가능한 자격 증명), 120초 최초 연결과 갱신형 통화 유지 허가 분리, 양측 웹 사이 Asterisk 교환기 경유다. 체인 자체 증명은 후속 확장이다.
 
-| 요구 ID | 이번 코드·호출 연결 | 구현 상태 | 검증 상태와 남은 코드 |
+현재 역할별 직접 통화 화면은 `/v2`를 사용한다. 추가 `/v3` 서버는 등록 주소·통화 유지·교환기 증거를 다루지만 기본 화면·운영·배포 전환이 남아 있다. 이는 호환성을 위한 형식 구분이며 제품 등급이 아니다. [통신 형식·용어](PROTOCOL.md#protocol-profiles).
+
+| 요구 ID | 작성한 코드·연결 | 구현 상태 | 검증과 남은 코드 |
 |---|---|---|---|
-| IDENTITY-001/003, CALL-001 | `protocol/service.ts`, `service-authority.ts`, `service-routes.ts`, finals-server의 v3 proxy·Sender service-proof·Issuer route | 부분 구현: 등록 URI VC·요청별 proof·승인 API | 단위·타입 통과. DID 없는 키/trust 준비·기본 UI/profile 전환 미구현 |
-| CALL-002/003/004/005 | terminal 거절·부재·오류·취소·종료, 수신자 키/nonce enrollment, 양측 PoP·최초 binding, 동일 저장 JWS 복구, 시작120초/lease30초 분리 | API/순차 상태 로직 작성, 전체 기능 부분 구현 | 순차 fake 12개. UI·양측 transport/갱신 연결·timeout/watchdog·실제 동시성 미완성/미검증 |
-| DB-001/002/003, STATE-003, OPS-005 | `0003_service_runtime.sql`, store: 기관/승인 공통 namespace·v1 trigger·v2 backfill·outbox·global quota·recovery gate, `service-current.ts`의 영속 checkpoint | 부분 구현 | 타입 검사. migration/GRANT/SQL 경합 미실행. worker·event cursor 소비기·retention·독립 anchor와 복구 해제·전체 backup 미구현 |
-| PBX-001/002/003, CALL-006 | `asterisk.ts`, `pbx-routes.ts`, `pbxSip.ts`, `verifier/service.ts`: 실제 ARI 채널/Call-ID 조회·mute/bridge·JWS·consume 검사·별도 PBX verifier branch·SIP UAS 모듈 | 부분 구현: 제어/암호 경계 코드, UI·운영 미연결 | ARI fake2개·SIP parser/digest2개 통과, 타입 검사. v3 verifier 변조 시험·브라우저 호출/관측·ARI 사건·자동 회수·설정/이미지·통합 suite 미완성 |
-| AI-001~004 | `service-audio.ts`, v3 WS proxy·기존 Deepgram/Anthropic 실제 adapter, 동의 generation/1stream·영속 예산 예약·현재 세션/lease 검사 | 부분 구현: v3 서버 경로 작성 | 타입 검사, 기존 revision fake 회귀. v3 UI·삭제/비용/공급자 전체 시험·한국어 독립 평가 미완성 |
-| UI/OPS/GOVERNANCE | 기존 v2 화면/배포/관리 코드 보존 | 부분 구현 유지 | URI/lease/PBX 전환·권한 세분화·재인증·새 v3 전체 회수·최소 관리키 경계·배포 연결 남음 |
+| IDENTITY-001/003, CALL-001 | `protocol/service.ts`, `service-authority.ts`, `service-routes.ts`: 등록 주소 위임·요청별 콜센터 서명·개별 승인 | 부분 구현 | 단위·타입 검사. DID 없는 키/신뢰 설정 준비·기본 화면 전환 남음 |
+| CALL-002~005 | 종료·거절·부재·취소·오류, 수신자 키/난수 고정·양측 소유 증명·동일 영수증 복구·최초 연결/유지 분리 | 부분 구현 | 메모리 시계·저장소 시험 12개. 양측 현재 연결·갱신·수락 화면·자동 기한 처리·실제 DB 경합 남음 |
+| DB-001~003, STATE-003, OPS-005 | `0003_service_runtime.sql`, 저장소·`service-current.ts`: 공통 승인 사용·후속 작업·사용량·기준 상태·복구 차단 | 부분 구현 | 타입 검사. SQL 적용/권한·경합 미실행. 작업 재처리·이벤트 읽기 위치·보관/삭제·독립 복구 기준·차단 해제·전체 백업 미구현 |
+| PBX-001~003, CALL-006 | `asterisk.ts`, `pbx-routes.ts`, `pbxSip.ts`, `verifier/service.ts`: 실제 채널 조회 코드·브리지·별도 서명·검증·브라우저 SIP | 부분 구현, 화면·운영 미연결 | ARI 대체 응답 2개·SIP 해석/인증 2개와 타입 검사. 검증 모듈 변조 시험·화면·사건 구독·자동 회수·실제 설정/배포·통합 시험 남음 |
+| AI-001~004 | `service-audio.ts`: 동의 세대·통화/유지 허가 검사·사용량 예약과 기존 Deepgram/Anthropic 연결 코드 | 부분 구현 | 타입 검사·기존 전사 수정 시험. 새 화면·삭제/비용/제공자 전체 시험·독립 한국어 평가 남음 |
+| AUTH/UI/OPS/GOVERNANCE | 직접 통화 화면·인증·관리·배포 코드, 모의 공식 응답 서버 API | 부분 구현 | 등록 주소·유지 허가·교환기 전환·관리 권한 세분화·재인증·새 경로 전체 회수·관리키 경계·배포 연결 남음 |
 
-원장 등록 outbox worker가 없어 v3 VC pending이 자동 확정되는 제품 경로는 없다. PBX 제어·SDK·SIP 모듈도 역할 화면·ARI 사건 처리·철회/로그아웃 회수까지 연결해야 한다. 기본 UI/배포는 여전히 v2 직접 통화 경로이며 v3가 자동 적용되지 않는다.
+원장 등록 작업 처리기가 없어 위임의 등록 대기를 자동 확정하는 제품 경로는 없다. 교환기도 제어·서명 도우미만으로 전체 연결 완료라고 판단하지 않는다. 현재 `/v3/lease`는 수신자 소유 증명만 받으므로 양측 현재 연결을 재확인하는 갱신 구현이 필요하다. `/v3/official/confirm`은 모의 거래 인지 응답·업무 완료를 저장하지만 화면·서명 영수증·교환기/분석 종료 전파·전용 시험은 남아 있다.
 
-v3 코드의 lease30초·최대 통화4시간은 임시 정책이다.120초는 확정된 연결 시작 창이며,4시간을 최종 운영 정책이나 성능 실측값으로 취급하지 않는다. 최신 권한 상태는 관측8초·각 시계오차1초 기준으로10초 상한을 목표로 하며 실환경 검증이 필요하다. 기존 v1/v2의12초/2초는 회귀 정책이다.
+30초 통화 유지 허가·최대 4시간은 임시 코드 정책이다. 120초는 최초 연결 시작 기한이며 통화 전체 길이 제한이 아니다. 권한 상태는 관측 8초·시계 오차 각 1초를 전제로 최대 10초를 목표로 한다. 기존 시연의 12초/2초 정책과 혼용하지 않는다. 실제 목표 달성은 미검증이다.
 
 ## 최신 검증 결과
 
-- `pnpm light`: **18개 파일·82개 통과·실패0**, 소스 위생·타입 검사 통과. 커밋 직전에도 같은 결과를 확인했다. 기존 회귀를 포함한 전체 수이며 `punycode` 경고가 남아 있다.
-- [현재 결과·원본 출력·코드 hash](../artifacts/master-implementation-20261027-service.json)를 보존한다. 새 v3 verifier·PBX API·audio는 타입 검사만 한 부분이 있고,82개 통과가 전체 요구 coverage를 뜻하지 않는다.
-- 문서 검토 시 상대 링크154개, SVG XML·Markdown fence·MASTER74개 ID/anchor를 검사했다. 독립 검토에서 고객 진입·음성 gate 순서·그림 방향·부재 전이를 보완했다. 브라우저/GitHub 렌더는 미확인이다.
-- 메모리 fake는 실제 PostgreSQL 잠금·원자성·QBFT 장애 내성·실제 통화·AI 정확도의 증거가 아니다. 측정 목표를 실측 성능/SLA로 표시하지 않는다.
+- 저장된 최신 `pnpm light`: **18개 파일·82개 통과·실패 0**, 소스 위생·문법·타입 검사 통과. 원본은 [실행 출력·코드 해시](../artifacts/master-implementation-20261027-service.json)에 보존한다.
+- 82개는 기존 회귀 포함 전체 수다. 새 수신 검증·교환기 API·오디오 경로에는 타입 검사만 한 부분이 있다. 모든 요구사항 검증을 뜻하지 않는다. `punycode` 사용 중단 예정 경고가 남아 있다.
+- 실제 PostgreSQL·외부 로그인·서비스 연결·Besu/증언자·WebRTC/TURN/교환기·STT/LLM·GCP·복구·장애/부하는 미실행이다. DB·직접 통화 시험 일부는 작성·타입 검사만 했고 새 경로 전체 통합 시험은 추가 작성도 필요하다.
+- 이번 Markdown 정리에서 기능 시험·서비스·브라우저는 실행하지 않았다. 상대 링크·요구 ID·코드 근거·문서 구문만 검사한다. 메모리 대체 객체는 DB 원자성·합의 내성·실제 통화·AI 정확도 증거가 아니다.
 
-실제 PG·OIDC·서비스 연결·Besu/Witness·WebRTC/TURN/PBX·STT/LLM·GCP·복구·장애/부하 검증은 미실행이다. 일부 PG·v2 미디어 시험은 작성·타입 검사만 했고 v3 전체 통합 시험은 추가 작성도 필요하다. 이번 문서 정리에서 시험을 재실행하지 않았다.
+## 앞선 인증·조회·세션 회수 구현
 
-## 인증·조회·연결 폐기 이행
-
-2026-10-27 인증 단계에서 작성한 경계다. 이후 서비스 profile 이행과 함께 적용하며, 아래 경계의 완료를 전체 AUTH/UI/운영 완료로 확대하지 않는다.
-
-| ID·작업 | 구현 상태 | 검증 상태·범위 |
+| 요구 ID | 작성한 경계 | 검증·한계 |
 |---|---|---|
-| AUTH-002: legacy/work/official purpose·issuer/client/audience, 선택 scope logout·CSRF, 별도 replay ledger | 해당 경계 코드 구현 완료. 전체 AUTH-002는 재인증 정책 등 남아 부분 구현 | scope/cookie 전용·로그아웃/토큰 재사용/기본 legacy 격리 fake route 단위 검증. 실제 OIDC/PG/역할/동시성 대기 |
-| BUSINESS-001: workspace의 수신자·상담원·공동 승인자별 객체/VC 반환 | 해당 projection 코드 구현 완료. 전체 역할 관리 미완성 | `workspace.test.ts` 소속·타기관·불일치 승인·VC 반환 단위 검증 |
-| CALL-006/MEDIA/AI: 세션 폐기 시 live socket/분석 중단·현재 DB 권한 재검사 | 보완 코드 구현 완료. v3 lease와 실제 media·chain 검증 별도 | `session-connections.test.ts` fake clock의 즉시 회수·slow check timeout·cleanup, finals test의 VC/key/epoch/서비스 상태 변화. 실제 WS/통화 미실행 |
-| GOVERNANCE-002: 실제 private/public key 대응 검사 | reader 검사 구현 완료. 전체 회전 workflow 미완성 | `signing-key.unit.test.ts` 실제 Ed25519로 잘못된 private seed 거절. 체인/키 파일 변경 없음 |
-| UI: 선택 attempt와 연결 attempt 분리, 로그아웃 후 늦은 응답 차단·scope별 CSRF | 코드 구현 완료 | 타입·API helper 단위 검증·독립 소스 검토. 실제 React/브라우저 경합·접근성 대기 |
-| DB: `0002_session_scopes.sql`, v1/v2 공통 versioned migration entrypoint | 파일 작성 완료, 적용 안 함 | 소스/타입 검사. `finals-session-scopes.test.ts` 실제 DB 시험 작성·타입 검사만, 실행 안 함 |
+| AUTH-002 | 일반/공식/이전 로그인 용도·발급자·대상 분리, 용도별 로그아웃·CSRF, 별도 토큰 재사용 기록 | 쿠키·용도·로그아웃 단위 시험. 주요 작업 재인증·실제 로그인/DB 남음 |
+| BUSINESS-001 | `workspaceFor`가 수신자·상담원에게 접근 가능한 업무·승인·위임만 반환 | `workspace.test.ts`의 타 기관·미할당·불일치 관계 거절. 전체 역할 관리 남음 |
+| CALL-006/MEDIA/AI | 세션 폐기 시 열린 웹소켓·분석 중단, 현재 DB 권한 재검사 | `session-connections.test.ts`의 시간 초과·즉시 회수·정리. 실제 통화·새 교환기 회수 남음 |
+| GOVERNANCE-002 | 실제 개인키 서명과 공개키 검증으로 키 쌍 일치 확인 | `signing-key.unit.test.ts`. 실제 키 교체·체인 전이 미실행 |
+| UI | 선택한 시도와 실제 연결 시도 분리, 로그아웃 후 늦은 응답 폐기 | 타입·API 도우미 단위 검사. 실제 화면·다중 탭 경합 미검증 |
+| DB | `0002_session_scopes.sql`과 공통 구조 변경 적용 도구 | 작성·타입 검사만. 실제 적용/GRANT/동시성 미실행 |
 
-`0002_session_scopes.sql`은 기존 세션을 legacy로 유지한다. logout은 선택 scope의 세션을 회수하고, 별도 replay ledger는 세션 삭제 뒤에도 같은 ID token의 재사용을 막는다. 실제 DB migration·GRANT·동시성은 미검증이다.
+## 검증 이력
 
-## 검증 이력과 보관 자료
-
-| 시점·범위 | 당시 결과 | 보존 근거 |
+| 시점·범위 | 당시 결과 | 원본 |
 |---|---|---|
-| 2026-10-27 서비스 profile |18개 파일82개 통과 | [service 결과](../artifacts/master-implementation-20261027-service.json) |
-| 2026-10-27 인증 경계 |15개 파일66개 통과 | [auth 결과](../artifacts/master-implementation-20261027-auth.json) |
-| 2026-10-26 초기 v2 개발 |10개 파일44개 통과, 당시 웹·Compose·shell 정적 검사 | [과거 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md), [raw 결과](../artifacts/finals-light-results.json), [요약](../artifacts/finals-validation.json) |
-| 2026-09-14 v1 |당시 별도 환경의 시험 결과 | [과거 시험 기록](TEST-RESULTS.md) |
+| 2026-10-27 서비스 확장 | 18개 파일·82개 통과 | [서비스 결과](../artifacts/master-implementation-20261027-service.json) |
+| 2026-10-27 인증 경계 | 15개 파일·66개 통과 | [인증 결과](../artifacts/master-implementation-20261027-auth.json) |
+| 2026-10-26 직접 통화 개발 | 10개 파일·44개 통과, 당시 웹/Compose/셸 정적 검사 | [보고서 보관본](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md), [시험 원본](../artifacts/finals-light-results.json), [환경 요약](../artifacts/finals-validation.json) |
+| 2026-09-14 초기 시청 시연 | 당시 별도 환경의 실행 결과 | [과거 시험 기록](TEST-RESULTS.md) |
 
-44·66개 결과를 현재82개 결과에 합산하지 않는다. [이전 4회차 초안](archive/2026-10-26/FINALS-ROUND4.md)은 보관 자료이며 현재 검토 자료를 대체하지 않는다. 원본 기획 PPTX/PDF·과거 raw 증거는 유지한다.
+각 결과는 누적 재검사 수이며 서로 더하지 않는다. 원본 기획 PPTX/PDF·영상·시험 증거는 유지한다. 기능 변경은 `7fb20f7`, `3339e90`, `3235b6d`, `ab0ec1c`, 문서는 `40d490c`부터 구분해 기록했다. 커밋·공개는 배포 성공을 뜻하지 않는다.
 
-## 커밋·문서 정리 기록
+## 문서 관리와 다음 개발
 
-기존 변경140개 파일을 백엔드/프로토콜, 웹, 실행 가드/배포, 시험/증거, 문서의5개 커밋으로 나누어 main에 push했다. `7fb20f7`, `3339e90`, `3235b6d`, `ab0ec1c`, `40d490c`가 해당 이력이다. 이 전달은 배포나 실환경 성공을 뜻하지 않는다.
+서비스 설명은 `docs/guide/`, 요구·완료 기준은 MASTER, 진행·검증 이력은 이 문서, 실행 명령은 RUNBOOK에서 관리한다. 멘토링 질문·대회 원고는 서비스 완료와 분리하고 과거 자료에는 기준 시점을 표시한다. `finals`·형식 번호가 들어간 실제 파일명·API·설정은 호환성을 위해 보존하고 설명은 동작 이름으로 쓴다.
 
-후속 문서 정리에서는 과거 보고서·4회차 초안을 `docs/archive/2026-10-26/`으로 옮기고 링크를 수정했다. 현행 진행표는 최신 상태부터 읽도록 정리했으며 중복 현황·도구 사용 메모와 설명 문서의 로컬 절대 경로를 제거했다. 원본 검증 JSON은 수정하지 않았다. 정리 후 상대 링크150개·Markdown fence·SVG XML·MASTER74개 ID/anchor·문서 전용 diff를 검사했고, 기존 JSON 증거의 바이트가 HEAD와 동일함을 확인했다. 사용자 요청으로 별도 작성한 로컬 `WORK-SUMMARY.md`는 그대로 보존한다.
+2026-10-27 문서 정리에서는 추적 중인 Markdown 39개를 읽고 제품 등급처럼 보이던 형식 번호를 동작 중심 이름으로 풀었다. 실제 코드의 식별값·명령은 보존하고, 초기 시연의 철회 후 통화 유지 정책과 현재 종료 목표를 구분했다. 명세의 옛 API 초안·미구현 표시를 실제 `/v3` 서버 코드와 대조했으며, 원본 시험 결과·기획서·영상은 수정하지 않았다. 상대 링크·74개 요구 ID/앵커·표·코드 구획·변경 범위를 정적으로 검사했다. 독립 문서 검토에서 수락/거절 순서·허가 만료·120초 시작 시점·제공자별 데이터 범위를 보완했다. 실제 서비스·브라우저·기능 시험을 새로 실행하지 않았다.
 
-## 문서 운영
-
-서비스 설명은 `docs/guide/`로 모으고, 이전 `docs/mentoring/` 주소는 가이드 링크와 검토 질문만 유지한다. README·아키텍처·프로토콜·운영 문서는 서비스의 사용·구현·운영 기준으로 작성한다. 외부 검토·대회 산출물은 별도로 관리하며 서비스 완료 조건에 섞지 않는다. 파일명과 경로의 `finals`는 기존 코드·설정 호환을 위해 유지한다. 이 정리에서 기능 코드와 검증 증거는 변경하지 않았다. 상대 링크·Markdown fence·SVG와74개 요구 ID를 검사했고, 독립 문서 검토에서 서비스 설명과 외부 검토 맥락이 분리됐음을 확인했다. 실제 서비스·시험·브라우저는 실행하지 않았다.
-
-## 다음 개발 시작점
-
-이 문서와 AGENTS·MASTER를 읽고 현재 ID 표의 코드 미구현부터 진행한다. 우선순위는 v3 화면/양측 수락·갱신 → DB outbox/원장 worker·복구 → PBX 사건/자원 회수·배포 → 관리 재인증·역할/키 경계 → 전체 통합 시험 소스다. 실제 실행은 별도 허가 뒤 RUNBOOK을 따른다. 기존 `demo:up`은 v1 로컬 초기화 도구이며 서비스 일반 재시작 명령이 아니다.
+다음 구현은 새 화면·양측 수락/갱신 → DB/원장 작업 재처리·독립 복구 → 교환기 사건/자동 회수·배포 → 관리 재인증·권한/키 분리 → 전체 통합 시험 소스 순이다. 기존 `demo:up`은 초기 시연 초기화 도구이며 일반 재시작 명령이 아니다. 실제 실행은 별도 허가 뒤 운영 절차를 따른다.
