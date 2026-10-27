@@ -1,3 +1,4 @@
+if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "infrastructure") throw new Error("WITNESS_EXECUTION_BLOCKED");
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import Fastify from "fastify";
@@ -25,10 +26,10 @@ interface PersistedKey { privateJwk: JWK; publicJwk: JWK; kid: string }
 async function loadOrCreateKey(): Promise<PersistedKey & { privateKey: KeyInput }> {
   try {
     const stored = JSON.parse(await readFile(keyPath, "utf8")) as PersistedKey;
-    await publishPublicKey(stored);
+    if (process.env.WITNESS_PREPROVISIONED_KEYS !== "true") await publishPublicKey(stored);
     return { ...stored, privateKey: await importJWK(stored.privateJwk, "EdDSA") };
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT" || process.env.WITNESS_PREPROVISIONED_KEYS === "true") throw error;
   }
   const pair = await generateKeyPair("Ed25519", { extractable: true });
   const privateJwk = await exportJWK(pair.privateKey);
@@ -60,9 +61,16 @@ app.get("/health", async () => {
   return { status: "ok", witnessId, kid: key.kid, publicJwk: key.publicJwk, blockNumber: String(blockNumber), rpcBoundary: rpcUrl };
 });
 
+app.get("/head", async () => {
+  const block = await client.getBlock({ blockTag: "latest" });
+  return { witnessId, blockNumber: String(block.number), blockHash: block.hash, blockTimestamp: Number(block.timestamp) };
+});
+
 app.post("/snapshot", async (request) => {
   const query = querySchema.parse(request.body);
   const deployment = JSON.parse(await readFile(deploymentPath, "utf8")) as { networkId: string; genesisHash: Hex; registryAddress: Hex; institutionId: Hex };
+  const [chainId, genesis] = await Promise.all([client.getChainId(), client.getBlock({ blockNumber: 0n })]);
+  if (String(chainId) !== deployment.networkId || genesis.hash !== deployment.genesisHash) throw new Error("OWN_NODE_CHAIN_MISMATCH");
   const blockNumber = BigInt(query.blockNumber);
   const block = await client.getBlock({ blockNumber });
   if (!block.hash || block.hash.toLowerCase() !== query.blockHash.toLowerCase()) throw new Error("PROPOSED_BLOCK_NOT_CANONICAL_ON_OWN_NODE");
@@ -71,6 +79,7 @@ app.post("/snapshot", async (request) => {
   const delegationKey = keccak256(stringToHex(query.delegationId));
   const institution = await client.readContract({ address: deployment.registryAddress, abi: registryAbi, functionName: "institutions", args: [institutionKey], blockNumber });
   const delegation = await client.readContract({ address: deployment.registryAddress, abi: registryAbi, functionName: "delegations", args: [delegationKey], blockNumber });
+  if (delegation[7] && delegation[0].toLowerCase() !== institutionKey.toLowerCase()) throw new Error("DELEGATION_INSTITUTION_MISMATCH");
   const snapshot: StateSnapshot = stateSnapshotSchema.parse({
     protocol: "callsign", version: 1, type: "SignedStateSnapshot",
     networkId: deployment.networkId, genesisHash: deployment.genesisHash, registryAddress: deployment.registryAddress,

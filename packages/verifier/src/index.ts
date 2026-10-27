@@ -69,6 +69,8 @@ export interface TrustBundle {
 }
 
 export interface VerificationContext {
+  maxStateAgeSeconds?: number;
+  maxFutureSkewSeconds?: number;
   nowWallSeconds: number;
   nowMonotonicMs: number;
   expectedInstitutionId: string;
@@ -84,6 +86,8 @@ export interface VerifiedState {
 }
 
 export async function verifyStateBundle(bundle: StateBundle, trust: TrustBundle, context: VerificationContext): Promise<VerifiedState> {
+  const identities = trust.witnessPublicKeys;
+  if (!Number.isInteger(trust.witnessThreshold) || trust.witnessThreshold < 1 || trust.witnessThreshold > identities.length || new Set(identities.map(k => k.witnessId)).size !== identities.length || new Set(identities.map(k => k.jwk.x)).size !== identities.length) throw new Error("INVALID_WITNESS_TRUST");
   const snapshot = stateSnapshotSchema.parse(bundle.snapshot);
   if (!trust.supportedProtocolVersions.includes(snapshot.version)) throw new Error("UNSUPPORTED_PROTOCOL_VERSION");
   if (snapshot.networkId !== trust.networkId || snapshot.genesisHash !== trust.genesisHash || snapshot.registryAddress.toLowerCase() !== trust.registryAddress.toLowerCase() || snapshot.policyVersion !== trust.policyVersion) {
@@ -92,9 +96,11 @@ export async function verifyStateBundle(bundle: StateBundle, trust: TrustBundle,
   if (snapshot.institutionId !== context.expectedInstitutionId || snapshot.delegationId !== context.expectedDelegationId) {
     throw new Error("QUERY_KEY_MISMATCH");
   }
+  const maxAge = context.maxStateAgeSeconds ?? 12, maxFuture = context.maxFutureSkewSeconds ?? 2;
+  if (!Number.isFinite(maxAge) || maxAge <= 0 || maxAge > 12 || !Number.isFinite(maxFuture) || maxFuture < 0 || maxFuture > 2) throw new Error("INVALID_FRESHNESS_POLICY");
   const observedAgeSeconds = context.nowWallSeconds - snapshot.blockTimestamp;
-  if (snapshot.blockTimestamp > context.nowWallSeconds + 2) throw new Error("FUTURE_SNAPSHOT");
-  if (observedAgeSeconds > 12) throw new Error("STALE_SNAPSHOT");
+  if (snapshot.blockTimestamp > context.nowWallSeconds + maxFuture) throw new Error("FUTURE_SNAPSHOT");
+  if (observedAgeSeconds >= maxAge) throw new Error("STALE_SNAPSHOT");
 
   const expectedBytes = canonicalBytes(snapshot);
   const trusted = new Map(trust.witnessPublicKeys.map((entry) => [entry.witnessId, entry]));
@@ -112,7 +118,7 @@ export async function verifyStateBundle(bundle: StateBundle, trust: TrustBundle,
     unique.add(signature.witnessId);
   }
   if (unique.size < trust.witnessThreshold) throw new Error("WITNESS_THRESHOLD_NOT_MET");
-  const remainingMs = Math.max(0, (12 - Math.max(0, observedAgeSeconds)) * 1000);
+  const remainingMs = Math.max(0, (maxAge - Math.max(0, observedAgeSeconds)) * 1000);
   return {
     snapshot,
     signerIds: [...unique],
@@ -131,18 +137,26 @@ function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
 
 export class MonotonicStateGuard {
   #highestBlock = -1n;
+  #highestHash = "";
+  #highestSnapshotHash = "";
   #knownRevokedAt = -1n;
   #deadlines = new Map<string, number>();
 
+  limitDeadline(verified: VerifiedState): VerifiedState {
+    const prior = this.#deadlines.get(verified.snapshot.blockHash);
+    return prior === undefined ? verified : { ...verified, deadlineMonotonicMs: Math.min(prior, verified.deadlineMonotonicMs) };
+  }
+
   accept(verified: VerifiedState, nowMonotonicMs: number): void {
     const block = BigInt(verified.snapshot.blockNumber);
+    if (block === this.#highestBlock && (verified.snapshot.blockHash !== this.#highestHash || verified.snapshotHash !== this.#highestSnapshotHash)) throw new Error("STATE_CONFLICT_AT_HEIGHT");
     if (block < this.#highestBlock) throw new Error("STATE_ROLLBACK");
     if (nowMonotonicMs > verified.deadlineMonotonicMs) throw new Error("MONOTONIC_DEADLINE_EXPIRED");
     const priorDeadline = this.#deadlines.get(verified.snapshot.blockHash);
     if (priorDeadline !== undefined && verified.deadlineMonotonicMs > priorDeadline) throw new Error("DEADLINE_EXTENSION_ATTEMPT");
     if (!verified.snapshot.delegationState.revoked && block <= this.#knownRevokedAt) throw new Error("REVOCATION_ROLLBACK");
     this.#deadlines.set(verified.snapshot.blockHash, priorDeadline ?? verified.deadlineMonotonicMs);
-    this.#highestBlock = block > this.#highestBlock ? block : this.#highestBlock;
+    if (block >= this.#highestBlock) { this.#highestBlock = block; this.#highestHash = verified.snapshot.blockHash; this.#highestSnapshotHash = verified.snapshotHash; }
     if (verified.snapshot.delegationState.revoked) this.#knownRevokedAt = block;
   }
 
@@ -166,3 +180,7 @@ export function verifyAuthorizationContext(
     if (expected.sessionId && expected.binding.sessionId !== expected.sessionId) throw new Error("SESSION_MISMATCH");
   }
 }
+
+export * from "./finals.js";
+
+export * from "./service.js";

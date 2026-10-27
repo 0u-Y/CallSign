@@ -20,7 +20,8 @@
     "postgres": "3.4.9",
     "viem": "2.56.5",
     "ws": "8.21.3",
-    "zod": "4.6.5"
+    "zod": "4.6.5",
+    "@callsign/verifier": "workspace:*"
   },
   "devDependencies": {
     "drizzle-kit": "0.31.10"

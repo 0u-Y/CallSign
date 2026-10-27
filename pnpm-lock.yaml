@@ -129,6 +129,9 @@ importers:
 
   services/api:
     dependencies:
+      '@callsign/verifier':
+        specifier: workspace:*
+        version: link:../../packages/verifier
       '@callsign/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol

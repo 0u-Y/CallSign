@@ -1,3 +1,4 @@
+import type {} from "@fastify/cookie";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { and, eq, gt } from "drizzle-orm";
 import type { FastifyRequest } from "fastify";
@@ -10,6 +11,19 @@ export interface AuthSession {
   displayName: string;
   role: string;
   csrfToken: string;
+  purpose: string;
+  expiresAt: Date;
+}
+
+export interface SessionPolicy {
+  purpose: "work" | "official";
+  issuer: string;
+  clientId: string;
+  audience: string;
+}
+
+export function sessionCookie(purpose: "legacy" | "work" | "official"): "ip_session" | "official_session" {
+  return purpose === "official" ? "official_session" : "ip_session";
 }
 
 export class HttpError extends Error {
@@ -26,8 +40,9 @@ export function tokenHash(token: string): string {
   return createHash("sha256").update(token, "utf8").digest("hex");
 }
 
-export async function sessionForRequest(db: Database, request: FastifyRequest): Promise<AuthSession> {
-  const token = request.cookies.ip_session;
+export async function sessionForRequest(db: Database, request: FastifyRequest, policy?: SessionPolicy): Promise<AuthSession> {
+  const purpose = policy?.purpose ?? "legacy";
+  const token = request.cookies[sessionCookie(purpose)];
   if (!token) throw new HttpError(401, "AUTH_REQUIRED");
   const rows = await db.select({
     sessionId: sessions.id,
@@ -35,9 +50,19 @@ export async function sessionForRequest(db: Database, request: FastifyRequest): 
     displayName: users.displayName,
     role: users.role,
     csrfToken: sessions.csrfToken,
+    purpose: sessions.purpose,
+    expiresAt: sessions.expiresAt,
+    oidcIssuer: sessions.oidcIssuer,
+    oidcClientId: sessions.oidcClientId,
+    oidcAudience: sessions.oidcAudience,
+    authenticatedAt: sessions.authenticatedAt,
   }).from(sessions).innerJoin(users, eq(sessions.userId, users.id)).where(and(eq(sessions.tokenHash, tokenHash(token)), gt(sessions.expiresAt, new Date()))).limit(1);
   if (!rows[0]) throw new HttpError(401, "SESSION_EXPIRED");
-  return rows[0];
+  const row = rows[0];
+  if (row.purpose !== purpose || (policy && (row.oidcIssuer !== policy.issuer || row.oidcClientId !== policy.clientId || row.oidcAudience !== policy.audience || !row.authenticatedAt))) {
+    throw new HttpError(403, purpose === "official" ? "OFFICIAL_SCOPE_REQUIRED" : "SESSION_SCOPE_INVALID");
+  }
+  return { sessionId: row.sessionId, userId: row.userId, displayName: row.displayName, role: row.role, csrfToken: row.csrfToken, purpose: row.purpose, expiresAt: row.expiresAt };
 }
 
 export function requireRole(session: AuthSession, ...roles: string[]): void {

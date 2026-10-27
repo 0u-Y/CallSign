@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import type { Database } from "./db.js";
-import { authorizationConsumptions } from "./schema.js";
+import { authorizationConsumptions, authorizations } from "./schema.js";
 
 export interface ConsumptionInput {
   authorizationId: string;
@@ -18,6 +18,8 @@ export interface ConsumptionRecord extends ConsumptionInput {
 
 export async function consumeAuthorizationAtomic(db: Database, input: ConsumptionInput): Promise<ConsumptionRecord> {
   return db.transaction(async (tx) => {
+    const locked = (await tx.select().from(authorizations).where(eq(authorizations.id, input.authorizationId)).for("update"))[0];
+    if (!locked || locked.cancelledAt || locked.expiresAt <= input.consumedAt) throw new HttpConflict("AUTHORIZATION_INVALID");
     const inserted = await tx.insert(authorizationConsumptions).values(input).onConflictDoNothing().returning();
     const record = inserted[0] ?? (await tx.select().from(authorizationConsumptions).where(eq(authorizationConsumptions.authorizationId, input.authorizationId)).limit(1))[0];
     if (!record) throw new Error("CONSUMPTION_READ_AFTER_WRITE_FAILED");

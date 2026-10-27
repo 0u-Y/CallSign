@@ -46,6 +46,7 @@ import {
   verifierEvents,
 } from "./schema.js";
 import { ensureLedgerDelegation, loadLedgerDeployment, realGovernanceLedger, revokeLedgerDelegation, type GovernanceLedger, type RecoveryRequestPayload } from "./ledger.js";
+import { aggregateWitnesses } from "./witness-aggregate.js";
 import { analyzeTranscript } from "./risk.js";
 
 export interface ServerOptions {
@@ -130,20 +131,13 @@ export async function buildServer(options: ServerOptions): Promise<FastifyInstan
   app.get("/state-bundles", async (request, reply) => {
     if (!ledger) throw new HttpError(503, "LEDGER_NOT_READY");
     const query = z.object({ institutionId: z.string().min(16).max(128), delegationId: z.string().min(16).max(128) }).strict().parse(request.query);
-    const witnesses = await Promise.allSettled(witnessUrls().map(async (url) => ({ url, health: await fetchJson<{ blockNumber: string }>(`${url}/health`) })));
-    const ready = witnesses.flatMap((entry) => entry.status === "fulfilled" ? [entry.value] : []);
-    if (ready.length < 3) return reply.status(503).send({ error: { code: "WITNESS_THRESHOLD_UNAVAILABLE", message: `${ready.length}/4 witness만 응답했습니다.` } });
-    const blockNumber = ready.map((entry) => BigInt(entry.health.blockNumber)).reduce((lowest, value) => value < lowest ? value : lowest);
-    const rpcResponse = await fetchJson<{ result?: { hash?: string } }>(process.env.BESU_RPC_URL ?? "http://127.0.0.1:18545", { jsonrpc: "2.0", method: "eth_getBlockByNumber", params: [`0x${blockNumber.toString(16)}`, false], id: 1 });
-    const blockHash = rpcResponse.result?.hash;
-    if (!blockHash) throw new HttpError(503, "CANDIDATE_BLOCK_UNAVAILABLE");
-    const signed = await Promise.allSettled(witnessUrls().map((url) => fetchJson<{ witnessId: string; snapshot: unknown; jws: string }>(`${url}/snapshot`, { ...query, blockNumber: String(blockNumber), blockHash })));
-    const responses = signed.flatMap((entry) => entry.status === "fulfilled" ? [entry.value] : []);
-    const groups = new Map<string, typeof responses>();
-    for (const item of responses) { const key = hashCanonical(item.snapshot); groups.set(key, [...(groups.get(key) ?? []), item]); }
-    const quorum = [...groups.values()].sort((a, b) => b.length - a.length)[0] ?? [];
-    if (new Set(quorum.map((item) => item.witnessId)).size < 3) return reply.status(503).send({ error: { code: "WITNESS_THRESHOLD_NOT_MET", message: "같은 snapshot에 대한 3개 서명을 모으지 못했습니다." } });
-    return { profile: "witness-qbft-p0", snapshot: quorum[0]!.snapshot, signatures: quorum.map(({ witnessId, jws }) => ({ witnessId, jws })) };
+    const bundle = await aggregateWitnesses({
+      endpoints: witnessUrls().map((url, index) => ({ url, witnessId: `witness-${index + 1}` })),
+      ...query,
+      trust: { networkId, genesisHash: ledger.genesisHash, registryAddress, policyVersion: "1", witnessThreshold: 3,
+        witnessPublicKeys: await loadWitnessPublicKeys(), enrollmentPublicKey: enrollmentKey.publicJwk, supportedProtocolVersions: [1] },
+    });
+    return { profile: "witness-qbft-p0", ...bundle };
   });
 
   app.post("/auth/login", async (request, reply) => {
@@ -535,6 +529,8 @@ async function fetchJson<T>(url: string, body?: unknown): Promise<T> {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
+  if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "infrastructure") throw new Error("INFRASTRUCTURE_EXECUTION_BLOCKED");
+  if (process.env.PUBLIC_DEPLOYMENT === "true") throw new Error("LEGACY_LOCAL_DEMO_ONLY_USE_FINALS_SERVER");
   const options: ServerOptions = {
     databaseUrl: process.env.DATABASE_URL ?? "postgres://institutionproof:institutionproof_dev_only@localhost:55432/institutionproof",
     webOrigin: process.env.WEB_ORIGIN ?? "http://localhost:4173",

@@ -231,6 +231,7 @@ export async function verifyPayload<T>(
 
 export function assertTemporalValidity(value: { issuedAt: number; expiresAt: number; notBefore?: number }, nowSeconds: number): void {
   if (!Number.isSafeInteger(nowSeconds)) throw new Error("INVALID_CLOCK");
+  if (value.issuedAt > nowSeconds) throw new Error("FUTURE_ISSUED_AT");
   if (value.expiresAt <= value.issuedAt) throw new Error("INVALID_TIME_ORDER");
   if (value.notBefore !== undefined && value.notBefore < value.issuedAt) throw new Error("INVALID_TIME_ORDER");
   if (value.notBefore !== undefined && nowSeconds < value.notBefore) throw new Error("NOT_YET_VALID");
@@ -246,4 +247,12 @@ function bytesToBase64url(value: Uint8Array): string {
   let binary = "";
   for (const byte of value) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+}
+
+export * from "./finals.js";
+export * from "./service.js";
+
+export async function exportSigningPrivateJwk(key: SigningKeyPair): Promise<JWK> {
+  if ("kty" in key.privateKey) return key.privateKey as JWK;
+  return exportJWK(key.privateKey as Parameters<typeof exportJWK>[0]);
 }

@@ -18,8 +18,18 @@ export const sessions = pgTable("sessions", {
   csrfToken: text("csrf_token").notNull(),
   userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  purpose: text("purpose").notNull().default("legacy"),
+  oidcIssuer: text("oidc_issuer"),
+  oidcClientId: text("oidc_client_id"),
+  oidcAudience: text("oidc_audience"),
+  authenticatedAt: timestamp("authenticated_at", { withTimezone: true }),
   ...timestamps,
 }, (table) => [index("sessions_user_idx").on(table.userId)]);
+
+export const oidcLoginUses = pgTable("oidc_login_uses", {
+  tokenHash: text("token_hash").primaryKey(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+}, table => [index("oidc_login_uses_expiry_idx").on(table.expiresAt)]);
 
 export const tasks = pgTable("tasks", {
   id: text("id").primaryKey(),
