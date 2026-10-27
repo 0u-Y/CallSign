@@ -1,0 +1,12 @@
+if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "chain") throw new Error("CHAIN_EXECUTION_BLOCKED");
+import { readFile } from "node:fs/promises";
+import { hashTypedData, type Hex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { recoveryTypedData, recoveryV2Schema } from "../services/api/src/governance-v2.js";
+const [requestPath, keyPath, expectedDigest] = process.argv.slice(2);
+if (!requestPath || !keyPath || !expectedDigest || !process.env.REGISTRY_ADDRESS || !process.env.NETWORK_ID) throw new Error("Usage: sign-recovery request.json ONE-approver-key.txt approved-typed-data-hash");
+const request = recoveryV2Schema.parse(JSON.parse(await readFile(requestPath, "utf8")));
+const data = recoveryTypedData(Number(process.env.NETWORK_ID), process.env.REGISTRY_ADDRESS as Hex, request);
+if (hashTypedData(data) !== expectedDigest || BigInt(request.deadline) <= BigInt(Math.floor(Date.now()/1000))) throw new Error("RECOVERY_APPROVAL_MISMATCH_OR_EXPIRED");
+const account = privateKeyToAccount((await readFile(keyPath, "utf8")).trim() as Hex);
+console.log(JSON.stringify({ signer: account.address, digest: expectedDigest, signature: await account.signTypedData(data) }));

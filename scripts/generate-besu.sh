@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != "infrastructure" ]; then echo "BLOCKED: explicit infrastructure execution approval required" >&2; exit 78; fi
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTPUT_DIR="${ROOT_DIR}/.local/besu"
 GENERATED_DIR="${OUTPUT_DIR}/generated"

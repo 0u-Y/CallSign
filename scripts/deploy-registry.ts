@@ -1,3 +1,4 @@
+if (!["chain", "infrastructure"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { createPublicClient, createWalletClient, http, keccak256, parseEther, stringToHex, type Hex } from "viem";

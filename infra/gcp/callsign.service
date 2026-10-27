@@ -1,0 +1,14 @@
+[Unit]
+Description=CallSign existing deployment (no initialization)
+After=docker.service network-online.target
+Requires=docker.service
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/callsign
+EnvironmentFile=/etc/callsign/deployment.env
+ExecStart=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml --profile https up -d --no-build --pull never
+ExecStop=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml --profile https stop
+TimeoutStartSec=180
+[Install]
+WantedBy=multi-user.target

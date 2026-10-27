@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": [
+    "packages/**/*.ts",
+    "tests/unit/**/*.ts",
+    "tests/integration/risk.test.ts",
+    "vitest.config.ts",
+    "scripts/prepare-finals.ts",
+    "scripts/provision-finals.ts",
+    "scripts/migrate-finals.ts",
+    "scripts/migrate.ts",
+    "scripts/sign-recovery.ts",
+    "tests/media/**/*.ts",
+    "playwright.finals.config.ts",
+    "tests/integration/finals-store.test.ts",
+    "tests/integration/finals-session-scopes.test.ts"
+  ]
+}

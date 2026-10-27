@@ -1,9 +1,4 @@
-import { readFile } from "node:fs/promises";
-import postgres from "postgres";
-
-const databaseUrl = process.env.DATABASE_URL ?? "postgres://institutionproof:institutionproof_dev_only@localhost:55432/institutionproof";
-const sql = postgres(databaseUrl, { max: 1 });
-const migration = await readFile(new URL("../services/api/drizzle/0000_initial.sql", import.meta.url), "utf8");
-await sql.unsafe(migration);
-await sql.end();
-console.log("Applied services/api/drizzle/0000_initial.sql");
+if (!["infrastructure", "integration"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
+// Both legacy and finals callers use the same version ledger and current shared schema.
+process.env.MIGRATOR_DATABASE_URL ??= process.env.DATABASE_URL ?? "postgres://institutionproof:institutionproof_dev_only@localhost:55432/institutionproof";
+await import("./migrate-finals.js");

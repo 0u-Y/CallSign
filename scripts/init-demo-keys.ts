@@ -1,3 +1,4 @@
+if (!["infrastructure"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
 import { resolve } from "node:path";
 import { loadOrCreateSigningKey } from "../services/api/src/keys.js";
 

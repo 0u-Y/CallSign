@@ -86,6 +86,7 @@ services:
       context: ../..
       dockerfile: infra/compose/witness.Dockerfile
     environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: ${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}
       WITNESS_ID: witness-1
       WITNESS_PORT: 4201
       BESU_RPC_URL: http://besu1:8545
@@ -107,6 +108,7 @@ services:
       context: ../..
       dockerfile: infra/compose/witness.Dockerfile
     environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: ${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}
       WITNESS_ID: witness-2
       WITNESS_PORT: 4202
       BESU_RPC_URL: http://besu2:8545
@@ -124,6 +126,7 @@ services:
       context: ../..
       dockerfile: infra/compose/witness.Dockerfile
     environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: ${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}
       WITNESS_ID: witness-3
       WITNESS_PORT: 4203
       BESU_RPC_URL: http://besu3:8545
@@ -141,6 +144,7 @@ services:
       context: ../..
       dockerfile: infra/compose/witness.Dockerfile
     environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: ${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}
       WITNESS_ID: witness-4
       WITNESS_PORT: 4204
       BESU_RPC_URL: http://besu4:8545

@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "media") throw new Error("MEDIA_EXECUTION_BLOCKED");
+
 export default defineConfig({
   testDir: "tests/e2e",
   timeout: 45_000,
@@ -15,7 +17,7 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: "DEMO_MODE=true pnpm dev",
+    command: "CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure DEMO_MODE=true pnpm dev",
     url: "http://localhost:4173/api/health",
     timeout: 30_000,
     reuseExistingServer: true,

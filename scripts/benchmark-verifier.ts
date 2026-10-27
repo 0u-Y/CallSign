@@ -1,3 +1,4 @@
+if (!["performance"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { performance } from "node:perf_hooks";

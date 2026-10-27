@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != "chain" ]; then echo "BLOCKED: explicit chain execution approval required" >&2; exit 78; fi
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "${ROOT_DIR}"
 COMPOSE=(docker compose -f infra/compose/docker-compose.yml)
@@ -11,7 +13,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-DEMO_MODE=true corepack pnpm --filter @callsign/api start >.local/witness-failover-api.log 2>&1 &
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure DEMO_MODE=true corepack pnpm --filter @callsign/api start >.local/witness-failover-api.log 2>&1 &
 api_pid=$!
 for attempt in $(seq 1 40); do
   if curl -fsS http://127.0.0.1:4100/health >/dev/null; then break; fi

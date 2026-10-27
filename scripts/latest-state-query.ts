@@ -1,3 +1,4 @@
+if (!["chain"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
 import postgres from "postgres";
 
 const sql = postgres(process.env.DATABASE_URL ?? "postgres://institutionproof:institutionproof_dev_only@127.0.0.1:55432/institutionproof", { max: 1 });

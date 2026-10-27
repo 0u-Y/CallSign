@@ -1,0 +1,305 @@
+name: callsign-finals
+x-app: &app
+  image: ${CALLSIGN_APP_IMAGE:?pin registry image tag or digest}
+  restart: unless-stopped
+  init: true
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  networks: [application]
+  stop_grace_period: 15s
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://127.0.0.1:'+process.env.PORT+'/readiness').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 15s
+    timeout: 4s
+    retries: 3
+x-env: &env
+  CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+  PUBLIC_DEPLOYMENT: ${PUBLIC_DEPLOYMENT:-false}
+  DEMO_MODE: 'false'
+  WEB_ORIGIN: ${WEB_ORIGIN:?set browser origin}
+  ISSUER_URL: http://issuer:4101
+  SENDER_URL: http://sender:4102
+  PLATFORM_INTERNAL_TOKEN: ${PLATFORM_INTERNAL_TOKEN:?required}
+  INSTITUTION_ID: ${INSTITUTION_ID:?required}
+  NETWORK_ID: ${NETWORK_ID:-20260914}
+  REGISTRY_ADDRESS: ${REGISTRY_ADDRESS:?required}
+  TRUST_BUNDLE_PATH: /trust/${TRUST_BUNDLE_FILENAME:-trust-bundle.json}
+services:
+  platform:
+    <<: *app
+    environment:
+      <<: *env
+      SERVICE_ROLE: platform
+      PORT: '4100'
+    depends_on:
+      issuer: { condition: service_healthy }
+      sender: { condition: service_healthy }
+    # No DB credential and no issuer/sender key mounts.
+  issuer:
+    <<: *app
+    networks: [application, ledger, egress]
+    environment:
+      <<: *env
+      SERVICE_ROLE: issuer
+      PORT: '4101'
+      SENDER_INTERNAL_TOKEN: ${SENDER_INTERNAL_TOKEN:?required}
+      ISSUER_DATABASE_URL: ${ISSUER_DATABASE_URL:?dedicated issuer login}
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL:?dedicated auth login}
+      ISSUER_KEY_DIRECTORY: /keys/issuer
+      TURN_URLS: ${TURN_URLS:?external TURN endpoint}
+      TURN_SECRET: ${TURN_SECRET:?required}
+      OIDC_ISSUER: ${OIDC_ISSUER:?required}
+      OIDC_JWKS_URL: ${OIDC_JWKS_URL:?required}
+      OIDC_AUTHORIZATION_URL: ${OIDC_AUTHORIZATION_URL:?required}
+      OIDC_TOKEN_URL: ${OIDC_TOKEN_URL:?required}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:?required}
+      OFFICIAL_OIDC_CLIENT_ID: ${OFFICIAL_OIDC_CLIENT_ID:?distinct client}
+      OIDC_AUDIENCE: ${OIDC_AUDIENCE:?required}
+      OFFICIAL_OIDC_AUDIENCE: ${OFFICIAL_OIDC_AUDIENCE:?distinct audience}
+      DEEPGRAM_API_KEY: ${DEEPGRAM_API_KEY:-}
+      DEEPGRAM_MODEL: ${DEEPGRAM_MODEL:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
+      BESU_NODE_URLS: http://besu1:8545,http://besu2:8545,http://besu3:8545,http://besu4:8545
+      REGISTRY_APPROVERS: ${REGISTRY_APPROVERS:?three public approver addresses}
+      REGISTRY_ADMIN_KEY_PATH: /keys/admin/administrator.txt
+      REGISTRY_OPERATOR_KEY_PATH: /keys/operator/emergency.txt
+    volumes:
+      - ${FINALS_DATA_DIR:?prepared persistent configuration}/issuer:/keys/issuer:ro
+      - ${FINALS_DATA_DIR}/operator:/keys/operator:ro
+      - ${FINALS_DATA_DIR}/admin:/keys/admin:ro
+      - ${FINALS_DATA_DIR}/trust:/trust:ro
+    depends_on: { postgres: { condition: service_healthy } }
+  sender:
+    <<: *app
+    environment:
+      <<: *env
+      SERVICE_ROLE: sender
+      PORT: '4102'
+      SENDER_INTERNAL_TOKEN: ${SENDER_INTERNAL_TOKEN:?required}
+      SENDER_KEY_PATH: /keys/sender/key.json
+      SERVICE_DID: ${SERVICE_DID:?registered sender DID}
+    volumes:
+      - ${FINALS_DATA_DIR}/sender:/keys/sender:ro
+  postgres:
+    image: postgres:17.6-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: callsign
+      POSTGRES_USER: callsign_migrator
+      POSTGRES_PASSWORD: ${MIGRATOR_DB_PASSWORD:?required}
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    networks: [application]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U callsign_migrator -d callsign']
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    # No host DB port. No startup migration or seed.
+  web:
+    image: ${CALLSIGN_WEB_IMAGE:?pin web image from same source revision}
+    restart: unless-stopped
+    networks: [application, public]
+    depends_on: { platform: { condition: service_healthy } }
+    ports: ['127.0.0.1:8080:8080']
+  https:
+    image: caddy:2.10.2-alpine
+    profiles: [https]
+    restart: unless-stopped
+    environment: { CALLSIGN_DOMAIN: '${CALLSIGN_DOMAIN:?external DNS domain}' }
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+    ports: ['80:80', '443:443']
+    networks: [public]
+  turn:
+    image: ${TURN_IMAGE:?pin coturn image digest}
+    profiles: [media]
+    restart: unless-stopped
+    command: ['-c', '/etc/coturn/turnserver.conf']
+    volumes: ['${FINALS_DATA_DIR}/turn:/etc/coturn:ro']
+    ports: ['3478:3478/udp', '3478:3478/tcp', '5349:5349/tcp', '49160-49200:49160-49200/udp']
+    networks: [public]
+  besu1:
+    image: hyperledger/besu:26.8.1
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node1/key --network-id=20260914 --p2p-host=10.203.0.11 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --rpc-http-cors-origins=http://localhost:4173 --min-gas-price=0"]
+    volumes:
+      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node1/key:/network/keys/node1/key:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - besu1-data:/var/lib/besu
+    networks:
+      ledger:
+        ipv4_address: 10.203.0.11
+    healthcheck: &besu-health
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8545'"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+  besu2:
+    image: hyperledger/besu:26.8.1
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node2/key --network-id=20260914 --p2p-host=10.203.0.12 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    volumes:
+      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node2/key:/network/keys/node2/key:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - besu2-data:/var/lib/besu
+    networks:
+      ledger:
+        ipv4_address: 10.203.0.12
+    depends_on: { besu1: { condition: service_healthy } }
+    healthcheck: *besu-health
+
+  besu3:
+    image: hyperledger/besu:26.8.1
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node3/key --network-id=20260914 --p2p-host=10.203.0.13 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    volumes:
+      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node3/key:/network/keys/node3/key:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - besu3-data:/var/lib/besu
+    networks:
+      ledger:
+        ipv4_address: 10.203.0.13
+    depends_on: { besu1: { condition: service_healthy } }
+    healthcheck: *besu-health
+
+  besu4:
+    image: hyperledger/besu:26.8.1
+    restart: unless-stopped
+    entrypoint: ["bash", "-lc"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node4/key --network-id=20260914 --p2p-host=10.203.0.14 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    volumes:
+      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node4/key:/network/keys/node4/key:ro
+      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - besu4-data:/var/lib/besu
+    networks:
+      ledger:
+        ipv4_address: 10.203.0.14
+    depends_on: { besu1: { condition: service_healthy } }
+    healthcheck: *besu-health
+
+  witness1:
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    image: ${CALLSIGN_APP_IMAGE:?pin app image}
+    command: ["pnpm", "--filter", "@callsign/witness", "start"]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      WITNESS_PREPROVISIONED_KEYS: "true"
+      WITNESS_ID: witness-1
+      WITNESS_PORT: 4201
+      BESU_RPC_URL: http://besu1:8545
+      WITNESS_KEY_PATH: /keys/witness.json
+      DEPLOYMENT_PATH: /trust/deployment.json
+    volumes:
+      - ${FINALS_DATA_DIR}/witness-keys/witness-1.json:/keys/witness.json:ro
+      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+    networks: [ledger]
+    depends_on: { besu1: { condition: service_healthy } }
+    healthcheck: &witness-health
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:' + process.env.WITNESS_PORT + '/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))\""]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+    restart: unless-stopped
+
+  witness2:
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    image: ${CALLSIGN_APP_IMAGE:?pin app image}
+    command: ["pnpm", "--filter", "@callsign/witness", "start"]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      WITNESS_PREPROVISIONED_KEYS: "true"
+      WITNESS_ID: witness-2
+      WITNESS_PORT: 4202
+      BESU_RPC_URL: http://besu2:8545
+      WITNESS_KEY_PATH: /keys/witness.json
+      DEPLOYMENT_PATH: /trust/deployment.json
+    volumes:
+      - ${FINALS_DATA_DIR}/witness-keys/witness-2.json:/keys/witness.json:ro
+      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+    networks: [ledger]
+    depends_on: { besu2: { condition: service_healthy } }
+    healthcheck: *witness-health
+    restart: unless-stopped
+
+  witness3:
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    image: ${CALLSIGN_APP_IMAGE:?pin app image}
+    command: ["pnpm", "--filter", "@callsign/witness", "start"]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      WITNESS_PREPROVISIONED_KEYS: "true"
+      WITNESS_ID: witness-3
+      WITNESS_PORT: 4203
+      BESU_RPC_URL: http://besu3:8545
+      WITNESS_KEY_PATH: /keys/witness.json
+      DEPLOYMENT_PATH: /trust/deployment.json
+    volumes:
+      - ${FINALS_DATA_DIR}/witness-keys/witness-3.json:/keys/witness.json:ro
+      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+    networks: [ledger]
+    depends_on: { besu3: { condition: service_healthy } }
+    healthcheck: *witness-health
+    restart: unless-stopped
+
+  witness4:
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    image: ${CALLSIGN_APP_IMAGE:?pin app image}
+    command: ["pnpm", "--filter", "@callsign/witness", "start"]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      WITNESS_PREPROVISIONED_KEYS: "true"
+      WITNESS_ID: witness-4
+      WITNESS_PORT: 4204
+      BESU_RPC_URL: http://besu4:8545
+      WITNESS_KEY_PATH: /keys/witness.json
+      DEPLOYMENT_PATH: /trust/deployment.json
+    volumes:
+      - ${FINALS_DATA_DIR}/witness-keys/witness-4.json:/keys/witness.json:ro
+      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+    networks: [ledger]
+    depends_on: { besu4: { condition: service_healthy } }
+    healthcheck: *witness-health
+    restart: unless-stopped
+
+volumes:
+  besu1-data:
+  besu2-data:
+  besu3-data:
+  besu4-data:
+  postgres-data:
+  caddy-data:
+  asterisk-data:
+networks:
+  application: { internal: true }
+  public: {}
+  egress: {}
+  ledger:
+    ipam: { config: [{ subnet: 10.203.0.0/24 }] }

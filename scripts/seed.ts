@@ -1,3 +1,4 @@
+if (!["infrastructure"].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION ?? "")) throw new Error("EXTERNAL_EXECUTION_BLOCKED");
 import { createDatabase } from "../services/api/src/db.js";
 import { seedDatabase } from "../services/api/src/seed.js";
 
