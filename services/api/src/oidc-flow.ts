@@ -13,7 +13,7 @@ export class OidcLoginFlow {
     const state = randomBytes(32).toString("base64url"), verifier = randomBytes(32).toString("base64url"), nonce = randomBytes(32).toString("base64url");
     this.pending.set(state, { verifier, nonce, official, expiresAt: this.now() + 300000 });
     const url = new URL(this.options.authorizationUrl);
-    for (const [key, value] of Object.entries({ client_id: official ? this.options.officialClientId : this.options.clientId, redirect_uri: this.options.redirectUri, response_type: "code", scope: "openid", state, nonce, code_challenge_method: "S256", code_challenge: createHash("sha256").update(verifier).digest("base64url") })) url.searchParams.set(key, value);
+    for (const [key, value] of Object.entries({ client_id: official ? this.options.officialClientId : this.options.clientId, redirect_uri: this.options.redirectUri, response_type: "code", max_age:"0", prompt:"login", scope: "openid", state, nonce, code_challenge_method: "S256", code_challenge: createHash("sha256").update(verifier).digest("base64url") })) url.searchParams.set(key, value);
     return { state, url: url.href };
   }
   async finish(state: string, cookieState: string, code: string) {

@@ -5,9 +5,13 @@ import { sessionForRequest, tokenHash } from "./auth.js";
 import { buildFinalsServer } from "./finals-server.js";
 import { finalsEnvironmentSchema } from "./finals-config.js";
 
-const injected = vi.hoisted(() => ({ db: undefined as any, institution: undefined as any, identity: undefined as any }));
+const injected = vi.hoisted(() => ({ db: undefined as any, institution: undefined as any, identity: undefined as any,quotaCalls:[] as string[] }));
+vi.mock("./notifications.js",()=>({registerNotifications:()=>{},notificationRecipients:()=>[]}));
+vi.mock("./account-management.js",async original=>({...await original<typeof import("./account-management.js")>(),registerAccountManagement:()=>{}}));
+vi.mock("./operations.js",()=>({registerServiceOperations:()=>{}}));
+vi.mock("./quota.js",()=>({postgresQuotaStore:()=>({chargeRequest:async(institution:string,user:string)=>{if(institution!==injected.institution.id||!injected.institution.members[user])throw new Error('UNAUTHENTICATED_QUOTA_PRINCIPAL');injected.quotaCalls.push(user);},reserve:async()=>{throw new Error("UNEXPECTED_QUOTA_USE_IN_AUTH_TEST");},settle:async()=>{throw new Error("UNEXPECTED_QUOTA_USE_IN_AUTH_TEST");},close:async()=>{}})}));
 vi.mock("./db.js", () => ({ createDatabase: () => ({ db: injected.db, client: { end: async () => {} } }) }));
-vi.mock("./finals-store.js", () => ({ postgresAuthorityStore: () => ({ read: async () => injected.institution, close: async () => {} }) }));
+vi.mock("./finals-store.js", () => ({ postgresAuthorityStore: () => ({ read: async () => injected.institution, transact:async (_id:string,operation:(record:any)=>Promise<unknown>)=>operation(injected.institution), close: async () => {} }) }));
 vi.mock("node:fs/promises", () => ({ readFile: async () => JSON.stringify({ witnessThreshold: 3, witnessPublicKeys: [{}, {}, {}, {}], endpoints: [{}, {}, {}, {}], didDocuments: {} }) }));
 vi.mock("jose", async original => ({ ...await original<typeof import("jose")>(), jwtVerify: async () => ({ payload: injected.identity }) }));
 
@@ -57,7 +61,7 @@ function databaseFake() {
 
 let fake: ReturnType<typeof databaseFake>;
 function add(purpose: "legacy" | "work" | "official", token = purpose) {
-  fake.state.sessions.set(token, { id: token, tokenHash: tokenHash(token), csrfToken: `csrf-${purpose}`, userId, purpose,
+  fake.state.sessions.set(token, { id: token, tokenHash: tokenHash(token), membershipGeneration:0,csrfToken: `csrf-${purpose}`, userId, purpose,
     expiresAt: new Date(Date.now() + 60000), createdAt: new Date(), oidcIssuer: issuer,
     oidcClientId: purpose === "official" ? "official-client" : clientId, oidcAudience: purpose === "official" ? "official-audience" : audience, authenticatedAt: new Date() });
 }
@@ -67,7 +71,7 @@ function server() {
 }
 function headers(cookie: string, csrfToken?: string) { return { cookie, origin, "x-service-token": serviceToken, ...(csrfToken ? { "x-csrf-token": csrfToken } : {}) }; }
 beforeEach(() => {
-  fake = databaseFake(); injected.db = fake.db;
+  fake = databaseFake(); injected.db = fake.db;injected.quotaCalls=[];
   injected.institution = { id: institutionId, members: { [userId]: { role: "recipient" } }, intents: { mine: { id: "mine", recipientId: userId } }, policy: {} };
   injected.identity = { sub: "alice", iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000)+300, aud: audience };
   for (const [key, value] of Object.entries({ ISSUER_DATABASE_URL: "fake-only", AUTH_DATABASE_URL: "fake-only", OIDC_ISSUER: issuer, OIDC_CLIENT_ID: clientId, OFFICIAL_OIDC_CLIENT_ID: "official-client", OIDC_AUDIENCE: audience, OFFICIAL_OIDC_AUDIENCE: "official-audience", OIDC_JWKS_URL: "https://identity.example/keys", OIDC_AUTHORIZATION_URL: "", OIDC_TOKEN_URL: "" })) vi.stubEnv(key, value);
@@ -88,6 +92,7 @@ describe("issuer purpose-bound sessions (offline routes)", () => {
         const result = await app.inject({ url: "/v2/official/mine", headers: headers(`official_session=${token}`) });
         expect(result.statusCode).toBe(403); expect(result.json().error.code).toBe("OFFICIAL_SCOPE_REQUIRED");
       }
+      expect(injected.quotaCalls).toHaveLength(1);
       const swapped = await app.inject({ url: "/v2/auth/me?purpose=work", headers: headers("ip_session=official") });
       expect(swapped.statusCode).toBe(403);
       expect((await app.inject({ url: "/v2/official/not-owned", headers: headers("official_session=official") })).statusCode).toBe(404);
@@ -134,3 +139,6 @@ describe("issuer purpose-bound sessions (offline routes)", () => {
     finally { await app.close(); }
   });
 });
+
+it('exposes the shared purpose-bound authentication through the default service route without fallback',async()=>{add('work');add('official');const app=await server();try{const work=await app.inject({method:'GET',url:'/v3/auth/me?purpose=work',headers:headers('ip_session=work')});expect(work.statusCode).toBe(200);expect(work.json().purpose).toBe('work');const wrong=await app.inject({method:'GET',url:'/v3/auth/me?purpose=official',headers:headers('official_session=work')});expect(wrong.statusCode).toBe(403);}finally{await app.close();}});
+it('rejects an old session even after the account is active again with a newer membership generation',async()=>{add('work');injected.institution.members[userId]={role:'recipient',active:true,sessionGeneration:1};const app=await server();try{const result=await app.inject({method:'GET',url:'/v3/auth/me?purpose=work',headers:headers('ip_session=work')});expect(result.statusCode).toBe(401);expect(result.json().error.code).toBe('MEMBERSHIP_SESSION_REVOKED');}finally{await app.close();}});

@@ -18,7 +18,8 @@
     "lucide-react": "0.563.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "react-router-dom": "7.18.3"
+    "react-router-dom": "7.18.3",
+    "viem": "2.56.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.3.3",

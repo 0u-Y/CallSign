@@ -1,0 +1,8 @@
+[general]
+enabled=yes
+pretty=no
+allowed_origins=@WEB_ORIGIN@
+[callsign]
+type=user
+read_only=no
+password=@ARI_PASSWORD@

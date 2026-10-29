@@ -1,19 +1,22 @@
 import { randomUUID } from "node:crypto";
 import { importJWK, type JWK } from "jose";
-import { assertTemporalValidity, hashCanonical, policyHash, publicKeySchema, registeredUriSchema, serviceBindingSchema, pbxEvidenceSchema, serviceCredentialDigest, serviceLeaseSchema, servicePolicy, servicePossessionSchema, serviceProofSchema, serviceReceiptSchema, signPayload, signServiceCredential, startAuthorizationSchema, verifyPayload, verifyServiceCredential, type ServiceBinding, type SigningKeyPair } from "@callsign/protocol";
+import { assertTemporalValidity, hashCanonical, policyHash, publicKeySchema, registeredUriSchema, serviceBindingSchema, pbxEvidenceSchema, serviceCredentialDigest, serviceLeaseSchema, servicePolicy, servicePossessionSchema, serviceProofSchema, serviceReceiptSchema, signPayload, signServiceCredential, startAuthorizationSchema, verifyPayload, verifyServiceCredential, renewalProofSchema, runtimePolicySchema, type RuntimePolicy, type ServiceBinding, type SigningKeyPair } from "@callsign/protocol";
 import { HttpError } from "./auth.js";
-import { activeIntent, importMockFds, membership, type Actor, type AuthorityStore, type InstitutionRecord } from "./finals-model.js";
+import { activeIntent, importMockFds, membership, requirePermission, type Actor, type AuthorityStore, type InstitutionRecord } from "./finals-model.js";
 import { terminal, type ServiceAttempt, type ServiceState } from "./service-state.js";
 
 export interface ServiceAuthorityOptions {
   store: AuthorityStore; networkId: string; registryAddress: string;
   signingKey(version: number): Promise<Pick<SigningKeyPair, "privateKey" | "kid">>;
   current(record: InstitutionRecord, digest: string): Promise<"current" | "revoked" | "unavailable">;
+  assertPublished?(record:InstitutionRecord):void;
   pbxTrust?: {kid:string;publicKey:JWK};
+  policy?: RuntimePolicy;
   now?: () => number;
 }
 export class ServiceAuthority {
   constructor(readonly options: ServiceAuthorityOptions) {}
+  get policy() { return runtimePolicySchema.parse(this.options.policy ?? servicePolicy); }
   now() { return this.options.now?.() ?? Math.floor(Date.now()/1000); }
   base() { return { protocol: "callsign" as const, version: 3 as const, networkId: this.options.networkId, registryAddress: this.options.registryAddress }; }
   state(r: InstitutionRecord): ServiceState { if (!r.serviceV3 || r.serviceV3.recovery !== "ready") throw new HttpError(503, "CONSUMPTION_HISTORY_RECOVERY_REQUIRED"); return r.serviceV3; }
@@ -37,7 +40,7 @@ export class ServiceAuthority {
     membership(r, actor, ["gateway", "recipient", "institution"]);
     const s = this.state(r), attempt = s.attempts[attemptId], intent = attempt && r.intents[attempt.intentId];
     if (!attempt || !intent || intent.institutionId !== r.id || (actor.role === "gateway" && (attempt.agentId !== actor.userId || r.members[actor.userId]?.serviceDid !== intent.serviceDid)) || (actor.role === "recipient" && intent.recipientId !== actor.userId)) throw new HttpError(404, "ATTEMPT_NOT_FOUND");
-    if (attempt.agentId !== intent.agentId || r.members[attempt.agentId]?.role !== "gateway" || r.members[attempt.agentId]?.serviceDid !== intent.serviceDid) throw new HttpError(409, "ASSIGNMENT_CHANGED");
+    if (r.members[intent.recipientId]?.role!=="recipient"||r.members[intent.recipientId]?.active===false||attempt.agentId !== intent.agentId || (r.members[attempt.agentId]?.role !== "gateway" || r.members[attempt.agentId]?.active===false) || r.members[attempt.agentId]?.serviceDid !== intent.serviceDid) throw new HttpError(409, "ASSIGNMENT_CHANGED");
     return { s, attempt, intent };
   }
   async credential(r: InstitutionRecord, digest: string) {
@@ -52,11 +55,11 @@ export class ServiceAuthority {
     const status = await this.options.current(r, digest);
     if (status !== "current") throw new HttpError(status === "revoked" ? 409 : 503, status === "revoked" ? "AUTHORITY_REVOKED" : "AUTHORITY_UNAVAILABLE");
   }
-  createIntent(actor: Actor, requestId: string, input: unknown) { return this.idempotent(actor, requestId, { action: "intent", input }, async r => {
-    const intent = importMockFds(r, actor, input, this.now()); this.event(r, actor, "intent.created", intent.id); return intent;
+  createIntent(actor: Actor, requestId: string, input: unknown) { return this.idempotent(actor, requestId, { action: "intent", input }, async r => { this.options.assertPublished?.(r);
+    requirePermission(r,actor,"contact.manage");const intent = importMockFds(r, actor, input, this.now()); this.event(r, actor, "intent.created", intent.id); return intent;
   }); }
-  issueCredential(actor: Actor, requestId: string, serviceUri: string) { return this.idempotent(actor, requestId, { action: "vc", serviceUri }, async r => {
-    membership(r, actor, ["institution"]); registeredUriSchema.parse(serviceUri);
+  issueCredential(actor: Actor, requestId: string, serviceUri: string) { return this.idempotent(actor, requestId, { action: "vc", serviceUri }, async r => { this.options.assertPublished?.(r);
+    requirePermission(r,actor,"delegation.manage"); registeredUriSchema.parse(serviceUri);
     const service = r.services[serviceUri]; if (r.status !== "active" || !service?.active) throw new HttpError(409, "SERVICE_INACTIVE");
     const id = `urn:uuid:${randomUUID()}`;
     const vc = { "@context": ["https://www.w3.org/ns/credentials/v2", { "@vocab": "urn:callsign:delegation:v1:" }], id, type: ["VerifiableCredential", "CallCenterDelegation"], issuer: registeredUriSchema.parse(r.institutionUri ?? r.did), validFrom: new Date(this.now()*1000).toISOString(), validUntil: new Date((this.now()+86400)*1000).toISOString(), credentialSubject: { id: serviceUri, institutionId: r.id, publicKey: publicKeySchema.parse(service.publicKey), keyVersion: service.keyVersion, scope: r.policy }, credentialStatus: { id, type: "CallSignRegistryStatus", networkId: this.options.networkId, registryAddress: this.options.registryAddress, epoch: r.epoch, approvalKeyVersion: r.approvalKeyVersion } };
@@ -64,17 +67,17 @@ export class ServiceAuthority {
     const item = { vc: parsed, jws: await signServiceCredential(parsed, await this.options.signingKey(r.approvalKeyVersion)), state: "pending" as const };
     this.state(r).credentials[digest] = item; this.event(r, actor, "credential.register", digest, { digest }); return { digest, ...item };
   }); }
-  createAttempt(actor: Actor, requestId: string, intentId: string, profile: ServiceAttempt["profile"]) { return this.idempotent(actor, requestId, { action: "attempt", intentId, profile }, async (r, s) => {
+  createAttempt(actor: Actor, requestId: string, intentId: string, profile: ServiceAttempt["profile"]) { return this.idempotent(actor, requestId, { action: "attempt", intentId, profile }, async (r, s) => { this.options.assertPublished?.(r);
     membership(r, actor, ["gateway"]); const intent = activeIntent(r, intentId, actor, this.now());
     for (const a of Object.values(s.attempts)) if (!terminal(a.status) && a.intentId === intentId) {
       if (a.status !== "accepted" && a.firstConnectBy <= this.now()) { a.status = "no-answer"; a.endedAt = this.now(); }
       else throw new HttpError(409, "ATTEMPT_ALREADY_ACTIVE");
     }
     if (Object.keys(s.attempts).length >= 10000) throw new HttpError(429, "ATTEMPT_CAPACITY_RETENTION_REQUIRED");
-    const a: ServiceAttempt = { id: `v3-${randomUUID()}`, intentId, agentId: actor.userId, sessionId: randomUUID(), generation: randomUUID(), profile, status: "created", firstConnectBy: Math.min(this.now()+120, intent.expiresAt), callEndBy: Math.min(this.now()+servicePolicy.maxCallSeconds, intent.expiresAt), revision: 1 };
+    const a: ServiceAttempt = { id: `v3-${randomUUID()}`, intentId, agentId: actor.userId, sessionId: randomUUID(), generation: randomUUID(), profile, status: "created", firstConnectBy: Math.min(this.now()+120, intent.expiresAt), callEndBy: Math.min(this.now()+this.policy.maxCallSeconds, intent.expiresAt), revision: 1 };
     s.attempts[a.id] = a; this.event(r, actor, "attempt.created", a.id); return a;
   }); }
-  challenge(actor: Actor, requestId: string, attemptId: string, digest: string, publicKey: unknown) { return this.idempotent(actor, requestId, { action: "challenge", attemptId, digest, publicKey }, async (r, s) => {
+  challenge(actor: Actor, requestId: string, attemptId: string, digest: string, publicKey: unknown) { return this.idempotent(actor, requestId, { action: "challenge", attemptId, digest, publicKey }, async (r, s) => { this.options.assertPublished?.(r);
     membership(r, actor, ["gateway"]); const { attempt, intent } = this.party(r, actor, attemptId); activeIntent(r, intent.id, actor, this.now());
     if (attempt.status !== "created" || this.now() >= attempt.firstConnectBy) throw new HttpError(409, "START_EXPIRED");
     const { vc, service } = await this.credential(r, digest); if (vc.credentialSubject.id !== intent.serviceDid) throw new HttpError(403, "SERVICE_MISMATCH"); await this.assertCurrent(r, digest);
@@ -86,7 +89,7 @@ export class ServiceAuthority {
     if (!challenge || challenge.used || challenge.payload.serviceUri !== serviceUri || challenge.payload.agentId !== actor.userId) throw new HttpError(403, "CHALLENGE_FORBIDDEN");
     this.party(r, actor, challenge.payload.attemptId); assertTemporalValidity(challenge.payload, this.now()); return challenge.payload;
   }); }
-  authorize(actor: Actor, requestId: string, challengeId: string, proofJws: string) { return this.idempotent(actor, requestId, { action: "authorize", challengeId, proofJws }, async (r, s) => {
+  authorize(actor: Actor, requestId: string, challengeId: string, proofJws: string) { return this.idempotent(actor, requestId, { action: "authorize", challengeId, proofJws }, async (r, s) => { this.options.assertPublished?.(r);
     membership(r, actor, ["gateway"]); const challenge = s.challenges[challengeId]; if (!challenge || challenge.used) throw new HttpError(409, "CHALLENGE_USED_OR_UNKNOWN");
     const expected = challenge.payload, { attempt, intent } = this.party(r, actor, expected.attemptId); activeIntent(r, intent.id, actor, this.now());
     if (attempt.status !== "created" || expected.agentId !== actor.userId) throw new HttpError(409, "ATTEMPT_INVALID");
@@ -108,7 +111,7 @@ export class ServiceAuthority {
     const proof = await verifyPayload(jws, await importJWK(publicKey, "EdDSA"), { type: "ServicePossession", kid: hashCanonical(publicKey), schema: servicePossessionSchema }); assertTemporalValidity(proof, this.now());
     if (proof.expiresAt-proof.issuedAt > 120 || proof.networkId !== this.options.networkId || proof.registryAddress !== this.options.registryAddress || proof.role !== role || proof.authorizationId !== authorizationId || proof.sessionId !== sessionId || proof.bindingHash !== bindingHash || proof.nonce !== nonce) throw new HttpError(409, "POSSESSION_CONTEXT_INVALID");
   }
-  consume(actor: Actor, requestId: string, attemptId: string, input: { binding: ServiceBinding; senderProof: string; recipientProof: string }) { return this.idempotent(actor, requestId, { action: "consume", attemptId, ...input }, async (r, s) => {
+  consume(actor: Actor, requestId: string, attemptId: string, input: { binding: ServiceBinding; senderProof: string; recipientProof: string }) { return this.idempotent(actor, requestId, { action: "consume", attemptId, ...input }, async (r, s) => { this.options.assertPublished?.(r);
     membership(r, actor, ["recipient"]); const { attempt, intent } = this.party(r, actor, attemptId), auth = attempt.authorizationId && s.authorizations[attempt.authorizationId];
     if (!auth) throw new HttpError(404, "AUTHORIZATION_NOT_FOUND"); const a = auth.payload, binding = serviceBindingSchema.parse(input.binding), hash = hashCanonical(binding), prior = s.consumptions[a.authorizationId];
     if (prior) { if (prior.payload.bindingHash !== hash) throw new HttpError(409, "AUTHORIZATION_ALREADY_CONSUMED"); return prior; }
@@ -135,25 +138,88 @@ export class ServiceAuthority {
     s.consumptions[a.authorizationId] = receipt; attempt.binding = binding; attempt.status = "consumed"; attempt.revision++;
     this.event(r, actor, "authorization.consumed", a.authorizationId, { bindingHash: hash }); return receipt;
   }); }
-  lease(actor: Actor, requestId: string, attemptId: string, sequence: number, nonce: string, proofJws: string, choice: "pause" | "continue" = "pause") { return this.idempotent(actor, requestId, { action: "lease", attemptId, sequence, nonce, proofJws, choice }, async (r, s) => {
+  lease(actor: Actor, requestId: string, attemptId: string, sequence: number, nonce: string, proofJws: string, choice: "pause" | "continue" = "pause", senderProofJws?: string) { return this.idempotent(actor, requestId, { action: "lease", attemptId, sequence, nonce, proofJws, choice, senderProofJws:senderProofJws??null }, async (r, s) => {
     membership(r, actor, ["recipient"]); const { attempt, intent } = this.party(r, actor, attemptId), auth = attempt.authorizationId && s.authorizations[attempt.authorizationId];
     if (!auth || !attempt.binding || !attempt.recipientKey || !["consumed", "accepted"].includes(attempt.status) || auth.cancelled || this.now() >= attempt.callEndBy || auth.payload.epoch !== r.epoch || auth.payload.approvalKeyVersion !== r.approvalKeyVersion) throw new HttpError(409, "CALL_NO_LONGER_AUTHORIZED");
     activeIntent(r, intent.id, actor, this.now()); await this.credential(r, auth.payload.vcDigest);
     if (sequence !== (attempt.lease?.payload.sequence ?? 0)+1) throw new HttpError(409, "LEASE_SEQUENCE_CONFLICT");
-    const hash = hashCanonical(attempt.binding); await this.possession(proofJws, attempt.recipientKey.publicKey, "recipient", auth.payload.authorizationId, attempt.sessionId, hash, nonce);
+    const hash = hashCanonical(attempt.binding);
+    const renewal = attempt.renewal;
+    if (!renewal || renewal.sequence !== sequence || renewal.nonce !== nonce || this.now() >= renewal.expiresAt || !senderProofJws || renewal.proofs.sender !== senderProofJws || renewal.proofs.recipient !== proofJws) throw new HttpError(409, "BOTH_RENEWAL_PROOFS_REQUIRED");
+    await this.renewalProof(r, attempt, "sender", senderProofJws);
+    await this.renewalProof(r, attempt, "recipient", proofJws);
     const status = await this.options.current(r, auth.payload.vcDigest);
     if (status === "revoked") {
-      attempt.status = "cancelled"; attempt.endedAt = this.now(); auth.cancelled = true; this.event(r, actor, "attempt.cancelled", attempt.id);
+      attempt.status = "cancelled"; attempt.endedAt = this.now(); auth.cancelled = true; this.event(r, actor, "call.cleanup", attempt.id); this.event(r, actor, "attempt.cancelled", attempt.id);
       return { authority: "revoked" as const, terminated: true };
     }
     if (attempt.status === "consumed" && this.now() >= auth.payload.firstConsumeBy) throw new HttpError(409,"INITIAL_CONNECTION_START_EXPIRED");
     if (status === "unavailable" && attempt.status !== "accepted") throw new HttpError(503, "INITIAL_AUTHORITY_CHECK_REQUIRED");
     if (attempt.status === "accepted" && (!attempt.lease || this.now() >= attempt.lease.payload.expiresAt)) throw new HttpError(409, "LEASE_EXPIRED_REVALIDATION_REQUIRED");
-    const payload = serviceLeaseSchema.parse({ ...this.base(), type: "CallLease", institutionId: r.id, authorizationId: auth.payload.authorizationId, bindingHash: hash, sessionId: attempt.sessionId, connectionGeneration: attempt.generation, epoch: r.epoch, approvalKeyVersion: r.approvalKeyVersion, policyHash: intent.policyHash, vcDigest: auth.payload.vcDigest, sequence, nonce, authority: status, callEndBy: attempt.callEndBy, issuedAt: this.now(), expiresAt: Math.min(this.now()+30, attempt.callEndBy) });
+    const payload = serviceLeaseSchema.parse({ ...this.base(), type: "CallLease", institutionId: r.id, authorizationId: auth.payload.authorizationId, bindingHash: hash, sessionId: attempt.sessionId, connectionGeneration: attempt.generation, epoch: r.epoch, approvalKeyVersion: r.approvalKeyVersion, policyHash: intent.policyHash, vcDigest: auth.payload.vcDigest, sequence, nonce, authority: status, callEndBy: attempt.callEndBy, issuedAt: this.now(), expiresAt: Math.min(this.now()+this.policy.leaseSeconds, attempt.callEndBy) });
     const result = { payload, jws: await signPayload(payload, await this.options.signingKey(r.approvalKeyVersion)) };
+    attempt.authorityStatus=status;attempt.authorityUntil=status==="current"?Math.min(this.now()+8,s.checkpoints[auth.payload.vcDigest]?.blockTimestamp!==undefined?s.checkpoints[auth.payload.vcDigest]!.blockTimestamp+8:this.now()+8):this.now();
     attempt.lease = result; attempt.status = "accepted"; if (status === "unavailable") attempt.unverifiedChoice = choice; else delete attempt.unverifiedChoice; attempt.revision++;
     this.event(r, actor, "call.lease", attempt.id, { sequence, authority: status, choice }); return { authority: status, lease: result };
   }); }
+  async renewalProof(r: InstitutionRecord, attempt: ServiceAttempt, role: "sender" | "recipient", jws: string) {
+    const s=this.state(r), auth=s.authorizations[attempt.authorizationId!], challenge=Object.values(s.challenges).find(c=>hashCanonical(c.payload)===auth?.payload.serviceProofHash);
+    const key=role==="sender"?challenge?.payload.browserPublicKey:attempt.recipientKey?.publicKey;
+    if(!key||!attempt.renewal||!attempt.binding)throw new HttpError(409,"RENEWAL_CONTEXT_REQUIRED");
+    const proof=await verifyPayload(jws,await importJWK(key,"EdDSA"),{type:"LeaseRenewalProof",kid:hashCanonical(key),schema:renewalProofSchema});assertTemporalValidity(proof,this.now());
+    const expected={...this.base(),type:"LeaseRenewalProof",role,authorizationId:attempt.authorizationId,sessionId:attempt.sessionId,bindingHash:hashCanonical(attempt.binding),...attempt.renewal};
+    const {proofs:_,...payload}=expected;
+    if(hashCanonical(proof)!==hashCanonical(payload))throw new HttpError(409,"RENEWAL_CONTEXT_MISMATCH");return proof;
+  }
+  renewalChallenge(actor:Actor,requestId:string,attemptId:string) { return this.idempotent(actor,requestId,{action:"renewal-challenge",attemptId},async r=>{
+    const {attempt}=this.party(r,actor,attemptId);if(actor.role!=="recipient"||!["consumed","accepted"].includes(attempt.status)||!attempt.binding)throw new HttpError(409,"CALL_NO_LONGER_AUTHORIZED");
+    if(attempt.renewal&&attempt.renewal.sequence===(attempt.lease?.payload.sequence??0)+1&&attempt.renewal.expiresAt>this.now())return attempt.renewal;
+    const expiresAt=Math.min(this.now()+20,attempt.callEndBy,attempt.lease?.payload.expiresAt??attempt.firstConnectBy);
+    if(expiresAt<=this.now())throw new HttpError(409,"LEASE_EXPIRED_REVALIDATION_REQUIRED");
+    attempt.renewal={nonce:randomUUID(),sequence:(attempt.lease?.payload.sequence??0)+1,priorLeaseHash:hashCanonical(attempt.lease?.payload??this.state(r).consumptions[attempt.authorizationId!]!.payload),issuedAt:this.now(),expiresAt,proofs:{}};return attempt.renewal;
+  }); }
+  submitRenewal(actor:Actor,requestId:string,attemptId:string,jws:string) { return this.idempotent(actor,requestId,{action:"renewal-proof",attemptId,jws},async r=>{
+    const {attempt}=this.party(r,actor,attemptId);if(!["gateway","recipient"].includes(actor.role)||terminal(attempt.status))throw new HttpError(403,"CALL_ROLE_REQUIRED");
+    const role=actor.role==="gateway"?"sender":"recipient";await this.renewalProof(r,attempt,role,jws);attempt.renewal!.proofs[role]=jws;return {stored:true};
+  }); }
+  ready(actor:Actor,requestId:string,attemptId:string,jws:string) {return this.idempotent(actor,requestId,{action:"media-ready",attemptId,jws},async r=>{
+    const {attempt}=this.party(r,actor,attemptId),role=actor.role==="gateway"?"sender":actor.role==="recipient"?"recipient":null;
+    const auth=this.state(r).authorizations[attempt.authorizationId!], challenge=Object.values(this.state(r).challenges).find(c=>hashCanonical(c.payload)===auth?.payload.serviceProofHash);
+    const key=role==="sender"?challenge?.payload.browserPublicKey:attempt.recipientKey?.publicKey;
+    if(!role||!key||!attempt.binding||attempt.status!=="accepted"||!attempt.lease||attempt.lease.payload.authority!=="current"||attempt.lease.payload.expiresAt<=this.now())throw new HttpError(409,"MEDIA_NOT_VERIFIED");
+    const hash=hashCanonical(attempt.binding);await this.possession(jws,key,role,auth!.payload.authorizationId,attempt.sessionId,hash,`media-ready:${hash}`);
+    (attempt.mediaReady??={})[role]=jws;return {ready:Object.keys(attempt.mediaReady).length===2};
+  }); }
+  async sweep(institutionId:string) {
+    const observed=await this.options.store.read(institutionId),snapshot=observed.serviceV3;
+    const digests=[...new Set(Object.values(snapshot?.attempts??{}).filter(t=>!terminal(t.status)).map(t=>snapshot?.authorizations[t.authorizationId??'']?.payload.vcDigest).filter((d):d is string=>!!d))];
+    const checked=new Map<string,{status:"current"|"revoked"|"unavailable";checkpoint?:ServiceState["checkpoints"][string]}>();
+    // Witness I/O must not hold the institution lock or serialize identical VC queries for every call.
+    let index=0;await Promise.all([0,1].map(async()=>{while(index<digests.length){const digest=digests[index++]!;try{const draft=structuredClone(observed),status=await this.options.current(draft,digest),checkpoint=draft.serviceV3?.checkpoints[digest];checked.set(digest,{status,...(checkpoint?{checkpoint}:{})});}catch{checked.set(digest,{status:"unavailable"});}}}));
+    return this.options.store.transact(institutionId,async r=>{
+      const s=r.serviceV3;if(!s)return;const actor:Actor={userId:"runtime",role:"institution",institutionId};
+      for(const attempt of Object.values(s.attempts)) {
+        if(terminal(attempt.status))continue;const intent=r.intents[attempt.intentId],auth=attempt.authorizationId&&s.authorizations[attempt.authorizationId];
+        let reason="",outcome:"cancelled"|"no-answer"|"failed"="cancelled";
+        if(s.recovery!=="ready"||r.status!=="active"||!intent||intent.status!=="open"||intent.expiresAt<=this.now()||r.members[attempt.agentId]?.role!=="gateway"||r.members[intent.recipientId]?.role!=="recipient"||r.members[attempt.agentId]?.active===false||r.members[intent.recipientId]?.active===false||r.members[attempt.agentId]?.serviceDid!==intent.serviceDid||(auth&&(auth.cancelled||auth.payload.epoch!==r.epoch||auth.payload.approvalKeyVersion!==r.approvalKeyVersion)))reason="authority-invalid";
+        else if(attempt.status!=="accepted"&&attempt.firstConnectBy<=this.now()){reason="ring-timeout";outcome="no-answer";}
+        else if(attempt.status==="accepted"&&(!attempt.lease||attempt.lease.payload.expiresAt<=this.now()||attempt.callEndBy<=this.now())){reason="lease-expired";outcome="failed";}
+        else if(auth){
+          try{
+            await this.credential(r,auth.payload.vcDigest);
+            const result=checked.get(auth.payload.vcDigest),previous=s.checkpoints[auth.payload.vcDigest],cp=result?.checkpoint;
+            const rollback=cp&&previous&&(BigInt(cp.height)<BigInt(previous.height)||(cp.height===previous.height&&(cp.hash!==previous.hash||cp.payloadHash!==previous.payloadHash)));
+            const unchanged=r.epoch===observed.epoch&&r.approvalKeyVersion===observed.approvalKeyVersion;
+            const status=unchanged&&!rollback?(result?.status??"unavailable"):"unavailable";
+            if(status==="revoked")reason="authority-revoked";
+            else {attempt.authorityStatus=status;if(cp&&!rollback&&unchanged)s.checkpoints[auth.payload.vcDigest]={...cp,firstSeenAt:previous?.hash===cp.hash?Math.min(previous.firstSeenAt,cp.firstSeenAt):cp.firstSeenAt};if(status==="current")attempt.authorityUntil=Math.min(this.now()+8,cp?cp.blockTimestamp+8:this.now()+8);}
+          }catch(error){if((error as {statusCode?:number}).statusCode===409)reason="authority-invalid";else attempt.authorityStatus="unavailable";}
+        }
+        if(reason){attempt.status=outcome;attempt.reason=reason;attempt.endedAt=this.now();attempt.revision++;if(attempt.consent){attempt.consent.granted=false;attempt.consent.generation++;}this.event(r,actor,"call.cleanup",attempt.id);}
+      }
+    });
+  }
+
   outcome(actor: Actor, requestId: string, attemptId: string, outcome: "ended" | "declined" | "no-answer" | "failed" | "cancelled", reason: string) { return this.idempotent(actor, requestId, { action: "outcome", attemptId, outcome, reason }, async r => {
     const { attempt } = this.party(r, actor, attemptId);
     if (terminal(attempt.status)) { if (attempt.status !== outcome) throw new HttpError(409, "TERMINAL_STATE_CONFLICT"); return attempt; }
@@ -163,11 +229,11 @@ export class ServiceAuthority {
     if (outcome === "ended" && attempt.status !== "accepted") throw new HttpError(409, "CALL_NOT_ACCEPTED");
     attempt.status = outcome; attempt.endedAt = this.now(); attempt.reason = reason.slice(0,100); attempt.revision++;
     if (attempt.consent) { attempt.consent.granted = false; attempt.consent.generation++; }
-    this.event(r, actor, `attempt.${outcome}`, attempt.id); return attempt;
+    this.event(r, actor, "call.cleanup", attempt.id); this.event(r, actor, `attempt.${outcome}`, attempt.id); return attempt;
   }); }
   revoke(actor: Actor, requestId: string, digest: string) { return this.idempotent(actor, requestId, { action: "revoke", digest }, async (r, s) => {
-    membership(r, actor, ["institution"]); const item = s.credentials[digest]; if (!item) throw new HttpError(404, "VC_NOT_FOUND"); item.state = "revoke-requested";
-    for (const a of Object.values(s.authorizations)) if (a.payload.vcDigest === digest) { a.cancelled = true; const attempt = s.attempts[a.payload.attemptId]; if (attempt && !terminal(attempt.status)) { attempt.status = "cancelled"; attempt.endedAt = this.now(); } }
+    requirePermission(r,actor,"delegation.manage"); const item = s.credentials[digest]; if (!item) throw new HttpError(404, "VC_NOT_FOUND"); item.state = "revoke-requested";
+    for (const a of Object.values(s.authorizations)) if (a.payload.vcDigest === digest) { a.cancelled = true; const attempt = s.attempts[a.payload.attemptId]; if (attempt && !terminal(attempt.status)) { attempt.status = "cancelled"; attempt.endedAt = this.now(); if(attempt.consent){attempt.consent.granted=false;attempt.consent.generation++;} this.event(r,actor,"call.cleanup",attempt.id); } }
     this.event(r, actor, "credential.revoke", digest, { digest }); return { status: "revoke-requested", ledgerStatus: "pending" };
   }); }
   usage(r: InstitutionRecord, actor: Actor, attempt: ServiceAttempt, unit: string, amount: number, max: number) {
@@ -182,8 +248,9 @@ export class ServiceAuthority {
   consent(actor: Actor, requestId: string, attemptId: string, granted: boolean) { return this.idempotent(actor, requestId, { action: "consent", attemptId, granted }, async (r, s) => {
     membership(r, actor, ["recipient"]); const { attempt } = this.party(r, actor, attemptId);
     if (granted && (attempt.status !== "accepted" || !attempt.lease || this.now() >= attempt.lease.payload.expiresAt)) throw new HttpError(409, "ACTIVE_CALL_REQUIRED");
+    if(granted)this.usage(r,actor,attempt,"consent-starts",1,3);
     const generation = (attempt.consent?.generation ?? 0)+1; attempt.consent = { granted, generation, at: this.now() };
-    if (granted) this.usage(r, actor, attempt, "stt-seconds", 300, 900);
+
     for (const [key, q] of Object.entries(s.quotas)) if (q.expiresAt <= this.now()) delete s.quotas[key];
     this.event(r, actor, granted ? "analysis.consented" : "analysis.withdrawn", attempt.id); return attempt.consent;
   }); }

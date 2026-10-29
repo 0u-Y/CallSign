@@ -1,0 +1,8 @@
+[general]
+rtpstart=10000
+rtpend=10099
+icesupport=yes
+strictrtp=yes
+
+[ice_host_candidates]
+@PBX_PRIVATE_ADDRESS@ => @PBX_PUBLIC_ADDRESS@

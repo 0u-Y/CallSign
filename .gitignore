@@ -17,3 +17,7 @@ artifacts/demo-video/page@*.webm
 contracts/cache/
 contracts/out/
 infra/compose/volumes/
+
+# Local private material is never part of a source checkpoint.
+/keys/
+/secrets/

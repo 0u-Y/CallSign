@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "environmentId": "test:REPLACE_WITH_ISOLATED_ENVIRONMENT_ID",
+  "kind": "disposable-test",
+  "deploymentId": "test:REPLACE_WITH_ISOLATED_DEPLOYMENT_ID",
+  "publicFiles": []
+}

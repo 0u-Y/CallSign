@@ -33,7 +33,7 @@ export const servicePossessionSchema = z.object({ ...serviceBase, ...time, type:
 export const serviceReceiptSchema = z.object({ ...serviceBase, type: z.literal("ServiceConsumptionReceipt"), institutionId: id, authorizationId: id, authorizationHash: digest, bindingHash: digest, sessionId: id, recipientId: id, consumedAt: z.number().int(), recoverUntil: z.number().int() }).strict();
 export const serviceLeaseSchema = z.object({ ...serviceBase, ...time, type: z.literal("CallLease"), institutionId: id, authorizationId: id, bindingHash: digest, sessionId: id, connectionGeneration: id, epoch: z.string(), approvalKeyVersion: z.number().int().positive(), policyHash: digest, vcDigest: digest, sequence: z.number().int().positive(), nonce: id, authority: z.enum(["current", "unavailable"]), callEndBy: z.number().int() }).strict();
 export const renewalProofSchema = z.object({ ...serviceBase, ...time, type: z.literal("LeaseRenewalProof"), role: z.enum(["sender", "recipient"]), authorizationId: id, sessionId: id, bindingHash: digest, priorLeaseHash: digest, sequence: z.number().int().positive(), nonce: id }).strict();
-export const pbxEvidenceSchema = z.object({ ...serviceBase, ...time, type: z.literal("AsteriskSessionEvidence"), institutionId: id, authorizationId: id, attemptId: id, sessionId: id, bindingHash: digest, connectionGeneration: id, bridgeId: id, senderChannelId: id, recipientChannelId: id, senderCallId: id, recipientCallId: id, senderEndpoint: id, recipientEndpoint: id, senderSdpHash: digest, recipientSdpHash: digest, senderFingerprint: z.string().min(64).max(100), recipientFingerprint: z.string().min(64).max(100), recipientNonce: id, senderPbxFingerprint:z.string().min(64).max(100),recipientPbxFingerprint:z.string().min(64).max(100), evidenceSequence: z.number().int().positive(), state: z.enum(["prepared", "bridged", "ended"]) }).strict();
+export const pbxEvidenceSchema = z.object({ ...serviceBase, ...time, type: z.literal("AsteriskSessionEvidence"), pbxFingerprintSource:z.literal('configured-certificate'), institutionId: id, authorizationId: id, attemptId: id, sessionId: id, bindingHash: digest, connectionGeneration: id, bridgeId: id, senderChannelId: id, recipientChannelId: id, senderCallId: id, recipientCallId: id, senderEndpoint: id, recipientEndpoint: id, senderSdpHash: digest, recipientSdpHash: digest, senderFingerprint: z.string().min(64).max(100), recipientFingerprint: z.string().min(64).max(100), recipientNonce: id, senderPbxFingerprint:z.string().min(64).max(100),recipientPbxFingerprint:z.string().min(64).max(100), evidenceSequence: z.number().int().positive(), state: z.enum(["prepared", "bridged", "ended"]) }).strict();
 export type StartAuthorization = z.infer<typeof startAuthorizationSchema>;
 export type ServiceBinding = z.infer<typeof serviceBindingSchema>;
 export type ServiceProof = z.infer<typeof serviceProofSchema>;
@@ -42,3 +42,10 @@ export type CallLease = z.infer<typeof serviceLeaseSchema>;
 export type PbxEvidence = z.infer<typeof pbxEvidenceSchema>;
 export const servicePolicy = Object.freeze({ startSeconds: 120, leaseSeconds: 30, observedStateAgeSeconds: 8, eachClockSkewSeconds: 1, maxCallSeconds: 14400, pollingMs: 1000 });
 export const pbxReportSchema = z.object({ ...serviceBase, ...time, type:z.literal('PbxBrowserReport'), role:z.enum(['sender','recipient']), attemptId:id, sessionId:id, connectionGeneration:id, callId:id, localSdp:z.string().min(1).max(16384), remoteSdp:z.string().min(1).max(16384), recipientNonce:id }).strict();
+
+export const runtimePolicySchema = z.object({
+  startSeconds: z.literal(120).default(120), leaseSeconds: z.number().int().min(10).max(120).default(30),
+  maxCallSeconds: z.number().int().min(120).max(28800).default(14400),
+  observedStateAgeSeconds: z.literal(8).default(8), eachClockSkewSeconds: z.literal(1).default(1), pollingMs: z.literal(1000).default(1000),
+}).strict();
+export type RuntimePolicy = z.infer<typeof runtimePolicySchema>;

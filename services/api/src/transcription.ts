@@ -57,7 +57,7 @@ export async function analyzeWithAnthropic(input: { apiKey: string; model: strin
 
 const deepgramResult = z.object({ type: z.literal("Results"), start: z.number().nonnegative(), duration: z.number().nonnegative(), is_final: z.boolean(), channel: z.object({ alternatives: z.array(z.object({ transcript: z.string().max(4000) })).min(1) }) });
 export class DeepgramStream {
-  private socket: WebSocket | null = null; private bytes = 0; private sequence = 0; private readonly revisions = new Map<string, number>();
+  private socket: WebSocket | null = null; private bytes = 0; private sequence = 0; private readonly revisions = new Map<string, {revision:number;text:string;final:boolean;duration:number}>();
   private timer: ReturnType<typeof setTimeout> | undefined; private keepAlive: ReturnType<typeof setInterval> | undefined;
   constructor(private readonly options: { apiKey: string; streamId: string; model: string; onRevision: (r: TranscriptRevision) => void; onUnavailable: (code: string) => void; onReady?: () => void; maxBytes?: number; maxDurationMs?: number; factory?: (url: string, key: string) => WebSocket }) {}
   connect() {
@@ -74,9 +74,11 @@ export class DeepgramStream {
       try {
         if (String(raw).length > 65536) throw new Error("STT_MESSAGE_TOO_LARGE");
         const value = JSON.parse(String(raw)); if (value.type !== "Results") return;
-        const data = deepgramResult.parse(value); const segmentId = String(data.start); const revision = (this.revisions.get(segmentId) ?? 0) + 1;
-        this.revisions.set(segmentId, revision);
-        this.options.onRevision({ streamId: this.options.streamId, segmentId, revision, final: data.is_final, text: data.channel.alternatives[0]!.transcript, source: "remote" });
+        const data = deepgramResult.parse(value),segmentId=String(data.start),old=this.revisions.get(segmentId),text=data.channel.alternatives[0]!.transcript;
+        if(old&&((old.final&&!data.is_final)||(old.text===text&&old.final===data.is_final)||data.duration<old.duration))return;
+        if(!old&&this.revisions.size>=256)throw new Error("STT_SEGMENT_LIMIT");
+        const revision=(old?.revision??0)+1;this.revisions.set(segmentId,{revision,text,final:data.is_final,duration:data.duration});
+        this.options.onRevision({ streamId: this.options.streamId, segmentId, revision, final: data.is_final, text, source: "remote" });
       } catch { this.options.onUnavailable("STT_RESPONSE_INVALID"); this.stop(); }
     });
     socket.on("error", () => { this.options.onUnavailable("STT_CONNECTION_FAILED"); this.stop(); });

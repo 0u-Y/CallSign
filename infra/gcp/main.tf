@@ -84,3 +84,19 @@ resource "google_compute_firewall" "turn" {
     ports = ["3478", "5349"]
   }
 }
+
+variable "enable_pbx_media" {
+  type = bool
+  default = false
+}
+resource "google_compute_firewall" "pbx_media" {
+  count = var.enable_pbx_media ? 1 : 0
+  name = "callsign-pbx-media"
+  network = var.network
+  target_tags = ["callsign-web"]
+  source_ranges = ["0.0.0.0/0"]
+  allow {
+    protocol = "udp"
+    ports = ["10000-10099"]
+  }
+}

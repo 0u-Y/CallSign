@@ -109,7 +109,7 @@ contract InstitutionRegistry is EIP712 {
         )));
     }
 
-    function registerInstitution(RegisterRequest calldata request, bytes[] calldata signatures) external {
+    function registerInstitution(RegisterRequest calldata request, bytes[] calldata signatures) public virtual {
         if (institutions[request.institutionId].exists) revert InvalidState();
         if (request.institutionId == bytes32(0) || request.administrator == address(0) || request.emergencyStopper == address(0) || request.approvalPublicKey == bytes32(0) || request.policyVersion == 0) revert InvalidInput();
         _checkDeadlineAndNonce(request.deadline, request.nonce);
@@ -147,7 +147,7 @@ contract InstitutionRegistry is EIP712 {
         emit DelegationGranted(delegationId, institutionId, expectedEpoch);
     }
 
-    function revokeDelegation(bytes32 delegationId, uint64 expectedEpoch) external {
+    function revokeDelegation(bytes32 delegationId, uint64 expectedEpoch) public virtual {
         Delegation storage delegation = delegations[delegationId];
         Institution storage institution = institutions[delegation.institutionId];
         if (!delegation.exists || delegation.revoked || institution.epoch != expectedEpoch || delegation.epoch != expectedEpoch) revert InvalidState();
@@ -195,7 +195,7 @@ contract InstitutionRegistry is EIP712 {
         )));
     }
 
-    function updateDirectory(DirectoryRequest calldata request, bytes calldata administratorSignature, bytes calldata approverSignature) external {
+    function updateDirectory(DirectoryRequest calldata request, bytes calldata administratorSignature, bytes calldata approverSignature) public virtual {
         Institution storage institution = institutions[request.institutionId];
         if (!institution.exists || institution.status != Status.Active || institution.epoch != request.expectedEpoch || request.newDirectoryVersion <= institution.directoryVersion || request.newDirectoryHash == bytes32(0)) revert InvalidState();
         _checkDeadlineAndNonce(request.deadline, request.nonce);
@@ -215,13 +215,13 @@ contract InstitutionRegistry is EIP712 {
         return delegation.exists && !delegation.revoked && institution.exists && institution.status == Status.Active && delegation.epoch == institution.epoch && atTime >= delegation.validFrom && atTime < delegation.validUntil && (delegation.purposeMask & purposeBit) == purposeBit;
     }
 
-    function _checkDeadlineAndNonce(uint64 deadline, bytes32 nonce) private view {
+    function _checkDeadlineAndNonce(uint64 deadline, bytes32 nonce) internal virtual view {
         if (deadline < block.timestamp) revert Expired();
         if (nonce == bytes32(0)) revert InvalidInput();
         if (nonceUsed[nonce]) revert NonceAlreadyUsed();
     }
 
-    function _requireQuorum(bytes32 digest, bytes[] calldata signatures, uint256 threshold) private view {
+    function _requireQuorum(bytes32 digest, bytes[] calldata signatures, uint256 threshold) internal virtual view {
         if (signatures.length < threshold) revert InsufficientQuorum();
         address[3] memory seen;
         uint256 valid;

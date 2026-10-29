@@ -1,4 +1,4 @@
-import { boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { integer, boolean, index, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -22,6 +22,7 @@ export const sessions = pgTable("sessions", {
   oidcIssuer: text("oidc_issuer"),
   oidcClientId: text("oidc_client_id"),
   oidcAudience: text("oidc_audience"),
+  membershipGeneration: integer("membership_generation").notNull().default(0),
   authenticatedAt: timestamp("authenticated_at", { withTimezone: true }),
   ...timestamps,
 }, (table) => [index("sessions_user_idx").on(table.userId)]);

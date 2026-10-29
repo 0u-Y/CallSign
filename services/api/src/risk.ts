@@ -27,14 +27,17 @@ const rules: Array<{ category: z.infer<typeof riskCategorySchema>; phrases: stri
 ];
 
 export function analyzeWithRules(transcript: string): RiskAnalysis {
+  const sentences:string[]=[];
+  for(const fragment of transcript.match(/[^.!?。\n]+[.!?。]?/g)??[]){
+    const correction=/정정합니다|잘못\s*말했습니다|아니요/.exec(fragment);
+    if(correction){sentences.pop();const rest=fragment.slice(correction.index+correction[0].length);if(rest.trim())sentences.push(rest);}else sentences.push(fragment);
+  }
   const signals = rules.flatMap((rule) => {
-    const corrections = [...transcript.matchAll(/정정합니다|잘못\s*말했습니다|아니요/g)];
-    const revised = corrections.length ? transcript.slice(corrections.at(-1)!.index) : transcript;
-    const sentences = revised.match(/[^.!?。\n]+[.!?。]?/g) ?? [];
-    const evidenceSpan = sentences.find(sentence => {
+    const evidenceSpan = sentences.find(original => {
+      const sentence=original.replace(/“[^”]*”|‘[^’]*’|"[^"]*"/g, "");
       if (!rule.phrases.some(phrase => sentence.toLocaleLowerCase("ko-KR").includes(phrase.toLocaleLowerCase("ko-KR")))) return false;
       // Conservative rules: negation, quotation and explicit self-correction need context.
-      if (/["“”‘’]|취소|정정|잘못\s*말/.test(sentence)) return false;
+      if (/취소|정정|잘못\s*말/.test(sentence)) return false;
       if (rule.category !== "비밀 유지 강요" && /(알려주지|말하지|보내지|설치하지|요구하지|공유하지|송금하지|입금하지).{0,12}(마|않|말)|하지\s*마|필요\s*없|절대.{0,20}(금지|안)/.test(sentence)) return false;
       if (rule.category === "비밀 유지 강요" && /비밀로.{0,8}(하지\s*마|필요\s*없)|숨기지\s*마/.test(sentence)) return false;
       return /알려|불러|보내|송금|입금|설치|비밀|말하지|알리지/.test(sentence);

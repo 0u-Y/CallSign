@@ -20,6 +20,14 @@ describe("TURN/PBX boundaries", () => {
   });
 });
 describe("microphone lifecycle without a browser or microphone", () => {
+  it('keeps both audio directions paused across asynchronous attachment until current verification explicitly resumes them',async()=>{
+    const microphone={enabled:true,readyState:'live',onended:null,stop:vi.fn()},incoming={kind:'audio',enabled:true,stop:vi.fn()};let finish!:()=>void;
+    const peer={addTransceiver:()=>({sender:{replaceTrack:()=>new Promise<void>(resolve=>{finish=resolve;})}}),close:vi.fn(),connectionState:'new',ontrack:undefined as undefined|((e:{track:typeof incoming})=>void)};
+    vi.stubGlobal('MediaStream',class {tracks:unknown[]=[];addTrack(track:unknown){this.tracks.push(track);}getTracks(){return this.tracks;}});
+    const media=new LiveMedia([],()=>{},()=>peer as unknown as RTCPeerConnection);await media.prepareMicrophone(async()=>({getTracks:()=>[microphone],getAudioTracks:()=>[microphone]}) as unknown as MediaStream);
+    peer.ontrack!({track:incoming});expect(incoming.enabled).toBe(false);const accepted=media.accept(true);media.pause();finish();await accepted;
+    expect(microphone.enabled).toBe(false);expect(incoming.enabled).toBe(false);media.resume(true);expect(incoming.enabled).toBe(true);expect(microphone.enabled).toBe(false);media.pause();expect(incoming.enabled).toBe(false);media.resume(false);expect(microphone.enabled).toBe(true);media.close();expect(()=>media.resume(false)).toThrow('MEDIA_NOT_ACCEPTED');
+  });
   it("attaches no track before acceptance, gates mute and cleans up tracks", async () => {
     const stop = vi.fn(); const track = { enabled: true, readyState: "live", onended: null, stop }; const stream = { getTracks: () => [track], getAudioTracks: () => [track] };
     const replaceTrack = vi.fn(async () => {}); const close = vi.fn();

@@ -2,7 +2,7 @@ import { expect, it } from 'vitest';
 import { parseSip, sipDigest } from '../../apps/web/src/lib/pbxSip.js';
 import { createHash } from 'node:crypto';
 it('rejects SIP duplicate headers, bad byte lengths and oversized messages',()=>{
-  const prefix='SIP/2.0 200 OK\r\nCall-ID: test\r\nCSeq: 1 REGISTER\r\n';
+  const prefix='SIP/2.0 200 OK\r\nCall-ID: test\r\nCSeq: 1 REGISTER\r\nFrom: <sip:sender@example.test>;tag=one\r\nTo: <sip:sender@example.test>;tag=two\r\nVia: SIP/2.0/WSS example.test;branch=z9hG4bKtest\r\n';
   expect(parseSip(`${prefix}Content-Length: 0\r\n\r\n`).start).toBe('SIP/2.0 200 OK');
   expect(()=>parseSip(`${prefix}Call-ID: other\r\nContent-Length: 0\r\n\r\n`)).toThrow('SIP_DUPLICATE_HEADER');
   expect(()=>parseSip(`${prefix}Content-Length: 1\r\n\r\n가`)).toThrow('SIP_CONTENT_LENGTH_INVALID');expect(()=>parseSip('x'.repeat(65537))).toThrow('SIP_MESSAGE_TOO_LARGE');

@@ -256,3 +256,5 @@ export async function exportSigningPrivateJwk(key: SigningKeyPair): Promise<JWK>
   if ("kty" in key.privateKey) return key.privateKey as JWK;
   return exportJWK(key.privateKey as Parameters<typeof exportJWK>[0]);
 }
+
+export * from "./configuration.js";

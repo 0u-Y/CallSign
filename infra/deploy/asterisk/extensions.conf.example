@@ -1,0 +1,6 @@
+[general]
+static=yes
+writeprotect=yes
+[callsign-deny]
+exten => _X!,1,Hangup(21)
+exten => s,1,Hangup(21)

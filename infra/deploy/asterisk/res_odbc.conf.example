@@ -1,0 +1,7 @@
+[callsign]
+enabled=yes
+dsn=callsign
+username=@PBX_DB_USER@
+password=@PBX_DB_PASSWORD@
+pre-connect=yes
+max_connections=4

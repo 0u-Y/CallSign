@@ -1,0 +1,12 @@
+import { expect,it } from 'vitest';
+import { privateKeyToAccount } from 'viem/accounts';
+import { registrationTypedData,verifyRegistrationApprovers } from '../../services/api/src/governance-v2.js';
+const accounts=[1,2,3].map(i=>privateKeyToAccount(`0x${String(i).padStart(64,'0')}`));
+const registry=`0x${'1'.repeat(40)}` as const,request={institutionId:`0x${'a'.repeat(64)}`,administrator:accounts[0]!.address,approvalPublicKey:`0x${'b'.repeat(64)}`,emergencyStopper:accounts[2]!.address,directoryHash:`0x${'c'.repeat(64)}`,directoryVersion:'1',policyVersion:'1',nonce:`0x${'d'.repeat(64)}`,deadline:'1800000300'};
+it('requires two distinct management approvers bound to chain, registry and the full registration',async()=>{const signatures=await Promise.all(accounts.slice(0,2).map(a=>a.signTypedData(registrationTypedData(20260914,registry,request))));const input={chainId:20260914,registry,request,signatures,approvers:accounts.map(a=>a.address),now:1800000000};expect(await verifyRegistrationApprovers(input)).toHaveLength(2);await expect(verifyRegistrationApprovers({...input,signatures:[signatures[0]!,signatures[0]!]})).rejects.toThrow('REGISTRATION_SIGNER_INVALID_OR_DUPLICATE');await expect(verifyRegistrationApprovers({...input,chainId:1})).rejects.toThrow();await expect(verifyRegistrationApprovers({...input,request:{...request,approvalPublicKey:`0x${'e'.repeat(64)}`}})).rejects.toThrow();await expect(verifyRegistrationApprovers({...input,now:1800000300})).rejects.toThrow('REGISTRATION_EXPIRED_OR_TOO_LONG');});
+
+it('binds joint service-key approval to the exact key set and new authority generation',async()=>{
+ const {serviceKeyTypedData,verifyServiceKeyApprovers}=await import('../../services/api/src/governance-v2.js');
+ const r={institutionId:request.institutionId,expectedEpoch:'1',newEpoch:'2',issuerKeyDigest:`0x${'a'.repeat(64)}`,keysHash:`0x${'b'.repeat(64)}`,nonce:request.nonce,deadline:request.deadline};
+ const signatures=await Promise.all(accounts.slice(0,2).map(a=>a.signTypedData(serviceKeyTypedData(20260914,registry,r))));const input={chainId:20260914,registry,request:r,signatures,approvers:accounts.map(a=>a.address),now:1800000000};expect(await verifyServiceKeyApprovers(input)).toHaveLength(2);await expect(verifyServiceKeyApprovers({...input,request:{...r,keysHash:`0x${'c'.repeat(64)}`}})).rejects.toThrow('SERVICE_KEY_SIGNER_INVALID');await expect(verifyServiceKeyApprovers({...input,signatures:[signatures[0]!,signatures[0]!]})).rejects.toThrow('SERVICE_KEY_SIGNER_INVALID');
+});

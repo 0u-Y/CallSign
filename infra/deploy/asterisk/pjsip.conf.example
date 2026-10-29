@@ -1,0 +1,11 @@
+[global]
+type=global
+user_agent=CallSign-PBX
+endpoint_identifier_order=username,ip,anonymous
+[transport-wss]
+type=transport
+protocol=wss
+bind=0.0.0.0
+external_signaling_address=@PBX_PUBLIC_HOST@
+external_media_address=@PBX_PUBLIC_ADDRESS@
+local_net=10.0.0.0/8

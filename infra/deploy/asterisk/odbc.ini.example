@@ -1,0 +1,8 @@
+[callsign]
+Driver=PostgreSQL Unicode
+Servername=postgres
+Port=5432
+Database=callsign
+ReadOnly=No
+
+ConnSettings=SET search_path TO pbx,pg_catalog

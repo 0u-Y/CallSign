@@ -1,12 +1,21 @@
+import {assertPublishedTrust} from './published-trust.js';
+import { registerMeasurements,registerRequestTiming } from './telemetry.js';
+import { registerNotifications } from './notifications.js';
+import { registerAccountManagement,assertMembershipGeneration } from './account-management.js';
+import { registerServiceOperations } from "./operations.js";
+import { httpConsumptionAnchor } from "./consumption-anchor.js";
+import { registerServiceManagement } from "./service-management.js";
+import { postgresQuotaStore } from "./quota.js";
+import { PbxRuntime } from "./pbx-runtime.js";
 import { registerServiceAudio } from "./service-audio.js";
 import { AriClient, AsteriskBridge } from "./asterisk.js";
 import { PbxEndpoints, registerPbxRoutes } from "./pbx-routes.js";
 import { ServiceAuthority } from "./service-authority.js";
 import { registerServiceRoutes } from "./service-routes.js";
 import { currentServiceState } from "./service-current.js";
-import { serviceProofSchema } from "@callsign/protocol";
+import { serviceProofSchema,registeredUriSchema } from "@callsign/protocol";
 import { readFile } from "node:fs/promises";
-import { timingSafeEqual } from "node:crypto";
+import { timingSafeEqual, X509Certificate } from "node:crypto";
 import { resolve } from "node:path";
 import Fastify, { type FastifyRequest, type FastifyReply } from "fastify";
 import cookie from "@fastify/cookie";
@@ -17,7 +26,7 @@ import { DeepgramStream, RevisionAnalyzer, analyzeWithAnthropic } from "./transc
 import { OidcLoginFlow } from "./oidc-flow.js";
 import { DidResolver, type DidDocument } from "./did.js";
 import { RegistryOperations, recoveryV2Schema, recoveryTypedData } from "./governance-v2.js";
-import { hashTypedData, type Hex } from "viem";
+import { keccak256,stringToHex,hashTypedData, type Hex } from "viem";
 import { turnCredentials } from "./media.js";
 import rateLimit from "@fastify/rate-limit";
 import { CompactSign, compactVerify, createRemoteJWKSet, importJWK, jwtVerify, type JWK } from "jose";
@@ -29,7 +38,7 @@ import { FinalsAuthority } from "./finals-authority.js";
 import { liveAttemptFor, membership, workspaceFor, type Actor } from "./finals-model.js";
 import { postgresAuthorityStore } from "./finals-store.js";
 import { finalsEnvironment } from "./finals-config.js";
-import { assertCsrf, HttpError, newToken, sessionForRequest, tokenHash } from "./auth.js";
+import { assertCsrf, assertRecentAuthentication, HttpError, newToken, sessionForRequest, tokenHash } from "./auth.js";
 import { createDatabase } from "./db.js";
 import { oidcLoginUses, sessions, users } from "./schema.js";
 import { sessionCookie, type SessionPolicy } from "./auth.js";
@@ -55,14 +64,17 @@ function authenticate(supplied: unknown, expected: string) {
   if (typeof supplied !== "string" || Buffer.byteLength(supplied) !== Buffer.byteLength(expected) || !timingSafeEqual(Buffer.from(supplied), Buffer.from(expected))) throw new HttpError(401, "SERVICE_AUTH_INVALID");
 }
 export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
+  const requestLimit=z.coerce.number().int().min(300).max(10000).parse(process.env.API_REQUESTS_PER_MINUTE??600);
   const app = Fastify({ logger: false, bodyLimit: 65536 });
+  registerRequestTiming(app);
   await app.register(websocket, { options: { maxPayload: 262144 } });
-  await app.register(cookie); await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
+  await app.register(cookie); await app.register(rateLimit, { max:request=>request.cookies.ip_session||request.cookies.official_session?requestLimit:120,timeWindow:"1 minute",keyGenerator:request=>{const token=request.cookies.ip_session??request.cookies.official_session;return token?`session:${tokenHash(token)}`:`ip:${request.ip}`;} });
+  app.addHook("preHandler",async request=>{if((process.env.SERVICE_PROFILE??"service")==="service"&&request.method==="POST"&&request.url.startsWith("/v2/")&&!request.url.startsWith("/v2/auth/")&&request.url!=="/v2/login")throw new HttpError(409,"COMPATIBILITY_PROFILE_REQUIRED");});
   app.setErrorHandler((error, _req, reply) => { const e = error as { statusCode?: number; code?: string }; reply.code(e.statusCode ?? (error instanceof z.ZodError ? 400 : 503)).send({ error: { code: e.code ?? (error instanceof z.ZodError ? "INVALID_INPUT" : "DEPENDENCY_UNAVAILABLE") } }); });
-  app.get("/health", async () => ({ status: "alive", role: env.SERVICE_ROLE, protocolVersion: 2 }));
+  app.get("/health", async () => ({ status: "alive", role: env.SERVICE_ROLE, protocolVersion: 3 }));
   const forward = async (target: string, path: string, request: FastifyRequest, token: string, overrideBody?: unknown) => {
     const response = await fetch(new URL(path, target), { method: request.method, signal: AbortSignal.timeout(4000), redirect: "error", headers: {
-      "content-type": "application/json", "x-service-token": token, cookie: request.headers.cookie ?? "", origin: request.headers.origin ?? "", "x-csrf-token": String(request.headers["x-csrf-token"] ?? ""), "idempotency-key": String(request.headers["idempotency-key"] ?? ""),
+      "content-type": "application/json", "x-correlation-id":String(request.headers["x-correlation-id"]??""), "x-service-token": token, cookie: request.headers.cookie ?? "", origin: request.headers.origin ?? "", "x-csrf-token": String(request.headers["x-csrf-token"] ?? ""), "idempotency-key": String(request.headers["idempotency-key"] ?? ""),
     }, ...(["GET", "HEAD"].includes(request.method) ? {} : { body: JSON.stringify(overrideBody ?? request.body) }) });
     const value = await response.text(); if (value.length > 131072) throw new HttpError(503, "UPSTREAM_TOO_LARGE");
     return { response, value };
@@ -94,12 +106,14 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
       if (request.url.startsWith("/v3/sender-context")) throw new HttpError(404, "NOT_FOUND");
       const sender = request.url === "/v3/sender-proof";
       const result = await forward(sender ? env.SENDER_URL : env.ISSUER_URL, sender ? "/service-proof" : request.url, request, env.PLATFORM_INTERNAL_TOKEN);
+      for(const item of result.response.headers.getSetCookie())reply.header("set-cookie",[...(reply.getHeader("set-cookie") as string[]??[]),item]);
       return reply.code(result.response.status).type("application/json").send(result.value);
     } });
     return app;
   }
   if (env.SERVICE_ROLE === "sender") {
-    const key = await readSigningKey(required("SENDER_KEY_PATH")); const serviceDid = process.env.SERVICE_URI ?? required("SERVICE_DID");
+    const key = await readSigningKey(required("SENDER_KEY_PATH")); const serviceDid = registeredUriSchema.parse(process.env.SERVICE_URI ?? required("SERVICE_DID"));
+    if((process.env.SERVICE_PROFILE??"service")==="service"){const publicTrust=JSON.parse(await readFile(env.TRUST_BUNDLE_PATH,"utf8"));if(publicTrust.service?.serviceUri!==serviceDid||publicTrust.service.serviceKid!==key.kid||hashCanonical(publicTrust.service.servicePublicKey)!==hashCanonical(key.publicJwk))throw new Error("SENDER_REGISTERED_KEY_MISMATCH");}
     app.get("/readiness", async () => ({ status: "key-loaded" }));
     app.post("/service-proof", async request => {
       authenticate(request.headers["x-service-token"], env.PLATFORM_INTERNAL_TOKEN);
@@ -121,13 +135,16 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
     });
     return app;
   }
-  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"));
+  app.addHook("onRoute", route=>{if(route.method!=="HEAD"&&["/v2/auth/start","/v2/auth/callback","/v2/auth/me","/v2/auth/logout","/v2/login"].includes(route.url))app.route({method:route.method,url:route.url.replace("/v2/","/v3/"),handler:route.handler});});
+  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"),process.env.CONSUMPTION_ANCHOR_URL?{anchor:httpConsumptionAnchor({url:required("CONSUMPTION_ANCHOR_URL"),token:required("CONSUMPTION_ANCHOR_TOKEN"),deployment:required("DEPLOYMENT_ID")}),deployment:required("DEPLOYMENT_ID")}:undefined);
+  if(process.env.CONSUMPTION_ANCHOR_URL)app.addHook("onReady",()=>store.verifyRecovery(env.INSTITUTION_ID));
   const { db, client } = createDatabase(required("AUTH_DATABASE_URL"));
+  let pbxRuntime:PbxRuntime|undefined;
   const connections = new SessionConnections();
-  app.addHook("onClose", async () => { connections.close(); await store.close(); await client.end({ timeout: 5 }); });
+  app.addHook("onClose", async () => { connections.close();pbxRuntime?.close(); await store.close(); await client.end({ timeout: 5 }); });
   const trust = JSON.parse(await readFile(env.TRUST_BUNDLE_PATH, "utf8")) as TrustBundle & { endpoints: WitnessEndpoint[]; didDocuments: Record<string, DidDocument>; didRemotePins?: Record<string, string> };
   if (trust.witnessThreshold !== 3 || trust.witnessPublicKeys.length !== 4 || trust.endpoints.length !== 4) throw new Error("FINALS_REQUIRES_THREE_OF_FOUR");
-  const resolver = new DidResolver(trust.didDocuments, trust.didRemotePins);
+  const resolver = new DidResolver(trust.didDocuments??{}, trust.didRemotePins);
   const guards = new Map<string, MonotonicStateGuard>();
   const authority = new FinalsAuthority({ resolveDid: did => resolver.resolve(did), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
     signingKey: version => readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"), `approval-v${version}.json`)),
@@ -145,34 +162,71 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
       const key = `${record.id}:${credentialId}`; const guard = guards.get(key) ?? new MonotonicStateGuard(); guards.set(key, guard); guard.accept(guard.limitDeadline(verified), performance.now());
       assertLedgerBinding(bundle.snapshot, { epoch: record.epoch, approvalPublicKey: record.approvalPublicKey, servicePublicKey: service.publicKey, now: Math.floor(Date.now() / 1000) });
     } });
+  if(required("OIDC_ISSUER").includes("|"))throw new Error("OIDC_ISSUER_DELIMITER_FORBIDDEN");
   const policyFor = (purpose: "work" | "official"): SessionPolicy => ({ purpose, issuer: required("OIDC_ISSUER"), clientId: required(purpose === "official" ? "OFFICIAL_OIDC_CLIENT_ID" : "OIDC_CLIENT_ID"), audience: required(purpose === "official" ? "OFFICIAL_OIDC_AUDIENCE" : "OIDC_AUDIENCE") });
-  const scopedSession = (request: FastifyRequest, purpose: "work" | "official" = "work") => sessionForRequest(db, request, policyFor(purpose));
+  const scopedSession = async(request: FastifyRequest, purpose: "work" | "official" = "work") => {const session=await sessionForRequest(db,request,policyFor(purpose));const record=await store.read(env.INSTITUTION_ID);membership(record,{userId:session.userId,role:session.role,institutionId:record.id},["institution","gateway","recipient","approver"]);assertMembershipGeneration(session,record.members[session.userId]!);return session;};
+  const chargedRequests=new WeakSet<FastifyRequest>();
   const actorFor = async (request: FastifyRequest, write = false, purpose: "work" | "official" = "work"): Promise<Actor> => {
     authenticate(request.headers["x-service-token"], ["/v2/sender-context", "/v3/sender-context"].includes(request.url) ? env.SENDER_INTERNAL_TOKEN! : env.PLATFORM_INTERNAL_TOKEN);
     const session = await scopedSession(request, purpose); if (write) assertCsrf(request, session, env.WEB_ORIGIN);
-    const actor = { userId: session.userId, role: session.role, institutionId: env.INSTITUTION_ID }; membership(await store.read(actor.institutionId), actor, ["institution", "gateway", "recipient", "approver"]); return actor;
+    if(write&&(request.url.startsWith("/v3/management/")||request.url==="/v3/credentials"||request.url==="/v3/revoke"||purpose==="official"))assertRecentAuthentication(session);
+    const actor = { userId: session.userId, role: session.role, institutionId: env.INSTITUTION_ID,membershipGeneration:session.membershipGeneration??0 }; const currentRecord=await store.read(actor.institutionId);membership(currentRecord, actor, ["institution", "gateway", "recipient", "approver"]);assertMembershipGeneration(session,currentRecord.members[actor.userId]!);
+    if(!chargedRequests.has(request)){await quota.chargeRequest(actor.institutionId,actor.userId,Math.floor(Date.now()/1000),requestLimit);chargedRequests.add(request);}return actor;
   };
   const pbxSigningKey = process.env.ARI_URL ? await readSigningKey(required("PBX_EVIDENCE_KEY_PATH")) : undefined;
-  const serviceAuthority = new ServiceAuthority({ ...(pbxSigningKey ? {pbxTrust:{kid:pbxSigningKey.kid,publicKey:pbxSigningKey.publicJwk}} : {}), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
+  const serviceAuthority = new ServiceAuthority({ assertPublished:record=>assertPublishedTrust(record,trust,required('VITE_SERVICE_TRUST_SHA256'),serviceAuthority.policy), ...(pbxSigningKey ? {pbxTrust:{kid:pbxSigningKey.kid,publicKey:pbxSigningKey.publicJwk}} : {}), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
+    policy:(await import("@callsign/protocol")).runtimePolicySchema.parse({...((await import("@callsign/protocol")).servicePolicy),leaseSeconds:Number(process.env.CALL_LEASE_SECONDS??30),maxCallSeconds:Number(process.env.CALL_MAX_SECONDS??14400)}),
     signingKey: version => readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"), `approval-v${version}.json`)),
     current: async (record, digest) => {
       let bundle;
-      try { bundle = await aggregateWitnesses({ endpoints: trust.endpoints, institutionId: record.id, delegationId: digest, trust }); }
+      try { bundle = await aggregateWitnesses({ endpoints: trust.endpoints, institutionId: record.id, delegationId: digest, trust,allowPolicyTransition:true }); }
       catch { return "unavailable"; }
       try { return await currentServiceState(record, digest, bundle, trust, Math.floor(Date.now()/1000)); }
       catch { return "unavailable"; }
     },
   });
-  registerServiceRoutes(app, { authority: serviceAuthority, store, actorFor });
-  registerServiceAudio(app,{authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId});
+  registerMeasurements(app,{actorFor,store});
+  registerNotifications(app,{databaseUrl:required("ISSUER_DATABASE_URL"),actorFor});
+  registerAccountManagement(app,{issuer:required("OIDC_ISSUER"),store,actorFor});
+  registerServiceOperations(app,{databaseUrl:required("ISSUER_DATABASE_URL"),store,actorFor,deploymentId:keccak256(stringToHex(`${trust.genesisHash}:${trust.registryAddress}`)),ledger:{urls:(process.env.BESU_NODE_URLS??"").split(",").filter(Boolean),networkId:env.NETWORK_ID,genesisHash:trust.genesisHash}});
+  registerServiceManagement(app,{authority:serviceAuthority,actorFor,approvers:(process.env.REGISTRY_APPROVERS??"").split(",").filter(Boolean),confirmConfiguration:async(record,proposal)=>{
+    const updatedTrust={...trust,policyVersion:String(proposal.contents.policy.version)},digest=Object.keys(record.serviceV3?.credentials??{})[0]??"0".repeat(64);
+    const bundle=await aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust:updatedTrust});
+    await verifyStateBundle(bundle,updatedTrust,{expectedInstitutionId:record.id,expectedDelegationId:digest,nowWallSeconds:Math.floor(Date.now()/1000),nowMonotonicMs:performance.now(),maxStateAgeSeconds:8,maxFutureSkewSeconds:1});
+    const state=bundle.snapshot.institutionState;
+    if(!state.exists||state.status!=="Active"||state.epoch!==record.observedEpoch||bundle.snapshot.policyHash!==proposal.request.newPolicyHash||state.approvalPublicKey.toLowerCase()!==`0x${Buffer.from(record.approvalPublicKey.x!,"base64url").toString("hex")}`||bundle.snapshot.directoryHash!==proposal.request.newDirectoryHash||bundle.snapshot.directoryVersion!==proposal.request.newDirectoryVersion)throw new HttpError(409,"CONFIGURATION_NOT_CURRENT");
+  },confirmKey:async(record,key)=>{
+    const installed=await readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"),`approval-v${key.version}.json`));if(installed.kid!==key.kid||hashCanonical(installed.publicJwk)!==hashCanonical(key.publicKey))throw new HttpError(409,"INSTALLED_KEY_MISMATCH");
+    const digest=Object.keys(record.serviceV3?.credentials??{})[0]??"0".repeat(64),bundle=await aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust});
+    await verifyStateBundle(bundle,trust,{expectedInstitutionId:record.id,expectedDelegationId:digest,nowWallSeconds:Math.floor(Date.now()/1000),nowMonotonicMs:performance.now(),maxStateAgeSeconds:8,maxFutureSkewSeconds:1});
+    const state=bundle.snapshot.institutionState;if(!state.exists||state.status!=="Active"||state.epoch!==key.epoch||state.approvalPublicKey.toLowerCase()!==`0x${Buffer.from(key.publicKey.x!,"base64url").toString("hex")}`)throw new HttpError(409,"ROTATED_KEY_NOT_CONFIRMED");
+  }});
+  registerServiceRoutes(app, { authority: serviceAuthority, store, actorFor, sessionId:async r=>(await scopedSession(r)).sessionId });
+  const quota=postgresQuotaStore(required("ISSUER_DATABASE_URL"));app.addHook("onClose",()=>quota.close());
+  registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId});
   if (process.env.ARI_URL) {
-    const bridge = new AsteriskBridge(new AriClient({base:new URL(required("ARI_URL")),authorization:required("ARI_AUTHORIZATION"),application:"callsign"}), pbxSigningKey!, {networkId:env.NETWORK_ID,registryAddress:env.REGISTRY_ADDRESS});
-    const endpoints = new PbxEndpoints({databaseUrl:required("ISSUER_DATABASE_URL"),secret:required("PBX_CREDENTIAL_SECRET"),realm:required("SIP_REALM"),wssUrl:required("SIP_WSS_URL"),sipDomain:required("SIP_DOMAIN")});
+    const certificate=new X509Certificate(await readFile(required("PBX_DTLS_CERT_PATH")));
+    const bridge = new AsteriskBridge(new AriClient({base:new URL(required("ARI_URL")),authorization:required("ARI_AUTHORIZATION"),application:"callsign"}), pbxSigningKey!, {networkId:env.NETWORK_ID,registryAddress:env.REGISTRY_ADDRESS,pbxFingerprint:certificate.fingerprint256});
+    const endpoints = new PbxEndpoints({databaseUrl:required("ISSUER_DATABASE_URL"),secret:required("PBX_CREDENTIAL_SECRET"),realm:required("SIP_REALM"),wssUrl:required("SIP_WSS_URL"),sipDomain:required("SIP_DOMAIN"),mediaAddress:required("PBX_PRIVATE_ADDRESS")});
     registerPbxRoutes(app,{authority:serviceAuthority,actorFor,bridge,endpoints});
+    pbxRuntime=new PbxRuntime({authority:serviceAuthority,institutionId:env.INSTITUTION_ID,bridge,endpoints,sessionsAlive:async attempt=>{const ids=Object.values(attempt.ownerSessions??{});if(ids.length===0)return false;for(const id of ids){const rows=await client`SELECT id FROM public.sessions WHERE id=${id} AND purpose='work' AND expires_at>now()`;if(!rows.length)return false;}return true;}});
+    app.addHook("onReady",()=>pbxRuntime!.start());app.addHook("onClose",async()=>{pbxRuntime?.close();});
   }
+  app.get("/v3/runtime-identity",async r=>{await actorFor(r);return {deploymentId:required("DEPLOYMENT_ID"),networkId:env.NETWORK_ID,registryAddress:env.REGISTRY_ADDRESS,trustPin:hashCanonical(trust),profile:"service"};});
+  app.get("/v3/public-trust",async r=>{await actorFor(r);return trust;});
+  app.get("/v3/state",async r=>{const actor=await actorFor(r),{digest}=z.object({digest:z.string().regex(/^[0-9a-f]{64}$/)}).strict().parse(r.query);const record=await store.read(actor.institutionId);if(!record.serviceV3?.credentials[digest])throw new HttpError(404,"VC_NOT_FOUND");
+    if(actor.role!=="institution"&&!Object.values(record.serviceV3.authorizations).some(auth=>auth.payload.vcDigest===digest&&(actor.role==="recipient"?auth.payload.recipientId===actor.userId:actor.role==="gateway"&&auth.payload.agentId===actor.userId)))throw new HttpError(404,"VC_NOT_FOUND");return aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust});});
+  app.post("/v3/turn",async r=>{const actor=await actorFor(r,true),{attemptId}=z.object({attemptId:z.string()}).strict().parse(r.body),record=await store.read(actor.institutionId),{attempt}=serviceAuthority.party(record,actor,attemptId);if(!["gateway","recipient"].includes(actor.role)||["ended","cancelled","declined","failed","no-answer"].includes(attempt.status))throw new HttpError(409,"CALL_ENDED");return process.env.TURN_URLS?turnCredentials({urls:required("TURN_URLS").split(","),secret:required("TURN_SECRET"),sessionId:attempt.sessionId,userId:actor.userId,now:serviceAuthority.now()}):{iceServers:[]};});
   app.get("/readiness", async () => {
     const record = await store.read(env.INSTITUTION_ID); const key = await readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"), `approval-v${record.approvalKeyVersion}.json`));
     if (key.kid !== record.approvalKid || hashCanonical(key.publicJwk) !== hashCanonical(record.approvalPublicKey)) throw new HttpError(503, "ISSUER_KEY_NOT_READY");
+    if((process.env.SERVICE_PROFILE??"service")==="service")assertPublishedTrust(record,trust,required("VITE_SERVICE_TRUST_SHA256"),serviceAuthority.policy);
+    if((process.env.SERVICE_PROFILE??"service")==="service"&&(!pbxRuntime?.ready||record.serviceV3?.recovery!=="ready"))throw new HttpError(503,"SERVICE_RUNTIME_NOT_READY");
+    if((process.env.SERVICE_PROFILE??"service")==="service"){
+      const profile=(trust as unknown as {service?:import("@callsign/verifier").ServiceTrust}).service;
+      if(trust.registryProfile!=="CALLSIGN_SERVICE_JOINT_CONFIGURATION_1"||trust.policyVersion!==String(record.policy.version))throw new HttpError(503,"TRUST_POLICY_PUBLICATION_REQUIRED");
+      if(!profile||profile.institutionUri!==record.institutionUri||profile.issuerKid!==record.approvalKid||profile.approvalKeyVersion!==record.approvalKeyVersion||hashCanonical(profile.issuerPublicKey)!==hashCanonical(record.approvalPublicKey)||hashCanonical(profile.policy)!==hashCanonical(serviceAuthority.policy)||trust.networkId!==env.NETWORK_ID||trust.registryAddress.toLowerCase()!==env.REGISTRY_ADDRESS.toLowerCase()||!pbxSigningKey||profile.pbx?.kid!==pbxSigningKey.kid||hashCanonical(profile.pbx.publicKey)!==hashCanonical(pbxSigningKey.publicJwk)||profile.pbx.fingerprint!==new X509Certificate(await readFile(required("PBX_DTLS_CERT_PATH"))).fingerprint256)throw new HttpError(503,"SERVICE_TRUST_NOT_READY");
+    }
     await db.select({ id: users.id }).from(users).limit(1); return { status: "ready", chain: "checked-per-operation" };
   });
   const finishLogin = async (request: FastifyRequest, reply: FastifyReply, idToken: string, official: boolean, expectedNonce?: string) => {
@@ -196,14 +250,14 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
       if (!accepted.length) throw new HttpError(401, "OIDC_TOKEN_ALREADY_USED");
       if (previous.length) await tx.delete(sessions).where(eq(sessions.id, previous[0]!.id));
       await tx.insert(sessions).values({ id: randomUUID(), tokenHash: tokenHash(token), csrfToken, userId: user.id, expiresAt: new Date(Date.now() + 3600000), purpose,
-        oidcIssuer: policy.issuer, oidcClientId: policy.clientId, oidcAudience: policy.audience, authenticatedAt: new Date((typeof identity.payload.auth_time === "number" ? identity.payload.auth_time : identity.payload.iat!) * 1000) });
+        oidcIssuer: policy.issuer, oidcClientId: policy.clientId, oidcAudience: policy.audience, membershipGeneration:record.members[user.id]?.sessionGeneration??0,authenticatedAt: new Date((typeof identity.payload.auth_time === "number" ? identity.payload.auth_time : 0) * 1000) });
     });
     for (const prior of previous) connections.revoke(prior.id);
     reply.setCookie(sessionCookie(purpose), token, { httpOnly: true, sameSite: "strict", secure: env.WEB_ORIGIN.startsWith("https:"), path: "/", maxAge: 3600 });
     return { user: { id: user.id, role: user.role, displayName: user.displayName }, csrfToken, official: official };
   };
   const oidcFlow = process.env.OIDC_AUTHORIZATION_URL && process.env.OIDC_TOKEN_URL ? new OidcLoginFlow({ authorizationUrl: process.env.OIDC_AUTHORIZATION_URL, tokenUrl: process.env.OIDC_TOKEN_URL,
-    redirectUri: `${env.WEB_ORIGIN}/finals`, clientId: required("OIDC_CLIENT_ID"), officialClientId: required("OFFICIAL_OIDC_CLIENT_ID") }) : null;
+    redirectUri: `${env.WEB_ORIGIN}/${process.env.SERVICE_PROFILE==="finals"?"finals":"service"}`, clientId: required("OIDC_CLIENT_ID"), officialClientId: required("OFFICIAL_OIDC_CLIENT_ID") }) : null;
   app.post("/v2/auth/start", async (request, reply) => {
     authenticate(request.headers["x-service-token"], env.PLATFORM_INTERNAL_TOKEN);
     if (request.headers.origin !== env.WEB_ORIGIN || !oidcFlow) throw new HttpError(503, "OIDC_LOGIN_NOT_CONFIGURED");
@@ -239,6 +293,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
     const { purpose } = z.object({ purpose: z.enum(["work", "official"]) }).strict().parse(request.body);
     const session = await scopedSession(request, purpose); assertCsrf(request, session, env.WEB_ORIGIN);
     await db.delete(sessions).where(eq(sessions.id, session.sessionId));
+    await store.transact(env.INSTITUTION_ID,async r=>{for(const t of Object.values(r.serviceV3?.attempts??{}))if(Object.values(t.ownerSessions??{}).includes(session.sessionId)&&!["ended","cancelled","declined","failed","no-answer"].includes(t.status)){t.status="failed";t.reason="logout";t.endedAt=serviceAuthority.now();if(t.consent){t.consent.granted=false;t.consent.generation++;}serviceAuthority.event(r,{userId:session.userId,role:session.role,institutionId:r.id},"call.cleanup",t.id);}});
     connections.revoke(session.sessionId);
     reply.clearCookie(sessionCookie(purpose), { path: "/" }); reply.clearCookie("oidc_state", { path: "/" });
     return { loggedOut: true, purpose };

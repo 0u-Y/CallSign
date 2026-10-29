@@ -13,6 +13,8 @@ export interface AuthSession {
   csrfToken: string;
   purpose: string;
   expiresAt: Date;
+  authenticatedAt?:Date;
+  membershipGeneration?:number;
 }
 
 export interface SessionPolicy {
@@ -56,13 +58,14 @@ export async function sessionForRequest(db: Database, request: FastifyRequest, p
     oidcClientId: sessions.oidcClientId,
     oidcAudience: sessions.oidcAudience,
     authenticatedAt: sessions.authenticatedAt,
+    membershipGeneration:sessions.membershipGeneration,
   }).from(sessions).innerJoin(users, eq(sessions.userId, users.id)).where(and(eq(sessions.tokenHash, tokenHash(token)), gt(sessions.expiresAt, new Date()))).limit(1);
   if (!rows[0]) throw new HttpError(401, "SESSION_EXPIRED");
   const row = rows[0];
   if (row.purpose !== purpose || (policy && (row.oidcIssuer !== policy.issuer || row.oidcClientId !== policy.clientId || row.oidcAudience !== policy.audience || !row.authenticatedAt))) {
     throw new HttpError(403, purpose === "official" ? "OFFICIAL_SCOPE_REQUIRED" : "SESSION_SCOPE_INVALID");
   }
-  return { sessionId: row.sessionId, userId: row.userId, displayName: row.displayName, role: row.role, csrfToken: row.csrfToken, purpose: row.purpose, expiresAt: row.expiresAt };
+  return { membershipGeneration:row.membershipGeneration??0,sessionId: row.sessionId, userId: row.userId, displayName: row.displayName, role: row.role, csrfToken: row.csrfToken, purpose: row.purpose, expiresAt: row.expiresAt, ...(row.authenticatedAt?{authenticatedAt:row.authenticatedAt}:{}) };
 }
 
 export function requireRole(session: AuthSession, ...roles: string[]): void {
@@ -76,4 +79,8 @@ export function assertCsrf(request: FastifyRequest, session: AuthSession, allowe
   const expectedBytes = Buffer.from(session.csrfToken);
   const suppliedBytes = Buffer.from(supplied);
   if (expectedBytes.length !== suppliedBytes.length || !timingSafeEqual(expectedBytes, suppliedBytes)) throw new HttpError(403, "CSRF_INVALID");
+}
+
+export function assertRecentAuthentication(session:Pick<AuthSession,'authenticatedAt'>,now=Date.now()){
+ const at=session.authenticatedAt?.getTime();if(at===undefined||!Number.isFinite(at)||now-at>300000||at>now+1000)throw new HttpError(403,'RECENT_AUTHENTICATION_REQUIRED');
 }

@@ -746,3 +746,19 @@ tbody th { color: var(--ink); font-weight: 700; }
 .finals-error { padding: 16px; color: var(--red-dark); background: var(--red-soft); }
 .finals-workspace audio { max-width: 100%; }
 @media (max-width: 600px) { .finals-status { grid-template-columns: 1fr; }.finals-workspace { padding: 24px 16px; } }
+
+/* Shared service forms keep key proofs readable without widening mobile pages. */
+.finals-workspace { overflow-wrap: anywhere; font-size: 1rem; }
+.finals-controls fieldset { flex: 1 1 100%; min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-small); }
+.finals-controls fieldset label { margin-block: 12px; }
+.finals-controls textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-small); background: var(--surface); color: var(--ink); font: inherit; resize: vertical; }
+.finals-workspace pre { max-width: 100%; overflow-x: auto; padding: 12px; font-size: .9rem; }
+.finals-workspace button { min-height: 44px; }
+.finals-workspace :is(button, input, select, textarea, a):focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* Management payloads must remain readable on narrow screens. */
+.finals-controls article { min-width: 0; }
+.finals-controls dd, .finals-controls td, .finals-controls th { overflow-wrap: anywhere; white-space: pre-wrap; }
+.finals-controls dl { margin: 1rem 0; }
+.finals-controls dd { margin: 0 0 .75rem; }
+.finals-controls table { width: 100%; table-layout: fixed; }

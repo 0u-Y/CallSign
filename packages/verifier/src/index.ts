@@ -33,6 +33,8 @@ export const stateSnapshotSchema = z.object({
   networkId: decimalInteger,
   genesisHash: hash32,
   registryAddress: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
+  registryProfile: z.literal("CALLSIGN_SERVICE_JOINT_CONFIGURATION_1").optional(),
+  policyHash: hash32.optional(),
   policyVersion: decimalInteger,
   blockNumber: decimalInteger,
   blockHash: hash32,
@@ -43,7 +45,7 @@ export const stateSnapshotSchema = z.object({
   delegationState: delegationStateSchema,
   directoryHash: hash32,
   directoryVersion: decimalInteger,
-}).strict();
+}).strict().refine(s=>!!s.registryProfile===!!s.policyHash,"PROFILE_AND_POLICY_HASH_REQUIRED_TOGETHER");
 
 export type StateSnapshot = z.infer<typeof stateSnapshotSchema>;
 
@@ -62,6 +64,7 @@ export interface TrustBundle {
   genesisHash: string;
   registryAddress: string;
   policyVersion: string;
+  registryProfile?:"CALLSIGN_SERVICE_JOINT_CONFIGURATION_1";
   witnessThreshold: number;
   witnessPublicKeys: Array<{ witnessId: string; kid: string; jwk: JWK }>;
   enrollmentPublicKey: JWK;
@@ -90,6 +93,7 @@ export async function verifyStateBundle(bundle: StateBundle, trust: TrustBundle,
   if (!Number.isInteger(trust.witnessThreshold) || trust.witnessThreshold < 1 || trust.witnessThreshold > identities.length || new Set(identities.map(k => k.witnessId)).size !== identities.length || new Set(identities.map(k => k.jwk.x)).size !== identities.length) throw new Error("INVALID_WITNESS_TRUST");
   const snapshot = stateSnapshotSchema.parse(bundle.snapshot);
   if (!trust.supportedProtocolVersions.includes(snapshot.version)) throw new Error("UNSUPPORTED_PROTOCOL_VERSION");
+  if(trust.registryProfile&&snapshot.registryProfile!==trust.registryProfile)throw new Error("REGISTRY_PROFILE_DOWNGRADE");
   if (snapshot.networkId !== trust.networkId || snapshot.genesisHash !== trust.genesisHash || snapshot.registryAddress.toLowerCase() !== trust.registryAddress.toLowerCase() || snapshot.policyVersion !== trust.policyVersion) {
     throw new Error("TRUST_BUNDLE_MISMATCH");
   }

@@ -1,15 +1,25 @@
+# Merge with compose.yml. Asterisk terminates DTLS-SRTP and mixes media; no external Edge service.
 services:
   asterisk:
-    image: ${ASTERISK_IMAGE:?pin independently reviewed Asterisk image digest}
+    image: ${ASTERISK_IMAGE:?reviewed Asterisk 22 image digest with SHA-256 digest auth and ODBC modules}
     profiles: [pbx]
     restart: unless-stopped
-    volumes: ['${FINALS_DATA_DIR}/asterisk:/etc/asterisk:ro', 'asterisk-data:/var/lib/asterisk']
-    networks: [application]
-    # Private SIP/ARI only; no unauthenticated trunk exposure.
-  media-edge:
-    image: ${MEDIA_EDGE_IMAGE:?implementation and image still required}
-    profiles: [pbx]
-    restart: unless-stopped
-    volumes: ['${FINALS_DATA_DIR}/media-edge:/config:ro']
-    networks: [application, public]
-    # The third-party media bridge is explicitly not fabricated by this repository.
+    init: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - ${FINALS_DATA_DIR}/asterisk:/etc/asterisk:ro
+      - ${FINALS_DATA_DIR}/asterisk/odbc.ini:/etc/odbc.ini:ro
+      - asterisk-data:/var/lib/asterisk
+    networks:
+      application: {}
+      public:
+        ipv4_address: ${PBX_PRIVATE_ADDRESS:-10.205.0.20}
+        gw_priority: 1
+    ports: ['10000-10099:10000-10099/udp']
+    healthcheck:
+      test: [CMD, asterisk, -rx, 'core show uptime']
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    # ARI and WSS remain internal; browser WSS is proxied through the same HTTPS origin.

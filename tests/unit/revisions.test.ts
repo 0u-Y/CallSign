@@ -51,6 +51,8 @@ it("adapts streaming STT revisions, enforces sequence/backpressure and stops cal
     const result = { type: "Results", start: 0, duration: 1, is_final: false, channel: { alternatives: [{ transcript: "OTP" }] } };
     socket.emit("message", Buffer.from(JSON.stringify(result))); socket.emit("message", Buffer.from(JSON.stringify({ ...result, is_final: true })));
     expect(revisions).toMatchObject([{ revision: 1, final: false }, { revision: 2, final: true }]);
+    socket.emit("message",Buffer.from(JSON.stringify({...result,is_final:true})));socket.emit("message",Buffer.from(JSON.stringify(result)));
+    expect(revisions).toHaveLength(2); // Identical final and a late partial must not consume another LLM request.
     socket.bufferedAmount = 600000; expect(() => stt.push(new Uint8Array([1]),2)).toThrow("STT_BACKPRESSURE_OR_BUDGET");
     socket.emit("message", Buffer.from(JSON.stringify(result))); expect(revisions).toHaveLength(2);
   } finally { stt.stop(); }

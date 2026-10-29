@@ -1,0 +1,34 @@
+import {expect,it} from 'vitest';
+import {privateKeyToAccount} from 'viem/accounts';
+import {hashTypedData,keccak256,stringToHex} from 'viem';
+import {bankPolicy,hashCanonical,policyHash,configurationTypedData} from '../../packages/protocol/src/index.js';
+import {configurationChanges,editedConfiguration,verifyConfigurationReview,verifyConfigurationSignature} from '../../apps/web/src/lib/configurationReview.js';
+import {serviceFixture} from './service-fixture.js';
+import {assertPublishedTrust} from '../../services/api/src/published-trust.js';
+const accounts=[1,2,3].map(n=>privateKeyToAccount(`0x${String(n).padStart(64,'0')}`)); // Public development fixture only, never operational keys.
+function fixture(){const previous={directory:[{path:'/official' as const,title:'공식 업무'}],policy:bankPolicy},contents=editedConfiguration(previous,'새 표시명',bankPolicy.allowedQuestions.join('\n'),bankPolicy.forbiddenRequests.join('\n')),request={institutionId:`0x${'a'.repeat(64)}`,expectedEpoch:'1',expectedDirectoryHash:`0x${hashCanonical(previous.directory)}`,expectedDirectoryVersion:'1',expectedPolicyVersion:'1',expectedPolicyHash:`0x${policyHash(bankPolicy)}`,newDirectoryHash:`0x${hashCanonical(contents.directory)}`,newDirectoryVersion:'2',newPolicyVersion:'1',newPolicyHash:`0x${policyHash(contents.policy)}`,nonce:`0x${'b'.repeat(64)}`,deadline:'1800000300'},chainId=20260914,registryAddress=`0x${'1'.repeat(40)}` as const,digest=hashTypedData(configurationTypedData(chainId,registryAddress,request)),expected={chainId,registryAddress,institutionKey:request.institutionId};const review=verifyConfigurationReview({format:'callsign-configuration-review',version:1,operation:hashCanonical(request),chainId,registryAddress,institutionId:request.institutionId,digest,request,contents,previous},expected);return {review,expected};}
+it('uses the same EIP-712 payload as the server, and rejects a changed diff, institution, chain or digest',()=>{
+ const {review,expected}=fixture();expect(configurationTypedData(review.chainId,review.registryAddress as `0x${string}`,review.request).message.actionType).toBe(keccak256(stringToHex('UPDATE_CONFIGURATION')));expect(configurationChanges(review)[0]!.after).toBe('새 표시명');
+ for(const value of [{...review,digest:`0x${'c'.repeat(64)}`},{...review,contents:{...review.contents,policy:{...bankPolicy,allowedQuestions:['changed']}}},{...review,previous:{...review.previous,policy:{...bankPolicy,allowedQuestions:['invented before']}}}])expect(()=>verifyConfigurationReview(value,expected)).toThrow();
+ expect(()=>verifyConfigurationReview(review,{...expected,chainId:1})).toThrow();expect(()=>verifyConfigurationReview(review,{...expected,institutionKey:`0x${'f'.repeat(64)}`})).toThrow();
+});
+it('verifies imported public signature files and rejects wrong request, claimed signer, unregistered key, aliases and expiry',async()=>{
+ const {review}=fixture(),signature=await accounts[0]!.signTypedData(configurationTypedData(review.chainId,review.registryAddress as `0x${string}`,review.request)),file={format:'callsign-configuration-signature',version:1,operation:review.operation,digest:review.digest,signer:accounts[0]!.address,signature},approvers=accounts.map(a=>a.address);
+ expect((await verifyConfigurationSignature(file,review,approvers,1800000000)).signer).toBe(accounts[0]!.address.toLowerCase());
+ for(const value of [{...file,operation:'c'.repeat(64)},{...file,signer:accounts[1]!.address},{...file,digest:`0x${'c'.repeat(64)}`}])await expect(verifyConfigurationSignature(value,review,approvers,1800000000)).rejects.toThrow();
+ await expect(verifyConfigurationSignature(file,review,[approvers[0]!,approvers[0]!.toUpperCase(),approvers[2]!],1800000000)).rejects.toThrow();await expect(verifyConfigurationSignature(file,review,approvers,1800000300)).rejects.toThrow();
+});
+it('keeps display-name changes compatible and increments policy only when question/forbidden content changes',()=>{
+ const {review}=fixture(),base=review.previous!;expect(editedConfiguration(base,'title',base.policy.allowedQuestions.join('\n'),base.policy.forbiddenRequests.join('\n')).policy.version).toBe(1);expect(editedConfiguration(base,'title','새 허용 질문',base.policy.forbiddenRequests.join('\n')).policy.version).toBe(2);
+});
+it('blocks new work while policy/key trust publication is stale, while leaving recovery operations outside that gate',async()=>{
+ const f=await serviceFixture(),r=await f.store.read(f.institution.institutionId);const trust={networkId:'20260914',genesisHash:`0x${'a'.repeat(64)}`,registryAddress:`0x${'1'.repeat(40)}`,policyVersion:'1',registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1' as const,witnessThreshold:3,witnessPublicKeys:[],endpoints:[],enrollmentPublicKey:r.approvalPublicKey,supportedProtocolVersions:[3],service:{institutionUri:r.institutionUri!,issuerKid:r.approvalKid,approvalKeyVersion:r.approvalKeyVersion,issuerPublicKey:r.approvalPublicKey,serviceUri:Object.keys(r.services)[0]!,serviceKid:Object.values(r.services)[0]!.kid,serviceKeyVersion:Object.values(r.services)[0]!.keyVersion,servicePublicKey:Object.values(r.services)[0]!.publicKey}};
+ assertPublishedTrust(r,trust);f.authority.options.assertPublished=record=>assertPublishedTrust(record,trust);
+ await f.store.transact(r.id,async record=>{record.policy={...record.policy,version:2};});
+ await expect(f.authority.createIntent(f.institution,f.id(),{id:'new-work',recipientId:'recipient',agentId:'agent',serviceDid:'https://center.example',expiresAt:1800001000})).rejects.toThrow('TRUST_PUBLICATION_REQUIRED');
+ const current=await f.store.read(r.id);expect(()=>assertPublishedTrust(current,{...trust,policyVersion:'2'})).not.toThrow();expect(()=>assertPublishedTrust({...current,approvalKid:'new-key'}, {...trust,policyVersion:'2'})).toThrow('TRUST_PUBLICATION_REQUIRED');
+});
+
+it('rejects bootstrap identities without a usable manager/approver, not merely a list of display names',async()=>{
+ const {assertInitialAccounts}=await import('../../services/api/src/finals-model.js');const issuer='https://id.example',base=[{id:`${issuer}|manager`,displayName:'manager',role:'institution',permissions:['contact.manage','delegation.manage','institution.suspend','institution.recover','key.activate']},{id:`${issuer}|agent`,displayName:'agent',role:'gateway',permissions:[]},{id:`${issuer}|recipient`,displayName:'recipient',role:'recipient',permissions:[]},{id:`${issuer}|approver`,displayName:'approver',role:'approver',permissions:['governance.approve']}];expect(assertInitialAccounts(base,issuer)).toHaveLength(4);expect(()=>assertInitialAccounts(base.slice(0,3),issuer)).toThrow('BOOTSTRAP_MANAGER_AND_APPROVER_REQUIRED');expect(()=>assertInitialAccounts(base.map(a=>a.role==='institution'?{...a,permissions:[]}:a),issuer)).toThrow('BOOTSTRAP_MANAGER');expect(()=>assertInitialAccounts([...base,{...base[1]!,id:'https://other.example|agent'}],issuer)).toThrow('BOOTSTRAP_IDENTITY');
+});

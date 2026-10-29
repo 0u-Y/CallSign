@@ -10,5 +10,5 @@ if [ "${SKIP_DB_START:-0}" != "1" ]; then
   docker compose -f infra/compose/docker-compose.yml up -d postgres
   bash scripts/wait-postgres.sh
 fi
-corepack pnpm tsx scripts/migrate-finals.ts
+corepack pnpm tsx scripts/migrate-finals.ts --apply
 corepack pnpm vitest run --config vitest.integration.config.ts --reporter=verbose --reporter=json --outputFile.json=artifacts/integration-results.json

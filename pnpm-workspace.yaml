@@ -9,3 +9,6 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - zod@4.6.5
+
+# Never install or run dependency lifecycle scripts implicitly from light/exec/run.
+verifyDepsBeforeRun: error

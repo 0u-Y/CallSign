@@ -1,0 +1,11 @@
+import { useEffect,useRef,useState } from 'react';
+import { api,ApiError } from '../lib/api.js';
+interface Inbox {enabled:boolean;items:Array<{id:string;code:string;acknowledged_at:string|null}>}
+const labels:Record<string,string>={'intent.cancelled':'업무가 취소됐습니다. 기존 연락을 다시 사용하지 마세요','intent.created':'새 업무가 할당됐습니다','authorization.issued':'기관이 이번 연락을 승인했습니다. 통화 내용의 안전성은 별도 판단하세요','attempt.ended':'통화가 종료됐습니다','attempt.declined':'상대방이 연락을 거절했습니다','attempt.no-answer':'연락이 연결되지 않았습니다','attempt.failed':'통화 연결이 중단됐습니다. 새 시도가 필요할 수 있습니다','attempt.cancelled':'업무 또는 통화 권한 변경으로 연결이 취소됐습니다','institution.suspend':'기관이 정지됐습니다','configuration.activated':'공동 승인한 업무 정책이 활성화됐습니다','worker.requires-operator':'처리 결과를 확정할 수 없습니다. 관리 화면에서 실패 작업을 확인하세요'};
+export function ServiceNotifications({post,onSessionExpired}:{onSessionExpired:()=>void;post:<T=unknown>(path:string,body:unknown)=>Promise<T>}){
+ const [inbox,setInbox]=useState<Inbox>(),[error,setError]=useState('');const running=useRef(false),mounted=useRef(true);
+ async function load(){if(running.current)return;running.current=true;try{const next=await api<Inbox>('/v3/notifications');if(mounted.current){setInbox(next);setError('');}}catch(e){if(mounted.current&&e instanceof ApiError&&(e.status===401||e.code==='OBJECT_FORBIDDEN'))onSessionExpired();if(mounted.current)setError('알림을 확인하지 못했습니다. 업무 새로고침으로 현재 상태를 확인하세요.');}finally{running.current=false;}}
+ useEffect(()=>{mounted.current=true;void load();const timer=setInterval(()=>void load(),5000);return()=>{mounted.current=false;clearInterval(timer);};},[]);
+ async function update(path:string,body:unknown){try{await post(path,body);await load();}catch{if(mounted.current)setError('알림 설정을 저장하지 못했습니다. 다시 시도하세요.');}}
+ return <section><h2>업무·연락 알림</h2>{error&&<p role="status">{error}</p>}<label><input type="checkbox" checked={inbox?.enabled??true} onChange={e=>void update('/v3/notifications/preferences',{enabled:e.target.checked})}/>웹 안에서 알림 받기</label><div aria-live="polite">{inbox&&!inbox.items.some(n=>!n.acknowledged_at)&&<p>새 알림이 없습니다.</p>}{inbox?.items.filter(n=>!n.acknowledged_at).map(n=><p key={n.id}>{labels[n.code]??'업무 상태가 변경됐습니다. 현재 상태를 확인하세요.'} <button onClick={()=>void update('/v3/notifications/read',{id:n.id})}>확인</button></p>)}</div><p>외부 문자·메일은 발송하지 않습니다. 연락·업무의 현재 상태는 업무 목록에서 확인합니다.</p></section>;
+}

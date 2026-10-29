@@ -15,8 +15,10 @@ const root = resolve(import.meta.dirname, "../../..");
 const deploymentPath = process.env.DEPLOYMENT_PATH ?? resolve(root, ".local/deployment.json");
 const keyPath = process.env.WITNESS_KEY_PATH ?? resolve(root, `.local/witness-keys/${witnessId}.json`);
 const publicKeyPath = process.env.WITNESS_PUBLIC_PATH ?? resolve(root, `.local/witness-public/${witnessId}.json`);
-const client = createPublicClient({ transport: http(rpcUrl) });
+const client = createPublicClient({ transport: http(rpcUrl,{timeout:2500,retryCount:0}) });
 const registryAbi = parseAbi([
+  "function policyHashes(bytes32) view returns (bytes32)",
+  "function PROFILE() view returns (bytes32)",
   "function institutions(bytes32) view returns (uint8 status,uint64 epoch,address administrator,bytes32 approvalPublicKey,address emergencyStopper,bytes32 directoryHash,uint64 directoryVersion,uint64 policyVersion,bool exists)",
   "function delegations(bytes32) view returns (bytes32 institutionId,uint64 epoch,bytes32 gatewayPublicKey,uint256 purposeMask,uint64 validFrom,uint64 validUntil,bool revoked,bool exists)",
 ]);
@@ -68,7 +70,7 @@ app.get("/head", async () => {
 
 app.post("/snapshot", async (request) => {
   const query = querySchema.parse(request.body);
-  const deployment = JSON.parse(await readFile(deploymentPath, "utf8")) as { networkId: string; genesisHash: Hex; registryAddress: Hex; institutionId: Hex };
+  const deployment = JSON.parse(await readFile(deploymentPath, "utf8")) as { networkId: string; genesisHash: Hex; registryAddress: Hex; institutionId: Hex;registryProfile?:string;registryCodeHash?:Hex };
   const [chainId, genesis] = await Promise.all([client.getChainId(), client.getBlock({ blockNumber: 0n })]);
   if (String(chainId) !== deployment.networkId || genesis.hash !== deployment.genesisHash) throw new Error("OWN_NODE_CHAIN_MISMATCH");
   const blockNumber = BigInt(query.blockNumber);
@@ -80,10 +82,16 @@ app.post("/snapshot", async (request) => {
   const institution = await client.readContract({ address: deployment.registryAddress, abi: registryAbi, functionName: "institutions", args: [institutionKey], blockNumber });
   const delegation = await client.readContract({ address: deployment.registryAddress, abi: registryAbi, functionName: "delegations", args: [delegationKey], blockNumber });
   if (delegation[7] && delegation[0].toLowerCase() !== institutionKey.toLowerCase()) throw new Error("DELEGATION_INSTITUTION_MISMATCH");
+  let profileFields={};
+  if(deployment.registryProfile==='CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'){
+    const [profile,policyHash,code]=await Promise.all([client.readContract({address:deployment.registryAddress,abi:registryAbi,functionName:'PROFILE',blockNumber}),client.readContract({address:deployment.registryAddress,abi:registryAbi,functionName:'policyHashes',args:[institutionKey],blockNumber}),client.getCode({address:deployment.registryAddress,blockNumber})]);
+    if(profile!==keccak256(stringToHex(deployment.registryProfile))||!code||keccak256(code)!==deployment.registryCodeHash)throw new Error('WITNESS_REGISTRY_PROFILE_OR_CODE_MISMATCH');
+    profileFields={registryProfile:deployment.registryProfile,policyHash};
+  }else if(process.env.SERVICE_REGISTRY_PROFILE==='CALLSIGN_SERVICE_JOINT_CONFIGURATION_1')throw new Error('SERVICE_DEPLOYMENT_METADATA_REQUIRED');
   const snapshot: StateSnapshot = stateSnapshotSchema.parse({
     protocol: "callsign", version: 1, type: "SignedStateSnapshot",
     networkId: deployment.networkId, genesisHash: deployment.genesisHash, registryAddress: deployment.registryAddress,
-    policyVersion: String(institution[7]), blockNumber: String(blockNumber), blockHash: block.hash,
+    ...profileFields,policyVersion: String(institution[7]), blockNumber: String(blockNumber), blockHash: block.hash,
     blockTimestamp: Number(block.timestamp), institutionId: query.institutionId,
     institutionState: { exists: institution[8], status: institution[0] === 0 ? "Active" : "Suspended", epoch: String(institution[1]), approvalPublicKey: institution[3], policyVersion: String(institution[7]) },
     delegationId: query.delegationId,

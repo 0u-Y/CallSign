@@ -1,3 +1,4 @@
+import { measurements } from './telemetry.js';
 import { verifyStateBundle, type StateBundle, type TrustBundle } from "@callsign/verifier";
 import { hashCanonical } from "@callsign/protocol";
 
@@ -5,7 +6,7 @@ export interface WitnessEndpoint { witnessId: string; url: string }
 // Every witness proposes its own latest canonical block; no aggregator RPC oracle.
 export async function aggregateWitnesses(input: {
   endpoints: WitnessEndpoint[]; institutionId: string; delegationId: string; trust: TrustBundle;
-  fetcher?: typeof fetch; now?: number; timeoutMs?: number;
+  fetcher?: typeof fetch; now?: number; timeoutMs?: number; allowPolicyTransition?:boolean;
 }): Promise<StateBundle> {
   const fetcher = input.fetcher ?? fetch;
   const controller = new AbortController();
@@ -18,7 +19,7 @@ export async function aggregateWitnesses(input: {
   const query = { institutionId: input.institutionId, delegationId: input.delegationId };
   try {
     // Resolve at first valid quorum; the slowest endpoint cannot hold it hostage.
-    return await new Promise<StateBundle>((resolve, reject) => {
+    return await measurements.measure('verification',()=>new Promise<StateBundle>((resolve, reject) => {
       const proposals = new Set<string>(); const groups = new Map<string, StateBundle>(); let pending = input.endpoints.length; let settled = false; let unavailable = "WITNESS_THRESHOLD_UNAVAILABLE";
       const failure = () => Object.assign(new Error(unavailable), { statusCode: 503, code: unavailable });
       const finished = () => { pending--; if (pending === 0 && !settled) reject(failure()); };
@@ -29,13 +30,13 @@ export async function aggregateWitnesses(input: {
           if (result.witnessId !== endpoint.witnessId) return;
           const one = { snapshot: result.snapshot, signatures: [{ witnessId: result.witnessId, jws: result.jws }] };
           // A bad signature cannot occupy a group or advance the candidate height.
-          await verifyStateBundle(one, { ...input.trust, witnessThreshold: 1 }, { nowWallSeconds: result.snapshot.blockTimestamp, nowMonotonicMs: 0, expectedInstitutionId: query.institutionId, expectedDelegationId: query.delegationId });
+          await verifyStateBundle(one, { ...input.trust, ...(input.allowPolicyTransition?{policyVersion:result.snapshot.policyVersion}:{}),witnessThreshold: 1 }, { nowWallSeconds: result.snapshot.blockTimestamp, nowMonotonicMs: 0, expectedInstitutionId: query.institutionId, expectedDelegationId: query.delegationId });
           const key = hashCanonical(result.snapshot); const group = groups.get(key) ?? { snapshot: result.snapshot, signatures: [] };
           if (!group.signatures.some(s => s.witnessId === result.witnessId)) group.signatures.push(one.signatures[0]!);
           groups.set(key, group);
           if (!settled && group.signatures.length >= input.trust.witnessThreshold) {
             try {
-              await verifyStateBundle(group, input.trust, { nowWallSeconds: input.now ?? Math.floor(Date.now()/1000), nowMonotonicMs: 0, expectedInstitutionId: query.institutionId, expectedDelegationId: query.delegationId });
+              await verifyStateBundle(group, input.allowPolicyTransition?{...input.trust,policyVersion:group.snapshot.policyVersion}:input.trust, { nowWallSeconds: input.now ?? Math.floor(Date.now()/1000), nowMonotonicMs: 0, expectedInstitutionId: query.institutionId, expectedDelegationId: query.delegationId });
               if (!settled) { settled = true; resolve(group); controller.abort(); }
             } catch (error) {
               unavailable = error instanceof Error && error.message === "STALE_SNAPSHOT" ? "STALE_WITNESS_QUORUM_CHAIN_PROGRESS_UNAVAILABLE" : "WITNESS_QUORUM_TIME_INVALID";
@@ -52,6 +53,6 @@ export async function aggregateWitnesses(input: {
           await Promise.all(input.endpoints.map(e => collect(e, { ...query, blockNumber: head.blockNumber, blockHash: head.blockHash })));
         }).catch(() => {}).finally(finished);
       }
-    });
+    }));
   } finally { clearTimeout(timer); controller.abort(); }
 }

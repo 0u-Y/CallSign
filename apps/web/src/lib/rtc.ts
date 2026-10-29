@@ -22,7 +22,7 @@ import {
 import { verifyAuthorizationContext, verifyStateBundle, type StateBundle, type TrustBundle, type VerifiedState } from "@callsign/verifier";
 import { api } from "./api.js";
 import type { BrowserSigningKey } from "./browserKeys.js";
-import pinnedTrust from "../generated/trust-bundle.json";
+import pinnedTrust from "../generated/trust-bundle.json" with { type: "json" };
 
 export const ALICE_ID = "recipient_alice_01HZZZZZZZZZZZZZZZZZZZZZZZ";
 export const GATEWAY_ID = "gateway_c_01HZZZZZZZZZZZZZZZZZZZZZZZZZ";
@@ -230,4 +230,13 @@ export async function verifyObservedTransport(peer: RTCPeerConnection, channel: 
   const observed = [...digest].map((byte) => byte.toString(16).padStart(2, "0").toUpperCase()).join(":");
   if (observed !== expectedRemoteFingerprint) throw new Error("REMOTE_CERTIFICATE_FINGERPRINT_MISMATCH");
   return { bytesReceived, profile: "chromium-dtls-certificate-v1" };
+}
+
+export async function observePbxTransport(peer:RTCPeerConnection,sipCallId:string){
+  if(peer.connectionState!=="connected"||!peer.localDescription||!peer.remoteDescription)throw new Error("PBX_TRANSPORT_NOT_CONNECTED");
+  const stats=await peer.getStats();if(![...stats.values()].some(r=>r.type==="transport"&&r.dtlsState==="connected"))throw new Error("DTLS_STATS_NOT_CONNECTED");
+  const transport=peer.getReceivers().find(r=>r.track?.kind==="audio")?.transport as (RTCDtlsTransport&{getRemoteCertificates?:()=>ArrayBuffer[]})|null|undefined;
+  const certificate=transport?.getRemoteCertificates?.()[0];if(!certificate)throw new Error("REMOTE_CERTIFICATE_API_UNSUPPORTED");
+  const bytes=new Uint8Array(await crypto.subtle.digest("SHA-256",certificate));
+  return {connected:true,localSdp:peer.localDescription.sdp,remoteSdp:peer.remoteDescription.sdp,sipCallId,remoteFingerprint:[...bytes].map(b=>b.toString(16).padStart(2,"0").toUpperCase()).join(":")};
 }

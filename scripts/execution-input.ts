@@ -1,0 +1,23 @@
+import {readFile} from 'node:fs/promises';
+import {parseEnv} from 'node:util';
+// Explicit files only. Dotenv text is parsed as data, never sourced as shell code.
+export async function inspectionEnvironment(file?:string,env:Record<string,string|undefined>=process.env){
+ const values=file?parseEnv(await readFile(file,'utf8')):{};
+ if(Object.keys(values).some(k=>['CALLSIGN_ALLOW_EXTERNAL_EXECUTION','NODE_OPTIONS','PATH','BASH_ENV','ENV','LD_PRELOAD','LD_LIBRARY_PATH'].includes(k)))throw new Error('EXECUTION_PERMISSION_MUST_NOT_BE_IN_CONFIG');
+ return {...values,...Object.fromEntries(Object.entries(env).filter(([,v])=>v!==undefined))};
+}
+export const preparationSteps=[
+ {id:'public-settings',after:[],category:'offline',inputs:['DEPLOYMENT_ID','INSTITUTION_ID','ISSUER_URI','SERVICE_URI','NETWORK_ID','WEB_ORIGIN','OIDC_*','REGISTRY_APPROVERS'],command:['pnpm','preflight','--phase','bootstrap'],output:'reviewed deployment env; no secrets printed'},
+ {id:'application-image',after:['public-settings'],category:'infrastructure',inputs:['reviewed source','app.Dockerfile'],command:[],output:'CALLSIGN_APP_IMAGE digest; explicit build approval required'},
+ {id:'keys',after:['public-settings'],category:'infrastructure',inputs:['new FINALS_DATA_DIR','three independently held approver keys','separate administrator/stopper keys'],command:['pnpm','exec','tsx','scripts/prepare-finals.ts','keys','NEW_DIRECTORY','--apply'],output:'public-manifest.json; role private files; preparation-state.json'},
+ {id:'network',after:['keys'],category:'infrastructure',inputs:['reviewed BESU_IMAGE','DEPLOYER_PUBLIC_ADDRESS','NETWORK_ID'],command:['pnpm','exec','tsx','scripts/prepare-service-network.ts','NEW_NETWORK_CONFIG','--apply'],output:'reviewed genesis/node identity; generate-besu.sh is a separately guarded container operation'},
+ {id:'database',after:['application-image','keys'],category:'infrastructure',inputs:['new disposable/initial database','owner MIGRATOR_DATABASE_URL','four role passwords via protected process environment'],command:['pnpm','exec','tsx','scripts/migrate-finals.ts','--apply'],output:'0000..0005 then psql -X -v ON_ERROR_STOP=1 -f infra/deploy/provision-logins.sql; separately reviewed LOGIN grants'},
+ {id:'accounts',after:['keys','database'],category:'infrastructure',inputs:['registered OIDC issuer/verified subjects','FINALS_ACCOUNTS_PATH','at least one institution manager; separately provisioned approvers'],command:['pnpm','exec','tsx','scripts/provision-finals.ts','PUBLIC_MANIFEST','ACCOUNTS_JSON','--apply'],output:'internal account links and blocked recovery gate; never creates IdP accounts'},
+ {id:'registry',after:['network'],category:'chain',inputs:['actual four RPC identities','EXPECTED_GENESIS_HASH','reviewed artifact','one deployer key'],command:['pnpm','ledger:deploy-service','--apply'],output:'deployment.json with registry/code/ABI hash and block; preserve .pending.json on uncertain submission'},
+ {id:'pbx-config',after:['keys'],category:'infrastructure',inputs:['reviewed PBX image/modules/ODBC','public/private media addresses','separate TLS/DTLS cert','protected ARI/PBX secrets'],command:['pnpm','exec','tsx','scripts/prepare-pbx.ts','NEW_CONFIG_DIRECTORY','--apply'],output:'protected Asterisk config; public cert/CA separate from private key'},
+ {id:'trust',after:['registry','pbx-config'],category:'infrastructure',inputs:['public-manifest.json','deployment.json','public certificate','current jointly confirmed policy version'],command:['pnpm','exec','tsx','scripts/prepare-finals.ts','trust','DIRECTORY','NEW_TRUST_OUTPUT','--apply'],output:'public trust; VITE_SERVICE_TRUST_SHA256; no institution registration prerequisite'},
+ {id:'web-image',after:['trust','application-image'],category:'infrastructure',inputs:['pinned trust hash','same reviewed source'],command:[],output:'build web with trust hash; record actual digest; no invented image reference'},
+ {id:'anchor',after:['accounts'],category:'infrastructure',inputs:['separate lifecycle anchor DB/HTTPS/authentication','deployment/institution identity'],command:[],output:'one reviewed zero record in infra/deploy/anchor-schema.sql; never reset an existing anchor'},
+ {id:'services',after:['web-image','anchor','database'],category:'infrastructure',inputs:['role mounts/URLs','trust','PBX config','all actual image digests'],command:[],output:'explicitly start reviewed stack; verify initial authority checkpoint; registration does not depend on call readiness'},
+ {id:'registration',after:['services'],category:'chain',inputs:['manager recent authentication','two independent exact registration signatures'],command:[],output:'management UI -> worker -> receipt/event/current Witness; then reusable delegation confirmation'},
+] as const;

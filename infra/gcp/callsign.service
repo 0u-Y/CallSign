@@ -7,8 +7,8 @@ Type=oneshot
 RemainAfterExit=yes
 WorkingDirectory=/opt/callsign
 EnvironmentFile=/etc/callsign/deployment.env
-ExecStart=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml --profile https up -d --no-build --pull never
-ExecStop=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml --profile https stop
+ExecStart=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml --profile https --profile pbx --profile media up -d --no-build --pull never postgres besu1 besu2 besu3 besu4 witness1 witness2 witness3 witness4 issuer sender worker platform web https turn asterisk
+ExecStop=/usr/bin/docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml --profile https --profile pbx --profile media stop
 TimeoutStartSec=180
 [Install]
 WantedBy=multi-user.target

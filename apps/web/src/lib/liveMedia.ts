@@ -3,12 +3,13 @@ export class LiveMedia {
   private microphone: MediaStream | undefined;
   private sender: RTCRtpSender;
   private accepted = false;
+  private remoteAccepted = false;
   private closed = false;
   readonly remote = new MediaStream();
   constructor(iceServers: RTCIceServer[], private readonly invalidate: (reason: string) => void, factory = (config: RTCConfiguration) => new RTCPeerConnection(config)) {
     this.peer = factory({ bundlePolicy: "max-bundle", iceServers });
     this.sender = this.peer.addTransceiver("audio", { direction: "sendrecv" }).sender;
-    this.peer.ontrack = e => { if (e.track.kind === "audio") this.remote.addTrack(e.track); };
+    this.peer.ontrack = e => { if (e.track.kind === "audio") {e.track.enabled=this.remoteAccepted;this.remote.addTrack(e.track);} };
     this.peer.onconnectionstatechange = () => { if (["disconnected", "failed", "closed"].includes(this.peer.connectionState)) { this.invalidate("연결 변경: 새 통화 시도와 재검증이 필요합니다."); this.close(); } };
   }
   async prepareMicrophone(getUserMedia = (constraints: MediaStreamConstraints) => navigator.mediaDevices.getUserMedia(constraints)) {
@@ -19,12 +20,15 @@ export class LiveMedia {
     this.microphone = stream;
     for (const track of stream.getTracks()) track.onended = () => { this.invalidate("마이크 장치가 종료됐습니다."); this.close(); };
   }
-  async accept() {
+  async accept(startMuted=false) {
     if (this.closed || !this.microphone) throw new Error("MICROPHONE_NOT_READY");
     const track = this.microphone.getAudioTracks()[0]; if (!track || track.readyState === "ended") throw new Error("MICROPHONE_UNAVAILABLE");
-    await this.sender.replaceTrack(track); if (this.closed || this.microphone.getAudioTracks()[0]?.readyState !== "live") throw new Error("MEDIA_CLOSED"); track.enabled = true; this.accepted = true;
+    if(this.accepted)return;
+    await this.sender.replaceTrack(track); if (this.closed || this.microphone.getAudioTracks()[0]?.readyState !== "live") throw new Error("MEDIA_CLOSED"); this.accepted = true;track.enabled=!startMuted;if(!startMuted){this.remoteAccepted=true;for(const incoming of this.remote.getTracks())incoming.enabled=true;}
   }
   mute(value: boolean) { for (const track of this.microphone?.getAudioTracks() ?? []) track.enabled = this.accepted && !value && !this.closed; }
+  pause(){this.mute(true);this.remoteAccepted=false;for(const track of this.remote.getTracks())track.enabled=false;}
+  resume(muted:boolean){if(!this.accepted||this.closed)throw new Error("MEDIA_NOT_ACCEPTED");this.remoteAccepted=true;for(const track of this.remote.getTracks())track.enabled=true;this.mute(muted);}
   close() {
     if (this.closed) return; this.closed = true; this.accepted = false;
     for (const track of this.microphone?.getTracks() ?? []) { track.enabled = false; track.onended = null; track.stop(); }

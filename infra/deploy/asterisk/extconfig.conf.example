@@ -1,0 +1,5 @@
+[settings]
+ps_endpoints => odbc,callsign,ps_endpoints
+ps_auths => odbc,callsign,ps_auths
+ps_aors => odbc,callsign,ps_aors
+ps_contacts => odbc,callsign,ps_contacts

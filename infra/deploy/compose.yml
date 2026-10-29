@@ -16,6 +16,7 @@ x-app: &app
     retries: 3
 x-env: &env
   CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+  SERVICE_PROFILE: service
   PUBLIC_DEPLOYMENT: ${PUBLIC_DEPLOYMENT:-false}
   DEMO_MODE: 'false'
   WEB_ORIGIN: ${WEB_ORIGIN:?set browser origin}
@@ -24,7 +25,7 @@ x-env: &env
   PLATFORM_INTERNAL_TOKEN: ${PLATFORM_INTERNAL_TOKEN:?required}
   INSTITUTION_ID: ${INSTITUTION_ID:?required}
   NETWORK_ID: ${NETWORK_ID:-20260914}
-  REGISTRY_ADDRESS: ${REGISTRY_ADDRESS:?required}
+  REGISTRY_ADDRESS: ${REGISTRY_ADDRESS:-}
   TRUST_BUNDLE_PATH: /trust/${TRUST_BUNDLE_FILENAME:-trust-bundle.json}
 services:
   platform:
@@ -41,6 +42,7 @@ services:
     <<: *app
     networks: [application, ledger, egress]
     environment:
+      VITE_SERVICE_TRUST_SHA256: ${VITE_SERVICE_TRUST_SHA256:-}
       <<: *env
       SERVICE_ROLE: issuer
       PORT: '4101'
@@ -64,12 +66,26 @@ services:
       ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
       BESU_NODE_URLS: http://besu1:8545,http://besu2:8545,http://besu3:8545,http://besu4:8545
       REGISTRY_APPROVERS: ${REGISTRY_APPROVERS:?three public approver addresses}
-      REGISTRY_ADMIN_KEY_PATH: /keys/admin/administrator.txt
-      REGISTRY_OPERATOR_KEY_PATH: /keys/operator/emergency.txt
+      API_REQUESTS_PER_MINUTE: ${API_REQUESTS_PER_MINUTE:-600}
+      CALL_LEASE_SECONDS: ${CALL_LEASE_SECONDS:-30}
+      CALL_MAX_SECONDS: ${CALL_MAX_SECONDS:-14400}
+      ARI_URL: https://asterisk:8089
+      ARI_AUTHORIZATION: ${ARI_AUTHORIZATION:?base64 callsign user and ARI password}
+      PBX_EVIDENCE_KEY_PATH: /keys/pbx/evidence.json
+      PBX_DTLS_CERT_PATH: /pbx-public/cert.pem
+      PBX_CREDENTIAL_SECRET: ${PBX_CREDENTIAL_SECRET:?32 byte base64url encryption key}
+      SIP_REALM: ${SIP_REALM:?registered PBX realm}
+      SIP_DOMAIN: ${SIP_DOMAIN:?SIP domain}
+      PBX_PRIVATE_ADDRESS: ${PBX_PRIVATE_ADDRESS:-10.205.0.20}
+      SIP_WSS_URL: ${SIP_WSS_URL:?same HTTPS origin with /pbx/ws using wss}
+      CONSUMPTION_ANCHOR_URL: ${CONSUMPTION_ANCHOR_URL:?independent HTTPS anchor}
+      CONSUMPTION_ANCHOR_TOKEN: ${CONSUMPTION_ANCHOR_TOKEN:?separate anchor credential}
+      DEPLOYMENT_ID: ${DEPLOYMENT_ID:?immutable deployment identifier}
+      NODE_EXTRA_CA_CERTS: /pbx-public/ca.pem
     volumes:
       - ${FINALS_DATA_DIR:?prepared persistent configuration}/issuer:/keys/issuer:ro
-      - ${FINALS_DATA_DIR}/operator:/keys/operator:ro
-      - ${FINALS_DATA_DIR}/admin:/keys/admin:ro
+      - ${FINALS_DATA_DIR}/pbx:/keys/pbx:ro
+      - ${FINALS_DATA_DIR}/asterisk/tls/public:/pbx-public:ro
       - ${FINALS_DATA_DIR}/trust:/trust:ro
     depends_on: { postgres: { condition: service_healthy } }
   sender:
@@ -79,12 +95,114 @@ services:
       SERVICE_ROLE: sender
       PORT: '4102'
       SENDER_INTERNAL_TOKEN: ${SENDER_INTERNAL_TOKEN:?required}
-      SENDER_KEY_PATH: /keys/sender/key.json
-      SERVICE_DID: ${SERVICE_DID:?registered sender DID}
+      SENDER_KEY_PATH: /keys/sender/${SENDER_KEY_FILENAME:-key.json}
+      SERVICE_URI: ${SERVICE_URI:?registered call center URI}
     volumes:
       - ${FINALS_DATA_DIR}/sender:/keys/sender:ro
+      - ${FINALS_DATA_DIR}/trust:/trust:ro
+  worker:
+    <<: *app
+    command: [pnpm, worker]
+    networks: [application, ledger]
+    healthcheck:
+      disable: true
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      WORKER_DATABASE_URL: ${WORKER_DATABASE_URL:?dedicated worker login}
+      DEPLOYMENT_PATH: /trust/deployment.json
+      INSTITUTION_ID: ${INSTITUTION_ID:?required}
+      BESU_NODE_URLS: http://besu1:8545,http://besu2:8545,http://besu3:8545,http://besu4:8545
+      REGISTRY_ADMIN_KEY_PATH: /keys/admin/administrator.txt
+      REGISTRY_OPERATOR_KEY_PATH: /keys/operator/emergency.txt
+      REGISTRY_APPROVERS: ${REGISTRY_APPROVERS:?three public addresses}
+      ARI_URL: https://asterisk:8089
+      ARI_AUTHORIZATION: ${ARI_AUTHORIZATION:?required}
+      NODE_EXTRA_CA_CERTS: /pbx-public/ca.pem
+    volumes:
+      - ${FINALS_DATA_DIR}/admin:/keys/admin:ro
+      - ${FINALS_DATA_DIR}/operator:/keys/operator:ro
+      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+      - ${FINALS_DATA_DIR}/asterisk/tls/public:/pbx-public:ro
+  migration-runner:
+    <<: *app
+    profiles: [operations]
+    restart: 'no'
+    healthcheck: {disable: true}
+    command: [pnpm, exec, tsx, scripts/migrate-finals.ts, --apply]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      MIGRATOR_DATABASE_URL: ${MIGRATOR_DATABASE_URL:-}
+      INSTITUTION_ID: ${INSTITUTION_ID:?required}
+      OIDC_ISSUER: ${OIDC_ISSUER:?required}
+      SERVICE_URI: ${SERVICE_URI:?required}
+    volumes:
+      - type: bind
+        source: ${FINALS_DATA_DIR}/public-manifest.json
+        target: /provision/public-manifest.json
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${FINALS_ACCOUNTS_PATH:-/nonexistent/callsign-accounts.json}
+        target: /provision/accounts.json
+        read_only: true
+        bind: {create_host_path: false}
+  registry-deployer:
+    <<: *app
+    profiles: [operations]
+    restart: 'no'
+    networks: [ledger]
+    healthcheck: {disable: true}
+    command: [pnpm, ledger:deploy-service, --apply]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: chain
+      NETWORK_ID: ${NETWORK_ID:-20260914}
+      INSTITUTION_ID: ${INSTITUTION_ID:?required}
+      REGISTRY_APPROVERS: ${REGISTRY_APPROVERS:?required}
+      EXPECTED_GENESIS_HASH: ${EXPECTED_GENESIS_HASH:-}
+      REGISTRY_ARTIFACT_SHA256: ${REGISTRY_ARTIFACT_SHA256:-}
+      REGISTRY_ARTIFACT_PATH: /artifact/registry.json
+      DEPLOYER_KEY_PATH: /deployer/key
+      DEPLOYMENT_PATH: /release/deployment.json
+      BESU_NODE_URLS: http://besu1:8545,http://besu2:8545,http://besu3:8545,http://besu4:8545
+    volumes:
+      - type: bind
+        source: ${DEPLOYER_KEY_PATH:-/nonexistent/callsign-deployer-key}
+        target: /deployer/key
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${REGISTRY_ARTIFACT_PATH:-/nonexistent/callsign-registry-artifact}
+        target: /artifact/registry.json
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ${DEPLOYMENT_WORK_DIR:-/nonexistent/callsign-new-release}
+        target: /release
+        bind: {create_host_path: false}
+  test-runner:
+    <<: *app
+    profiles: [validation]
+    restart: 'no'
+    healthcheck: {disable: true}
+    command: [pnpm, exec, vitest, run, --config, vitest.integration.config.ts, tests/integration/finals-store.test.ts, tests/integration/finals-session-scopes.test.ts, tests/integration/service-runtime.test.ts]
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: integration
+      MIGRATOR_DATABASE_URL: ${TEST_DATABASE_URL:-}
+      TEST_DATABASE_URL: ${TEST_DATABASE_URL:-}
+      TEST_AUTH_DATABASE_URL: ${TEST_AUTH_DATABASE_URL:-}
+    volumes:
+      - type: bind
+        source: ../../tests
+        target: /app/tests
+        read_only: true
+        bind: {create_host_path: false}
+      - type: bind
+        source: ../../vitest.integration.config.ts
+        target: /app/vitest.integration.config.ts
+        read_only: true
+        bind: {create_host_path: false}
   postgres:
-    image: postgres:17.6-alpine
+    image: ${POSTGRES_IMAGE:-postgres:17.6-alpine}
     restart: unless-stopped
     environment:
       POSTGRES_DB: callsign
@@ -99,13 +217,14 @@ services:
       retries: 15
     # No host DB port. No startup migration or seed.
   web:
-    image: ${CALLSIGN_WEB_IMAGE:?pin web image from same source revision}
+    image: ${CALLSIGN_WEB_IMAGE:-callsign-web-not-prepared:blocked}
+    volumes: ["${FINALS_DATA_DIR}/asterisk/tls/public/ca.pem:/etc/nginx/pbx-ca.pem:ro"]
     restart: unless-stopped
     networks: [application, public]
     depends_on: { platform: { condition: service_healthy } }
     ports: ['127.0.0.1:8080:8080']
   https:
-    image: caddy:2.10.2-alpine
+    image: ${HTTPS_IMAGE:-caddy:2.10.2-alpine}
     profiles: [https]
     restart: unless-stopped
     environment: { CALLSIGN_DOMAIN: '${CALLSIGN_DOMAIN:?external DNS domain}' }
@@ -123,14 +242,16 @@ services:
     ports: ['3478:3478/udp', '3478:3478/tcp', '5349:5349/tcp', '49160-49200:49160-49200/udp']
     networks: [public]
   besu1:
-    image: hyperledger/besu:26.8.1
+    image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node1/key --network-id=20260914 --p2p-host=10.203.0.11 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --rpc-http-cors-origins=http://localhost:4173 --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node1/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.11 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu1,localhost,127.0.0.1,10.203.0.11 --min-gas-price=0"]
     volumes:
       - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
       - ${FINALS_DATA_DIR}/besu/keys/node1/key:/network/keys/node1/key:ro
       - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
+      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
       - besu1-data:/var/lib/besu
     networks:
       ledger:
@@ -142,14 +263,16 @@ services:
       retries: 20
 
   besu2:
-    image: hyperledger/besu:26.8.1
+    image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node2/key --network-id=20260914 --p2p-host=10.203.0.12 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node2/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.12 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu2,localhost,127.0.0.1,10.203.0.12 --min-gas-price=0"]
     volumes:
       - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
       - ${FINALS_DATA_DIR}/besu/keys/node2/key:/network/keys/node2/key:ro
       - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
+      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
       - besu2-data:/var/lib/besu
     networks:
       ledger:
@@ -158,14 +281,16 @@ services:
     healthcheck: *besu-health
 
   besu3:
-    image: hyperledger/besu:26.8.1
+    image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node3/key --network-id=20260914 --p2p-host=10.203.0.13 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node3/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.13 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu3,localhost,127.0.0.1,10.203.0.13 --min-gas-price=0"]
     volumes:
       - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
       - ${FINALS_DATA_DIR}/besu/keys/node3/key:/network/keys/node3/key:ro
       - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
+      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
       - besu3-data:/var/lib/besu
     networks:
       ledger:
@@ -174,14 +299,16 @@ services:
     healthcheck: *besu-health
 
   besu4:
-    image: hyperledger/besu:26.8.1
+    image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node4/key --network-id=20260914 --p2p-host=10.203.0.14 --p2p-port=30303 --bootnodes=enode://$$(sed 's/^0x//' /network/keys/node1/key.pub)@10.203.0.11:30303 --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,QBFT,WEB3 --host-allowlist=* --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node4/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.14 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu4,localhost,127.0.0.1,10.203.0.14 --min-gas-price=0"]
     volumes:
       - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
       - ${FINALS_DATA_DIR}/besu/keys/node4/key:/network/keys/node4/key:ro
       - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
+      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
+      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
       - besu4-data:/var/lib/besu
     networks:
       ledger:
@@ -199,6 +326,7 @@ services:
     command: ["pnpm", "--filter", "@callsign/witness", "start"]
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      SERVICE_REGISTRY_PROFILE: CALLSIGN_SERVICE_JOINT_CONFIGURATION_1
       WITNESS_PREPROVISIONED_KEYS: "true"
       WITNESS_ID: witness-1
       WITNESS_PORT: 4201
@@ -227,6 +355,7 @@ services:
     command: ["pnpm", "--filter", "@callsign/witness", "start"]
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      SERVICE_REGISTRY_PROFILE: CALLSIGN_SERVICE_JOINT_CONFIGURATION_1
       WITNESS_PREPROVISIONED_KEYS: "true"
       WITNESS_ID: witness-2
       WITNESS_PORT: 4202
@@ -251,6 +380,7 @@ services:
     command: ["pnpm", "--filter", "@callsign/witness", "start"]
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      SERVICE_REGISTRY_PROFILE: CALLSIGN_SERVICE_JOINT_CONFIGURATION_1
       WITNESS_PREPROVISIONED_KEYS: "true"
       WITNESS_ID: witness-3
       WITNESS_PORT: 4203
@@ -275,6 +405,7 @@ services:
     command: ["pnpm", "--filter", "@callsign/witness", "start"]
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      SERVICE_REGISTRY_PROFILE: CALLSIGN_SERVICE_JOINT_CONFIGURATION_1
       WITNESS_PREPROVISIONED_KEYS: "true"
       WITNESS_ID: witness-4
       WITNESS_PORT: 4204
@@ -299,7 +430,8 @@ volumes:
   asterisk-data:
 networks:
   application: { internal: true }
-  public: {}
+  public:
+    ipam: { config: [{ subnet: 10.205.0.0/24, ip_range: 10.205.0.128/25 }] }
   egress: {}
   ledger:
     ipam: { config: [{ subnet: 10.203.0.0/24 }] }

@@ -30,7 +30,16 @@
     "typecheck": "tsc -p services/api/tsconfig.json --noEmit && tsc -p services/witness/tsconfig.json --noEmit && tsc -p apps/web/tsconfig.json --noEmit && tsc -p tsconfig.light.json --noEmit",
     "lint": "node scripts/check-source.mjs",
     "light": "pnpm lint && pnpm typecheck && pnpm test:light",
-    "test:media": "node scripts/restricted.mjs media pnpm exec playwright test --config playwright.finals.config.ts"
+    "test:media": "node scripts/restricted.mjs media pnpm exec playwright test --config playwright.finals.config.ts",
+    "worker": "tsx scripts/service-worker.ts",
+    "anchor": "pnpm --filter @callsign/api exec tsx src/anchor-server.ts",
+    "ledger:deploy-service": "node scripts/restricted.mjs chain pnpm exec tsx scripts/deploy-service-registry.ts",
+    "release:manifest": "tsx scripts/release-manifest.ts",
+    "test:providers": "node scripts/restricted.mjs media pnpm exec tsx scripts/provider-smoke.ts",
+    "preflight": "node --import tsx scripts/preflight.ts",
+    "evidence:collect": "node --import tsx scripts/collect-evidence.ts",
+    "validate": "node --import tsx scripts/validation-runner.ts",
+    "prepare:execution": "node --import tsx scripts/prepare-execution.ts"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "5.6.1",

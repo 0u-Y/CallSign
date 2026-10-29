@@ -5,7 +5,12 @@ export const terminal = (status: AttemptStatus) => ["ended", "declined", "no-ans
 export interface ServiceAttempt {
   id: string; intentId: string; agentId: string; sessionId: string; generation: string; profile: "direct-webrtc-v3" | "asterisk-webrtc-v3";
   status: AttemptStatus; firstConnectBy: number; callEndBy: number; revision: number;
+  authorityStatus?:"current"|"unavailable"; authorityUntil?:number;
   authorizationId?: string; binding?: ServiceBinding; lease?: Signed<CallLease>; recipientKey?: { userId: string; publicKey: import("jose").JWK; nonce: string };
+  possessions?: Partial<Record<"sender" | "recipient", string>>;
+  mediaReady?: Partial<Record<"sender" | "recipient", string>>;
+  renewal?: { nonce: string; sequence: number; priorLeaseHash: string; issuedAt: number; expiresAt: number; proofs: Partial<Record<"sender" | "recipient", string>> };
+  ownerSessions?: Partial<Record<"sender" | "recipient", string>>;
   endedAt?: number; reason?: string; consent?: { granted: boolean; generation: number; at: number; streamId?:string }; unverifiedChoice?: "pause" | "continue";
   pbx?: { bridgeId: string; senderChannelId: string; recipientChannelId: string; senderEndpoint: string; recipientEndpoint: string; state: "reserved" | "prepared" | "bridged" | "ended"; evidence?: string; credentials:Record<string,string>; reports: Record<string, { callId: string; sdp: string; remoteSdp: string; fingerprint: string; proof: string }> };
 }

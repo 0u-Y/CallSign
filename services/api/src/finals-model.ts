@@ -1,20 +1,27 @@
 import { z } from "zod";
-import { bankPolicy, policyHash, type PurposePolicy, type ContactAuthorizationV2, type DelegationCredential, type ReceiptV2 } from "@callsign/protocol";
+import { bankPolicy, hashCanonical, policyHash, type PurposePolicy, type ContactAuthorizationV2, type DelegationCredential, type ReceiptV2 } from "@callsign/protocol";
 import type { JWK } from "jose";
 import { HttpError } from "./auth.js";
 
-export interface Actor { userId: string; role: string; institutionId: string; serviceDid?: string }
+export interface Actor { userId: string; role: string; institutionId: string; serviceDid?: string; membershipGeneration?:number }
 export interface ContactIntent { id: string; institutionId: string; recipientId: string; agentId: string; serviceDid: string; purpose: "FRAUD_CONFIRMATION"; policyHash: string; expiresAt: number; status: "open" | "cancelled" | "completed"; source: "mock-crm-fds" }
 export interface CallAttempt { id: string; intentId: string; sessionId: string; agentId: string; status: "created" | "authorized" | "consumed" | "cancelled" | "ended"; expiresAt: number }
 export interface InstitutionRecord {
+  authorityCheckpointVersion?:1;
   institutionUri?: string;
+  observedEpoch?:string;
+  registrationOperation?:string;
+  registrationState?:"pending"|"failed"|"confirmed";
+  directory?:{hash:string;version:number;entries:import("./configuration.js").ConfigurationContents["directory"]};
+  configurationProposals?:Record<string,import("./configuration.js").ConfigurationProposal>;
+  recovery?:{hash:string;request:unknown;signatures:Record<string,string>;submitted:boolean};
   serviceV3?: import("./service-state.js").ServiceState;
   pendingEvents?: Array<{ id: string; kind: string; objectId: string; at: number; payload: unknown }>;
   pendingUsage?: Array<{ key: string; units: number; limit: number; expiresAt: number }>;
   id: string; did: string; epoch: string; approvalKeyVersion: number; approvalKid: string; approvalPublicKey: JWK; status: "active" | "suspended";
   policy: PurposePolicy;
   services: Record<string, { did: string; kid: string; publicKey: JWK; keyVersion: number; active: boolean }>;
-  members: Record<string, { role: "institution" | "gateway" | "recipient" | "approver"; serviceDid?: string }>;
+  members: Record<string, { role: "institution" | "gateway" | "recipient" | "approver"; serviceDid?: string; permissions?: string[]; active?:boolean; sessionGeneration?:number }>;
   intents: Record<string, ContactIntent>; attempts: Record<string, CallAttempt>;
   credentials: Record<string, { vc: DelegationCredential; jws: string; revoked: boolean }>;
   authorizations: Record<string, { payload: ContactAuthorizationV2; jws: string; cancelled: boolean }>;
@@ -25,9 +32,12 @@ export interface InstitutionRecord {
 export interface AuthorityStore {
   read(institutionId: string): Promise<InstitutionRecord>;
   transact<T>(institutionId: string, operation: (record: InstitutionRecord) => Promise<T>): Promise<T>;
+  manageAccount?(institutionId:string,actorId:string,requestId:string,input:unknown):Promise<unknown>;
 }
+// Calls, indexer observations and directory labels are not authority metadata.
+export function authorityStateHash(r:InstitutionRecord){return hashCanonical({epoch:r.epoch,approvalKeyVersion:r.approvalKeyVersion,approvalKid:r.approvalKid,approvalPublicKey:r.approvalPublicKey,members:r.members,services:r.services,policy:r.policy});}
 export function membership(record: InstitutionRecord, actor: Actor, roles: string[]): void {
-  if (record.id !== actor.institutionId || !roles.includes(actor.role) || record.members[actor.userId]?.role !== actor.role) throw new HttpError(403, "OBJECT_FORBIDDEN");
+  if (record.id !== actor.institutionId || !roles.includes(actor.role) || record.members[actor.userId]?.role !== actor.role || record.members[actor.userId]?.active===false||(actor.membershipGeneration!==undefined&&actor.membershipGeneration!==(record.members[actor.userId]?.sessionGeneration??0))) throw new HttpError(403, "OBJECT_FORBIDDEN");
 }
 export function activeIntent(record: InstitutionRecord, intentId: string, actor: Actor, now: number): ContactIntent {
   membership(record, actor, ["gateway", "institution", "recipient"]);
@@ -82,10 +92,22 @@ export const mockFdsSchema = z.object({ id: z.string().min(3).max(100), recipien
 export function importMockFds(record: InstitutionRecord, actor: Actor, input: unknown, now: number): ContactIntent {
   membership(record, actor, ["institution"]);
   const body = mockFdsSchema.parse(input);
-  if (record.status !== "active" || record.intents[body.id] || body.expiresAt <= now || body.expiresAt > now + 86400 || record.members[body.recipientId]?.role !== "recipient" || record.members[body.agentId]?.role !== "gateway" || record.members[body.agentId]?.serviceDid !== body.serviceDid || !record.services[body.serviceDid]?.active) throw new HttpError(409, "FDS_ASSIGNMENT_INVALID");
+  if (record.status !== "active" || record.intents[body.id] || body.expiresAt <= now || body.expiresAt > now + 86400 || (record.members[body.recipientId]?.role !== "recipient" || record.members[body.recipientId]?.active===false) || (record.members[body.agentId]?.role !== "gateway" || record.members[body.agentId]?.active===false) || record.members[body.agentId]?.serviceDid !== body.serviceDid || !record.services[body.serviceDid]?.active) throw new HttpError(409, "FDS_ASSIGNMENT_INVALID");
   const intent: ContactIntent = { ...body, institutionId: record.id, purpose: bankPolicy.purpose, policyHash: policyHash(record.policy), status: "open", source: "mock-crm-fds" };
   record.intents[intent.id] = intent;
   return intent;
 }
 
-export const provisioningAccountsSchema = z.array(z.object({ id: z.string().min(3).max(200), displayName: z.string().min(1).max(100), role: z.enum(["institution", "gateway", "recipient", "approver"]) }).strict()).min(3).max(100);
+export const provisioningAccountsSchema = z.array(z.object({ id: z.string().min(3).max(200), displayName: z.string().min(1).max(100), role: z.enum(["institution", "gateway", "recipient", "approver"]), permissions:z.array(z.enum(["contact.manage","delegation.manage","institution.suspend","institution.recover","key.activate","governance.approve"])).default([]) }).strict()).min(3).max(100);
+
+export function requirePermission(record:InstitutionRecord,actor:Actor,permission:string){
+  membership(record,actor,["institution","approver"]);
+  if(!record.members[actor.userId]?.permissions?.includes(permission))throw new HttpError(403,"PERMISSION_REQUIRED");
+}
+
+export function assertInitialAccounts(input:unknown,issuer:string){
+ const accounts=provisioningAccountsSchema.parse(input);
+ if(!issuer||issuer.includes('|')||new Set(accounts.map(a=>a.id)).size!==accounts.length||accounts.some(a=>!a.id.startsWith(`${issuer}|`)||a.id.length<=issuer.length+1||(['gateway','recipient'].includes(a.role)&&a.permissions.length)||(a.role!=='approver'&&a.permissions.includes('governance.approve'))))throw new HttpError(400,'BOOTSTRAP_IDENTITY_OR_ROLE_INVALID');
+ if(!['gateway','recipient'].every(role=>accounts.some(a=>a.role===role))||!accounts.some(a=>a.role==='institution'&&['contact.manage','delegation.manage','institution.suspend','institution.recover','key.activate'].every(p=>a.permissions.includes(p as typeof a.permissions[number])))||!accounts.some(a=>a.role==='approver'&&a.permissions.includes('governance.approve')))throw new HttpError(400,'BOOTSTRAP_MANAGER_AND_APPROVER_REQUIRED');
+ return accounts;
+}
