@@ -1,8 +1,37 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-30(KST)**. 이번 연결 작업 시작 HEAD는 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 개발 당시 아래 변경은 **미커밋 worktree**에 있었으며, 현재 로컬 보존 결과는 첫 PostgreSQL 검증 절을 따른다. 시작 시 있던 `docs/WORK-SUMMARY.md`는 변경하지 않았다. 커밋·push·배포는 하지 않았다. 과거 `ab0ec1c`·82개 시험은 이번 결과와 별도 이력이다.
+기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 이번 작업 시작은 `7638501`, 인증·HTTP·브라우저 코드 checkpoint는 `5c2842d`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+
+<a id="authenticated-http-validation-20261030"></a>
+
+## 2026-10-30 실제 인증·HTTP·PostgreSQL·브라우저 검증
+
+사용자의 이번 한정 허가로 로컬 PostgreSQL17.6·issuer/platform API·HTTPS 웹·HTTPS OIDC fixture·설치된 Chromium을 실행했다. 체인/Witness/PBX/TURN/음성장치·외부 AI/GCP는 실행하지 않았다. 서버 초기 CPU24·load0.34·available39553MiB·disk533GiB, swap 사용7604MiB였으나 관측 구간 si/so는0이었다. DB512MiB·CPU1·tmpfs256MiB, Node/브라우저 예산2GiB·단계 timeout120초·worker1로 실행했고 DB 관측은 약95.68MiB였다.
+
+### 수정과 실제 확인 범위
+
+- AUTH-001/002: OIDC state/code/JWT 불일치를401로 분리하고 provider429/5xx는503 계열 의존성 실패로 보존했다. 실제 HTTPS RS256 JWKS·code 교환·PKCE·nonce·issuer/audience/client·만료/서명·callback 재사용·정확한 issuer/subject·미등록/비활성 계정·공식 인증 분리·실제 auth_time 재인증·CSRF·로그아웃·membership generation 회수를 HTTP로 확인했다. 정상 로그인에 session row를 주입하지 않았다. discovery 문서는 fixture가 제공하지만 앱은 설정된 endpoint를 직접 소비한다.
+- BUSINESS-001/002: 등록된 계정 ID는200자까지인데 업무 생성 내부에서100자로 제한하던 불일치를 수정했다. 100자를 넘는 합성 issuer/subject로 실제 화면의 업무 생성·취소를 확인했다. 다른 기관 subject/수신자·할당·역할 상승 거절, strict schema와 같은 요청의 중복/다른 payload 충돌을 검사했다.
+- CALL-004/005·DB-001/003: 실제 platform→issuer→최소권한 SQL을 통해 서명 승인·수신 nonce/키·합성 binding·양측 소유 증명·동시 consume·새 HTTP 요청에서 동일 영수증 복구·다른 binding 거절·양측 갱신 proof와 서명 lease 발급을 확인했다. DB의 소비 row/outbox와 서명 내용을 assertion으로 검사했다. 합성 binding은 실제 WebRTC/PBX 연결 증거가 아니다.
+- UI-001/002/003: 콜센터/위임/시도 select의 접근 가능한 이름이 option 텍스트에 섞이는 문제를 명시적 label로 수정했다. 실제 `/service`에서 기관 로그인·업무 생성/취소·로그아웃·수신자 메뉴 분리·HTTPS Secure/HttpOnly/SameSite cookie·390px 화면 overflow·키보드 Tab/focus·uncaught/console 오류를 확인했다. API 응답을 browser route mock으로 대체하지 않았다. 기본 인증 전/로그아웃 단계의 정확한 `/auth/me` 401만 예상 오류로 기록했다.
+- TEST-001/004·OPS-001: `test:http`/전용 Vitest config를 추가하고 기존 light·database 구성에서는 HTTP/브라우저 시작을 제외했다. 외부 adapter 주입은 integration guard·test 배포·loopback·같은 `callsign_test_*`의 별도 issuer/auth LOGIN을 요구한다. 보호 키·스크린샷은 고유 run 디렉터리에 쓴다. 운영 기본값에서 fixture 선택이나 실패 후 fake fallback은 없다.
+
+### 결과와 실패 이력
+
+| 실행 | 실제 결과 | 근거 |
+|---|---|---|
+| HTTPS OIDC + HTTP API + PostgreSQL + Chromium | 1파일7시험 PASS, 실패/skip0 | [원본](../artifacts/http-validation-20261030/http-results.json) |
+| 기존 PostgreSQL 경계 회귀 | 4파일15시험 PASS, 실패/skip0 | [원본](../artifacts/http-validation-20261030/database-results.json) |
+| light | 44파일197시험 PASS | [소스 검사](../artifacts/http-source-validation-20261030.json) |
+| 웹 build·API runtime 타입·최종 harness 타입 | PASS | 소스 검사와 [평가/파일 hash](../artifacts/http-validation-20261030.json) |
+
+개발 중 root의 jose 모듈 해석, 공식 로그인 후 work CSRF 선택, Vite proxy 객체 교체, 기존 버튼을 새 업무 완료 신호로 사용한 시험 race를 수정했다. select의 실제 label 문제와 계정 길이 불일치·인증 오류 의미는 제품 수정이다. 중간 브라우저 heading timeout1회는 독립 원인을 확정하지 못했으며 기한을 늘리지 않은 후속 순차 실행에서 재현되지 않았다. console 검사에서 HTTPS의 비어 있는401 reason phrase를 잘못 분류한 [실패 원본](../artifacts/http-validation-20261030/development-console-failure.json)도 따로 보존했다. 모든 시도의 시험 수를 합산하지 않는다.
+
+실제 구성은 issuer/auth 별도 LOGIN이며 superuser/bypassrls=false였다. 원장 최신 상태는 digest별 current/미확정/철회/불가 fixture, 독립 anchor는 memory CAS fixture다. 실제 Witness 서명 정족수·체인 확정/전파·PBX/음성·실제 IdP/MFA/운영 TLS·STT/LLM·독립 복원·성능/GCP는 미검증이다. issuer 전체 readiness는 PBX 없이 통과시켰다고 보고하지 않는다.
+
+증거를 비밀값 없이 보존한 뒤 label/identity가 일치하는 이번 시험 컨테이너만 제거했다. tmpfs 외 volume은 없었고 기존 서비스는 중지하지 않았다. app·Vite·OIDC·browser는 시험 finally에서 닫았고 보호 환경/시험 개인키/프로필을 제거했다. 종료 전 pending/processing outbox는0이었다. [평가와 정리 기록](../artifacts/http-validation-20261030.json), [실행 절차](RUNBOOK.md#authenticated-http-tests)를 따른다.
 
 <a id="contract-validation-20261030"></a>
 

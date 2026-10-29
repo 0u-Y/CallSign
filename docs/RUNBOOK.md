@@ -408,3 +408,33 @@ node --import tsx scripts/contract-interop.ts contracts/out/ServiceRegistry.sol/
 수락 기준은 전체21시험 실패/skip0, fuzz32case에서2개씩 실제 상태 변경, 정상 대조군이 성공하는 문맥의 replay 거절, 실패 시 상태/nonce 보존이다. 이것을 전체 상태 공간·Besu/QBFT·Witness·미디어 회수·실측 지연 검증으로 확대하지 않는다. [최신 계약 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)을 따른다.
 
 CI 이식성: source hygiene의 파일 열거는 Git checkout의 cached/untracked 목록을 사용한다. rg 설치를 실행 환경 전제로 두지 않는다. conflict marker/JS syntax 검사와 Git-only PATH 회귀를 유지한다. 2026-10-30 최초 push CI의 rg ENOENT와 수정은 진행표에 기록했다.
+
+
+<a id="authenticated-http-tests"></a>
+
+## 인증·HTTP·브라우저 통합 검증
+
+별도 사용자 허가 후 `pnpm test:http`를 사용한다. 기존 database 단계와 기본 light에는 포함하지 않는다. 시험은 실제 issuer/platform 라우트·OIDC callback·세션/CSRF/권한 검사·PostgreSQL을 사용하며, 원장 현재 상태와 독립 anchor만 시험 adapter로 대체한다. PBX/음성·외부 제공자를 실행하지 않는다.
+
+필요 입력과 준비 순서:
+
+1. 새 고유 `callsign_test_*` DB가 있는 별도 PostgreSQL cluster/container를 loopback에 준비한다. 기존 인스턴스를 사용하지 않는다. 이번 실행은 로컬 `postgres:17.6-alpine`, 512MiB·CPU1·tmpfs256MiB·max_connections32를 사용했다. 이미지가 없으면 다운로드하지 않고 중단한다. 컨테이너 label에 시험 identity를 기록한다.
+2. owner `MIGRATOR_DATABASE_URL`로 기존 `scripts/migrate-finals.ts --apply`를 integration 범주에서 실행한다. `infra/deploy/provision-logins.sql`로 별도 issuer/auth/worker/PBX LOGIN을 준비한다. 비밀번호는 보호 환경파일에만 두고 owner를 API에 전달하지 않는다. 기존 LOGIN이 있으면 재설정하지 말고 다른 시험 cluster를 사용한다.
+3. 보호 디렉터리 `CALLSIGN_HTTP_TEST_ROOT`(0700)에 시험용 `tls.key`(0600), `tls.crt`를 준비한다. 설치된 OpenSSL로 1일짜리 **시험 전용** 인증서를 만들며 SAN은 `IP:127.0.0.1,DNS:localhost`다. 운영 인증서/키를 복사하지 않는다. 예: `openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes -keyout "$CALLSIGN_HTTP_TEST_ROOT/tls.key" -out "$CALLSIGN_HTTP_TEST_ROOT/tls.crt" -days 1 -subj /CN=127.0.0.1 -addext subjectAltName=IP:127.0.0.1,DNS:localhost`. 쉘의 umask는077로 둔다.
+4. 보호 환경파일에 `TEST_DATABASE_URL`=owner, `ISSUER_DATABASE_URL`=issuer LOGIN, `AUTH_DATABASE_URL`/`TEST_AUTH_DATABASE_URL`=auth LOGIN을 지정한다. 같은 시험 DB의 서로 다른 LOGIN이어야 한다. `NODE_EXTRA_CA_CERTS`는 위 tls.crt의 경로다. Node 시작 전에 설정해야 하며 TLS 검증을 전역 해제하지 않는다. 실제 OIDC/ARI/STT/LLM/클라우드 자격정보는 시험 환경에 상속하지 않는다.
+5. 기존 pnpm 의존성과 설치된 Playwright Chromium/headless shell을 확인한다. 시험은 브라우저나 모듈을 설치하지 않는다. 브라우저가 없으면 HTTP 검증과 구분해 환경 차단으로 기록한다.
+
+보호 환경파일을 검토해 현재 shell에 읽은 뒤 실행할 정확한 명령:
+
+```sh
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm test:http --reporter=json --outputFile=artifacts/NEW-HTTP.json
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run --config vitest.integration.config.ts tests/integration/finals-store.test.ts tests/integration/finals-session-scopes.test.ts tests/integration/service-runtime.test.ts tests/integration/database-readiness.test.ts --reporter=json --outputFile=artifacts/NEW-DATABASE.json
+```
+
+`NEW-*`는 기존 증거와 겹치지 않는 새 이름으로 바꾼다. HTTP fixture는 고유 기관/계정을 만들고 issuer·platform·HTTPS 웹·OIDC의 포트를 직접 할당한다. 체인 상태 adapter는 지정한 digest만 확정 상태로 간주하고, 미확정/철회/조회 불가를 따로 시험한다. 앱의 인증·서명 검증을 대체하지 않는다. `test:` 배포 identity와 loopback origin, 같은 `callsign_test_*` DB의 별도 LOGIN이 아니면 adapter 주입을 거절한다. `oidc_state`·세션 row를 정상 로그인 fixture로 직접 주입하지 않는다. discovery 문서는 fixture가 제공하지만 현재 앱은 명시적으로 설정한 authorize/token/JWKS URL을 소비한다.
+
+통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium은 시험 인증서만 허용하도록 해당 context의 `ignoreHTTPSErrors`를 사용하고 Node↔OIDC는 추가 CA로 검증한다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
+
+각 단계는120초 이내, worker1로 실행한다. DB512MiB 외 Node/브라우저 예산2GiB를 잡고 가용 메모리8GiB 미만·지속적 swap 입출력·기존 작업 영향이면 중단한다. 정상 종료 시 app·Vite·fixture·browser를 닫는다. 강제 timeout 때에는 **이번 실행이 만든 자식 process group**만 회수하고, DB label/identity를 대조한 후 해당 컨테이너만 제거한다. 전역 prune/pkill을 사용하지 않는다.
+
+스크린샷은 ROOT 아래 고유 `run-*` 디렉터리의 `service-mobile.png`/`service-desktop.png`다. cookie/storage/trace는 저장하지 않는다. 공유 전 합성 계정만 들어 있는지 확인하고 실제 API/DB 결과·코드 hash와 함께 보존한다. 보호 ROOT에는 테스트 개인키와 인증서가 있으므로 통째로 커밋하지 않는다. 증거 추출 후 이번 자원과 보호 파일만 제거한다.

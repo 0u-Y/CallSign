@@ -303,6 +303,14 @@ CONTRACT-001/003/004·GOVERNANCE-001/002·BUSINESS-003·TEST-002의 선택된 �
 
 기존 미공개 checkpoint는 복구 ref를 만든 뒤 코드/설정·증거·문서로 재구성했으며 원본 tip과 tree가 같음을 확인했다. 과거 증거의 HEAD/결과는 보존했다. [최신 진행 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)이 실제 시험 HEAD·도구·원본 실패·커밋 대응의 기준이다. 온체인 회수 전이 확인과 실제 VC/브라우저/통화 회수 전파는 구분하며 Besu/QBFT/Witness는 여전히 미검증이다.
 
+### 2.9 실제 인증·HTTP·브라우저 선택 경로 — 2026-10-30
+
+AUTH-001/002, BUSINESS-001/002, CALL-004/005, DB-001/003, UI-001~003, TEST-001/004의 일부 경로를 실제 loopback API·PostgreSQL·HTTPS OIDC fixture·Chromium으로 실행했다. 1파일7시험과 기존 DB 회귀4파일15시험이 각각 PASS이며, light44파일197시험·웹 build/runtime/harness 타입도 PASS다. 과거 시험 수와 합산하지 않는다.
+
+정상 로그인은 실제 code/callback/JWKS 서명을 거치며 issuer/subject로 계정을 찾고 별도 LOGIN으로 세션/권한/업무를 저장한다. 계정 길이200자 계약, OIDC 인증 실패와 제공자 장애의 응답 구분, 화면 select 접근 이름을 수정했다. 생성/취소·객체 경계·재인증/CSRF·세션 세대 회수·동시 소비와 영수증 복구·서명 lease를 확인했다. browser API 응답 mock은 없다.
+
+체인 현재 상태와 독립 anchor는 명시적인 adapter fixture이며 PBX/TURN/실제 음성장치·외부 AI·GCP는 미실행이다. 합성 binding/lease 성공을 실제 연결 검증이나 진행 음성 회수 성공으로 확대하지 않는다. 기관/공동 관리 전체 UI·실제 IdP/MFA·전체 TLS 운영·다중 탭/장시간·네트워크 장애·독립 복구도 아직 전체 완료가 아니다. [이번 평가/파일 hash](../artifacts/http-validation-20261030.json), [진행표](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030), [재현 절차](RUNBOOK.md#authenticated-http-tests)가 근거다.
+
 ## 3. 우선 해결할 충돌·차단 요인
 
 | 확인된 사실 | 최종 명세에서의 처리 |

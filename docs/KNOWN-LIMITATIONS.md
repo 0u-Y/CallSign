@@ -4,16 +4,16 @@
 
 ## 현재 서비스
 
-- **DB 한정 검증·전체 서비스 미검증.** 기본 화면과 URI 승인·양측 갱신·PBX·분석·worker·운영 코드를 연결했으나 이전 기록 이후 격리 PostgreSQL17.6에서15개 통합 시험은 통과했다. 체인·Witness·PBX·TURN·OIDC·브라우저·외부 AI·GCP·백업/복원은 실행하지 않았다. 아래 단위 시험을 이 환경들의 보장으로 확대하지 않는다.
+- **인증·HTTP·DB·화면 일부 검증, 전체 서비스 미검증.** 이번 격리 PostgreSQL 회귀15시험과 HTTPS OIDC fixture→실제 API/DB→Chromium 선택 경로7시험은 통과했다. 체인 상태·독립 anchor는 명시적 fixture이며 실제 IdP·Witness·PBX·TURN·외부 AI·GCP·백업/복원은 실행하지 않았다. 합성 통화 binding을 실제 미디어 연결로 확대하지 않는다. [이번 평가](../artifacts/http-validation-20261030.json)를 따른다.
 - **PBX 보장 경계.** Asterisk가 DTLS-SRTP 음성 종단이다. ARI는 채널·Call-ID·bridge를 조회한다. 인증서 지문은 배치한 공개 인증서에서 고정하고 브라우저의 실제 관측과 대조한다. 서버의 독립 DTLS handshake 수집이나 원 상담원의 개인 신원 증명은 아니다. 자체 SIP 모듈은 직접 Asterisk WSS/등록/수신 dialog로 제한하며 proxy route·PSTN·임의 transfer·재협상은 거절한다. 실제 구현 이미지·ODBC·인증서·단말 호환은 검증 전이다.
 - **통화 정책값.** 120초는 attempt 생성부터의 연결 시작 창이다. lease 30초·최대 4시간은 설정 가능한 초기값이며 합의된 SLA가 아니다. 업무·VC가 먼저 만료되면 더 일찍 종료한다. 기관 서비스 재시작 후 기존 PBX 통화는 정리하고 새 시도를 요구한다. 진행 통화의 무중단 복원은 보장하지 않는다.
 - **원장 외부 호출.** 같은 서명 raw tx/hash를 저장한 뒤 제출·조회·재전송한다. 외부 exactly-once는 아니다. 12회 실패는 운영자 확인 상태로 남고, 결과 불명의 signer nonce가 있으면 새 nonce 발급도 차단한다. 다른 도구가 같은 관리자 계정으로 동시에 tx를 제출하는 운영은 지원하지 않는다.
 - **독립 복구 기준.** anchor는 별도 장애·백업 영역에 배치해야 한다. VM 백업 안의 값만으로 차단을 풀지 않는다. 외부 CAS 진행 뒤 DB commit이 불명확하거나 기존 소비 이력과 journal이 다르면 gate를 닫는다. 완전한 최신 이력이 없으면 자동 복구하지 않으며 운영자 재신뢰 판단이 필요하다. 구 배포를 새 구조로 옮길 때 소비 journal 기준도 별도 대조해야 한다.
 - **DB와 운영.** 행 잠금·공통 소비 제약·quota 예약/정산·작업 claim·retention·권한 SQL을 작성했으나 격리 시험의 소비/claim/quota 경합·응답 유실과 auth LOGIN의 제한된 실제 허용/금지 SQL은 검증했다. 모든 production 역할의 SQL 전체, 영속 disk 장애/부하 내성은 미검증이다. JSONB 기관 aggregate의 실제 성장·잠금 비용도 미측정이다. 백업 도구의 chain archive는 정지된 체인의 일관 snapshot이어야 하며 이 조건을 파일 복사만으로 입증할 수 없다.
 - **요금·AI.** 사용 초·요청·입력 바이트를 제한/계측하지만 STT는 연결 초/바이트와 응답을 제한하며 실제 제공자 음성 길이 과금·청구서·가격 정산은 구현하지 않았다. 제공자 콘솔 지출 한도와 짧은 입력 검토를 별도로 적용해야 한다. 원음/전사는 기본 비영구이고 모델 제공자 측 보관 설정은 별도 확인 대상이다. 36개 합성 개발 fixture의 규칙 결과는 독립 한국어 품질·실제 STT/LLM 평가가 아니다. 재연결은 새 동의·스트림을 요구하며 누락 음성을 복구하지 않는다.
-- **인증·관리.** 주요 작업은 실제 OIDC auth_time이 최근인지 검사하고 토큰 iat로 재인증을 대신하지 않는다. 실제 IdP/MFA 정책은 미검증이며 로그인 진행 상태는 재시작 후 다시 로그인해야 한다. 관리 화면은 등록한 OIDC issuer/subject에 내부 역할을 연결하며 외부 IdP 계정을 생성하지 않는다. 공동 정책·공식 경로 변경은 새 계약에서 2-of-3으로 연결했지만 기존 배포가 자동 변경되지는 않는다. 공동 변경 전후 비교·제안 내보내기/서명 가져오기·로컬 digest/서명 검사를 연결했다. 실제 브라우저 사용성·접근성 검증은 남는다.
+- **인증·관리.** 주요 작업은 실제 OIDC auth_time이 최근인지 검사하고 토큰 iat로 재인증을 대신하지 않는다. 실제 IdP/MFA 정책은 미검증이며 로그인 진행 상태는 재시작 후 다시 로그인해야 한다. 관리 화면은 등록한 OIDC issuer/subject에 내부 역할을 연결하며 외부 IdP 계정을 생성하지 않는다. 공동 정책·공식 경로 변경은 새 계약에서 2-of-3으로 연결했지만 기존 배포가 자동 변경되지는 않는다. 공동 변경 전후 비교·제안 내보내기/서명 가져오기·로컬 digest/서명 검사를 연결했다. Chromium에서 로그인·생성/취소·역할 메뉴·390px overflow·Tab/focus·select label을 확인했으나 공동 관리 전체·다른 브라우저·보조기술 접근성은 미검증이다.
 - **복구 이행.** 새 authority checkpoint 기준이 없는 구 DB는 gate를 닫는다. 별도 수명 anchor와 동일한 소비·계정/키/정책 이력을 복구하지 못하면 자동 해제하지 않는다. 기존 DB의 flag나 anchor만 임의로 초기화하는 절차는 없다. DB·Issuer·anchor 관리자는 신뢰 대상이며 이 journal이 임의 악성 DB 관리자까지 방어한다는 주장은 하지 않는다.
-- **관측·알림·증거.** 내부 웹 알림은 영속/중복 억제/설정/만료를 구현했다. 외부 문자·메일 채널은 미선택이다. 제한된 오프라인 검사와 preflight의 증거 수집은 구현했으나 실제 환경 trace/스크린샷은 실행 후 수집해야 한다. 고정 단계 runner가 기존 시험·guard·증거와 선행 identity를 연결하지만 Besu/Witness 전체 장애·TURN/철회·동의 중단·실제 복원·측정 수집·GCP 확인은 MANUAL이다. 자동 시험으로 위장하지 않으며 관측 출처를 검토 후 호환 status는 MANUAL로 남지만 assessment는 수동/완료/검토된 PASS 또는 FAIL을 기록한다. 과거 MANUAL이나 첨부만으로 PASS하지 않는다. 브라우저 지연 표본은 사용자 단말의 비신뢰 관측이며 체인 확정→화면까지의 실측을 대신하지 않는다.
+- **관측·알림·증거.** 내부 웹 알림은 영속/중복 억제/설정/만료를 구현했다. 외부 문자·메일 채널은 미선택이다. 제한된 오프라인 검사와 preflight의 증거 수집은 구현했으나 이번 합성 계정의 로컬 화면 스크린샷은 수집했으나 실제 통화/운영 환경 trace는 미수집이다. 고정 단계 runner가 기존 시험·guard·증거와 선행 identity를 연결하지만 Besu/Witness 전체 장애·TURN/철회·동의 중단·실제 복원·측정 수집·GCP 확인은 MANUAL이다. 자동 시험으로 위장하지 않으며 관측 출처를 검토 후 호환 status는 MANUAL로 남지만 assessment는 수동/완료/검토된 PASS 또는 FAIL을 기록한다. 과거 MANUAL이나 첨부만으로 PASS하지 않는다. 브라우저 지연 표본은 사용자 단말의 비신뢰 관측이며 체인 확정→화면까지의 실측을 대신하지 않는다.
 - **실행 준비 검사.** runtime preflight는 BLOCKED62·PASS14·SKIPPED1이다. 각 차단의 준비 주체/입력/순서는 실행 준비 artifact에 기록했다. local PASS는 이미지 존재·SQL GRANT·실제 DNS/인증서 handshake·독립성의 증거가 아니다. Node 자식의 네트워크/listen 제한은 OS 수준의 악성 코드 sandbox가 아니며 브라우저·네이티브 도구의 모든 통신을 일반적으로 가로채는 보장은 없다. runner는 고정 도구/시험 소스와 별도 test 배포만 사용한다.
 - **신뢰 게시.** 정책/키 확정 뒤 공개 trust·웹 pin·runtimePolicy가 맞지 않으면 신규 발급/연결을 막는다. 여러 replica·오래된 탭·캐시의 실제 전환과 일부 배포 실패 복구는 검증 전이다. 일반 재시작에 신뢰 전환이나 키 재생성을 숨기지 않는다.
 - **별도 확장.** 선택 DID의 추가 DNS/캐시 방어와 체인 헤더·commit seal·account/storage proof 직접 검증은 기본 PBX 서비스와 분리한다. Witness를 native proof로 설명하지 않는다.
@@ -40,3 +40,9 @@
 온체인은 정책/공식 경로의 hash와 version을 검증할 뿐 질문·표시 문자열의 의미를 해석하지 않는다. directory-only의 현재 제품 범위는 서버 schema가 제한한 `/official` 표시명 변경이며 임의 외부 경로의 안전성을 증명하지 않는다. 전역 nonce는 기관 간에도 재사용할 수 없다. fuzz는 assume 없는2단계 sequence32회이며 전체 상태 공간의 invariant 증명은 아니다. [현재 증거](../artifacts/contract-validation-20261030.json)를 따른다.
 
 첫 공개 push CI에서 source checker의 rg 의존성이 실패해 Git 기반 목록으로 수정했다. 현재 source hygiene는 Git checkout이 필요하며 rg 설치는 요구하지 않는다. 최신 로컬 light는43파일195시험 PASS이고 원격 CI 상태는 해당 실행 URL을 별도로 확인한다.
+
+## 인증·화면 시험의 대체 경계
+
+실제 로그인/세션/권한 middleware·issuer/platform HTTP·역할별 PostgreSQL은 실행했다. 로컬 OIDC fixture는 production IdP/MFA 호환성이 아니며 앱은 discovery 대신 설정한 endpoint를 소비한다. Node는 시험 CA로 TLS 검증했고 Chromium context만 시험 인증서 오류를 허용했다. 운영 인증서 정책을 바꾸지 않았다. 실제 원격 오디오·PBX·Witness snapshot SDK 검증·체인 권한 전파·제공자 장애 중 분석 회수는 미실행이다.
+
+시험 중 heading timeout1회는 원인을 확정하지 못했고 후속 순차 실행에서는 재현되지 않았다. 개발 실패와 최종 PASS를 구분해 보존했다. 화면 캡처에는 합성 계정만 있으며 cookie·storage·trace·음성은 공유하지 않는다. API/DB가 시험 fixture에서 통과한 것은 전체 배포 readiness나 성능 목표 달성이 아니다.

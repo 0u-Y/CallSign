@@ -6,7 +6,7 @@
 
 2026-10-27: 등록 기관/콜센터 URI·키를 기본으로 하고 DID는 선택 호환 기능이다. VC는 기관→콜센터 업무 위임, 개별 승인은 이번 고객·업무·세션에 한정한다.120초 시작 승인·현재 권한 상태 최신성·진행 통화 lease를 분리한다. 기본 음성은 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이며 Asterisk가 media edge 종단이다. native proof는 별도 후속 확장이다.
 
-기본 `/service` 화면은 URI 기반 위임·개별 승인·수신 nonce·양측 단기키 서명·일회 소비·수신 SDK·통화 유지·PBX·동의 기반 원격 음성 분석으로 연결했다. 영속 worker는 서명 요청/nonce 보존·재조회, 원장 사건 cursor, 회수·사용량·보관 처리를 수행한다. 이는 코드 연결 상태이며 실제 DB·체인·교환기·브라우저·외부 AI 성공을 뜻하지 않는다. 아래 도식의 직접 WebRTC는 `/finals` 호환 경로이고 현재 기본 경로는 서비스 가이드 그림을 따른다. [현재 상태](FINALS-IMPLEMENTATION-PLAN.md#service-20261027), [서비스 구조도](guide/02-ARCHITECTURE.md).
+기본 `/service` 화면은 URI 기반 위임·개별 승인·수신 nonce·양측 단기키 서명·일회 소비·수신 SDK·통화 유지·PBX·동의 기반 원격 음성 분석으로 연결했다. 영속 worker는 서명 요청/nonce 보존·재조회, 원장 사건 cursor, 회수·사용량·보관 처리를 수행한다. 이는 전체 서비스 성공을 뜻하지 않는다. 실제 PostgreSQL·로컬 HTTPS OIDC·issuer/platform HTTP·Chromium의 선택 경로는 [통합 기록](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030)에서 따로 검증했다. 이 실행의 체인/독립 anchor는 adapter fixture이며 교환기·음성·외부 AI는 실행하지 않았다. 아래 도식의 직접 WebRTC는 `/finals` 호환 경로이고 현재 기본 경로는 서비스 가이드 그림을 따른다. [현재 상태](FINALS-IMPLEMENTATION-PLAN.md#service-20261027), [서비스 구조도](guide/02-ARCHITECTURE.md).
 
 ## 보존한 직접 통화 호환 경로
 

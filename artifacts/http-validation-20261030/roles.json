@@ -1,0 +1,1 @@
+{"issuer":{"login":"callsign_issuer_login","rolsuper":false,"rolbypassrls":false},"auth":{"login":"callsign_auth_login","rolsuper":false,"rolbypassrls":false},"pendingOutbox":"0","postgres":"PostgreSQL 17.6 on x86_64-pc-linux-musl, compiled by gcc (Alpine 14.2.0) 14.2.0, 64-bit"}
