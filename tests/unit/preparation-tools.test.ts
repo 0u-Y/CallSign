@@ -5,9 +5,18 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {hashTypedData} from 'viem';
 import {hashCanonical,bankPolicy,policyHash,configurationTypedData} from '../../packages/protocol/src/index.js';
-it('all preparation entrypoints default to inspection without touching key/config output or starting infrastructure',async()=>{
- const dir=await mkdtemp(join(tmpdir(),'callsign-fixture-dry-run-'));try{const commands=[['scripts/prepare-finals.ts','keys',join(dir,'keys')],['scripts/prepare-finals.ts','approval-key',dir,join(dir,'new-manifest.json')],['scripts/prepare-pbx.ts',join(dir,'pbx')],['scripts/prepare-service-network.ts',join(dir,'network.json')],['scripts/prepare-besu-peers.ts',dir],['scripts/migrate-finals.ts'],['scripts/provision-finals.ts'],['scripts/deploy-service-registry.ts']];
- for(const args of commands){const value=execFileSync(process.execPath,['--import','tsx',...args],{encoding:'utf8',env:process.env,timeout:10000});expect(JSON.parse(value).mode).toBe('dry-run');}expect(await readdir(dir)).toEqual([]);
+it.each([
+ ['service keys',(dir:string)=>['scripts/prepare-finals.ts','keys',join(dir,'keys')]],
+ ['approval key',(dir:string)=>['scripts/prepare-finals.ts','approval-key',dir,join(dir,'new-manifest.json')]],
+ ['PBX',(dir:string)=>['scripts/prepare-pbx.ts',join(dir,'pbx')]],
+ ['service network',(dir:string)=>['scripts/prepare-service-network.ts',join(dir,'network.json')]],
+ ['Besu peers',(dir:string)=>['scripts/prepare-besu-peers.ts',dir]],
+ ['migration',()=>['scripts/migrate-finals.ts']],
+ ['account provisioning',()=>['scripts/provision-finals.ts']],
+ ['contract deployment',()=>['scripts/deploy-service-registry.ts']],
+] as const)('inspects %s without touching key/config output or starting infrastructure',async(_name,args)=>{
+ const dir=await mkdtemp(join(tmpdir(),'callsign-fixture-dry-run-'));try{
+ const value=execFileSync(process.execPath,['--import','tsx',...args(dir)],{encoding:'utf8',env:process.env,timeout:10000});expect(JSON.parse(value).mode).toBe('dry-run');expect(await readdir(dir)).toEqual([]);
  }finally{await rm(dir,{recursive:true});}
 });
 it('inspects a public signing proposal without opening the supplied private-key path',async()=>{

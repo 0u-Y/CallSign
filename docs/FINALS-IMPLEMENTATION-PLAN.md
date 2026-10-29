@@ -24,7 +24,7 @@
 |---|---|---|
 | 실제 HTTPS OIDC fixture·platform/issuer/Sender·최소권한 PostgreSQL·Chromium | 2파일17시험 PASS, 실패/skip0 | [HTTP 원본](../artifacts/service-boundaries-20261030/http-results.json) |
 | 기존 범위 지정 PostgreSQL 회귀 | 4파일15시험 PASS, 실패/skip0 | [DB 원본](../artifacts/service-boundaries-20261030/database-results.json) |
-| light | 44파일198시험 PASS | [최종 소스 검사](../artifacts/service-boundary-source-final-20261030.json) |
+| light | 통합 시점44파일198시험 PASS, 준비 CLI 분리 후44파일205시험 PASS | [최종 소스 검사](../artifacts/service-boundary-source-final-20261030.json) |
 | 웹 build·API runtime 타입 검사 | PASS | 같은 소스 검사. 기존 번들 크기·중복 dynamic import 경고는 빌드 실패가 아님 |
 
 [이번 평가·source hash·명령·환경·정리](../artifacts/service-boundaries-20261030.json)를 따른다. 공동 관리 화면은 전후 비교·chain/contract/action/nonce/만료/digest·제안 내보내기·독립 서명 가져오기·정족수·중복 제출·처리 중·확정 후 활성화·실패를 실제 API/SQL과 연결해 확인했다. 중복/미등록/다른 작업·기관·내용/만료 서명, stale 경쟁 제안, 잘못된 이벤트·계약 조회·Witness 서명/freshness/directory는 거절했다.
@@ -40,6 +40,8 @@
 공식 목록 비어 있음은 실제 StrictMode pending 결함이었다. 탐색 중 빈 화면·로그인 버튼 timeout은 추가로 관측됐으며 원인을 확정하지 못했다. 진단을 저장하고 한 Chromium 내 독립 context로 자원을 줄인 최종 전체 실행은 통과했다. 과거 heading timeout을 해결했다고 단정하지 않으며 제한 시간 확대·무제한 retry는 하지 않았다. 강화한 콘솔 검사에서는 계정 회수 시험의 빈 본문이 형식400을 먼저 반환함을 확인해 유효 본문·정확한401 검증으로 수정했다. 별도 전체 실행에서 Chromium `ERR_NETWORK_CHANGED`가 로그인 요청을 중단한 환경 실패도 보존하고, 검사 완화 없이 제한된 재실행으로 확인했다. 중간 실패/부분 필터의 SKIPPED와 최종 시험 수는 합산하지 않는다.
 
 서버 CPU24, 시작 available39503MiB·load1.19/1.31/1.15·disk533GiB, 관측 swap 입출력0이었다. PG512MiB/CPU1/tmpfs256MiB·worker1·각 명령120초·Node/브라우저 예산2GiB로 제한했으며 후반 available38979MiB·DB약98.01MiB였다. Node 예산은 운영 중단 판단 기준이며 강제 메모리 cgroup을 적용했다고 주장하지 않는다. 이번 identity는 `callsign_test_ecd6632fa7`이며 label 대조 후 컨테이너/tmpfs·보호 키/인증서/임시 도구를 제거한 결과를 평가에 기록한다. 기존 프로세스·자료·volume은 변경하지 않는다.
+
+게시 `343feb2`의 CI에서는 준비 도구8개를 한 시험에서 순차 실행하던 기존 회귀가5초를 초과했다. [CI 실패 원본](../artifacts/service-boundaries-20261030/ci-preparation-failure.json)을 보존하고 같은 명령/조건을8개의 독립 parameterized 시험으로 분리했다. timeout/worker/guard/assertion은 완화하지 않았다. [후속 light 결과](../artifacts/service-boundary-ci-source-20261030.json)를 따르며 시험 분리로 늘어난 개수를 새로운 제품 보장으로 세지 않는다. HTTP/DB 소스는 바뀌지 않아 통합 서버를 다시 기동하지 않았다.
 
 실제 체인/전파·PBX/TURN/음성·운영 IdP/MFA/TLS·외부 제공자·독립 anchor 복원·장애/성능/GCP는 여전히 미검증이다. 계약/typed-data를 바꾸지 않아 기존 로컬 EVM 시험은 반복하지 않았다. 다음 실행은 해당 인프라의 주소·공개 trust/인증서·역할별 보호 파일과 별도 허가가 필요하며 이 결과를 전체 배포 완료로 사용하지 않는다.
 

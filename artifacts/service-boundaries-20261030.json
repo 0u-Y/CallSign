@@ -368,6 +368,7 @@
     "artifacts/service-boundaries-20261030/development-official-timeout.json": "1188b7b5aa3f1775ab83d26d4cbba5c52e687603a77c5de89eb65a131f01ce73",
     "artifacts/service-boundaries-20261030/development-console-input-failure.json": "27454888ab4e0156b2d52c0af940dad126ba85ba439c7e70db2734c404de5812",
     "artifacts/service-boundaries-20261030/joint-mobile.png": "87cdd4700f6917f0c2deb654fa0dec9e6bd005a71b0f57ff052008a1c9aef2d1",
+    "artifacts/service-boundaries-20261030/ci-preparation-failure.json": "db1986067f3de5f6241cdcc774b687f21fbbb7d21b8a3ba7570098788776bd43",
     "artifacts/service-boundaries-20261030/run-4oko1X-navigation-failure.json": "abac414291141a9274bcc59767028e943b83ae69a56e2d9c7b4cc2da73fc6acb",
     "artifacts/service-boundaries-20261030/development-navigation-repeat.json": "c261b0519d28516bacb60c04819902f6cb46e7c73193adca2887cb84dc414cf1",
     "artifacts/service-boundaries-20261030/development-network-change-failure.json": "ed610704f92f92e25ff7886d6c53a9f2f6d902e506b8fb6ddd2a7c5fbaebc8f6",
@@ -380,5 +381,19 @@
   },
   "codeCheckpointCommit": "bcdbd6b49dcd656d89a69e4b55db4f88834fb98f",
   "checkpointRelation": "Execution HEAD remains a75398d with dirty worktree; all recorded runtime/test/config file hashes match this later code checkpoint, not a new test run.",
-  "diagnosticLogStorage": "Redacted bounded .log outputs are preserved verbatim inside development-commands.json; raw .log copies are ignored local artifacts."
+  "diagnosticLogStorage": "Redacted bounded .log outputs are preserved verbatim inside development-commands.json; raw .log copies are ignored local artifacts.",
+  "ciFollowup": {
+    "firstPushRun": "https://github.com/0u-Y/CallSign/actions/runs/40935121497",
+    "firstPushConclusion": "FAIL",
+    "cause": "Existing single preparation-tools test exceeded 5000ms while invoking 8 guarded CLI entrypoints sequentially",
+    "fix": "Split into independent parameterized cases, unchanged assertions/timeout/worker limits",
+    "localEvidence": "artifacts/service-boundary-ci-source-20261030.json",
+    "latestLight": {
+      "files": 44,
+      "passed": 205,
+      "failed": 0
+    },
+    "httpDatabaseRerunRequired": false,
+    "reason": "Only preparation-tools unit test organization changed after the integrated run"
+  }
 }
