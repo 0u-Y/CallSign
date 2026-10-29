@@ -30,7 +30,7 @@ TypeScript/pnpm, React/Vite, Fastify, PostgreSQL/Drizzle, Solidity/Foundry, Besu
 
 ## Operating Context
 
-기본 목표는 상담원 웹 ↔ Asterisk 교환기 ↔ 고객 웹이다. 기존 브라우저 직접 통화와 시청 사례·생성 음원은 이전 기능이 깨지지 않는지 검사하는 데 보존한다. 현재 화면은 직접 통화에 연결돼 있고 교환기 연동 서버 코드는 부분 구현이다. 실제 통화·외부 분석·배포 검증은 아직 하지 않았다. [작업 지침](AGENTS.md)의 실행 제한을 유지한다.
+기본 목표는 상담원 웹 ↔ Asterisk 교환기 ↔ 고객 웹이다. 기존 브라우저 직접 통화와 시청 사례·생성 음원은 이전 기능이 깨지지 않는지 검사하는 데 보존한다. 기본 `/service` 화면은 교환기 제어·서명 검증·통화 유지 허가·원격 음성 분석 API에 연결돼 있다. 직접 통화 회귀 화면은 `/finals`에 보존한다. 실제 통화·외부 분석·배포 검증은 아직 하지 않았다. [작업 지침](AGENTS.md)의 실행 제한을 유지한다.
 
 ## Capabilities and Constraints
 

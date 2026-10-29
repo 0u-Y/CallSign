@@ -16,9 +16,9 @@ CallSign은 기관과 위탁 콜센터의 연락 업무를 고객의 통화 세�
 
 ## 구현 상태
 
-현재 역할별 업무 화면은 **브라우저끼리 직접 통화하는 경로**에 연결돼 있습니다. 업무 할당·승인·일회 사용 기록·연결 검증·마이크·상대 음성 분석 코드가 있으며 실제 환경에서는 아직 검증하지 않았습니다.
+기본 업무 화면은 `/service`이며 등록 기관 주소·키 기반 승인, 양측 브라우저의 서명 검증, Asterisk 교환기 연결, 통화 유지 허가와 원격 음성 분석 API에 코드로 연결했습니다. 기관 담당자는 업무·위임을 관리하고 상담원은 할당된 연락을 승인받으며, 수신자는 별도 상태로 승인·연결·분석·위험을 확인합니다. 이전 브라우저 직접 통화 화면은 `/finals` 호환 경로에 보존했습니다.
 
-추가 개발 중인 **Asterisk 교환기 경유 경로**는 등록 기관 주소와 키를 사용하고, 최초 연결을 시작하는 120초 승인과 진행 중 통화를 유지하는 갱신형 허가를 구분합니다. 채널·브리지 연결 증거와 서버 오디오 처리 코드도 추가했습니다. 화면 연결, 교환기 사건 처리와 자동 자원 정리, 원장 작업 재처리, 복구·배포 연결이 남아 있어 전체 서비스는 개발 중입니다.
+원장 작업 재처리·사건 cursor, PBX 사건/만료/로그아웃 회수, 공유 사용량 예약·정산, 독립 소비 이력 기준과 암호화 백업·복원 코드도 추가했습니다. **실제 DB·체인·교환기·브라우저·외부 AI·GCP 통합 검증은 하지 않았습니다.** 공동 정책·계정 관리의 이행 경계와 남은 코드·실행 대기 항목은 개발 기록에서 구분합니다.
 
 문서에 남긴 통신 형식 번호는 이 구현 차이를 구별하는 값입니다. 사용자에게 보여주는 제품 등급이나 별도 서비스가 아닙니다. [통신 형식과 용어](docs/PROTOCOL.md#protocol-profiles)를 참고하세요.
 
@@ -49,7 +49,7 @@ pnpm light
 - **Asterisk:** 목표 웹 통화의 SIP/WSS·음성 종단과 브리지
 - **음성 분석:** 상대 음성 → 스트리밍 STT(음성→문자 변환) → 전사 수정·정책 규칙/언어 모델 → 위험 근거
 
-서버컴과 GCP는 같은 소스·이미지·배포 구조를 사용하도록 준비합니다. 설정은 [infra/deploy](infra/deploy/compose.yml), GCP 구성은 [infra/gcp](infra/gcp/main.tf), 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 교환기 경유 통화의 배포 연결은 아직 남아 있습니다.
+서버컴과 GCP는 같은 소스·이미지·배포 구조를 사용하도록 준비합니다. 설정은 [infra/deploy](infra/deploy/compose.yml), GCP 구성은 [infra/gcp](infra/gcp/main.tf), 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 교환기 경유 통화의 코드·배포 구성을 연결했으며 실제 이미지·드라이버·통화 검증은 남아 있습니다.
 
 통합·체인·미디어·성능 검증은 기본 차단되며 별도 실행 허가가 필요합니다. 일반 push/PR CI는 light만 실행합니다.
 
@@ -57,4 +57,8 @@ pnpm light
 
 [아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [표준](docs/STANDARDS.md) · [설계 결정](docs/adr/0002-finals-offline.md)
 
-초기 시청 사례·고정 시험 데이터와 과거 시험·기획 자료는 보존합니다. `/finals`는 현재 역할별 직접 통화 화면이며 교환기 경유 통화로 전환 중입니다. `/demo`는 고정 시험 데이터와 과거 증거를 사용하는 시연 화면입니다. `finals` 경로명은 기존 실행 설정과의 호환을 위해 유지합니다. [과거 시험 기록](docs/TEST-RESULTS.md)과 [보관 문서](docs/archive/2026-10-26/)는 해당 시점의 기록입니다.
+초기 시청 사례·고정 시험 데이터와 과거 시험·기획 자료는 보존합니다. 기본 화면은 `/service`이며 `/finals`는 보존한 역할별 직접 통화 호환 화면입니다. `/demo`는 고정 시험 데이터와 과거 증거를 사용하는 시연 화면입니다. `finals` 경로명은 기존 실행 설정과의 호환을 위해 유지합니다. [과거 시험 기록](docs/TEST-RESULTS.md)과 [보관 문서](docs/archive/2026-10-26/)는 해당 시점의 기록입니다.
+
+공동 정책 변경·내부 계정 관리·복구 checkpoint·오프라인 실행 전 검사의 최신 범위는 [개발 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#pre-execution-20261027)을 따릅니다. `pnpm preflight`는 서비스를 기동하지 않으며 설정 누락을 구체적으로 차단합니다. 실제 실행 준비/성공을 보증하는 검사는 아닙니다.
+
+실행 준비는 [항목별 준비 결과](artifacts/execution-preparation-rechecked-20261029.json)와 [RUNBOOK](docs/RUNBOOK.md#단계별-검증과-판정)을 따른다. `pnpm prepare:execution --dry-run`은 설정의 생성 순서를, `pnpm validate --stage offline --environment infra/validation/offline.json --output artifacts/NEW.json --execute`는 현재 허용된 검사를 실행한다. 나머지 단계는 별도 실행 허가 전 dry-run만 허용하며 누락 설정과 수동 확인을 PASS로 바꾸지 않는다. 최신 검증 수치는 [개발 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)에 기록한다.
