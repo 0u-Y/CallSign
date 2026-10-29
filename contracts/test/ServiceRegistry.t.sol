@@ -3,12 +3,12 @@ pragma solidity 0.8.30;
 import {ServiceRegistry} from "../src/ServiceRegistry.sol";
 import {InstitutionRegistry} from "../src/InstitutionRegistry.sol";
 import {Vm,Actor} from "./InstitutionRegistry.t.sol";
-// Deferred source. Does not assert that the deployed Besu contract has been tested.
-contract ServiceRegistryTest {
+// Local EVM regression source; deployed Besu behavior remains a separate validation.
+abstract contract ServiceRegistryFixture {
     Vm private constant vm=Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
-    ServiceRegistry private registry;
-    bytes32 private constant INST=keccak256("institution");
-    Actor private stopper;
+    ServiceRegistry internal registry;
+    bytes32 internal constant INST=keccak256("institution");
+    Actor internal stopper;
     function sign(uint256 key,bytes32 digest) internal returns(bytes memory){(uint8 v,bytes32 r,bytes32 s)=vm.sign(key,digest);return abi.encodePacked(r,s,v);}
     function signatures(bytes32 digest) internal returns(bytes[] memory out){out=new bytes[](2);out[0]=sign(1,digest);out[1]=sign(2,digest);}
     function setUp() public {
@@ -18,6 +18,8 @@ contract ServiceRegistryTest {
         registry.registerInstitution(r,signatures(registry.hashRegistration(r)));
     }
     function request() internal view returns(ServiceRegistry.ConfigurationRequest memory){return ServiceRegistry.ConfigurationRequest(INST,1,bytes32(uint256(2)),1,1,bytes32(uint256(1)),bytes32(uint256(2)),1,2,bytes32(uint256(4)),bytes32(uint256(5)),uint64(block.timestamp+600));}
+}
+contract ServiceRegistryTest is ServiceRegistryFixture {
     function testPolicyChangeInvalidatesOldDelegationAndRejectsReplay() public {
         bytes32 delegation=keccak256("delegation");registry.grantDelegation(delegation,INST,1,bytes32(uint256(8)),4,uint64(block.timestamp),uint64(block.timestamp+3600));
         ServiceRegistry.ConfigurationRequest memory r=request();bytes[] memory sig=signatures(registry.hashConfiguration(r));registry.updateConfiguration(r,sig);

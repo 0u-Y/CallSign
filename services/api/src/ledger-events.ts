@@ -5,7 +5,7 @@ import type { workerLedger } from './worker-ledger.js';
 import { serviceRegistryAbi } from './worker-ledger.js';
 import { configurationForEvent } from './configuration.js';
 import { invalidateInstitution } from './service-management.js';
-const events=parseAbi([
+export const events=parseAbi([
  'event InstitutionSuspended(bytes32 indexed institutionId,uint64 epoch)',
  'event InstitutionRecovered(bytes32 indexed institutionId,uint64 epoch,address administrator)',
  'event DelegationRevoked(bytes32 indexed delegationId,bytes32 indexed institutionId,uint64 epoch)',

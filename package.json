@@ -39,7 +39,8 @@
     "preflight": "node --import tsx scripts/preflight.ts",
     "evidence:collect": "node --import tsx scripts/collect-evidence.ts",
     "validate": "node --import tsx scripts/validation-runner.ts",
-    "prepare:execution": "node --import tsx scripts/prepare-execution.ts"
+    "prepare:execution": "node --import tsx scripts/prepare-execution.ts",
+    "test:contracts:offline": "node scripts/restricted.mjs chain forge test --offline --threads 1 --fuzz-runs 32 --fuzz-seed 0x20261030"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "5.6.1",
