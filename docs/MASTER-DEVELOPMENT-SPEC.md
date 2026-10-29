@@ -299,7 +299,7 @@ runtime preflight **BLOCKED62·PASS14·SKIPPED1**이다. [항목별 원인·주�
 
 ### 2.8 로컬 EVM 권한·서명 검증 — 2026-10-30
 
-CONTRACT-001/003/004·GOVERNANCE-001/002·BUSINESS-003·TEST-002의 선택된 계약 상태 전이를 실제 프로세스 내부 EVM에서 실행했다.21시험 PASS(실패/skip0), fuzz32회×2성공 전이, 앱 typed-data/calldata·서명·event bytes 호환을 확인했다. 현재 light43파일194시험·웹 build/API runtime 타입은 통과했다. 계약 본체와 기존 ABI/bytecode는 변경하지 않았다.
+CONTRACT-001/003/004·GOVERNANCE-001/002·BUSINESS-003·TEST-002의 선택된 계약 상태 전이를 실제 프로세스 내부 EVM에서 실행했다.21시험 PASS(실패/skip0), fuzz32회×2성공 전이, 앱 typed-data/calldata·서명·event bytes 호환을 확인했다. 최초 light43파일194시험·웹 build/API runtime 타입은 통과했다. 이후 첫 push CI의 rg 미설치 실패를 수정하고 Git-only PATH 회귀를 추가해 최신 light43파일195시험을 통과했다. 계약 본체와 기존 ABI/bytecode는 변경하지 않았다.
 
 기존 미공개 checkpoint는 복구 ref를 만든 뒤 코드/설정·증거·문서로 재구성했으며 원본 tip과 tree가 같음을 확인했다. 과거 증거의 HEAD/결과는 보존했다. [최신 진행 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)이 실제 시험 HEAD·도구·원본 실패·커밋 대응의 기준이다. 온체인 회수 전이 확인과 실제 VC/브라우저/통화 회수 전파는 구분하며 Besu/QBFT/Witness는 여전히 미검증이다.
 

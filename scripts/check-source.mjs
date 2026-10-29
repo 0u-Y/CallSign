@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-const files = execFileSync('rg', ['--files', '--hidden', '-g', '!**/.git/**', '-g', '!**/node_modules/**'], { encoding: 'utf8' }).trim().split('\n');
+const files = [...new Set(execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean))];
 let failed = false;
 for (const path of files.filter(p => /\.(ts|tsx|mjs|sql|ya?ml)$/.test(p))) {
   const source = readFileSync(path, 'utf8');

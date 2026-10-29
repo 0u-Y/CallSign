@@ -406,3 +406,5 @@ node --import tsx scripts/contract-interop.ts contracts/out/ServiceRegistry.sol/
 기존 벡터를 자동 덮어쓰지 않는다. 앱/서명 규약 변경 시 새 벡터 diff와 Solidity 입력 경로를 함께 검토한다. bytecode가 바뀌면 ABI·검토 hash·신뢰 이행도 별도로 갱신하며 배포는 별도 승인이다. 이번에는 계약 본체/ABI/bytecode가 기존 검토 artifact와 같아 재배포나 artifact 교체가 필요하지 않았다.
 
 수락 기준은 전체21시험 실패/skip0, fuzz32case에서2개씩 실제 상태 변경, 정상 대조군이 성공하는 문맥의 replay 거절, 실패 시 상태/nonce 보존이다. 이것을 전체 상태 공간·Besu/QBFT·Witness·미디어 회수·실측 지연 검증으로 확대하지 않는다. [최신 계약 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)을 따른다.
+
+CI 이식성: source hygiene의 파일 열거는 Git checkout의 cached/untracked 목록을 사용한다. rg 설치를 실행 환경 전제로 두지 않는다. conflict marker/JS syntax 검사와 Git-only PATH 회귀를 유지한다. 2026-10-30 최초 push CI의 rg ENOENT와 수정은 진행표에 기록했다.

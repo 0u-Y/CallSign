@@ -38,3 +38,5 @@
 2026-10-30 계약21시험·실패/skip0, 제한 fuzz32회, 실제 앱 EIP-712와 계약의 digest/signer/calldata/event 호환을 확인했다. 이는 설치된 forge/Solc의 로컬 실행이며 Besu/QBFT 합의·P2P·Witness·실제 배포·오프체인 회수 전파의 검증이 아니다. 기존 InstitutionRegistry는 회귀용이며 기본 ServiceRegistry의 모든 추가 서명 검증·legacy 우회 차단과 구분한다.
 
 온체인은 정책/공식 경로의 hash와 version을 검증할 뿐 질문·표시 문자열의 의미를 해석하지 않는다. directory-only의 현재 제품 범위는 서버 schema가 제한한 `/official` 표시명 변경이며 임의 외부 경로의 안전성을 증명하지 않는다. 전역 nonce는 기관 간에도 재사용할 수 없다. fuzz는 assume 없는2단계 sequence32회이며 전체 상태 공간의 invariant 증명은 아니다. [현재 증거](../artifacts/contract-validation-20261030.json)를 따른다.
+
+첫 공개 push CI에서 source checker의 rg 의존성이 실패해 Git 기반 목록으로 수정했다. 현재 source hygiene는 Git checkout이 필요하며 rg 설치는 요구하지 않는다. 최신 로컬 light는43파일195시험 PASS이고 원격 CI 상태는 해당 실행 URL을 별도로 확인한다.

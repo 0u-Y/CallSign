@@ -49,6 +49,12 @@ Solidity 시험은 이 fixture의 등록→정책 변경→정지/복구 calldat
 
 최신 소스 검사: **light43파일194시험 PASS**, 웹 build·API runtime 타입·규칙 회귀 PASS. 전체 preflight는 외부 설정 미입력으로 BLOCKED이며 계약 PASS와 별개다. [EVM 원본](../artifacts/contract-evm-results-20261030.json), [소스 검증](../artifacts/contract-source-verification-20261030.json), [실패/파일 hash·도구/커밋 대응](../artifacts/contract-validation-20261030.json)을 연결한다. 이 결과는 Besu/QBFT·Witness·브라우저 통화/VC/lease 실제 회수·성능·배포 성공을 뜻하지 않는다.
 
+### push 후 CI 이식성 수정
+
+첫 일반 push는 origin/main의 `dccca63849e24416dbb2acba273450ef530b48ab`와 로컬 SHA 일치를 확인했다. 새 [CI 실행](https://github.com/0u-Y/CallSign/actions/runs/40903996280)은 source hygiene 단계에서 `spawnSync rg ENOENT`로 실패했다. GitHub runner의 미설치 검색 도구를 암묵 전제로 사용한 결함이다.
+
+`check-source.mjs`의 파일 나열을 이미 checkout에 필요한 Git의 NUL 구분 목록으로 바꾸고 기존 conflict marker/JS syntax 검사를 유지했다. 시스템 패키지 설치로 우회하지 않았다. PATH에 Git만 둔 실제 자식 검사 회귀를 추가해 **최신 light43파일195시험 PASS**를 확인했다. 계약/Solidity/서명 규약은 바꾸지 않았으므로 로컬 EVM21시험의 적용 코드 범위는 그대로다. [CI 실패·로컬 수정 증거](../artifacts/ci-portability-20261030.json)를 추가하고 후속 일반 push/최신 CI 상태는 별도로 확인한다.
+
 일반 push 대상은 유일한 origin의 main이며 push 전 재fetch/fast-forward 관계·공개 파일을 검토한다. 실제 원격 SHA와 CI 상태는 push 후 확인하여 최종 응답에 구분한다. backup ref는 로컬에만 남기며 force push하지 않는다.
 
 ## 실행 제한
