@@ -2,9 +2,15 @@
 
 기준일: 2026-10-30. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
+## 인증 후속 경계
+
+[후속 검증 평가](../artifacts/service-boundaries-20261030.json)는 `a75398d` 이후 변경의 별도 증거다. 공동 관리의 이벤트 소비·서명 검증·SQL·브라우저 처리, 계정 전환·공식 세션 만료·분석 취소 경계를 추가했지만, RPC/log·Witness 전송·STT/LLM은 명시적인 fixture다. Witness 시험키의 실제 서명 검증을 실제 Witness 서버나 독립 분산 운영으로 확대하지 않는다. 원격 오디오는 장치 없이 합성 프레임만 사용했다.
+
+브라우저 탐색 중 빈 화면/로그인 버튼 timeout이 관측됐다. 시간 제한·retry로 숨기지 않고 탐색 실패 진단을 남겼으며 browser context를 한 Chromium 프로세스에서 분리해 자원을 줄였다. 이것만으로 과거 heading timeout의 원인이 확정됐다고 주장하지 않는다. Chromium `ERR_NETWORK_CHANGED`로 로그인 요청이 중단된 실행도 별도로 보존한다. 호스트 네트워크 변경의 발생 주체는 확정하지 못했으며 재시도로 숨기는 제품 동작을 추가하지 않았다. 운영 TLS·실제 IdP·여러 브라우저/장치·PBX/RTP와 제공자 취소·보관·청구는 계속 별도 검증이 필요하다.
+
 ## 현재 서비스
 
-- **인증·HTTP·DB·화면 일부 검증, 전체 서비스 미검증.** 이번 격리 PostgreSQL 회귀15시험과 HTTPS OIDC fixture→실제 API/DB→Chromium 선택 경로7시험은 통과했다. 체인 상태·독립 anchor는 명시적 fixture이며 실제 IdP·Witness·PBX·TURN·외부 AI·GCP·백업/복원은 실행하지 않았다. 합성 통화 binding을 실제 미디어 연결로 확대하지 않는다. [이번 평가](../artifacts/http-validation-20261030.json)를 따른다.
+- **인증·HTTP·DB·화면 일부 검증, 전체 서비스 미검증.** 격리 PostgreSQL 회귀15시험과 최초 HTTPS OIDC fixture→실제 API/DB→Chromium 선택 경로7시험은 당시 통과했으며, 후속 경계의 최신 결과는 위 평가와 진행 기록을 따른다. 체인 상태·독립 anchor는 명시적 fixture이며 실제 IdP·Witness·PBX·TURN·외부 AI·GCP·백업/복원은 실행하지 않았다. 합성 통화 binding을 실제 미디어 연결로 확대하지 않는다. [이번 평가](../artifacts/http-validation-20261030.json)를 따른다.
 - **PBX 보장 경계.** Asterisk가 DTLS-SRTP 음성 종단이다. ARI는 채널·Call-ID·bridge를 조회한다. 인증서 지문은 배치한 공개 인증서에서 고정하고 브라우저의 실제 관측과 대조한다. 서버의 독립 DTLS handshake 수집이나 원 상담원의 개인 신원 증명은 아니다. 자체 SIP 모듈은 직접 Asterisk WSS/등록/수신 dialog로 제한하며 proxy route·PSTN·임의 transfer·재협상은 거절한다. 실제 구현 이미지·ODBC·인증서·단말 호환은 검증 전이다.
 - **통화 정책값.** 120초는 attempt 생성부터의 연결 시작 창이다. lease 30초·최대 4시간은 설정 가능한 초기값이며 합의된 SLA가 아니다. 업무·VC가 먼저 만료되면 더 일찍 종료한다. 기관 서비스 재시작 후 기존 PBX 통화는 정리하고 새 시도를 요구한다. 진행 통화의 무중단 복원은 보장하지 않는다.
 - **원장 외부 호출.** 같은 서명 raw tx/hash를 저장한 뒤 제출·조회·재전송한다. 외부 exactly-once는 아니다. 12회 실패는 운영자 확인 상태로 남고, 결과 불명의 signer nonce가 있으면 새 nonce 발급도 차단한다. 다른 도구가 같은 관리자 계정으로 동시에 tx를 제출하는 운영은 지원하지 않는다.

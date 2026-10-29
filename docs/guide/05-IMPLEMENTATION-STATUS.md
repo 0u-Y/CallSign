@@ -1,5 +1,8 @@
 # 05. 구현 및 검증 현황
 
+
+인증 후속 검증은 [진행 기록](../FINALS-IMPLEMENTATION-PLAN.md#authenticated-boundaries-20261030)에 별도로 연결했습니다. 공동 변경 파일 검토·독립 승인자 서명·제출/확정/활성화 구분, 다중 탭 계정 전환과 공식 세션 만료, 응답 유실 재시도, 동의 철회 후 분석 중단을 실제 HTTP·SQL·Chromium 경로에서 확인하는 범위입니다. 원장 사건/Witness 전송/분석 제공자는 시험 fixture이며 실제 체인·PBX·음성/AI 품질의 증거는 아닙니다.
+
 [서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md)
 
 기준일: **2026-10-30(KST)**. 현재 인증·HTTP·화면 코드 기준은 `5c2842d`이며, 실제 시험 시점은 직전 HEAD와 미커밋 변경을 포함했습니다. [이번 평가](../../artifacts/http-validation-20261030.json)의 소스 hash·원래 실행 HEAD를 따릅니다. 커밋·게시와 서비스 배포 성공은 구분합니다.

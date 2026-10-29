@@ -438,3 +438,23 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run 
 각 단계는120초 이내, worker1로 실행한다. DB512MiB 외 Node/브라우저 예산2GiB를 잡고 가용 메모리8GiB 미만·지속적 swap 입출력·기존 작업 영향이면 중단한다. 정상 종료 시 app·Vite·fixture·browser를 닫는다. 강제 timeout 때에는 **이번 실행이 만든 자식 process group**만 회수하고, DB label/identity를 대조한 후 해당 컨테이너만 제거한다. 전역 prune/pkill을 사용하지 않는다.
 
 스크린샷은 ROOT 아래 고유 `run-*` 디렉터리의 `service-mobile.png`/`service-desktop.png`다. cookie/storage/trace는 저장하지 않는다. 공유 전 합성 계정만 들어 있는지 확인하고 실제 API/DB 결과·코드 hash와 함께 보존한다. 보호 ROOT에는 테스트 개인키와 인증서가 있으므로 통째로 커밋하지 않는다. 증거 추출 후 이번 자원과 보호 파일만 제거한다.
+
+
+### 인증 후속 경계 검증
+
+`pnpm test:http`는 `service-http.test.ts`와 `service-boundaries.test.ts`를 worker1로 실행한다. 두 파일은 `service-http-fixture.ts`의 같은 실제 서버 lifecycle을 사용한다. 후속 시험은 시나리오마다 고유 기관·계정·DB 상태를 만들고 자체 행만 제거한다. 공동 승인자는 같은 Chromium 프로세스의 **서로 다른 browser context**를 사용하고, 다중 탭 시험은 의도적으로 하나의 context를 공유한다. 키는 Node 준비 단계에만 존재하고 서명 파일만 화면에 가져온다.
+
+- 원장 확정은 fixture log와 계약 조회 응답을 실제 SQL event consumer에 공급한다. Witness는 4개 시험키로 실제 JWS를 만들고 집계·서명·freshness 검사를 그대로 수행한다. 실제 RPC·Witness 서비스·합의 시험은 아니다.
+- 시계 주입은 통화 업무 권한의 경계에만 적용한다. OIDC 서명·auth_time·cookie 조건은 완화하지 않으며 세션 만료 시험은 해당 합성 계정의 시험 session 행만 만료시킨다.
+- 응답 지연·유실은 `route.fetch()`가 받은 **실제 API 응답**을 보류하거나 버린다. 응답 본문을 성공 mock으로 바꾸지 않는다. STT/LLM은 명시적인 provider fixture이며 실제 WebSocket·동의·quota·revision·AbortSignal 경로를 사용한다. 원격 마이크/RTP는 검증하지 않는다.
+- 통과 조건은 제안 digest와 독립 서명·정족수, outbox/confirmed/activated 분리, 잘못된 이벤트·Witness 거절, 이전 계정 응답 폐기, 서버 세션 회수, 실제 저장된 단일 업무와 재시도 결과, 동의 철회 후 provider push0 및 늦은 위험 결과 폐기다. 공식 업무는 목록 버튼 출현을 기다린 뒤 만료·삭제를 비교한다. 로그인 완료는 callback200과 정확한 계정 heading을 기다린다. 고정 sleep·무제한 retry를 사용하지 않는다.
+
+DB 회귀를 따로 실행할 때에는 전체 integration glob 대신 아래 네 파일을 지정한다. 이전 시연 API와 독립 anchor 시험은 각자의 환경이 필요한 별도 범위다.
+
+```bash
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run --config vitest.integration.config.ts tests/integration/service-runtime.test.ts tests/integration/finals-session-scopes.test.ts tests/integration/finals-store.test.ts tests/integration/database-readiness.test.ts --reporter=json --outputFile=artifacts/NEW-DATABASE.json
+```
+
+DB의 최초 준비 완료는 `pg_isready -h 127.0.0.1 -U TEST_OWNER -d callsign_test_UNIQUE`로 확인한다. 공식 PostgreSQL 이미지의 초기화용 임시 Unix socket만 열린 시점에는 migration을 시작하지 않는다. 실제 자격은 앞 절의 보호 파일/환경 참조를 사용한다.
+
+후속 증거는 [경계 검증 평가](../artifacts/service-boundaries-20261030.json)에 연결한다. 실패 이력도 보존하고 부분 필터 실행의 SKIPPED를 전체 PASS에 합산하지 않는다. 검증 이후에도 실제 체인·독립 anchor·PBX·제공자·운영 IdP 검증은 별도 허가와 설정이 필요하다.

@@ -29,6 +29,17 @@
 
 문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [과거 결과 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 특정 블록의 상태 묶음, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 보고서·초안은 날짜별 archive에 보존하고, 원본 기획서와 시험 증거는 유지한다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
 
+### 2026-10-30 인증 후속 경계의 현행 기준
+
+이번 후속 작업은 게시 `a75398d`를 시작점으로 한다. 아래 이전 조사 시점의 미커밋/미검증 표시는 당시 기록이며 현재 상태를 덮어쓰지 않는다. [후속 경계 검증 기록](FINALS-IMPLEMENTATION-PLAN.md#authenticated-boundaries-20261030)과 [실행 절차](RUNBOOK.md#인증-후속-경계-검증)가 현재 추가 근거다.
+
+| 요구 ID | 이번 구현·연결 변경 | 검증 경계 |
+|---|---|---|
+| CONTRACT-002·GOVERNANCE-002·UI-004 | 표시 정보 변경도 확인된 이벤트 뒤 현재 Witness 증거를 검사한다. 활성화 시각과 작업 processing/failed를 UI에 별도 표시한다. 검토/파일 처리 중 중복 입력을 차단한다. | 실제 API·최소권한 SQL·event consumer·서명 verifier·독립 browser context. 원장 조회/로그와 Witness 전송은 명시적 fixture이며 실제 합의 검증이 아님 |
+| AUTH-001/002·BUSINESS-001·UI-001/003/005 | 계정 전환 broadcast와 요청 세대로 이전 화면·임시 입력·늦은 응답을 폐기한다. 공식 업무 초기 효과 재실행 잠금과 만료/로그아웃 상태를 정리한다. 업무 생성·취소·위임 발급 버튼은 실제 permission과 일치시킨다. | 합성 계정의 실제 HTTPS OIDC callback·세션·CSRF·HTTP·DB·Chromium 경로. 운영 IdP/MFA·다른 브라우저 조합 미검증 |
+| CALL-002/005·AI-001/002 | 시작 창/lease/terminal 상태 구분을 검증한다. 분석의 동의·세션을 프레임 수락과 전사/위험 결과 송신 때 재검사하고 구 revision·철회 후 결과를 폐기한다. | 실제 WebSocket·quota·orchestration, 합성 binding/오디오 바이트와 지연 provider fixture. 실제 음성 수집·STT/LLM 품질·제공자 취소/보관/청구는 미검증 |
+| DB-001/003·TEST-001/004·OPS-001 | 동일 업무 생성의 응답 유실 재시도, 계정별 fixture 정리, TCP DB readiness와 범위 지정 DB 회귀를 연결한다. | 현재 실행 결과와 원본 실패는 위 진행 기록/평가에 보존. 일부 검증 통과를 전체 서비스 완료로 해석하지 않음 |
+
 ### 0.1 상태와 범위 읽는 법
 
 각 요구사항은 **구현 / 검증 / 범위**를 별도 기록한다.

@@ -1,0 +1,108 @@
+[
+  {
+    "fixture": "run-Gl13Nc",
+    "observation": {
+      "consoleErrors": 9,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-gdQazJ",
+    "observation": {
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-5VmBFU",
+    "observation": {
+      "consoleErrors": 3,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-ZAYoAd",
+    "observation": {
+      "consoleErrors": 12,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-o3CwA5",
+    "observation": {
+      "consoleErrors": 7,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-ta59Fd",
+    "observation": {
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-yuzZfZ",
+    "observation": {
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-GWzmId",
+    "observation": {
+      "consoleErrors": 0,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-W8pVoF",
+    "observation": {
+      "consoleErrors": 7,
+      "failedRequests": 0,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-6AjuUg",
+    "observation": {
+      "consoleErrors": 4,
+      "failedRequests": 1,
+      "uncaughtPageErrors": 0
+    }
+  },
+  {
+    "fixture": "run-KsjaWG",
+    "observation": {
+      "uncaughtErrors": [],
+      "consoleErrors": [
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()",
+        "Failed to load resource: the server responded with a status of 401 ()"
+      ],
+      "unsuccessfulRequests": [
+        "401:/api/v3/auth/me",
+        "401:/api/v3/auth/me",
+        "401:/api/v3/auth/me",
+        "401:/api/v3/auth/me"
+      ],
+      "viewportChecks": [
+        390,
+        1440
+      ],
+      "routeMocking": false,
+      "externalRequestsBlocked": true,
+      "permissions": [],
+      "traceStored": false
+    }
+  }
+]

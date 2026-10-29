@@ -1,8 +1,47 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 이번 작업 시작은 `7638501`, 인증·HTTP·브라우저 코드 checkpoint는 `5c2842d`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
+기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 현재 후속 경계 작업 시작은 `a75398d`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+
+<a id="authenticated-boundaries-20261030"></a>
+
+## 2026-10-30 공동 관리·세션·분석의 인증 후속 경계
+
+시작 HEAD는 `a75398d03faaf1a36735edb6fced60700afea752`이며 이번 실행은 해당 HEAD 뒤의 미커밋 소스를 대상으로 했다. 실행 후 구현·회귀 시험은 `bcdbd6b`에 보존했고, 기록된 소스 파일 hash가 해당 커밋의 blob과 일치함을 대조했다. 시험 HEAD를 새 커밋으로 바꾸지 않았다. 기존 미추적 진행 포인터28개·사용자 요약2개와 과거 증거를 보존하고 stage에서 제외한다. 평가의 source hash는 소스·시험·설정/lockfile 집합을 식별하며 HEAD만으로 시험 당시 상태가 재현된다고 주장하지 않는다.
+
+### 실제 수정한 결함
+
+- CONTRACT-002/GOVERNANCE-002/UI-004: 표시 정보만 변경하면 정책 버전이 같다는 이유로 Witness 확인 없이 활성화하던 조기 반환을 제거했다. 확인된 이벤트 높이 이후의 현재 상태·정책 버전/세대·등록 키·directory를 확인하고 `activatedAt`을 저장한다. 표시 변경은 기존 lease를 유지하고 권한 정책 변경은 확정 이벤트에서 이전 통화를 취소한 뒤 별도 활성화한다. API의 outbox object ID를 사용해 화면에 처리 중·확정·실패·활성화를 구분하며, 제안/서명 파일 처리 중 입력을 잠근다.
+- AUTH-001/002/UI-001/003/005: 다른 탭의 계정 전환 후 이전 workspace 응답·입력 초안이 복원되거나 옛 비동기 작업이 새 요청 잠금을 해제하는 경계를 막았다. 기존 BroadcastChannel과 요청 세대만 사용한다. 공식 업무의 개발 StrictMode 초기 효과 재실행에서 pending이 남아 목록을 읽지 못하던 결함을 수정했다. 공식 세션 만료 시 업무/CSRF를 비우고 재로그인을 안내하며 로그아웃 후 버튼 잠금을 해제한다. 일반/공식 쿠키·채널은 분리한다.
+- BUSINESS-001/UI-002: 역할만으로 보이던 업무 생성·취소·위임 발급 버튼을 서버 permission과 일치시켰다. 실제 HTTP403 검사는 그대로 유지한다.
+- AI-001/002/CALL-005: REST 동의 철회 후 감시 주기까지 새 프레임이 전송되거나 늦은 전사/LLM 결과가 반영되지 않도록 각 경계에서 현재 세션·동의·revision을 검사한다. stop은 transport/analyzer를 먼저 중단하고 AbortSignal을 전달한다. WebSocket의 중첩 처리·buffer 한도는 분석 불가로 종료하며 안전 판정으로 바꾸지 않는다.
+- TEST-001/004/OPS-001: 기존 실제 HTTP fixture를 별도 helper로 옮겨 시나리오별 기관·계정을 격리했다. Chromium 프로세스는 재사용하고 승인자 context는 분리한다. DB 준비 확인은 초기 임시 Unix socket 대신 loopback TCP로 바꿨다. Compose/대기 스크립트는 정적으로 수정했으며 Compose를 실행하지 않았다.
+
+### 실행 결과와 대체 경계
+
+| 검사 | 이번 결과 | 증거 |
+|---|---|---|
+| 실제 HTTPS OIDC fixture·platform/issuer/Sender·최소권한 PostgreSQL·Chromium | 2파일17시험 PASS, 실패/skip0 | [HTTP 원본](../artifacts/service-boundaries-20261030/http-results.json) |
+| 기존 범위 지정 PostgreSQL 회귀 | 4파일15시험 PASS, 실패/skip0 | [DB 원본](../artifacts/service-boundaries-20261030/database-results.json) |
+| light | 44파일198시험 PASS | [최종 소스 검사](../artifacts/service-boundary-source-final-20261030.json) |
+| 웹 build·API runtime 타입 검사 | PASS | 같은 소스 검사. 기존 번들 크기·중복 dynamic import 경고는 빌드 실패가 아님 |
+
+[이번 평가·source hash·명령·환경·정리](../artifacts/service-boundaries-20261030.json)를 따른다. 공동 관리 화면은 전후 비교·chain/contract/action/nonce/만료/digest·제안 내보내기·독립 서명 가져오기·정족수·중복 제출·처리 중·확정 후 활성화·실패를 실제 API/SQL과 연결해 확인했다. 중복/미등록/다른 작업·기관·내용/만료 서명, stale 경쟁 제안, 잘못된 이벤트·계약 조회·Witness 서명/freshness/directory는 거절했다.
+
+일반 로그아웃의 다른 탭 거절과 공식 세션 유지, 계정 전환 후 보류 응답 폐기·비활성 계정의 옛 요청 거절, 일반/공식 만료 후 화면 비우기, 저장 후 응답 유실의 동일 요청 재시도·단일 업무·취소 상태를 확인했다. 합성 승인/서명 lease 경로로 최초120초와 lease 만료·terminal 재활성화 거절을 확인했다. 분석은 실제 WS·동의·quota·revision orchestration에 지연/실패 provider fixture를 넣어 동의 전0연결·철회 후0push·AbortSignal·늦은 위험 결과 폐기·수정 전사/분석 불가를 검사했다.
+
+원장 RPC/log·Witness 전송과 최신 상태 adapter·memory anchor·합성 binding/STT/LLM은 fixture다. Witness는 실제 시험키 JWS와 집계/verifier를 실행하지만 실제 Witness 서비스·합의 증거가 아니다. provider 키/외부 요청·실제 오디오 장치/RTP는 사용하지 않았다. 브라우저에서 실제 API 본문을 성공 응답으로 바꾸지 않고, 늦은 응답/유실만 transport에서 제어했다. 서버 권한 회수는 즉시 거절되지만 다른 탭 UI 인지는 broadcast 또는 다음 보호 요청/5초 refresh에 의존한다.
+
+### 실패·환경·보존
+
+초기 PG 준비는 이미지 초기화용 소켓과 실제 TCP 시작 사이의 경합으로 connection reset이 있었다. fixture 파일 로딩 전 상태 대기·hidden option·UI3초 polling보다 짧은 시험 polling·상수 transaction hash에 의한 중복 이벤트 fixture 문제는 시험 결함으로 수정했다. 초기 test payload/선택 필드 TypeScript 오류도 수정했다. 범위 없이 integration config 전체를 선택해 별도 시연 로그인/독립 HTTPS anchor 환경이 필요한5시험이 실패한 실행은 별도 보존하고 PASS로 바꾸지 않았다. 올바른 기존 네 파일15시험의 결과만 DB 회귀로 집계한다.
+
+공식 목록 비어 있음은 실제 StrictMode pending 결함이었다. 탐색 중 빈 화면·로그인 버튼 timeout은 추가로 관측됐으며 원인을 확정하지 못했다. 진단을 저장하고 한 Chromium 내 독립 context로 자원을 줄인 최종 전체 실행은 통과했다. 과거 heading timeout을 해결했다고 단정하지 않으며 제한 시간 확대·무제한 retry는 하지 않았다. 강화한 콘솔 검사에서는 계정 회수 시험의 빈 본문이 형식400을 먼저 반환함을 확인해 유효 본문·정확한401 검증으로 수정했다. 별도 전체 실행에서 Chromium `ERR_NETWORK_CHANGED`가 로그인 요청을 중단한 환경 실패도 보존하고, 검사 완화 없이 제한된 재실행으로 확인했다. 중간 실패/부분 필터의 SKIPPED와 최종 시험 수는 합산하지 않는다.
+
+서버 CPU24, 시작 available39503MiB·load1.19/1.31/1.15·disk533GiB, 관측 swap 입출력0이었다. PG512MiB/CPU1/tmpfs256MiB·worker1·각 명령120초·Node/브라우저 예산2GiB로 제한했으며 후반 available38979MiB·DB약98.01MiB였다. Node 예산은 운영 중단 판단 기준이며 강제 메모리 cgroup을 적용했다고 주장하지 않는다. 이번 identity는 `callsign_test_ecd6632fa7`이며 label 대조 후 컨테이너/tmpfs·보호 키/인증서/임시 도구를 제거한 결과를 평가에 기록한다. 기존 프로세스·자료·volume은 변경하지 않는다.
+
+실제 체인/전파·PBX/TURN/음성·운영 IdP/MFA/TLS·외부 제공자·독립 anchor 복원·장애/성능/GCP는 여전히 미검증이다. 계약/typed-data를 바꾸지 않아 기존 로컬 EVM 시험은 반복하지 않았다. 다음 실행은 해당 인프라의 주소·공개 trust/인증서·역할별 보호 파일과 별도 허가가 필요하며 이 결과를 전체 배포 완료로 사용하지 않는다.
 
 <a id="authenticated-http-validation-20261030"></a>
 

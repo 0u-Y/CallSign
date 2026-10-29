@@ -26,3 +26,8 @@
 ## 2026-10-30 인증·HTTP·브라우저 검증의 한정 예외
 
 이번 사용자 요청은 격리된 시험 PostgreSQL·최소권한 LOGIN·migration, loopback 시험 API/웹/HTTPS OIDC fixture와 설치된 headless 브라우저, 합성 계정/시험키 및 관련 일반 commit/push를 허용한다. integration guard와 `callsign_test_*` 대상 검사를 유지한다. 체인/Witness/Anvil/RPC·PBX/TURN·실제 음성장치·외부 AI·클라우드는 금지다. 기존 서비스는 읽기 전용이며 이번 identity의 자원만 정리한다. 이 기록은 후속 세션의 상시 기동 허가가 아니다.
+
+
+## 2026-10-30 인증 후속 검증의 한정 예외
+
+이번 요청은 격리 PostgreSQL, loopback issuer/platform/Sender·HTTPS 웹·OIDC fixture, 설치 Chromium과 합성 계정/시험키, 원장·anchor·binding·분석 fixture, 관련 커밋·일반 push·CI 조회만 일시 허용한다. 실제 체인/Witness/PBX/TURN·음성 장치·외부 AI/IdP/GCP·전체 Compose·다운로드·기존 자원 변경·force push는 금지한다. 이 허가는 이후 작업의 상시 기동 권한이 아니다. integration guard와 production 검증은 유지하고 이번에 생성한 identity의 자원만 회수한다.
