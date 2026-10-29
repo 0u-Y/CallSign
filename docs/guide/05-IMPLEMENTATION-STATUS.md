@@ -40,3 +40,7 @@ PBX 증거는 고정한 인증서와 실제 ARI 관측을 브라우저 DTLS 관�
 ## 첫 DB 실검증
 
 2026-10-29 별도 승인 후 격리 PostgreSQL17.6의 선택된4파일15시험이 통과했습니다. 실제 SQL 소비/응답 유실·quota·worker 경합·계정 회수·migration hash와 auth LOGIN 금지 SQL을 확인했습니다. 메모리 anchor와 tmpfs DB이므로 독립 복구·영속 disk 장애·체인·통화·AI 검증으로 확대하지 않습니다. [현재 시도·자원·commit 기록](../FINALS-IMPLEMENTATION-PLAN.md#postgres-validation-20261029)을 따르며 앞선 DB 미실행 문구는 과거 상태입니다.
+
+## 로컬 계약 실행 확인
+
+2026-10-30 Foundry 로컬 EVM에서 권한·서명·상태 전이21시험, 제한 fuzz32회가 통과했습니다. 실제 앱 함수로 생성한 서명·calldata를 계약에 전달하고 consumer event bytes도 대조했습니다. light43파일194시험·웹 build·API runtime 타입도 통과했습니다. [최신 기록](../FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)의 도구·시험 HEAD·커밋 재구성 대응을 따릅니다. 이 결과는 Besu/Witness·배포·통화·AI·독립 복구 성공을 뜻하지 않습니다.

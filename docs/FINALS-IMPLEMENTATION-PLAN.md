@@ -1,8 +1,55 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-29(KST)**. 이번 연결 작업 시작 HEAD는 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 개발 당시 아래 변경은 **미커밋 worktree**에 있었으며, 현재 로컬 보존 결과는 첫 PostgreSQL 검증 절을 따른다. 시작 시 있던 `docs/WORK-SUMMARY.md`는 변경하지 않았다. 커밋·push·배포는 하지 않았다. 과거 `ab0ec1c`·82개 시험은 이번 결과와 별도 이력이다.
+기준일: **2026-10-30(KST)**. 이번 연결 작업 시작 HEAD는 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 개발 당시 아래 변경은 **미커밋 worktree**에 있었으며, 현재 로컬 보존 결과는 첫 PostgreSQL 검증 절을 따른다. 시작 시 있던 `docs/WORK-SUMMARY.md`는 변경하지 않았다. 커밋·push·배포는 하지 않았다. 과거 `ab0ec1c`·82개 시험은 이번 결과와 별도 이력이다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+
+<a id="contract-validation-20261030"></a>
+
+## 2026-10-30 커밋 정리와 로컬 EVM 계약 실행
+
+이 절이 아래의 계약 미실행 기록보다 최신이다. 사용자는 이번 작업에 한해 설치된 도구의 프로세스 내부 EVM·제한 fuzz·Git fetch/일반 push를 허용했다. DB/체인/Witness/API/PBX/브라우저/AI/GCP·RPC/fork·실제 배포는 수행하지 않았다. 현재41GiB 안팎의 available memory·CPU24/load1.26·disk533GiB를 재확인했고, forge threads1·메모리 상한2GiB·timeout90초를 적용했다.
+
+### 커밋 보존과 재구성
+
+fetch 결과 origin/main은 `a9d67f0`, 로컬 원본3개는 모두 미공개였다. `backup/pre-contract-audit-20261030` ref로 원본 tip `ea55736`을 보존하고 미추적29개는 보호된 로컬 사본/hash 목록으로 보존했다. 기존 staging은 없었다.
+
+| 재구성 commit | 책임 | 원본 대응 |
+|---|---|---|
+| `c357f3839aec2e8cda0dd3a6518e5cd21ad9d108` | 서비스 권한/통화/영속 처리와 실행 준비의 코드·시험·설정 | 원본819a825·7c1df4f의 최종 코드와 의존성. protocol→API→web과 준비/배포 시험이 연결되어 함께 보존 |
+| `4fdb828597ca660c28c90309d947d4a84bfc1865` | 기존 오프라인·PostgreSQL 증거 | 원본3개 커밋의 artifact를 내용 변경 없이 보존 |
+| `75d245f07c19765350b587dc46fa8cdd6c129e7f` | 제품/운영 문서 | 원본3개 커밋의 문서·그림을 내용 변경 없이 보존 |
+
+재구성 tip과 원본ea55736의 Git tree가 정확히 같음을 확인했다. 공개된 a9d67f0 이하 이력은 재작성하지 않았다. 원본 증거의 HEAD·시각·결과도 바꾸지 않았다. 후속 계약/호환성 검증 코드는 `d673c9a`에 별도로 기록했다.
+
+### 실제 계약 검증
+
+기존10시험을 먼저 실행해10 PASS를 확인했다. 보강 후 중복 상속 실행을 제거한 **21개 시험 PASS·FAIL0·SKIP0**를 확인했다. 도구는 forge1.7.1, 설치된 Solc0.8.30+73712a01, EVM target cancun, optimizer10000이다. FFI=false·fork/RPC 없음·compiler/dependency 다운로드 없음·운영키 접근 없음이다.
+
+| 요구 ID·보장 | 실행한 경계 |
+|---|---|
+| CONTRACT-001/004, GOVERNANCE-001 | 등록/공동 변경/복구의0/1 서명 거절, 서로 다른2명·순서 독립·3명 수락, 중복/미등록·유효2개 뒤 무효 추가 서명 거절 |
+| CONTRACT-003/004 | 짧은 서명·zero 복구·잘못된 v·high-S 거절. 실제 상태 변경 함수에서 OpenZeppelin ECDSA 오류 확인 |
+| CONTRACT-004 | 다른 chain/contract/실제로 등록된 다른 기관/action·변경 내용·회복 후 현재 epoch에 맞지 않는 옛 서명을 거절. 유효한 현재 문맥의 정상 대조군은 성공 |
+| BUSINESS-003, CONTRACT-003 | 정책 hash/version 변경은 epoch 증가·구 위임 무효화, directory-only 변경은 유지. legacy 관리자+1승인자 경로는 기본 ServiceRegistry에서 거절 |
+| GOVERNANCE-001/002 | 자기 기관 stopper의 정지와 타 기관/관리자 단독 정지 거절, 공동 복구/새 관리자·승인키·epoch 반영, 옛 관리자·위임 ID·철회 위임 부활 거절 |
+| CONTRACT-004, TEST-002 | nonce 재사용·경쟁 제안/옛 version/hash/epoch 거절, 실패한 nonce 미소비, 기한 직전 수락/동일·직후·600초 초과 거절, revert 전후 상태/nonce 동일·실패 event 없음 |
+
+fuzz는 seed `0x20261030`, runs32, 명시적 sequence depth2, assume0이다. 각 case에서 directory 변경과 policy 변경의 성공을 각각 assert하여 **성공 configuration 호출64개**를 확인했다. setup 등록 호출을 그 숫자에 섞지 않았고 전체 invariant 증명이라고 부르지 않는다.
+
+새 시험의 첫 실행에서3개 실패가 있었다. 원인은 Solidity memory struct alias, 다른 기관 정상 대조군이 전역 nonce를 먼저 소비한 것, 인자가 있는 custom error에 대한 Foundry exact/partial 매칭 차이였다. 시험을 수정해 의도한 문맥/오류 selector와 원자성을 검사했다. 계약 본체의 권한 조건은 완화하지 않았다. TS검사에서 decoder 결과 unknown 좁히기 오류1개도 수정했다. 원본 실패 출력은 [검증 기록](../artifacts/contract-validation-20261030.json)에 보존했다.
+
+### 실제 앱과 계약의 호환성
+
+`contract-interop.ts`가 현재 registrationTypedData/configurationTypedData/recoveryTypedData, worker의 serviceRegistryAbi, event consumer의 기존 ABI로 fixture를 생성한다. 공개 고정 시험키1/2와 CREATE 주소용99만 사용하며 운영키/env/RPC를 읽지 않는다. 컴파일된 ABI를 통한 calldata 재인코딩이 worker ABI의 bytes와 같은지 확인했다.
+
+Solidity 시험은 이 fixture의 등록→정책 변경→정지/복구 calldata를 실제 계약에 실행한다. digest와 signer 복구를 비교하고 변조된 정책 요청을 거절한 뒤 정상 요청을 수락한다. 실제 ConfigurationUpdated의 topic/indexed 기관/data를 consumer ABI가 만든 bytes와 비교했다. TS 단위 시험은 fixture와 현재 앱 함수의 출력을 다시 비교하여 같은 수동 상수만 복사한 통과를 방지한다.
+
+계약 본체·ABI·bytecode는 기존 `service-registry-build-20261027.json`과 정확히 같다. 검토 artifact hash도 유지한다. 새 배포 주소나 배포 이력은 생성하지 않았다. 새 API 변경은 기존 event ABI export뿐이며 SQL/DB 실행 경로를 바꾸지 않았고 DB를 다시 기동하지 않았다. 과거DB15 PASS는 당시 검증 범위 그대로다.
+
+최신 소스 검사: **light43파일194시험 PASS**, 웹 build·API runtime 타입·규칙 회귀 PASS. 전체 preflight는 외부 설정 미입력으로 BLOCKED이며 계약 PASS와 별개다. [EVM 원본](../artifacts/contract-evm-results-20261030.json), [소스 검증](../artifacts/contract-source-verification-20261030.json), [실패/파일 hash·도구/커밋 대응](../artifacts/contract-validation-20261030.json)을 연결한다. 이 결과는 Besu/QBFT·Witness·브라우저 통화/VC/lease 실제 회수·성능·배포 성공을 뜻하지 않는다.
+
+일반 push 대상은 유일한 origin의 main이며 push 전 재fetch/fast-forward 관계·공개 파일을 검토한다. 실제 원격 SHA와 CI 상태는 push 후 확인하여 최종 응답에 구분한다. backup ref는 로컬에만 남기며 force push하지 않는다.
 
 ## 실행 제한
 

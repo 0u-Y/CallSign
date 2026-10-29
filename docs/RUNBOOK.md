@@ -384,3 +384,25 @@ source 검사에서 타입 검사 프로세스 트리 RSS는 약1.2GiB를 사용
 증거와 실패 관측을 먼저 보존하고 생성 label/id를 대조한 뒤 이번 컨테이너와 network만 제거한다. tmpfs 데이터는 컨테이너와 함께 없어지며 별도 volume을 만들지 않는다. 마지막에 보호 임시 자격 파일도 제거한다. 전역 prune, 기존 DB 정리, 기존 프로세스 중단은 하지 않는다. 공급자·OIDC·체인 설정이 없어도 이 DB 검증은 가능하다.
 
 실행 결과: 수정 checkpoint `7c1df4f`에서 같은 DB 재실행15/15, 남은 worker queue0을 확인했다. [최종 결과](../artifacts/local-postgres-result-20261029.json)에 정리 완료·시험 HEAD·소스 hash가 있다. 두 번째 cluster 정리는304초로5분 목표를4초 넘겼으며 이후 실행에서는 hard deadline 이전 정리 여유를 확보한다. 이 결과는 독립 anchor·disk 복구·전체 서비스 검증이 아니다.
+
+## 로컬 EVM 계약 검증 (2026-10-30)
+
+사용자의 이번 한정 허가는 서버 없는 Foundry 로컬 EVM과 제한 fuzz/일반 Git push다. 기존 chain guard를 유지한다. Anvil/Besu/RPC·fork·배포·DB를 이 명령에 끼우지 않는다.
+
+```sh
+# 설치된 forge/Solc/기존 의존성이 있을 때만, 별도 허가 후 사용
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain timeout 90s pnpm test:contracts:offline
+```
+
+이 명령은 `forge test --offline --threads 1 --fuzz-runs 32 --fuzz-seed 0x20261030`이다. 현재 검증은 Solc0.8.30·cancun·optimizer10000·FFI=false, 시험 자식의 address-space2GiB 상한에서 수행했다. 별도 output/cache를 사용하려면 forge의 `--out`/`--cache-path`를 지정한다. 기존 cache 삭제나 compiler 자동 다운로드로 우회하지 않는다. 도구/버전이 없으면 BLOCKED로 남긴다.
+
+`artifacts/contract-interop-fixture-20261030.json`은 실제 앱 typed-data·worker ABI·consumer event ABI로 생성한 공개 시험 벡터다. 운영키나 실제 배포 metadata가 아니다. Solidity가 이를 읽어 실제 수락/변조 거절·digest/signer·event bytes를 검증하고, light 단위 시험도 현재 앱 출력과 비교한다. FFI는 필요 없다.
+
+```sh
+# 실제 로컬 compiler artifact를 입력해 새 경로에 생성한다. 네트워크/운영키 없음.
+node --import tsx scripts/contract-interop.ts contracts/out/ServiceRegistry.sol/ServiceRegistry.json artifacts/NEW-REVIEWED-FIXTURE.json
+```
+
+기존 벡터를 자동 덮어쓰지 않는다. 앱/서명 규약 변경 시 새 벡터 diff와 Solidity 입력 경로를 함께 검토한다. bytecode가 바뀌면 ABI·검토 hash·신뢰 이행도 별도로 갱신하며 배포는 별도 승인이다. 이번에는 계약 본체/ABI/bytecode가 기존 검토 artifact와 같아 재배포나 artifact 교체가 필요하지 않았다.
+
+수락 기준은 전체21시험 실패/skip0, fuzz32case에서2개씩 실제 상태 변경, 정상 대조군이 성공하는 문맥의 replay 거절, 실패 시 상태/nonce 보존이다. 이것을 전체 상태 공간·Besu/QBFT·Witness·미디어 회수·실측 지연 검증으로 확대하지 않는다. [최신 계약 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)을 따른다.

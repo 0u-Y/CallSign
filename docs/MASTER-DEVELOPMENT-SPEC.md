@@ -297,6 +297,12 @@ runtime preflight **BLOCKED62·PASS14·SKIPPED1**이다. [항목별 원인·주�
 
 사용자 한정 허가 후 로컬 checkpoint와 자원 확인을 수행했다. DB-001/003·CALL-004·LEDGER-002·AUTH-002의 선택된 실제 SQL 경계15시험이 PostgreSQL17.6에서 통과했다. session fixture 문맥과 outbox 정리를 수정하고 auth 실제 금지 SQL을 확인했다. 전체 역할·disk 장애·독립 anchor·chain/통화는 미검증이다. 코드/시험 시점과 commit 관계 및 자원 제한은 [최신 기록](FINALS-IMPLEMENTATION-PLAN.md#postgres-validation-20261029)을 따른다. 이전 DB 미실행 표시는 당시 기록이다.
 
+### 2.8 로컬 EVM 권한·서명 검증 — 2026-10-30
+
+CONTRACT-001/003/004·GOVERNANCE-001/002·BUSINESS-003·TEST-002의 선택된 계약 상태 전이를 실제 프로세스 내부 EVM에서 실행했다.21시험 PASS(실패/skip0), fuzz32회×2성공 전이, 앱 typed-data/calldata·서명·event bytes 호환을 확인했다. 현재 light43파일194시험·웹 build/API runtime 타입은 통과했다. 계약 본체와 기존 ABI/bytecode는 변경하지 않았다.
+
+기존 미공개 checkpoint는 복구 ref를 만든 뒤 코드/설정·증거·문서로 재구성했으며 원본 tip과 tree가 같음을 확인했다. 과거 증거의 HEAD/결과는 보존했다. [최신 진행 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)이 실제 시험 HEAD·도구·원본 실패·커밋 대응의 기준이다. 온체인 회수 전이 확인과 실제 VC/브라우저/통화 회수 전파는 구분하며 Besu/QBFT/Witness는 여전히 미검증이다.
+
 ## 3. 우선 해결할 충돌·차단 요인
 
 | 확인된 사실 | 최종 명세에서의 처리 |

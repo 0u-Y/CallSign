@@ -1,0 +1,304 @@
+{
+  "version": 1,
+  "recordedAt": "2026-10-29T15:35:15.507425+00:00",
+  "testedHead": "d673c9a1b916a511ab6610f47e7f02697d3cad4c",
+  "testedSourceHash": "b4a8b3fa39bc57bf243b3b31e2289d9630d739768fa204a33432580147b9fac7",
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "scope": "local EVM contract transitions plus application TypeScript interoperability; not distributed chain/voice",
+  "realEnvironmentVerified": false,
+  "contractTests": {
+    "passed": 21,
+    "failed": 0,
+    "skipped": 0,
+    "fuzz": {
+      "seed": "0x20261030",
+      "runs": 32,
+      "sequenceDepth": 2,
+      "assumeCalls": 0,
+      "successfulConfigurationCalls": 64,
+      "note": "Exactly2 successful configuration mutations asserted per fuzz case; setup registrations excluded from this count"
+    },
+    "perTest": [
+      [
+        "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest",
+        "testNonOwnerCannotGrantOrRevoke()",
+        "Success"
+      ],
+      [
+        "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest",
+        "testRecoveryNeedsDistinctQuorumAndOldDelegationStaysInactive()",
+        "Success"
+      ],
+      [
+        "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest",
+        "testRegistrationAndDelegationLifecycle()",
+        "Success"
+      ],
+      [
+        "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest",
+        "testRegistrationQuorumAndDomainReplayFail()",
+        "Success"
+      ],
+      [
+        "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest",
+        "testSuspendRejectsRepeatAndOldAdministratorGrant()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest",
+        "testDirectoryOnlyChangeKeepsDelegationButLegacyUpdateCannotBypassQuorum()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest",
+        "testDuplicateThirdSignerWrongOperationAndChangedContentFail()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest",
+        "testEmergencyStopperCannotRevokeDelegation()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest",
+        "testPolicyChangeInvalidatesOldDelegationAndRejectsReplay()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest",
+        "testUsedNonceCannotAuthorizeAnotherDirectoryChange()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistryInterop.t.sol:ServiceRegistryInteropTest",
+        "testApplicationTypedDataCalldataSignaturesAndConsumerEventMatchEvm()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testChainContractInstitutionActionAndContentReplayUseValidContexts()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testCompetingProposalsStaleStateAndNonceReplay()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testDeadlineBeforeAtAfterAndTooFarNeverConsumeFailedNonce()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testFuzzTwoSuccessfulTransitionsAndRejectedStaleProposal(bytes32,bytes32)",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testInvalidStateVersionHashAndZeroNoncePreserveStateBeforeControl()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testMalformedHighSZeroAndInvalidVAreAtomicAtEntryPoint()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testOldEpochSignatureFailsAfterValidRecoveryWithFreshContextControl()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testQuorumCountsOrderAndEveryAdditionalSignature()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testRecoveryQuorumKeyBindingTenantAndOldRightsCannotRevive()",
+        "Success"
+      ],
+      [
+        "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest",
+        "testRegistrationRejectsUnregisteredExpiredAndAlteredSignaturesThenSucceeds()",
+        "Success"
+      ]
+    ]
+  },
+  "toolchain": {
+    "forge": "1.7.1 4072e48705af9d93e3c0f6e29e93b5e9a40caed8",
+    "solc": "0.8.30+commit.73712a01.Linux.g++",
+    "openZeppelin": "5.6.1",
+    "evm": "cancun",
+    "optimizer": true,
+    "optimizerRuns": 10000
+  },
+  "budget": {
+    "threads": 1,
+    "memoryBytes": 2147483648,
+    "timeoutSeconds": 90,
+    "cpuCount": 24,
+    "initialAvailableMiB": 41904,
+    "initialLoad1": 1.26,
+    "initialDiskAvailableGiB": 533
+  },
+  "guards": {
+    "ffi": false,
+    "fork": false,
+    "rpc": false,
+    "compilerDownload": false,
+    "operationalKeysRead": false,
+    "knownFixtureKeysOnly": true
+  },
+  "applicationInterop": {
+    "generatedWith": [
+      "registrationTypedData",
+      "configurationTypedData",
+      "recoveryTypedData",
+      "serviceRegistryAbi",
+      "ledger-events.events"
+    ],
+    "compiledAbiCalldataEquality": true,
+    "compiledEventDecode": true,
+    "evmDigestAndRecoveredSignerEquality": true,
+    "evmStateMutationsSucceeded": true,
+    "tamperedRequestRejectedBeforePositiveControl": true,
+    "regeneratedFixtureByteIdentical": true
+  },
+  "productionArtifact": {
+    "path": "artifacts/service-registry-build-20261027.json",
+    "abiUnchanged": true,
+    "bytecodeUnchanged": true,
+    "sha256": "44106b7087d542431cee1264df10d2c50d255e90ef36916090cb27db54753b23",
+    "deploymentNotPerformed": true
+  },
+  "historyRewrite": {
+    "originalHead": "ea557367b4e423ace138c79f2950c82a72cfa68a",
+    "backupRef": "backup/pre-contract-audit-20261030",
+    "newCommits": [
+      {
+        "commit": "c357f3839aec2e8cda0dd3a6518e5cd21ad9d108",
+        "message": "Connect delegated calls with durable authority and guarded operations"
+      },
+      {
+        "commit": "4fdb828597ca660c28c90309d947d4a84bfc1865",
+        "message": "Preserve offline and PostgreSQL validation evidence"
+      },
+      {
+        "commit": "75d245f07c19765350b587dc46fa8cdd6c129e7f",
+        "message": "Document service boundaries and reproducible validation procedures"
+      }
+    ],
+    "identicalTree": true
+  },
+  "failureHistory": {
+    "callsign-contract-initial-20261030.log": {
+      "sha256": "948000165fa105632eb953bfd1bde5819edaea4ea82ca960756bd66606955d88",
+      "output": "Compiling 16 files with Solc 0.8.30\nSolc 0.8.30 finished in 493.55ms\nCompiler run successful!\n\nRan 5 tests for contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest\n[PASS] testNonOwnerCannotGrantOrRevoke() (gas: 172575)\n[PASS] testRecoveryNeedsDistinctQuorumAndOldDelegationStaysInactive() (gas: 652922)\n[PASS] testRegistrationAndDelegationLifecycle() (gas: 168777)\n[PASS] testRegistrationQuorumAndDomainReplayFail() (gas: 2395577)\n[PASS] testSuspendRejectsRepeatAndOldAdministratorGrant() (gas: 32186)\nSuite result: ok. 5 passed; 0 failed; 0 skipped; finished in 9.89ms (1.61ms CPU time)\n\nRan 5 tests for contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest\n[PASS] testDirectoryOnlyChangeKeepsDelegationButLegacyUpdateCannotBypassQuorum() (gas: 221713)\n[PASS] testDuplicateThirdSignerWrongOperationAndChangedContentFail() (gas: 124029)\n[PASS] testEmergencyStopperCannotRevokeDelegation() (gas: 164753)\n[PASS] testPolicyChangeInvalidatesOldDelegationAndRejectsReplay() (gas: 221138)\n[PASS] testUsedNonceCannotAuthorizeAnotherDirectoryChange() (gas: 82962)\nSuite result: ok. 5 passed; 0 failed; 0 skipped; finished in 2.38ms (1.82ms CPU time)\n\nRan 2 test suites in 18.90ms (12.28ms CPU time): 10 tests passed, 0 failed, 0 skipped (10 total tests)\n"
+    },
+    "callsign-contract-security-first-20261030.log": {
+      "sha256": "808b106fa8a1e9ab42ac14bae42dfbcdaaba0035156475d66f4071ae52b6d312",
+      "output": "Compiling 17 files with Solc 0.8.30\nSolc 0.8.30 finished in 661.18ms\nCompiler run successful!\n\nRan 5 tests for contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest\n[PASS] testNonOwnerCannotGrantOrRevoke() (gas: 172575)\n[PASS] testRecoveryNeedsDistinctQuorumAndOldDelegationStaysInactive() (gas: 652922)\n[PASS] testRegistrationAndDelegationLifecycle() (gas: 168777)\n[PASS] testRegistrationQuorumAndDomainReplayFail() (gas: 2395577)\n[PASS] testSuspendRejectsRepeatAndOldAdministratorGrant() (gas: 32186)\nSuite result: ok. 5 passed; 0 failed; 0 skipped; finished in 2.42ms (1.21ms CPU time)\n\nRan 5 tests for contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest\n[PASS] testDirectoryOnlyChangeKeepsDelegationButLegacyUpdateCannotBypassQuorum() (gas: 221713)\n[PASS] testDuplicateThirdSignerWrongOperationAndChangedContentFail() (gas: 124029)\n[PASS] testEmergencyStopperCannotRevokeDelegation() (gas: 164753)\n[PASS] testPolicyChangeInvalidatesOldDelegationAndRejectsReplay() (gas: 221138)\n[PASS] testUsedNonceCannotAuthorizeAnotherDirectoryChange() (gas: 82962)\nSuite result: ok. 5 passed; 0 failed; 0 skipped; finished in 2.33ms (1.79ms CPU time)\n\nRan 13 tests for contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest\n[FAIL: Error != expected error: NonceAlreadyUsed() != Unauthorized()] testChainContractInstitutionActionAndContentReplayUseValidContexts() (gas: 3239269)\n[FAIL: EvmError: Revert] testCompetingProposalsStaleStateAndNonceReplay() (gas: 96241)\n[PASS] testDeadlineBeforeAtAfterAndTooFarNeverConsumeFailedNonce() (gas: 135922)\n[PASS] testDirectoryOnlyChangeKeepsDelegationButLegacyUpdateCannotBypassQuorum() (gas: 221814)\n[PASS] testDuplicateThirdSignerWrongOperationAndChangedContentFail() (gas: 124262)\n[PASS] testEmergencyStopperCannotRevokeDelegation() (gas: 164859)\n[PASS] testFuzzTwoSuccessfulTransitionsAndRejectedStaleProposal(bytes32,bytes32) (runs: 32, μ: 147364, ~: 147364)\n[FAIL: Error != expected error: ECDSAInvalidSignatureLength(2) != custom error 0xfce698f7] testMalformedHighSZeroAndInvalidVAreAtomicAtEntryPoint() (gas: 46117)\n[PASS] testPolicyChangeInvalidatesOldDelegationAndRejectsReplay() (gas: 221241)\n[PASS] testQuorumCountsOrderAndEveryAdditionalSignature() (gas: 218790)\n[PASS] testRecoveryQuorumKeyBindingTenantAndOldRightsCannotRevive() (gas: 1210801)\n[PASS] testRegistrationRejectsUnregisteredExpiredAndAlteredSignaturesThenSucceeds() (gas: 453958)\n[PASS] testUsedNonceCannotAuthorizeAnotherDirectoryChange() (gas: 83049)\nSuite result: FAILED. 10 passed; 3 failed; 0 skipped; finished in 30.81ms (30.22ms CPU time)\n\nRan 3 test suites in 36.15ms (35.55ms CPU time): 20 tests passed, 3 failed, 0 skipped (23 total tests)\n\nFailing tests:\nEncountered 3 failing tests in contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest\n[FAIL: Error != expected error: NonceAlreadyUsed() != Unauthorized()] testChainContractInstitutionActionAndContentReplayUseValidContexts() (gas: 3239269)\n[FAIL: EvmError: Revert] testCompetingProposalsStaleStateAndNonceReplay() (gas: 96241)\n[FAIL: Error != expected error: ECDSAInvalidSignatureLength(2) != custom error 0xfce698f7] testMalformedHighSZeroAndInvalidVAreAtomicAtEntryPoint() (gas: 46117)\n\nEncountered a total of 3 failing tests, 20 tests succeeded\n\nTip: Run `forge test --rerun` to retry only the 3 failed tests\n"
+    },
+    "callsign-contract-security-fixed-20261030.log": {
+      "sha256": "14bea948b8c1e8590f2f3d4bff3a525bd264bff00fba64cebd9d117c0bbd2919",
+      "output": "Compiling 1 files with Solc 0.8.30\nSolc 0.8.30 finished in 392.57ms\nCompiler run successful!\n\nRan 3 tests for contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest\n[PASS] testChainContractInstitutionActionAndContentReplayUseValidContexts() (gas: 3336392)\n[PASS] testCompetingProposalsStaleStateAndNonceReplay() (gas: 165917)\n[PASS] testMalformedHighSZeroAndInvalidVAreAtomicAtEntryPoint() (gas: 191924)\nSuite result: ok. 3 passed; 0 failed; 0 skipped; finished in 4.47ms (3.40ms CPU time)\n\nRan 1 test suite in 4.98ms (4.47ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)\n"
+    },
+    "callsign-contract-light-first-20261030.log": {
+      "sha256": "956f2cafdd142afad33c88a7b86fdaf62a1ad1d440c5be35727966794da5b789",
+      "output": "$ pnpm lint && pnpm typecheck && pnpm test:light\n$ node scripts/check-source.mjs\nSource hygiene and JavaScript syntax passed (not an ESLint audit).\n$ tsc -p services/api/tsconfig.json --noEmit && tsc -p services/witness/tsconfig.json --noEmit && tsc -p apps/web/tsconfig.json --noEmit && tsc -p tsconfig.light.json --noEmit\nscripts/contract-interop.ts(40,178): error TS18046: 'event' is of type 'unknown'.\n[ELIFECYCLE] Command failed with exit code 1.\n[ELIFECYCLE] Command failed with exit code 1.\n"
+    }
+  },
+  "files": {
+    "contracts/src/InstitutionRegistry.sol": "f5307e482d38bc9d590770c21946bb65293ef08a34c1b0dfb2efb080a38546ae",
+    "contracts/src/ServiceRegistry.sol": "4410cd9486d30c71fa5d32de24ce6e503ee1c11258585132a35aea5dc7a46d3d",
+    "contracts/test/InstitutionRegistry.t.sol": "3673c97b20a4e351fb9ab5c709b3e25bbffd1b172ca09ef1ada5271ecd7d2bcf",
+    "contracts/test/ServiceRegistry.t.sol": "6d29eb67fdeb6b6e0abc567c2c7ef6f09681a6541e36b28f4847d8d575f959d9",
+    "contracts/test/ServiceRegistrySecurity.t.sol": "1107c19578c4c41c6f3ed3ae7c3bac6584631f241ef3289dc6bd25bf3ebe268a",
+    "contracts/test/ServiceRegistryInterop.t.sol": "768fa077066cbaaea1011660082f562f6c854c5c8b2c390a8880de0f98e43969",
+    "packages/protocol/src/configuration.ts": "82301907315db477ddc25223a1859727e97867dbd36a193402233e4027e28e9a",
+    "services/api/src/governance-v2.ts": "112b127512fc5f5a4e595e9544f11476802df3139552ec0087c1b477e13c9771",
+    "services/api/src/worker-ledger.ts": "92b6f9969de767ef3f6ab221c6c779ef153116ced6b437b742a774057522bcbb",
+    "services/api/src/ledger-events.ts": "dd14d42ff5ca21ef3d00b16dac526cdb74beea861adfa0512079542598f71a59",
+    "scripts/contract-interop.ts": "1b9252bda66153b2b826e0978244b7c9fdcbd5e13489f43d36b38392244fada8",
+    "tests/unit/contract-interop.test.ts": "5866606dff4f4b1cbf6f7886aaea86fd90f8b1a7787e7ad2e10f5af6fe3822fd",
+    "foundry.toml": "d0cb3e2a825dc9dadf3ef61ad0719df109252c2265bb139b8e9fc96a645a4855",
+    "package.json": "defe6c9bb4314f12526c20f9e54db841049bc8a35455a74de70a01803ab0e445",
+    "pnpm-lock.yaml": "46b2f41318c97bfab18ab58aa7d861a7434e9f48fa659b2b9053fa8adbb11541",
+    "artifacts/contract-interop-fixture-20261030.json": "1ed7e881b4dcebf42d084170b61c582db9b5e5642593dc9086d03978622aecd4",
+    "artifacts/service-registry-build-20261027.json": "44106b7087d542431cee1264df10d2c50d255e90ef36916090cb27db54753b23"
+  },
+  "relatedChecks": [
+    {
+      "id": "light",
+      "status": "PASS",
+      "command": [
+        "pnpm",
+        "light"
+      ]
+    },
+    {
+      "id": "web",
+      "status": "PASS",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@callsign/web",
+        "build"
+      ]
+    },
+    {
+      "id": "runtime",
+      "status": "PASS",
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "-p",
+        "services/api/tsconfig.runtime.json",
+        "--noEmit"
+      ]
+    },
+    {
+      "id": "preflight",
+      "status": "BLOCKED",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/preflight.ts",
+        "--phase",
+        "bootstrap"
+      ]
+    },
+    {
+      "id": "rules",
+      "status": "PASS",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/evaluate-risk.ts"
+      ]
+    }
+  ],
+  "deferred": [
+    "Besu/QBFT/P2P/Witness",
+    "on-chain-to-VC/browser/lease revocation propagation",
+    "actual deployment/migration",
+    "PBX/TURN/OIDC/browser/AI/GCP",
+    "exhaustive state-space verification"
+  ],
+  "notes": [
+    "Original historical evidence HEAD/time/results are unchanged.",
+    "Legacy InstitutionRegistry behavior is preserved; strict 2-of-3/all supplied signatures applies to ServiceRegistry.",
+    "Fuzz depth is an explicit two-step sequence, not a Foundry invariant campaign; no assume calls.",
+    "Database was not restarted; API change only exports the existing event ABI with no SQL behavior change."
+  ]
+}

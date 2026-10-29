@@ -1,0 +1,433 @@
+{
+  "startedAt": "2026-10-29T15:32:51.950510+00:00",
+  "finishedAt": "2026-10-29T15:32:52.055808+00:00",
+  "testedHead": "d673c9a1b916a511ab6610f47e7f02697d3cad4c",
+  "command": [
+    "timeout",
+    "90s",
+    "forge",
+    "test",
+    "--offline",
+    "--threads",
+    "1",
+    "--fuzz-runs",
+    "32",
+    "--fuzz-seed",
+    "0x20261030",
+    "--out",
+    "/tmp/callsign-contract-security-out",
+    "--cache-path",
+    "/tmp/callsign-contract-security-cache",
+    "--json"
+  ],
+  "exitCode": 0,
+  "tool": "forge1.7.1",
+  "compiler": "0.8.30+commit.73712a01",
+  "evmTarget": "cancun",
+  "optimizerRuns": 10000,
+  "memoryLimitBytes": 2147483648,
+  "timeoutSeconds": 90,
+  "ffi": false,
+  "fork": false,
+  "rpc": false,
+  "results": {
+    "contracts/test/InstitutionRegistry.t.sol:InstitutionRegistryTest": {
+      "duration": "2ms 424\u00b5s 721ns",
+      "test_results": {
+        "testNonOwnerCannotGrantOrRevoke()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 172575
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "60\u00b5s 435ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testRecoveryNeedsDistinctQuorumAndOldDelegationStaysInactive()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 652922
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "612\u00b5s 360ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testRegistrationAndDelegationLifecycle()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 168777
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "42\u00b5s 391ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testRegistrationQuorumAndDomainReplayFail()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 2395577
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "550\u00b5s 682ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testSuspendRejectsRepeatAndOldAdministratorGrant()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 32186
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "29\u00b5s 166ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        }
+      },
+      "warnings": []
+    },
+    "contracts/test/ServiceRegistry.t.sol:ServiceRegistryTest": {
+      "duration": "2ms 819\u00b5s 375ns",
+      "test_results": {
+        "testDirectoryOnlyChangeKeepsDelegationButLegacyUpdateCannotBypassQuorum()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 221713
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "490\u00b5s 126ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testDuplicateThirdSignerWrongOperationAndChangedContentFail()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 124029
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "886\u00b5s 2ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testEmergencyStopperCannotRevokeDelegation()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 164753
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "33\u00b5s 44ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testPolicyChangeInvalidatesOldDelegationAndRejectsReplay()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 221138
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "303\u00b5s 369ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testUsedNonceCannotAuthorizeAnotherDirectoryChange()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 82962
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "471\u00b5s 220ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        }
+      },
+      "warnings": []
+    },
+    "contracts/test/ServiceRegistryInterop.t.sol:ServiceRegistryInteropTest": {
+      "duration": "2ms 363\u00b5s 314ns",
+      "test_results": {
+        "testApplicationTypedDataCalldataSignaturesAndConsumerEventMatchEvm()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 3566001
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "2ms 219\u00b5s 359ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        }
+      },
+      "warnings": []
+    },
+    "contracts/test/ServiceRegistrySecurity.t.sol:ServiceRegistrySecurityTest": {
+      "duration": "35ms 390\u00b5s 97ns",
+      "test_results": {
+        "testChainContractInstitutionActionAndContentReplayUseValidContexts()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 3336334
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "1ms 838\u00b5s 131ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testCompetingProposalsStaleStateAndNonceReplay()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 165883
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "973\u00b5s 138ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testDeadlineBeforeAtAfterAndTooFarNeverConsumeFailedNonce()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 135898
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "587\u00b5s 964ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testFuzzTwoSuccessfulTransitionsAndRejectedStaleProposal(bytes32,bytes32)": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Fuzz": {
+              "first_case": {
+                "gas": 169130,
+                "stipend": 21800
+              },
+              "runs": 32,
+              "mean_gas": 147330,
+              "median_gas": 147330,
+              "failed_corpus_replays": 0
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "24ms 461\u00b5s 11ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testInvalidStateVersionHashAndZeroNoncePreserveStateBeforeControl()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 183660
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "1ms 339\u00b5s 598ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testMalformedHighSZeroAndInvalidVAreAtomicAtEntryPoint()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 191856
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "881\u00b5s 373ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testOldEpochSignatureFailsAfterValidRecoveryWithFreshContextControl()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 166626
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "823\u00b5s 243ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testQuorumCountsOrderAndEveryAdditionalSignature()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 218732
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "1ms 198\u00b5s 339ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testRecoveryQuorumKeyBindingTenantAndOldRightsCannotRevive()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 1373321
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "1ms 380\u00b5s 96ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        },
+        "testRegistrationRejectsUnregisteredExpiredAndAlteredSignaturesThenSucceeds()": {
+          "status": "Success",
+          "reason": null,
+          "counterexample": null,
+          "logs": [],
+          "decoded_logs": [],
+          "kind": {
+            "Unit": {
+              "gas": 473457
+            }
+          },
+          "traces": [],
+          "labeled_addresses": {},
+          "duration": "1ms 201\u00b5s 946ns",
+          "breakpoints": {},
+          "gas_snapshots": {}
+        }
+      },
+      "warnings": []
+    }
+  },
+  "stderr": "",
+  "fuzz": {
+    "seed": "0x20261030",
+    "runs": 32,
+    "sequenceDepth": 2,
+    "assumeCalls": 0,
+    "successfulConfigurationCalls": 64,
+    "note": "Exactly2 successful configuration mutations asserted per fuzz case; setup registrations excluded from this count"
+  },
+  "scope": "process-internal EVM only; no Besu/Witness/deployment validation"
+}

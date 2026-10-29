@@ -1,6 +1,6 @@
 # 현재 구현의 한계
 
-기준일: 2026-10-29. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+기준일: 2026-10-30. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
 ## 현재 서비스
 
@@ -32,3 +32,9 @@
 - 당시 Vercel 공개 화면은 고정 시험 데이터·브라우저 내 검증·저장된 로컬 증거를 보여주는 미리보기였다. 원격 PostgreSQL·Besu·분리 브라우저 전체 서비스는 아니었으며 현재 공개 주소·자동 배포 연결은 재확인하지 않았다.
 
 최신 실행 준비 후속에서는 전체 설정과 DB 소스 선행 조건을 분리했다. 검토한 수동 PASS도 사람의 관측/판정이며 독립기관 운영·침해 내성 인증이 아니다. sourceFiles/계약 파일 hash는 코드·선택 공개 산출물의 범위이고 개인키·DB/chain 상태·이미지의 실제 실행을 포함하지 않는다. [최신 기록](FINALS-IMPLEMENTATION-PLAN.md#readiness-refinement-20261029)을 따른다.
+
+## 로컬 EVM 검증의 보장 범위
+
+2026-10-30 계약21시험·실패/skip0, 제한 fuzz32회, 실제 앱 EIP-712와 계약의 digest/signer/calldata/event 호환을 확인했다. 이는 설치된 forge/Solc의 로컬 실행이며 Besu/QBFT 합의·P2P·Witness·실제 배포·오프체인 회수 전파의 검증이 아니다. 기존 InstitutionRegistry는 회귀용이며 기본 ServiceRegistry의 모든 추가 서명 검증·legacy 우회 차단과 구분한다.
+
+온체인은 정책/공식 경로의 hash와 version을 검증할 뿐 질문·표시 문자열의 의미를 해석하지 않는다. directory-only의 현재 제품 범위는 서버 schema가 제한한 `/official` 표시명 변경이며 임의 외부 경로의 안전성을 증명하지 않는다. 전역 nonce는 기관 간에도 재사용할 수 없다. fuzz는 assume 없는2단계 sequence32회이며 전체 상태 공간의 invariant 증명은 아니다. [현재 증거](../artifacts/contract-validation-20261030.json)를 따른다.
