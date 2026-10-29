@@ -40,6 +40,7 @@
     "evidence:collect": "node --import tsx scripts/collect-evidence.ts",
     "validate": "node --import tsx scripts/validation-runner.ts",
     "prepare:execution": "node --import tsx scripts/prepare-execution.ts",
+    "test:http": "node scripts/restricted.mjs integration pnpm exec vitest run --config vitest.http.config.ts",
     "test:contracts:offline": "node scripts/restricted.mjs chain forge test --offline --threads 1 --fuzz-runs 32 --fuzz-seed 0x20261030"
   },
   "devDependencies": {

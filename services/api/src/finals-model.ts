@@ -88,7 +88,7 @@ export function liveAttemptFor(record: InstitutionRecord, actor: Actor, attemptI
   }
   return { attempt, intent };
 }
-export const mockFdsSchema = z.object({ id: z.string().min(3).max(100), recipientId: z.string().min(3).max(100), agentId: z.string().min(3).max(100), serviceDid: z.string().min(3).max(200), expiresAt: z.number().int().positive() }).strict();
+export const mockFdsSchema = z.object({ id: z.string().min(3).max(100), recipientId: z.string().min(3).max(200), agentId: z.string().min(3).max(200), serviceDid: z.string().min(3).max(200), expiresAt: z.number().int().positive() }).strict();
 export function importMockFds(record: InstitutionRecord, actor: Actor, input: unknown, now: number): ContactIntent {
   membership(record, actor, ["institution"]);
   const body = mockFdsSchema.parse(input);

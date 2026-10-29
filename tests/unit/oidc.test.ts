@@ -11,3 +11,11 @@ it("binds code exchange to the original browser state, PKCE verifier, nonce and 
   expect(createHash("sha256").update(submitted.get("code_verifier")!).digest("base64url")).toBe(url.searchParams.get("code_challenge"));
   await expect(flow.finish(start.state,start.state,"code")).rejects.toThrow("OIDC_STATE_INVALID");
 });
+
+it("keeps provider outages separate from rejected authorization codes", async () => {
+  for (const status of [400, 401, 429, 503]) {
+    const flow = new OidcLoginFlow({ authorizationUrl: "https://id.example/authorize", tokenUrl: "https://id.example/token", redirectUri: "https://callsign.example/service", clientId: "work", officialClientId: "official", fetcher: async () => new Response("{}", {status}) });
+    const start = flow.begin(false);
+    await expect(flow.finish(start.state,start.state,"code")).rejects.toThrow(status === 400 || status === 401 ? "OIDC_CODE_EXCHANGE_FAILED" : "OIDC_PROVIDER_UNAVAILABLE");
+  }
+});

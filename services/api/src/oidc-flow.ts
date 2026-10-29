@@ -21,7 +21,7 @@ export class OidcLoginFlow {
     if (!pending || pending.expiresAt <= this.now() || Buffer.byteLength(state) !== Buffer.byteLength(cookieState) || !timingSafeEqual(Buffer.from(state), Buffer.from(cookieState)) || !code || code.length > 8192) throw new Error("OIDC_STATE_INVALID");
     this.pending.delete(state);
     const response = await (this.options.fetcher ?? fetch)(this.options.tokenUrl, { method: "POST", redirect: "error", signal: AbortSignal.timeout(4000), headers: { "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ grant_type: "authorization_code", code, redirect_uri: this.options.redirectUri, client_id: pending.official ? this.options.officialClientId : this.options.clientId, code_verifier: pending.verifier }) });
-    if (!response.ok) throw new Error("OIDC_CODE_EXCHANGE_FAILED");
+    if (!response.ok) throw new Error([400, 401].includes(response.status) ? "OIDC_CODE_EXCHANGE_FAILED" : "OIDC_PROVIDER_UNAVAILABLE");
     const raw = await response.text(); if (raw.length > 32768) throw new Error("OIDC_RESPONSE_TOO_LARGE");
     const result = JSON.parse(raw) as { id_token?: unknown };
     if (typeof result.id_token !== "string" || result.id_token.length > 16384) throw new Error("OIDC_ID_TOKEN_REQUIRED");

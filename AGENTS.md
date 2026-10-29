@@ -22,3 +22,7 @@
 ## 2026-10-30 계약 검증·게시의 한정 예외
 
 이번 사용자 요청은 설치된 forge/Solc의 프로세스 내부 로컬 EVM·오프라인 컴파일·제한 fuzz/TS 호환성 검증과 미공개 프로젝트 커밋 재구성·Git fetch/일반 push를 허용한다. chain guard는 해당 자식 실행에만 명시한다. RPC/fork/Anvil/Besu/Witness·DB/통화/AI/클라우드·실제 배포·운영키·대형 다운로드·force push는 금지다. 공개된 이력은 재작성하지 않으며 원본 ref/미커밋 자료/증거를 보존한다. 이것은 이후 세션의 상시 실행 허가가 아니다.
+
+## 2026-10-30 인증·HTTP·브라우저 검증의 한정 예외
+
+이번 사용자 요청은 격리된 시험 PostgreSQL·최소권한 LOGIN·migration, loopback 시험 API/웹/HTTPS OIDC fixture와 설치된 headless 브라우저, 합성 계정/시험키 및 관련 일반 commit/push를 허용한다. integration guard와 `callsign_test_*` 대상 검사를 유지한다. 체인/Witness/Anvil/RPC·PBX/TURN·실제 음성장치·외부 AI·클라우드는 금지다. 기존 서비스는 읽기 전용이며 이번 identity의 자원만 정리한다. 이 기록은 후속 세션의 상시 기동 허가가 아니다.

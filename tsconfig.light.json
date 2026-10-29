@@ -39,6 +39,8 @@
     "scripts/execution-input.ts",
     "scripts/preflight-requirements.ts",
     "scripts/evaluate-performance.ts",
-    "tests/integration/database-readiness.test.ts"
+    "tests/integration/database-readiness.test.ts",
+    "tests/integration/service-http.test.ts",
+    "vitest.http.config.ts"
   ]
 }

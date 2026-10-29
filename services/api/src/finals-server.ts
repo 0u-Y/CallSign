@@ -63,7 +63,19 @@ export async function readSigningKey(path: string) {
 function authenticate(supplied: unknown, expected: string) {
   if (typeof supplied !== "string" || Buffer.byteLength(supplied) !== Buffer.byteLength(expected) || !timingSafeEqual(Buffer.from(supplied), Buffer.from(expected))) throw new HttpError(401, "SERVICE_AUTH_INVALID");
 }
-export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
+export async function buildFinalsServer(env = finalsEnvironment(process.env), adapters?: {
+  anchor: import("./consumption-anchor.js").ConsumptionAnchor;
+  current: import("./service-authority.js").ServiceAuthorityOptions["current"];
+}) {
+  // Explicit integration injection replaces only external authority adapters, never authentication or SQL.
+  if (adapters) {
+    let isolatedDatabase = false;
+    try {
+      const issuer = new URL(process.env.ISSUER_DATABASE_URL ?? ""), auth = new URL(process.env.AUTH_DATABASE_URL ?? "");
+      isolatedDatabase = ["127.0.0.1", "localhost", "[::1]"].includes(issuer.hostname) && /^\/callsign_test_/.test(issuer.pathname) && issuer.host === auth.host && issuer.pathname === auth.pathname && issuer.username !== auth.username;
+    } catch { /* Missing or malformed test targets must not reach any connection. */ }
+    if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "integration" || !process.env.DEPLOYMENT_ID?.startsWith("test:") || !["127.0.0.1", "localhost", "[::1]"].includes(new URL(env.WEB_ORIGIN).hostname) || !isolatedDatabase) throw new Error("TEST_ADAPTER_SCOPE_REQUIRED");
+  }
   const requestLimit=z.coerce.number().int().min(300).max(10000).parse(process.env.API_REQUESTS_PER_MINUTE??600);
   const app = Fastify({ logger: false, bodyLimit: 65536 });
   registerRequestTiming(app);
@@ -136,8 +148,8 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
     return app;
   }
   app.addHook("onRoute", route=>{if(route.method!=="HEAD"&&["/v2/auth/start","/v2/auth/callback","/v2/auth/me","/v2/auth/logout","/v2/login"].includes(route.url))app.route({method:route.method,url:route.url.replace("/v2/","/v3/"),handler:route.handler});});
-  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"),process.env.CONSUMPTION_ANCHOR_URL?{anchor:httpConsumptionAnchor({url:required("CONSUMPTION_ANCHOR_URL"),token:required("CONSUMPTION_ANCHOR_TOKEN"),deployment:required("DEPLOYMENT_ID")}),deployment:required("DEPLOYMENT_ID")}:undefined);
-  if(process.env.CONSUMPTION_ANCHOR_URL)app.addHook("onReady",()=>store.verifyRecovery(env.INSTITUTION_ID));
+  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"),adapters?{anchor:adapters.anchor,deployment:required("DEPLOYMENT_ID")}:process.env.CONSUMPTION_ANCHOR_URL?{anchor:httpConsumptionAnchor({url:required("CONSUMPTION_ANCHOR_URL"),token:required("CONSUMPTION_ANCHOR_TOKEN"),deployment:required("DEPLOYMENT_ID")}),deployment:required("DEPLOYMENT_ID")}:undefined);
+  if(adapters||process.env.CONSUMPTION_ANCHOR_URL)app.addHook("onReady",()=>store.verifyRecovery(env.INSTITUTION_ID));
   const { db, client } = createDatabase(required("AUTH_DATABASE_URL"));
   let pbxRuntime:PbxRuntime|undefined;
   const connections = new SessionConnections();
@@ -177,13 +189,13 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
   const serviceAuthority = new ServiceAuthority({ assertPublished:record=>assertPublishedTrust(record,trust,required('VITE_SERVICE_TRUST_SHA256'),serviceAuthority.policy), ...(pbxSigningKey ? {pbxTrust:{kid:pbxSigningKey.kid,publicKey:pbxSigningKey.publicJwk}} : {}), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
     policy:(await import("@callsign/protocol")).runtimePolicySchema.parse({...((await import("@callsign/protocol")).servicePolicy),leaseSeconds:Number(process.env.CALL_LEASE_SECONDS??30),maxCallSeconds:Number(process.env.CALL_MAX_SECONDS??14400)}),
     signingKey: version => readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"), `approval-v${version}.json`)),
-    current: async (record, digest) => {
+    current: adapters?.current ?? (async (record, digest) => {
       let bundle;
       try { bundle = await aggregateWitnesses({ endpoints: trust.endpoints, institutionId: record.id, delegationId: digest, trust,allowPolicyTransition:true }); }
       catch { return "unavailable"; }
       try { return await currentServiceState(record, digest, bundle, trust, Math.floor(Date.now()/1000)); }
       catch { return "unavailable"; }
-    },
+    }),
   });
   registerMeasurements(app,{actorFor,store});
   registerNotifications(app,{databaseUrl:required("ISSUER_DATABASE_URL"),actorFor});
@@ -232,7 +244,10 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
   const finishLogin = async (request: FastifyRequest, reply: FastifyReply, idToken: string, official: boolean, expectedNonce?: string) => {
     if (required("OIDC_AUDIENCE") === required("OFFICIAL_OIDC_AUDIENCE")) throw new HttpError(503, "OFFICIAL_AUDIENCE_MUST_DIFFER");
     const issuer = required("OIDC_ISSUER"); const jwksUrl = new URL(required("OIDC_JWKS_URL")); if (jwksUrl.protocol !== "https:") throw new HttpError(503, "OIDC_HTTPS_REQUIRED");
-    const identity = await jwtVerify(idToken, createRemoteJWKSet(jwksUrl, { timeoutDuration: 2000 }), { issuer, audience: required(official ? "OFFICIAL_OIDC_AUDIENCE" : "OIDC_AUDIENCE"), algorithms: ["RS256", "ES256", "EdDSA"], maxTokenAge: "5m", requiredClaims: ["sub", "iat", "exp"] });
+    const identity = await jwtVerify(idToken, createRemoteJWKSet(jwksUrl, { timeoutDuration: 2000 }), { issuer, audience: required(official ? "OFFICIAL_OIDC_AUDIENCE" : "OIDC_AUDIENCE"), algorithms: ["RS256", "ES256", "EdDSA"], maxTokenAge: "5m", requiredClaims: ["sub", "iat", "exp"] }).catch(error => {
+      if (["ERR_JWT_EXPIRED", "ERR_JWT_CLAIM_VALIDATION_FAILED", "ERR_JWS_SIGNATURE_VERIFICATION_FAILED", "ERR_JWS_INVALID", "ERR_JWT_INVALID", "ERR_JOSE_ALG_NOT_ALLOWED", "ERR_JWKS_NO_MATCHING_KEY"].includes(error.code)) throw new HttpError(401, "OIDC_TOKEN_INVALID");
+      throw error;
+    });
     if (expectedNonce && identity.payload.nonce !== expectedNonce) throw new HttpError(401, "OIDC_NONCE_INVALID");
     const expectedClient = required(official ? "OFFICIAL_OIDC_CLIENT_ID" : "OIDC_CLIENT_ID");
     if ((identity.payload.azp !== undefined && identity.payload.azp !== expectedClient) || (Array.isArray(identity.payload.aud) && identity.payload.aud.length > 1 && identity.payload.azp !== expectedClient)) throw new HttpError(401, "OIDC_CLIENT_MISMATCH");
@@ -269,7 +284,12 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env)) {
     authenticate(request.headers["x-service-token"], env.PLATFORM_INTERNAL_TOKEN);
     if (request.headers.origin !== env.WEB_ORIGIN || !oidcFlow) throw new HttpError(401, "OIDC_STATE_INVALID");
     const body = z.object({ state: z.string().max(100), code: z.string().max(8192) }).strict().parse(request.body);
-    const result = await oidcFlow.finish(body.state, request.cookies.oidc_state ?? "", body.code);
+    let result;
+    try { result = await oidcFlow.finish(body.state, request.cookies.oidc_state ?? "", body.code); }
+    catch (error) {
+      if (error instanceof Error && ["OIDC_STATE_INVALID", "OIDC_CODE_EXCHANGE_FAILED"].includes(error.message)) throw new HttpError(401, error.message);
+      throw error;
+    }
     reply.clearCookie("oidc_state", { path: "/" }); return finishLogin(request, reply, result.idToken, result.official, result.expectedNonce);
   });
   app.post("/v2/login", async (request, reply) => {
