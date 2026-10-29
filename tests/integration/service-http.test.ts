@@ -27,7 +27,7 @@ const anchor={read:async(i:string)=>structuredClone(records[i]!),advance:async(p
 let current:'current'|'revoked'|'unavailable'='current';
 const registeredDigests=new Set<string>();
 const longSubject='recipient-'+ 'r'.repeat(100);
-let issuerApp:Awaited<ReturnType<typeof buildFinalsServer>>,platform:typeof issuerApp;
+let issuerApp:Awaited<ReturnType<typeof buildFinalsServer>>,platform:typeof issuerApp,senderApp:typeof issuerApp;
 let web:{close():Promise<void>;resolvedUrls:{local:string[]}|null};
 let provider:ReturnType<typeof createServer>,origin:string,oidc:string,apiOrigin:string,record:InstitutionRecord;
 let subject='staff',mode='normal',codes=new Map<string,{nonce:string;challenge:string;client:string;redirect:string;subject:string;mode:string}>();
@@ -89,13 +89,15 @@ beforeAll(async()=>{
  const witnessKeys=await Promise.all([1,2,3,4].map(async n=>({witnessId:`w-${n}`,kid:`test-witness-${n}`,jwk:(await generateEd25519KeyPair()).publicJwk})));
  const trust={enrollmentPublicKey:issuerKey.publicJwk,supportedProtocolVersions:[3],networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,genesisHash:`0x${'0'.repeat(64)}`,registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1',policyVersion:String(bankPolicy.version),witnessThreshold:3,witnessPublicKeys:witnessKeys,endpoints:[1,2,3,4].map(n=>({witnessId:`w-${n}`,url:'https://127.0.0.1:1'})),service:{institutionUri:record.institutionUri,issuerKid:issuerKey.kid,issuerPublicKey:issuerKey.publicJwk,approvalKeyVersion:1,serviceUri:'https://center.example',serviceKid:serviceKey.kid,servicePublicKey:serviceKey.publicJwk,serviceKeyVersion:1,policy:servicePolicy}};
  await writeFile(`${runRoot}/trust.json`,JSON.stringify(trust),{mode:0o600});await writeFile(`${runRoot}/approval-v1.json`,JSON.stringify({kid:issuerKey.kid,privateJwk:await exportSigningPrivateJwk(issuerKey),publicJwk:issuerKey.publicJwk}),{mode:0o600});
- Object.assign(process.env,{SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
+ await writeFile(`${runRoot}/sender.json`,JSON.stringify({kid:serviceKey.kid,privateJwk:await exportSigningPrivateJwk(serviceKey),publicJwk:serviceKey.publicJwk}),{flag:'wx',mode:0o600});
+ Object.assign(process.env,{SENDER_KEY_PATH:`${runRoot}/sender.json`,SERVICE_URI:'https://center.example',SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
  const env=finalsEnvironment({...process.env,SERVICE_ROLE:'issuer',WEB_ORIGIN:origin,PUBLIC_DEPLOYMENT:'true',PLATFORM_INTERNAL_TOKEN:'p'.repeat(40),SENDER_INTERNAL_TOKEN:'s'.repeat(40),ISSUER_URL:'http://127.0.0.1:1',SENDER_URL:'http://127.0.0.1:1',INSTITUTION_ID:id,NETWORK_ID:'31337',REGISTRY_ADDRESS:trust.registryAddress,TRUST_BUNDLE_PATH:`${runRoot}/trust.json`});
  issuerApp=await buildFinalsServer(env,{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?current:'unavailable'});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
- platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
+ senderApp=await buildFinalsServer({...env,SERVICE_ROLE:'sender',ISSUER_URL:upstream});const senderOrigin=await senderApp.listen({host:'127.0.0.1',port:0});
+ platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream,SENDER_URL:senderOrigin});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
  (vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
 },30000);
-afterAll(async()=>{await web?.close();await platform?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql`DELETE FROM issuer_v2.outbox WHERE institution_id=${id}`;await sql.end();if(runRoot)await writeFile(`${runRoot}/identity.json`,JSON.stringify({institution:id,deployment,screenshots:['service-mobile.png','service-desktop.png'],scope:'synthetic-accounts-local-oidc-real-http-postgres-browser-external-authority-fixtures'}),{flag:'wx',mode:0o600});});
+afterAll(async()=>{await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql`DELETE FROM issuer_v2.outbox WHERE institution_id=${id}`;await sql.end();if(runRoot)await writeFile(`${runRoot}/identity.json`,JSON.stringify({institution:id,deployment,screenshots:['service-mobile.png','service-desktop.png'],scope:'synthetic-accounts-local-oidc-real-http-postgres-browser-external-authority-fixtures'}),{flag:'wx',mode:0o600});});
 
 it('uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries',async()=>{
  const r=await login('recipient');expect(r.done.status).toBe(200);expect(r.done.headers.get('set-cookie')).toContain('Secure');expect(r.done.headers.get('set-cookie')).toContain('HttpOnly');expect(r.done.headers.get('set-cookie')).toContain('SameSite=Strict');
@@ -131,7 +133,10 @@ it('issues and consumes real signed authorizations once across concurrent HTTP r
  current='unavailable';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(503);
  current='revoked';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(409);current='current';
  const challenge=await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk});expect(challenge.status).toBe(200);
- const auth=await agent.c.request('/v3/authorizations',{challengeId:challenge.body.challengeId,proofJws:await signPayload(challenge.body,serviceKey)});expect(auth.status).toBe(200);
+ expect((await other.c.request('/v3/sender-proof',{challengeId:challenge.body.challengeId})).status).toBe(403);
+ expect((await agent.c.request('/v3/sender-context',{challengeId:challenge.body.challengeId,serviceUri:'https://center.example'})).status).toBe(404);
+ const signedProof=await agent.c.request('/v3/sender-proof',{challengeId:challenge.body.challengeId});expect(signedProof.status).toBe(200);expect(signedProof.body.proof).toEqual(challenge.body);
+ const auth=await agent.c.request('/v3/authorizations',{challengeId:challenge.body.challengeId,proofJws:signedProof.body.jws});expect(auth.status).toBe(200);
  expect(auth.body.payload.firstConsumeBy).toBe(a.body.firstConnectBy);
  const nonce=randomUUID();expect((await other.c.request('/v3/enroll',{attemptId:a.body.id,publicKey:recipient.publicJwk,nonce})).status).toBe(404);
  expect((await receiver.c.request('/v3/enroll',{attemptId:a.body.id,publicKey:recipient.publicJwk,nonce})).status).toBe(200);

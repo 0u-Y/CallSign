@@ -414,11 +414,11 @@ CI 이식성: source hygiene의 파일 열거는 Git checkout의 cached/untracke
 
 ## 인증·HTTP·브라우저 통합 검증
 
-별도 사용자 허가 후 `pnpm test:http`를 사용한다. 기존 database 단계와 기본 light에는 포함하지 않는다. 시험은 실제 issuer/platform 라우트·OIDC callback·세션/CSRF/권한 검사·PostgreSQL을 사용하며, 원장 현재 상태와 독립 anchor만 시험 adapter로 대체한다. PBX/음성·외부 제공자를 실행하지 않는다.
+별도 사용자 허가 후 `pnpm test:http`를 사용한다. 기존 database 단계와 기본 light에는 포함하지 않는다. 시험은 실제 issuer/platform/Sender Agent 라우트·OIDC callback·세션/CSRF/권한 검사·PostgreSQL을 사용하며, 원장 현재 상태와 독립 anchor만 시험 adapter로 대체한다. PBX/음성·외부 제공자를 실행하지 않는다.
 
 필요 입력과 준비 순서:
 
-1. 새 고유 `callsign_test_*` DB가 있는 별도 PostgreSQL cluster/container를 loopback에 준비한다. 기존 인스턴스를 사용하지 않는다. 이번 실행은 로컬 `postgres:17.6-alpine`, 512MiB·CPU1·tmpfs256MiB·max_connections32를 사용했다. 이미지가 없으면 다운로드하지 않고 중단한다. 컨테이너 label에 시험 identity를 기록한다.
+1. 새 고유 `callsign_test_*` DB가 있는 별도 PostgreSQL cluster/container를 loopback에 준비한다. 기존 인스턴스를 사용하지 않는다. migration 전에 `docker exec TEST_CONTAINER pg_isready -t 2 -U TEST_OWNER -d TEST_DB`로 준비 완료를 확인한다. 준비 안 된 상태에서 migration을 시작하지 말고 최대10초 안에 준비되지 않으면 중단한다. 이번 실행은 로컬 `postgres:17.6-alpine`, 512MiB·CPU1·tmpfs256MiB·max_connections32를 사용했다. 이미지가 없으면 다운로드하지 않고 중단한다. 컨테이너 label에 시험 identity를 기록한다.
 2. owner `MIGRATOR_DATABASE_URL`로 기존 `scripts/migrate-finals.ts --apply`를 integration 범주에서 실행한다. `infra/deploy/provision-logins.sql`로 별도 issuer/auth/worker/PBX LOGIN을 준비한다. 비밀번호는 보호 환경파일에만 두고 owner를 API에 전달하지 않는다. 기존 LOGIN이 있으면 재설정하지 말고 다른 시험 cluster를 사용한다.
 3. 보호 디렉터리 `CALLSIGN_HTTP_TEST_ROOT`(0700)에 시험용 `tls.key`(0600), `tls.crt`를 준비한다. 설치된 OpenSSL로 1일짜리 **시험 전용** 인증서를 만들며 SAN은 `IP:127.0.0.1,DNS:localhost`다. 운영 인증서/키를 복사하지 않는다. 예: `openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes -keyout "$CALLSIGN_HTTP_TEST_ROOT/tls.key" -out "$CALLSIGN_HTTP_TEST_ROOT/tls.crt" -days 1 -subj /CN=127.0.0.1 -addext subjectAltName=IP:127.0.0.1,DNS:localhost`. 쉘의 umask는077로 둔다.
 4. 보호 환경파일에 `TEST_DATABASE_URL`=owner, `ISSUER_DATABASE_URL`=issuer LOGIN, `AUTH_DATABASE_URL`/`TEST_AUTH_DATABASE_URL`=auth LOGIN을 지정한다. 같은 시험 DB의 서로 다른 LOGIN이어야 한다. `NODE_EXTRA_CA_CERTS`는 위 tls.crt의 경로다. Node 시작 전에 설정해야 하며 TLS 검증을 전역 해제하지 않는다. 실제 OIDC/ARI/STT/LLM/클라우드 자격정보는 시험 환경에 상속하지 않는다.
@@ -431,7 +431,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm test:http --repo
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run --config vitest.integration.config.ts tests/integration/finals-store.test.ts tests/integration/finals-session-scopes.test.ts tests/integration/service-runtime.test.ts tests/integration/database-readiness.test.ts --reporter=json --outputFile=artifacts/NEW-DATABASE.json
 ```
 
-`NEW-*`는 기존 증거와 겹치지 않는 새 이름으로 바꾼다. HTTP fixture는 고유 기관/계정을 만들고 issuer·platform·HTTPS 웹·OIDC의 포트를 직접 할당한다. 체인 상태 adapter는 지정한 digest만 확정 상태로 간주하고, 미확정/철회/조회 불가를 따로 시험한다. 앱의 인증·서명 검증을 대체하지 않는다. `test:` 배포 identity와 loopback origin, 같은 `callsign_test_*` DB의 별도 LOGIN이 아니면 adapter 주입을 거절한다. `oidc_state`·세션 row를 정상 로그인 fixture로 직접 주입하지 않는다. discovery 문서는 fixture가 제공하지만 현재 앱은 명시적으로 설정한 authorize/token/JWKS URL을 소비한다.
+`NEW-*`는 기존 증거와 겹치지 않는 새 이름으로 바꾼다. HTTP fixture는 고유 기관/계정을 만들고 issuer·platform·Sender Agent·HTTPS 웹·OIDC의 포트를 직접 할당한다. 체인 상태 adapter는 지정한 digest만 확정 상태로 간주하고, 미확정/철회/조회 불가를 따로 시험한다. 앱의 인증·서명 검증을 대체하지 않는다. `test:` 배포 identity와 loopback origin, 같은 `callsign_test_*` DB의 별도 LOGIN이 아니면 adapter 주입을 거절한다. `oidc_state`·세션 row를 정상 로그인 fixture로 직접 주입하지 않는다. discovery 문서는 fixture가 제공하지만 현재 앱은 명시적으로 설정한 authorize/token/JWKS URL을 소비한다.
 
 통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium은 시험 인증서만 허용하도록 해당 context의 `ignoreHTTPSErrors`를 사용하고 Node↔OIDC는 추가 CA로 검증한다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
 

@@ -309,7 +309,7 @@ AUTH-001/002, BUSINESS-001/002, CALL-004/005, DB-001/003, UI-001~003, TEST-001/0
 
 정상 로그인은 실제 code/callback/JWKS 서명을 거치며 issuer/subject로 계정을 찾고 별도 LOGIN으로 세션/권한/업무를 저장한다. 계정 길이200자 계약, OIDC 인증 실패와 제공자 장애의 응답 구분, 화면 select 접근 이름을 수정했다. 생성/취소·객체 경계·재인증/CSRF·세션 세대 회수·동시 소비와 영수증 복구·서명 lease를 확인했다. browser API 응답 mock은 없다.
 
-체인 현재 상태와 독립 anchor는 명시적인 adapter fixture이며 PBX/TURN/실제 음성장치·외부 AI·GCP는 미실행이다. 합성 binding/lease 성공을 실제 연결 검증이나 진행 음성 회수 성공으로 확대하지 않는다. 기관/공동 관리 전체 UI·실제 IdP/MFA·전체 TLS 운영·다중 탭/장시간·네트워크 장애·독립 복구도 아직 전체 완료가 아니다. [이번 평가/파일 hash](../artifacts/http-validation-20261030.json), [진행표](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030), [재현 절차](RUNBOOK.md#authenticated-http-tests)가 근거다.
+서비스 proof도 실제 platform→Sender Agent→issuer HTTP 경로를 거친 [후속7시험](../artifacts/http-sender-validation-20261030.json)이 현재 HTTP 결과다. 다른 수신자 요청과 비공개 context 노출을 거절한다. 앞선7시험에 더하지 않는다. 체인 현재 상태와 독립 anchor는 명시적인 adapter fixture이며 PBX/TURN/실제 음성장치·외부 AI·GCP는 미실행이다. 합성 binding/lease 성공을 실제 연결 검증이나 진행 음성 회수 성공으로 확대하지 않는다. 기관/공동 관리 전체 UI·실제 IdP/MFA·전체 TLS 운영·다중 탭/장시간·네트워크 장애·독립 복구도 아직 전체 완료가 아니다. [이번 평가/파일 hash](../artifacts/http-validation-20261030.json), [진행표](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030), [재현 절차](RUNBOOK.md#authenticated-http-tests)가 근거다.
 
 ## 3. 우선 해결할 충돌·차단 요인
 

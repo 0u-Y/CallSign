@@ -19,7 +19,7 @@
 
 ## 최신 선택 경로 검증
 
-실제 HTTPS OIDC fixture·issuer/platform HTTP·PostgreSQL·Chromium의1파일7시험과 DB 회귀4파일15시험이 각각 PASS입니다. 이번 light는44파일197시험, 웹 build·API/runtime/harness 타입도 PASS입니다. [원본 결과·대체 경계·실패 이력·자원 정리](../../artifacts/http-validation-20261030.json)를 확인할 수 있습니다. 과거 시험과 합산하지 않습니다.
+실제 HTTPS OIDC fixture·issuer/platform/Sender Agent HTTP·PostgreSQL·Chromium의1파일7시험과 DB 회귀4파일15시험이 각각 PASS입니다. 이번 light는44파일197시험, 웹 build·API/runtime/harness 타입도 PASS입니다. [최신 Sender Agent 경로](../../artifacts/http-sender-validation-20261030.json)와 [원본 결과·대체 경계·실패 이력·자원 정리](../../artifacts/http-validation-20261030.json)를 확인할 수 있습니다. 과거 시험과 합산하지 않습니다.
 
 브라우저는 실제 화면에서 로그인·업무 생성/취소·로그아웃·수신자 메뉴·Secure cookie와390px 화면·Tab/focus를 확인했습니다. API 응답을 mock하지 않았습니다. 실제 체인/Witness·PBX/TURN/음성·외부 IdP/MFA·STT/LLM·독립 anchor·복원/GCP는 미검증입니다. 합성 binding과 서명 lease가 실제 연결 성공을 의미하지 않습니다.
 

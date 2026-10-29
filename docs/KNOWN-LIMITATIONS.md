@@ -43,6 +43,6 @@
 
 ## 인증·화면 시험의 대체 경계
 
-실제 로그인/세션/권한 middleware·issuer/platform HTTP·역할별 PostgreSQL은 실행했다. 로컬 OIDC fixture는 production IdP/MFA 호환성이 아니며 앱은 discovery 대신 설정한 endpoint를 소비한다. Node는 시험 CA로 TLS 검증했고 Chromium context만 시험 인증서 오류를 허용했다. 운영 인증서 정책을 바꾸지 않았다. 실제 원격 오디오·PBX·Witness snapshot SDK 검증·체인 권한 전파·제공자 장애 중 분석 회수는 미실행이다.
+실제 로그인/세션/권한 middleware·issuer/platform/Sender Agent HTTP·역할별 PostgreSQL은 실행했다. 로컬 OIDC fixture는 production IdP/MFA 호환성이 아니며 앱은 discovery 대신 설정한 endpoint를 소비한다. Node는 시험 CA로 TLS 검증했고 Chromium context만 시험 인증서 오류를 허용했다. 운영 인증서 정책을 바꾸지 않았다. 실제 원격 오디오·PBX·Witness snapshot SDK 검증·체인 권한 전파·제공자 장애 중 분석 회수는 미실행이다.
 
 시험 중 heading timeout1회는 원인을 확정하지 못했고 후속 순차 실행에서는 재현되지 않았다. 개발 실패와 최종 PASS를 구분해 보존했다. 화면 캡처에는 합성 계정만 있으며 cookie·storage·trace·음성은 공유하지 않는다. API/DB가 시험 fixture에서 통과한 것은 전체 배포 readiness나 성능 목표 달성이 아니다.

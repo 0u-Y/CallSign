@@ -18,6 +18,8 @@
 - UI-001/002/003: 콜센터/위임/시도 select의 접근 가능한 이름이 option 텍스트에 섞이는 문제를 명시적 label로 수정했다. 실제 `/service`에서 기관 로그인·업무 생성/취소·로그아웃·수신자 메뉴 분리·HTTPS Secure/HttpOnly/SameSite cookie·390px 화면 overflow·키보드 Tab/focus·uncaught/console 오류를 확인했다. API 응답을 browser route mock으로 대체하지 않았다. 기본 인증 전/로그아웃 단계의 정확한 `/auth/me` 401만 예상 오류로 기록했다.
 - TEST-001/004·OPS-001: `test:http`/전용 Vitest config를 추가하고 기존 light·database 구성에서는 HTTP/브라우저 시작을 제외했다. 외부 adapter 주입은 integration guard·test 배포·loopback·같은 `callsign_test_*`의 별도 issuer/auth LOGIN을 요구한다. 보호 키·스크린샷은 고유 run 디렉터리에 쓴다. 운영 기본값에서 fixture 선택이나 실패 후 fake fallback은 없다.
 
+추가 경로 점검에서 시험 자체의 서비스 키 서명 대신 실제 Sender Agent HTTP 교환을 연결했다. platform `/v3/sender-proof`→Sender Agent `/service-proof`→issuer의 비공개 context를 거치며, 원래 세션·CSRF와 서로 다른 서비스 token을 그대로 검사한다. 다른 수신자의 proof 요청403과 platform의 비공개 context404도 확인했다. 새 격리 DB에서 같은7시험을 다시 실행해 모두 통과했다. [최신 Sender Agent 포함 증거](../artifacts/http-sender-validation-20261030.json)가 현재 HTTP 결과이며 앞선7시험과 합산하지 않는다. 첫 부팅에서 DB readiness 전에 migration을 시도한 환경 실패는 별도 보존하고 `pg_isready` 확인 뒤 진행했다. 두 번째 identity의 자원·키도 정리했다. 첫 게시 `2188336`의 light CI는 성공했고 후속 게시의 CI는 해당 commit 실행을 별도로 확인한다.
+
 ### 결과와 실패 이력
 
 | 실행 | 실제 결과 | 근거 |
