@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "runId": "fbb4da22-4bdf-48bb-8b17-cc9914f57b27",
+  "stage": "chain",
+  "startedAt": "2026-10-29T09:07:18.532Z",
+  "finishedAt": "2026-10-29T09:07:18.603Z",
+  "identity": {
+    "stageInputs": {},
+    "head": "a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a",
+    "dirty": true,
+    "sourceHash": "493d7f8c6e88fd97720a6c96bafa021a0484d5281d48be9d7ff2c1b6c1740749",
+    "configurationHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "publicFiles": {},
+    "environmentId": "offline:source",
+    "environmentHash": "d16087fd5b8605a5621c02c4f1a2c3004f0cdf18836056f43e32d8a0396ee1e7"
+  },
+  "identityHash": "d059dbd0a6dce42033357e103b5723fdda7cfecc6b8912d39016a85064568e7a",
+  "dryRun": true,
+  "results": [
+    {
+      "id": "management-contract",
+      "command": [
+        "forge",
+        "test",
+        "--offline",
+        "--match-contract",
+        "ServiceRegistryTest",
+        "--fuzz-runs",
+        "1",
+        "-vv"
+      ],
+      "requirements": [
+        "CONTRACT-001",
+        "CONTRACT-003",
+        "GOVERNANCE-001"
+      ],
+      "expectation": "Actual contract assertions: duplicate/replay/legacy bypass, exact action and policy invalidation; no fork or node startup",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED"
+    },
+    {
+      "id": "besu-witness",
+      "requirements": [
+        "STATE-001",
+        "STATE-002",
+        "CALL-006"
+      ],
+      "expectation": "Same deployed chain/registry/block/state; 3 distinct witnesses; insufficient quorum/stale/conflicting state rejected; confirmed key/policy changes revoke old VC/lease",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED; MANUAL: Use the prepared disposable deployment and RUNBOOK. Contract unit success is not Besu/Witness integration success."
+    }
+  ],
+  "status": "SKIPPED",
+  "automaticExecutionScope": "selected-existing-tests-only-no-service-startup",
+  "attachments": [],
+  "realEnvironmentVerified": false
+}

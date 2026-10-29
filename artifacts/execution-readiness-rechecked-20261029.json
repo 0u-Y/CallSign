@@ -1,0 +1,2267 @@
+{
+  "version": 1,
+  "recordedAt": "2026-10-29T09:20:16.920Z",
+  "head": "a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a",
+  "worktreeDirty": true,
+  "scope": "offline execution preparation and selected automatic validation tools; actual environment stages not executed",
+  "realEnvironmentVerified": false,
+  "preflight": {
+    "before": {
+      "PASS": 10,
+      "FAIL": 0,
+      "BLOCKED": 38,
+      "SKIPPED": 3
+    },
+    "after": {
+      "PASS": 14,
+      "FAIL": 0,
+      "BLOCKED": 62,
+      "SKIPPED": 1
+    },
+    "remainingClasses": {
+      "A": 0,
+      "B": 0,
+      "C": 43,
+      "D": 19,
+      "E": 0,
+      "F": 0
+    },
+    "originalBlockedItems": [
+      {
+        "id": "WEB_ORIGIN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        },
+        "current": {
+          "id": "WEB_ORIGIN",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+            "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+          }
+        }
+      },
+      {
+        "id": "OIDC_ISSUER",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OIDC_ISSUER",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OIDC_JWKS_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OIDC_JWKS_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OIDC_AUTHORIZATION_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OIDC_AUTHORIZATION_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OIDC_TOKEN_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "OIDC_TOKEN_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "SIP_WSS_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        },
+        "current": {
+          "id": "SIP_WSS_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+            "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+          }
+        }
+      },
+      {
+        "id": "OIDC_CLIENT_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OIDC_AUDIENCE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OFFICIAL_OIDC_CLIENT_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OFFICIAL_OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "OFFICIAL_OIDC_AUDIENCE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "OFFICIAL_OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "TURN_URLS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        },
+        "current": {
+          "id": "TURN_URLS",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+            "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+          }
+        }
+      },
+      {
+        "id": "SIP_REALM",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        },
+        "current": {
+          "id": "SIP_REALM",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+            "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+          }
+        }
+      },
+      {
+        "id": "SIP_DOMAIN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        },
+        "current": {
+          "id": "SIP_DOMAIN",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+            "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+          }
+        }
+      },
+      {
+        "id": "PBX_PRIVATE_ADDRESS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "B",
+          "input": "기본 Compose의 고정 IPv4 10.205.0.20",
+          "next": "기본 compose.pbx.yml의 고정 IP와 일치 확인; 다른 배포망이면 명시 변경"
+        },
+        "current": {
+          "id": "pbx-static-network",
+          "status": "PASS",
+          "detail": "PBX_PRIVATE_ADDRESS는 기본 overlay의 고정 IPv4와 같아야 합니다. 다른 망은 overlay도 명시 변경합니다.",
+          "preparation": {
+            "stage": "offline",
+            "producer": "저장소 배포 설정",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "B",
+            "input": "고정 PBX_PRIVATE_ADDRESS와 Compose overlay",
+            "next": "pnpm preflight; 실제 라우팅은 media 검증"
+          },
+          "source": "repository-default"
+        }
+      },
+      {
+        "id": "REGISTRY_APPROVERS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "독립 공동 승인자3명",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+          "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+        },
+        "current": {
+          "id": "REGISTRY_APPROVERS",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "chain",
+            "producer": "독립 공동 승인자3명",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+            "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+          }
+        }
+      },
+      {
+        "id": "official-auth-isolation",
+        "status": "BLOCKED",
+        "detail": "공식 업무의 client·audience는 통화 로그인과 분리해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        },
+        "current": {
+          "id": "official-auth-isolation",
+          "status": "BLOCKED",
+          "detail": "공식 업무의 client·audience는 통화 로그인과 분리해야 합니다.",
+          "preparation": {
+            "stage": "auth/media",
+            "producer": "선택한 IdP 관리자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+            "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+          }
+        }
+      },
+      {
+        "id": "service-token-separation",
+        "status": "BLOCKED",
+        "detail": "플랫폼과 Sender의 내부 인증 비밀값은 서로 달라야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "service-token-separation",
+          "status": "BLOCKED",
+          "detail": "플랫폼과 Sender의 내부 인증 비밀값은 서로 달라야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "joint-approvers",
+        "status": "BLOCKED",
+        "detail": "서로 다른 유효 승인자 주소 3개가 필요합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "독립 공동 승인자3명",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+          "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+        },
+        "current": {
+          "id": "joint-approvers",
+          "status": "BLOCKED",
+          "detail": "서로 다른 유효 승인자 주소 3개가 필요합니다.",
+          "preparation": {
+            "stage": "chain",
+            "producer": "독립 공동 승인자3명",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+            "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+          }
+        }
+      },
+      {
+        "id": "ISSUER_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "ISSUER_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "AUTH_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "AUTH_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "WORKER_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "WORKER_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "database-account-separation",
+        "status": "BLOCKED",
+        "detail": "Issuer·인증·worker·PBX의 서로 다른 로그인 계정이 필요합니다. 실제 GRANT 검증은 PostgreSQL에서 수행합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "database-account-separation",
+          "status": "BLOCKED",
+          "detail": "Issuer·인증·worker·PBX의 서로 다른 로그인 계정이 필요합니다. 실제 GRANT 검증은 PostgreSQL에서 수행합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "CALLSIGN_APP_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        },
+        "current": {
+          "id": "CALLSIGN_APP_IMAGE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "명시적 이미지 build/검토 단계",
+            "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+            "category": "D",
+            "input": "검토한 registry/repository@sha256:64hex",
+            "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+          }
+        }
+      },
+      {
+        "id": "CALLSIGN_WEB_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "실제 trust/pin 생성 후 웹 build",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        },
+        "current": {
+          "id": "CALLSIGN_WEB_IMAGE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "명시적 이미지 build/검토 단계",
+            "prerequisite": "실제 trust/pin 생성 후 웹 build",
+            "category": "D",
+            "input": "검토한 registry/repository@sha256:64hex",
+            "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+          }
+        }
+      },
+      {
+        "id": "ASTERISK_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        },
+        "current": {
+          "id": "ASTERISK_IMAGE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "명시적 이미지 build/검토 단계",
+            "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+            "category": "D",
+            "input": "검토한 registry/repository@sha256:64hex",
+            "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+          }
+        }
+      },
+      {
+        "id": "TURN_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        },
+        "current": {
+          "id": "TURN_IMAGE",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "명시적 이미지 build/검토 단계",
+            "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+            "category": "D",
+            "input": "검토한 registry/repository@sha256:64hex",
+            "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+          }
+        }
+      },
+      {
+        "id": "REGISTRY_ADMIN_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        },
+        "current": {
+          "id": "REGISTRY_ADMIN_KEY_PATH",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+            "prerequisite": "키 소유자·신규 배포와 복원 구별",
+            "category": "D",
+            "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+            "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+          }
+        }
+      },
+      {
+        "id": "REGISTRY_OPERATOR_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        },
+        "current": {
+          "id": "REGISTRY_OPERATOR_KEY_PATH",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+            "prerequisite": "키 소유자·신규 배포와 복원 구별",
+            "category": "D",
+            "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+            "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+          }
+        }
+      },
+      {
+        "id": "PBX_EVIDENCE_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        },
+        "current": {
+          "id": "PBX_EVIDENCE_KEY_PATH",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "bootstrap",
+            "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+            "prerequisite": "키 소유자·신규 배포와 복원 구별",
+            "category": "D",
+            "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+            "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+          }
+        }
+      },
+      {
+        "id": "PBX_CREDENTIAL_SECRET",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "PBX_CREDENTIAL_SECRET",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "CONSUMPTION_ANCHOR_TOKEN",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "TURN_SECRET",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "TURN_SECRET",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "PLATFORM_INTERNAL_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "PLATFORM_INTERNAL_TOKEN",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "SENDER_INTERNAL_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        },
+        "current": {
+          "id": "SENDER_INTERNAL_TOKEN",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "database/auth/media",
+            "producer": "배포 운영자",
+            "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+            "category": "C",
+            "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+            "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+          }
+        }
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "recovery",
+          "producer": "배포 운영자",
+          "prerequisite": "운영 DB/VM 백업과 별개 관리자·보관 정책",
+          "category": "C",
+          "input": "별도 수명 HTTPS anchor URL·인증 참조·새 zero record",
+          "next": "별도 관리자가 infra/deploy/anchor-schema.sql 검토/사전 등록; 기존 record 초기화 금지"
+        },
+        "current": {
+          "id": "CONSUMPTION_ANCHOR_URL",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "recovery",
+            "producer": "배포 운영자",
+            "prerequisite": "운영 DB/VM 백업과 별개 관리자·보관 정책",
+            "category": "C",
+            "input": "별도 수명 HTTPS anchor URL·인증 참조·새 zero record",
+            "next": "별도 관리자가 infra/deploy/anchor-schema.sql 검토/사전 등록; 기존 record 초기화 금지"
+          }
+        }
+      },
+      {
+        "id": "DEPLOYMENT_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "scripts/deploy-service-registry.ts",
+          "prerequisite": "체인 identity 관측·검토 ABI·배포 승인",
+          "category": "D",
+          "input": "새 deployment.json (chain/genesis/registry/code/profile/initialPolicyHash)",
+          "next": "pnpm ledger:deploy-service --apply (현재 실행 금지)"
+        },
+        "current": {
+          "id": "DEPLOYMENT_PATH",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "chain",
+            "producer": "scripts/deploy-service-registry.ts",
+            "prerequisite": "체인 identity 관측·검토 ABI·배포 승인",
+            "category": "D",
+            "input": "새 deployment.json (chain/genesis/registry/code/profile/initialPolicyHash)",
+            "next": "pnpm ledger:deploy-service --apply (현재 실행 금지)"
+          }
+        }
+      },
+      {
+        "id": "TRUST_BUNDLE_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "trust/web",
+          "producer": "scripts/prepare-finals.ts trust",
+          "prerequisite": "실제 deployment.json·public manifest·PBX 공개 인증서",
+          "category": "D",
+          "input": "공개 trust JSON과 canonical SHA-256",
+          "next": "pnpm exec tsx scripts/prepare-finals.ts trust DIRECTORY NEW_OUTPUT --apply (승인 후)"
+        },
+        "current": {
+          "id": "TRUST_BUNDLE_PATH",
+          "status": "BLOCKED",
+          "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+          "preparation": {
+            "stage": "trust/web",
+            "producer": "scripts/prepare-finals.ts trust",
+            "prerequisite": "실제 deployment.json·public manifest·PBX 공개 인증서",
+            "category": "D",
+            "input": "공개 trust JSON과 canonical SHA-256",
+            "next": "pnpm exec tsx scripts/prepare-finals.ts trust DIRECTORY NEW_OUTPUT --apply (승인 후)"
+          }
+        }
+      },
+      {
+        "id": "REGISTRY_ARTIFACT_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        },
+        "current": [
+          {
+            "id": "registry-abi",
+            "status": "PASS",
+            "detail": "새 공동 관리 ABI가 필요합니다.",
+            "preparation": {
+              "stage": "offline",
+              "producer": "저장소/오프라인 컴파일",
+              "prerequisite": "source hash와 ABI 대조",
+              "category": "B",
+              "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+              "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+            },
+            "source": "repository-default"
+          },
+          {
+            "id": "artifact-hash",
+            "status": "PASS",
+            "detail": "검토한 artifact 파일 해시와 일치해야 합니다.",
+            "preparation": {
+              "stage": "offline",
+              "producer": "저장소/오프라인 컴파일",
+              "prerequisite": "source hash와 ABI 대조",
+              "category": "B",
+              "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+              "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+            },
+            "source": "repository-default"
+          }
+        ]
+      }
+    ],
+    "allCurrentChecks": [
+      {
+        "id": "WEB_ORIGIN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "OIDC_ISSUER",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OIDC_JWKS_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OIDC_AUTHORIZATION_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OIDC_TOKEN_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "SIP_WSS_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "OIDC_CLIENT_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OIDC_AUDIENCE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OFFICIAL_OIDC_CLIENT_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "OFFICIAL_OIDC_AUDIENCE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "TURN_URLS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "SIP_REALM",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "SIP_DOMAIN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "REGISTRY_APPROVERS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "독립 공동 승인자3명",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+          "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+        }
+      },
+      {
+        "id": "official-auth-isolation",
+        "status": "BLOCKED",
+        "detail": "공식 업무의 client·audience는 통화 로그인과 분리해야 합니다.",
+        "preparation": {
+          "stage": "auth/media",
+          "producer": "선택한 IdP 관리자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "HTTPS issuer/JWKS/authorize/token; 일반·공식 서로 다른 client/audience; auth_time 지원",
+          "next": "IdP 등록값을 보호 env로 전달하고 검증된 issuer|subject를 내부 accounts에 연결"
+        }
+      },
+      {
+        "id": "CALLSIGN_DOMAIN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "PBX_PUBLIC_HOST",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "INSTITUTION_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "등록 기관/콜센터 URI, 배포 식별자 또는 해당 검사에 표시한 공개 설정",
+          "next": "pnpm prepare:execution --env-file PROTECTED_ENV; 필요한 입력만 확인"
+        }
+      },
+      {
+        "id": "PBX_PUBLIC_ADDRESS",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "WEB_ORIGIN HTTPS; 같은 origin wss://HOST/pbx/ws; TURN URLs; SIP realm/domain",
+          "next": "DNS/TLS/공개 미디어 경로를 선택; prepare-pbx dry-run 후 승인된 구성 준비"
+        }
+      },
+      {
+        "id": "PBX_DB_USER",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "ARI_PASSWORD",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "PBX_DB_PASSWORD",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "MIGRATOR_DB_PASSWORD",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "FINALS_ACCOUNTS_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth",
+          "producer": "기관/IdP 관리자",
+          "prerequisite": "외부 계정 subject와 최초 관리자/공동 승인자 역할 확인",
+          "category": "C",
+          "input": "검토한0600 최초 accounts JSON 경로 (등록 issuer|subject/id/displayName/role/permissions)",
+          "next": "새 빈 DB의 provision-finals --apply 이전에 파일 준비; 이름/이메일 기반 자동 연결 금지"
+        }
+      },
+      {
+        "id": "call-time-policy",
+        "status": "PASS",
+        "detail": "최초 연결 120초와 갱신 lease·최대 통화 정책의 유효 범위를 확인합니다. 운영 승인이나 실측을 뜻하지 않습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소 설정과 운영자 검토",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "A",
+          "input": "기존 공통 정책/최소권한/기본 차단",
+          "next": "pnpm preflight; guard는 해제하지 않음"
+        }
+      },
+      {
+        "id": "public-demo-isolation",
+        "status": "PASS",
+        "detail": "공개 배포에서 데모 로그인을 켤 수 없습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소 설정과 운영자 검토",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "A",
+          "input": "기존 공통 정책/최소권한/기본 차단",
+          "next": "pnpm preflight; guard는 해제하지 않음"
+        }
+      },
+      {
+        "id": "service-token-separation",
+        "status": "BLOCKED",
+        "detail": "플랫폼과 Sender의 내부 인증 비밀값은 서로 달라야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "provider:stt",
+        "status": "BLOCKED",
+        "detail": "제공자 키·모델은 함께 준비합니다. 지원 여부·보관 정책·한국어 품질은 이 검사에서 확인하지 않습니다.",
+        "preparation": {
+          "stage": "provider",
+          "producer": "배포 운영자",
+          "prerequisite": "분석 동의·예산·provider 보관 조건 확인",
+          "category": "C",
+          "input": "현재 연결한 STT/LLM provider 키의 보호 환경 참조와 모델 이름",
+          "next": "전체 분석 준비에는 키/모델 쌍 필요. bootstrap에서는 보류하고 provider 단계에서 반드시 확인; 미준비를 안전으로 표시하지 않음"
+        }
+      },
+      {
+        "id": "provider:llm",
+        "status": "BLOCKED",
+        "detail": "제공자 키·모델은 함께 준비합니다. 지원 여부·보관 정책·한국어 품질은 이 검사에서 확인하지 않습니다.",
+        "preparation": {
+          "stage": "provider",
+          "producer": "배포 운영자",
+          "prerequisite": "분석 동의·예산·provider 보관 조건 확인",
+          "category": "C",
+          "input": "현재 연결한 STT/LLM provider 키의 보호 환경 참조와 모델 이름",
+          "next": "전체 분석 준비에는 키/모델 쌍 필요. bootstrap에서는 보류하고 provider 단계에서 반드시 확인; 미준비를 안전으로 표시하지 않음"
+        }
+      },
+      {
+        "id": "joint-approvers",
+        "status": "BLOCKED",
+        "detail": "서로 다른 유효 승인자 주소 3개가 필요합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "독립 공동 승인자3명",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "서로 다른 nonzero EVM 공개 주소3개, 콤마 구분",
+          "next": "공개 주소만 REGISTRY_APPROVERS에 설정; private key는 각자 보관"
+        }
+      },
+      {
+        "id": "PLATFORM_DATABASE_URL",
+        "status": "PASS",
+        "detail": "플랫폼은 DB 계정을 보유하지 않습니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "ISSUER_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "AUTH_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "WORKER_DATABASE_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "database-account-separation",
+        "status": "BLOCKED",
+        "detail": "Issuer·인증·worker·PBX의 서로 다른 로그인 계정이 필요합니다. 실제 GRANT 검증은 PostgreSQL에서 수행합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "CALLSIGN_APP_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "CALLSIGN_WEB_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "실제 trust/pin 생성 후 웹 build",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "ASTERISK_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "TURN_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "BESU_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "POSTGRES_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "HTTPS_IMAGE",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "명시적 이미지 build/검토 단계",
+          "prerequisite": "각 이미지의 출처·모듈·driver 검토",
+          "category": "D",
+          "input": "검토한 registry/repository@sha256:64hex",
+          "next": "실행 허가 후 이미지 준비; 실제 digest를 기록, 임의 값을 채우지 않음"
+        }
+      },
+      {
+        "id": "REGISTRY_ADMIN_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "REGISTRY_OPERATOR_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "PBX_EVIDENCE_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "ISSUER_APPROVAL_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "SENDER_PRIVATE_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "WITNESS_1_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "WITNESS_2_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "WITNESS_3_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "WITNESS_4_KEY_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "PBX_CREDENTIAL_SECRET",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "TURN_SECRET",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "PLATFORM_INTERNAL_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "SENDER_INTERNAL_TOKEN",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_URL",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "recovery",
+          "producer": "배포 운영자",
+          "prerequisite": "운영 DB/VM 백업과 별개 관리자·보관 정책",
+          "category": "C",
+          "input": "별도 수명 HTTPS anchor URL·인증 참조·새 zero record",
+          "next": "별도 관리자가 infra/deploy/anchor-schema.sql 검토/사전 등록; 기존 record 초기화 금지"
+        }
+      },
+      {
+        "id": "ISSUER_URI",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "등록 기관/콜센터 URI, 배포 식별자 또는 해당 검사에 표시한 공개 설정",
+          "next": "pnpm prepare:execution --env-file PROTECTED_ENV; 필요한 입력만 확인"
+        }
+      },
+      {
+        "id": "SERVICE_URI",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "등록 기관/콜센터 URI, 배포 식별자 또는 해당 검사에 표시한 공개 설정",
+          "next": "pnpm prepare:execution --env-file PROTECTED_ENV; 필요한 입력만 확인"
+        }
+      },
+      {
+        "id": "DEPLOYMENT_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "등록 기관/콜센터 URI, 배포 식별자 또는 해당 검사에 표시한 공개 설정",
+          "next": "pnpm prepare:execution --env-file PROTECTED_ENV; 필요한 입력만 확인"
+        }
+      },
+      {
+        "id": "NETWORK_ID",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "등록 기관/콜센터 URI, 배포 식별자 또는 해당 검사에 표시한 공개 설정",
+          "next": "pnpm prepare:execution --env-file PROTECTED_ENV; 필요한 입력만 확인"
+        }
+      },
+      {
+        "id": "pbx-static-network",
+        "status": "PASS",
+        "detail": "PBX_PRIVATE_ADDRESS는 기본 overlay의 고정 IPv4와 같아야 합니다. 다른 망은 overlay도 명시 변경합니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소 배포 설정",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "B",
+          "input": "고정 PBX_PRIVATE_ADDRESS와 Compose overlay",
+          "next": "pnpm preflight; 실제 라우팅은 media 검증"
+        },
+        "source": "repository-default"
+      },
+      {
+        "id": "PBX_DTLS_CERT_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "bootstrap",
+          "producer": "기관/콜센터/공동 운영자의 승인된 key provisioning",
+          "prerequisite": "키 소유자·신규 배포와 복원 구별",
+          "category": "D",
+          "input": "역할 전용 파일 경로; 일반 파일/0600; 값 출력 금지",
+          "next": "검토한 새 디렉터리에서 keys --apply; 관리 승인키는 독립 준비"
+        }
+      },
+      {
+        "id": "ARI_AUTHORIZATION",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "database/auth/media",
+          "producer": "배포 운영자",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "C",
+          "input": "역할별 보호 환경 또는 비밀 파일 참조; 서비스 비밀값 최소32자·서로 다른 DB LOGIN",
+          "next": "보호 env로 입력; DB는 migration 뒤 infra/deploy/provision-logins.sql; 채팅/증거에 값 기입 금지"
+        }
+      },
+      {
+        "id": "ARI_URL",
+        "status": "PASS",
+        "detail": "내부 ARI는 검토한 CA의 HTTPS와 별도 서비스 인증을 사용합니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소 Compose/template",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "B",
+          "input": "기본 Compose의 내부 https://asterisk:8089",
+          "next": "공개 DNS 값 대신 기본 내부 주소를 사용; 실제 CA/인증은 media 검증"
+        },
+        "source": "repository-default"
+      },
+      {
+        "id": "DEPLOYMENT_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "chain",
+          "producer": "scripts/deploy-service-registry.ts",
+          "prerequisite": "체인 identity 관측·검토 ABI·배포 승인",
+          "category": "D",
+          "input": "새 deployment.json (chain/genesis/registry/code/profile/initialPolicyHash)",
+          "next": "pnpm ledger:deploy-service --apply (현재 실행 금지)"
+        }
+      },
+      {
+        "id": "TRUST_BUNDLE_PATH",
+        "status": "BLOCKED",
+        "detail": "운영자가 검토한 값을 비밀 설정 또는 환경 파일에 준비해야 합니다.",
+        "preparation": {
+          "stage": "trust/web",
+          "producer": "scripts/prepare-finals.ts trust",
+          "prerequisite": "실제 deployment.json·public manifest·PBX 공개 인증서",
+          "category": "D",
+          "input": "공개 trust JSON과 canonical SHA-256",
+          "next": "pnpm exec tsx scripts/prepare-finals.ts trust DIRECTORY NEW_OUTPUT --apply (승인 후)"
+        }
+      },
+      {
+        "id": "registry-abi",
+        "status": "PASS",
+        "detail": "새 공동 관리 ABI가 필요합니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        },
+        "source": "repository-default"
+      },
+      {
+        "id": "artifact-hash",
+        "status": "PASS",
+        "detail": "검토한 artifact 파일 해시와 일치해야 합니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        },
+        "source": "repository-default"
+      },
+      {
+        "id": "migration:0000_initial",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "migration:0001_finals_authority",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "migration:0002_session_scopes",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "migration:0003_service_runtime",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "migration:0004_worker_recovery",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "migration:0005_account_management",
+        "status": "PASS",
+        "detail": "소스 존재만 확인했습니다. 적용 여부는 확인하지 않았습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소/오프라인 컴파일",
+          "prerequisite": "source hash와 ABI 대조",
+          "category": "B",
+          "input": "기존 SQL/실제 오프라인 compiler artifact 및 검토 hash",
+          "next": "pnpm preflight (저장소 기본 artifact 자동 확인)"
+        }
+      },
+      {
+        "id": "execution-guard",
+        "status": "PASS",
+        "detail": "실행 전 검사에서는 무거운 실행 허용 변수를 설정하지 않습니다.",
+        "preparation": {
+          "stage": "offline",
+          "producer": "저장소 설정과 운영자 검토",
+          "prerequisite": "검토한 새 배포 identity; 실제 비밀값은 보호 환경/파일로 전달",
+          "category": "A",
+          "input": "기존 공통 정책/최소권한/기본 차단",
+          "next": "pnpm preflight; guard는 해제하지 않음"
+        }
+      },
+      {
+        "id": "network-and-runtime",
+        "status": "SKIPPED",
+        "detail": "DNS·OIDC auth_time·실제 DB GRANT·PBX 모듈/driver·TLS/DTLS·TURN relay·anchor CAS·체인 상태·이미지 내용은 실행 허가 후 확인해야 합니다.",
+        "preparation": {
+          "stage": "database/chain/media/recovery",
+          "producer": "승인된 시험 환경",
+          "prerequisite": "단계별 명시적 실행 허가",
+          "category": "E",
+          "input": "DNS/OIDC auth_time/GRANT/PBX modules/TURN/CAS의 실제 관측",
+          "next": "pnpm validate --stage STAGE --environment ENV_JSON --output NEW_ARTIFACT --execute"
+        }
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "path": "artifacts/execution-validation-final-20261029.json",
+      "sha256": "c2c9482fe46506d1e251b747667523072425eacb10378d24bc23e044fc7003ac",
+      "bytes": 124620,
+      "status": "BLOCKED",
+      "stage": "offline",
+      "dryRun": false
+    },
+    {
+      "path": "artifacts/execution-validation-20261029.json",
+      "sha256": "e5cfd1b4921001b1a89b1769049ade130ebde2227b33a3afe7fb4c4afae54b6a",
+      "bytes": 119113,
+      "status": "BLOCKED",
+      "stage": "offline",
+      "dryRun": false
+    },
+    {
+      "path": "artifacts/execution-preparation-20261029.json",
+      "sha256": "62c2a997fa22683ec1891fa69e19a90c897ed3367e594a6b539351b565bfe04c",
+      "bytes": 48908,
+      "status": "preparation-dry-run",
+      "stage": "preparation",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-database-20261029.json",
+      "sha256": "8e14a288671e3724af9212d2f19267c9172e40dd31151286f74d05b06953700b",
+      "bytes": 1889,
+      "status": "SKIPPED",
+      "stage": "database",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-chain-20261029.json",
+      "sha256": "c8cef317ed4e6a27f1c2860c1f06030308c7c44261e19ea6959371fdfa49fb8b",
+      "bytes": 1991,
+      "status": "SKIPPED",
+      "stage": "chain",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-media-20261029.json",
+      "sha256": "7816566499bd5cbd878a236c9eb3d30736b62951633c86e30651723585dc0492",
+      "bytes": 1981,
+      "status": "SKIPPED",
+      "stage": "media",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-provider-20261029.json",
+      "sha256": "523d05224a3fe49fb5423e2de2a8858daa339193373a3c53a6fd8166aa468c13",
+      "bytes": 2513,
+      "status": "SKIPPED",
+      "stage": "provider",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-recovery-20261029.json",
+      "sha256": "5c4722dd9c12813b0ac452bada7e837989fcb26bba59235a28aea3a57e0bd23f",
+      "bytes": 2026,
+      "status": "SKIPPED",
+      "stage": "recovery",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-performance-20261029.json",
+      "sha256": "40e33bf975f5cbfed42b2ee5d413cfc15bd2345a0ccc12cc61f773e931ca85a5",
+      "bytes": 2133,
+      "status": "SKIPPED",
+      "stage": "performance",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-dryrun-cloud-20261029.json",
+      "sha256": "eb51910599bcba80f0d20ed8571742651a34eec7dbdfa2c8358ac36a6826f087",
+      "bytes": 1394,
+      "status": "SKIPPED",
+      "stage": "cloud",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-preparation-rechecked-20261029.json",
+      "sha256": "64d62111d9b97c5f7d450b30fa2346bbdb1366d98cb7adf3bd9eb331470eeeb5",
+      "bytes": 54804,
+      "status": "preparation-dry-run",
+      "stage": "preparation",
+      "dryRun": true
+    },
+    {
+      "path": "artifacts/execution-validation-rechecked-20261029.json",
+      "sha256": "ea53cee8bd5ba83f0aa8a6caee1a0506e9f9491d1e9de9098717cf0adc6853ae",
+      "bytes": 130982,
+      "status": "BLOCKED",
+      "stage": "offline",
+      "dryRun": false
+    }
+  ],
+  "documentHashes": {
+    "README.md": "5b164b9cdccb2a1e1eaf2cf30f7c6bc568d3679dbd51fc60a944d5ddfac86b3c",
+    "PRODUCT.md": "6c15cb4f3d44c78117ef3633e69f5ba9617bb678722b4e0bb505ae38e197f2b3",
+    "docs/MASTER-DEVELOPMENT-SPEC.md": "e657362ac58d7572aa3d8b94bc2d27e15d46861b19f27e78ad80ce49fba38aec",
+    "docs/FINALS-IMPLEMENTATION-PLAN.md": "012d79dcb7812f77fdf022bb4b54bc091ce916dfc518eb7be8c3c3c367e172dc",
+    "docs/RUNBOOK.md": "ec6574fd1b3d0a6956ef6d6770007a01d9bee9491758c7e748677f757c5d49d7",
+    "docs/KNOWN-LIMITATIONS.md": "d55ab6728e60a01b50cd5a60123979b6a3a5f507950b80a6362815282bf56747",
+    "docs/guide/05-IMPLEMENTATION-STATUS.md": "06667ac122be7d71f29aa14182b5d50cf592ed6e8841b90dc2088bbafe93046a"
+  },
+  "preservation": {
+    "docs/WORK-SUMMARY.md": "43ec11d0a1d172e3629884f95f99701b0cae070b0ee63b33ba27efe31c73c7a4",
+    "docs/PRODUCT-CONNECTION-WORK-SUMMARY.md": "f9c2d4773a011e181f0431daa8e1869f4f195d657c8bcd73e72c252e3ae78ec4",
+    "docs/DEVELOPMENT-REVIEW-SUMMARY.md": "04518c700471d932cd7efb4110240360fe1dc0c617c366b5a9ff74fe5b0f72c7"
+  },
+  "localChecks": [
+    {
+      "command": "bash -n scripts/deployment.sh scripts/backup.sh scripts/restore.sh scripts/generate-besu.sh scripts/test-integration.sh",
+      "status": "PASS",
+      "scope": "syntax only"
+    },
+    {
+      "command": "Python yaml.safe_load",
+      "status": "PASS",
+      "files": [
+        "infra/deploy/compose.yml",
+        "infra/deploy/compose.pbx.yml",
+        "pnpm-workspace.yaml",
+        ".github/workflows/ci.yml",
+        ".github/workflows/integration-manual.yml"
+      ],
+      "scope": "parser only; no Docker/Terraform execution"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    },
+    {
+      "command": "Impeccable detect.mjs --json ConfigurationReviewPanel.tsx ServiceAdministration.tsx with Node network containment",
+      "status": "PASS",
+      "observations": [],
+      "scope": "mechanical source detector only; no visual/browser/accessibility certification"
+    },
+    {
+      "command": "relative file links/fences/requirement IDs",
+      "status": "PASS",
+      "requirements": 74,
+      "documents": 7
+    }
+  ],
+  "validationHistory": [
+    {
+      "label": "callsign-validation-types-first.log",
+      "sha256": "2180ace1992a11c2a3265c18a0d5a8043a7d89a04663c3cb4ef84fa30ce03f7e",
+      "bytes": 4135,
+      "excerpt": "Scope: all 6 workspace projects\n? Verifying lockfile against supply-chain policies (375 entries)...\nLockfile is up to date, resolution step is skipped\nAlready up to date\n\n   ╭──────────────────────────────────────────────────────────────────────╮\n   │                                                                      │\n   │                 Update available! 11.27.0 → 12.16.1.                 │\n   │                 Changelog: https://pnpm.io/v/12.16.1                 │\n   │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │\n   │                                                                      │\n   ╰──────────────────────────────────────────────────────────────────────╯\n\n✓ Lockfile passes supply-chain policies (375 entries in 2s)\n\nDone in 2.4s using pnpm v11.27.0\nscripts/validation-runner.ts(78,35): error TS2379: Argument of type '{ id: string; command: string[] | undefined; requirements: string[]; expectation: string; status: \"SKIPPED\"; reason: string; }' is not assignable to parameter of type 'Result' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'command' are incompatible.\n    Type 'string[] | undefined' is not assignable to type 'string[]'.\n      Type 'undefined' is not assignable to type 'string[]'.\nscripts/validation-runner.ts(79,28): error TS2379: Argument of type '{ id: string; command: string[] | undefined; requirements: string[]; expectation: string; status: \"BLOCKED\"; reason: string; }' is not assignable to parameter of type 'Result' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'command' are incompatible.\n    Type 'string[] | undefined' is not assignable to type 'string[]'.\n      Type 'undefined' is not assignable to type 'string[]'.\nscripts/validation-runner.ts(80,32): error TS2379: Argument of type '{ id: string; command: string[] | undefined; requirements: string[]; expectation: string; status: \"MANUAL\"; reason: string; }' is not assignable to parameter of type 'Result' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'command' are incompatible.\n    Type 'string[] | undefined' is not assignable to type 'string[]'.\n      Type 'undefined' is not assignable to type 'string[]'.\nscripts/validation-runner.ts(82,69): error TS2379: Argument of type '{ status: Status; durationMs: number; exitCode: number | null; output: string; id: string; command: string[] | undefined; requirements: string[]; expectation: string; }' is not assignable to parameter of type 'Result' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'command' are incompatible.\n    Type 'string[] | undefined' is not assignable to type 'string[]'.\n      Type 'undefined' is not assignable to type 'string[]'.\nscripts/validation-runner.ts(93,35): error TS2379: Argument of type '{ stage: \"chain\" | \"cloud\" | \"database\" | \"media\" | \"offline\" | \"performance\" | \"provider\" | \"recovery\"; environment: Environment; output: string; env: { [x: string]: string | undefined; }; ... 4 more ...; manualReview?: any; }' is not assignable to parameter of type '{ stage: \"chain\" | \"cloud\" | \"database\" | \"media\" | \"offline\" | \"performance\" | \"provider\" | \"recovery\"; environment: Environment; env: Record<string, string | undefined>; ... 5 more ...; manualReview?: { ...; } | undefined; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.\n  Types of property 'resume' are incompatible.\n    Type 'string | undefined' is not assignable to type 'string'.\n      Type 'undefined' is not assignable to type 'string'.\n"
+    },
+    {
+      "label": "callsign-validation-types-second.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "excerpt": ""
+    },
+    {
+      "label": "callsign-validation-types-third.log",
+      "sha256": "6e5b04fcc2268922fcd5d180d4353203694b6f43acee7b5067403d3a164d471e",
+      "bytes": 921,
+      "excerpt": "$ tsc -p services/api/tsconfig.json --noEmit && tsc -p services/witness/tsconfig.json --noEmit && tsc -p apps/web/tsconfig.json --noEmit && tsc -p tsconfig.light.json --noEmit\napps/web/src/lib/configurationReview.ts(32,47): error TS2322: Type '{ id: string; version: number; purpose: \"FRAUD_CONFIRMATION\"; followUpPath: \"/official\"; allowedQuestions: string[]; forbiddenRequests: string[]; }' is not assignable to type '{ id: string; version: number; purpose: \"FRAUD_CONFIRMATION\"; allowedQuestions: string[]; forbiddenRequests: (\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\")[]; followUpPath: \"/official\"; }'.\n  Types of property 'forbiddenRequests' are incompatible.\n    Type 'string[]' is not assignable to type '(\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\")[]'.\n      Type 'string' is not assignable to type '\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\"'.\n[ELIFECYCLE] Command failed with exit code 1.\n"
+    },
+    {
+      "label": "callsign-validation-light-first.log",
+      "sha256": "7aac0b7f8522fb2bed58df3124ee4b294347e75669461b63ee37ba0cfdb3228c",
+      "bytes": 1115,
+      "excerpt": "$ pnpm lint && pnpm typecheck && pnpm test:light\n$ node scripts/check-source.mjs\nSource hygiene and JavaScript syntax passed (not an ESLint audit).\n$ tsc -p services/api/tsconfig.json --noEmit && tsc -p services/witness/tsconfig.json --noEmit && tsc -p apps/web/tsconfig.json --noEmit && tsc -p tsconfig.light.json --noEmit\napps/web/src/lib/configurationReview.ts(32,47): error TS2322: Type '{ id: string; version: number; purpose: \"FRAUD_CONFIRMATION\"; followUpPath: \"/official\"; allowedQuestions: string[]; forbiddenRequests: string[]; }' is not assignable to type '{ id: string; version: number; purpose: \"FRAUD_CONFIRMATION\"; allowedQuestions: string[]; forbiddenRequests: (\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\")[]; followUpPath: \"/official\"; }'.\n  Types of property 'forbiddenRequests' are incompatible.\n    Type 'string[]' is not assignable to type '(\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\")[]'.\n      Type 'string' is not assignable to type '\"OTP\" | \"REMOTE_CONTROL\" | \"SECRECY\" | \"TRANSFER\"'.\n[ELIFECYCLE] Command failed with exit code 1.\n[ELIFECYCLE] Command failed with exit code 1.\n"
+    },
+    {
+      "label": "callsign-validation-light-second.log",
+      "sha256": "f40af317c58cbbf69471cc77565c1d1b04491fe230584697d2734e66cb081712",
+      "bytes": 5356,
+      "excerpt": "$ pnpm lint && pnpm typecheck && pnpm test:light\n$ node scripts/check-source.mjs\nSource hygiene and JavaScript syntax passed (not an ESLint audit).\n$ tsc -p services/api/tsconfig.json --noEmit && tsc -p services/witness/tsconfig.json --noEmit && tsc -p apps/web/tsconfig.json --noEmit && tsc -p tsconfig.light.json --noEmit\ntests/unit/configuration-review.test.ts(26,25): error TS2345: Argument of type '{ networkId: string; genesisHash: string; registryAddress: string; policyVersion: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublic...' is not assignable to parameter of type 'TrustBundle & { service?: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: unknown; }; }'.\n  Type '{ networkId: string; genesisHash: string; registryAddress: string; policyVersion: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublic...' is missing the following properties from type 'TrustBundle': enrollmentPublicKey, supportedProtocolVersions\ntests/unit/configuration-review.test.ts(26,104): error TS2345: Argument of type '{ networkId: string; genesisHash: string; registryAddress: string; policyVersion: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublic...' is not assignable to parameter of type 'TrustBundle & { service?: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: unknown; }; }'.\n  Type '{ networkId: string; genesisHash: string; registryAddress: string; policyVersion: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublic...' is missing the following properties from type 'TrustBundle': enrollmentPublicKey, supportedProtocolVersions\ntests/unit/configuration-review.test.ts(29,81): error TS2345: Argument of type '{ networkId: string; genesisHash: string; registryAddress: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: JWK; }; policyVers...' is not assignable to parameter of type 'TrustBundle & { service?: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: unknown; }; }'.\n  Type '{ networkId: string; genesisHash: string; registryAddress: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: JWK; }; policyVers...' is missing the following properties from type 'TrustBundle': enrollmentPublicKey, supportedProtocolVersions\ntests/unit/configuration-review.test.ts(29,194): error TS2345: Argument of type '{ networkId: string; genesisHash: string; registryAddress: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: JWK; }; policyVers...' is not assignable to parameter of type 'TrustBundle & { service?: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: unknown; }; }'.\n  Type '{ networkId: string; genesisHash: string; registryAddress: string; registryProfile: 'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1'; witnessThreshold: number; witnessPublicKeys: never[]; endpoints: never[]; service: { institutionUri: string; issuerKid: string; approvalKeyVersion: number; issuerPublicKey: JWK; }; policyVers...' is missing the following properties from type 'TrustBundle': enrollmentPublicKey, supportedProtocolVersions\ntests/unit/validation-runner.test.ts(34,38): error TS2352: Conversion of type '() => EventEmitter<DefaultEventMap> & { stdout: EventEmitter; stderr: EventEmitter; }' to type '{ (command: string, options?: SpawnOptionsWithoutStdio | undefined): ChildProcessWithoutNullStreams; (command: string, options: SpawnOptionsWithStdioTuple<...>): ChildProcessByStdio<...>; (command: string, options: SpawnOptionsWithStdioTuple<...>): ChildProcessByStdio<...>; (command: string, options: SpawnOptionsWit...' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.\n  Type 'EventEmitter<DefaultEventMap> & { stdout: EventEmitter<DefaultEventMap>; stderr: EventEmitter<DefaultEventMap>; }' is missing the following properties from type 'ChildProcessWithoutNullStreams': stdin, stdio, killed, connected, and 10 more.\n[ELIFECYCLE] Command failed with exit code 1.\n[ELIFECYCLE] Command failed with exit code 1.\n"
+    },
+    {
+      "label": "callsign-validation-light-fourth.log",
+      "sha256": "789a2bbe7ac6c140643b687331fd8755dec46f00e2f2450bdf8d153999994bfc",
+      "bytes": 11173,
+      "excerpt": "ationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839712) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839720) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839820) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839832) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839887) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839907) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839878) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839966) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:840002) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:839965) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:840010) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n(node:840096) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  tests/unit/validation-runner.test.ts > the actual child preload blocks forbidden network/listen without even reaching a sentinel implementation\nError: Command failed: /home/ana/.nvm/versions/node/v22.22.2/bin/node --input-type=module -e import net from 'node:net';import dgram from 'node:dgram';import tls from 'node:tls';let leaked=0;const sentinel=()=>{leaked++;throw Error('SENTINEL_NO_NETWORK_IMPLEMENTATION');};net.Socket.prototype.connect=sentinel;net.Server.prototype.listen=sentinel;dgram.Socket.prototype.send=sentinel;dgram.Socket.prototype.bind=sentinel;tls.connect=sentinel;globalThis.fetch=sentinel;await import('./scripts/validation-network-guard.mjs');for(const fn of [()=>fetch('https://forbidden.invalid'),()=>new net.Socket().connect(1,'forbidden.invalid'),()=>net.createServer().listen(0),()=>tls.connect(443,'forbidden.invalid')]){let blocked=false;try{fn();}catch(e){blocked=e.message==='VALIDATION_NETWORK_NOT_AUTHORIZED';}if(!blocked)throw Error('GUARD_MISSING');}if(leaked)throw Error('GUARD_LEAKED');console.log('CONTAINED');\nfile:///home/ana/Desktop/yyw/CallSign/[eval1]:1\nimport net from 'node:net';import dgram from 'node:dgram';import tls from 'node:tls';let leaked=0;const sentinel=()=>{leaked++;throw Error('SENTINEL_NO_NETWORK_IMPLEMENTATION');};net.Socket.prototype.connect=sentinel;net.Server.prototype.listen=sentinel;dgram.Socket.prototype.send=sentinel;dgram.Socket.prototype.bind=sentinel;tls.connect=sentinel;globalThis.fetch=sentinel;await import('./scripts/validation-network-guard.mjs');for(const fn of [()=>fetch('https://forbidden.invalid'),()=>new net.Socket().connect(1,'forbidden.invalid'),()=>net.createServer().listen(0),()=>tls.connect(443,'forbidden.invalid')]){let blocked=false;try{fn();}catch(e){blocked=e.message==='VALIDATION_NETWORK_NOT_AUTHORIZED';}if(!blocked)throw Error('GUARD_MISSING');}if(leaked)throw Error('GUARD_LEAKED');console.log('CONTAINED');\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^\n\nError: GUARD_MISSING\n    at file:///home/ana/Desktop/yyw/CallSign/[eval1]:1:727\n\nNode.js v22.22.2\n\n ❯ [eval1]:1:727\n ❯ tests/unit/validation-runner.test.ts:54:9\n\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯\n\n\n Test Files  1 failed | 40 passed (41)\n      Tests  1 failed | 184 passed (185)\n   Start at  17:32:55\n   Duration  6.21s (import 66%, tests 26%, transform 5%, setup 2%, worker 1%)\n\n     Import  122 modules were evaluated 209 times · 6.58s total, 66% of tracked time\n             ~882ms faster with isolate: false — shared modules are evaluated once per worker instead of once per file\n             learn more: https://vitest.dev/guide/improving-performance#test-isolation\n\n[ELIFECYCLE] Command failed with exit code 1.\n[ELIFECYCLE] Command failed with exit code 1.\n"
+    }
+  ],
+  "toolingIncidents": [
+    {
+      "tool": "Impeccable context helper",
+      "issue": "Optional version lookup path discovered after invocation; actual cache/network use unknown. Not claimed offline; not rerun."
+    },
+    {
+      "tool": "pnpm dependency verification",
+      "issue": "Initial typecheck entered implicit install path and printed Already up to date. No deliberate large download; verifyDepsBeforeRun:error and offline/ignore-scripts now prevent implicit installs."
+    },
+    {
+      "tool": "tsx CLI",
+      "issue": "IPC listener attempt rejected by containment; offline CLI commands changed to node --import tsx; no listener/service started."
+    }
+  ],
+  "independenceLimits": [
+    "Unit fixtures/expected results were authored with implementation; not independent Korean quality or external-system proof.",
+    "Manual observation requires actual sources/hash/identity but remains operator attestation, not automated PASS.",
+    "Node transport guard is not an OS sandbox for arbitrary browser/native binaries."
+  ],
+  "notExecuted": [
+    "DB/service/node/container/image startup/build/pull",
+    "migration/deployment/seed",
+    "browser/microphone/media",
+    "STT/LLM/cloud/notification provider calls",
+    "fault/load/actual backup/restore",
+    "commit/push"
+  ],
+  "next": "Privately supply reviewed C inputs; explicitly authorize isolated preparation and D generation. Then rerun offline with identical test environment/config before database stage.",
+  "latestValidationSourceHash": "7b3115ac45a3c14c6480e07fb0a5d1b46b014735445099d20f3d3be3c5406e1d",
+  "previousIndex": "artifacts/execution-readiness-20261029.json",
+  "finalReview": {
+    "coldRead": "RUNBOOK excerpt only; missing protected-env invocation and bootstrap/runtime ambiguity corrected. Full command procedures already present above excerpt.",
+    "consistency": "Current status lives in latest execution artifact; MASTER/progress/guide point to it, older result sections explicitly dated. No consolidation/deletion performed.",
+    "evaluationLimits": "Synthetic unit/performance/AI fixtures test logic only; independent environment observations and people still needed. MANUAL remains manual.",
+    "dryRunScope": "Seven earlier heavy-stage dry-runs preserved as SKIPPED, not reused as execution prerequisites. Current 191-test light also dry-runs every stage without child commands.",
+    "sourceIdentityStable": true
+  }
+}

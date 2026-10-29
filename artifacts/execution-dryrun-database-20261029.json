@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "runId": "b02fd30d-add9-40f6-8b84-6db63020d14c",
+  "stage": "database",
+  "startedAt": "2026-10-29T09:07:18.451Z",
+  "finishedAt": "2026-10-29T09:07:18.530Z",
+  "identity": {
+    "stageInputs": {},
+    "head": "a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a",
+    "dirty": true,
+    "sourceHash": "493d7f8c6e88fd97720a6c96bafa021a0484d5281d48be9d7ff2c1b6c1740749",
+    "configurationHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "publicFiles": {},
+    "environmentId": "offline:source",
+    "environmentHash": "d16087fd5b8605a5621c02c4f1a2c3004f0cdf18836056f43e32d8a0396ee1e7"
+  },
+  "identityHash": "d059dbd0a6dce42033357e103b5723fdda7cfecc6b8912d39016a85064568e7a",
+  "dryRun": true,
+  "results": [
+    {
+      "id": "postgres-boundaries",
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vitest.integration.config.ts",
+        "tests/integration/finals-store.test.ts",
+        "tests/integration/finals-session-scopes.test.ts",
+        "tests/integration/service-runtime.test.ts",
+        "tests/integration/database-readiness.test.ts",
+        "--reporter=json",
+        "--outputFile",
+        "/home/ana/Desktop/yyw/CallSign/artifacts/execution-dryrun-database-20261029.json.database.json"
+      ],
+      "requirements": [
+        "CALL-004",
+        "DB-001",
+        "DB-002",
+        "DB-003",
+        "AUTH-002"
+      ],
+      "expectation": "Separate SQL connections; real row locks/unique claims, committed receipt retry, quota/worker fencing, applied migration hashes and role grants. No automatic migration/server hook.",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED"
+    }
+  ],
+  "status": "SKIPPED",
+  "automaticExecutionScope": "selected-existing-tests-only-no-service-startup",
+  "attachments": [],
+  "realEnvironmentVerified": false
+}

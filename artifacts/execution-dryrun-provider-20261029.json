@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "runId": "971a1e00-8a3d-4f31-83eb-f5cd7003b531",
+  "stage": "provider",
+  "startedAt": "2026-10-29T09:07:18.673Z",
+  "finishedAt": "2026-10-29T09:07:18.735Z",
+  "identity": {
+    "stageInputs": {},
+    "head": "a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a",
+    "dirty": true,
+    "sourceHash": "493d7f8c6e88fd97720a6c96bafa021a0484d5281d48be9d7ff2c1b6c1740749",
+    "configurationHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "publicFiles": {},
+    "environmentId": "offline:source",
+    "environmentHash": "d16087fd5b8605a5621c02c4f1a2c3004f0cdf18836056f43e32d8a0396ee1e7"
+  },
+  "identityHash": "d059dbd0a6dce42033357e103b5723fdda7cfecc6b8912d39016a85064568e7a",
+  "dryRun": true,
+  "results": [
+    {
+      "id": "stt-small-sample",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/provider-smoke.ts",
+        "stt",
+        "$VALIDATION_CONSENTED_WEBM",
+        "/home/ana/Desktop/yyw/CallSign/artifacts/execution-dryrun-provider-20261029.json.stt.json"
+      ],
+      "requirements": [
+        "AI-002"
+      ],
+      "expectation": "Consented <=1MiB WebM, bounded provider stream, actual nonempty final revision",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED"
+    },
+    {
+      "id": "llm-small-sample",
+      "command": [
+        "node",
+        "--import",
+        "tsx",
+        "scripts/provider-smoke.ts",
+        "llm",
+        "$VALIDATION_CONSENTED_TRANSCRIPT",
+        "/home/ana/Desktop/yyw/CallSign/artifacts/execution-dryrun-provider-20261029.json.llm.json"
+      ],
+      "requirements": [
+        "AI-003"
+      ],
+      "expectation": "Consented <=4000-byte input and schema/grounding checked actual provider response",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED"
+    },
+    {
+      "id": "consent-stop",
+      "requirements": [
+        "AI-001",
+        "AI-004",
+        "AI-005"
+      ],
+      "expectation": "Revoking consent stops remote audio transport/provider work and ignores delayed results; inspect provider retention/billing separately",
+      "status": "SKIPPED",
+      "reason": "DRY_RUN_NO_CHILD_STARTED; MANUAL: Observe the actual consent lifecycle and record no further audio/results after the consent generation changes. Smoke tests do not prove Korean quality."
+    }
+  ],
+  "status": "SKIPPED",
+  "automaticExecutionScope": "selected-existing-tests-only-no-service-startup",
+  "attachments": [],
+  "realEnvironmentVerified": false
+}

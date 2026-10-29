@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "run": "callsign_test_59dafb2dfb",
+  "testedHead": "7c1df4f9bec9730574c8bd0c6e6ff97a6bf3a32d",
+  "testedSourceHash": "6e6023c2243505174bedef8629b2bfa83af6e9707b8e7e2f18532052c93d41b2",
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "dbAssertions": {
+    "passed": 15,
+    "failed": 0,
+    "pending": 0,
+    "repeatOnSameDatabase": true,
+    "remainingPendingOrProcessingJobs": 0
+  },
+  "sourceEvidence": "artifacts/db-source-postcommit-callsign_test_59dafb2dfb.json",
+  "databaseEvidence": "artifacts/db-verification-postcommit-callsign_test_59dafb2dfb.json",
+  "databaseReport": "artifacts/db-verification-postcommit-callsign_test_59dafb2dfb.json.database.json",
+  "databaseStatsBeforeCleanup": "70.65MiB / 512MiB",
+  "monitor": [
+    {
+      "stage": "offline",
+      "exit": 2,
+      "peakTestRssKiB": 1195476,
+      "seconds": 14.37,
+      "stopReason": null,
+      "output": "artifacts/db-source-postcommit-callsign_test_59dafb2dfb.json"
+    },
+    {
+      "stage": "database",
+      "exit": 0,
+      "peakTestRssKiB": 607484,
+      "seconds": 3.07,
+      "stopReason": null,
+      "output": "artifacts/db-verification-postcommit-callsign_test_59dafb2dfb.json"
+    }
+  ],
+  "cleanup": {
+    "identityAndLabelChecked": true,
+    "containerRemoved": true,
+    "networkRemoved": true,
+    "protectedTemporaryFilesRemoved": true,
+    "databaseLifetimeSeconds": 304,
+    "timeLimitDeviationSeconds": 4
+  },
+  "scopeLimitations": [
+    "PostgreSQL17.6 with tmpfs; not disk/power-loss recovery",
+    "Memory anchor fixtures; independent HTTPS anchor not executed",
+    "Auth-login allowed/denied SQL verified; not an exhaustive privilege audit of all production roles",
+    "No chain/PBX/TURN/IdP/browser/voice/AI/cloud execution; existing containers unchanged"
+  ],
+  "realEnvironmentVerified": false,
+  "verifiedScope": "isolated PostgreSQL17.6 selected assertions"
+}

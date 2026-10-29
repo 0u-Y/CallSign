@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "recordedAt": 1793270032.2681293,
+  "scope": "local checkpoint and isolated PostgreSQL only",
+  "baseline": {
+    "cpuCount": 24,
+    "load1": 0.99,
+    "availableMemoryMiB": 41663,
+    "swapUsedMiB": 7804,
+    "sampledSwapInOutKiBPerSecond": [
+      0,
+      0,
+      0
+    ],
+    "diskAvailableGiB": 534,
+    "dockerAlreadyRunning": true,
+    "localImage": "postgres:17.6-alpine",
+    "hostPostgresBinariesFound": false
+  },
+  "budget": {
+    "databaseMiB": 512,
+    "databaseCpu": 1,
+    "additionalDatabaseSwap": 0,
+    "initialTestsRssMiB": 1024,
+    "revisedTestsRssMiB": 2048,
+    "reason": "initial typecheck hit the1GiB process-tree budget; stopped then explicitly re-budgeted with >40GiB available",
+    "worker": 1,
+    "limitSecondsPerOwnedDatabase": 300,
+    "stopAvailableMemoryMiB": 8192,
+    "sustainedSwapPagesPerSecond": 1024
+  },
+  "history": [
+    {
+      "run": "callsign_test_676b473ea9",
+      "container": "callsign-test-676b473ea9",
+      "network": "callsign-test-676b473ea9",
+      "created": [
+        "network",
+        "container"
+      ],
+      "startedAt": 1793269487.81719,
+      "image": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "port": 32769,
+      "error": "CalledProcessError",
+      "prepared": true,
+      "cleaned": true,
+      "cleanedAt": 1793269786.5698917,
+      "monitor": {
+        "test-monitor.json": [
+          {
+            "stage": "offline",
+            "exit": 1,
+            "peakTestRssKiB": 1160972,
+            "seconds": 3.42,
+            "stopReason": "RESOURCE_OR_TIME_LIMIT",
+            "output": "artifacts/db-source-callsign_test_676b473ea9.json"
+          },
+          {
+            "stage": "database",
+            "exit": 2,
+            "peakTestRssKiB": 44848,
+            "seconds": 1.02,
+            "stopReason": null,
+            "output": "artifacts/db-verification-callsign_test_676b473ea9.json"
+          }
+        ],
+        "test-monitor-bounded.json": [
+          {
+            "stage": "offline",
+            "exit": 2,
+            "peakTestRssKiB": 1249744,
+            "seconds": 14.35,
+            "stopReason": null,
+            "output": "artifacts/db-source-bounded-callsign_test_676b473ea9.json"
+          },
+          {
+            "stage": "database",
+            "exit": 1,
+            "peakTestRssKiB": 605176,
+            "seconds": 3.07,
+            "stopReason": null,
+            "output": "artifacts/db-verification-bounded-callsign_test_676b473ea9.json"
+          }
+        ],
+        "test-monitor-isolated.json": [
+          {
+            "stage": "offline",
+            "exit": 2,
+            "peakTestRssKiB": 1254072,
+            "seconds": 14.38,
+            "stopReason": null,
+            "output": "artifacts/db-source-isolated-callsign_test_676b473ea9.json"
+          },
+          {
+            "stage": "database",
+            "exit": 1,
+            "peakTestRssKiB": 595728,
+            "seconds": 3.08,
+            "stopReason": null,
+            "output": "artifacts/db-verification-isolated-callsign_test_676b473ea9.json"
+          }
+        ],
+        "test-monitor-corrected.json": [
+          {
+            "stage": "offline",
+            "exit": 2,
+            "peakTestRssKiB": 1237232,
+            "seconds": 14.35,
+            "stopReason": null,
+            "output": "artifacts/db-source-corrected-callsign_test_676b473ea9.json"
+          },
+          {
+            "stage": "database",
+            "exit": 1,
+            "peakTestRssKiB": 605576,
+            "seconds": 3.07,
+            "stopReason": null,
+            "output": "artifacts/db-verification-corrected-callsign_test_676b473ea9.json"
+          }
+        ]
+      }
+    },
+    {
+      "run": "callsign_test_1b8ff23ec3",
+      "container": "callsign-test-1b8ff23ec3",
+      "network": "callsign-test-1b8ff23ec3",
+      "created": [
+        "network",
+        "container"
+      ],
+      "startedAt": 1793269458.2666652,
+      "image": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "error": "TypeError",
+      "cleaned": true,
+      "monitor": {}
+    },
+    {
+      "run": "callsign_test_59dafb2dfb",
+      "container": "callsign-test-59dafb2dfb",
+      "network": "callsign-test-59dafb2dfb",
+      "created": [
+        "network",
+        "container"
+      ],
+      "startedAt": 1793269844.7818756,
+      "image": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "port": 32770,
+      "prepared": true,
+      "monitor": {
+        "test-monitor-isolated.json": [
+          {
+            "stage": "offline",
+            "exit": 2,
+            "peakTestRssKiB": 1135300,
+            "seconds": 15.39,
+            "stopReason": null,
+            "output": "artifacts/db-source-isolated-callsign_test_59dafb2dfb.json"
+          },
+          {
+            "stage": "database",
+            "exit": 0,
+            "peakTestRssKiB": 597740,
+            "seconds": 3.08,
+            "stopReason": null,
+            "output": "artifacts/db-verification-isolated-callsign_test_59dafb2dfb.json"
+          }
+        ]
+      }
+    }
+  ],
+  "latestDatabaseEvidence": "artifacts/db-verification-isolated-callsign_test_59dafb2dfb.json",
+  "latestSourceEvidence": "artifacts/db-source-isolated-callsign_test_59dafb2dfb.json",
+  "cleanupAtThisCheckpoint": "first failed database and its network removed; current owned DB retained briefly for one reentrancy run",
+  "existingResourcesModified": false,
+  "excludedProgressPointers": [
+    "artifacts/execution-dryrun-chain-20261029.json.progress.json",
+    "artifacts/execution-dryrun-cloud-20261029.json.progress.json",
+    "artifacts/execution-dryrun-database-20261029.json.progress.json",
+    "artifacts/execution-dryrun-media-20261029.json.progress.json",
+    "artifacts/execution-dryrun-performance-20261029.json.progress.json",
+    "artifacts/execution-dryrun-provider-20261029.json.progress.json",
+    "artifacts/execution-dryrun-recovery-20261029.json.progress.json",
+    "artifacts/execution-validation-20261029.json.progress.json",
+    "artifacts/execution-validation-final-20261029.json.progress.json",
+    "artifacts/execution-validation-rechecked-20261029.json.progress.json",
+    "artifacts/readiness-refinement-20261029.json.progress.json",
+    "artifacts/readiness-refinement-complete-20261029.json.progress.json",
+    "artifacts/readiness-refinement-final-20261029.json.progress.json",
+    "artifacts/readiness-refinement-stable-20261029.json.progress.json"
+  ]
+}
