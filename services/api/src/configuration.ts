@@ -4,7 +4,7 @@ import { hashCanonical, policyHash,configurationSchema,configurationContentsSche
 import { keccak256, recoverTypedDataAddress, stringToHex, type Hex } from 'viem';
 import type { InstitutionRecord } from './finals-model.js';
 
-export interface ConfigurationProposal {id:string;request:ConfigurationRequest;contents:ConfigurationContents;previous?:ConfigurationContents;signatures:Record<string,Hex>;status:'awaiting-approval'|'submitted'|'confirmed'|'failed';transactionHash?:string;block?:string;failure?:string}
+export interface ConfigurationProposal {id:string;request:ConfigurationRequest;contents:ConfigurationContents;previous?:ConfigurationContents;signatures:Record<string,Hex>;status:'awaiting-approval'|'submitted'|'confirmed'|'failed';activatedAt?:number;transactionHash?:string;block?:string;failure?:string}
 export async function configurationSigners(input:{chainId:number;registry:Hex;request:ConfigurationRequest;signatures:Hex[];approvers:string[];now:number;collect?:boolean}){
  const r=configurationSchema.parse(input.request),trusted=input.approvers.map(v=>v.toLowerCase());
  if(trusted.length!==3||new Set(trusted).size!==3||trusted.some(v=>!/^0x[0-9a-f]{40}$/.test(v)||/^0x0{40}$/.test(v)))throw new HttpError(409,'CONFIGURATION_TRUST_INVALID');

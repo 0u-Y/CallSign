@@ -66,6 +66,9 @@ function authenticate(supplied: unknown, expected: string) {
 export async function buildFinalsServer(env = finalsEnvironment(process.env), adapters?: {
   anchor: import("./consumption-anchor.js").ConsumptionAnchor;
   current: import("./service-authority.js").ServiceAuthorityOptions["current"];
+  witnessFetch?: typeof fetch;
+  now?:()=>number;
+  audioProviders?: import("./service-audio.js").AudioProviders;
 }) {
   // Explicit integration injection replaces only external authority adapters, never authentication or SQL.
   if (adapters) {
@@ -186,7 +189,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
     if(!chargedRequests.has(request)){await quota.chargeRequest(actor.institutionId,actor.userId,Math.floor(Date.now()/1000),requestLimit);chargedRequests.add(request);}return actor;
   };
   const pbxSigningKey = process.env.ARI_URL ? await readSigningKey(required("PBX_EVIDENCE_KEY_PATH")) : undefined;
-  const serviceAuthority = new ServiceAuthority({ assertPublished:record=>assertPublishedTrust(record,trust,required('VITE_SERVICE_TRUST_SHA256'),serviceAuthority.policy), ...(pbxSigningKey ? {pbxTrust:{kid:pbxSigningKey.kid,publicKey:pbxSigningKey.publicJwk}} : {}), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
+  const serviceAuthority = new ServiceAuthority({ ...(adapters?.now?{now:adapters.now}:{}),assertPublished:record=>assertPublishedTrust(record,trust,required('VITE_SERVICE_TRUST_SHA256'),serviceAuthority.policy), ...(pbxSigningKey ? {pbxTrust:{kid:pbxSigningKey.kid,publicKey:pbxSigningKey.publicJwk}} : {}), store, networkId: env.NETWORK_ID, registryAddress: env.REGISTRY_ADDRESS,
     policy:(await import("@callsign/protocol")).runtimePolicySchema.parse({...((await import("@callsign/protocol")).servicePolicy),leaseSeconds:Number(process.env.CALL_LEASE_SECONDS??30),maxCallSeconds:Number(process.env.CALL_MAX_SECONDS??14400)}),
     signingKey: version => readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"), `approval-v${version}.json`)),
     current: adapters?.current ?? (async (record, digest) => {
@@ -203,10 +206,10 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
   registerServiceOperations(app,{databaseUrl:required("ISSUER_DATABASE_URL"),store,actorFor,deploymentId:keccak256(stringToHex(`${trust.genesisHash}:${trust.registryAddress}`)),ledger:{urls:(process.env.BESU_NODE_URLS??"").split(",").filter(Boolean),networkId:env.NETWORK_ID,genesisHash:trust.genesisHash}});
   registerServiceManagement(app,{authority:serviceAuthority,actorFor,approvers:(process.env.REGISTRY_APPROVERS??"").split(",").filter(Boolean),confirmConfiguration:async(record,proposal)=>{
     const updatedTrust={...trust,policyVersion:String(proposal.contents.policy.version)},digest=Object.keys(record.serviceV3?.credentials??{})[0]??"0".repeat(64);
-    const bundle=await aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust:updatedTrust});
+    const bundle=await aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust:updatedTrust,...(adapters?.witnessFetch?{fetcher:adapters.witnessFetch}:{})});
     await verifyStateBundle(bundle,updatedTrust,{expectedInstitutionId:record.id,expectedDelegationId:digest,nowWallSeconds:Math.floor(Date.now()/1000),nowMonotonicMs:performance.now(),maxStateAgeSeconds:8,maxFutureSkewSeconds:1});
     const state=bundle.snapshot.institutionState;
-    if(!state.exists||state.status!=="Active"||state.epoch!==record.observedEpoch||bundle.snapshot.policyHash!==proposal.request.newPolicyHash||state.approvalPublicKey.toLowerCase()!==`0x${Buffer.from(record.approvalPublicKey.x!,"base64url").toString("hex")}`||bundle.snapshot.directoryHash!==proposal.request.newDirectoryHash||bundle.snapshot.directoryVersion!==proposal.request.newDirectoryVersion)throw new HttpError(409,"CONFIGURATION_NOT_CURRENT");
+    if(BigInt(bundle.snapshot.blockNumber)<BigInt(proposal.block!)||state.policyVersion!==proposal.request.newPolicyVersion||!state.exists||state.status!=="Active"||state.epoch!==String(BigInt(proposal.request.expectedEpoch)+(proposal.request.newPolicyHash!==proposal.request.expectedPolicyHash?1n:0n))||bundle.snapshot.policyHash!==proposal.request.newPolicyHash||state.approvalPublicKey.toLowerCase()!==`0x${Buffer.from(record.approvalPublicKey.x!,"base64url").toString("hex")}`||bundle.snapshot.directoryHash!==proposal.request.newDirectoryHash||bundle.snapshot.directoryVersion!==proposal.request.newDirectoryVersion)throw new HttpError(409,"CONFIGURATION_NOT_CURRENT");
   },confirmKey:async(record,key)=>{
     const installed=await readSigningKey(resolve(required("ISSUER_KEY_DIRECTORY"),`approval-v${key.version}.json`));if(installed.kid!==key.kid||hashCanonical(installed.publicJwk)!==hashCanonical(key.publicKey))throw new HttpError(409,"INSTALLED_KEY_MISMATCH");
     const digest=Object.keys(record.serviceV3?.credentials??{})[0]??"0".repeat(64),bundle=await aggregateWitnesses({endpoints:trust.endpoints,institutionId:record.id,delegationId:digest,trust});
@@ -215,7 +218,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
   }});
   registerServiceRoutes(app, { authority: serviceAuthority, store, actorFor, sessionId:async r=>(await scopedSession(r)).sessionId });
   const quota=postgresQuotaStore(required("ISSUER_DATABASE_URL"));app.addHook("onClose",()=>quota.close());
-  registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId});
+  registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId,...(adapters?.audioProviders?{providers:adapters.audioProviders}:{})});
   if (process.env.ARI_URL) {
     const certificate=new X509Certificate(await readFile(required("PBX_DTLS_CERT_PATH")));
     const bridge = new AsteriskBridge(new AriClient({base:new URL(required("ARI_URL")),authorization:required("ARI_AUTHORIZATION"),application:"callsign"}), pbxSigningKey!, {networkId:env.NETWORK_ID,registryAddress:env.REGISTRY_ADDRESS,pbxFingerprint:certificate.fingerprint256});

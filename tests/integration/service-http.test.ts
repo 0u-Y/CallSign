@@ -1,104 +1,17 @@
-// Real HTTPS OIDC + HTTP routing + PostgreSQL. Only authority/anchor are explicit external fixtures.
-if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== 'integration') throw new Error('INTEGRATION_EXECUTION_BLOCKED');
-import { beforeAll, afterAll, it, expect } from 'vitest';
-import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
-import { join } from 'node:path';
-import { createServer } from 'node:https';
-import { createHash, randomUUID } from 'node:crypto';
-import { chromium } from '@playwright/test';
-import postgres from 'postgres';
-const { SignJWT, exportJWK, importJWK, generateKeyPair } = await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js', import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
-import { bankPolicy, hashCanonical, servicePolicy, generateEd25519KeyPair, exportSigningPrivateJwk, signPayload, verifyPayload, serviceReceiptSchema, serviceLeaseSchema, type ServiceBinding } from '../../packages/protocol/src/index.js';
-import { buildFinalsServer } from '../../services/api/src/finals-server.js';
-import { finalsEnvironment } from '../../services/api/src/finals-config.js';
-import { postgresAuthorityStore } from '../../services/api/src/finals-store.js';
-import { newServiceState } from '../../services/api/src/service-state.js';
-import { assertAnchorMatches, type Anchor } from '../../services/api/src/consumption-anchor.js';
-import type { InstitutionRecord } from '../../services/api/src/finals-model.js';
-
-const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
-if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
-if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
-const sql=postgres(process.env.TEST_DATABASE_URL,{max:2});
-let runRoot:string;
-const id='test-http-'+randomUUID(), deployment='test:'+id;
-const records:Record<string,Anchor>={};
-const anchor={read:async(i:string)=>structuredClone(records[i]!),advance:async(p:Anchor,n:Anchor)=>{assertAnchorMatches(p,records[p.institutionId]!);records[p.institutionId]=structuredClone(n);}};
-let current:'current'|'revoked'|'unavailable'='current';
-const registeredDigests=new Set<string>();
-const longSubject='recipient-'+ 'r'.repeat(100);
-let issuerApp:Awaited<ReturnType<typeof buildFinalsServer>>,platform:typeof issuerApp,senderApp:typeof issuerApp;
-let web:{close():Promise<void>;resolvedUrls:{local:string[]}|null};
-let provider:ReturnType<typeof createServer>,origin:string,oidc:string,apiOrigin:string,record:InstitutionRecord;
-let subject='staff',mode='normal',codes=new Map<string,{nonce:string;challenge:string;client:string;redirect:string;subject:string;mode:string}>();
-const issuerKey=await generateEd25519KeyPair(),serviceKey=await generateEd25519KeyPair();
-const signing=await generateKeyPair('RS256',{extractable:true}),jwk={...await exportJWK(signing.publicKey),kid:'test-oidc',alg:'RS256',use:'sig'};
-let issuedTokens=0;
-const uid=(s:string)=>`${oidc}|${s}`;
-const serverListen=(server:ReturnType<typeof createServer>)=>new Promise<string>((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',()=>{const a=server.address();if(!a||typeof a==='string')return reject(new Error('NO_PORT'));resolve(`https://127.0.0.1:${a.port}`);});});
-interface Client {cookies:Map<string,string>;csrf:string;request(path:string,body?:unknown,headers?:Record<string,string>):Promise<{status:number;body:any;headers:Headers}>}
-function client():Client {
- const c:Client={cookies:new Map(),csrf:'',async request(path,body,headers={}){
-  const r=await fetch(apiOrigin+path,{method:body===undefined?'GET':'POST',headers:{origin,cookie:[...c.cookies].map(([k,v])=>`${k}=${v}`).join('; '),'content-type':'application/json','x-csrf-token':c.csrf,'idempotency-key':randomUUID(),...headers},...(body===undefined?{}:{body:JSON.stringify(body)})});
-  for(const cookie of r.headers.getSetCookie()){const [key,value]=cookie.split(';')[0]!.split('=');if(value)c.cookies.set(key!,value);else c.cookies.delete(key!);}
-  return {status:r.status,body:await r.json(),headers:r.headers};
- }};return c;
-}
-async function login(s:string,official=false,variant='normal',c=client()){
- subject=s;mode=variant;const start=await c.request('/v3/auth/start',{official});expect(start.status).toBe(200);
- const auth=await fetch(start.body.url,{redirect:'manual'});expect(auth.status).toBe(302);
- const redirect=new URL(auth.headers.get('location')!);const body={state:redirect.searchParams.get('state'),code:redirect.searchParams.get('code')};
- const done=await c.request('/v3/auth/callback',body);if(done.status===200)c.csrf=done.body.csrfToken;
- return {c,start,body,done};
-}
-async function state(){return (await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]!.state as InstitutionRecord;}
-async function mutate(op:(r:InstitutionRecord)=>void){const store=postgresAuthorityStore(process.env.ISSUER_DATABASE_URL!,{anchor,deployment});try{await store.transact(id,async r=>op(r));}finally{await store.close();}}
-
-beforeAll(async()=>{
- runRoot=await mkdtemp(join(root!,'run-'));
- const tls={key:await readFile(`${root}/tls.key`),cert:await readFile(`${root}/tls.crt`)};
- provider=createServer(tls,async(req,res)=>{try{
-  const url=new URL(req.url!,'https://127.0.0.1');res.setHeader('content-type','application/json');
-  if(url.pathname==='/jwks'){res.end(JSON.stringify({keys:[jwk]}));return;}
-  if(url.pathname==='/.well-known/openid-configuration'){res.end(JSON.stringify({issuer:oidc,authorization_endpoint:oidc+'/authorize',token_endpoint:oidc+'/token',jwks_uri:oidc+'/jwks'}));return;}
-  if(url.pathname==='/authorize'){
-   const code=randomUUID();codes.set(code,{nonce:url.searchParams.get('nonce')!,challenge:url.searchParams.get('code_challenge')!,client:url.searchParams.get('client_id')!,redirect:url.searchParams.get('redirect_uri')!,subject,mode});
-   const next=new URL(url.searchParams.get('redirect_uri')!);next.searchParams.set('state',url.searchParams.get('state')!);next.searchParams.set('code',code);res.writeHead(302,{location:next.href});res.end();return;
-  }
-  if(url.pathname==='/token'){
-   let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>16384)throw new Error('SIZE');}const b=new URLSearchParams(raw),entry=codes.get(b.get('code')!);codes.delete(b.get('code')!);
-   if(!entry||b.get('client_id')!==entry.client||b.get('redirect_uri')!==entry.redirect||createHash('sha256').update(b.get('code_verifier')??'').digest('base64url')!==entry.challenge){res.writeHead(400);res.end('{}');return;}
-   const now=Math.floor(Date.now()/1000),official=entry.client==='official-client';
-   const payload={nonce:entry.mode==='nonce'?'wrong':entry.nonce,azp:entry.mode==='client'?'wrong':entry.client,auth_time:entry.mode==='old-auth'?now-600:now,name:'Same Display Name',email:'same@example.invalid'};
-   const key=entry.mode==='signature'?(await generateKeyPair('RS256')).privateKey:signing.privateKey;
-   const token=await new SignJWT(payload).setProtectedHeader({alg:'RS256',kid:jwk.kid}).setIssuer(entry.mode==='issuer'?'https://wrong.example':oidc).setAudience(entry.mode==='audience'?'wrong':official?'official-audience':'work-audience').setSubject(entry.subject).setIssuedAt(now).setExpirationTime(entry.mode==='expired'?now-1:now+240).setJti(String(++issuedTokens)).sign(key);
-   res.end(JSON.stringify({id_token:token}));return;
-  }res.writeHead(404);res.end('{}');
- }catch{res.writeHead(500);res.end('{}');}});
- oidc=await serverListen(provider);
- // Vite is already installed in the web workspace; no download or webServer hook.
- const {createServer:createVite}=await import('../../apps/web/node_modules/vite/dist/node/index.js');
- const vite=await createVite({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
- web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');
- record={id,did:'https://bank.example',institutionUri:'https://bank.example',authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion:1,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{'https://center.example':{did:'https://center.example',kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
- for(const [s,role] of [['staff','institution'],['agent','gateway'],['recipient','recipient'],['other','recipient'],['inactive','recipient'],[longSubject,'recipient']] as const){record.members[uid(s)]={role,active:s!=='inactive',...(role==='gateway'?{serviceDid:'https://center.example'}:{}),permissions:role==='institution'?['contact.manage','delegation.manage','institution.recover','institution.suspend']:[]};await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid(s)},'Synthetic test account',${role},${randomUUID()})`;}
- // Same name/email at a different issuer/subject never implies membership in this institution.
- await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid('tenant-b')},'Synthetic test account','institution',${randomUUID()})`;
- records[id]={deployment,institutionId:id,sequence:'0',hash:'0'.repeat(64),epoch:'1'};
- await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${id},${sql.json(record as unknown as postgres.JSONValue)})`;await sql`INSERT INTO issuer_v2.recovery_gate VALUES(${id},'blocked',now())`;
- const witnessKeys=await Promise.all([1,2,3,4].map(async n=>({witnessId:`w-${n}`,kid:`test-witness-${n}`,jwk:(await generateEd25519KeyPair()).publicJwk})));
- const trust={enrollmentPublicKey:issuerKey.publicJwk,supportedProtocolVersions:[3],networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,genesisHash:`0x${'0'.repeat(64)}`,registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1',policyVersion:String(bankPolicy.version),witnessThreshold:3,witnessPublicKeys:witnessKeys,endpoints:[1,2,3,4].map(n=>({witnessId:`w-${n}`,url:'https://127.0.0.1:1'})),service:{institutionUri:record.institutionUri,issuerKid:issuerKey.kid,issuerPublicKey:issuerKey.publicJwk,approvalKeyVersion:1,serviceUri:'https://center.example',serviceKid:serviceKey.kid,servicePublicKey:serviceKey.publicJwk,serviceKeyVersion:1,policy:servicePolicy}};
- await writeFile(`${runRoot}/trust.json`,JSON.stringify(trust),{mode:0o600});await writeFile(`${runRoot}/approval-v1.json`,JSON.stringify({kid:issuerKey.kid,privateJwk:await exportSigningPrivateJwk(issuerKey),publicJwk:issuerKey.publicJwk}),{mode:0o600});
- await writeFile(`${runRoot}/sender.json`,JSON.stringify({kid:serviceKey.kid,privateJwk:await exportSigningPrivateJwk(serviceKey),publicJwk:serviceKey.publicJwk}),{flag:'wx',mode:0o600});
- Object.assign(process.env,{SENDER_KEY_PATH:`${runRoot}/sender.json`,SERVICE_URI:'https://center.example',SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
- const env=finalsEnvironment({...process.env,SERVICE_ROLE:'issuer',WEB_ORIGIN:origin,PUBLIC_DEPLOYMENT:'true',PLATFORM_INTERNAL_TOKEN:'p'.repeat(40),SENDER_INTERNAL_TOKEN:'s'.repeat(40),ISSUER_URL:'http://127.0.0.1:1',SENDER_URL:'http://127.0.0.1:1',INSTITUTION_ID:id,NETWORK_ID:'31337',REGISTRY_ADDRESS:trust.registryAddress,TRUST_BUNDLE_PATH:`${runRoot}/trust.json`});
- issuerApp=await buildFinalsServer(env,{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?current:'unavailable'});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
- senderApp=await buildFinalsServer({...env,SERVICE_ROLE:'sender',ISSUER_URL:upstream});const senderOrigin=await senderApp.listen({host:'127.0.0.1',port:0});
- platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream,SENDER_URL:senderOrigin});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
- (vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
-},30000);
-afterAll(async()=>{await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql`DELETE FROM issuer_v2.outbox WHERE institution_id=${id}`;await sql.end();if(runRoot)await writeFile(`${runRoot}/identity.json`,JSON.stringify({institution:id,deployment,screenshots:['service-mobile.png','service-desktop.png'],scope:'synthetic-accounts-local-oidc-real-http-postgres-browser-external-authority-fixtures'}),{flag:'wx',mode:0o600});});
-
+// Existing success-path regression; boundary scenarios use the same isolated fixture in a separate file.
+import {beforeAll,afterAll,it,expect} from 'vitest';
+import {readFile,writeFile} from 'node:fs/promises';
+import {randomUUID} from 'node:crypto';
+import {chromium} from '@playwright/test';
+import {bankPolicy,hashCanonical,generateEd25519KeyPair,signPayload,verifyPayload,serviceReceiptSchema,serviceLeaseSchema,type ServiceBinding} from '../../packages/protocol/src/index.js';
+import {postgresAuthorityStore} from '../../services/api/src/finals-store.js';
+import {createHttpFixture} from './service-http-fixture.js';
+const {importJWK}=await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js',import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
+const f=await createHttpFixture();
+const {sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject}=f;
+let origin:string,runRoot:string,oidc:string;
+beforeAll(async()=>{await f.start();origin=f.origin;runRoot=f.runRoot;oidc=f.oidc;},30000);
+afterAll(()=>f.close());
 it('uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries',async()=>{
  const r=await login('recipient');expect(r.done.status).toBe(200);expect(r.done.headers.get('set-cookie')).toContain('Secure');expect(r.done.headers.get('set-cookie')).toContain('HttpOnly');expect(r.done.headers.get('set-cookie')).toContain('SameSite=Strict');
  expect((await r.c.request('/v3/auth/me?purpose=work')).body.user.id).toBe(uid('recipient'));
@@ -130,8 +43,8 @@ it('issues and consumes real signed authorizations once across concurrent HTTP r
  const a=await agent.c.request('/v3/attempts',{intentId:'http-case',profile:'direct-webrtc-v3'});expect(a.status).toBe(200);
  const sender=await generateEd25519KeyPair(),recipient=await generateEd25519KeyPair();
  expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(503);registeredDigests.add(vc.body.digest);
- current='unavailable';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(503);
- current='revoked';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(409);current='current';
+ f.control.current='unavailable';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(503);
+ f.control.current='revoked';expect((await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk})).status).toBe(409);f.control.current='current';
  const challenge=await agent.c.request('/v3/challenge',{attemptId:a.body.id,digest:vc.body.digest,publicKey:sender.publicJwk});expect(challenge.status).toBe(200);
  expect((await other.c.request('/v3/sender-proof',{challengeId:challenge.body.challengeId})).status).toBe(403);
  expect((await agent.c.request('/v3/sender-context',{challengeId:challenge.body.challengeId,serviceUri:'https://center.example'})).status).toBe(404);
@@ -188,7 +101,7 @@ it('renders the actual service in Chromium, completes OIDC login, creates/cancel
  try{
   // No device grants, fake media, route mocks, storage injection or provider calls.
   await context.route('**/*',route=>new URL(route.request().url()).hostname==='127.0.0.1'?route.continue():route.abort());
-  subject='staff';mode='normal';await page.goto(origin+'/service');await page.getByRole('button',{name:'기관 계정 로그인',exact:true}).click();
+  f.setIdentity('staff');await page.goto(origin+'/service');await page.getByRole('button',{name:'기관 계정 로그인',exact:true}).click();
   await page.getByRole('heading',{name:'기관 업무',exact:true}).waitFor({timeout:15000});allowUnauthenticated=false;
   await page.getByLabel('수신자 계정',{exact:true}).fill(uid(longSubject));await page.getByLabel('할당 상담원',{exact:true}).fill(uid('agent'));await page.getByLabel('등록된 콜센터 URI',{exact:true}).selectOption('https://center.example');
   const [createdResponse]=await Promise.all([page.waitForResponse(r=>r.url().endsWith('/api/v3/intents')&&r.request().method()==='POST'),page.getByRole('button',{name:'연락 업무 생성',exact:true}).click()]);expect(createdResponse.status()).toBe(200);const created=(await createdResponse.json()).id as string;expect((await state()).intents[created]).toBeDefined();
@@ -198,7 +111,7 @@ it('renders the actual service in Chromium, completes OIDC login, creates/cancel
   await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
   await page.screenshot({path:`${runRoot}/service-mobile.png`,fullPage:true});await page.setViewportSize({width:1440,height:1000});await page.screenshot({path:`${runRoot}/service-desktop.png`,fullPage:true});
   allowUnauthenticated=true;await page.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();await page.getByRole('heading',{name:'기관 업무',exact:true}).waitFor({state:'hidden'});
-  subject='recipient';await page.getByRole('button',{name:'기관 계정 로그인',exact:true}).click();await page.getByRole('heading',{name:'위임 및 통화',exact:true}).waitFor({timeout:15000});allowUnauthenticated=false;expect(await page.getByRole('heading',{name:'기관 업무',exact:true}).count()).toBe(0);
+  f.setIdentity('recipient');await page.getByRole('button',{name:'기관 계정 로그인',exact:true}).click();await page.getByRole('heading',{name:'위임 및 통화',exact:true}).waitFor({timeout:15000});allowUnauthenticated=false;expect(await page.getByRole('heading',{name:'기관 업무',exact:true}).count()).toBe(0);
   expect(await page.getByText('안전 판정 아님',{exact:false}).count()).toBeGreaterThan(0);await page.getByRole('button',{name:'업무 새로고침',exact:true}).focus();expect(await page.getByRole('button',{name:'업무 새로고침',exact:true}).evaluate(e=>e===document.activeElement)).toBe(true);
   await page.keyboard.press('Tab');expect(await page.evaluate(()=>document.activeElement?.tagName)).not.toBe('BODY');
   expect(failures).toEqual([]);await writeFile(`${runRoot}/browser-observations.json`,JSON.stringify({uncaughtErrors:failures,consoleErrors,unsuccessfulRequests:requests,viewportChecks:[390,1440],routeMocking:false,externalRequestsBlocked:true,permissions:[],traceStored:false}),{flag:'wx',mode:0o600});

@@ -24,3 +24,17 @@ it('collects distinct approvals but keeps policy inactive until a matching confi
  }finally{await app.close();}
 });
 it('blocks a normal manager from granting joint approval or modifying a joint approver',async()=>{const f=await serviceFixture(),app=Fastify();registerServiceManagement(app,{authority:f.authority,actorFor:async()=>f.institution,approvers:[],confirmKey:async()=>{throw new Error('NOT_USED');}});await f.store.transact(f.institution.institutionId,async r=>{r.members.joint={role:'approver',permissions:['governance.approve']};r.members['other-staff']={role:'institution',permissions:[]};});try{for(const userId of ['joint','other-staff']){const result=await app.inject({method:'POST',url:'/v3/management/member',headers:{'idempotency-key':`joint-${userId}`},payload:{userId,active:true,permissions:['governance.approve']}});expect(result.statusCode).toBeGreaterThanOrEqual(400);}}finally{await app.close();}});
+
+it('requires fresh confirmation for directory-only activation and preserves the authority generation',async()=>{
+ const f=await serviceFixture(),app=Fastify();let confirmed=false,checks=0;
+ app.setErrorHandler((e,_r,p)=>p.code(409).send({code:(e as Error).message}));
+ registerServiceManagement(app,{authority:f.authority,actorFor:async()=>f.institution,approvers:[],confirmKey:async()=>{throw new Error('NOT_USED');},confirmConfiguration:async()=>{checks++;if(!confirmed)throw new Error('WITNESS_REQUIRED');}});
+ await f.store.transact(f.institution.institutionId,async r=>{r.registrationState='confirmed';r.directory={hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory};});
+ const post=(url:string,payload:unknown)=>app.inject({method:'POST',url,headers:{'idempotency-key':crypto.randomUUID(),'content-type':'application/json'},payload:JSON.stringify(payload)});
+ try{
+  const response=await post('/v3/management/configuration',{directory:[{path:'/official',title:'Changed display title'}],policy:(await f.store.read(f.institution.institutionId)).policy});expect(response.statusCode).toBe(200);const {operation}=response.json();
+  await f.store.transact(f.institution.institutionId,async r=>{const p=r.configurationProposals![operation]!;p.status='confirmed';p.transactionHash='fixture';p.block='12';});
+  expect((await post('/v3/management/configuration/activate',{operation})).json().code).toBe('WITNESS_REQUIRED');expect((await f.store.read(f.institution.institutionId)).configurationProposals![operation]!.activatedAt).toBeUndefined();
+  confirmed=true;expect((await post('/v3/management/configuration/activate',{operation})).json()).toEqual({active:true,newDelegationAndTrustPublicationRequired:false});const r=await f.store.read(f.institution.institutionId);expect(r.epoch).toBe('1');expect(r.policy.version).toBe(1);expect(r.configurationProposals![operation]!.activatedAt).toBeDefined();expect(checks).toBe(2);
+ }finally{await app.close();}
+});

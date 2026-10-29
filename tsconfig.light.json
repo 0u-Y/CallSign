@@ -41,6 +41,8 @@
     "scripts/evaluate-performance.ts",
     "tests/integration/database-readiness.test.ts",
     "tests/integration/service-http.test.ts",
+    "tests/integration/service-http-fixture.ts",
+    "tests/integration/service-boundaries.test.ts",
     "vitest.http.config.ts"
   ]
 }
