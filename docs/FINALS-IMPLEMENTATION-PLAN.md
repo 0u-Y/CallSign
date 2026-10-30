@@ -4,6 +4,40 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="backup-boundaries-20261030"></a>
+
+## 2026-10-30 쓰기 중 drain·별도 cluster 복원·Anchor 잠금 후속
+
+시작 HEAD는 `ac31f254b225813380088b12a34a78d0833bc028`다. 기존 미추적 문서4개·진행 포인터28개는 보존하며 이번 커밋에 포함하지 않는다. 아래는 그 이후 worktree의 검증이며 [이번 실행 증거](../artifacts/backup-boundaries-20261030.json)에 실행별 소스·명령·결과를 연결한다. 앞 절의 고정 fixture/같은 cluster 한계는 당시 기록이며 이번에 추가로 확인한 범위와 구분한다.
+
+- OPS-003/005·DB-001/003: migration `0006_backup_drain`의 DB 공통 admission 상태와 shared/exclusive advisory lock으로 모든 동일 DB 서비스 인스턴스의 권한 transaction·외부 Anchor CAS·commit을 백업 snapshot 앞에서 정리한다. `drain`은 준비 완료가 아니라 유입 차단이다. 일반 쓰기/신규 일반 worker claim은 거절하고 이미 처리 중인 작업은 완료/명확한 재시도로 남긴다. 종료·동의 철회·업무 취소·위임 철회·긴급 정지와 관련 안전 작업은 draining 동안 허용한다. snapshot의 짧은 배타 구간은 `BACKUP_SNAPSHOT_BUSY_RETRY`로 명시 재시도를 요구한다. 처리 중 claim·진행 통화 또는 잠금 기한 초과는 백업 성공 manifest를 만들지 않는다.
+- CALL-002·AUTH-002·STATE-003: Anchor timeout이 통화 종료까지 막던 결함을 수정했다. 종료/동의 철회/재시작 정리는 등록 권한·키·기관 상태와 소비 권한을 변경하지 못하는 별도 mode로 수행하고 신규 권한 쓰기는 여전히 독립 Anchor 검사를 요구한다. 위임 철회·기관 정지 등 권한 이력 변경은 기존 Anchor/journal 확인을 유지한다.
+- OPS-005·DB-001: 복원은 source 소유자와 비밀번호를 복제하지 않고 `pg_restore --no-owner`와 target의 새 owner/NOLOGIN 그룹/독립 LOGIN을 사용한다. 기존 provisioning 도구에 새 빈 cluster의 그룹 준비 옵션만 추가했다. 복원 SQL은 admission을 fenced로 유지한다. archived issuer 키 참조가 없거나 실제 개인키가 공개키와 맞지 않으면 SQL 복원 전에 거절한다. 새 키로 대체하지 않는다.
+- OPS-003/005: `scripts/backup-control.ts`는 owner 전용 status/drain/resume/fence/activate 명령이다. 복원된 target은 최신 Anchor와 모든 recovery gate 확인 및 운영자의 source 정지·fence 확인 후 명시 활성화한다. source의 fenced 상태는 일반 resume으로 해제하지 못한다. 자동 failover나 source 생존 여부를 원격 증명하는 장치는 추가하지 않았다.
+
+### 시험과 관측
+
+동일 기관 API 프로세스2개, 실제 PostgreSQL worker claim/완료, 진행 중 authority transaction에서 drain을 시작했다. 양쪽 API의 새 발급·소비는503이고 DB 소비 행이 증가하지 않는다. 준비가 덜 된 backup은 실패하며, 진행 transaction의 CAS/commit과 worker 완료·종료/철회/취소/cleanup 후 실제 암호화 snapshot의 checkpoint와 Anchor가 일치한다. 잘못된 drain token과 snapshot 배타 구간 요청은 거절하고, 백업만 수행하는 source는 올바른 token으로 명시 재개한다.
+
+source/target/Anchor는 서로 다른 PostgreSQL 프로세스·volume·자격을 사용한다. target의 owner와 issuer/auth/worker LOGIN으로 실제 SQL·HTTP 동작, superuser/createdb/createrole 불허, 금지 SQL42501, 역할 GRANT 누락42501, migration hash, 소비·철회·계정 비활성/세대·epoch·세션 폐기·gate, 비어 있지 않은 대상 거절을 확인한다. source를 fenced로 만든 뒤 target만 활성화하며, target 전진 후 과거 백업은 Anchor 불일치로 차단한다.
+
+Anchor proxy는 실제 HTTPS Anchor로 전달하되 특정 기관 요청만 제어한다. 정상·지연·timeout·저장 후 응답 유실·접근 불가에서 실제 HTTP 종료와 `pg_stat_activity`/`pg_blocking_pids`의 행 잠금 대기를 확인한다. 다른 기관 요청은 진행하고 timeout은 rollback하며 후속 요청이 성공한다. HTTP 취소는 즉시 서버 transaction 취소가 아니라 제한된 Anchor timeout 뒤 rollback되는 경계다. per-request 관측값은 증거에 남기며 SLA·분위수·부하 시험으로 해석하지 않는다. 기관 잠금 밖으로 Anchor 조회를 이동하지 않았다.
+
+### 최종 실행 결과
+
+| 검사 | 이번 결과 | 범위 |
+|---|---|---|
+| 복구·DB 통합 | 5파일25 PASS, 실패/skip0 | 복구10 + 기존 DB15를 같은 명령에서 실행 |
+| 영향받은 HTTP | 6 PASS, 브라우저1 의도적 제외 | 실제 인증·세션·CSRF·SQL, local OIDC/원장/Anchor fixture |
+| light·runtime 타입 | 44파일207 PASS·runtime PASS | 네트워크/listen 차단과 기존 worker 제한 유지 |
+| target URL guard 음성 시험 | 잘못된 대상이 setup 전에 거절됨 | 자식 runner의 예상 실패를 확인. 실행 시험 수에 합산하지 않음 |
+
+최종 복구 source hash는 `6fff6a4f79047655a2c5e515e763beed42534befc74b21ff425b1ce2654cd931`다. HTTP 이후 변경은 복구 시험 파일의 대상/역할 URL guard뿐이며 제품 코드는 같다. 중간 fixture의 `.intent.id` 참조 오류는 `.attempt.intentId`로 고쳤고 취소 assertion은 유지했다. 최초 HTTP 실행은 보호 root 입력 누락으로 기존 guard가 거절했으며 이후 해당 입력과 API-only 모드를 명시했다. 원본 실패 기록을 보존하고 과거/중간 PASS를 합산하지 않는다.
+
+마지막 소수 요청 표본은 정상53.9ms, 제어 지연 전체168.0ms, 다른 기관51.2ms, timeout2505.7ms, timeout 뒤 종료 정리6.1ms였다. 실제 행 lock 대기를 관측했지만 이 값은 단일 실행의 예시이며 p95/SLA·큰 pool 내성으로 확대하지 않는다. 시작 available38118MiB·disk507GiB, 종료 available41121MiB·세 DB96.91/57.29/18.52MiB를 관측했다. DB 제한은512/512/256MiB·합계CPU2, Node heap2048MiB·integration worker1이다. swap 사용량은13023→15182MiB로 늘었고 표본 si156→28KiB/s·so0이었다. 호스트 전체 swap 증가를 시험에 귀속하거나 지속 활동0으로 표현하지 않는다.
+
+코드·설정·시험은 `9c764107d66e97a6b87ac7dbe7ff233580ce071d`에 보존했고 최종 source259개 파일 hash가 해당 커밋과 일치함을 확인했다. 이번 identity의 애플리케이션 프로세스 잔존0을 확인한 뒤 컨테이너3개·volume3개·임시 백업·평문·키·인증서·자격·보호 root를 정리했다. 기존 자원과 미추적32개 파일은 보존했다. 실행 결과·최종 정리는 이 절과 연결된 증거의 최신 완료 기록을 따른다. 실제 체인·Witness·PBX·RTP·외부 AI/IdP·GCP·전원/호스트/디스크 장애는 실행하지 않는다. 같은 호스트의 별도 cluster 검증이며 독립 호스트 내성이 아니다. source 정지 확인은 승인된 운영자의 수동 절차에 의존하고, 무단 owner SQL/구버전 writer/별도 source가 같은 Anchor 자격으로 쓰는 것을 자동 차단하는 failover 보장은 없다.
+
 <a id="persistent-recovery-20261030"></a>
 
 ## 2026-10-30 영속 anchor·프로세스 재시작·앱 백업/복원

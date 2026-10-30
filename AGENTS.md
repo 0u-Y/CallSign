@@ -36,3 +36,7 @@
 ## 2026-10-30 영속 복구 검증의 한정 예외
 
 이번 사용자 요청은 작업 소유 PostgreSQL 두 개와 별도 영속 시험 volume, 기존 anchor의 로컬 HTTPS 실행, 필요한 loopback API/worker, 합성 키/계정, 소유 프로세스 재시작·제한된 응답 유실·암호화 앱 백업과 새 시험 DB 복원, 관련 commit/일반 push/CI 조회만 일시 허용한다. 실제 체인/Witness/PBX/TURN/음성/외부 AI/실제 IdP/GCP·호스트 재부팅/디스크 고갈/전역 네트워크 변경·기존 자원 변경·다운로드/설치·force push는 금지한다. 기존 guard는 유지하고 infrastructure는 소유 anchor/backup/restore 자식에만 지정한다. 상시 실행 허가가 아니며 이번 identity의 자원만 정리한다.
+
+## 2026-10-30 Drain·별도 cluster 복원·Anchor 지연 검증 예외
+
+이번 요청은 고유 identity/label의 source·target·Anchor PostgreSQL과 별도 volume, loopback API/worker/HTTPS Anchor, 합성 데이터·키·인증서, 소수 경쟁 요청과 제한 지연·중단/재시작, 암호화 application 백업/복원 및 관련 commit/일반 push/CI 확인을 허용한다. 기존 자원·운영키·실제 체인/Witness/PBX/음성/외부 AI/IdP/GCP·전역 장애·다운로드·force push는 금지한다. 기존 guard와 최소권한을 유지하며 이번 소유 자원만 정리한다. 상시 실행 허가가 아니다.

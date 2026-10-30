@@ -2,6 +2,15 @@
 
 기준일: 2026-10-30. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
+## 백업 경계 후속 검증의 적용 범위
+
+[2026-10-30 후속 기록](FINALS-IMPLEMENTATION-PLAN.md#backup-boundaries-20261030)은 실제 쓰기/worker drain과 별도 PostgreSQL cluster 복원·LOGIN 권한, Anchor 지연 중 소수 요청을 추가 확인한다. 이전의 ‘정지 fixture/같은 cluster만 검증’ 표시는 그 당시 범위다. 최신 결과는 연결된 실행 증거를 따른다.
+
+- admission fence는 이 migration/코드를 사용하는 모든 동일 DB replica가 준수해야 한다. owner 수동 SQL·구버전 writer·다른 DB source의 Anchor 자격 사용을 자동 제어하지 않는다. target 활성화의 source 정지 확인은 운영자 책임이며 자동 failover가 아니다.
+- draining 중 안전 작업은 허용하지만 snapshot의 배타 구간에는 빠른503 재시도가 필요하다. 신규 일반 작업은 재개 전까지 차단하며 dead worker/미확정 작업 때문에 drain이 완료되지 않으면 abort/resume 후 재조정해야 한다. claim 이력을 지워 백업을 강행하지 않는다.
+- HTTP 연결 종료가 서버 작업의 즉시 취소를 뜻하지 않는다. 시험의 미응답 Anchor 요청은 약2.5초 timeout 뒤 rollback했으며, Anchor CAS가 이미 성공한 응답 유실은 정확한 readback/저장 이력으로 확인해야 한다. 기관별 행 잠금은 유지한다. 큰 동시성·pool 고갈 내성·SLA 검증이 아니다.
+- application 복원과 합성 키만 검증한다. 체인 전체 복원·운영 키 전체·호스트 내구성·GCP·실제 미디어/제공자는 여전히 별도다.
+
 ## 영속 복구의 추가 확인 범위
 
 [영속 복구 평가](../artifacts/persistent-recovery-20261030.json)에서 실제 HTTPS anchor·별도 PG 저장소·API/worker 자식 프로세스·application 범위 암호화 백업/새 DB 복원을 확인했다. 아래 인증 단계의 메모리 anchor 설명은 그 실행 당시 경계다. 같은 호스트의 프로세스·volume·계정·복원 수명을 분리한 시험이며 독립 기관/호스트 장애 격리·전원/디스크 내구성을 입증하지 않는다.

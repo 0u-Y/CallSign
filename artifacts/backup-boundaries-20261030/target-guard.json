@@ -1,0 +1,8 @@
+{
+  "case": "invalid target cluster rejected before test setup",
+  "childExitCode": 1,
+  "expected": "DISPOSABLE_LOCAL_RECOVERY_DATABASE_REQUIRED",
+  "assertion": "PASS",
+  "executedTestAssertions": 0,
+  "servicesStarted": false
+}

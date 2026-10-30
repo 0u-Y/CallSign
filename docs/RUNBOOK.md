@@ -460,6 +460,88 @@ DB의 최초 준비 완료는 `pg_isready -h 127.0.0.1 -U TEST_OWNER -d callsign
 후속 증거는 [경계 검증 평가](../artifacts/service-boundaries-20261030.json)에 연결한다. 실패 이력도 보존하고 부분 필터 실행의 SKIPPED를 전체 PASS에 합산하지 않는다. 검증 이후에도 실제 체인·독립 anchor·PBX·제공자·운영 IdP 검증은 별도 허가와 설정이 필요하다.
 
 
+## 쓰기 중 백업 준비와 별도 cluster 복원
+
+적용 코드: `0006_backup_drain`, `backup-control.ts`와 현재 backup/restore 도구. [이번 실행·관측](FINALS-IMPLEMENTATION-PLAN.md#backup-boundaries-20261030)을 따른다. 아래 명령은 **해당 인프라/복구 실행을 허가받은 대상에서만** 사용한다. 이번 소유 시험 환경은 결과 보존 후 제거하므로 해당 URL/키를 재사용하지 않는다.
+
+### 일관성 조건과 쓰기 정책
+
+보존 대상은 기관 권한/키·회원 세대, journal hash/소비 영수증, 철회·취소, quota와 outbox의 저장 transaction/nonce/불명 결과, migration identity다. sessions·challenge·임시 승인 요청·연결 lease·임시 PBX 자격은 복원 후 활성화하지 않는다. Anchor는 백업 대상에 포함하지 않는다. 현재 구성은 `INSTITUTION_ID`의 키·Anchor checkpoint를 검증하는 기관별 profile이다. 다기관 전체 키/Anchor manifest와 운영 키 전체 복원 보장으로 확대하지 않는다.
+
+모든 동일 DB API/worker/event consumer/maintenance replica를 같은 migration·코드로 전환한 뒤 준비한다. 기관 권한 transaction은 DB 공통 shared advisory lock을 잡은 상태에서 CAS와 SQL commit까지 끝낸다. `drain`은 DB의 admission을 draining으로 바꾸고 즉시 반환한다. **반환값 ready=false는 준비 완료가 아니다.** 신규 일반 발급·소비·claim은 차단하고 진행 중 작업은 끝내거나 명확한 재시도 상태로 둔다. 종료·동의 철회·취소·위임 철회·긴급 정지·cleanup은 계속 허용한다. 권한을 바꾸는 철회/정지는 Anchor/journal 검증을 유지한다.
+
+백업은 drain token을 확인하고 배타 advisory lock을 최대3초 기다린다. 잠금을 얻은 후 table SHARE lock·처리 중 claim0·대상 기관 진행 통화0·ready recovery·기관 키/Anchor 일치를 확인하고 exported snapshot을 dump한다. 잠금 대기 전에 만들어진 repeatable-read snapshot을 사용하지 않는다. 배타 구간의 새 쓰기는 `BACKUP_SNAPSHOT_BUSY_RETRY`503으로 거절하므로 안전 요청은 짧게 재시도한다. 백업 실패에 성공 manifest를 만들어서는 안 된다. 준비 실패/종료하지 않은 통화/죽은 worker/미확정 작업이 있으면 source 재개 후 기존 lease/retry 절차로 조정하고 다시 drain한다. 이력을 삭제하거나 Anchor를 되돌리지 않는다.
+
+### 단순 백업: source를 다시 사용할 때
+
+사전 입력은 source owner `MIGRATOR_DATABASE_URL`, `INSTITUTION_ID`, `DEPLOYMENT_ID`, 독립 Anchor URL/token, 기존 키가 있는 `FINALS_DATA_DIR`, 보호된 `BACKUP_DEPLOYMENT_ENV_PATH`, 새 `BACKUP_DIR`, 별도32바이트 `BACKUP_ENCRYPTION_KEY_PATH`다. DB URL과 키는 보호 파일/환경 참조로 전달하고 출력하지 않는다. 설치된 pg_dump/pg_restore/psql·tar가 필요하며 다운로드는 자동 수행하지 않는다.
+
+```sh
+# owner 환경과 보호된 새 DRAIN_RECORD 경로를 준비한 상태
+umask 077
+set -o noclobber
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node --import tsx scripts/backup-control.ts drain > "$DRAIN_RECORD"
+export BACKUP_DRAIN_TOKEN="$(node -e 'process.stdout.write(JSON.parse(require("node:fs").readFileSync(process.argv[1],"utf8")).token)' "$DRAIN_RECORD")"
+# 통화를 종료하고 진행 worker가 완료/재시도 상태로 정리되었는지 확인
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node --import tsx scripts/backup-control.ts status
+BACKUP_SCOPE=application BACKUP_CONFIRMATION=QUIESCED-APPLICATION-ONLY \
+  CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node --import tsx scripts/backup-bundle.ts
+# 성공 manifest와 암호화 payload를 보존한 뒤, 백업만 수행하는 source를 재개
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node --import tsx scripts/backup-control.ts resume
+```
+
+`status`는 admission 상태이지 drain 완료·서비스 준비 완료 판정이 아니다. 일반 전체 백업은 기존 `full`/`MAINTENANCE-WITH-QUIESCED-CHAIN` 확인을 유지하고 별도 quiesced 체인 archive가 필요하다. 이번에는 application만 실행했다. source를 재개하면 Anchor가 전진할 수 있으므로 이 백업을 나중에 복원한 target이 최신성 불일치로 차단되는 것은 정상이다.
+
+### 새 cluster 역할 준비와 격리 복원
+
+source와 다른 PostgreSQL 프로세스·data volume·owner·비밀번호를 준비한다. 운영 DB나 기존 비어 있지 않은 DB를 쓰지 않는다. target owner는 새 빈 DB의 복원에만 사용한다. source LOGIN 비밀번호·superuser를 복제하지 않는다. 기존 `provision-logins.sql`에 target의 새 issuer/auth/worker/pbx 비밀번호를 보호 환경으로 제공한다. 아래 `target-owner`는 실제로 준비한 보호된 PostgreSQL service file의 이름이며 예제 비밀번호가 아니다.
+
+```sh
+# PGSERVICEFILE(0600), target-owner 및 보호 환경의 target 전용 *_DB_PASSWORD를 준비
+PGSERVICE=target-owner psql -X -v ON_ERROR_STOP=1 -v restore_roles_only=true \
+  -f infra/deploy/provision-logins.sql
+# RESTORE_DATABASE_URL/RESTORE_DATA_DIR는 새 target. source의 MIGRATOR URL과 혼동 금지
+RESTORE_CONFIRMATION=NEW-EMPTY-DATABASE-AND-DIRECTORY \
+  CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node --import tsx scripts/restore-bundle.ts
+```
+
+이 옵션은 새 cluster의 알려진 NOLOGIN 그룹과 LOGIN/CONNECT만 준비한다. 기존 LOGIN/그룹이 있으면 자동 비밀번호 재설정 대신 검토를 요구한다. **복원 전에 target에 전체 migration을 적용해 테이블을 만들지 않는다.** 복원 도구는 `--no-owner`로 새 owner 소유 객체를 만들고 dump의 검토된 GRANT를 복원한다. `public.callsign_migrations`의 hash와 현재 소스가 일치하는지 기존 `migrate-finals.ts --apply`/DB readiness 시험으로 확인한다. 임의 구 migration hash를 덮어쓰지 않는다.
+
+복원은 encrypted bundle/manifest/정확한 inventory·크기·hash·GCM·archive 및 실제 issuer 개인키/공개키 참조를 먼저 검증한다. 미준비 키를 새로 만들지 않는다. SQL commit 시 admission=fenced, recovery=blocked이며 기존 sessions/임시 연결 권한은 폐기한다. target의 issuer/auth/worker 최소권한 LOGIN으로 실제 SELECT/허용 UPDATE·sessions DELETE와 금지 journal DELETE·권한 변경 거절을 확인한다. GRANT가 누락되면42501로 차단되어야 하며 owner로 앱을 실행해 우회하지 않는다. `deployment.env.restored` 안의 source 주소·비밀번호를 target 앱 설정으로 그대로 사용하지 않는다.
+
+### 이전 모의 시험과 실제 전환
+
+1. source를 draining으로 유지하고 검증된 백업을 만든다. source 재개 명령을 실행하지 않는다.
+2. target은 네트워크와 앱 쓰기가 격리된 fenced 상태에서 복원·역할·데이터·최신 Anchor를 대조한다. 기관별 기존 `postgresAuthorityStore.verifyRecovery`를 실행해 모든 recovery gate를 확인한다. 이는 admission을 자동 활성화하지 않는다.
+3. source owner 환경에서 같은 token으로 `backup-control.ts fence`를 실행한다. 진행 중 claim/통화가 있으면 실패한다. source의 모든 writer 인스턴스를 승인된 종료 절차로 멈추고, 다른 source/구버전 writer가 같은 Anchor 자격으로 쓰지 않는지 운영자가 확인한다.
+4. target owner 환경으로 명시 전환한다. target `backup-control.ts status`에서 읽은 token을 `BACKUP_DRAIN_TOKEN`에 넣고 `SOURCE_FENCE_CONFIRMATION=SOURCE-WRITERS-STOPPED-AND-FENCED` 및 기존 infrastructure guard로 `backup-control.ts activate`를 실행한다. gate가 하나라도 blocked이거나 token/확인이 없으면 활성화하지 않는다.
+5. target issuer/auth/worker의 새 자격으로 API와 worker를 확인한다. source의 `resume`은 fenced 상태를 해제하지 못한다. target이 전진한 뒤 과거 source/백업을 일반 재시작으로 되살리지 않는다.
+
+이 절차는 owner와 운영자의 올바른 source 정지 확인을 신뢰한다. 자동 failover·다른 호스트의 source 정지 증명·악의적인 DB owner/Anchor 자격 복제 방어가 아니다. 부분 전환에 실패하면 양쪽의 신규 권한 쓰기를 차단하고 최신 journal/Anchor와 승인된 현재 writer를 확인한다. 임의로 source를 다시 열거나 Anchor를 rollback하지 않는다.
+
+### 제한된 통합 회귀의 재실행 입력
+
+기존 `tests/integration/persistent-recovery.test.ts`를 확장했다. 별도 source/target/Anchor 시험 cluster를 먼저 준비한 뒤 실행하며, test hook이 DB/container를 자동 생성하지 않는다. `CALLSIGN_RECOVERY_ID=callsign_test_*`, 보호된 `CALLSIGN_RECOVERY_TEST_ROOT`와 그 아래 `tls.key`/`tls.crt`, `NODE_EXTRA_CA_CERTS`, 보호 `TMPDIR`가 필요하다. source는 `TEST_DATABASE_URL`/`MIGRATOR_DATABASE_URL` 및 실제 `ISSUER_DATABASE_URL`/`AUTH_DATABASE_URL`/`WORKER_DATABASE_URL`을 같은 소유 시험 DB로 지정한다. source에 migration0000..0006와 LOGIN을 준비한다. target은 다른 프로세스/volume의 `TARGET_ADMIN_DATABASE_URL`과 새 `TARGET_ISSUER_DATABASE_URL`/`TARGET_AUTH_DATABASE_URL`/`TARGET_WORKER_DATABASE_URL`을 준비하고 위 roles-only provisioning을 수행한다. 테스트의 새 DB 생성/CONNECT 부여는 시험 owner만 사용한다. 모든 대상은 loopback의 `callsign_test_*`이어야 한다.
+
+Anchor는 별도 schema·owner `ANCHOR_ADMIN_DATABASE_URL`, SELECT/UPDATE만 허용한 `ANCHOR_DATABASE_URL`, `ANCHOR_TOKEN`, `ANCHOR_TLS_KEY_PATH`/`ANCHOR_TLS_CERT_PATH`가 필요하다. 환경 값은 보호 파일/프로세스 참조로 전달한다. 설치된 pg_dump/pg_restore/psql·tar를 사용한다. 이 시험은 source/target에서 소유 시험 DB를 추가하므로 기존 DB/volume을 지정하지 않는다.
+
+```sh
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration pnpm exec vitest run \
+  --config vitest.integration.config.ts \
+  tests/integration/persistent-recovery.test.ts \
+  tests/integration/service-runtime.test.ts \
+  tests/integration/finals-session-scopes.test.ts \
+  tests/integration/finals-store.test.ts \
+  tests/integration/database-readiness.test.ts \
+  --reporter=verbose --reporter=json --outputFile="$RECOVERY_REPORT"
+```
+
+테스트 child는 기존 infrastructure guard를 Anchor/backup/restore/control에 한해 명시한다. 브라우저·실제 체인·PBX·제공자를 시작하지 않는다. 순차 worker1, 소수 요청, 기존45초 lease 대기이며 소유 프로세스만 종료한다. 완료/실패 모두 이번 identity의 프로세스·DB/volume·backup·시험 자격을 증거 보존 후 정리한다.
+
+### Anchor 지연과 요청 종료 경계
+
+실제 HTTPS 요청의 기본 per-call timeout은2.5초, 기관 행 lock timeout은2초다. 하나의 요청이 여러 Anchor 호출을 할 수 있으므로 이를 전체 요청 상한/SLA로 해석하지 않는다. 소수 요청 시험에서 같은 기관 행 잠금 대기와 다른 기관 요청의 진행, timeout rollback/연결 반환/재시도 성공을 확인했다. 연결을 취소해도 서버 작업은 즉시 중지된다고 보장하지 않는다. 시험의 미응답 조회는2.5초 후 rollback했고 이미 CAS가 전진한 경우에는 기존 exact-readback/결과 불명 gate 정책이 적용된다. 실제 대규모 pool 고갈 내성은 별도다. 성능을 위해 stale Anchor를 수락하거나 검사를 잠금 밖으로 옮기지 않았다.
+
 ## 영속 anchor·앱 복원 검증
 
 [2026-10-30 실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)은 같은 호스트에서 분리한 PostgreSQL 저장소·HTTPS anchor·API/worker 재시작과 **앱 범위** 암호화 복원을 확인했다. 실제 체인/미디어·호스트 전원/디스크 장애·독립 기관 운영은 별도다. 이후 실행도 별도 허가·현재 자원 확인이 필요하다. 전체 recovery runner의 chain 선행 조건은 전체 배포 복원에 대한 조건으로 유지한다. 아래 application 시험은 그 PASS를 대신하지 않는다.
@@ -517,7 +599,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeou
 
 ### 백업 범위·복원 실패·재개
 
-백업 동안 모든 API/worker 쓰기를 승인된 유지보수 절차로 멈추고 진행 중 요청을 drain해야 한다. SQL SHARE lock만으로 외부 anchor CAS를 막을 수는 없다. 독립 anchor는 조회를 위해 유지하지만 같은 배포의 다른 writer가 전진시키지 않아야 한다. 이를 확인할 수 없으면 확인 문자열만 넣어 실행하지 말고 BLOCKED로 남긴다. 이번 시험은 backup 동안 API/worker 자식이 없는 합성 환경에서 수행했다.
+현재 백업 준비는 위 ‘쓰기 중 백업 준비와 별도 cluster 복원’ 절의 DB 공통 drain token/fence 절차를 따른다. 다음은 이전 고정 fixture 시험의 전제다. 백업 동안 모든 API/worker 쓰기를 승인된 유지보수 절차로 멈추고 진행 중 요청을 drain해야 한다. SQL SHARE lock만으로 외부 anchor CAS를 막을 수는 없다. 독립 anchor는 조회를 위해 유지하지만 같은 배포의 다른 writer가 전진시키지 않아야 한다. 이를 확인할 수 없으면 확인 문자열만 넣어 실행하지 말고 BLOCKED로 남긴다. 이번 시험은 backup 동안 API/worker 자식이 없는 합성 환경에서 수행했다.
 
 - 기본 `BACKUP_SCOPE=full`은 기존 `BACKUP_CONFIRMATION=MAINTENANCE-WITH-QUIESCED-CHAIN`과 실제 정지된 chain archive를 요구한다. 이번에는 실행하지 않았다.
 - 체인 없는 검증은 `BACKUP_SCOPE=application`, `BACKUP_CONFIRMATION=QUIESCED-APPLICATION-ONLY`로 명시한다. 이 경우 manifest에도 application으로 기록하며 chain archive를 만들거나 채우지 않는다. 다른 issuer/sender/키/trust/config/deployment env 경계는 유지한다.

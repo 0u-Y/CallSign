@@ -29,6 +29,10 @@
 
 문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [과거 결과 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 특정 블록의 상태 묶음, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 보고서·초안은 날짜별 archive에 보존하고, 원본 기획서와 시험 증거는 유지한다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
 
+### 2026-10-30 백업 준비·cluster 이전·지연 후속 기준
+
+OPS-003/005·DB-001/003·STATE-003·CALL-002·TEST-004의 추가 근거는 [후속 진행 기록](FINALS-IMPLEMENTATION-PLAN.md#backup-boundaries-20261030)과 [실행 증거](../artifacts/backup-boundaries-20261030.json)다. `0006_backup_drain`은 DB 공통 admission과 CAS/commit을 포함하는 shared transaction fence, 백업의 배타 snapshot, source/target 명시 전환을 연결한다. drain 시작을 백업 준비 완료로 표시하지 않는다. 종료·동의 철회는 신규 권한/소비를 부여하지 않는 정리 경로이며 권한 철회/정지는 Anchor/journal 조건을 유지한다. 복원 직후 target은 fenced이며 새 LOGIN·최신 recovery 확인·수동 source fence 확인을 거쳐 활성화한다. 별도 cluster의 application 복원과 소수 요청의 지연 경계만 해당하며 체인 archive·자동 failover·독립 호스트 장애 내성은 범위가 아니다. 기존 요구 ID와 완료 기준을 축소하지 않는다.
+
 ### 2026-10-30 영속 복구 검증의 현행 기준
 
 [실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)과 [평가](../artifacts/persistent-recovery-20261030.json)는 `c59edac` 이후 worktree의 추가 증거다. 기본 요구사항 ID/완료 기준은 유지한다.

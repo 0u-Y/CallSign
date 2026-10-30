@@ -1,0 +1,148 @@
+[
+  {
+    "case": "persistent-anchor",
+    "casWinners": 1,
+    "lostResponsePosts": 1,
+    "restartedState": "2",
+    "tlsAuthDomainRejected": true
+  },
+  {
+    "case": "api-recovery-gate",
+    "unverified": "blocked",
+    "remoteAhead": "blocked",
+    "anchorUnavailable": "blocked",
+    "actorAuthentication": "explicit synthetic bearer fixture; OIDC not retested"
+  },
+  {
+    "case": "missing",
+    "gate": "blocked"
+  },
+  {
+    "case": "altered",
+    "gate": "blocked"
+  },
+  {
+    "case": "after-anchor",
+    "gate": "blocked"
+  },
+  {
+    "case": "backup-restore",
+    "scope": "application-only, no chain archive",
+    "receiptPreserved": true,
+    "revokedCredentialPreserved": true,
+    "epoch": "2",
+    "sessions": 0,
+    "gateBeforeLiveAnchor": "blocked",
+    "gateAfterMatchingAnchor": "ready",
+    "staleBackup": "blocked"
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "key",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "bytes",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "manifest",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "missing",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "symlink",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "traversal",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "special",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "inventory",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "tag",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "missing-key",
+    "committedTables": 0
+  },
+  {
+    "case": "restore-rejection",
+    "fault": "key-reference",
+    "committedTables": 0
+  },
+  {
+    "case": "api-restart",
+    "gate": "verified before serving",
+    "previousCall": "failed",
+    "consent": false,
+    "media": "synthetic only"
+  },
+  {
+    "case": "worker-restart",
+    "leaseSeconds": 45,
+    "prepared": 1,
+    "staleOwner": "rejected",
+    "externalTransaction": "fixture only; no actual chain effect asserted"
+  },
+  {
+    "case": "live-drain",
+    "replicas": 2,
+    "inFlightAuthority": "committed",
+    "worker": "settled",
+    "newClaims": "blocked",
+    "newRights": "503 on both replicas",
+    "safety": "decline/revoke/cancel/cleanup accepted",
+    "prematureBackup": "rejected",
+    "snapshotMatchesAnchor": true,
+    "sourceResume": "explicit token"
+  },
+  {
+    "case": "cross-cluster",
+    "independentProcessVolume": true,
+    "differentOwnerAndPasswords": true,
+    "issuerAuthWorker": "actual distinct restricted logins",
+    "historyPreserved": true,
+    "targetInitiallyFenced": true,
+    "activation": "manual source fence confirmation + verified gate",
+    "staleRestore": "blocked",
+    "missingGrant": "42501",
+    "nonemptyTarget": "rejected",
+    "automaticFailover": false
+  },
+  {
+    "case": "anchor-locks",
+    "normalMs": 53.93246200001158,
+    "delayedMs": 167.9977829999989,
+    "otherInstitutionMs": 51.17155100000673,
+    "timeoutMs": 2505.7053159999923,
+    "terminalCleanupMs": 6.087580999999773,
+    "rowLockWaitObserved": true,
+    "timeoutRollback": true,
+    "disconnect": "bounded anchor timeout then rollback, no immediate cancellation promise",
+    "lostResponse": "exact readback",
+    "unavailable": "classified",
+    "pool": "later requests succeeded",
+    "scope": "few requests, not SLA/load benchmark"
+  }
+]

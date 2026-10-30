@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "recordedAt": "2026-10-30T14:29:25.980216+00:00",
+  "executionHead": "ac31f254b225813380088b12a34a78d0833bc028",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "fullServiceVerified": false,
+  "requirements": [
+    "OPS-003",
+    "OPS-005",
+    "DB-001",
+    "DB-003",
+    "STATE-003",
+    "CALL-002",
+    "AUTH-002",
+    "TEST-004"
+  ],
+  "sourceHash": "6fff6a4f79047655a2c5e515e763beed42534befc74b21ff425b1ce2654cd931",
+  "sourceFiles": "artifacts/backup-boundaries-20261030/source-recovery.json",
+  "executions": [
+    {
+      "report": "artifacts/backup-boundaries-20261030/recovery-and-db.json",
+      "files": 5,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0,
+      "breakdown": {
+        "persistentRecovery": 10,
+        "existingDatabaseRegression": 15
+      },
+      "command": [
+        "CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration",
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--config",
+        "vitest.integration.config.ts",
+        "tests/integration/persistent-recovery.test.ts",
+        "tests/integration/service-runtime.test.ts",
+        "tests/integration/finals-session-scopes.test.ts",
+        "tests/integration/finals-store.test.ts",
+        "tests/integration/database-readiness.test.ts",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=PROTECTED_ROOT/guarded-recovery.json"
+      ],
+      "sourceHash": "6fff6a4f79047655a2c5e515e763beed42534befc74b21ff425b1ce2654cd931"
+    },
+    {
+      "report": "artifacts/backup-boundaries-20261030/http-regression.json",
+      "files": 1,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 1,
+      "skippedReason": "Browser case deliberately excluded; no Vite/Chromium starts in API-only mode.",
+      "sourceHash": "97a5a572102d507108d88de7016bf9b6b81c41891d9bae41a056cea16d760b19",
+      "sourceFiles": "artifacts/backup-boundaries-20261030/source-http.json",
+      "command": "CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true pnpm exec vitest run --config vitest.http.config.ts tests/integration/service-http.test.ts --testNamePattern='uses real|rejects issuer|enforces CSRF|issues and consumes|requires real recent|blocks new work' --reporter=verbose --reporter=json --outputFile=PROTECTED_ROOT/verified-http.json"
+    }
+  ],
+  "provenanceNotes": [
+    "Final recovery source snapshot was captured before the run and checked after it. Later edits affect documentation/evidence only.",
+    "HTTP source differs only in the recovery test file (added target/role URL pre-start guards). Production code is identical.",
+    "Intermediate failure is a test fixture field name (.intent.id instead of .attempt.intentId), fixed without removing the cancel assertion. Intermediate passes are not summed.",
+    "An initial HTTP invocation was rejected by the existing guard because CALLSIGN_HTTP_TEST_ROOT was omitted; protected root/API-only settings were supplied explicitly on retry.",
+    "Initial TypeScript errors were fixed (module resolution for key validation, optional request method and fixture member name). No security check or test assertion was removed."
+  ],
+  "offline": {
+    "evidence": "artifacts/backup-boundaries-verified-source-20261030.json",
+    "light": {
+      "files": 44,
+      "passed": 207
+    },
+    "runtimeTypes": "PASS",
+    "developmentOnlyEarlierEvidence": "artifacts/backup-boundaries-source-20261030.json",
+    "scopeNote": "Offline collector deferred lists describe checks it did not execute; actual recovery/HTTP execution is recorded separately above."
+  },
+  "environment": {
+    "identity": "callsign_test_2a47672b87",
+    "postgresImage": "postgres:17.6-alpine",
+    "imageId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+    "node": "22.22.2",
+    "pnpm": "11.27.0",
+    "clusters": [
+      {
+        "purpose": "source",
+        "container": "callsign_test_2a47672b87_source",
+        "volume": "callsign_test_2a47672b87_source_data",
+        "memoryMiB": 512,
+        "cpu": 0.75
+      },
+      {
+        "purpose": "target",
+        "container": "callsign_test_2a47672b87_target",
+        "volume": "callsign_test_2a47672b87_target_data",
+        "memoryMiB": 512,
+        "cpu": 0.75
+      },
+      {
+        "purpose": "anchor",
+        "container": "callsign_test_2a47672b87_anchor",
+        "volume": "callsign_test_2a47672b87_anchor_data",
+        "memoryMiB": 256,
+        "cpu": 0.5
+      }
+    ],
+    "storageBoundary": "Distinct processes, persistent volumes, owners/LOGIN passwords; same physical host. Anchor not included in application backup.",
+    "nativeTools": "Existing PG17.6 container clients via protected host UID/GID wrappers, host tar/OpenSSL. No image download/build or package installation.",
+    "initial": {
+      "cpus": 24,
+      "availableMemoryMiB": 38118,
+      "swapUsedMiB": 13023,
+      "diskAvailableGiB": 507,
+      "sampleSwapInKiBPerSec": 156,
+      "sampleSwapOutKiBPerSec": 0
+    },
+    "final": {
+      "availableMemoryMiB": 41121,
+      "swapUsedMiB": 15182,
+      "sampleSwapInKiBPerSec": 28,
+      "sampleSwapOutKiBPerSec": 0,
+      "databaseMemoryMiB": [
+        96.91,
+        57.29,
+        18.52
+      ]
+    },
+    "limits": {
+      "nodeHeapMiB": 2048,
+      "integrationWorkers": 1,
+      "commandTimeoutSeconds": 240,
+      "backupLockTimeoutSeconds": 3,
+      "anchorPerCallTimeoutSeconds": 2.5
+    },
+    "resourceCaveat": "Swap use increased on the host. Samples did not show sustained swap-out/pressure; no claim of continuous zero activity or peak-only attribution."
+  },
+  "observations": "artifacts/backup-boundaries-20261030/observations.json",
+  "fixtureBoundaries": [
+    "Live drain uses two real API child processes, a real PostgreSQL worker claim and processDurableJob executed in the test process; separate existing restart case kills/restarts actual worker children.",
+    "Recovery API uses real service routes/store/SQL and explicit synthetic bearer actors. Target API uses actual restricted target issuer/auth logins.",
+    "HTTP regression uses real authentication/session/CSRF plus local HTTPS OIDC, memory anchor and authority/binding fixtures; no real IdP or browser.",
+    "Recovery Anchor uses real HTTPS and separate restricted PostgreSQL storage. Delay proxy controls only selected synthetic institution requests.",
+    "Ledger transaction/receipt and call bindings remain explicit fixtures; no chain/PBX/AI operation asserted.",
+    "Backup is application-only and test keys/configuration. No source DB passwords are reused for target app logins."
+  ],
+  "policy": {
+    "drain": "New general authority writes/consumption/claims blocked across replicas. Existing admitted jobs can settle; terminal/consent withdrawal/cancel/revoke/suspend/cleanup remain eligible during draining.",
+    "snapshot": "Exclusive shared-writer fence spans exported SQL snapshot; safety writes in this short window return named 503 retry. Failed drain creates no success manifest.",
+    "restore": "New empty database only, no source object owner replay; authenticated archived key reference checked, target admission fenced and sessions cleared.",
+    "activation": "Manual source fence/stop confirmation and all target recovery gates ready; no automatic failover or independent verification of a remote source stop."
+  },
+  "unverified": [
+    "Actual chain/Witness/transaction signatures/chain archive restore",
+    "PBX/TURN/RTP/audio/STT/LLM/actual IdP/GCP",
+    "Independent-host failure tolerance, power loss/storage durability/global network faults",
+    "High concurrency/pool exhaustion/load benchmark/SLA/all process crash windows",
+    "Malicious owner SQL, old application writers, duplicated Anchor credentials or remote source stop proof"
+  ],
+  "cleanup": {
+    "status": "completed",
+    "recordedAt": "2026-10-30T14:31:19.524059+00:00",
+    "identityAndLabelsChecked": true,
+    "ownedApplicationProcessesRemaining": 0,
+    "containersRemoved": 3,
+    "namedVolumesRemoved": 3,
+    "temporaryKeysCertificatesBackupsPlaintextCredentialsAndRootRemoved": true,
+    "existingResourcesUnchanged": true,
+    "preexistingUntrackedFilesPreserved": 32
+  },
+  "retention": "Only redacted reports/hashes/assertions are shared. Raw DB dumps, encrypted bundles, keys, credentials, sessions and private temporary files are excluded. Existing artifacts are untouched.",
+  "artifactHashes": {
+    "artifacts/backup-boundaries-20261030/development-commands.json": "aeab690045602c31f16e5aafdbdf2ac3e3e2572f9096c969d5ef5e4534ca1d48",
+    "artifacts/backup-boundaries-20261030/http-regression.json": "0b2c3cf92a6d3e1a447bedaf2e6b95641af277bd7e73f20717032b8ed13ce63d",
+    "artifacts/backup-boundaries-20261030/intermediate-fixture-failure.json": "c083524a977611d5fadc984e36e2830d1b50249fc94c74c57de6c29d87ce969d",
+    "artifacts/backup-boundaries-20261030/observations.json": "a406f55f8cb0249b8754d1fc6bf8818438587a87414d6146acbbf6c859360636",
+    "artifacts/backup-boundaries-20261030/recovery-and-db.json": "45fd755575a25dd31f461f7f6af244552b2c9eacaab4e1334a842ef782e9a4c7",
+    "artifacts/backup-boundaries-20261030/source-http.json": "8c47fdaf7e064a10fc29c5101f418cfc94950df895810f33315355bc356681a8",
+    "artifacts/backup-boundaries-20261030/source-recovery.json": "f9a06bba4e1486945087ecc06809aa90abb5d59481252ddef15797e6a073943c",
+    "artifacts/backup-boundaries-20261030/target-guard.json": "c92618878d535e6323573eebd3d1c3f1729654987ee37a3602f74a0a369deead"
+  },
+  "codeCheckpointCommit": "9c764107d66e97a6b87ac7dbe7ff233580ce071d",
+  "checkpointRelation": "Execution HEAD remains ac31f25. All 259 final recovery source-file hashes match this later code commit; documentation and redacted evidence are committed separately."
+}
