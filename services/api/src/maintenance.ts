@@ -4,6 +4,7 @@ import {hashCanonical} from '@callsign/protocol';
 import type { InstitutionRecord } from './finals-model.js';
 import { pruneServiceState } from './retention.js';
 export function serviceMaintenance(databaseUrl:string,institutionId:string,retentionSeconds=604800){
+ if(!Number.isSafeInteger(retentionSeconds)||retentionSeconds<=0)throw new Error('RETENTION_SECONDS_INVALID');
  const sql=postgres(databaseUrl,{max:1,prepare:false,connect_timeout:3,connection:{statement_timeout:5000,lock_timeout:2000}});
  return {async tick(){await sql.begin(async tx=>{
    await enterBackupWrite(tx);

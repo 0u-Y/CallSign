@@ -1,3 +1,4 @@
+import {serviceMaintenance} from '../../services/api/src/maintenance.js';
 import {expect,it} from 'vitest';
 import {preflight} from '../../scripts/preflight.js';
 import {privateEvidencePath,redactOutput,offlineChecks,collectEvidence} from '../../scripts/collect-evidence.js';
@@ -30,3 +31,5 @@ it("excludes protected env filenames without excluding the public template",()=>
 it('refuses private material in the public extra-CA reference without echoing it',async()=>{
  const root=await mkdtemp(join(tmpdir(),'callsign-public-ca-'));const path=join(root,'ca.pem'),marker='PRIVATE_CA_MATERIAL_MUST_NOT_BE_REPORTED';try{await writeFile(path,'-----BEGIN PRIVATE KEY-----\n'+marker+'\n-----END PRIVATE KEY-----\n',{mode:0o600});const result=await preflight({SERVICE_EXTRA_CA_PATH:path});expect(result.find(c=>c.id==='SERVICE_EXTRA_CA_PATH')?.status).toBe('BLOCKED');expect(JSON.stringify(result)).not.toContain(marker);}finally{await rm(root,{recursive:true,force:true});}
 });
+
+it('rejects invalid retention before constructing database work and reports the policy in preflight',async()=>{for(const value of [NaN,0,-1,1.5,Infinity])expect(()=>serviceMaintenance('must-not-connect','institution',value)).toThrow('RETENTION_SECONDS_INVALID');const checks=await preflight({RETENTION_SECONDS:'NaN'});expect(checks.find(c=>c.id==='retention-policy')?.status).toBe('FAIL');});
