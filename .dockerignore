@@ -8,3 +8,13 @@ artifacts
 submission
 contracts/out
 contracts/cache
+
+# Integration entrypoints and test sources are host-side validation only.
+services/api/test
+tests
+**/*.test.ts
+**/*.test.tsx
+**/.env
+**/.env.*
+**/*.key
+**/*.pem

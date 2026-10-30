@@ -21,7 +21,7 @@
     "demo:up": "node scripts/restricted.mjs infrastructure bash -c 'bash scripts/demo-up.sh'",
     "demo:seed": "node scripts/restricted.mjs infrastructure bash -c 'tsx scripts/seed.ts'",
     "ledger:deploy": "node scripts/restricted.mjs chain bash -c 'tsx scripts/deploy-registry.ts'",
-    "trust:generate": "tsx scripts/generate-web-trust.ts",
+    "trust:generate": "tsx scripts/prepare-finals.ts trust",
     "submission:build": "tsx scripts/generate-submission.ts && libreoffice --headless --convert-to pdf --outdir submission submission/CallSign_\uae30\ud68d\uc81c\uc548\uc11c.pptx",
     "demo:record": "node scripts/restricted.mjs media bash -c 'playwright test tests/e2e/demo-record.spec.ts --project=chromium'",
     "demo:down": "node scripts/restricted.mjs infrastructure bash -c 'docker compose -f infra/compose/docker-compose.yml down'",
@@ -41,7 +41,8 @@
     "validate": "node --import tsx scripts/validation-runner.ts",
     "prepare:execution": "node --import tsx scripts/prepare-execution.ts",
     "test:http": "node scripts/restricted.mjs integration pnpm exec vitest run --config vitest.http.config.ts",
-    "test:contracts:offline": "node scripts/restricted.mjs chain forge test --offline --threads 1 --fuzz-runs 32 --fuzz-seed 0x20261030"
+    "test:contracts:offline": "node scripts/restricted.mjs chain forge test --offline --threads 1 --fuzz-runs 32 --fuzz-seed 0x20261030",
+    "trust:generate:legacy": "tsx scripts/generate-web-trust.ts"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "5.6.1",

@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts",
+    "start": "tsx src/finals-server.ts",
     "build": "tsc -p tsconfig.json",
-    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts"
+    "db:migrate": "drizzle-kit migrate --config drizzle.config.ts",
+    "start:legacy": "tsx src/server.ts"
   },
   "dependencies": {
     "@fastify/cookie": "11.1.2",

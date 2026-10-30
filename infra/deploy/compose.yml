@@ -35,8 +35,8 @@ services:
       SERVICE_ROLE: platform
       PORT: '4100'
     depends_on:
-      issuer: { condition: service_healthy }
-      sender: { condition: service_healthy }
+      issuer: { condition: service_started }
+      sender: { condition: service_started }
     # No DB credential and no issuer/sender key mounts.
   issuer:
     <<: *app
@@ -81,11 +81,16 @@ services:
       CONSUMPTION_ANCHOR_URL: ${CONSUMPTION_ANCHOR_URL:?independent HTTPS anchor}
       CONSUMPTION_ANCHOR_TOKEN: ${CONSUMPTION_ANCHOR_TOKEN:?separate anchor credential}
       DEPLOYMENT_ID: ${DEPLOYMENT_ID:?immutable deployment identifier}
-      NODE_EXTRA_CA_CERTS: /pbx-public/ca.pem
+      NODE_EXTRA_CA_CERTS: /tls/extra-ca.pem
     volumes:
       - ${FINALS_DATA_DIR:?prepared persistent configuration}/issuer:/keys/issuer:ro
       - ${FINALS_DATA_DIR}/pbx:/keys/pbx:ro
       - ${FINALS_DATA_DIR}/asterisk/tls/public:/pbx-public:ro
+      - type: bind
+        source: ${SERVICE_EXTRA_CA_PATH:?public PEM CA bundle for PBX and private Anchor or OIDC}
+        target: /tls/extra-ca.pem
+        read_only: true
+        bind: {create_host_path: false}
       - ${FINALS_DATA_DIR}/trust:/trust:ro
     depends_on: { postgres: { condition: service_healthy } }
   sender:
@@ -109,6 +114,7 @@ services:
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
       WORKER_DATABASE_URL: ${WORKER_DATABASE_URL:?dedicated worker login}
+      RETENTION_SECONDS: ${RETENTION_SECONDS:-604800}
       DEPLOYMENT_ID: ${DEPLOYMENT_ID:?required}
       CONSUMPTION_ANCHOR_URL: ${CONSUMPTION_ANCHOR_URL:?independent HTTPS anchor}
       CONSUMPTION_ANCHOR_TOKEN: ${CONSUMPTION_ANCHOR_TOKEN:?separate anchor credential}
@@ -120,12 +126,17 @@ services:
       REGISTRY_APPROVERS: ${REGISTRY_APPROVERS:?three public addresses}
       ARI_URL: https://asterisk:8089
       ARI_AUTHORIZATION: ${ARI_AUTHORIZATION:?required}
-      NODE_EXTRA_CA_CERTS: /pbx-public/ca.pem
+      NODE_EXTRA_CA_CERTS: /tls/extra-ca.pem
     volumes:
       - ${FINALS_DATA_DIR}/admin:/keys/admin:ro
       - ${FINALS_DATA_DIR}/operator:/keys/operator:ro
       - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
       - ${FINALS_DATA_DIR}/asterisk/tls/public:/pbx-public:ro
+      - type: bind
+        source: ${SERVICE_EXTRA_CA_PATH:?public PEM CA bundle for PBX and private Anchor or OIDC}
+        target: /tls/extra-ca.pem
+        read_only: true
+        bind: {create_host_path: false}
   migration-runner:
     <<: *app
     profiles: [operations]
@@ -224,7 +235,7 @@ services:
     volumes: ["${FINALS_DATA_DIR}/asterisk/tls/public/ca.pem:/etc/nginx/pbx-ca.pem:ro"]
     restart: unless-stopped
     networks: [application, public]
-    depends_on: { platform: { condition: service_healthy } }
+    depends_on: { platform: { condition: service_started } }
     ports: ['127.0.0.1:8080:8080']
   https:
     image: ${HTTPS_IMAGE:-caddy:2.10.2-alpine}

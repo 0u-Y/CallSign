@@ -10,5 +10,6 @@ it('rejects external-adapter injection without integration approval, test identi
  await expect(buildFinalsServer(env,adapters)).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');
  vi.stubEnv('DEPLOYMENT_ID','test:unit');
  await expect(buildFinalsServer({...env,WEB_ORIGIN:'https://public.example'},adapters)).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');
+ for(const database of ['postgres://issuer:fixture@127.0.0.1/callsign','postgres://issuer:fixture@postgres/callsign_test_scope']){vi.stubEnv('ISSUER_DATABASE_URL',database);await expect(buildFinalsServer(env,adapters)).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');}
  vi.unstubAllEnvs();
 });
