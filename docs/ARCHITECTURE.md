@@ -92,7 +92,7 @@ flowchart LR
 
 `issuer_v2.outbox`의 claim token·만료로 작업을 배정하고 제출 전 서명 raw transaction과 nonce를 저장한다. 외부 호출과 SQL 사이 exactly-once를 주장하지 않으며 동일 요청을 재조회·재처리한다. 원장 확인과 Witness 최신 상태 확인은 별개다. 기관 JSONB는 종료된 개인정보를 보관 정책으로 줄이지만 승인 소비 식별 범위와 hash journal은 유지한다.
 
-신규 소비와 계정·키·정책 및 취소/회수 사건은 DB journal과 독립 anchor의 순서·hash에 결합한다. 재시작 검사는 읽기 전용 snapshot에서 500행씩 전체 순번·각 hash 연결·권한 metadata marker를 검증하고 마지막 짧은 잠금에서 head·metadata·검사 token을 재확인하므로 마지막 root만 남은 중간 이력 유실도 거절한다. 복원 검증 전 gate를 닫고 anchor/DB 불일치·anchor 미설정이면 신규 발급·연결을 거절한다. anchor가 먼저 전진한 뒤 DB commit이 유실되면 자동 해제하지 않는다. 이는 가용성보다 재사용 차단을 우선한 설계이며 실제 백업·복원은 미검증이다.
+신규 소비와 계정·키·정책 및 취소/회수 사건은 DB journal과 독립 anchor의 순서·hash에 결합한다. 재시작 검사는 읽기 전용 snapshot에서 500행씩 전체 순번·각 hash 연결·권한 metadata marker를 검증하고 마지막 짧은 잠금에서 head·metadata·검사 token을 재확인하므로 마지막 root만 남은 중간 이력 유실도 거절한다. 복원 검증 전 gate를 닫고 anchor/DB 불일치·anchor 미설정이면 신규 발급·연결을 거절한다. anchor가 먼저 전진한 뒤 DB commit이 유실되면 자동 해제하지 않는다. 이는 가용성보다 재사용 차단을 우선한 설계다. 같은 호스트의 별도 PG volume/LOGIN·HTTPS anchor와 앱 범위 암호화 복원은 [추가 실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)에서 검증했다. 실제 chain snapshot 전체 복원·독립 호스트/하드웨어 내성은 미검증이다.
 
 ## 공동 설정·내부 계정의 권한 경계
 
@@ -100,4 +100,7 @@ flowchart LR
 
 내부 계정 화면→Issuer 최근 인증/CSRF→제한된 SQL 함수→기관 aggregate와 세션 generation→권한 checkpoint를 같은 DB transaction으로 연결한다. 외부 IdP 사용자 생성이나 이메일 기반 자동 연결은 없다. 일반 관리자는 공동 승인자 집합을 단독 변경할 수 없다. 플랫폼은 계정/업무 DB에 직접 쓰지 않는다.
 
-원장 서명 준비는 서명자별 영속 lease로 조정하고 RPC 대기 중 전역 DB transaction을 열지 않는다. 늦은 결과는 token·기한을 재검사한 뒤 저장한다. anchor CAS는 DB와 분산 원자성을 제공하지 않으므로 CAS 뒤 commit 유실은 차단 상태다. 이 경계와 새 배포 기준은 [RUNBOOK](RUNBOOK.md)에 있다. 실제 DB/체인/복구 검증은 미실행이다.
+원장 서명 준비는 서명자별 영속 lease로 조정하고 RPC 대기 중 전역 DB transaction을 열지 않는다. 늦은 결과는 token·기한을 재검사한 뒤 저장한다. anchor CAS는 DB와 분산 원자성을 제공하지 않으므로 CAS 뒤 commit 유실은 차단 상태다. 이 경계와 새 배포 기준은 [RUNBOOK](RUNBOOK.md)에 있다. 선택 SQL/영속 anchor/앱 복원은 위 추가 기록의 범위에서 실행했으며 실제 체인·전체 배포 복구는 미실행이다.
+
+
+복원 도구는 native pg_restore가 만든 SQL과 gate 차단·세션/임시 연결 정리를 하나의 psql transaction으로 commit한다. 복호화와 archive 검사는 먼저 완료한다. 소비 journal과 계정/키/epoch는 보존하며, 일치하는 외부 anchor 없이는 재개하지 않는다. Worker startup도 journal/anchor를 검증하지만 최초 zero 기준을 만들지 않는다. Issuer가 사전 준비된 독립 zero와 첫 checkpoint를 확인한 뒤 worker를 시작한다. Worker는 gate가 닫히면 신규 원장 작업을 중단하고 terminal cleanup만 남긴다.

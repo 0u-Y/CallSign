@@ -458,3 +458,73 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run 
 DB의 최초 준비 완료는 `pg_isready -h 127.0.0.1 -U TEST_OWNER -d callsign_test_UNIQUE`로 확인한다. 공식 PostgreSQL 이미지의 초기화용 임시 Unix socket만 열린 시점에는 migration을 시작하지 않는다. 실제 자격은 앞 절의 보호 파일/환경 참조를 사용한다.
 
 후속 증거는 [경계 검증 평가](../artifacts/service-boundaries-20261030.json)에 연결한다. 실패 이력도 보존하고 부분 필터 실행의 SKIPPED를 전체 PASS에 합산하지 않는다. 검증 이후에도 실제 체인·독립 anchor·PBX·제공자·운영 IdP 검증은 별도 허가와 설정이 필요하다.
+
+
+## 영속 anchor·앱 복원 검증
+
+[2026-10-30 실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)은 같은 호스트에서 분리한 PostgreSQL 저장소·HTTPS anchor·API/worker 재시작과 **앱 범위** 암호화 복원을 확인했다. 실제 체인/미디어·호스트 전원/디스크 장애·독립 기관 운영은 별도다. 이후 실행도 별도 허가·현재 자원 확인이 필요하다. 전체 recovery runner의 chain 선행 조건은 전체 배포 복원에 대한 조건으로 유지한다. 아래 application 시험은 그 PASS를 대신하지 않는다.
+
+### 소유 시험 환경 준비
+
+1. 고유 `callsign_test_*` identity와0700 보호 ROOT를 정한다. 기존 이미지 `postgres:17.6-alpine`이 없거나 현재 여유가 없으면 다운로드/기존 서비스 중단으로 우회하지 않는다. 이번 기준은 DB 합계768MiB/CPU1.5, Node 예산2GiB, worker1, 명령240초·개별 시험 최대65초다. available8GiB 미만·지속 swap·기존 작업 영향이면 이번 자원만 중단한다.
+2. 서비스와 anchor에 **각각 다른** 컨테이너·named volume·비밀번호·LOGIN을 사용한다. `docker volume create --label callsign.recovery=IDENTITY VOLUME` 뒤, 기존 이미지에 `--pull=never --label callsign.recovery=IDENTITY --memory=512m --memory-swap=512m --cpus=1 --pids-limit=100 --mount source=SERVICE_VOLUME,target=/var/lib/postgresql/data --env-file PROTECTED_SERVICE_ENV -p 127.0.0.1::5432`를 지정한다. anchor는 별도256m/CPU0.5/volume/env로 만든다. ROOT를 양쪽의 **같은 절대 경로**에 bind하면 native DB 도구가 보호 파일을 읽고 쓸 수 있다. `POSTGRES_USER=test_owner`, `POSTGRES_DB=callsign_test_UNIQUE`, `POSTGRES_PASSWORD`는 각각 보호 env 파일에만 둔다. 접속 준비는 Unix socket이 아니라 `pg_isready -h 127.0.0.1`로 확인한다.
+3. 서비스 DB owner의 `MIGRATOR_DATABASE_URL`을 보호 환경에서 읽고 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration pnpm exec tsx scripts/migrate-finals.ts --apply`를 실행한다. `infra/deploy/provision-logins.sql`로 issuer/auth/worker/PBX의 서로 다른 LOGIN을 준비한다. owner를 API 실행 계정으로 사용하지 않는다.
+4. anchor DB owner로 `infra/deploy/anchor-schema.sql`을 적용한다. 별도 anchor service LOGIN은 해당 테이블의 SELECT/UPDATE만 부여하고 token도32자 이상으로 분리한다. 시험은 owner의 `ANCHOR_ADMIN_DATABASE_URL`로 **매번 새로운** 기관/deployment의 zero 행만 만든다. 이미 전진한 anchor를 삭제/초기화/과거 복원하지 않는다. 운영 준비도 같은 별도 수명 원칙을 따르며 DB 백업에 anchor 저장소를 포함하지 않는다.
+5. ROOT에 시험 전용 `tls.key`0600·`tls.crt`를 준비한다. SAN은 `IP:127.0.0.1,DNS:localhost`이며 `NODE_EXTRA_CA_CERTS`를 Node 시작 전에 지정한다. `ANCHOR_TLS_KEY_PATH`/`ANCHOR_TLS_CERT_PATH`는 둘 다 설정하거나 둘 다 생략한다. 운영 기본은 기존 reverse proxy HTTPS 경로를 사용할 수 있다. worker의 CA bundle도 anchor와 PBX가 사용하는 신뢰를 포함해야 하며 CA를 자동 신뢰하지 않는다.
+6. `TEST_DATABASE_URL`/`MIGRATOR_DATABASE_URL`은 새 서비스 시험 owner, `ISSUER_DATABASE_URL`/`AUTH_DATABASE_URL`/`WORKER_DATABASE_URL`/`TEST_AUTH_DATABASE_URL`은 별도 서비스 LOGIN이다. `ANCHOR_DATABASE_URL`은 별도 저장소의 anchor service LOGIN이다. `CALLSIGN_RECOVERY_TEST_ROOT`, `CALLSIGN_RECOVERY_ID`, `ANCHOR_TOKEN`, TLS 경로, `TMPDIR`을 보호 환경에서 설정한다. URI·비밀번호·키 원문을 로그/명령 인자에 넣지 않는다.
+
+호스트에 `pg_dump`/`pg_restore`/`psql`이 없다면 설치·다운로드 대신 이미 실행 허가받은 시험 이미지의 native 도구만 사용한다. 아래 보호 wrapper는 ROOT가 컨테이너 안에서도 같은 경로로 mount된 경우의 예다. `CALLSIGN_TEST_PG_CONTAINER`는 identity/label을 대조한 **서비스 시험 컨테이너** 이름이다. 세 이름의 실행 파일에 동일 내용을0700으로 저장하고 해당 bin 경로를 시험 자식 PATH에만 추가한다. 다른 장비에 matching PostgreSQL client가 있으면 wrapper 없이 그 도구를 사용한다.
+
+```python
+#!/usr/bin/python3
+import os, sys, subprocess
+from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
+
+def local_uri(value):
+    if value.startswith(('postgres://', 'postgresql://')):
+        u = urlsplit(value)
+        if u.hostname != '127.0.0.1' or not u.path.startswith('/callsign_test_'):
+            raise SystemExit('DISPOSABLE_LOCAL_DB_REQUIRED')
+        return urlunsplit((u.scheme, u.netloc.rsplit(':', 1)[0] + ':5432', u.path, u.query, u.fragment))
+    return value
+
+container = os.environ['CALLSIGN_TEST_PG_CONTAINER']
+if not container.startswith('callsign_test_'):
+    raise SystemExit('OWNED_TEST_CONTAINER_REQUIRED')
+args = ['docker', 'exec', '--user', f'{os.getuid()}:{os.getgid()}', '-i']
+if 'PGPASSWORD' in os.environ:
+    args += ['-e', 'PGPASSWORD']
+args += [container, Path(sys.argv[0]).name, *map(local_uri, sys.argv[1:])]
+raise SystemExit(subprocess.run(args).returncode)
+```
+
+이번 wrapper도 기존 이미지·동일 UID/GID를 사용하고 loopback 포트와 보호 파일 mount 경로만 변환했다. 기존 DB에 이 wrapper를 사용하지 않는다.
+
+### 명시적 시험 명령
+
+```bash
+# 기존 DB 네 파일과 영속 복구 시험. 이번 ROOT의 anchor/API/worker 자식 프로세스를 실행한다.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 240s pnpm exec vitest run --config vitest.integration.config.ts tests/integration/persistent-recovery.test.ts tests/integration/service-runtime.test.ts tests/integration/finals-session-scopes.test.ts tests/integration/finals-store.test.ts tests/integration/database-readiness.test.ts --reporter=json --outputFile=artifacts/NEW-PERSISTENT-RECOVERY.json
+
+# 영향받은 HTTP 경로만 확인한다. Vite/브라우저는 기동하지 않고 OIDC는 로컬 HTTPS fixture다.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeout 120s pnpm exec vitest run --config vitest.http.config.ts tests/integration/service-http.test.ts --testNamePattern='uses real|rejects issuer|enforces CSRF|issues and consumes|requires real recent|blocks new work' --reporter=json --outputFile=artifacts/NEW-HTTP-API.json
+```
+
+`CALLSIGN_HTTP_TEST_ROOT`는 같은 시험 TLS ROOT로 지정한다. 브라우저 케이스의 의도적 제외1개는 실제 실행6개와 별도로 기록한다. `persistent-recovery.test.ts`의 actor는 합성 bearer fixture이며 로그인 생성 검증을 대신하지 않는다. 실제 라우트·ServiceAuthority·SQL·journal·CAS·native backup/restore는 유지한다. 원장 전송/receipt는 명시적인 fixture이며 RPC를 호출하지 않는다. 시험별 관측 JSON은 ROOT 아래 UUID+wx로 새로 쓰며 원본을 덮지 않는다.
+
+첫 Issuer는 별도로 사전 준비된 zero anchor와 빈 journal을 확인해 첫 authority checkpoint를 만든다. anchor가 없으면 자동 초기화하지 않는다. Worker는 기존 checkpoint 검증만 수행하며 zero checkpoint를 만들지 않는다. Issuer의 초기 확인이 끝난 다음 worker를 시작한다. Compose worker에도 별도 `DEPLOYMENT_ID`·anchor URL/token·신뢰 CA가 필요하다. gate가 닫히면 일반 작업 claim/renew/서명 저장/완료는 중단하고 terminal cleanup은 남긴다.
+
+### 백업 범위·복원 실패·재개
+
+백업 동안 모든 API/worker 쓰기를 승인된 유지보수 절차로 멈추고 진행 중 요청을 drain해야 한다. SQL SHARE lock만으로 외부 anchor CAS를 막을 수는 없다. 독립 anchor는 조회를 위해 유지하지만 같은 배포의 다른 writer가 전진시키지 않아야 한다. 이를 확인할 수 없으면 확인 문자열만 넣어 실행하지 말고 BLOCKED로 남긴다. 이번 시험은 backup 동안 API/worker 자식이 없는 합성 환경에서 수행했다.
+
+- 기본 `BACKUP_SCOPE=full`은 기존 `BACKUP_CONFIRMATION=MAINTENANCE-WITH-QUIESCED-CHAIN`과 실제 정지된 chain archive를 요구한다. 이번에는 실행하지 않았다.
+- 체인 없는 검증은 `BACKUP_SCOPE=application`, `BACKUP_CONFIRMATION=QUIESCED-APPLICATION-ONLY`로 명시한다. 이 경우 manifest에도 application으로 기록하며 chain archive를 만들거나 채우지 않는다. 다른 issuer/sender/키/trust/config/deployment env 경계는 유지한다.
+- manifest format1의 현재 producer는 scope·정확한 payload/tag 목록·hash/size·migration source hash를 MAC에 포함한다. 이 정보가 없는 이전 bundle은 자동 복원하지 않는다. 기존 파일을 수정해 통과시키지 말고 인증/내용/호환성을 별도 검토하고 준비 가능한 정상 원본에서 새 bundle을 만든다.
+- 새 비어 있는 DB와 새0700 디렉터리만 사용한다. 모든 GCM payload와 archive 경로/형식을 확인한 뒤 SQL schema/data·migration 대조·gate 차단·세션/임시 자격 제거를 한 transaction으로 적용한다. 사용자 테이블이 하나라도 있거나 target 폴더가 이미 존재하면 중단한다.
+- 영수증/journal·권한 epoch·키 version·계정 비활성/철회 이력을 보존한다. 세션·미사용 승인·challenge·요청 cache·lease·PBX 임시 자격/행은 다시 사용하지 않는다. outbox의 진행 claim만 해제하고 signed transaction/nonce/결과 불명 이력은 유지한다.
+- 인증/복호화/archive/SQL 검증 실패는 새 DB에 정상 상태를 commit하지 않는다. SQL 적용 뒤 파일 쓰기 실패가 나면 gate는 blocked이고 완료 checkpoint는 쓰지 않는다. 대상은 재사용하지 말고 이 실행 소유의 부분 대상임을 확인해 폐기한 뒤 새 대상으로 재시도한다. 임시 복호화 파일은 finally에서 제거한다. 프로세스 강제 종료 때 남은 평문은 해당 보호 TMPDIR만 확인해 제거한다.
+- 복원은 서비스 시작·anchor rollback·키 재발급·권한 generation 초기화를 하지 않는다. 최신 anchor 대조가 일치해야 gate를 열고, 새 로그인·새 통화 시도·공개 trust/키 검증을 적용한다. anchor가 앞서거나 이력이 손상됐으면 자동으로 맞추지 않는다. 현재 구현에는 이 불일치를 자동 해제하는 승인 복구 도구가 없으며 운영자의 원본 이력 복구/공동 재신뢰 결정이 필요하다.
+
+공유 증거는 코드/도구 hash·원본 판정·관측 요약·비밀 제거 로그만 남긴다. 백업/복호화 키·dump·SQL 평문·session·개인키·브라우저 storage는 게시하지 않는다. 자식 서버/worker가 종료됐음을 확인하고 container/volume의 identity label을 대조한 뒤 **그 두 컨테이너·그 두 volume과 보호 ROOT**만 정리한다. 전역 prune, 기존 프로세스 종료, 기존 anchor 초기화는 하지 않는다.

@@ -1,0 +1,9 @@
+[
+  {
+    "case": "persistent-anchor",
+    "casWinners": 1,
+    "lostResponsePosts": 1,
+    "restartedState": "2",
+    "tlsAuthDomainRejected": true
+  }
+]

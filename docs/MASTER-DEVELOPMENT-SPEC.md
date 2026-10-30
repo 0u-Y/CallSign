@@ -29,6 +29,19 @@
 
 문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [과거 결과 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 특정 블록의 상태 묶음, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 보고서·초안은 날짜별 archive에 보존하고, 원본 기획서와 시험 증거는 유지한다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
 
+### 2026-10-30 영속 복구 검증의 현행 기준
+
+[실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)과 [평가](../artifacts/persistent-recovery-20261030.json)는 `c59edac` 이후 worktree의 추가 증거다. 기본 요구사항 ID/완료 기준은 유지한다.
+
+| 요구사항 | 이번 변경·실행 범위 | 남은 경계 |
+|---|---|---|
+| STATE-003·DB-003 | 실제 HTTPS/별도 PG anchor의 CAS·재시작·응답 유실, journal 손상/최신 anchor 불일치·미초기화 gate 차단, worker의 최초 checkpoint 발급 금지 | 같은 호스트의 분리 수명만 검증. 독립 기관·전원/스토리지 장애 내성 아님 |
+| AUTH-002·CALL-002/005 | API startup은 recovery 확인 후 이전 시도를 failed로 회수. 복원 SQL은 세션·임시 승인/연결/분석 상태를 폐기하면서 소비 영수증과 권한 세대를 유지 | 실제 PBX/RTP·운영 IdP·브라우저 재연결은 별도 검증 |
+| DB-001/003·OPS-003 | 실제 worker 프로세스 종료와45초 lease 만료 뒤 새 프로세스 회수, stale 완료 거절, gate 폐쇄 시 일반 작업 차단·cleanup 유지 | 외부 transaction은 adapter 표식. 실제 체인의 서명/적용 횟수 증거 아님 |
+| OPS-005·TEST-004 | application 범위의 실제 encrypted pg_dump/새 PG 대상 복원, manifest MAC/hash/size/migration·GCM·archive 경계, 권한/소비/session/gate 대조 | 전체 chain archive 복원·운영 키/trust 전체·모든 crash 지점·장기 자원/성능 미검증 |
+
+전체 백업 기본 scope는 full로 유지하며 체인 없는 application 검증을 분리한다. 새 producer의 manifest는 필수 inventory/size/migration 정보를 MAC에 결합하며 정보가 없는 구 bundle은 별도 검토 없이 자동 복원하지 않는다. 복원은 epoch·회원 세대·키·소비 이력을 초기화하지 않으며, 독립 anchor가 앞서거나 이력이 손상됐을 때 gate를 자동으로 해제하는 정책을 만들지 않는다. [준비·재현·실패 처리](RUNBOOK.md#영속-anchor앱-복원-검증)를 따른다.
+
 ### 2026-10-30 인증 후속 경계의 현행 기준
 
 이번 후속 작업은 게시 `a75398d`를 시작점으로 한다. 아래 이전 조사 시점의 미커밋/미검증 표시는 당시 기록이며 현재 상태를 덮어쓰지 않는다. [후속 경계 검증 기록](FINALS-IMPLEMENTATION-PLAN.md#authenticated-boundaries-20261030)과 [실행 절차](RUNBOOK.md#인증-후속-경계-검증)가 현재 추가 근거다.

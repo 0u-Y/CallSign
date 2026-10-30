@@ -1,8 +1,48 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 현재 후속 경계 작업 시작은 `a75398d`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
+기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 인증 후속 경계 작업 시작은 `a75398d`, 현재 영속 복구 검증 시작은 `c59edac`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+
+<a id="persistent-recovery-20261030"></a>
+
+## 2026-10-30 영속 anchor·프로세스 재시작·앱 백업/복원
+
+이번 시작 HEAD는 `c59edac6475bd49f450a2836e6fd7e67df80b2c0`다. 기존 사용자 요약3개와 진행 포인터28개는 보존한다. 시험은 해당 HEAD 이후 미커밋 코드로 수행했으며 [평가·실행별 source hash](../artifacts/persistent-recovery-20261030.json)에 당시 상태와 실패 이력을 구분한다. 뒤의 커밋을 시험 HEAD로 바꾸지 않는다. 코드·설정·시험은 `37d01d682e55f78035181997766604095120cf50`에 보존했으며 final source 집합의 파일 hash가 이 커밋 내용과 일치함을 확인했다. 이번 identity의 컨테이너2개·volume2개·임시 백업·평문·키·인증서와 보호 경로를 정리했고 기존 자원은 변경하지 않았다.
+
+### 결함 수정과 연결
+
+- STATE-003/DB-003: gate가 이미 ready인 동안 새 승인·업무 쓰기가 anchor 접근 불가를 확인하지 않는 경계를 수정했다. 기관 행 잠금 아래 현재 journal head/epoch와 독립 anchor를 대조한 뒤 operation을 수행한다. 불일치·조회 실패는 신규 작업을 거절하고 gate를 닫는다. 이 네트워크 대기는 기관별 잠금에서 client 최대2.5초로 제한되며 전체 요청의 지연·경합 실측 보장은 아니다.
+- STATE-003/OPS-005: anchor client는 CAS409, 인증401, timeout, 접근 불가, 응답/domain 불일치를 구분한다. 저장 성공 후 응답 유실은 정확한 next 상태를 재조회해 확인하고 추가 checkpoint를 만들지 않는다. 기존 PostgreSQL anchor 서비스에 선택적 직접 TLS를 연결했으며 기존 HTTPS reverse proxy 경로도 유지한다.
+- OPS-005: `pg_dump`에 URL을 `PGDATABASE`로만 전달해 root 계정 연결을 시도하던 실제 결함을 수정했다. 비밀번호 없는 명시적 DB 주소와 별도 `PGPASSWORD`로 연결한다. manifest는 필수 payload/tag·각 hash/크기·migration source hash를 인증하며 symlink/특수 파일·잘못된 경로를 거절한다. 모든 GCM payload 인증과 archive 검사를 SQL 복원 전에 완료한다.
+- AUTH-002/CALL-002/005/OPS-005: SQL 복원과 gate 차단·세션 삭제·임시 PBX 행/이전 challenge·request cache·lease/소유 세션 제거·옛 승인 취소를 단일 transaction으로 묶었다. 소비 영수증/journal, 회원 상태·epoch·승인키 version과 공개키는 유지한다. 진행 outbox claim은 해제하지만 저장된 raw/nonce/결과 불명 이력은 버리지 않는다. startup은 독립 anchor 확인 후 중단된 통화를 failed로 만들고 새 시도를 요구한다. PBX 없는 직접 경로도 동일한 재시작 정리를 사용한다.
+- DB-003/OPS-003: worker startup은 실제 journal/anchor를 검증하되 zero checkpoint를 발급하지 않는다. Issuer가 최초 checkpoint를 준비해야 한다. gate가 닫히면 일반 작업 claim·renew·서명 보존·완료를 거절하며 terminal cleanup은 허용한다. 기존 최소권한 LOGIN을 유지하고 worker에 issuer 권한/키를 추가하지 않았다.
+
+### 실행 결과
+
+| 범위 | 이번 결과 | 실제 환경과 대체 경계 |
+|---|---|---|
+| 영속 복구 전용 | 1파일7시험 PASS | 서로 다른 PostgreSQL 프로세스/volume/LOGIN, 실제 HTTPS·native dump/restore·API/worker 자식 프로세스 |
+| 기존 DB 회귀 | 4파일15시험 PASS | 위7시험과 같은 최종 명령에서 총5파일22시험, 실패/skip0. 서로 더한 과거 결과가 아님 |
+| 영향받은 HTTP 회귀 | 6시험 PASS, 브라우저1시험 의도적 제외 | 실제 platform/issuer/Sender·SQL·HTTPS OIDC fixture. API-only 모드로 Vite/Chromium 기동 없음 |
+| 추가 anchor domain 확인 | 별도 필터 실행 | 다른 기관으로 바꾼 raw HTTPS CAS409와 상태 불변을 추가 확인. 필터의 SKIPPED를 전체 PASS에 합산하지 않음 |
+| light·API runtime 타입 | 44파일207시험 PASS·runtime 타입 PASS | [오프라인 검사](../artifacts/persistent-recovery-source-20261030.json). 웹·계약 소스 미변경으로 전체 브라우저/계약 시험 반복 없음 |
+
+복구 전용 `persistent-recovery.test.ts`는 integration guard와 `callsign_test_*`·loopback·보호 ROOT를 요구한다. 실제 업무 라우트/ServiceAuthority·최소권한 SQL·복구/worker 로직을 실행한다. 복구 API 프로세스의 actor 인증은 합성 bearer fixture이며 OIDC 재검증을 주장하지 않는다. 세션 폐기는 실제 `sessionForRequest`로401을 확인했고 별도 기존 HTTP 회귀로 실제 인증 흐름을 확인했다. 원장 current/transaction/receipt와 통화 binding은 명시적 fixture이며 실제 체인·PBX·음성은 실행하지 않았다. Worker의 transaction 문자열은 외부 adapter 표식이므로 EVM 서명·체인 적용 횟수 증거가 아니다.
+
+HTTPS CAS는 같은 이전 상태의 서로 다른 next 후보 중1개 성공, 오래된 CAS·교차 기관/배포·잘못된 인증/TLS 거절, 실제 서버 timeout 구분, anchor 프로세스 재시작 후 sequence2 유지, 별도 LOGIN의 SELECT/UPDATE 허용·INSERT/DELETE 불허 및 superuser=false, 응답 유실 뒤POST1회/정확한 next 조회를 확인했다. anchor만 전진한 뒤 DB transaction이 rollback된 경우, 중간 journal 누락/변조, 미준비 zero checkpoint, anchor 불가 때 실제 업무/승인 API503과 DB 무변경·gate 차단을 확인했다.
+
+실제 암호화한 `application` 백업을 새 DB에 복원해 소비 영수증, 철회 VC, 비활성 계정, membership generation2, epoch2·승인키 version2/공개키를 대조했다. 옛 로그인 session은0행/실제 조회401, 연결 상태는 terminal, 새 시도 없이 lease를 복구하지 않는다. 복원 직후 gate는 blocked, 최신 anchor 일치 후만 ready이며 더 오래된 백업은 blocked다. 동일 승인의 무조건 재사용을 허용하지 않으며 회수된 할당으로 consume을 다시 시도하면 거절된다. 권한 세대/키 변경은 시험 상태 준비이며 실제 공동 계약 회전 검증으로 확대하지 않는다.
+
+잘못된 키, ciphertext/manifest 변조, 누락 파일, symlink, traversal/특수 tar entry, 필수 inventory 누락, MAC은 맞지만 GCM tag가 잘못된 경우 모두 거절하고 새 대상 DB의 사용자 테이블0행과 복원 평문 임시 폴더 제거를 확인했다. Worker는 실제 claim 프로세스를 SIGKILL하고 원래45초 lease 만료 후 새 프로세스로 회수했다. 늦은 소유자의 완료는 거절하고, 결과 불명 재시도에서 보존된 transaction을 다시 사용하여 prepare1회만 확인했다.
+
+### 실패·한계·자원
+
+초기 실패는 `pg_dump` 연결 전달 결함, 시험의 consumed 통화를 accepted로 가정한 종료 요청, fixture block 문자열의 bigint 불일치였다. 컨테이너 native 도구가 root 소유의 restore.sql을 만들던 환경 문제는 wrapper의 실행 UID/GID를 맞춰 해결했다. 복원 후 비활성 상담원에게 동일 consume을 허용해야 한다는 시험 가정은 잘못이므로 정상적으로 거절됨과 저장된 영수증 보존을 구분했다. node/tsx cache와 복원 평문 디렉터리도 구분했다. 임시 관측 파일의 고정 이름을 실행별 UUID+wx로 바꿔 후속 실행이 덮지 않게 했다. 원본 실패 JSON/로그는 새 증거에 별도로 보존한다.
+
+시작 CPU24·available41896MiB·load0.47/0.58/0.73·disk526GiB, swap 사용8263MiB와 두 표본 si/so0을 관측했다. 서비스 DB512MiB/CPU1, anchor DB256MiB/CPU0.5·각 named volume, Node 예산2GiB·worker1·명령240초/시험 최대65초다. 후반 available41282MiB·DB약97.96/22.04MiB를 관측했다. swap 사용량은 증가했으나 표본의 지속 입출력은 관측하지 못했다. 전 기간 swap0이나 강제 Node cgroup 적용을 주장하지 않는다.
+
+같은 호스트의 분리 저장소·자격·복원 수명 검증이며 독립 기관 운영·호스트 장애 격리·전원/디스크 내구성 증거가 아니다. 실제 체인 snapshot 전체 복원, 원장 서명/확정/전파, PBX/RTP 회수, 외부 AI, 실제 IdP, GCP·하드웨어/장기 부하·모든 crash 지점은 미실행이다. source guard/추가 관측 assertion만 바뀐 후속 필터 실행은 별도 source hash로 기록한다. 최종 cleanup은 평가의 owned identity/label 대조 결과를 따른다.
 
 <a id="authenticated-boundaries-20261030"></a>
 

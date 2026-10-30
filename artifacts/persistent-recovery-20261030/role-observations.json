@@ -1,0 +1,35 @@
+[
+  {
+    "kind": "anchor",
+    "login": "callsign_anchor_login",
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "can_select": true,
+    "can_update": true,
+    "can_insert": false,
+    "can_delete": false
+  },
+  {
+    "kind": "issuer",
+    "login": "callsign_issuer_login",
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "can_select": true,
+    "can_update": true,
+    "can_insert": false,
+    "can_delete": false
+  },
+  {
+    "kind": "worker",
+    "login": "callsign_worker_login",
+    "rolsuper": false,
+    "rolcreatedb": false,
+    "rolcreaterole": false,
+    "can_select": true,
+    "can_update": true,
+    "can_insert": true,
+    "can_delete": false
+  }
+]

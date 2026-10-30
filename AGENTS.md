@@ -31,3 +31,8 @@
 ## 2026-10-30 인증 후속 검증의 한정 예외
 
 이번 요청은 격리 PostgreSQL, loopback issuer/platform/Sender·HTTPS 웹·OIDC fixture, 설치 Chromium과 합성 계정/시험키, 원장·anchor·binding·분석 fixture, 관련 커밋·일반 push·CI 조회만 일시 허용한다. 실제 체인/Witness/PBX/TURN·음성 장치·외부 AI/IdP/GCP·전체 Compose·다운로드·기존 자원 변경·force push는 금지한다. 이 허가는 이후 작업의 상시 기동 권한이 아니다. integration guard와 production 검증은 유지하고 이번에 생성한 identity의 자원만 회수한다.
+
+
+## 2026-10-30 영속 복구 검증의 한정 예외
+
+이번 사용자 요청은 작업 소유 PostgreSQL 두 개와 별도 영속 시험 volume, 기존 anchor의 로컬 HTTPS 실행, 필요한 loopback API/worker, 합성 키/계정, 소유 프로세스 재시작·제한된 응답 유실·암호화 앱 백업과 새 시험 DB 복원, 관련 commit/일반 push/CI 조회만 일시 허용한다. 실제 체인/Witness/PBX/TURN/음성/외부 AI/실제 IdP/GCP·호스트 재부팅/디스크 고갈/전역 네트워크 변경·기존 자원 변경·다운로드/설치·force push는 금지한다. 기존 guard는 유지하고 infrastructure는 소유 anchor/backup/restore 자식에만 지정한다. 상시 실행 허가가 아니며 이번 identity의 자원만 정리한다.

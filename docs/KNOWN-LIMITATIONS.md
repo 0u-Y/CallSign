@@ -2,6 +2,12 @@
 
 기준일: 2026-10-30. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
+## 영속 복구의 추가 확인 범위
+
+[영속 복구 평가](../artifacts/persistent-recovery-20261030.json)에서 실제 HTTPS anchor·별도 PG 저장소·API/worker 자식 프로세스·application 범위 암호화 백업/새 DB 복원을 확인했다. 아래 인증 단계의 메모리 anchor 설명은 그 실행 당시 경계다. 같은 호스트의 프로세스·volume·계정·복원 수명을 분리한 시험이며 독립 기관/호스트 장애 격리·전원/디스크 내구성을 입증하지 않는다.
+
+복원 대상은 같은 시험 cluster의 새 DB이며, 새 cluster의 global role/owner provisioning과 운영 분산 drain은 이번 증거가 아니다. 백업은 API/worker 쓰기가 quiesced됐다는 운영 전제가 필요하고 SQL lock만으로 외부 anchor CAS를 정지시키지 못한다. 전체 chain archive 복원은 여전히 미실행이다. 새 manifest의 필수 inventory/size/migration 정보가 없는 구 bundle은 자동 수용하지 않으며, 부분 파일 복원 실패 뒤 DB gate는 blocked로 남긴다. 임의 악성 파일 동시 교체·강제 종료 시점 전수·장기 보관/용량·전체 운영 키/trust 조합은 미검증이다. 복구 전 확인이 필요한 worker에는 issuer 권한을 추가하지 않았으며 최초 checkpoint를 만들 수 없다. 실제 PBX/RTP·제공자·운영 IdP/GCP와 원장 적용 횟수는 검증하지 않았다.
+
 ## 인증 후속 경계
 
 [후속 검증 평가](../artifacts/service-boundaries-20261030.json)는 `a75398d` 이후 변경의 별도 증거다. 공동 관리의 이벤트 소비·서명 검증·SQL·브라우저 처리, 계정 전환·공식 세션 만료·분석 취소 경계를 추가했지만, RPC/log·Witness 전송·STT/LLM은 명시적인 fixture다. Witness 시험키의 실제 서명 검증을 실제 Witness 서버나 독립 분산 운영으로 확대하지 않는다. 원격 오디오는 장치 없이 합성 프레임만 사용했다.
