@@ -216,6 +216,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
     await verifyStateBundle(bundle,trust,{expectedInstitutionId:record.id,expectedDelegationId:digest,nowWallSeconds:Math.floor(Date.now()/1000),nowMonotonicMs:performance.now(),maxStateAgeSeconds:8,maxFutureSkewSeconds:1});
     const state=bundle.snapshot.institutionState;if(!state.exists||state.status!=="Active"||state.epoch!==key.epoch||state.approvalPublicKey.toLowerCase()!==`0x${Buffer.from(key.publicKey.x!,"base64url").toString("hex")}`)throw new HttpError(409,"ROTATED_KEY_NOT_CONFIRMED");
   }});
+  app.addHook('onReady',()=>serviceAuthority.stopInterruptedCalls(env.INSTITUTION_ID).then(()=>{}));
   registerServiceRoutes(app, { authority: serviceAuthority, store, actorFor, sessionId:async r=>(await scopedSession(r)).sessionId });
   const quota=postgresQuotaStore(required("ISSUER_DATABASE_URL"));app.addHook("onClose",()=>quota.close());
   registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId,...(adapters?.audioProviders?{providers:adapters.audioProviders}:{})});

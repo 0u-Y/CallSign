@@ -22,13 +22,13 @@ it('reserves a shared budget under contention and settles a reservation only onc
  const rows=await sql`SELECT used,reserved FROM issuer_v2.quota_balances WHERE key=${key}`;expect(Number(rows[0]!.used)).toBe(3);expect(Number(rows[0]!.reserved)).toBe(0);
 });
 it('claims a job once across workers and fences an expired claim before committing a result',async()=>{
- const run=randomUUID(),institution=`worker-test:${run}`;await sql`INSERT INTO issuer_v2.outbox(id,institution_id,kind,object_id,payload) VALUES(${run},${institution},'intent.created','test','{}')`;
+ const run=randomUUID(),institution=`worker-test:${run}`;await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${institution},'{}')`;await sql`INSERT INTO issuer_v2.recovery_gate(institution_id,status) VALUES(${institution},'ready')`;await sql`INSERT INTO issuer_v2.outbox(id,institution_id,kind,object_id,payload) VALUES(${run},${institution},'intent.created','test','{}')`;
  const second=postgresWorkerStore(url,async()=>{});try{
   const jobs=await Promise.all([worker.claim(),second.claim()]);const claimed=jobs.filter(j=>j?.id===run);expect(claimed).toHaveLength(1);const job=claimed[0]!;
   await sql`UPDATE issuer_v2.outbox SET lease_until=now()-interval '1 second' WHERE id=${run}`;
   expect(await worker.renew(job)).toBe(false);await expect(worker.complete(job)).rejects.toThrow('CLAIM_LOST');
   const recovered=await worker.claim();expect(recovered?.id).toBe(run);expect(recovered?.claim_token).not.toBe(job.claim_token);if(recovered)await worker.complete(recovered);
- }finally{await second.close();await sql`DELETE FROM issuer_v2.outbox WHERE id=${run}`;}
+ }finally{await second.close();await sql`DELETE FROM issuer_v2.outbox WHERE id=${run}`;await sql`DELETE FROM issuer_v2.recovery_gate WHERE institution_id=${institution}`;await sql`DELETE FROM issuer_v2.institutions WHERE id=${institution}`;}
 });
 
 it('cannot recreate SIP credentials from an idempotent result after terminal cleanup',async()=>{
@@ -89,7 +89,7 @@ it('serializes duplicate account onboarding across independent SQL connections, 
 });
 
 it('fences a late signed result after the signer lease changes without persisting or broadcasting it',async()=>{
- const run=randomUUID(),institution=`signer-test:${run}`,signer=`0x${'9'.repeat(40)}`;await sql`INSERT INTO issuer_v2.outbox(id,institution_id,kind,object_id,payload) VALUES(${run},${institution},'institution.configure','test','{}')`;
+ const run=randomUUID(),institution=`signer-test:${run}`,signer=`0x${'9'.repeat(40)}`;await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${institution},'{}')`;await sql`INSERT INTO issuer_v2.recovery_gate(institution_id,status) VALUES(${institution},'ready')`;await sql`INSERT INTO issuer_v2.outbox(id,institution_id,kind,object_id,payload) VALUES(${run},${institution},'institution.configure','test','{}')`;
  try{const job=await worker.claim();expect(job?.id).toBe(run);if(!job)throw new Error('EXPECTED_TEST_JOB');
  let release!:(value:{raw:string;hash:string;signer:string;nonce:string})=>void,started!:()=>void;
  const waiting=new Promise<void>(resolve=>{started=resolve;});
@@ -99,7 +99,7 @@ it('fences a late signed result after the signer lease changes without persistin
  await sql`UPDATE issuer_v2.signer_leases SET owner='another-worker',expires_at=now()+interval '1 minute' WHERE signer=${signer}`;
  release({raw:'never-broadcast-fixture',hash:'hash',signer,nonce:'0'});await rejected;
  expect((await sql`SELECT signed_transaction FROM issuer_v2.outbox WHERE id=${run}`)[0]!.signed_transaction).toBeNull();
- }finally{await sql`DELETE FROM issuer_v2.signer_leases WHERE signer=${signer}`;await sql`DELETE FROM issuer_v2.outbox WHERE id=${run}`;}
+ }finally{await sql`DELETE FROM issuer_v2.signer_leases WHERE signer=${signer}`;await sql`DELETE FROM issuer_v2.outbox WHERE id=${run}`;await sql`DELETE FROM issuer_v2.recovery_gate WHERE institution_id=${institution}`;await sql`DELETE FROM issuer_v2.institutions WHERE id=${institution}`;}
 });
 
 it('bootstraps authority metadata once across two independently connected recovery passes',async()=>{

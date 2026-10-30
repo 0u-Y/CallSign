@@ -1,5 +1,7 @@
 // Explicit infrastructure entrypoint. Importable logic lives in services/api/src without starting services.
 if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='infrastructure')throw new Error('WORKER_EXECUTION_BLOCKED');
+import {postgresAuthorityStore} from '../services/api/src/finals-store.js';
+import {httpConsumptionAnchor} from '../services/api/src/consumption-anchor.js';
 import { serviceMaintenance } from '../services/api/src/maintenance.js';
 import { readFile } from 'node:fs/promises';
 import { keccak256,stringToHex,type Hex } from 'viem';
@@ -13,6 +15,8 @@ const privateKey=async(name:string)=>(await readFile(required(name),'utf8')).tri
 const deployment=JSON.parse(await readFile(required('DEPLOYMENT_PATH'),'utf8'));
 if(deployment.registryProfile!=='CALLSIGN_SERVICE_JOINT_CONFIGURATION_1')throw new Error('SERVICE_REGISTRY_TRUST_TRANSITION_REQUIRED');
 if(!/^0x[0-9a-f]{64}$/.test(deployment.registryCodeHash)||!/^\d+$/.test(String(deployment.deploymentBlock)))throw new Error('DEPLOYMENT_CODE_HASH_AND_BLOCK_REQUIRED');
+const recovery=postgresAuthorityStore(required('WORKER_DATABASE_URL'),{anchor:httpConsumptionAnchor({url:required('CONSUMPTION_ANCHOR_URL'),token:required('CONSUMPTION_ANCHOR_TOKEN'),deployment:required('DEPLOYMENT_ID')}),deployment:required('DEPLOYMENT_ID')});
+try{await recovery.verifyRecovery(required('INSTITUTION_ID'),false);}finally{await recovery.close();}
 const ledger=workerLedger({networkId:Number(deployment.networkId),genesisHash:deployment.genesisHash,registry:deployment.registryAddress,codeHash:deployment.registryCodeHash,rpcUrls:required('BESU_NODE_URLS').split(','),administratorKey:await privateKey('REGISTRY_ADMIN_KEY_PATH'),stopperKey:await privateKey('REGISTRY_OPERATOR_KEY_PATH'),approvers:required('REGISTRY_APPROVERS').split(',')});
 const ari=new AriClient({base:new URL(required('ARI_URL')),authorization:required('ARI_AUTHORIZATION'),application:'callsign'});
 const endpoints=pbxCleanupStore(required('WORKER_DATABASE_URL'));

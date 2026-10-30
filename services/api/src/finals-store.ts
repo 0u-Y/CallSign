@@ -8,7 +8,7 @@ import { authorityStateHash,type AuthorityStore,type InstitutionRecord } from ".
 
 // One institution row is the shared authority boundary for cancellation, rotation and consumption.
 // PostgreSQL lock/isolation behavior still requires the deferred integration suite.
-export function postgresAuthorityStore(url: string, options?:{anchor:ConsumptionAnchor;deployment:string}): AuthorityStore & { close(): Promise<void>;verifyRecovery(id:string):Promise<void> } {
+export function postgresAuthorityStore(url: string, options?:{anchor:ConsumptionAnchor;deployment:string}): AuthorityStore & { close(): Promise<void>;verifyRecovery(id:string,allowBootstrap?:boolean):Promise<void> } {
   const sql = postgres(url, { max: 4, prepare: false, connect_timeout: 3, idle_timeout: 10, connection: { statement_timeout: 5000, lock_timeout: 2000 } });
   const checkpoint=async(tx:postgres.TransactionSql,record:InstitutionRecord,previousEpoch=record.epoch,onAdvance=()=>{})=>{
     if(!options)throw new Error("INDEPENDENT_ANCHOR_REQUIRED");
@@ -53,6 +53,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
         if (state.serviceV3) {
           const gate = await tx`SELECT status FROM issuer_v2.recovery_gate WHERE institution_id=${id}`;
           if (!options || gate[0]?.status !== "ready") state.serviceV3.recovery = "blocked";
+          else {const head=await tx`SELECT sequence,entry_hash FROM issuer_v2.consumption_journal WHERE institution_id=${id} ORDER BY sequence DESC LIMIT 1`;assertAnchorMatches({deployment:options.deployment,institutionId:id,sequence:String(head[0]?.sequence??0),hash:String(head[0]?.entry_hash??'0'.repeat(64)),epoch:state.epoch},await options.anchor.read(id));}
         }
         const appendJournal=async(authorizationId:string,bindingHash:string)=>{
           if(!options)throw new Error("INDEPENDENT_ANCHOR_REQUIRED");
@@ -95,7 +96,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
         return result as never;
       }) as T;}catch(error){await closeGate(id,error,anchorTouched);throw error;}
     },
-    async verifyRecovery(id:string){
+    async verifyRecovery(id:string,allowBootstrap=true){
       if(!options)throw new Error("INDEPENDENT_ANCHOR_REQUIRED");
       const token=randomUUID();
       await sql`UPDATE issuer_v2.recovery_gate SET status='blocked',verification_token=${token} WHERE institution_id=${id}`;
@@ -118,7 +119,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
         const head=await tx`SELECT sequence,entry_hash FROM issuer_v2.consumption_journal WHERE institution_id=${id} ORDER BY sequence DESC LIMIT 1`;
         if(!state||state.epoch!==verified.epoch||String(head[0]?.sequence??0)!==verified.sequence||String(head[0]?.entry_hash??'0'.repeat(64))!==verified.hash)throw new Error("CONSUMPTION_HISTORY_CHANGED_DURING_RECOVERY");
         assertAnchorMatches({deployment:options.deployment,institutionId:id,sequence:verified.sequence,hash:verified.hash,epoch:verified.epoch},await options.anchor.read(id));
-        if(verified.sequence==="0")verified=await checkpoint(tx,state);else if(verified.authorityHash!==authorityStateHash(state))throw new Error("AUTHORITY_METADATA_CHANGED_DURING_RECOVERY");
+        if(verified.sequence==="0"){if(!allowBootstrap)throw new Error("AUTHORITY_METADATA_CHECKPOINT_REQUIRED");verified=await checkpoint(tx,state);}else if(verified.authorityHash!==authorityStateHash(state))throw new Error("AUTHORITY_METADATA_CHANGED_DURING_RECOVERY");
         const opened=await tx`UPDATE issuer_v2.recovery_gate SET status='ready',checked_at=now() WHERE institution_id=${id} AND verification_token=${token} AND status='blocked' RETURNING institution_id`;
         if(!opened.length)throw new Error("RECOVERY_VERIFICATION_SUPERSEDED");
         await tx`UPDATE issuer_v2.institutions SET state=jsonb_set(state,'{serviceV3,recovery}','"ready"'::jsonb) WHERE id=${id}`;

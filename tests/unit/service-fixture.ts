@@ -3,9 +3,9 @@ import { ServiceAuthority } from '../../services/api/src/service-authority.js';
 import { newServiceState } from '../../services/api/src/service-state.js';
 import type { Actor, AuthorityStore, InstitutionRecord } from '../../services/api/src/finals-model.js';
 
-export async function serviceFixture() {
+export async function serviceFixture(institutionId='mock-bank-institution') {
   const issuer = await generateEd25519KeyPair(), service = await generateEd25519KeyPair(), sender = await generateEd25519KeyPair(), recipient = await generateEd25519KeyPair();
-  const institution: Actor = {userId:'staff',role:'institution',institutionId:'mock-bank-institution'}, agent: Actor = {...institution,userId:'agent',role:'gateway'}, receiver: Actor = {...institution,userId:'recipient',role:'recipient'};
+  const institution: Actor = {userId:'staff',role:'institution',institutionId}, agent: Actor = {...institution,userId:'agent',role:'gateway'}, receiver: Actor = {...institution,userId:'recipient',role:'recipient'};
   let now = 1800000000, current: 'current'|'revoked'|'unavailable' = 'current';
   let state: InstitutionRecord = {authorityCheckpointVersion:1,id:institution.institutionId,did:'https://bank.example',institutionUri:'https://bank.example',epoch:'1',approvalKeyVersion:1,approvalKid:issuer.kid,approvalPublicKey:issuer.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{'https://center.example':{did:'https://center.example',kid:service.kid,publicKey:service.publicJwk,keyVersion:1,active:true}},members:{staff:{role:'institution',permissions:['contact.manage','delegation.manage','institution.suspend','institution.recover','key.activate']},agent:{role:'gateway',serviceDid:'https://center.example'},recipient:{role:'recipient'},other:{role:'recipient'}},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
   const store: AuthorityStore = {read:async()=>structuredClone(state),transact:async(_id,op)=>{const draft=structuredClone(state);const result=await op(draft);state=draft;return structuredClone(result);}};

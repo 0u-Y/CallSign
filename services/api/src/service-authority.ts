@@ -190,6 +190,9 @@ export class ServiceAuthority {
     const hash=hashCanonical(attempt.binding);await this.possession(jws,key,role,auth!.payload.authorizationId,attempt.sessionId,hash,`media-ready:${hash}`);
     (attempt.mediaReady??={})[role]=jws;return {ready:Object.keys(attempt.mediaReady).length===2};
   }); }
+  async stopInterruptedCalls(institutionId:string){
+    return this.options.store.transact(institutionId,async r=>{let stopped=0;for(const t of Object.values(r.serviceV3?.attempts??{}))if(!terminal(t.status)){t.status='failed';t.reason='issuer-restarted-new-attempt-required';t.endedAt=this.now();t.revision++;delete t.lease;if(t.consent){t.consent.granted=false;t.consent.generation++;}const auth=r.serviceV3!.authorizations[t.authorizationId??''];if(auth)auth.cancelled=true;this.event(r,{institutionId,userId:'runtime',role:'institution'},'call.cleanup',t.id);stopped++;}return stopped;});
+  }
   async sweep(institutionId:string) {
     const observed=await this.options.store.read(institutionId),snapshot=observed.serviceV3;
     const digests=[...new Set(Object.values(snapshot?.attempts??{}).filter(t=>!terminal(t.status)).map(t=>snapshot?.authorizations[t.authorizationId??'']?.payload.vcDigest).filter((d):d is string=>!!d))];

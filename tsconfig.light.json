@@ -43,6 +43,8 @@
     "tests/integration/service-http.test.ts",
     "tests/integration/service-http-fixture.ts",
     "tests/integration/service-boundaries.test.ts",
-    "vitest.http.config.ts"
+    "vitest.http.config.ts",
+    "tests/integration/persistent-recovery.test.ts",
+    "services/api/test/recovery-process.ts"
   ]
 }

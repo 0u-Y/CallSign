@@ -16,7 +16,7 @@ import { newServiceState } from '../../services/api/src/service-state.js';
 import { assertAnchorMatches, type Anchor } from '../../services/api/src/consumption-anchor.js';
 import type { InstitutionRecord } from '../../services/api/src/finals-model.js';
 
-export async function createHttpFixture(){
+export async function createHttpFixture(options:{web?:boolean}={}){
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
 if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
@@ -82,8 +82,8 @@ const start=async()=>{
  oidc=await serverListen(provider);
  // Vite is already installed in the web workspace; no download or webServer hook.
  const {createServer:createVite}=await import('../../apps/web/node_modules/vite/dist/node/index.js');
- const vite=await createVite({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
- web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');
+ const vite=options.web===false?undefined:await createVite({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
+ if(vite){web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');}else origin='https://127.0.0.1:1';
  record={registrationState:'confirmed',directory:{hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory},id,did:'https://bank.example',institutionUri:'https://bank.example',authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion:1,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{'https://center.example':{did:'https://center.example',kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
  for(const [s,role] of [['staff','institution'],['agent','gateway'],['recipient','recipient'],['other','recipient'],['inactive','recipient'],['approver-one','approver'],['approver-two','approver'],[longSubject,'recipient']] as const){record.members[uid(s)]={role,active:s!=='inactive',...(role==='gateway'?{serviceDid:'https://center.example'}:{}),permissions:role==='institution'?['contact.manage','delegation.manage','institution.recover','institution.suspend']:role==='approver'?['governance.approve']:[]};await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid(s)},'Synthetic test account',${role},${randomUUID()})`;}
  // Same name/email at a different issuer/subject never implies membership in this institution.
@@ -106,7 +106,7 @@ const start=async()=>{
  issuerApp=await buildFinalsServer(env,{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?control.current:'unavailable',witnessFetch,audioProviders,now:()=>Math.floor(Date.now()/1000)+control.offset});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
  senderApp=await buildFinalsServer({...env,SERVICE_ROLE:'sender',ISSUER_URL:upstream});const senderOrigin=await senderApp.listen({host:'127.0.0.1',port:0});
  platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream,SENDER_URL:senderOrigin});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
- (vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
+ if(vite)(vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
 };
 const close=async()=>{await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));const owned=(await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]?.state as InstitutionRecord|undefined;
  for(const table of ['usage_reservations','outbox','audit','approval_consumptions','consumption_journal','recovery_gate','identity_links','account_requests','notifications','notification_preferences','configuration_history','worker_status'])await sql`DELETE FROM ${sql('issuer_v2.'+table)} WHERE institution_id=${id}`;

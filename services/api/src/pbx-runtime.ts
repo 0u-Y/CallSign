@@ -16,7 +16,7 @@ export class PbxRuntime {
   constructor(readonly options:{authority:ServiceAuthority;institutionId:string;bridge:AsteriskBridge;endpoints:Pick<PbxEndpoints,'remove'>;sessionsAlive(attempt:ServiceAttempt):Promise<boolean>;factory?:(url:URL,headers:Record<string,string>)=>WebSocket}){}
   async start(){
     // Browser session keys cannot be recovered by the issuer after a process restart.
-    await this.options.authority.options.store.transact(this.options.institutionId,async r=>{for(const t of Object.values(r.serviceV3?.attempts??{}))if(t.pbx&&!terminal(t.status)){t.status='failed';t.reason='issuer-restarted-new-attempt-required';t.endedAt=this.options.authority.now();if(t.consent){t.consent.granted=false;t.consent.generation++;}}});
+    await this.options.authority.stopInterruptedCalls(this.options.institutionId);
     this.connect();void this.tick();
   }
   private connect(){if(this.closed)return;const ari=this.options.bridge.ari,url=new URL('/ari/events',ari.config.base);url.protocol='wss:';url.searchParams.set('app',ari.config.application);

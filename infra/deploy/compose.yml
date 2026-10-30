@@ -109,6 +109,9 @@ services:
     environment:
       CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
       WORKER_DATABASE_URL: ${WORKER_DATABASE_URL:?dedicated worker login}
+      DEPLOYMENT_ID: ${DEPLOYMENT_ID:?required}
+      CONSUMPTION_ANCHOR_URL: ${CONSUMPTION_ANCHOR_URL:?independent HTTPS anchor}
+      CONSUMPTION_ANCHOR_TOKEN: ${CONSUMPTION_ANCHOR_TOKEN:?separate anchor credential}
       DEPLOYMENT_PATH: /trust/deployment.json
       INSTITUTION_ID: ${INSTITUTION_ID:?required}
       BESU_NODE_URLS: http://besu1:8545,http://besu2:8545,http://besu3:8545,http://besu4:8545

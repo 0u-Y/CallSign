@@ -7,7 +7,7 @@ import {bankPolicy,hashCanonical,generateEd25519KeyPair,signPayload,verifyPayloa
 import {postgresAuthorityStore} from '../../services/api/src/finals-store.js';
 import {createHttpFixture} from './service-http-fixture.js';
 const {importJWK}=await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js',import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
-const f=await createHttpFixture();
+const f=await createHttpFixture({web:process.env.CALLSIGN_HTTP_API_ONLY!=='true'});
 const {sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject}=f;
 let origin:string,runRoot:string,oidc:string;
 beforeAll(async()=>{await f.start();origin=f.origin;runRoot=f.runRoot;oidc=f.oidc;},30000);
