@@ -1,0 +1,252 @@
+{
+  "version": 1,
+  "recordedAt": "2026-10-30T15:31:40.319355+00:00",
+  "executionHead": "1149314baab401bf0a14a7e4311b5ddfaa54e70c",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "BLOCKED",
+    "review": "unreviewed"
+  },
+  "candidateScope": "Source/configuration candidate for later explicitly authorized infrastructure connection. Not a deployed or runtime-verified release.",
+  "fullServiceVerified": false,
+  "offlineEvidence": "artifacts/release-candidate-retention-source-20261031.json",
+  "developmentOnlyEarlierOfflineEvidence": "artifacts/release-candidate-source-20261031.json",
+  "checks": {
+    "light": {
+      "files": 44,
+      "passed": 212
+    },
+    "runtimeTypes": "PASS",
+    "webBuild": {
+      "result": "PASS",
+      "scope": "Earlier in this task, identical web sources/build configuration; no generated deployment pin. Retention follow-up affects only maintenance/preflight/tests and does not require another web build."
+    },
+    "composeFullAndPbx": "PASS: no interpolation/env/path resolution; no startup",
+    "derivedStagePlans": {
+      "chain": {
+        "services": [
+          "besu1",
+          "besu2",
+          "besu3",
+          "besu4",
+          "registry-deployer",
+          "witness1",
+          "witness2",
+          "witness3",
+          "witness4"
+        ],
+        "variables": [
+          "BESU_IMAGE",
+          "CALLSIGN_APP_IMAGE",
+          "DEPLOYER_KEY_PATH",
+          "DEPLOYMENT_WORK_DIR",
+          "EXPECTED_GENESIS_HASH",
+          "FINALS_DATA_DIR",
+          "INSTITUTION_ID",
+          "NETWORK_ID",
+          "REGISTRY_APPROVERS",
+          "REGISTRY_ARTIFACT_PATH",
+          "REGISTRY_ARTIFACT_SHA256"
+        ],
+        "configurationParsing": "PASS",
+        "runtimeExecuted": false,
+        "derivedResourceNamesNotHardcoded": true
+      },
+      "auth": {
+        "services": [
+          "postgres",
+          "migration-runner",
+          "issuer",
+          "sender",
+          "platform",
+          "worker",
+          "web",
+          "https"
+        ],
+        "variables": [
+          "ANTHROPIC_API_KEY",
+          "ANTHROPIC_MODEL",
+          "API_REQUESTS_PER_MINUTE",
+          "ARI_AUTHORIZATION",
+          "AUTH_DATABASE_URL",
+          "CALLSIGN_APP_IMAGE",
+          "CALLSIGN_DOMAIN",
+          "CALLSIGN_WEB_IMAGE",
+          "CALL_LEASE_SECONDS",
+          "CALL_MAX_SECONDS",
+          "CONSUMPTION_ANCHOR_TOKEN",
+          "CONSUMPTION_ANCHOR_URL",
+          "DEEPGRAM_API_KEY",
+          "DEEPGRAM_MODEL",
+          "DEPLOYMENT_ID",
+          "FINALS_ACCOUNTS_PATH",
+          "FINALS_DATA_DIR",
+          "HTTPS_IMAGE",
+          "INSTITUTION_ID",
+          "ISSUER_DATABASE_URL",
+          "MIGRATOR_DATABASE_URL",
+          "MIGRATOR_DB_PASSWORD",
+          "NETWORK_ID",
+          "OFFICIAL_OIDC_AUDIENCE",
+          "OFFICIAL_OIDC_CLIENT_ID",
+          "OIDC_AUDIENCE",
+          "OIDC_AUTHORIZATION_URL",
+          "OIDC_CLIENT_ID",
+          "OIDC_ISSUER",
+          "OIDC_JWKS_URL",
+          "OIDC_TOKEN_URL",
+          "PBX_CREDENTIAL_SECRET",
+          "PBX_PRIVATE_ADDRESS",
+          "PLATFORM_INTERNAL_TOKEN",
+          "POSTGRES_IMAGE",
+          "PUBLIC_DEPLOYMENT",
+          "REGISTRY_ADDRESS",
+          "REGISTRY_APPROVERS",
+          "RETENTION_SECONDS",
+          "SENDER_INTERNAL_TOKEN",
+          "SENDER_KEY_FILENAME",
+          "SERVICE_EXTRA_CA_PATH",
+          "SERVICE_URI",
+          "SIP_DOMAIN",
+          "SIP_REALM",
+          "SIP_WSS_URL",
+          "TRUST_BUNDLE_FILENAME",
+          "TURN_SECRET",
+          "TURN_URLS",
+          "VITE_SERVICE_TRUST_SHA256",
+          "WEB_ORIGIN",
+          "WORKER_DATABASE_URL"
+        ],
+        "configurationParsing": "PASS",
+        "runtimeExecuted": false,
+        "derivedResourceNamesNotHardcoded": true
+      }
+    },
+    "deploymentShellSyntax": "PASS: bash -n scripts/deployment.sh",
+    "documentRelativeLinksAndFences": "PASS"
+  },
+  "preflight": {
+    "report": "artifacts/release-candidate-retention-preflight-20261031.json",
+    "environment": "No user deployment values; repository public defaults only",
+    "counts": {
+      "BLOCKED": 63,
+      "PASS": 16,
+      "SKIPPED": 1
+    },
+    "meaning": "Counts are checks, not user decision count. Missing external/generated inputs remain blocked."
+  },
+  "historicalEvidenceApplicability": {
+    "apiRuntime": {
+      "comparedFiles": 47,
+      "changedFiles": [
+        "services/api/src/maintenance.ts"
+      ],
+      "scope": "Maintenance gained an input-only positive integer guard. Default retention and SQL body unchanged; existing DB/HTTP/restore evidence is historical, not rerun. Other API implementation files match."
+    },
+    "witnessRuntime": {
+      "comparedFiles": 1,
+      "changedFiles": [],
+      "scope": "Byte comparison only. Prior integration assertions retain their original environment/fixture scope; no rerun."
+    },
+    "webRuntime": {
+      "comparedFiles": 27,
+      "changedFiles": [],
+      "scope": "Byte comparison only. Prior integration assertions retain their original environment/fixture scope; no rerun."
+    },
+    "contracts": {
+      "comparedFiles": 2,
+      "changedFiles": [],
+      "comparisonReference": "Reviewed contract artifact sourceHashes, matching current sources; contracts not edited this task.",
+      "scope": "Static source match, no recompilation or EVM rerun."
+    }
+  },
+  "contractArtifact": {
+    "path": "artifacts/service-registry-build-20261027.json",
+    "sha256": "44106b7087d542431cee1264df10d2c50d255e90ef36916090cb27db54753b23",
+    "compilerVersion": "0.8.30+commit.73712a01",
+    "evmVersion": "cancun",
+    "optimizer": {
+      "enabled": true,
+      "runs": 10000
+    },
+    "sourceHashesMatch": true,
+    "scope": "Static metadata and two declared source hash comparisons. Dependencies/bytecode not recompiled; local EVM/Besu not executed in this review."
+  },
+  "localImageReadOnlyObservation": [
+    "postgres:17.6-alpine",
+    "postgres:18-alpine",
+    "hyperledger/besu:26.8.1"
+  ],
+  "networkReadOnlyObservation": {
+    "defaultLedgerSubnet": "10.203.0.0/24",
+    "overlappingExistingNetworks": 1,
+    "defaultMediaSubnet": "10.205.0.0/24",
+    "mediaOverlappingExistingNetworks": 0,
+    "decision": "BLOCK first local chain startup until host/network decision; no existing network or process changed"
+  },
+  "fixes": [
+    "Default API and trust generation commands select the service implementation; explicit legacy aliases preserved.",
+    "Issuer/worker receive a public extra-CA PEM reference and read-only non-autocreating bind mount; preflight rejects private material and malformed/missing public CA.",
+    "Worker retention env forwarded; migration preparation lists 0000..0006.",
+    "Docker context excludes integration process entrypoints/tests, nested env and PEM/key files. Static boundary only; image not built.",
+    "Platform/web start dependencies separated from readiness. Readiness route/DB health checks remain intact.",
+    "Adapter scope regression rejects production DB and non-loopback container DB even with integration flag.",
+    "Invalid retention values fail before constructing the maintenance database client; current positive default and maintenance SQL are unchanged."
+  ],
+  "userDecisionGroups": [
+    "Execution host/access/network",
+    "DNS/TLS/OIDC",
+    "Institution/call-center/approver identities and role-key/anchor responsibility",
+    "PBX/TURN/media connectivity",
+    "AI providers/retention/small test budget"
+  ],
+  "generatedLater": [
+    "Reviewed app/web/infrastructure image digests",
+    "Role keys/public manifest and initial zero anchor provisioning",
+    "Actual genesis/registry address/code hash/deployment block",
+    "Public trust/canonical web pin and actual release observations"
+  ],
+  "implementationLimits": [
+    "Existing fixed private network requires coordinated peer/Compose review if operator chooses a different subnet; no generic dynamic CIDR switch added.",
+    "OIDC public client+PKCE only; arbitrary confidential-client support not claimed.",
+    "Asterisk image/module/ODBC availability, real provider/IdP support require external selection and runtime verification.",
+    "Native proof/PSTN/KMS/HSM/dynamic validators/automatic failover remain extensions, not silently added completion gates."
+  ],
+  "notExecuted": [
+    "Any DB/Anchor/API/web/browser service",
+    "Besu/Witness/Anvil/RPC/contract deployment",
+    "PBX/TURN/microphone",
+    "Actual IdP/STT/LLM/GCP",
+    "Image build/pull/large download, key generation, migrations, seed, deployment, backup/restore"
+  ],
+  "preserved": {
+    "preexistingUntrackedFiles": 33,
+    "userSummaryMarkdownFiles": 5,
+    "progressPointers": 28,
+    "existingEvidenceUntouched": true,
+    "existingServicesUntouched": true
+  },
+  "cleanup": "Removed 8 owned public temporary Compose JSON files. No service/container/volume/key was created, started, stopped or deleted. Ignored web compile output retained.",
+  "references": {
+    "runbook": "docs/RUNBOOK.md#배포-후보와-실제-연결-순서",
+    "requirements": "docs/MASTER-DEVELOPMENT-SPEC.md",
+    "progress": "docs/FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031"
+  },
+  "developmentOnlyEarlierPreflightEvidence": "artifacts/release-candidate-preflight-20261031.json",
+  "unchangedWebBuildEvidence": "artifacts/release-candidate-final-source-20261031.json",
+  "reviewStartHead": "a6e2452db2691d5102ff076ea1f23dd89761b3a4",
+  "webBuildExecutionHead": "a6e2452db2691d5102ff076ea1f23dd89761b3a4",
+  "codeCheckpointCommit": "ddda697e17dcf64c192291ff515a5dfffceec7fd",
+  "entrypointConfigurationCommit": "1149314",
+  "sourceProvenance": "Review began at a6e2452. Final retention light/types ran on worktree above 1149314; earlier web build ran above a6e2452 with identical web code. Later code checkpoint is not a rerun HEAD. Docs/evidence committed separately.",
+  "artifactHashes": {
+    "artifacts/release-candidate-source-20261031.json": "69a0bdceac23909e62131cf1fc0d1dd3118a8a548be0aa605d7fab03f178f599",
+    "artifacts/release-candidate-final-source-20261031.json": "24d778f3a3c85495c861ea3f1c2f1f013f74f32dd9406601aabd176f8403f6d3",
+    "artifacts/release-candidate-retention-source-20261031.json": "459163c8a86aa19a5475f085ee899bcebc08a2d9b52b64a51131ab208ea6e082",
+    "artifacts/release-candidate-preflight-20261031.json": "af6dc44ed1a95894d4f6f8e3f7cceb9ecbdc0d7444156d41f639f649a15d7570",
+    "artifacts/release-candidate-final-preflight-20261031.json": "f23be5d1ab5f45c660aa78a2322876109ccf203d2e9bebccd21ec56eb866931a",
+    "artifacts/release-candidate-retention-preflight-20261031.json": "c794b0f40b3f600dace3cc9e2b1d3529228ddca2d21f03c759822d611b76ef9a"
+  }
+}

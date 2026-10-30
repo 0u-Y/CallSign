@@ -40,3 +40,7 @@
 ## 2026-10-30 Drain·별도 cluster 복원·Anchor 지연 검증 예외
 
 이번 요청은 고유 identity/label의 source·target·Anchor PostgreSQL과 별도 volume, loopback API/worker/HTTPS Anchor, 합성 데이터·키·인증서, 소수 경쟁 요청과 제한 지연·중단/재시작, 암호화 application 백업/복원 및 관련 commit/일반 push/CI 확인을 허용한다. 기존 자원·운영키·실제 체인/Witness/PBX/음성/외부 AI/IdP/GCP·전역 장애·다운로드·force push는 금지한다. 기존 guard와 최소권한을 유지하며 이번 소유 자원만 정리한다. 상시 실행 허가가 아니다.
+
+## 2026-10-31 배포 후보 정합성 작업
+
+이번 요청은 저장소/로컬 도구/이미지의 읽기 전용 조사, 코드·공개 설정·기존 문서 수정, 가벼운 정적/타입/단위 검사·웹 build, 관련 commit/일반 push/CI 확인만 허용한다. 이전의 DB/Anchor/API/브라우저 한정 허가는 승계하지 않는다. 모든 서비스·체인·미디어·제공자·클라우드 기동/호출·키 생성·migration·배포·이미지 build/다운로드·기존 자원 변경·force push를 하지 않는다.

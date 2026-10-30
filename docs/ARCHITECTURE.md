@@ -2,6 +2,10 @@
 
 이 문서의 Platform은 요청 중계, Issuer Gateway는 기관 승인, Sender Agent는 콜센터 서명 서비스다. PBX는 교환기이며 Witness는 원장 상태 증언자다. 통신 형식 번호·세션 결합·갱신형 통화 유지 허가 등은 [용어와 형식 대응](PROTOCOL.md#protocol-profiles)을 따른다.
 
+## 배포 후보 구성의 현재 경계
+
+2026-10-31 검토는 [진행 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 따른다. 역할/DB/키 구조를 유지하면서 issuer/worker는 PBX·사설 Anchor/OIDC용 공개 CA bundle을 read-only로 받고, worker는 보관 기간을 명시 전달한다. Platform/Web의 시작 의존성과 서비스 readiness를 구분해 인증/관리 준비가 PBX 연결 완료를 기다리지 않도록 했다. readiness 검사는 유지한다. source/target/Anchor의 같은 호스트 분리 cluster 복원은 이전 실제 시험에서 확인했으며, 아래 인증 시점의 메모리 fixture 설명과 구분한다. 전체 image/체인/미디어/provider/GCP 연결은 아직 검증하지 않았다.
+
 ## 확정 기본 서비스와 이행 상태
 
 2026-10-27: 등록 기관/콜센터 URI·키를 기본으로 하고 DID는 선택 호환 기능이다. VC는 기관→콜센터 업무 위임, 개별 승인은 이번 고객·업무·세션에 한정한다.120초 시작 승인·현재 권한 상태 최신성·진행 통화 lease를 분리한다. 기본 음성은 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이며 Asterisk가 media edge 종단이다. native proof는 별도 후속 확장이다.

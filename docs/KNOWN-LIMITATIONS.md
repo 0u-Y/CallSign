@@ -1,6 +1,12 @@
 # 현재 구현의 한계
 
-기준일: 2026-10-30. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+기준일: 2026-10-31. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+
+## 배포 후보의 차단과 미확인
+
+[2026-10-31 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)은 오프라인 정합성 검토다. 기본 ledger subnet과 기존 host network가 중복되어 현재 호스트의 첫 chain 기동은 차단한다. 기존 자원 중단으로 해결하지 않았다. 다른 호스트/네트워크의 결정, DNS/TLS/OIDC·키 소유자·PBX/TURN·provider 입력과 실제 생성값은 [다섯 결정 묶음](RUNBOOK.md#배포-후보와-실제-연결-순서)에 구분한다.
+
+API/trust 기본 명령·공개 CA mount·worker 보관 기간·Docker 시험/비밀 context 배제를 수정했지만 실제 image build/내용·mount UID·CA 전체 체인·TLS·IdP·PBX 모듈/ODBC 지원은 미확인이다. Web/Platform은 시작 가능과 readiness를 분리하므로 UI 표시 자체가 전체 준비 성공이 아니다. 기본 서비스의 OIDC는 공개 client+PKCE 경로이며 임의 confidential-client/secret 교환을 지원한다고 가정하지 않는다. 고정 private subnet 변경은 peer/Compose/network config의 공동 검토가 필요하며 임의 환경변수 하나로 전환되는 기능은 없다.
 
 ## 백업 경계 후속 검증의 적용 범위
 

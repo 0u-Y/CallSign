@@ -4,6 +4,41 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="release-candidate-20261031"></a>
+
+## 2026-10-31 실제 인프라 연결 전 배포 후보 검토
+
+시작 HEAD `a6e2452db2691d5102ff076ea1f23dd89761b3a4`, 원격 main과 일치했으며 기존 미추적 요약5개·진행 포인터28개는 보존한다. 이번에는 서비스·DB·Anchor·브라우저·체인·이미지를 실행하지 않고 로컬 구성 파싱·소스/타입·단위·웹 build만 수행했다. 과거 통합 결과는 당시 source hash와 경계 그대로 보존한다. [이번 검토 증거](../artifacts/release-candidate-review-20261031.json), [소스 검사](../artifacts/release-candidate-retention-source-20261031.json), [설정 차단](../artifacts/release-candidate-retention-preflight-20261031.json)을 따른다.
+
+### 수정한 실제 불일치
+
+- OPS-001/003: API 기본 `start`를 실제 서비스 entrypoint로 수정하고 이전 서버는 `start:legacy`로 보존했다. root trust 생성도 현재 URI/등록 키 준비 도구가 기본이며 구 test-key 도구는 `trust:generate:legacy`다.
+- OPS-001/005·AUTH-002: Issuer/Worker의 추가 CA가 PBX 파일 하나로 고정되어 있던 경계를 `SERVICE_EXTRA_CA_PATH` 공개 PEM bundle→read-only `/tls/extra-ca.pem`으로 연결했다. PBX·사설 Anchor/OIDC CA를 함께 준비할 수 있고 Node 기본 공용 roots는 유지한다. 실제 handshake는 미확인이다.
+- DB-004·OPS-003: Worker `RETENTION_SECONDS` 전달 누락과 잘못된 값의 maintenance DB 클라이언트 생성 전 거절을 보완하고, 준비표의 migration0005 종료 표기를0006까지 수정했다. 복원 전 roles-only와 신규 설치 migration의 차이를 유지한다.
+- OPS-001·TEST-001: Docker context에서 integration entrypoint/시험 소스·중첩 env·PEM/key를 제외했다. 기존 adapter 주입은 integration 허가+test identity+loopback/test DB 범위를 계속 요구한다. 운영 DB/내부 container DB를 지정하면 scope 단계에서 거절하는 회귀를 보강했다. 이미지를 build하거나 내부 파일을 검사한 증거는 아니다.
+- OPS-003·UI-005: Platform/Web 시작 의존성을 `service_started`로 분리했다. healthcheck는 `/readiness`, DB는 `service_healthy`를 유지해 PBX 준비를 기다리는 동안 인증/관리 UI의 시작이 막히지 않게 했다. 시작 성공을 준비 완료로 표시하지 않는다.
+
+### 이번 실제 검사와 다음 차단
+
+`pnpm light`44파일212시험·API runtime 타입·웹 build PASS. 웹 build는 실제 배포 pin을 주입하지 않은 컴파일 검사이며 deployable image/pin 생성이 아니다. 전체 Compose/PBX overlay와 원본에서 고정 추출한 chain9개·auth8개 구성은 `config --no-interpolate --no-env-resolution --no-path-resolution`으로 정적 파싱했다. 추출 전 `--no-normalize`로 resource 이름을 특정 project에 고정하지 않아 원본과 같은 명시적 project를 사용할 수 있다. 실제 서비스는 시작하지 않았다.
+
+사용자 배포값 없는 preflight는 BLOCKED63·PASS16·SKIPPED1이다. 이 숫자를 사용자 입력 개수로 요구하지 않는다. [RUNBOOK의 다섯 결정 묶음](RUNBOOK.md#배포-후보와-실제-연결-순서)은 실행 호스트/접근, DNS/TLS/OIDC, 기관·콜센터·키 소유/독립 Anchor, PBX/TURN, AI/보관/예산이다. image digest·키·genesis·계약 주소/높이·trust pin은 이후 생성값이다. 현재 호스트의 기본10.203.0.0/24는 기존 Docker network와 중복되어 첫 체인 기동을 차단한다. 기존 network·서비스는 변경하지 않았다. 새 호스트 또는 peer/Compose/genesis를 함께 검토한 네트워크 결정을 기다린다.
+
+코드/설정은 `1149314`와 `ddda697e17dcf64c192291ff515a5dfffceec7fd`에 보존했다. 최종 light/타입은1149314 이후 worktree에서 실행했으며, 웹 build는 그 전 같은 웹 소스로 실행했다. 변경 코드/설정12개 파일의 hash를 최종 검사 snapshot과 대조했다. 임시 공개 Compose JSON8개는 제거했고 서비스·키·DB/volume은 생성·기동·변경하지 않았다. 기존 미추적33개 파일은 보존했다.
+
+### 요구사항별 적용 범위
+
+| 요구 ID·사용자 흐름 | 실제/fixture 검증 근거 | 이번 이후 상태 |
+|---|---|---|
+| CONTRACT-001/002·GOVERNANCE-001/002 | 과거 로컬 EVM21 및 앱 EIP-712/calldata/event 호환. 계약 source와 검토 artifact source hash 일치 | Besu 배포·epoch→Witness→실제 통화 회수 미실행 |
+| AUTH-001/002·BUSINESS-001~003·UI-001~005 | 과거 실제 SQL·HTTP/Chromium·local HTTPS OIDC. 인증/권한/CSRF 실제 구현, 원장·초기 Anchor/binding fixture | 실제 IdP/auth_time·운영 TLS·이번 container entrypoint/CA/start 순서는 실제 재검증 필요 |
+| CALL-001~005·STATE-001~003 | 서명 verifier·합성 binding·lease/취소 경계, DB 소비/응답 유실. 실제 영속 HTTPS Anchor와별도 cluster 복구는 과거25시험 | DTLS/RTP와 실제 Witness freshness/철회 전파·다기기 미실행 |
+| AI-001~005 | orchestration·동의/revision/근거·취소·quota의 단위/fixture | 실제 provider/한국어 품질·보관·청구 미검증. 제공자 정보는 해당 단계만 차단 |
+| DB-001~004·OPS-003/005 | 과거 실제25복구/DB,6HTTP, drain/CAS·암호화 별도cluster·least privilege | 같은 호스트·application 범위. 전체 chain/운영 키/GCP·호스트 내성 아님 |
+| OPS-001~007·TEST-001/004 | 이번 source/Compose/entrypoint/CA/fixture 배제·기존 light CI | 외부 정보·이미지/키/배포 산출물·실제 환경 검증 BLOCKED. 코드 검사 PASS와 구분 |
+
+기본 경로의 다음 실행을 위해 새 프로토콜/복구 플랫폼을 추가할 이유는 발견하지 않았다. 이는74개 전체 요구사항 완료 선언이 아니다. Asterisk 실제 이미지/driver, 실제 IdP·provider의 선택/지원, 준비된 CA/키·trust·계약 배포가 남는다. 임의 CIDR 전환·OIDC confidential client·PSTN/native proof/KMS/HSM/자동 failover는 기본 지원으로 가정하지 않는다. [RUNBOOK](RUNBOOK.md#배포-후보와-실제-연결-순서)에 단계별 구성·명령·assertion·중단/소유 자원 정리·전달 증거를 정리했다.
+
 <a id="backup-boundaries-20261030"></a>
 
 ## 2026-10-30 쓰기 중 drain·별도 cluster 복원·Anchor 잠금 후속

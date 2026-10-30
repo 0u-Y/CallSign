@@ -5,7 +5,7 @@
 
 [서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md)
 
-기준일: **2026-10-30(KST)**. 현재 인증·HTTP·화면 코드 기준은 `5c2842d`이며, 실제 시험 시점은 직전 HEAD와 미커밋 변경을 포함했습니다. [이번 평가](../../artifacts/http-validation-20261030.json)의 소스 hash·원래 실행 HEAD를 따릅니다. 커밋·게시와 서비스 배포 성공은 구분합니다.
+아래 초기 표의 기준일: **2026-10-30(KST)**. 당시 인증·HTTP·화면 코드 기준은 `5c2842d`이며, 실제 시험 시점은 직전 HEAD와 미커밋 변경을 포함했습니다. [이번 평가](../../artifacts/http-validation-20261030.json)의 소스 hash·원래 실행 HEAD를 따릅니다. 커밋·게시와 서비스 배포 성공은 구분합니다.
 
 기본 `/service` 화면은 등록 기관 주소·키 기반 위임/승인, Asterisk 교환기 제어·서명 검증, 양측 통화 유지 허가와 원격 음성 분석 API에 연결했습니다. 이전 직접 통화 화면은 `/finals`에 보존했습니다. **코드 연결은 실통화나 실환경 성공을 뜻하지 않습니다.**
 
@@ -20,11 +20,25 @@
 | 역할별 화면 | 기관·상담원·수신자·관리 API, 별도 공식 업무, 로딩/실패/빈 목록/재시도·선택 시도와 연결 시도 분리 | 타입/웹 build·단위 시험 + Chromium 실제 로그인·업무 생성/취소·로그아웃·역할 메뉴·모바일 overflow·focus/console | 공동 관리 전체·다른 기기/보조기술 접근성. 계정·재할당은 구조화 양식, 공동 변경 전후 비교·제안 파일 내보내기·서명 파일 가져오기·로컬 digest/서명 확인을 연결. 실제 사용성 확인 필요 | [기본 화면](../../apps/web/src/pages/Service.tsx), [경로](../../apps/web/src/App.tsx) |
 | 영속성·복구·운영 | 기관별 SQL claim·서명자 lease/fencing·동일 raw tx 복구·공유 예약/정산·retention, 계정/키/정책 checkpoint·독립 anchor/gate, manifest 인증·복원 세션 폐기, 기본 배포와 GCP 기동 구성 | worker 재시도/claim 유실·anchor 충돌·암호화 변조 단위 시험, YAML/셸/타입 검사 | PostgreSQL 선택 경계15시험은 실제 실행. 독립 anchor 배치·일관 chain snapshot·GCP 복원은 대기. 외부 알림 채널은 미선택, 내부 알림/설정/읽음/만료와 제한된 오프라인 증거 도구는 구현. 고정 단계 runner/증거 수집을 연결. 전체 장애·복원·측정 수집·GCP 실관측은 수동 확인 단계로 남음 | [SQL](../../services/api/drizzle/0004_worker_recovery.sql), [quota](../../services/api/src/quota.ts), [복구](../../services/api/src/consumption-anchor.ts), [운영](../RUNBOOK.md) |
 
-## 최신 선택 경로 검증
+## 현재 배포 후보의 상태 — 2026-10-31
+
+조사 시작은 `a6e2452`이며 [현재 추가 기록](../FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 따릅니다. 이번에는 서비스 기동 없이 light44파일212시험·타입·웹 컴파일·Compose 파싱을 확인했습니다. 실제 배포 pin·이미지·TLS·권한/미디어 연결 성공을 뜻하지 않습니다.
+
+| 구분 | 확인한 내용 | 남은 경계 |
+|---|---|---|
+| 실제 구성요소 | 이전 PostgreSQL 소비/권한/복구25시험, 영속 HTTPS Anchor·별도 cluster/LOGIN·drain. 이전 실제 HTTP/Chromium 선택 흐름 | 같은 호스트·application 복원 및 합성 계정 범위 |
+| fixture 포함 | 로컬 OIDC, 합성 binding·원장/receipt·Witness/분석 adapter. 실제 서버·SQL·서명 verifier는 유지 | 실제 IdP·체인 정족수/epoch 전파·DTLS/RTP·provider 결과와 다름 |
+| 코드/시험은 있음 | PBX 제어/세션 증거·remote audio·STT/LLM·철회 회수·운영/GCP 구성 | 실제 이미지/driver/TLS·통화·한국어 품질·비용·GCP 미실행 |
+| 설정/결정 대기 | 실행 호스트/망, DNS/TLS/OIDC, 기관·콜센터·키 책임, PBX/TURN, AI 보관·예산 | 현재 host의 ledger 대역 충돌 포함. 다음 실행은 [RUNBOOK](../RUNBOOK.md#배포-후보와-실제-연결-순서)의 단계별 승인 후 |
+| 기본 밖의 미지원/확장 | native chain proof, PSTN·단말 OS, 자동 failover, KMS/HSM, 임의 subnet·confidential OIDC client 자동 전환 | 기본 서비스 검증을 대체하거나 새 필수 목표로 편입하지 않음 |
+
+아래 표와 숫자는 해당 시점의 원본 검증 범위입니다. 현재 전체 완성률이나 최신 HEAD에서 재실행한 결과로 합산하지 않습니다. light CI는 오프라인 검사이며 DB·EVM·HTTP·브라우저·복구의 실환경 증거는 별도의 로컬 실행 기록입니다.
+
+## 2026-10-30 초기 선택 경로 검증
 
 실제 HTTPS OIDC fixture·issuer/platform/Sender Agent HTTP·PostgreSQL·Chromium의1파일7시험과 DB 회귀4파일15시험이 각각 PASS입니다. 이번 light는44파일197시험, 웹 build·API/runtime/harness 타입도 PASS입니다. [최신 Sender Agent 경로](../../artifacts/http-sender-validation-20261030.json)와 [원본 결과·대체 경계·실패 이력·자원 정리](../../artifacts/http-validation-20261030.json)를 확인할 수 있습니다. 과거 시험과 합산하지 않습니다.
 
-브라우저는 실제 화면에서 로그인·업무 생성/취소·로그아웃·수신자 메뉴·Secure cookie와390px 화면·Tab/focus를 확인했습니다. API 응답을 mock하지 않았습니다. 실제 체인/Witness·PBX/TURN/음성·외부 IdP/MFA·STT/LLM·독립 anchor·복원/GCP는 미검증입니다. 합성 binding과 서명 lease가 실제 연결 성공을 의미하지 않습니다.
+브라우저는 실제 화면에서 로그인·업무 생성/취소·로그아웃·수신자 메뉴·Secure cookie와390px 화면·Tab/focus를 확인했습니다. API 응답을 mock하지 않았습니다. 이 초기 실행에서는 실제 체인/Witness·PBX/TURN/음성·외부 IdP/MFA·STT/LLM·독립 anchor·복원/GCP를 검증하지 않았습니다. 독립 Anchor·application 복원은 이후 별도 기록에서 확인했습니다. 합성 binding과 서명 lease가 실제 연결 성공을 의미하지 않습니다.
 
 ## 2026-10-29 실행 준비 당시 기록
 

@@ -2,9 +2,98 @@
 
 **현재 단계에서는 아래 실환경 명령을 실행하지 않는다.** 사용자 요청으로 해당 범주 실행이 명시적으로 승인된 뒤 운영자가 수행한다. 자동 차단은 보안 sandbox가 아니라 실수 방지 장치다. 기존 프로세스·키·볼륨·증거를 정리하거나 초기화하지 않는다.
 
+## 배포 후보와 실제 연결 순서
+
+기준일2026-10-31, 조사 시작 `a6e2452`. 이 절은 현재 코드의 다음 실제 연결 절차이며 **아래 기동·생성·배포 명령은 이번에 실행하지 않았다.** 설정 준비와 소스 검사 통과는 실환경 연결 성공이 아니다. [검증·차단 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 함께 본다.
+
+### 설정·실행물의 연결
+
+| 대상 | 실제 소비 경로·준비 조건 |
+|---|---|
+| 기본 entrypoint | API `pnpm --filter @callsign/api start` → `finals-server.ts`. 이전 서버는 `start:legacy`. root `dev/setup/demo:*`는 호환 개발/기동 명령이며 배포 후보 검사가 아님 |
+| app/web 이미지 | 저장소 루트 context와 `infra/deploy/app.Dockerfile`, app=`--target runtime`, web=`--target web`. build/pull은 별도 승인. runtime stage는 웹 pin 생성에 의존하지 않음 |
+| trust | `pnpm trust:generate DIRECTORY NEW_TRUST_OUTPUT`은 기본 dry-run. 실제 생성은 승인 후 `--apply`. 구 `.local/test-keys` 생성 경로는 `trust:generate:legacy`만 사용 |
+| DB | 새 설치는 owner로0000~0006→별도 LOGIN provisioning→검증된 issuer/subject 계정 연결. 복원은 새 빈 cluster에 roles-only→인증된 복원→gate/fence 확인. source 비밀번호 복제 금지 |
+| 역할 | Platform은 DB/개인키 없음. Issuer는 issuer/auth LOGIN과 기관/PBX 서명키, Sender는 콜센터키만. Worker는 worker LOGIN·별도 EVM admin/stopper 키만. bind mount의 UID/상위 디렉터리 접근과0600 키를 확인; `chmod 777`로 해결하지 않음 |
+| CA | `SERVICE_EXTRA_CA_PATH`는 공개 PEM bundle. PBX CA 및 사설 Anchor/OIDC CA를 포함해 issuer/worker의 `/tls/extra-ca.pem`에 read-only mount. Node 기본 공용 CA도 유지. 웹 nginx는 PBX 전용 공개 CA만 mount. 개인키를 bundle에 넣지 않음 |
+| 호스트와 컨테이너 | `FINALS_DATA_DIR`/공개 CA는 호스트 경로, `/keys`·`/trust`·`/tls`는 container 경로. `ISSUER_URL`/`SENDER_URL`, Besu/Witness, ARI는 내부 DNS. 브라우저는 `WEB_ORIGIN`, 같은 origin `/api`·`wss://HOST/pbx/ws`와 실제 TURN 주소 사용 |
+| 키·등록 | 키/URI는 public manifest·기관 등록·위임·trust와 동일해야 함. API/브라우저에 장기 개인키를 전달하지 않음. 키 파일 존재와 원장 등록은 다른 단계 |
+| OIDC | 현재 클라이언트는 Authorization Code+PKCE의 공개 client 경로. 업무/공식 client와 audience를 분리하고 auth_time을 제공. 두 client의 callback은 `${WEB_ORIGIN}/service`; 이름·이메일로 소속 자동 연결하지 않음. confidential client 요구 시 별도 호환 검토 |
+| PBX | ARI와 nginx의 TLS 이름 `asterisk`, 실제 인증서 fingerprint·SIP realm/domain·WSS·ODBC·UDP media 주소 대조. Asterisk22와 필요한 모듈/driver가 있는 실제 image digest는 미확보 |
+| 분석·보관 | Deepgram/Anthropic 모델·키는 현재 adapter의 보호 환경 참조. 없으면 분석 미준비이지 mock 성공이 아님. 동의·원격 오디오·timeout·quota는 기존 코드 사용. `RETENTION_SECONDS`는 worker에 전달하는 보관 정책이며 법정 기간/실제 제공자 청구 정산 아님 |
+
+웹 Docker build는 공개 trust canonical hash를 `VITE_SERVICE_TRUST_SHA256` build arg로 주입한 뒤 digest를 기록한다. API의 같은 pin·공개 trust·현재 키/정책과 일치해야 한다. `.dockerignore`는 시험 entrypoint/시험 소스·중첩 env·PEM/key 파일을 제외한다. 역할 JSON 키를 웹 public/src에 넣지 않는다. 실제 이미지 내용·권한·TLS는 build/기동 후 다시 확인한다.
+
+Platform/Web의 시작 의존성은 `service_started`이며 healthcheck는 계속 `/readiness`다. PBX를 기다리는 동안 인증/관리 UI에 접근할 수 있지만 통화 준비 완료로 표시하지 않는다. 실제 공개 전에는 전체 readiness와 단계별 assertion을 별도로 확인한다. DB는 `service_healthy`를 유지한다.
+
+### 사용자 결정: 최대 다섯 묶음
+
+| 묶음 | 지금 필요한 결정·추천 | 공개 정보/보호 참조 | 첫 차단과 뒤로 미룰 항목 |
+|---|---|---|---|
+| 1 실행 위치·접근 | 기존 서비스와 분리한 시험 호스트 권장. 현재 호스트 기본 ledger 대역10.203.0.0/24는 기존 Docker 망과 중복됨. 기존 망/프로세스를 끄지 않고 별도 호스트 또는 peer/genesis/Compose를 함께 검토한 주소 정책 선택 | 실행 호스트·이미지 registry/접근 참조·충돌 없는 network 계획·소유 자원 식별자 | 첫 체인 기동 차단. GCP project/zone/IAM/VM 선택은 이전 단계까지 미룰 수 있음 |
+| 2 DNS·TLS·OIDC | HTTPS origin 하나와 동일 origin WSS 권장. 업무/공식 공개 client·audience 분리 및 auth_time 지원 확인 | 도메인/origin, issuer/JWKS/authorize/token/client/audience/callback 공개값, cert/공개 CA 경로와 비밀 참조 | 인증 단계 차단. 실제 IdP MFA·공개 배포 정책은 해당 provider와 확인. secret 원문은 채팅에 보내지 않음 |
+| 3 기관·콜센터·키 책임 | 모의 기관/콜센터 URI와 검증된 OIDC subject, 별도 기관/콜센터/PBX/Witness/admin/stopper 키 책임. 독립 관리 승인자3명 중2명, Witness4개 중3개 유지 | 등록 URI/기관 ID/승인자 공개 주소, accounts JSON·역할별 보호 파일 참조, 독립 Anchor 관리자/주소 | 키/등록·계약·최초 Anchor 준비 차단. 키·계약 주소·배포 높이는 이후 도구 산출물이지 지금 입력할 값이 아님 |
+| 4 PBX·TURN | 현재 Asterisk PJSIP/WSS+ARI·ODBC 경로 유지. 실제 이미지/모듈·외부 UDP 접근·인증서 이름/fingerprint·TURN relay 경로 검토 | PBX 공개/내부 주소·SIP realm/domain/WSS/TURN URLs, ARI/PBX/TURN 비밀 참조 | trust/web 준비·인증 단계 및 실제 media 단계 차단. PSTN·단말 OS·일반 SIP 확장은 뒤로 미룸 |
+| 5 AI·보관·예산 | 기존 Deepgram/Anthropic adapter로 동의한 합성/허가 음성의 소량 시험부터. 원음 기본 미보관·전사 삭제·provider 보관 조건 확인 | 선택 모델명, 계정/보호 API 참조·보관 조건·소량 시험 한도 | provider 단계만 차단. 체인/API를 AI 계정 때문에 막지 않음. 가격·결제 상품은 정하지 않음 |
+
+망주소 변경만으로 genesis·validator 키·권한 세대를 재생성하지 않는다. 기존 네트워크를 이전한다면 같은 논리 identity를 유지한 채 peer/접근 설정을 검토한다.
+
+build 후 image digest, 키 생성 후 public manifest, chain 기동/배포 후 genesis·registry 주소/code hash·배포 높이, trust 생성 후 pin은 실행 산출물이다. 예제 주소·임의 digest로 준비 상태를 통과시키지 않는다.
+
+### 단계별 실행 범위와 판정
+
+| 단계 | 최소 구성·선행 입력 | 산출물·성공 assertion | 중단·정리·다음 증거 |
+|---|---|---|---|
+| 0 준비 | 승인된 새 호스트/namespace, 검토 source·image, 별도 key owner, 공개 network 입력. `prepare-finals.ts keys`, `prepare-service-network.ts`, `generate-besu.sh`는 각각 별도 실행 승인 후 | 생성키/manifest·network config/genesis·별도 digest. 기존 파일 무덮어쓰기 | CIDR 충돌·키 책임 불명·부분 생성이면 중단하고 journal 보존. 실제 메모리 요구는 미측정 |
+| 1 체인·계약·Witness | Besu4개, ledger network/volume, 새 deployer와2-of-3 승인자, 이후 Witness4개·각 RPC/키. 아래 chain plan 사용 | `deploy-service-registry.ts inspect`로4개 chain/genesis/높이 관측→검토 artifact 배포→code/profile/receipt→같은 snapshot의 서로 다른3Witness와 freshness 확인. TCP health나 로컬 EVM PASS만으로 합의 성공 판정 금지 | identity 불일치·합의 진행 정지·quorum 부족 시 후속 단계 중단. 소유 resource만 정리하고 genesis/배포 pending journal/실제 관측 보존 |
+| 2 인증·업무 API | 별도 PG/LOGIN0000~0006 또는 검증된 restore, 독립 HTTPS Anchor, 준비된 키·trust/web pin·OIDC, issuer/sender/platform/web와 승인된 HTTPS ingress. PBX용 인증서는 미리 준비하되 PBX daemon·AI는 아직 불필요 | issuer startup checkpoint, 실제 OIDC callback·세션/CSRF/tenant·업무/위임·개별 승인·실제 Witness 권한 조회. 기관 등록은 관리 UI→기존 worker→확정event/current state. Worker는 이때 별도 기동 | 실제 IdP 실패·Anchor/gate·공개 trust 불일치면 신규 권한 차단. PBX readiness가503인 상태를 인증 검증 성공과 구분. 승인 소비는 media binding 준비 후 |
+| 3 PBX·브라우저 | 검토 Asterisk/TURN, ODBC/TLS/WSS/UDP, 로그인한 양쪽 웹, 기관/위임 확정 | 수락/검증 전 송수신 차단, 실제 양방향 RTP/decoded audio·DTLS fingerprint·ARI mapping, 철회·logout·lease 종료 후 회수 | UI 연결 문구·HTTP200만 성공 금지. 불명 연결은 회수·자기 테스트 채널만 정리. 기존 media harness/관측을 남김 |
+| 4 제공자 | 실제 연결의 remote audio, 명시 동의, 모델/보관/소량 예산 | 실제 STT revision→규칙+LLM→원문 근거 경고, 동의 철회 후 전송/늦은 결과 중단·사용량·비용 관측 | consent 혼합·예산 초과·보관 불명·provider 장애면 분석 중단. 실패를 위험 없음으로 표시하지 않음 |
+| 5 전체·GCP 이전 | 위 단계의 같은 release/contract/trust identity, 별도 승인된 GCP 대상과 일관 backup/fence 절차 | 체인/미디어 포함 실제 회수·재시작·복원, 같은 image/논리 identity·소비/세대 보존. 새 환경 주소/CA/OIDC/TURN은 재검증 | 소프트웨어 rollback으로 구 권한을 되살리지 않음. 진행 세션/임시 키는 이전하지 않음. 독립 Anchor는 과거 DB와 함께 rollback하지 않음 |
+
+노드4개·Witness3-of-4·관리2-of-3을 줄여 원래 보장을 검증했다고 하지 않는다. 같은 호스트 배치를 독립 기관/호스트 내성으로 설명하지 않는다. 각 단계는 자신의 실제 명령·설정/환경 identity·assertion·실패/skip·로그 hash를 기존 evidence/runner에 남기고 다음 단계로 넘긴다. 미확정 tx에 새 nonce를 발급하거나 전체 volume을 초기화하지 않는다.
+
+### 전체 설정에 묶이지 않는 첫 체인 plan
+
+전체 Compose는 선택하지 않은 서비스의 `${VAR:?}`도 해석한다. OIDC/PBX/AI 값을 가짜로 채우지 말고 **원본에서 아래 고정 서비스만 추출**한다. 별도 AUTH_PLAN에는 인증 단계 구성만 넣어 아직 없는 TURN/Asterisk 이미지 때문에 인증 준비를 막지 않는다. PBX 공개 인증서·주소·ARI 보호 참조는 현재 서비스 trust 준비에 필요하다. 이는 운영자의 일회 준비 명령이며 별도 설정 기준/배포 플랫폼이 아니다. 설치 Compose의 `--no-path-resolution` 지원을 확인하고 저장소 루트에서 실행한다. source·출력 파일은 새 보호 경로, `FINALS_DATA_DIR` 등 bind 참조는 절대 경로를 사용한다.
+
+```sh
+# 이 두 명령은 기동 없는 로컬 구성 처리다. output 경로는 새 파일을 사용한다.
+docker compose --env-file /dev/null -f infra/deploy/compose.yml \
+  config --no-interpolate --no-env-resolution --no-path-resolution --no-normalize --format json > "$RAW_COMPOSE"
+node --input-type=module - "$RAW_COMPOSE" "$CHAIN_PLAN" "$AUTH_PLAN" <<'JS'
+import {readFileSync,writeFileSync} from 'node:fs';
+const full=JSON.parse(readFileSync(process.argv[2],'utf8'));
+const names=['besu1','besu2','besu3','besu4','registry-deployer','witness1','witness2','witness3','witness4'];
+const plan={name:full.name,services:Object.fromEntries(names.map(n=>[n,full.services[n]])),networks:{ledger:full.networks.ledger},volumes:Object.fromEntries(['besu1-data','besu2-data','besu3-data','besu4-data'].map(n=>[n,full.volumes[n]]))};
+writeFileSync(process.argv[3],JSON.stringify(plan,null,2)+'\n',{flag:'wx',mode:0o600});
+const authNames=['postgres','migration-runner','issuer','sender','platform','worker','web','https'];
+const auth={name:full.name,services:Object.fromEntries(authNames.map(n=>[n,full.services[n]])),networks:full.networks,volumes:{'postgres-data':full.volumes['postgres-data'],'caddy-data':full.volumes['caddy-data']}};
+writeFileSync(process.argv[4],JSON.stringify(auth,null,2)+'\n',{flag:'wx',mode:0o600});
+JS
+```
+
+아래부터는 **실제 기동/chain 실행 허가 후에만** 실행한다. `CALLSIGN_PROJECT`는 동일 배포의 고유 이름, `CHAIN_ENV`는 선택한 체인 단계 공개/보호 참조다. image digest·키·artifact는 생성/검토된 실값만 사용한다. subnet 충돌을 해소하기 전에는 실행하지 않는다.
+
+```sh
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" \
+  up -d --no-build --pull never besu1 besu2 besu3 besu4
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain node scripts/restricted.mjs chain \
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" --profile operations \
+  run --rm --no-deps --pull never registry-deployer pnpm exec tsx scripts/deploy-service-registry.ts inspect /release/network-observation.json
+# 관측된 genesis/artifact hash를 검토한 뒤 같은 registry-deployer를 기본 명령으로 run하여 --apply 수행
+# 새 deployment.json을 검토·배치한 뒤에만 Witness를 기동
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" \
+  up -d --no-build --pull never witness1 witness2 witness3 witness4
+```
+
+계약 배포 기본 run 명령은 위 inspect 줄의 뒤쪽 `pnpm ... inspect ...` override만 제거한 동일 `registry-deployer` 호출이다. 그 command가 기존 `pnpm ledger:deploy-service --apply`다. 인증 단계는 같은 `-p "$CALLSIGN_PROJECT"`와 위 `AUTH_PLAN`을 사용해 `issuer sender platform web`만 `up --no-deps --no-build --pull never`하고 DB/Anchor 준비를 선행한다. registration 처리를 위해 worker를 별도로 시작한다. media 단계에서 `--profile pbx --profile media`로 `asterisk turn`을 추가하고 OIDC 검증은 HTTPS ingress가 필요하므로 인증 단계에서 승인된 기존 ingress 또는 `AUTH_PLAN`의 `--profile https` 서비스 `https`를 별도로 시작한다. media 추가는 원본 Compose/PBX overlay와 같은 project 이름을 사용한다. 각 `up`은 범주 승인 guard를 사용한다. 일반 `deployment.sh start`는 **전체 설정과 검증을 끝낸 이후**의 전체 기동 편의 명령이지 최초 단계별 검증 명령이 아니다.
+
 ## 현재 실행 계약
 
-기본 서비스는 등록 URI·갱신형 통화 유지·Asterisk 경로다. 화면·worker·키/trust 준비·독립 복원 anchor·회수·배포 설정은 코드로 연결했다. 실제 migration·기동·DB/체인/교환기/브라우저/AI/복원 검증은 하지 않았다. 신규 schema는 `0000`~`0005`이며 적용 이력과 실제 DDL이 충돌하면 자동 stamp/초기화하지 않는다. [구현·남은 작업](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029).
+기본 서비스는 등록 URI·갱신형 통화 유지·Asterisk 경로다. 실제 SQL·로컬 EVM·로컬 인증/HTTP/Chromium·영속 Anchor/application 복원의 선택 경계는 날짜별 증거로 확인했다. 체인/Witness·PBX/RTP·실제 IdP/AI·GCP의 전체 연결은 미검증이다. 신규 설치 migration은 `0000`~`0006`이며 새 cluster 복원은 먼저 빈 대상에 역할만 준비한다. 이번 배포 후보 검토는 어떤 서비스 기동도 승인하지 않는다. [현재 기준](#배포-후보와-실제-연결-순서).
 
 용어: migration은 DB 구조 변경 적용, provisioning은 새 기관·계정·키 준비, trust bundle은 미리 신뢰할 기관·공개키·체인 설정이다. manifest는 배포 구성 기록, image digest는 이미지 내용 해시, scope는 로그인 용도다. OIDC는 외부 로그인 표준, TURN은 음성 중계, ARI는 Asterisk 교환기 제어 인터페이스다. [전체 통신 용어](PROTOCOL.md#protocol-profiles).
 
@@ -110,7 +199,7 @@ Compose의 migration-runner는 앱 이미지·공개 manifest·최초 accounts �
 호스트에는 DB/RPC를 노출하지 않는다. 따라서 URL이 `postgres`·`besu1`인 관리 명령을 호스트에서 실행할 수 있다고 가정하지 않는다. 아래는 이미지를 별도 검토/준비하고 새 키·genesis·고정 peer·보호 env·공개 manifest·계정 파일을 준비한 **새 배포에서 실행 허가 후** 사용하는 명령이다. `operations` profile은 일반 기동에 포함하지 않는다. 최초 bootstrap에서는 기관 서비스의 `REGISTRY_ADDRESS`를 비워 둘 수 있지만 Issuer는 이 상태로 기동하지 못한다. 웹 이미지 참조는 사전에 정한 릴리스 tag로 두고, trust/pin 생성·이미지 준비 후 실제 digest로 고정한다. migrator 비밀값은 일회 작업에만 제공하고 일반 기동 환경에는 필요하지 않다. [Compose one-off run](https://docs.docker.com/reference/cli/docker/compose/run/)의 `--no-deps`·`--pull never`로 의존 서비스 자동 기동과 이미지 다운로드를 막는다.
 
 ```sh
-# DB/체인만: 기존 데이터는 재초기화하지 않는다. 필요한 이미지와 network 파일은 사전에 준비한다.
+# 전체 서비스 설정을 이미 준비한 배포용 예시다. 초기 체인은 위 배포 후보 절의 부분 plan을 사용한다. 기존 데이터는 재초기화하지 않는다.
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml up -d --no-build --pull never postgres besu1 besu2 besu3 besu4
 # DB schema: 전용 일회 계정만 사용한다.
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure docker compose --env-file /etc/callsign/deployment.env -f infra/deploy/compose.yml --profile operations run --rm --no-deps --pull never migration-runner
@@ -232,7 +321,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media node scripts/restricted.mjs media pnpm e
 
 Asterisk `TIMEOUT(absolute)` 설정/조회가 실제 이미지에서 지원되고 API/DB 장애 뒤에도 이전 허가 기한 이내 채널이 종료되는지 확인한다. ARI 요청 최대3초를 기한에서 빼므로 실제 발신/갱신 transport window는120초 또는 lease보다 짧을 수 있다. 제어 요청 성공만으로 음성 전달 성공으로 세지 않는다. [TIMEOUT 함수](https://docs.asterisk.org/Latest_API/API_Documentation/Dialplan_Functions/TIMEOUT/), [ARI variable/function API](https://docs.asterisk.org/Asterisk_20_Documentation/API_Documentation/Asterisk_REST_Interface/Channels_REST_API/), [PJSIP 인증 기능](https://docs.asterisk.org/Configuration/Channel-Drivers/SIP/Configuring_res_pjsip/PJSIP-Authentication/)을 적용하되 선택한 이미지 모듈/버전은 별도 검증한다.
 
-백업 manifest는 암호화 키에서 HKDF로 분리한 MAC 키로 인증하고 파일 hash·크기·대상 배포를 검사한다. tar의 링크/특수 파일/경로 이탈을 거절한다. 인증 없는 구 manifest는 자동 신뢰하지 않는다. 복원은 새 빈 대상만 허용하고 로그인 세션을 모두 폐기하며 gate는 닫힌다. DB·체인·키/trust의 일관 snapshot과 독립 anchor 대조 전 공개하지 않는다. 실제 백업/복원은 아직 실행하지 않았다.
+백업 manifest는 암호화 키에서 HKDF로 분리한 MAC 키로 인증하고 파일 hash·크기·대상 배포를 검사한다. tar의 링크/특수 파일/경로 이탈을 거절한다. 인증 없는 구 manifest는 자동 신뢰하지 않는다. 복원은 새 빈 대상만 허용하고 로그인 세션을 모두 폐기하며 gate는 닫힌다. DB·체인·키/trust의 일관 snapshot과 독립 anchor 대조 전 공개하지 않는다. application 범위의 영속 Anchor·별도 cluster 복원은2026-10-30 기록에서 확인했다. 전체 chain/운영 키 복원은 아직 실행하지 않았다.
 
 ## 단계별 검증과 판정
 
@@ -355,7 +444,7 @@ pnpm validate --stage offline --environment TEST_ENV_JSON --env-file TEST_ENV --
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration pnpm validate --stage database --environment TEST_ENV_JSON --env-file TEST_ENV --prerequisite artifacts/NEW-SOURCE.json --output artifacts/NEW-DATABASE.json --execute
 ```
 
-필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0005 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH_DATABASE_URL=같은 시험 DB의 별도 auth LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
+필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0006 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH_DATABASE_URL=같은 시험 DB의 별도 auth LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
 
 ### 미커밋 checkpoint의 포함·제외
 
