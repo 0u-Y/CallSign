@@ -22,6 +22,8 @@
 | PBX | ARI와 nginx의 TLS 이름 `asterisk`, 실제 인증서 fingerprint·SIP realm/domain·WSS·ODBC·UDP media 주소 대조. Asterisk22와 필요한 모듈/driver가 있는 실제 image digest는 미확보 |
 | 분석·보관 | Deepgram/Anthropic 모델·키는 현재 adapter의 보호 환경 참조. 없으면 분석 미준비이지 mock 성공이 아님. 동의·원격 오디오·timeout·quota는 기존 코드 사용. `RETENTION_SECONDS`는 worker에 전달하는 보관 정책이며 법정 기간/실제 제공자 청구 정산 아님 |
 
+`WEB_ORIGIN`이 loopback 외부 주소이면 `PUBLIC_DEPLOYMENT=true`, `DEMO_MODE=false`를 명시한다. 이 flag는 해당 origin을 허용한다는 뜻이며 실제 공개·인증 성공 판정이 아니다. Host에서 직접 Node를 실행할 때는 `SERVICE_EXTRA_CA_PATH`가 자동 반영되지 않으므로 검토한 공개 CA 경로를 `NODE_EXTRA_CA_CERTS`로 Node 시작 전에 지정한다. Container는 Compose가 이 매핑을 수행한다.
+
 웹 Docker build는 공개 trust canonical hash를 `VITE_SERVICE_TRUST_SHA256` build arg로 주입한 뒤 digest를 기록한다. API의 같은 pin·공개 trust·현재 키/정책과 일치해야 한다. `.dockerignore`는 시험 entrypoint/시험 소스·중첩 env·PEM/key 파일을 제외한다. 역할 JSON 키를 웹 public/src에 넣지 않는다. 실제 이미지 내용·권한·TLS는 build/기동 후 다시 확인한다.
 
 Platform/Web의 시작 의존성은 `service_started`이며 healthcheck는 계속 `/readiness`다. PBX를 기다리는 동안 인증/관리 UI에 접근할 수 있지만 통화 준비 완료로 표시하지 않는다. 실제 공개 전에는 전체 readiness와 단계별 assertion을 별도로 확인한다. DB는 `service_healthy`를 유지한다.
