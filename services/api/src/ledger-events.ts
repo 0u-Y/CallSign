@@ -1,3 +1,4 @@
+import { enterBackupWrite } from './backup-drain.js';
 import postgres from 'postgres';
 import { decodeEventLog,keccak256,parseAbi,stringToHex,type Hex } from 'viem';
 import type { InstitutionRecord } from './finals-model.js';
@@ -25,6 +26,7 @@ export function ledgerEventConsumer(options:{databaseUrl:string;client:ReturnTyp
   const configurationState=configurationLogs.length?await options.client.readContract({address:options.registry,abi:serviceRegistryAbi,functionName:'institutions',args:[keccak256(stringToHex(options.institutionId))],blockNumber:to}):undefined;
   const currentPolicyHash=configurationLogs.length?await options.client.readContract({address:options.registry,abi:serviceRegistryAbi,functionName:'policyHashes',args:[keccak256(stringToHex(options.institutionId))],blockNumber:to}):undefined;
   await sql.begin(async tx=>{
+   await enterBackupWrite(tx,true);
    await tx`SELECT pg_advisory_xact_lock(1129534287)`;const current=await tx`SELECT * FROM issuer_v2.event_cursor WHERE deployment_id=${options.deploymentId} FOR UPDATE`;
    if(String(current[0]?.block_number??'')!==String(cursor[0]?.block_number??''))return;
    const rows=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${options.institutionId} FOR UPDATE`;const record=rows[0]?.state as InstitutionRecord;if(!record)throw new Error('INSTITUTION_NOT_FOUND');

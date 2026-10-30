@@ -1,4 +1,4 @@
--- Explicit new-deployment owner operation AFTER migrations 0000..0005.
+-- Explicit new-deployment owner operation AFTER migrations 0000..0006.
 -- psql -X -v ON_ERROR_STOP=1 -f infra/deploy/provision-logins.sql
 -- Read secrets from a protected process environment; never pass -v passwords or echo this session.
 \set ON_ERROR_STOP on
@@ -7,6 +7,14 @@
 \getenv worker_password WORKER_DB_PASSWORD
 \getenv pbx_password PBX_DB_PASSWORD
 BEGIN;
+-- New empty cross-cluster restore: create only the known NOLOGIN groups before applying dump ACLs.
+\if :{?restore_roles_only}
+DO $$ BEGIN
+ IF EXISTS(SELECT FROM pg_roles WHERE rolname IN ('callsign_issuer','callsign_worker','callsign_auth','callsign_pbx','callsign_sender','callsign_platform')) THEN RAISE EXCEPTION 'RESTORE_GROUPS_MUST_BE_NEW'; END IF;
+ CREATE ROLE callsign_issuer NOLOGIN; CREATE ROLE callsign_worker NOLOGIN; CREATE ROLE callsign_auth NOLOGIN;
+ CREATE ROLE callsign_pbx NOLOGIN; CREATE ROLE callsign_sender NOLOGIN; CREATE ROLE callsign_platform NOLOGIN;
+END $$;
+\endif
 DO $$ BEGIN
  IF EXISTS(SELECT FROM pg_roles WHERE rolname IN ('callsign_issuer_login','callsign_auth_login','callsign_worker_login','callsign_pbx_login')) THEN
   RAISE EXCEPTION 'EXISTING_LOGIN_REQUIRES_EXPLICIT_REVIEW_NO_PASSWORD_RESET';

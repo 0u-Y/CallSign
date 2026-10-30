@@ -31,6 +31,7 @@
     "scripts/provision-member.ts",
     "scripts/provider-smoke.ts",
     "scripts/preflight.ts",
+    "scripts/backup-control.ts",
     "scripts/collect-evidence.ts",
     "tests/integration/independent-anchor.test.ts",
     "scripts/validation-runner.ts",

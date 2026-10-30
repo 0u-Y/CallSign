@@ -5,6 +5,7 @@ import { encryptBackup,hashFile,backupManifestMac,backupPayloads,regularBackupFi
 import { spawn } from 'node:child_process';
 import { resolve,relative,sep,isAbsolute } from 'node:path';
 import postgres from 'postgres';
+import {backupLock} from '../services/api/src/backup-drain.js';
 import { httpConsumptionAnchor,assertAnchorMatches } from '../services/api/src/consumption-anchor.js';
 const required=(name:string)=>{const v=process.env[name];if(!v)throw new Error(`MISSING_${name}`);return v;};
 const scope=process.env.BACKUP_SCOPE??'full';if(scope!=='full'&&scope!=='application')throw new Error('BACKUP_SCOPE_INVALID');
@@ -20,9 +21,12 @@ const entries=['issuer','sender','pbx','witness-keys','admin','operator','trust'
 await mkdir(directory,{mode:0o700});
 async function encrypt(input:NodeJS.ReadableStream,name:string){const tag=await encryptBackup(input,key,resolve(directory,name));await writeFile(resolve(directory,`${name}.tag`),tag,{flag:'wx',mode:0o600});}
 async function command(command:string,args:string[],name:string,env=process.env){const child=spawn(command,args,{env,stdio:['ignore','pipe','pipe']});let detail='';child.stderr.on('data',b=>{if(detail.length<4096)detail+=String(b);});const done=new Promise<void>((resolve,reject)=>{child.on('error',reject);child.on('exit',code=>code===0?resolve():reject(new Error(`${command.toUpperCase()}_FAILED`)));});await Promise.all([encrypt(child.stdout,name),done]);}
-const sql=postgres(required('MIGRATOR_DATABASE_URL'),{max:1,prepare:false,connect_timeout:3});
+const sql=postgres(required('MIGRATOR_DATABASE_URL'),{max:1,prepare:false,connect_timeout:3,connection:{lock_timeout:3000,statement_timeout:15000}});
 let checkpoint:unknown;let migrations:Record<string,string>={};
-try{await sql.begin('isolation level repeatable read',async tx=>{
+try{await sql.begin('isolation level read committed',async tx=>{
+  await tx`SELECT pg_advisory_xact_lock(${backupLock})`;
+  const fence=(await tx`SELECT phase,token FROM issuer_v2.backup_control WHERE singleton`)[0];
+  if(fence?.phase!=='draining'||fence.token!==required('BACKUP_DRAIN_TOKEN'))throw new Error('VERIFIED_DRAIN_TOKEN_REQUIRED');
   // Share locks permit pg_dump reads but stop API/worker mutations during the exported snapshot.
   const tables=await tx`SELECT schemaname,tablename FROM pg_tables WHERE schemaname IN ('public','issuer_v2','pbx') ORDER BY schemaname,tablename`;
   for(const t of tables)await tx`LOCK TABLE ${tx(`${t.schemaname}.${t.tablename}`)} IN SHARE MODE`;
@@ -40,7 +44,7 @@ try{await sql.begin('isolation level repeatable read',async tx=>{
   const databaseUrl=new URL(required('MIGRATOR_DATABASE_URL'));if(databaseUrl.searchParams.has('password'))throw new Error('PASSWORD_QUERY_NOT_SUPPORTED');const password=decodeURIComponent(databaseUrl.password);databaseUrl.password='';
   await command('pg_dump',['--format=custom','--dbname',databaseUrl.href,`--snapshot=${exported[0]!.snapshot}`],'database.dump.enc',{...process.env,PGPASSWORD:password});
   await command('tar',['-C',source,'-cf','-',...entries],'configuration.tar.enc');
-  checkpoint={anchor,chainCheckpoints:state.serviceV3?.checkpoints??{},warning:'Chain archive consistency requires the separately quiesced chain snapshot; filesystem copying of a live Besu database is not accepted.'};
+  checkpoint={anchor,drainToken:fence.token,chainCheckpoints:state.serviceV3?.checkpoints??{},warning:'Chain archive consistency requires the separately quiesced chain snapshot; filesystem copying of a live Besu database is not accepted.'};
  });
  if(snapshot){await regularBackupFile(snapshot);await encrypt(createReadStream(snapshot),'chain.snapshot.enc');}
  await encrypt(createReadStream(deploymentEnv),'deployment.env.enc');

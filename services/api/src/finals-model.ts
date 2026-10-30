@@ -31,7 +31,7 @@ export interface InstitutionRecord {
 }
 export interface AuthorityStore {
   read(institutionId: string): Promise<InstitutionRecord>;
-  transact<T>(institutionId: string, operation: (record: InstitutionRecord) => Promise<T>): Promise<T>;
+  transact<T>(institutionId: string, operation: (record: InstitutionRecord) => Promise<T>, mode?: "safety" | "cleanup"): Promise<T>;
   manageAccount?(institutionId:string,actorId:string,requestId:string,input:unknown):Promise<unknown>;
 }
 // Calls, indexer observations and directory labels are not authority metadata.

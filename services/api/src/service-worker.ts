@@ -1,3 +1,4 @@
+import { enterBackupWrite } from './backup-drain.js';
 import { notificationRecipients } from './notifications.js';
 import { measurements } from './telemetry.js';
 import { randomUUID } from 'node:crypto';
@@ -55,16 +56,16 @@ export function postgresWorkerStore(url:string,cleanup:(job:DurableJob)=>Promise
   const sql=postgres(url,{max:2,prepare:false,connect_timeout:3,connection:{statement_timeout:5000,lock_timeout:2000}});
   const owned=(j:DurableJob)=>sql`SELECT id FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND status='processing' AND lease_until>now()`;
   return {
-    async claim(){const token=randomUUID();const rows=await sql`WITH candidate AS (SELECT id FROM issuer_v2.outbox WHERE (${institutionId===undefined} OR institution_id=${institutionId??''}) AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) AND ((status='pending' AND retry_at<=now()) OR (status='processing' AND lease_until<now())) ORDER BY created_at LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE issuer_v2.outbox o SET status='processing',claim_token=${token},lease_until=now()+interval '45 seconds',attempts=attempts+1 FROM candidate c WHERE o.id=c.id RETURNING o.*`;return rows[0] as DurableJob??null;},
+    async claim(){return sql.begin(async tx=>{await enterBackupWrite(tx,true);const token=randomUUID();const rows=await tx`WITH candidate AS (SELECT id FROM issuer_v2.outbox WHERE (${institutionId===undefined} OR institution_id=${institutionId??''}) AND ((SELECT phase FROM issuer_v2.backup_control WHERE singleton)='open' OR kind IN ('call.cleanup','credential.revoke','institution.suspend')) AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) AND ((status='pending' AND retry_at<=now()) OR (status='processing' AND lease_until<now())) ORDER BY created_at LIMIT 1 FOR UPDATE SKIP LOCKED) UPDATE issuer_v2.outbox o SET status='processing',claim_token=${token},lease_until=now()+interval '45 seconds',attempts=attempts+1 FROM candidate c WHERE o.id=c.id RETURNING o.*`;return rows[0] as DurableJob??null;});},
     async record(id){if(institutionId!==undefined&&id!==institutionId)throw new PermanentJobError('WORKER_INSTITUTION_SCOPE_MISMATCH');const rows=await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`;if(!rows[0])throw new PermanentJobError('INSTITUTION_NOT_FOUND');return rows[0].state as InstitutionRecord;},
-    async renew(j){return (await sql`UPDATE issuer_v2.outbox SET lease_until=now()+interval '45 seconds' WHERE id=${j.id} AND claim_token=${j.claim_token} AND lease_until>now() AND status='processing' AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) RETURNING id`).length===1;},
+    async renew(j){return (await sql`UPDATE issuer_v2.outbox SET lease_until=now()+interval '45 seconds' WHERE id=${j.id} AND claim_token=${j.claim_token} AND lease_until>now() AND status='processing' AND EXISTS(SELECT 1 FROM issuer_v2.backup_control WHERE singleton AND phase<>'fenced') AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) RETURNING id`).length===1;},
     async persist(j,signer,prepare){
       const owner=randomUUID(),address=signer.toLowerCase();
       // A bounded per-signer lease serializes nonce preparation without holding a DB transaction over RPC.
       const acquired=await sql`INSERT INTO issuer_v2.signer_leases(signer,owner,expires_at) VALUES(${address},${owner},now()+interval '40 seconds') ON CONFLICT(signer) DO UPDATE SET owner=EXCLUDED.owner,expires_at=EXCLUDED.expires_at WHERE issuer_v2.signer_leases.expires_at<now() RETURNING signer`;
       if(!acquired.length)throw new Error('SIGNER_PREPARATION_BUSY');
       try{
-        const rows=await sql`SELECT * FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND lease_until>now() AND status='processing' AND EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')`;if(!rows[0])throw new Error('CLAIM_LOST');
+        const rows=await sql`SELECT * FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND lease_until>now() AND status='processing' AND EXISTS(SELECT 1 FROM issuer_v2.backup_control WHERE singleton AND phase<>'fenced') AND EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')`;if(!rows[0])throw new Error('CLAIM_LOST');
         const existing=rows[0];if(existing.signed_transaction)return {raw:existing.signed_transaction,hash:existing.transaction_hash,signer:existing.signer_address,nonce:String(existing.transaction_nonce)} as SignedTransaction;
         const unresolved=await sql`SELECT id FROM issuer_v2.outbox WHERE signer_address=${address} AND status='failed' AND signed_transaction IS NOT NULL AND receipt_block IS NULL LIMIT 1`;if(unresolved.length)throw new Error('SIGNER_REQUIRES_RECONCILIATION');
         const maximum=await sql`SELECT max(transaction_nonce) AS nonce FROM issuer_v2.outbox WHERE signer_address=${address}`;
@@ -76,7 +77,7 @@ export function postgresWorkerStore(url:string,cleanup:(job:DurableJob)=>Promise
         });return signed;
       }finally{await sql`DELETE FROM issuer_v2.signer_leases WHERE signer=${address} AND owner=${owner}`;}
     },
-    async complete(j,block){await sql.begin(async tx=>{await tx`SELECT id FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`;const rows=await tx`SELECT * FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND status='processing' AND lease_until>now() AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) FOR UPDATE`;if(!rows[0])throw new Error('CLAIM_LOST');
+    async complete(j,block){await sql.begin(async tx=>{await enterBackupWrite(tx,true);await tx`SELECT id FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`;const rows=await tx`SELECT * FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND status='processing' AND lease_until>now() AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) FOR UPDATE`;if(!rows[0])throw new Error('CLAIM_LOST');
       if(j.kind==='institution.register')await tx`UPDATE issuer_v2.institutions SET state=jsonb_set(state,'{registrationState}','"confirmed"'::jsonb),revision=revision+1 WHERE id=${j.institution_id} AND state->>'registrationOperation'=${j.object_id}`;
       if(j.kind==='call.cleanup'){
         const records=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`,record=records[0]?.state as InstitutionRecord;
@@ -90,6 +91,7 @@ export function postgresWorkerStore(url:string,cleanup:(job:DurableJob)=>Promise
     async retry(j,code,permanent=false,receiptBlock){
       const failed=permanent||j.attempts>=12,delay=Math.min(300,2**Math.min(j.attempts,8));
       await sql.begin(async tx=>{
+        await enterBackupWrite(tx,true);
         await tx`SELECT id FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`;
         const rows=await tx`UPDATE issuer_v2.outbox SET status=${failed?'failed':'pending'},retry_at=now()+${delay}*interval '1 second',lease_until=NULL,claim_token=NULL,last_error=${code.slice(0,100)},receipt_block=COALESCE(${receiptBlock??null},receipt_block) WHERE id=${j.id} AND claim_token=${j.claim_token} AND status='processing' AND lease_until>now() RETURNING signed_transaction`;
         if(rows.length&&failed)await tx`INSERT INTO issuer_v2.notifications(id,institution_id,user_id,code) SELECT ${`worker:${j.id}:${j.attempts}`},${j.institution_id},m.key,'worker.requires-operator' FROM issuer_v2.institutions i CROSS JOIN LATERAL jsonb_each(i.state->'members') m WHERE i.id=${j.institution_id} AND m.value->'permissions' ? 'institution.recover' ON CONFLICT DO NOTHING`;

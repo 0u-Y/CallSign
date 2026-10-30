@@ -27,6 +27,8 @@ export class ServiceAuthority {
   }
   async idempotent<T>(actor: Actor, requestId: string, input: unknown, operation: (r: InstitutionRecord, s: ServiceState) => Promise<T>): Promise<T> {
     if (!/^[A-Za-z0-9:._-]{8,200}$/.test(requestId)) throw new HttpError(400, "REQUEST_ID_REQUIRED");
+    const change=input as {action?:string;granted?:boolean};
+    const mode=change.action==="outcome"||(change.action==="consent"&&change.granted===false)?"cleanup":["revoke","cancel","suspend","official-confirm"].includes(change.action??"")?"safety":undefined;
     return this.options.store.transact(actor.institutionId, async r => {
       membership(r, actor, ["institution", "gateway", "recipient", "approver"]);
       const s = this.state(r), key = `${actor.userId}:${requestId}`, hash = hashCanonical(input), previous = s.requests[key];
@@ -34,7 +36,7 @@ export class ServiceAuthority {
       for (const [id, value] of Object.entries(s.requests)) if (value.at < this.now()-604800) delete s.requests[id];
       if (Object.keys(s.requests).length >= 10000) throw new HttpError(429, "IDEMPOTENCY_CAPACITY");
       const result = await operation(r, s); s.requests[key] = { hash, at: this.now(), result }; return result;
-    });
+    }, mode);
   }
   party(r: InstitutionRecord, actor: Actor, attemptId: string) {
     membership(r, actor, ["gateway", "recipient", "institution"]);
@@ -191,7 +193,7 @@ export class ServiceAuthority {
     (attempt.mediaReady??={})[role]=jws;return {ready:Object.keys(attempt.mediaReady).length===2};
   }); }
   async stopInterruptedCalls(institutionId:string){
-    return this.options.store.transact(institutionId,async r=>{let stopped=0;for(const t of Object.values(r.serviceV3?.attempts??{}))if(!terminal(t.status)){t.status='failed';t.reason='issuer-restarted-new-attempt-required';t.endedAt=this.now();t.revision++;delete t.lease;if(t.consent){t.consent.granted=false;t.consent.generation++;}const auth=r.serviceV3!.authorizations[t.authorizationId??''];if(auth)auth.cancelled=true;this.event(r,{institutionId,userId:'runtime',role:'institution'},'call.cleanup',t.id);stopped++;}return stopped;});
+    return this.options.store.transact(institutionId,async r=>{let stopped=0;for(const t of Object.values(r.serviceV3?.attempts??{}))if(!terminal(t.status)){t.status='failed';t.reason='issuer-restarted-new-attempt-required';t.endedAt=this.now();t.revision++;delete t.lease;if(t.consent){t.consent.granted=false;t.consent.generation++;}const auth=r.serviceV3!.authorizations[t.authorizationId??''];if(auth)auth.cancelled=true;this.event(r,{institutionId,userId:'runtime',role:'institution'},'call.cleanup',t.id);stopped++;}return stopped;},'cleanup');
   }
   async sweep(institutionId:string) {
     const observed=await this.options.store.read(institutionId),snapshot=observed.serviceV3;

@@ -1,3 +1,4 @@
+import { enterBackupWrite } from './backup-drain.js';
 import postgres from 'postgres';
 import {hashCanonical} from '@callsign/protocol';
 import type { InstitutionRecord } from './finals-model.js';
@@ -5,6 +6,7 @@ import { pruneServiceState } from './retention.js';
 export function serviceMaintenance(databaseUrl:string,institutionId:string,retentionSeconds=604800){
  const sql=postgres(databaseUrl,{max:1,prepare:false,connect_timeout:3,connection:{statement_timeout:5000,lock_timeout:2000}});
  return {async tick(){await sql.begin(async tx=>{
+   await enterBackupWrite(tx);
    // Lock the institution before deleting aggregate material; running API transactions share this boundary.
    const rows=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${institutionId} FOR UPDATE`;if(!rows[0])throw new Error('INSTITUTION_NOT_FOUND');
    const record=rows[0].state as InstitutionRecord;

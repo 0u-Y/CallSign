@@ -1,3 +1,4 @@
+import { enterBackupWrite,backupLock } from './backup-drain.js';
 import { randomUUID } from 'node:crypto';
 import { notificationRecipients } from './notifications.js';
 import postgres from "postgres";
@@ -25,6 +26,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
     async manageAccount(id,actorId,requestId,input){
       let anchorTouched=false;
       try{return await sql.begin(async tx=>{
+        await enterBackupWrite(tx);
         const rows=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${id} FOR UPDATE`,before=rows[0]?.state as InstitutionRecord;if(!before)throw new Error('INSTITUTION_NOT_PROVISIONED');
         const gate=await tx`SELECT status FROM issuer_v2.recovery_gate WHERE institution_id=${id}`;if(!options||gate[0]?.status!=='ready'||before.authorityCheckpointVersion!==1)throw new Error('AUTHORITY_METADATA_RECOVERY_REQUIRED');
         const originalHash=authorityStateHash(before),result=await tx`SELECT issuer_v2.manage_account(${id},${actorId},${requestId},${tx.json(input as postgres.JSONValue)}) AS result`;
@@ -40,9 +42,10 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
       if (state.serviceV3) { const gate = await sql`SELECT status FROM issuer_v2.recovery_gate WHERE institution_id=${id}`; if (!options || gate[0]?.status !== "ready") state.serviceV3.recovery = "blocked"; }
       return state;
     },
-    async transact<T>(id: string, operation: (record: InstitutionRecord) => Promise<T>): Promise<T> {
+    async transact<T>(id: string, operation: (record: InstitutionRecord) => Promise<T>, mode?: "safety" | "cleanup"): Promise<T> {
       let anchorTouched=false;
       try{return await sql.begin(async tx => {
+        await enterBackupWrite(tx,!!mode);
         const rows = await tx`SELECT state FROM issuer_v2.institutions WHERE id = ${id} FOR UPDATE`;
         if (!rows[0]) throw new Error("INSTITUTION_NOT_PROVISIONED");
         const state = rows[0].state as InstitutionRecord;
@@ -52,8 +55,8 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
         const priorClaims = new Set([...Object.keys(state.consumptions), ...Object.keys(state.serviceV3?.consumptions ?? {})]);
         if (state.serviceV3) {
           const gate = await tx`SELECT status FROM issuer_v2.recovery_gate WHERE institution_id=${id}`;
-          if (!options || gate[0]?.status !== "ready") state.serviceV3.recovery = "blocked";
-          else {const head=await tx`SELECT sequence,entry_hash FROM issuer_v2.consumption_journal WHERE institution_id=${id} ORDER BY sequence DESC LIMIT 1`;assertAnchorMatches({deployment:options.deployment,institutionId:id,sequence:String(head[0]?.sequence??0),hash:String(head[0]?.entry_hash??'0'.repeat(64)),epoch:state.epoch},await options.anchor.read(id));}
+          if ((!options || gate[0]?.status !== "ready") && mode!=="cleanup") state.serviceV3.recovery = "blocked";
+          else if(mode!=="cleanup"&&options) {const head=await tx`SELECT sequence,entry_hash FROM issuer_v2.consumption_journal WHERE institution_id=${id} ORDER BY sequence DESC LIMIT 1`;assertAnchorMatches({deployment:options.deployment,institutionId:id,sequence:String(head[0]?.sequence??0),hash:String(head[0]?.entry_hash??'0'.repeat(64)),epoch:state.epoch},await options.anchor.read(id));}
         }
         const appendJournal=async(authorizationId:string,bindingHash:string)=>{
           if(!options)throw new Error("INDEPENDENT_ANCHOR_REQUIRED");
@@ -66,6 +69,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
               await tx`INSERT INTO issuer_v2.consumption_journal(sequence,institution_id,authorization_id,binding_hash,entry_hash,previous_hash) VALUES(${next.sequence},${id},${authorizationId},${bindingHash},${next.hash},${previous.hash})`;
         };
         const result = await operation(state);
+        if(mode==="cleanup"&&(originalAuthorityHash!==authorityStateHash(state)||originalStatus!==state.status||Object.keys(state.serviceV3?.consumptions??{}).some(id=>!priorClaims.has(id))))throw new Error("CLEANUP_CANNOT_GRANT_OR_CHANGE_AUTHORITY");
         const claims = [...Object.entries(state.consumptions).map(([id, item]) => ({ id, version: 2, hash: item.payload.bindingHash, receipt: item })), ...Object.entries(state.serviceV3?.consumptions ?? {}).map(([id, item]) => ({ id, version: 3, hash: item.payload.bindingHash, receipt: item }))];
         if(originalEpoch!==state.epoch&&claims.some(c=>!priorClaims.has(c.id)))throw new Error("AUTHORITY_CHANGE_AND_CONSUMPTION_MUST_BE_SEPARATE");
         // Same authoritative transaction as the aggregate, including legacy namespace conflicts.
@@ -79,7 +83,7 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
             }
             if (!existing[0]) await tx`INSERT INTO issuer_v2.approval_consumptions(institution_id,authorization_id,protocol_version,binding_hash,receipt) VALUES(${id},${claim.id},${claim.version},${claim.hash},${tx.json(claim.receipt as unknown as postgres.JSONValue)})`;
           }
-          if(state.serviceV3&&(originalAuthorityHash!==authorityStateHash(state)||originalStatus!==state.status||(state.pendingEvents??[]).slice(eventOffset).some(e=>['credential.revoke','intent.cancelled','official.completed','intent.reassigned','call.cleanup'].includes(e.kind))))await checkpoint(tx,state,journalEpoch,()=>{anchorTouched=true;});
+          if(mode!=="cleanup"&&state.serviceV3&&(originalAuthorityHash!==authorityStateHash(state)||originalStatus!==state.status||(state.pendingEvents??[]).slice(eventOffset).some(e=>['credential.revoke','intent.cancelled','official.completed','intent.reassigned','call.cleanup'].includes(e.kind))))await checkpoint(tx,state,journalEpoch,()=>{anchorTouched=true;});
           for (const usage of state.pendingUsage ?? []) {
             const charged = await tx`INSERT INTO issuer_v2.global_quota(key,used,hard_limit,expires_at) VALUES(${usage.key},${usage.units},${usage.limit},to_timestamp(${usage.expiresAt}))
               ON CONFLICT(key) DO UPDATE SET used=issuer_v2.global_quota.used+EXCLUDED.used WHERE issuer_v2.global_quota.used+EXCLUDED.used<=issuer_v2.global_quota.hard_limit RETURNING key`;
@@ -114,12 +118,13 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
       }) as JournalCursor;
       // Fence intervening consumption, generation changes, and another replica's recovery pass.
       await sql.begin(async tx=>{
+        await tx`SELECT pg_advisory_xact_lock_shared(${backupLock})`;
         const rows=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${id} FOR UPDATE`,state=rows[0]?.state as InstitutionRecord;
         const fence=await tx`SELECT institution_id FROM issuer_v2.recovery_gate WHERE institution_id=${id} AND verification_token=${token} AND status='blocked' FOR UPDATE`;if(!fence.length)throw new Error("RECOVERY_VERIFICATION_SUPERSEDED");
         const head=await tx`SELECT sequence,entry_hash FROM issuer_v2.consumption_journal WHERE institution_id=${id} ORDER BY sequence DESC LIMIT 1`;
         if(!state||state.epoch!==verified.epoch||String(head[0]?.sequence??0)!==verified.sequence||String(head[0]?.entry_hash??'0'.repeat(64))!==verified.hash)throw new Error("CONSUMPTION_HISTORY_CHANGED_DURING_RECOVERY");
         assertAnchorMatches({deployment:options.deployment,institutionId:id,sequence:verified.sequence,hash:verified.hash,epoch:verified.epoch},await options.anchor.read(id));
-        if(verified.sequence==="0"){if(!allowBootstrap)throw new Error("AUTHORITY_METADATA_CHECKPOINT_REQUIRED");verified=await checkpoint(tx,state);}else if(verified.authorityHash!==authorityStateHash(state))throw new Error("AUTHORITY_METADATA_CHANGED_DURING_RECOVERY");
+        if(verified.sequence==="0"){if(!allowBootstrap)throw new Error("AUTHORITY_METADATA_CHECKPOINT_REQUIRED");await enterBackupWrite(tx);verified=await checkpoint(tx,state);}else if(verified.authorityHash!==authorityStateHash(state))throw new Error("AUTHORITY_METADATA_CHANGED_DURING_RECOVERY");
         const opened=await tx`UPDATE issuer_v2.recovery_gate SET status='ready',checked_at=now() WHERE institution_id=${id} AND verification_token=${token} AND status='blocked' RETURNING institution_id`;
         if(!opened.length)throw new Error("RECOVERY_VERIFICATION_SUPERSEDED");
         await tx`UPDATE issuer_v2.institutions SET state=jsonb_set(state,'{serviceV3,recovery}','"ready"'::jsonb) WHERE id=${id}`;
