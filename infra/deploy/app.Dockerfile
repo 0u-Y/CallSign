@@ -17,6 +17,7 @@ COPY packages packages
 COPY services services
 COPY scripts scripts
 COPY apps/web apps/web
+COPY artifacts/test-results.json artifacts/test-results.json
 RUN pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit
 FROM dependencies AS web-build
 ARG VITE_SERVICE_TRUST_SHA256

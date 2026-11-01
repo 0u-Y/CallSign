@@ -30,3 +30,6 @@ infra/compose/volumes/
 *.env.*
 !.env.example
 !infra/deploy/*.env.example
+
+# Local Python validation bytecode
+**/__pycache__/

@@ -232,16 +232,68 @@ docker build --network=none --pull=false --target turn   --build-arg "MEDIA_BUIL
 
 Asterisk/PJSIP/WSS/ARI/SRTP/ODBC와 PostgreSQL Unicode driver를 실제 image에서 확인한다. immutable XML을 숨기거나 권한 검사를 제거해 기동을 통과시키지 않는다. 다운로드 없는 archive load와 container 기동은 서로 다른 실행 단계다.
 
-### 실제 통합 harness
+### 전달물만 사용하는 NEW 리허설
 
-`tests/integration/runtime-media-driver.py`는 기존에 준비한 **고유 disposable none namespace**의 DB/Anchor/chain/Witness/PBX/TURN/controller를 소비한다. 이 파일은 해당 준비를 대신하거나 현재 host의 포트를 공개하지 않는다. `ownership.json`·chain/deployment/public manifest·기관 등록·보호 role URL/secret/TLS·합성 WAV·설치 Node/Chromium이 필요하다. 생성은 기존 준비·migration·LOGIN 도구를 사용하고 새 identity와 기존 배포를 섞지 않는다. 세부 초기 chain/DB 순서는 [소유 원장·API 연결](#owned-ledger-runtime), SQL 준비는 [최소권한/복원 절차](#application-cross-cluster-restore)를 따른다. 이 harness에 전체 stack 자동 bootstrap은 없으며 파일 세트가 없는 다른 장비에서 명령 하나로 재현된다고 보장하지 않는다.
+이 절차는 **폐기할 합성 배포** 전용이다. AWS override나 host bridge/port publish를 실행하지 않는다. 운영 NEW/RESTORE는 위 AWS 절차를 따른다. 서비스는 전달한 이미지·공개 파일·이번에 생성한 보호 입력만 사용한다. 별도 `observer-tests.tar`와 설치 Chromium·공유 라이브러리·폰트는 시험 controller의 입력이며 서비스 실행 의존성이 아니다.
+
+필요한 입력은 checksum에 포함된 `aws-bootstrap-images.tar`, `deployment-files.tar`, `images.json`, `observer-tests.tar`다. 이미지6종은 linux/amd64이며 웹은 새 PBX 인증서·trust에 맞춰 전달 runtime/nginx에서 만든다. 원래 전달물에는 웹이 참조하는 `artifacts/test-results.json`이 빠져 있었으므로 수정된 공개 묶음을 사용한다. 이 JSON은 날짜가 있는 과거 증거이며 현재 배포 결과로 갱신하지 않는다.
+
+준비 PC에는 Docker, Python3.12 이상, UID1000, 기존 Chromium1243와 `/usr/lib/x86_64-linux-gnu`, `/usr/share/fonts`, `/etc/fonts`가 필요하다. 누락돼도 설치하거나 host 권한을 바꾸지 않는다. 시작 시 available RAM40GiB를 요구한다. 이는 최대 약23GiB의 시험/빌드 예산과16GiB 여유를 확보하는 보수적인 실행 조건이며 서비스 최소 사양이 아니다. `vmstat`·available RAM·소유 container의 OOM을 계속 관측하고 지속 swap·OOM·16GiB 미만 여유·기존 작업 영향이면 소유 시험만 중단한다.
+
+```bash
+# All paths are reviewed local delivery/observer paths. No cloud or host configuration command.
+umask 077
+DELIVERY=/absolute/path/to/reviewed-delivery
+OBSERVER=/absolute/path/to/NEW-observer-directory
+mkdir "$OBSERVER"
+(cd "$DELIVERY" && sha256sum -c SHA256SUMS)
+tar -xf "$DELIVERY/observer-tests.tar" -C "$OBSERVER"
+cd "$OBSERVER"
+ROOT="$PWD/.local/media-delivery-$(date +%Y%m%d)-$(python3 -c 'import secrets; print(secrets.token_hex(4))')"
+BROWSER_CACHE=/absolute/path/to/already-installed/ms-playwright
+# Default is a non-executing plan. --apply is an explicitly authorized local integration operation.
+python3 tests/integration/runtime-delivery-bootstrap.py --delivery "$DELIVERY" --root "$ROOT" --browser-cache "$BROWSER_CACHE"
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 600s python3 tests/integration/runtime-delivery-bootstrap.py \
+  --delivery "$DELIVERY" --root "$ROOT" --browser-cache "$BROWSER_CACHE" --apply
+APP="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["CALLSIGN_APP_IMAGE"])' "$ROOT/images-loaded.json")"
+proof() {
+  CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_RUNTIME_TEST_ROOT="$ROOT" \
+    CALLSIGN_EXPECTED_RUNTIME_IMAGE="$APP" python3 tests/integration/runtime-media-driver.py "$@"
+}
+# Actual UI work/delegation/approval/consumption/audio/revocation. No external IdP or real microphone.
+proof --delivery-files "$ROOT/public" --case delegation-revoke
+```
+
+bootstrap는 archive를 실제 load하고 ID/architecture를 대조한 뒤 새 key/network-config/genesis, Besu4/계약/Witness4, migration0000~0009·최소권한 LOGIN, 별도 PostgreSQL Anchor·TLS, 합성 내부 계정, PBX/TURN, controller를 준비한다. 기관 등록은 아직 pending 전 단계다. 제품 시험이 실제 로그인·공동 등록 API→worker→원장/Witness→DB confirmed를 확인한다. bootstrap의 `PREPARED_NOT_PRODUCT_PASS`를 제품 PASS로 합산하지 않는다. 일반 계정·서명은 합성 시험용이며 독립 승인자의 실제 키 보관을 검증한 것은 아니다.
+
+같은 초기화 명령의 재실행은 기존 디렉터리/파일을 거절한다. foundation 이후 실패는 원본 output·ownership·키/genesis hash·이미지·namespace·volume을 확인한 뒤에만 위 bootstrap에 `--resume --apply`를 붙인다. 다른 소유 DB/volume, 다른 이미지/port/mount, 다른 checksum이면 SQL 전에 차단한다. foundation가 끝나기 전의 부분 키 생성은 자동 복구하지 않는다. 남은 파일을 검토해 같은 산출물을 보존하거나 새 시험 identity로 별도 시작한다. 일반 서비스 재시작은 이미지 entrypoint만 실행하며 준비·migration·provision을 호출하지 않는다. 시험 keeper/controller·TURN 자격은4시간, 시험 TLS는2일이며3시간이 지난 bootstrap resume은 거절한다. 기존 identity의 키나 이력을 갱신해 시험 시간을 연장하지 않는다.
+
+후속 경계는 `--case session-expiry`, `--case pbx-outage device-denied device-absent`, `--case policy-change`, `--case key-change`로 선택한다. 자연 만료는 실제1시간 세션을 기다리며3900초 controller 제한을 사용한다. PBX 장애는 소유 Asterisk의 pause/unpause만 사용하며 host firewall을 조작하지 않는다. 장치 없음은 음성 장치가 없는 controller, 권한 거절은 해당 browser context의 실제 permission 거절로 확인한다. ARI cleanup의503을 성공으로 바꾸지 않으며 영속 상태의 정리 재시도와 실제 ARI 자원 부재를 확인한다.
+
+다음 phase 전에 원본 로그·결과·controller 소스를 보호된 phase에 보존한다. 이 명령은 소유 앱/worker/web/ingress를 종료·제거하고 controller만 재시작한다. 체인·DB·Anchor·키를 초기화하지 않는다.
+
+```bash
+proof --archive-phase previous-phase-name
+# Then run the selected next case(s), retaining the same protected runtime-test.env and identity.
+proof --delivery-files "$ROOT/public" --case pbx-outage device-denied device-absent
+```
+
+정책 변경 후에는 API의 공동 확정·명시 활성화, 새 policy version의 trust 생성, web pin 재build가 필요하다. 키 변경은 자기 기관 정지→공동 복구→확정된 새 key 활성화→새 trust/web 게시 순서다. `key-change` 전에 기존 `prepare-finals.ts approval-key`로 새 **비활성** 버전2 파일과 별도 public manifest를 생성한다. `runtime-test.env`의 `CALLSIGN_PREPARED_TRUST`는 검토한 새 trust 파일 참조로만 변경한다. 구 키/VC/소비 이력·계정·Anchor를 삭제하거나 API가 보낸 키를 자동 신뢰하지 않는다. [권한·trust 전환](#trust-transition)을 따른다.
+
+로컬 차이는 none keeper의 공유 loopback·validator별 RPC/P2P 포트, 합성 URI/OIDC/중앙 시험 승인자, 단기 시험 CA, 같은 호스트의 별도 Anchor 저장소, TURN의 loopback-peer 허용이다. AWS에서는 별도 서비스 주소·실제 origin/TLS/IdP·공개/NAT mapping·loopback 차단을 사용한다. 이미지·서비스 entrypoint·migration·업무/서명 검증 코드는 동일하지만 **AWS Compose override·외부 TLS/NAT/TURN은 이 리허설로 검증되지 않는다**. 웹 builder는 이번 host에서만 자식 환경의 `DOCKER_BUILDKIT=0`와2GiB/CPU1 제한을 사용하며 daemon 설정은 변경하지 않는다. [Docker 공식 build 옵션](https://docs.docker.com/reference/cli/docker/image/build/)을 따른다. 해당 builder가 없는 환경에서 자동 설치/우회하지 않는다.
+
+`ownership.json`에 기록한 ID와 현재 label을 대조한 후 이번 container만 stop/rm하고, volume도 같은 소유 label을 재확인한 뒤 제거한다. 증거부터 보존하며 다른 project나 전역 prune/down -v는 사용하지 않는다. 보호 env·signer key·브라우저 profile·합성 WAV·DB/체인 상태는 공개 전달물/Git에 넣지 않는다. 일회성 시험의 잔여 key/chain만으로 서비스 복원이 가능하다고 표시하지 않는다. 공개 전달물과 보호 자료를 분리해 승인된 외부 보관처에서 재수령·checksum 대조하기 전에는 외부 전달 완료로 보고하지 않는다.
+
+### 앞선 준비형 harness와 경로 계약
+
+앞선 미디어 실행의 `tests/integration/runtime-media-driver.py`는 이미 준비한 **고유 disposable none namespace**를 소비했다. 현재 전달물 NEW는 위 bootstrap을 사용한다. 이 파일은 해당 준비를 대신하거나 현재 host의 포트를 공개하지 않는다. `ownership.json`·chain/deployment/public manifest·기관 등록·보호 role URL/secret/TLS·합성 WAV·설치 Node/Chromium이 필요하다. 생성은 기존 준비·migration·LOGIN 도구를 사용하고 새 identity와 기존 배포를 섞지 않는다. 세부 초기 chain/DB 순서는 [소유 원장·API 연결](#owned-ledger-runtime), SQL 준비는 [최소권한/복원 절차](#application-cross-cluster-restore)를 따른다. 전달물 전용 NEW bootstrap은 바로 위 절차를 사용한다. 이 driver만 단독으로 실행해서 준비가 대체된다고 보장하지 않는다.
 
 보호된 입력의 경로 계약은 다음과 같다. host의 `REVIEWED_OWNED_RUN_DIR`는 controller 안에서 `/run/callsign`으로 보인다. `REVIEWED_DOCKER_CONFIG_ID`는 공개 실행 증거의 `runtimeTransfer.images.runtime` 또는 보호 디렉터리 `runtime-final-image-id.txt`에서 읽는다. image archive의 네 ID 대조도 그 실행 증거를 사용한다.
 
 | host 작업 디렉터리 아래 파일 | 필수 내용/생성 근거 |
 |---|---|
 | `ownership.json` | runId=`media-*`, directory, scope, 이번 container name/id/role 목록과 volume 이름. `directory`의 끝과 Docker label run-id가 같아야 함 |
-| `synthetic-public-context.json`, `live-http-context.json` | runId/networkId/institutionId/institutionUri/serviceUri, publicAddresses의 administrator/stopper/approver1~3. live 문맥은 실제 기관 등록 transaction/block을 추가하며 기존 배포에서 임의 작성하지 않음 |
+| `synthetic-public-context.json`, `live-http-context.json` | runId/networkId/institutionId/institutionUri/serviceUri, publicAddresses의 administrator/stopper/approver1~3. live 문맥의 기관/배포 identity는 생성 기록과 일치해야 하며 등록 확정은 실제 원장·DB에서 별도 확인 |
 | `data/public-manifest.json`, `data/deployment.json` | 기존 `prepare-finals.ts keys`와 실제 `deploy-service-registry.ts`·공동 등록 결과. genesis/code/artifact hash·chain/registry/institution/profile 일치 필수 |
 | `data/issuer/approval-v1.json`, `data/sender/key.json`, `data/pbx/evidence.json`, Witness key | 역할별 보호 파일. 브라우저에 전달하지 않으며 기존 key를 다시 생성하지 않음 |
 | `private-app.json` | ariPassword, base64url32byte pbxCredentialSecret, turnSecret, platformToken, senderToken. 모두 합성 시험용이며 `.env.example`의 해당 역할 설정에 대응 |
@@ -260,7 +312,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_RUNTIME_TEST_ROOT="$REVIE
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_RUNTIME_TEST_ROOT="$REVIEWED_OWNED_RUN_DIR" CALLSIGN_EXPECTED_RUNTIME_IMAGE="$REVIEWED_DOCKER_CONFIG_ID" python3 tests/integration/runtime-media-driver.py --case emergency-stop
 ```
 
-driver는 이전 결과가 있으면 중단한다. 원본 로그/결과/request 파일을 보호된 별도 phase로 보존하고 소유 역할만 종료한 뒤 재시도한다. `CALLSIGN_RUNTIME_RESUME_OIDC`는 같은 공개 issuer 주소의 새 fixture를 쓰면서 DB/journal/Anchor를 보존하는 시험 전용 입력이다. 정상 로그인은 실제 start/callback을 다시 거친다. 정지·철회/세대 변경 뒤 과거 상태를 초기화해서 이 harness를 재사용하지 않는다. **이번 환경은 emergency-stop 뒤 시험 DB/Anchor volume까지 정리했으므로 남은 파일로 위 명령을 재실행할 수 없다.** [정책·키·trust 전환](#trust-transition)의 공동 복구/새 trust 또는 별도의 새 disposable identity가 필요하다. 첫 실행의5 PASS는 공통 이미지와 logout/cancel/lease/revoke 네 통화, 재실행의2 PASS는 같은 공통 이미지와 emergency-stop 한 통화다.
+driver는 이전 결과가 있으면 중단한다. 원본 로그/결과/request 파일을 보호된 별도 phase로 보존하고 소유 역할만 종료한 뒤 재시도한다. `CALLSIGN_RUNTIME_RESUME_OIDC`는 같은 공개 issuer 주소의 새 fixture를 쓰면서 DB/journal/Anchor를 보존하는 시험 전용 입력이다. 정상 로그인은 실제 start/callback을 다시 거친다. 정지·철회/세대 변경 뒤 과거 상태를 초기화해서 이 harness를 재사용하지 않는다. **앞선 미디어 환경은 emergency-stop 뒤 시험 DB/Anchor volume까지 정리했으므로 남은 파일로 위 명령을 재실행할 수 없다.** [정책·키·trust 전환](#trust-transition)의 공동 복구/새 trust 또는 별도의 새 disposable identity가 필요하다. 첫 실행의5 PASS는 공통 이미지와 logout/cancel/lease/revoke 네 통화, 재실행의2 PASS는 같은 공통 이미지와 emergency-stop 한 통화다.
 
 실제 DB 회귀는 owner `TEST_DATABASE_URL`과 서로 다른 auth/issuer/worker/PBX `TEST_*_DATABASE_URL`을 요구한다. 모두 같은 `callsign_test_*` 대상이어야 한다. 이 URL은 보호 환경파일에만 둔다. 기존 validation runner와 Compose validation env는 다섯 URL을 소비한다. 새 migration, GRANT, row lock·접촉 저장·금지 UPDATE를 실제 제한 LOGIN으로 확인한다.
 

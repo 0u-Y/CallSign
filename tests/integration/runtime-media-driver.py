@@ -1,10 +1,14 @@
 """Explicit host-side driver for the owned final-image integration test; creates no network or published port."""
-import argparse, json, os, re, subprocess, time
+import argparse, json, os, re, shutil, subprocess, time
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--case', choices=['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop'])
-selected_case = parser.parse_args().case
+parser.add_argument('--case', nargs='+', choices=['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change','device-denied','device-absent'])
+parser.add_argument('--archive-phase', help='Preserve prior private evidence and stop only owned application/controller processes before an explicit new phase')
+parser.add_argument('--delivery-files', type=Path, help='Extracted, checksum-verified public delivery directory; build web only from delivered runtime/nginx')
+options = parser.parse_args()
+selected_cases = options.case or ['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop']
+if len(set(selected_cases)) != len(selected_cases): raise SystemExit('DUPLICATE_CASE_SELECTION')
 
 if os.environ.get('CALLSIGN_ALLOW_EXTERNAL_EXECUTION') != 'integration':
     raise SystemExit('INTEGRATION_EXECUTION_BLOCKED')
@@ -21,7 +25,7 @@ def command(args, **kwargs):
     return subprocess.run(args, check=True, **kwargs)
 
 def inspect(name):
-    return json.loads(subprocess.check_output(['docker', 'inspect', name]))[0]
+    return json.loads(subprocess.check_output(['docker', 'container', 'inspect', name]))[0]
 
 import base64
 credential = json.loads((root / 'private-app.json').read_text())['pbxCredentialSecret']
@@ -32,20 +36,52 @@ keeper = inspect(run_id + '-net')
 if keeper['Config']['Labels'].get('org.callsign.run-id') != run_id or keeper['HostConfig']['NetworkMode'] != 'none':
     raise SystemExit('OWNED_NONE_NAMESPACE_REQUIRED')
 
+if options.archive_phase:
+    if not re.fullmatch(r'[a-z0-9-]{1,60}',options.archive_phase): raise SystemExit('PHASE_NAME_INVALID')
+    phase = root / ('phase-' + options.archive_phase)
+    phase.mkdir(mode=0o700)
+    for role in ['issuer','platform','sender','worker','web','https']:
+        observed = subprocess.run(['docker','container','inspect',run_id+'-'+role],capture_output=True,text=True)
+        if observed.returncode: continue
+        info = json.loads(observed.stdout)[0]
+        if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['HostConfig']['NetworkMode'] != 'container:'+keeper['Id'] or not any(c['id']==info['Id'] for c in owner['containers']):
+            raise RuntimeError('OWNED_PHASE_RESOURCE_REQUIRED')
+        (phase/(role+'.log')).write_bytes(subprocess.run(['docker','logs',info['Id']],capture_output=True).stdout)
+        command(['docker','stop','-t','5',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
+        command(['docker','rm',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
+        if (root/(role+'.env')).exists(): (root/(role+'.env')).rename(phase/(role+'.env'))
+    controller = inspect(run_id+'-controller')
+    if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
+    command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
+    command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
+    names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt']
+    names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','pbx-control-*'] for p in root.glob(pattern)]
+    for name in names:
+        if (root/name).exists(): (root/name).rename(phase/name)
+    if (root/'controller-code').exists(): shutil.copytree(root/'controller-code',phase/'controller-code')
+    if (root/'runtime-test.env').exists(): shutil.copyfile(root/'runtime-test.env',phase/'runtime-test.env')
+    print('Prior private evidence preserved; owned app/controller processes stopped/restarted. DB, chain, Anchor and keys were not initialized.')
+    raise SystemExit(0)
+
 def write_env(name, values):
     path = root / (name + '.env')
+    text = ''.join(k + '=' + str(v) + '\n' for k, v in values.items())
+    if path.exists():
+        if path.read_text() != text: raise RuntimeError('EXISTING_ROLE_CONFIGURATION_DIFFERS:' + name)
+        return path
     with open(path, 'x', opener=lambda p, f: os.open(p, f, 0o600)) as output:
-        output.write(''.join(k + '=' + str(v) + '\n' for k, v in values.items()))
+        output.write(text)
     return path
 
 def start(role, env, mounts, args=None, image=app_image, memory='512m'):
     name = run_id + '-' + role
     env_path = write_env(role, env)
     request = ['docker', 'run', '-d', '--name', name, '--label', 'org.callsign.run-id=' + run_id,
-               '--network', 'container:' + run_id + '-net', '--memory', memory, '--memory-swap', memory,
+               '--pull=never', '--init', '--network', 'container:' + run_id + '-net', '--memory', memory, '--memory-swap', memory,
                '--cpus', '1', '--pids-limit', '128', '--read-only', '--cap-drop', 'ALL',
                '--security-opt', 'no-new-privileges', '--tmpfs', '/tmp:rw,nosuid,nodev,size=67108864',
                '--env-file', str(env_path)]
+    if role in ['web','https']: request += ['--user', '1000:1000']
     for source, target in mounts:
         request += ['--mount', f'type=bind,src={source},dst={target},readonly']
     result = subprocess.check_output(request + [image] + (args or [])).decode().strip()
@@ -61,8 +97,9 @@ controller = run_id + '-controller'
 controller_info = inspect(controller)
 if controller_info['Config']['Labels'].get('org.callsign.run-id') != run_id or not controller_info['HostConfig'].get('Init'):
     raise SystemExit('OWNED_CONTROLLER_INIT_REQUIRED')
-selection = ['--testNamePattern', 'boots final image|after ' + selected_case + '$'] if selected_case else []
-child = subprocess.Popen(['timeout', '600', 'docker', 'exec', '--env-file', str(root / 'runtime-test.env'), controller,
+selection = ['--testNamePattern', 'boots final image|after (' + '|'.join(selected_cases) + ')$']
+limit = 3900 if 'session-expiry' in selected_cases else 600
+child = subprocess.Popen(['timeout', str(limit), 'docker', 'exec', '--env-file', str(root / 'runtime-test.env'), controller,
                           'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
                           '--configLoader', 'runner', '--fsModuleCachePath', '/tmp/callsign-runtime-image-modules',
                           '--cache=false', '--reporter=json', '--outputFile=/run/callsign/runtime-media-results.json'] + selection,
@@ -116,32 +153,76 @@ try:
               'BESU_NODE_URLS': ','.join('http://127.0.0.1:' + str(18540+n) for n in [1,2,3,4]),
               'ARI_URL': ari, 'ARI_AUTHORIZATION': ari_auth}
     start('worker', worker, [(root / 'data/deployment.json', '/ledger/deployment.json'), (root / 'private-keys/administrator.txt', '/keys/administrator.txt'), (root / 'private-keys/stopper.txt', '/keys/stopper.txt'), (root / 'tls/ca.pem', '/tls/ca.pem')], ['pnpm', 'exec', 'tsx', 'scripts/service-worker.ts'])
-    build_env = {k:v for k,v in os.environ.items() if not k.startswith('VITE_')}
-    build_env.update({'VITE_SERVICE_TRUST_SHA256': prepared['pin'], 'VITE_PROTOCOL_PROFILE': 'service'})
-    command(['pnpm', '--filter', '@callsign/web', 'exec', 'vite', 'build', '--outDir', str(root / 'web-inputs/dist')], env=build_env, stdout=log, stderr=subprocess.STDOUT, timeout=60)
-    inputs = root / 'web-inputs'
-    config = Path('infra/deploy/nginx.conf').read_text().replace('listen 8080;', 'listen 8443 ssl;\n  ssl_certificate /tls/cert.pem;\n  ssl_certificate_key /tls/key.pem;').replace('https://asterisk:8089/ws','https://127.0.0.1:8089/ws').replace('http://platform:4100/','http://127.0.0.1:4100/')
-    (inputs/'default.conf').write_text(config)
-    (inputs/'nginx.conf').write_text('pid /tmp/nginx.pid;\nerror_log /dev/stderr notice;\nevents { worker_connections 128; }\nhttp { include /etc/nginx/mime.types; access_log off; client_body_temp_path /tmp/client; proxy_temp_path /tmp/proxy; fastcgi_temp_path /tmp/fastcgi; uwsgi_temp_path /tmp/uwsgi; scgi_temp_path /tmp/scgi; include /etc/nginx/conf.d/*.conf; }\n')
-    (inputs/'Dockerfile').write_text('ARG BASE\nFROM ${BASE}\nCOPY dist /usr/share/nginx/html\nCOPY default.conf /etc/nginx/conf.d/default.conf\nCOPY nginx.conf /etc/nginx/nginx.conf\nUSER 1000:1000\nCMD ["nginx","-g","daemon off;"]\n')
-    nginx = json.loads(subprocess.check_output(['docker','image','inspect','nginx:stable']))[0]
-    nginx_ref = nginx['RepoDigests'][0] if nginx.get('RepoDigests') else nginx['Id']
-    command(['docker','build','--network=none','--pull=false','--build-arg','BASE='+nginx_ref,'--iidfile',str(root/'web-image-id.txt'),'-t',run_id+'-web:candidate',str(inputs)],stdout=log,stderr=subprocess.STDOUT,timeout=60)
-    web_image = (root/'web-image-id.txt').read_text().strip()
-    start('web', {}, [(root/'tls/cert.pem','/tls/cert.pem'),(root/'tls/key.pem','/tls/key.pem'),(root/'tls/ca.pem','/etc/nginx/pbx-ca.pem')], image=web_image)
+    if options.delivery_files:
+        import hashlib
+        public = options.delivery_files.resolve()
+        if public != root / 'public' or not (root / 'images-loaded.json').is_file():
+            raise RuntimeError('OWNED_DELIVERY_FILES_REQUIRED')
+        images = json.loads((root / 'images-loaded.json').read_text())
+        if images['CALLSIGN_APP_IMAGE'] != app_image:
+            raise RuntimeError('DELIVERED_RUNTIME_IMAGE_MISMATCH')
+        tags = {'PREPARED_RUNTIME_IMAGE': run_id + '-runtime:delivery', 'NGINX_IMAGE': run_id + '-nginx:delivery'}
+        for key, ref in [('PREPARED_RUNTIME_IMAGE', app_image), ('NGINX_IMAGE', images['HTTPS_IMAGE'])]:
+            existing = subprocess.run(['docker','image','inspect','--format','{{.Id}}',tags[key]],capture_output=True,text=True)
+            if existing.returncode == 0 and existing.stdout.strip() != ref: raise RuntimeError('EXISTING_BUILD_ALIAS_DIFFERS')
+            if existing.returncode != 0: command(['docker', 'image', 'tag', ref, tags[key]], stdout=log, stderr=subprocess.STDOUT)
+        build = ['docker', 'build', '--network=none', '--pull=false', '--no-cache', '--force-rm', '--memory=2g', '--memory-swap=2g', '--cpu-quota=100000',
+                 '--file', str(public / 'infra/deploy/web.Dockerfile'), '--iidfile', str(root / 'web-image-id.txt'),
+                 '--build-arg', 'VITE_SERVICE_TRUST_SHA256=' + prepared['pin']]
+        for key, ref in tags.items(): build += ['--build-arg', key + '=' + ref]
+        command(build + ['-t', run_id + '-web:candidate', str(public)], env={**os.environ,'DOCKER_BUILDKIT':'0'}, stdout=log, stderr=subprocess.STDOUT, timeout=90)
+        web_image = (root / 'web-image-id.txt').read_text().strip()
+        inputs = root / 'web-inputs'
+        inputs.mkdir(exist_ok=True)
+        (inputs / 'nginx.conf').write_text('pid /tmp/nginx.pid;\nerror_log /dev/stderr notice;\nevents { worker_connections 128; }\nhttp { include /etc/nginx/mime.types; access_log off; client_body_temp_path /tmp/client; proxy_temp_path /tmp/proxy; fastcgi_temp_path /tmp/fastcgi; uwsgi_temp_path /tmp/uwsgi; scgi_temp_path /tmp/scgi; include /etc/nginx/conf.d/*.conf; }\n')
+        start('web', {}, [(inputs/'nginx.conf','/etc/nginx/nginx.conf'), (root/'tls/ca.pem','/etc/nginx/pbx-ca.pem')], image=web_image, args=['nginx','-g','daemon off;'])
+        ingress = (public / 'infra/deploy/https-nginx.conf').read_text().replace('listen 80;', 'listen 8087;').replace('listen 443 ssl;', 'listen 8443 ssl;').replace('http://web:8080', 'http://127.0.0.1:8080').replace('/tls/privkey.pem','/tls/key.pem')
+        (inputs / 'https.conf').write_text(ingress)
+        start('https', {}, [(inputs/'nginx.conf','/etc/nginx/nginx.conf'), (inputs/'https.conf','/etc/nginx/conf.d/default.conf'), (root/'tls/cert.pem','/tls/fullchain.pem'), (root/'tls/key.pem','/tls/key.pem')], image=images['HTTPS_IMAGE'], args=['nginx','-g','daemon off;'])
+        (root / 'delivery-web-build.json').write_text(json.dumps({'runtime':app_image,'nginx':images['HTTPS_IMAGE'],'web':web_image,'pin':prepared['pin'],'dockerfileSha256':hashlib.sha256((public/'infra/deploy/web.Dockerfile').read_bytes()).hexdigest(),'source':'delivered runtime layers only; public delivery build context','hostSourceOrNodeModules':False,'awsOverrideExecuted':False},indent=2)+'\n')
+    else:
+        build_env = {k:v for k,v in os.environ.items() if not k.startswith('VITE_')}
+        build_env.update({'VITE_SERVICE_TRUST_SHA256': prepared['pin'], 'VITE_PROTOCOL_PROFILE': 'service'})
+        command(['pnpm', '--filter', '@callsign/web', 'exec', 'vite', 'build', '--outDir', str(root / 'web-inputs/dist')], env=build_env, stdout=log, stderr=subprocess.STDOUT, timeout=60)
+        inputs = root / 'web-inputs'
+        config = Path('infra/deploy/nginx.conf').read_text().replace('listen 8080;', 'listen 8443 ssl;\n  ssl_certificate /tls/cert.pem;\n  ssl_certificate_key /tls/key.pem;').replace('https://asterisk:8089/ws','https://127.0.0.1:8089/ws').replace('http://platform:4100/','http://127.0.0.1:4100/')
+        (inputs/'default.conf').write_text(config)
+        (inputs/'nginx.conf').write_text('pid /tmp/nginx.pid;\nerror_log /dev/stderr notice;\nevents { worker_connections 128; }\nhttp { include /etc/nginx/mime.types; access_log off; client_body_temp_path /tmp/client; proxy_temp_path /tmp/proxy; fastcgi_temp_path /tmp/fastcgi; uwsgi_temp_path /tmp/uwsgi; scgi_temp_path /tmp/scgi; include /etc/nginx/conf.d/*.conf; }\n')
+        (inputs/'Dockerfile').write_text('ARG BASE\nFROM ${BASE}\nCOPY dist /usr/share/nginx/html\nCOPY default.conf /etc/nginx/conf.d/default.conf\nCOPY nginx.conf /etc/nginx/nginx.conf\nUSER 1000:1000\nCMD ["nginx","-g","daemon off;"]\n')
+        nginx = json.loads(subprocess.check_output(['docker','image','inspect','nginx:stable']))[0]
+        nginx_ref = nginx['RepoDigests'][0] if nginx.get('RepoDigests') else nginx['Id']
+        command(['docker','build','--network=none','--pull=false','--build-arg','BASE='+nginx_ref,'--iidfile',str(root/'web-image-id.txt'),'-t',run_id+'-web:candidate',str(inputs)],stdout=log,stderr=subprocess.STDOUT,timeout=60)
+        web_image = (root/'web-image-id.txt').read_text().strip()
+        start('web', {}, [(root/'tls/cert.pem','/tls/cert.pem'),(root/'tls/key.pem','/tls/key.pem'),(root/'tls/ca.pem','/etc/nginx/pbx-ca.pem')], image=web_image)
     web_health = "const end=Date.now()+10000;for(;;){try{const r=await fetch('https://127.0.0.1:8443/service');if(!r.ok)throw Error();break;}catch{if(Date.now()>end)throw Error('WEB_HTTPS_READINESS_TIMEOUT');await new Promise(r=>setTimeout(r,200));}}"
     command(['docker', 'exec', '--env', 'NODE_EXTRA_CA_CERTS=/run/callsign/tls/ca.pem', controller, 'node', '--input-type=module', '-e', web_health], stdout=log, stderr=subprocess.STDOUT)
-    service_ids = [c['id'] for c in owner['containers'] if c['role'] in ['final-image-issuer','final-image-sender','final-image-platform','final-image-worker']]
+    service_ids = [run_id + '-' + role for role in ['issuer','sender','platform','worker']]
     service_info = [inspect(i) for i in service_ids]
     if any(any(mount['Destination'].startswith('/work') or 'node_modules' in mount['Destination'] for mount in item['Mounts']) for item in service_info):
         raise RuntimeError('APPLICATION_SOURCE_MOUNT_FORBIDDEN')
     report = {'appImage':app_image,'webImage':web_image,'noApplicationSourceMounts':True,'serviceImages':{item['Name']:item['Image'] for item in service_info},'roleEnvironmentNames':{item['Name']:[e.split('=',1)[0] for e in item['Config']['Env']] for item in service_info},'configScope':'owned-loopback-test-only'}
     (root/'image-services-started.json').write_text(json.dumps(report,indent=2)+'\n')
-    code = child.wait(timeout=450)
+    deadline = time.monotonic() + limit
+    while child.poll() is None:
+        if time.monotonic() > deadline: raise RuntimeError('OWNED_TEST_TIME_LIMIT')
+        for action in ['pause','unpause']:
+            request, done = root / ('pbx-control-' + action + '.request'), root / ('pbx-control-' + action + '.done')
+            if request.exists() and not done.exists():
+                pbx = inspect(run_id + '-pbx')
+                if pbx['Config']['Labels'].get('org.callsign.run-id') != run_id or pbx['HostConfig']['NetworkMode'] != 'container:' + keeper['Id']:
+                    raise RuntimeError('OWNED_PBX_CONTROL_REQUIRED')
+                command(['docker', action, pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
+                done.write_text(json.dumps({action+'d':True})+'\n')
+        time.sleep(.2)
+    code = child.returncode
     if code:
         raise RuntimeError('RUNTIME_MEDIA_ASSERTIONS_FAILED')
     print('Owned final-image integration assertions completed.')
 finally:
+    if 'pbx-outage' in selected_cases:
+        pbx = inspect(run_id + '-pbx')
+        if pbx['Config']['Labels'].get('org.callsign.run-id') == run_id and pbx['State']['Paused']:
+            command(['docker','unpause',pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
     if child.poll() is None:
         child.terminate()
         child.wait(timeout=5)

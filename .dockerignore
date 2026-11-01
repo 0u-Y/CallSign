@@ -4,7 +4,8 @@
 .local
 .env
 .env.*
-artifacts
+artifacts/*
+!artifacts/test-results.json
 submission
 contracts/out
 contracts/cache
