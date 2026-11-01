@@ -48,3 +48,7 @@
 ## 2026-11-01 첫 체인 준비의 한정 작업
 
 이번 요청은 host/interface/route/Docker IPAM·자원의 읽기 전용 관측, 저장소의 신규 배포 설정안/준비 도구·문서 수정, 제한된 오프라인 검사와 관련 commit/일반 push/CI 확인을 허용한다. 서버의 실제 설정은 변경하지 않는다. 모든 서비스/노드/컨테이너 기동·이미지 build/download·의존성 설치·키/인증서 생성·계약 배포·GCP 변경·기존 자원 변경은 금지다. 신규 prefix 제안은 미적용이며 과거 한정 실행 허가는 승계하지 않는다.
+
+## 2026-11-01 호스트 설정 보존 격리 연결의 한정 예외
+
+이번 사용자 요청은 기존 host/interface/route/DNS/firewall/Docker daemon·기존 서비스/volume을 보존하는 조건으로 작업 전용 none namespace·loopback의 Besu4/Witness4·DB/Anchor/API·worker, 합성 키/계정, 오프라인 app image build·검증과 관련 commit/일반 push/CI 확인을 허용했다. 새 bridge/host port publish·공개 노출·host 설정 변경은 허용하지 않았다. package probe137 종료 후 소유 서비스를 중단했으며 사용자가 명시한2GiB·60초 재검증은1회만 수행했다. 유료 AI/GCP·운영 데이터는 사용하지 않았다. 실행 결과와 남은 media/외부 설정은 진행 기록을 따른다. 이 기록은 후속 세션의 상시 기동 허가가 아니다.

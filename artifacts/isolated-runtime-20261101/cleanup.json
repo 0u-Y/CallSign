@@ -1,0 +1,27 @@
+{
+  "recordedAt": "2026-11-01T13:48:09.041420+00:00",
+  "runId": "connection-20261101-9f53dcdf",
+  "ownedContainersRemoved": 17,
+  "ownedVolumesRemoved": 2,
+  "remainingOwnedContainers": 0,
+  "remainingOwnedVolumes": 0,
+  "hostConfigurationChanged": false,
+  "retainedProtectedLocalMaterial": [
+    "original synthetic deployment keys and genesis/node data",
+    "raw failures and integration logs",
+    "source/build contexts",
+    "runtime image archives and provenance"
+  ],
+  "retainedImages": "Only task runtime build images; no global prune. Final archive is partial runtime candidate, not full service release.",
+  "privateEnvironmentFilesRemoved": [
+    "database.env",
+    "anchor-database.env",
+    "owner-node.env",
+    "anchor-runtime.env",
+    "live-http.env",
+    "http-regression.env",
+    "http-regression-api.env",
+    "private-database.json"
+  ],
+  "httpFixtureKeyAndSessionFilesRemoved": true
+}

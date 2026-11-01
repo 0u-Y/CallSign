@@ -1,0 +1,11 @@
+{
+  "interfacesUnchangedExceptLifetimes": true,
+  "routesUnchangedExceptLifetimes": true,
+  "dockerNetworkIdsUnchanged": true,
+  "ignoredOnlyCountdownFields": [
+    "expires",
+    "valid_life_time",
+    "preferred_life_time"
+  ],
+  "noHostPublishedPorts": true
+}

@@ -1,6 +1,12 @@
 # 현재 구현의 한계
 
-기준일: 2026-10-31. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+기준일: 2026-11-01. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+
+## 실제 원장·API 연결의 검증 범위
+
+[2026-11-01 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)에서 같은 host의 Besu4/계약/Witness5시험과 실제 worker·PG·HTTPS Anchor·HTTP3시험을 실행했다. OIDC는 fixture이며 기본 PBX profile의 승인 발급까지만 확인했다. 실제 PBX binding·RTP/음성·외부 IdP·한국어 STT/LLM·GCP·전체 복원은 미검증이다. 제한된 노드/Witness 중단 관측을 독립 host 장애 내성으로 확대하지 않는다.
+
+부분 runtime archive는 생성했으나 웹/PBX/TURN·운영 trust/키·일관된 전체 데이터 이전 패키지는 아니다. 최종 재build image는 오프라인 build만 확인했다. 시점별 RAM 표본을 peak·최소 클라우드 사양·SLA로 쓰지 않는다. 기존 host bridge/route/방화벽/서비스는 보존했으며 공개 네트워크 접근은 검증하지 않았다.
 
 ## 배포 후보의 차단과 미확인
 

@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+**2026-11-01 추가 검증:** 실제 Besu4·계약·Witness 경계5시험, 최소권한 PostgreSQL·독립 HTTPS Anchor·실제 worker·HTTP 연결3시험을 확인했습니다. 업무→위임 원장 확정→Witness 확인→기본 교환기 profile의 승인 발급과 긴급 정지 전파까지입니다. OIDC는 로컬 fixture이고 실제 PBX/음성·외부 AI·GCP는 미검증입니다. 아래 표의 과거 fixture 시험과 합산하지 않습니다. [소스·결과·한계](../FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
+
 
 인증 후속 검증은 [진행 기록](../FINALS-IMPLEMENTATION-PLAN.md#authenticated-boundaries-20261030)에 별도로 연결했습니다. 공동 변경 파일 검토·독립 승인자 서명·제출/확정/활성화 구분, 다중 탭 계정 전환과 공식 세션 만료, 응답 유실 재시도, 동의 철회 후 분석 중단을 실제 HTTP·SQL·Chromium 경로에서 확인하는 범위입니다. 원장 사건/Witness 전송/분석 제공자는 시험 fixture이며 실제 체인·PBX·음성/AI 품질의 증거는 아닙니다.
 

@@ -1,5 +1,7 @@
 # CallSign 전체 개발 명세
 
+2026-11-01 검증 추가: CHAIN-001/002·STATE-001/002·OPS-001/003·TEST-001의 [선택 경로를 실제 구성요소로 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)했다. 같은 host의 chain/Witness와 HTTP/SQL/독립 Anchor/실제 worker 경계이며, 미디어·외부 IdP/AI·전체 이전 완료는 아니다. 아래 요구사항·완료 조건은 낮추지 않는다.
+
 ## 서비스 설계 원칙
 
 기본 서비스의 식별·권한·통화·분석·운영 경계다. 기존 초기 시연·역할 분리 직접 통화의 두 형식 코드와 증거는 보존하고, 현재 구현 상태는 개발 현황에서 관리한다.

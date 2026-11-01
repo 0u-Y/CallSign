@@ -9,3 +9,5 @@
 - OpenZeppelin Contracts, Copyright OpenZeppelin, MIT License
 - Hyperledger Besu, Hyperledger Foundation, Apache License 2.0
 - React, Vite, Fastify, Drizzle, viem, jose, Zod, Playwright 등은 각 패키지 메타데이터의 오픈소스 라이선스를 따른다.
+
+`local-runtime` 오프라인 이미지에는 설치된 Node·Corepack/pnpm과 GNU 공유 library를 복사한다. 원본 고지문은 이미지의 `/opt/local-runtime/licenses/NODE-LICENSE`, `libstdc++-copyright`, `libgcc-copyright`와 각 패키지 LICENSE에 함께 보존한다. 이 target의 공급 소스·이미지/파일 hash는 runtime 전달 기록에서 구분한다.

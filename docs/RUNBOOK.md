@@ -2,6 +2,45 @@
 
 **현재 단계에서는 아래 실환경 명령을 실행하지 않는다.** 사용자 요청으로 해당 범주 실행이 명시적으로 승인된 뒤 운영자가 수행한다. 자동 차단은 보안 sandbox가 아니라 실수 방지 장치다. 기존 프로세스·키·볼륨·증거를 정리하거나 초기화하지 않는다.
 
+## 2026-11-01 격리 실행과 runtime archive의 사용 범위
+
+[실제 결과](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)는 기존 bridge/route/방화벽을 바꾸지 않기 위해 작업 전용 `--network none` keeper와 `--network container:소유_keeper`를 사용했다. 모든 RPC/DB/HTTPS/API는 그 namespace의127.0.0.1이고 Docker host port publish는 없다. 이는 공개 배포 구성이나 GCP 연결 시험이 아니다. Docker `none`/namespace 공유의 기능은 [Docker 문서](https://docs.docker.com/engine/network/drivers/none/), [네트워크 문서](https://docs.docker.com/engine/network/)를 따른다. 실제 host interface/route/network ID도 전후 대조했다.
+
+### 재검증의 선행 자료
+
+기존 `prepare-finals.ts keys`, `prepare-service-network.ts`, `generate-besu.sh`, `deploy-service-registry.ts`로 새 합성 배포를 준비한 뒤에만 실행한다. 생성 키는 보호 파일로 유지한다. 운영/이미 등록된 기관에 시험을 다시 실행하지 않는다. 시험은 노드·DB·Anchor를 자동 기동하지 않는다.
+
+- `CALLSIGN_CHAIN_TEST_ROOT`에는 소유권 `ownership.json`, `synthetic-public-context.json`, 실제 `data/deployment.json`, `data/public-manifest.json`, 현재 `registry.json`, `private-keys` 보호 참조가 필요하다. chain suite는 등록·정책 변경·정지·복구를 실제 적용한다.
+- live HTTP suite에는 별도 신규 합성 기관의 `live-http-context.json`과 `data/live-http-deployment.json`이 필요하다. 기존 공동 등록 payload로 실제 등록한 epoch1 상태를 확인하고, 같은 기관에 scope한 Witness4개를 구성한다. 빈 journal을 기존 epoch4 기관에 붙이면 recovery gate가 거절하며 이를 자동 보정하지 않는다.
+- 전용 DB에 migration0000~0006과 `provision-logins.sql`을 먼저 적용한다. 보호 env 파일의 `TEST_DATABASE_URL`은 fixture 준비/관측용 owner, `ISSUER_DATABASE_URL`·`AUTH_DATABASE_URL`·`WORKER_DATABASE_URL`은 서로 다른 최소권한 LOGIN이다. Anchor는 별도 DB/로그인·TLS와 같은 institution/deployment의 명시적 zero checkpoint가 필요하다. DB 백업에 Anchor 저장소를 포함하지 않는다.
+- 보호 env 파일은 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration`, `CALLSIGN_LIVE_AUTHORITY_CONFIRMATION=OWNED_LOOPBACK_ONLY`, 위 root/DB 참조, `TEST_ANCHOR_TOKEN`, `NODE_EXTRA_CA_CERTS`를 전달한다. TLS 파일은 fixture root의 `tls.key`/`tls.crt`를 사용하며 key는0600이다. 실제 토큰·URL 비밀번호를 명령 인자나 Git에 넣지 않는다.
+
+다음은 **준비된 소유 namespace 안에서만 쓰는 재검증 명령**이다. host에서 임의 실행하거나 기존 container ID를 대입하지 않는다. keeper/client·키·DB·기관 준비는 먼저 소유권과 상태를 확인한다. OIDC는 로컬 HTTPS fixture이며 실제 IdP 성공 판정이 아니다.
+
+```bash
+# 보호 env 파일로 loopback 시험 연결을 전달한다. 이 명령은 인프라를 생성하지 않는다.
+timeout 90 docker exec --env-file "$PROTECTED_HTTP_ENV" "$OWNED_CLIENT_ID"   node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts   --configLoader runner --fsModuleCachePath /tmp/callsign-live-http-module-cache   --cache=false --reporter=json --outputFile=/run/callsign/NEW-http-results.json
+```
+
+live suite는 `buildFinalsServer`에 adapter를 주입하지 않고 실제 worker 진입점을 자식 프로세스로 실행·종료한다. PBX가 없으면 위임 등록·정지 같은 원장 작업은 가능하지만 PBX cleanup이 필요한 작업은 재시도 상태로 남는다. `ARI_URL`이 있으면 `ARI_AUTHORIZATION`도 필수다. 원장 등록을 완료하려고 fake ARI 성공을 사용하지 않는다. 테스트 fixture·private context·시험 키는 배포 image에 넣지 않는다.
+
+### 오프라인 runtime 이미지와 클라우드 전달
+
+`infra/deploy/app.Dockerfile`의 기존 `runtime`/`web` target을 유지하고, 설치된 Node/의존성을 재사용하는 `local-runtime` target만 추가했다. 별도 local build context의 `/runtime`은 Node·Corepack·필요 공유 library/라이선스, `/app`은 검토한 소스·lockfile·설치 의존성이다. 원래 workspace 경로를 **이미지 내부 경로**로 유지해 `verifyDepsBeforeRun: error`를 통과한다. 클라우드 host에 같은 절대 경로가 있어야 한다는 뜻은 아니다. 이번 이미지는 linux/amd64이며 다른 아키텍처를 지원한다고 가정하지 않는다. 외부 registry 접속·의존성 install 없이 `--network=none --pull=false`로 build했다.
+
+[전달 기록](../artifacts/isolated-runtime-20261101/runtime-transfer.json)의 image ID는 `sha256:...`인 Docker config ID다. registry의 `repository@sha256:...` manifest digest와 다르며 서로 바꿔 쓰지 않는다. archive를 전달할 때는 보호 경로에서 파일 크기와 SHA256을 대조하고 새 대상에서 load한 뒤 같은 image ID/architecture인지 확인한다. 아래 **클라우드 명령은 이번에 실행하지 않았다.**
+
+```bash
+sha256sum "$RUNTIME_ARCHIVE"  # 전달 기록의 archiveSha256과 실제 비교
+# 별도 실행 승인과 대상 확인 후에만 실행한다.
+docker image load --input "$RUNTIME_ARCHIVE"
+docker image inspect --format '{{.Id}} {{.Architecture}}' "$RUNTIME_IMAGE_ID"
+```
+
+이 archive에는 운영 비밀값·DB/Anchor/chain backup·실행 세션이 없으며 **전체 배포 패키지가 아니다.** 웹은 실제 기관 trust 생성→pin 고정→build가 남아 있고 PBX/TURN 이미지도 미준비다. 전체 release manifest의 clean commit/evidence 및 모든 역할 image 요구는 유지한다. 같은 소스를 클라우드에서 재설치해 동일한 의존성이 생긴다는 보증 대신, 검토한 불변 image/archive를 전달한다. 최종 image의 오프라인 build와 이전 image/소스에서 실행한 서비스 검증을 구분한다.
+
+이후 실제 이전에서는 기존 drain/fence·암호화 application/chain backup 절차를 따르고 source와 target의 동시 쓰기를 금지한다. 기관/계약/genesis/키/epoch/소비 이력을 보존하며 독립 Anchor를 DB와 함께 과거로 복원하지 않는다. 주소·TLS·OIDC callback·TURN이 달라지면 공개 trust/web pin과 실제 연결을 다시 검증한다. 최종 클라우드 사양은 PBX·media·동시 통화의 실제 자원 관측 전에는 확정하지 않는다.
+
 ## 배포 후보와 실제 연결 순서
 
 기준일2026-10-31, 조사 시작 `a6e2452`. 이 절은 현재 코드의 다음 실제 연결 절차이며 **아래 기동·생성·배포 명령은 이번에 실행하지 않았다.** 설정 준비와 소스 검사 통과는 실환경 연결 성공이 아니다. [검증·차단 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 함께 본다.

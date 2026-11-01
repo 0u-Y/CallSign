@@ -1,0 +1,35 @@
+{
+  "recordedAt": "2026-11-01T12:30:00.102Z",
+  "scope": "real Besu4 QBFT in one private loopback namespace; no host network or failure tolerance claim",
+  "first": [
+    {
+      "chainId": 20261101,
+      "genesis": "0xe10ff9f94a6eb631034390725e4ef55b5e5edb8b25ca2af5650612a8503e8876",
+      "height": "25"
+    },
+    {
+      "chainId": 20261101,
+      "genesis": "0xe10ff9f94a6eb631034390725e4ef55b5e5edb8b25ca2af5650612a8503e8876",
+      "height": "25"
+    },
+    {
+      "chainId": 20261101,
+      "genesis": "0xe10ff9f94a6eb631034390725e4ef55b5e5edb8b25ca2af5650612a8503e8876",
+      "height": "25"
+    },
+    {
+      "chainId": 20261101,
+      "genesis": "0xe10ff9f94a6eb631034390725e4ef55b5e5edb8b25ca2af5650612a8503e8876",
+      "height": "25"
+    }
+  ],
+  "second": [
+    "27",
+    "27",
+    "27",
+    "27"
+  ],
+  "sameHeight": "27",
+  "sameBlockHash": "0x371c00afc70f2ebf91fb96b669e65c30f9753fb2d91c6fa8ed620be42facd85a",
+  "validatorCount": 4
+}

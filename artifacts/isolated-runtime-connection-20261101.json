@@ -1,0 +1,381 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-01T13:45:40.125758+00:00",
+  "executionHead": "e4771beb18b07bcfaafcc885bbb100743748664c",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "fullServiceVerified": false,
+  "requirements": [
+    "CHAIN-001",
+    "CHAIN-002",
+    "STATE-001",
+    "STATE-002",
+    "OPS-001",
+    "OPS-003",
+    "TEST-001"
+  ],
+  "sourceFiles": {
+    "infra/deploy/app.Dockerfile": "35aa4ee560bcdc37c00f76b48ca1a80df79054fa5ad4bd4b73a7f2fac8944ebc",
+    "package.json": "1ea5c35ca6f78e7f70dc6c2f8ace4e1ca548d39a67948da406daa63b3ad5e871",
+    "scripts/deployment.sh": "b5407fd55dd4a35b43e55a31371946ab43aa60ef7498c8a19222481069ab32d1",
+    "scripts/generate-besu.sh": "b87b0c5558f4cd7788c28c8454a244603c8d01aa0c26d6c34d18f2675f1893ac",
+    "scripts/preflight-chain.ts": "fc2e4b574d09d704f5c8131229190bbd4ac675f15708cbf275522173a5430804",
+    "scripts/preflight.ts": "f727584ecb01cd7c28ad3a9e49f992fae2ab05b8acb1811ce7c7645f650b3bd3",
+    "scripts/release-manifest.ts": "c07027ae9d6b9ed7e2a78d0a572a5727635a22e8444a8c2e4335279baf9a793c",
+    "scripts/image-reference.mjs": "2d5503ff701a035f7c870171a3d4882f7aa5d10ad40150bface953d102aa7a2a",
+    "scripts/image-reference.d.mts": "0dd89d32241688409eea4587a55040ab3067181f6cf71dcfb41db679b684fb5e",
+    "scripts/service-worker.ts": "8dff0cdea1487b49e4d49940b12c5c4dbc36cd9387b82ed982b35e28bb67021c",
+    "tests/integration/chain-runtime.test.ts": "4dfe627e8b36f11691aebb34c5613f7398423d32f1b32eb0f5614baa90906feb",
+    "tests/integration/live-authority-http.test.ts": "afe58ac43d674f0b9fcafef0e132bcef85ddfd75e56d12065444e132b0ccb7f5",
+    "tests/integration/service-http-fixture.ts": "d6662b884831555ca89bf5bc0bb98e4e617fd9f5a3fb4cf8f7a33b1dba0d7ae4",
+    "vitest.http.config.ts": "6855cb17c994fca7b5c8e78ea936e1639c5ca55acfa37d7736880cee5e44330e",
+    "vitest.chain.config.ts": "781b2115d0d063c7a3aae18de036064cce8332d1d3d266ae4ad829d2de54f935",
+    "vitest.integration.config.ts": "b0ff5440da288cc3ff3e6b71dc7891089cfadec228357dc62b9054739adff540",
+    "tsconfig.light.json": "1c71b0e31993f1fff41f97272e8bbe7588f5f8f022f3992d82bb0c5dcf71e359"
+  },
+  "executions": [
+    {
+      "scope": "real same-host Besu4 + deployed contract + Witness4",
+      "executionHead": "36e88bd8744c15f3e57cd76ca51645e268e9d41f",
+      "sourceDirty": true,
+      "passed": 5,
+      "failed": 0,
+      "result": "isolated-runtime-20261101/chain-results.json"
+    },
+    {
+      "scope": "actual authenticated HTTP + least-privilege SQL + production worker process + actual chain/Witness + persistent HTTPS Anchor; OIDC fixture",
+      "passed": 3,
+      "failed": 0,
+      "result": "isolated-runtime-20261101/live-http-results.json"
+    },
+    {
+      "scope": "existing API regression; authority/OIDC/anchor/binding fixtures",
+      "passed": 6,
+      "failed": 0,
+      "skipped": 1,
+      "skippedReason": "Browser case not rerun; no UI source changed",
+      "result": "isolated-runtime-20261101/http-regression-results.json"
+    }
+  ],
+  "faultCases": "isolated-runtime-20261101/limited-chain-faults.json",
+  "offlineEvidence": "isolated-runtime-final-source-20261101.json",
+  "failuresPreserved": [
+    {
+      "stage": "initial runtime image relocation",
+      "cause": "Strict pnpm workspace layout check rejected changed installed workspace root",
+      "resolution": "Keep installed workspace layout in local image; do not disable pnpm check"
+    },
+    {
+      "stage": "Besu initial startup",
+      "cause": "Native JNA/Netty libraries could not execute from noexec temporary mount",
+      "resolution": "Use exec only on task-owned Besu /tmp tmpfs; no host permissions changed"
+    },
+    {
+      "stage": "offline package attempts",
+      "cause": "Bounded 512MiB and 128MiB probes exited 137",
+      "resolution": "Stopped owned services; one explicitly approved 2048MiB/60s package probe succeeded; no automatic resource increase"
+    },
+    {
+      "stage": "live API fixture setup",
+      "cause": "Wrong enum assumption; then empty journal at epoch 4 correctly rejected; then institution-scoped Witness metadata rejected a different test institution",
+      "resolution": "Correct enum; register a separate epoch-1 synthetic institution using real quorum; explicitly scope owned Witness metadata without changing original deployment or weakening guards"
+    },
+    {
+      "stage": "existing HTTP regression setup",
+      "cause": "Browser-enabled fixture selected without installed Vite path in isolated source copy",
+      "resolution": "Use existing CALLSIGN_HTTP_API_ONLY=true; retain browser test as skipped"
+    }
+  ],
+  "fixtureBoundaries": {
+    "OIDC": "Local HTTPS authorization-code/PKCE fixture, not external IdP",
+    "chainWitnessAnchor": "Actual processes and durable storage; no adapters injected into the live Issuer",
+    "media": "No PBX, no actual media session; primary PBX profile authorization only",
+    "consumptionLease": "Existing regression uses explicit direct-WebRTC synthetic binding and fixture authority; not proof of actual PBX binding",
+    "worker": "Actual scripts/service-worker.ts process; no ARI configuration or fake successful PBX cleanup"
+  },
+  "resources": {
+    "hostCpuThreads": 24,
+    "availableMiBObserved": [
+      34399,
+      34050,
+      34835
+    ],
+    "diskAvailableGiBObserved": 446,
+    "swapUsedMiBObserved": [
+      10155,
+      11071
+    ],
+    "swapNote": "Short samples included page-in activity; owned services stopped after scenarios and before final offline work. No latency/SLA or cloud minimum inferred.",
+    "pointSamples": [
+      {
+        "BlockIO": "4.1kB / 0B",
+        "CPUPerc": "0.04%",
+        "Container": "afbb4e4c3387",
+        "ID": "afbb4e4c3387",
+        "MemPerc": "33.03%",
+        "MemUsage": "169.1MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-live-witness4",
+        "NetIO": "0B / 0B",
+        "PIDs": "49"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.05%",
+        "Container": "54ff3638621b",
+        "ID": "54ff3638621b",
+        "MemPerc": "33.81%",
+        "MemUsage": "173.1MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-live-witness3",
+        "NetIO": "0B / 0B",
+        "PIDs": "51"
+      },
+      {
+        "BlockIO": "4.1kB / 0B",
+        "CPUPerc": "0.05%",
+        "Container": "07e39d6c3acc",
+        "ID": "07e39d6c3acc",
+        "MemPerc": "32.85%",
+        "MemUsage": "168.2MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-live-witness2",
+        "NetIO": "0B / 0B",
+        "PIDs": "49"
+      },
+      {
+        "BlockIO": "299kB / 0B",
+        "CPUPerc": "0.06%",
+        "Container": "c6f0018fc94d",
+        "ID": "c6f0018fc94d",
+        "MemPerc": "33.31%",
+        "MemUsage": "170.6MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-live-witness1",
+        "NetIO": "0B / 0B",
+        "PIDs": "50"
+      },
+      {
+        "BlockIO": "1.12MB / 0B",
+        "CPUPerc": "0.10%",
+        "Container": "84b889ca6da6",
+        "ID": "84b889ca6da6",
+        "MemPerc": "10.41%",
+        "MemUsage": "53.32MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-anchor",
+        "NetIO": "0B / 0B",
+        "PIDs": "25"
+      },
+      {
+        "BlockIO": "1.43MB / 55.2MB",
+        "CPUPerc": "0.00%",
+        "Container": "e32a876c1044",
+        "ID": "e32a876c1044",
+        "MemPerc": "4.26%",
+        "MemUsage": "21.81MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-anchor-database",
+        "NetIO": "0B / 0B",
+        "PIDs": "7"
+      },
+      {
+        "BlockIO": "26.2MB / 64.7MB",
+        "CPUPerc": "0.00%",
+        "Container": "91f0fb051c1e",
+        "ID": "91f0fb051c1e",
+        "MemPerc": "4.62%",
+        "MemUsage": "23.68MiB / 512MiB",
+        "Name": "connection-20261101-9f53dcdf-database",
+        "NetIO": "0B / 0B",
+        "PIDs": "6"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "da51e40d2586",
+        "ID": "da51e40d2586",
+        "MemPerc": "0.00%",
+        "MemUsage": "0B / 0B",
+        "Name": "connection-20261101-9f53dcdf-witness4",
+        "NetIO": "0B / 0B",
+        "PIDs": "0"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "9df5bebc3d43",
+        "ID": "9df5bebc3d43",
+        "MemPerc": "0.00%",
+        "MemUsage": "0B / 0B",
+        "Name": "connection-20261101-9f53dcdf-witness3",
+        "NetIO": "0B / 0B",
+        "PIDs": "0"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "ef6f6585a768",
+        "ID": "ef6f6585a768",
+        "MemPerc": "0.00%",
+        "MemUsage": "0B / 0B",
+        "Name": "connection-20261101-9f53dcdf-witness2",
+        "NetIO": "0B / 0B",
+        "PIDs": "0"
+      },
+      {
+        "BlockIO": "0B / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "f27aee004c63",
+        "ID": "f27aee004c63",
+        "MemPerc": "0.00%",
+        "MemUsage": "0B / 0B",
+        "Name": "connection-20261101-9f53dcdf-witness1",
+        "NetIO": "0B / 0B",
+        "PIDs": "0"
+      },
+      {
+        "BlockIO": "16.8MB / 4.21MB",
+        "CPUPerc": "0.36%",
+        "Container": "048303b413ba",
+        "ID": "048303b413ba",
+        "MemPerc": "13.01%",
+        "MemUsage": "399.6MiB / 3GiB",
+        "Name": "connection-20261101-9f53dcdf-besu4",
+        "NetIO": "0B / 0B",
+        "PIDs": "81"
+      },
+      {
+        "BlockIO": "19.4MB / 4.96MB",
+        "CPUPerc": "1.86%",
+        "Container": "ecac2db601a5",
+        "ID": "ecac2db601a5",
+        "MemPerc": "13.36%",
+        "MemUsage": "410.3MiB / 3GiB",
+        "Name": "connection-20261101-9f53dcdf-besu3",
+        "NetIO": "0B / 0B",
+        "PIDs": "88"
+      },
+      {
+        "BlockIO": "16.3MB / 4.96MB",
+        "CPUPerc": "1.95%",
+        "Container": "df246f5eec1a",
+        "ID": "df246f5eec1a",
+        "MemPerc": "13.12%",
+        "MemUsage": "403MiB / 3GiB",
+        "Name": "connection-20261101-9f53dcdf-besu2",
+        "NetIO": "0B / 0B",
+        "PIDs": "89"
+      },
+      {
+        "BlockIO": "48.3MB / 4.96MB",
+        "CPUPerc": "0.33%",
+        "Container": "cdb58c0f60f5",
+        "ID": "cdb58c0f60f5",
+        "MemPerc": "14.38%",
+        "MemUsage": "441.6MiB / 3GiB",
+        "Name": "connection-20261101-9f53dcdf-besu1",
+        "NetIO": "0B / 0B",
+        "PIDs": "84"
+      },
+      {
+        "BlockIO": "9.18MB / 139kB",
+        "CPUPerc": "0.00%",
+        "Container": "32e5a6df5a69",
+        "ID": "32e5a6df5a69",
+        "MemPerc": "0.63%",
+        "MemUsage": "12.89MiB / 2GiB",
+        "Name": "connection-20261101-9f53dcdf-client",
+        "NetIO": "0B / 0B",
+        "PIDs": "2"
+      },
+      {
+        "BlockIO": "8.19kB / 0B",
+        "CPUPerc": "0.00%",
+        "Container": "81a799498613",
+        "ID": "81a799498613",
+        "MemPerc": "0.56%",
+        "MemUsage": "364KiB / 64MiB",
+        "Name": "connection-20261101-9f53dcdf-net",
+        "NetIO": "0B / 0B",
+        "PIDs": "1"
+      }
+    ],
+    "budgets": {
+      "besuEachMiB": 3072,
+      "witnessEachMiB": 512,
+      "postgresEachMiB": 512,
+      "anchorMiB": 512,
+      "testControllerMiB": 2048
+    },
+    "peakMeasured": false
+  },
+  "hostPreservation": {
+    "interfacesUnchangedExceptLifetimes": true,
+    "routesUnchangedExceptLifetimes": true,
+    "dockerNetworkIdsUnchanged": true,
+    "ignoredOnlyCountdownFields": [
+      "expires",
+      "valid_life_time",
+      "preferred_life_time"
+    ],
+    "noHostPublishedPorts": true
+  },
+  "cleanup": {
+    "recordedAt": "2026-11-01T13:48:09.041420+00:00",
+    "runId": "connection-20261101-9f53dcdf",
+    "ownedContainersRemoved": 17,
+    "ownedVolumesRemoved": 2,
+    "remainingOwnedContainers": 0,
+    "remainingOwnedVolumes": 0,
+    "hostConfigurationChanged": false,
+    "retainedProtectedLocalMaterial": [
+      "original synthetic deployment keys and genesis/node data",
+      "raw failures and integration logs",
+      "source/build contexts",
+      "runtime image archives and provenance"
+    ],
+    "retainedImages": "Only task runtime build images; no global prune. Final archive is partial runtime candidate, not full service release.",
+    "privateEnvironmentFilesRemoved": [
+      "database.env",
+      "anchor-database.env",
+      "owner-node.env",
+      "anchor-runtime.env",
+      "live-http.env",
+      "http-regression.env",
+      "http-regression-api.env",
+      "private-database.json"
+    ],
+    "httpFixtureKeyAndSessionFilesRemoved": true
+  },
+  "runtimeTransfer": "isolated-runtime-20261101/runtime-transfer.json",
+  "cloudDeploymentVerified": false,
+  "unverified": [
+    "Actual external IdP and public TLS",
+    "PBX/PJSIP/WSS/DTLS/RTP/ODBC and TURN path",
+    "External STT/LLM Korean quality, retention and billing",
+    "Full service backup/restore with actual ledger and media",
+    "Independent-host faults and GCP deployment",
+    "Final rebuilt runtime has offline build verification; service processes ran from prior runtime image/source identified in the execution records"
+  ],
+  "retention": "Only synthetic observations and hashes published. Raw logs, keys, env, chain data, image archives remain protected locally; no data payload or credentials in Git.",
+  "artifactHashes": {
+    "artifacts/isolated-runtime-20261101/chain-results.json": "c93f6596487cebacb2b6beb69889e50cab96d9eff747386d43a0a8260f1b5355",
+    "artifacts/isolated-runtime-20261101/live-http-results.json": "f7d8518da75e59cec3b4947cdf497473db11591e05fb1b8840080aabc6b9e00e",
+    "artifacts/isolated-runtime-20261101/http-regression-results.json": "02f3c098760f7b458572ad3e6b46311a90bdeec95e90c18079c4c16e7425b878",
+    "artifacts/isolated-runtime-20261101/chain-observation.json": "9326093a1d276548950dbae5d80b91ea1f3ed0fd04ae304179f4bfaa870e4d56",
+    "artifacts/isolated-runtime-20261101/limited-chain-faults.json": "5327f35ae54fccf7709c58874ee3a6fd4b2ffd26cc90e6104206a1ebf025d374",
+    "artifacts/isolated-runtime-20261101/host-preservation-final.json": "ea1034d8f895a0c37b5582f79f272c0287d10dce35aecf9ed96cda28c7cee553",
+    "artifacts/isolated-runtime-20261101/runtime-transfer.json": "0085ed35536d8123d90156bd289e02dda4ebbbf26afa4fc29d5fb7c3a42c73c2",
+    "artifacts/isolated-runtime-20261101/cleanup.json": "b6dd1c2f37250ec6116f4b7a21f28152b6e622a1f5dbceb9f367ac98dae0ad14"
+  },
+  "contractIdentity": {
+    "networkId": "20261101",
+    "genesisHash": "0xe10ff9f94a6eb631034390725e4ef55b5e5edb8b25ca2af5650612a8503e8876",
+    "registryAddress": "0x3e23bcaf94142881908f6ab9286eb1777dc4abcd",
+    "registryCodeHash": "0xa0b81363524817301de4b2e8873837f2a416fbae8298711e75136449399327bf",
+    "registryProfile": "CALLSIGN_SERVICE_JOINT_CONFIGURATION_1",
+    "deploymentBlock": "28",
+    "artifactSha256": "44106b7087d542431cee1264df10d2c50d255e90ef36916090cb27db54753b23",
+    "sourceSha256": "4410cd9486d30c71fa5d32de24ce6e503ee1c11258585132a35aea5dc7a46d3d"
+  }
+}

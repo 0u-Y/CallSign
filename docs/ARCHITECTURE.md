@@ -1,5 +1,7 @@
 # 시스템 아키텍처
 
+2026-11-01에는 host 설정을 유지한 별도 loopback namespace에서 실제 Besu/Witness·독립 HTTPS Anchor·SQL·worker·HTTP 연결을 검증했다. 아래 과거 fixture 범위와 구분하며, 실제 PBX/음성·외부 IdP/AI·GCP 검증으로 확대하지 않는다. [최신 실행 경계](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
+
 이 문서의 Platform은 요청 중계, Issuer Gateway는 기관 승인, Sender Agent는 콜센터 서명 서비스다. PBX는 교환기이며 Witness는 원장 상태 증언자다. 통신 형식 번호·세션 결합·갱신형 통화 유지 허가 등은 [용어와 형식 대응](PROTOCOL.md#protocol-profiles)을 따른다.
 
 ## 배포 후보 구성의 현재 경계

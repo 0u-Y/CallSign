@@ -1,0 +1,36 @@
+{
+  "startTime": 1793538038478,
+  "success": true,
+  "numTotalTests": 5,
+  "numPassedTests": 5,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "cases": [
+    {
+      "name": "real isolated Besu contract and independent Witness RPC paths verifies signed absent state before registration without treating it as active authority",
+      "status": "passed",
+      "durationMs": 213.90985199999977
+    },
+    {
+      "name": "real isolated Besu contract and independent Witness RPC paths rejects missing/duplicate quorum at the real entrypoint and registers with two app-encoded signatures",
+      "status": "passed",
+      "durationMs": 1862.1196499999996
+    },
+    {
+      "name": "real isolated Besu contract and independent Witness RPC paths confirms a real delegation and rejects a wrong epoch",
+      "status": "passed",
+      "durationMs": 2078.0458
+    },
+    {
+      "name": "real isolated Besu contract and independent Witness RPC paths executes a jointly signed policy change and observes epoch invalidation via actual Witnesses",
+      "status": "passed",
+      "durationMs": 2108.700764
+    },
+    {
+      "name": "real isolated Besu contract and independent Witness RPC paths limits emergency suspension to its key and recovers jointly without reviving the old epoch",
+      "status": "passed",
+      "durationMs": 3897.734716000001
+    }
+  ],
+  "rawResultSha256": "2f9acea366665c492f12fe6745fbb8ba097184993a5b699fdd5731c892aa12dd"
+}

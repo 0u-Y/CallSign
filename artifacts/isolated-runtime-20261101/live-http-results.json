@@ -1,0 +1,26 @@
+{
+  "startTime": 1793540366384,
+  "success": true,
+  "numTotalTests": 3,
+  "numPassedTests": 3,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "cases": [
+    {
+      "name": "logs in through OIDC/PKCE and persists pending work/delegation with distinct minimum-privilege SQL roles",
+      "status": "passed",
+      "durationMs": 212.57066199999986
+    },
+    {
+      "name": "registers the API-issued delegation through the durable worker and obtains real fresh Witness signatures before authorization",
+      "status": "passed",
+      "durationMs": 4753.588384000001
+    },
+    {
+      "name": "submits a real emergency stop through HTTP/outbox and observes chain/Witness revocation in persisted API authority",
+      "status": "passed",
+      "durationMs": 4857.838631999999
+    }
+  ],
+  "rawResultSha256": "c5713b56fc0df4d7f5852325b71ec5fe046f568cbbb0d52dbb0453dfe76424db"
+}

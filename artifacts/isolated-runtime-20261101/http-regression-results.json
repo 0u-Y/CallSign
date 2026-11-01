@@ -1,0 +1,46 @@
+{
+  "startTime": 1793540149888,
+  "success": true,
+  "numTotalTests": 7,
+  "numPassedTests": 6,
+  "numFailedTests": 0,
+  "numPendingTests": 1,
+  "cases": [
+    {
+      "name": "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+      "status": "passed",
+      "durationMs": 107.93515400000001
+    },
+    {
+      "name": "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+      "status": "passed",
+      "durationMs": 125.29681800000003
+    },
+    {
+      "name": "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+      "status": "passed",
+      "durationMs": 77.33772399999998
+    },
+    {
+      "name": "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+      "status": "passed",
+      "durationMs": 248.8536889999998
+    },
+    {
+      "name": "requires real recent auth_time and revokes active sessions through the account-management API",
+      "status": "passed",
+      "durationMs": 78.61751000000004
+    },
+    {
+      "name": "blocks new work after trust publication or recovery mismatch without creating partial state",
+      "status": "passed",
+      "durationMs": 63.12156199999981
+    },
+    {
+      "name": "renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus",
+      "status": "skipped",
+      "durationMs": null
+    }
+  ],
+  "rawResultSha256": "09eee45f6339c02aacf6556e85cbbcfa23131759a1fccff1f3b1215db60fe1ff"
+}

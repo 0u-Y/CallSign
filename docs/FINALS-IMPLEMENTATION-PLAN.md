@@ -4,6 +4,24 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="isolated-runtime-20261101"></a>
+
+## 2026-11-01 호스트 설정을 보존한 실제 원장·API 연결
+
+작업 시작 HEAD `36e88bd` 이후 미커밋 소스를 사용했다. 중간 문서 보존·정리 커밋 이후 실제 worker/API 시험 HEAD는 `e4771be`다. 각 시험의 원래 HEAD·dirty 소스 hash는 [이번 증거](../artifacts/isolated-runtime-connection-20261101.json)와 [최종 오프라인 검사](../artifacts/isolated-runtime-final-source-20261101.json)에 보존한다. 커밋 후 재실행한 것처럼 바꾸지 않는다.
+
+- CHAIN-001/002·STATE-001/002: bridge 생성·host port publish 없이 Docker `none` namespace를 공유했다. 실제 Besu4의 동일 chain/genesis·높이 전진·동일 높이 hash·validator4, 현재 artifact 배포 receipt/code/profile, 등록/위임/공동 정책 변경/정지/공동 복구와 실제 Witness 서명을 **5시험 PASS**로 확인했다. 소유 Besu1개+Witness1개 중단 시 잔여3개 제공, Witness2개 중단 시 정족수 거절을 별도2관측으로 남긴다. 같은 호스트의 제한 시험이며 독립 기관·호스트 장애 내성이 아니다.
+- OPS-001/003·TEST-001: 실제 HTTPS OIDC fixture→Platform/Issuer/Sender→역할별 PostgreSQL LOGIN→독립 HTTPS Anchor→실제 worker 프로세스→Besu/Witness 경로 **3시험 PASS**. 업무/위임 pending 저장, 실제 raw transaction·확정 receipt·Witness3개 이상 확인 후 기본 `asterisk-webrtc-v3` 개별 승인 발급, HTTP 긴급 정지→원장/Witness→DB 권한 회수를 확인했다. 실제 PBX 연결·소비 binding·음성은 포함하지 않는다. 기존 HTTP API 회귀는 **6 PASS·브라우저1 SKIPPED**이며 외부 권한/통화 binding은 명시적 fixture다.
+- 실제 결함: worker가 원장 작업만 처리해도 ARI 설정을 요구했다. PBX 미준비 상태에서 원장 작업은 시작하되 PBX cleanup이 필요한 작업은 `PBX_CLEANUP_UNAVAILABLE`로 재시도하고 성공 처리하지 않도록 수정했다. API-only 시험도 Vite를 무조건 import하던 경계를 필요한 경우에만 읽도록 고쳤다.
+- runtime image를 `/app`으로 옮기자 설치된 pnpm workspace metadata 검사가 거절했다. 검사를 끄지 않고 설치 layout을 이미지 안에서 보존하는 `local-runtime` target을 추가했다. 기존 Node·의존성·고정 Ubuntu base만 쓰고 build network/download를 차단했다. Besu 생성기는 task UID·network none·CPU/RAM/PID 상한을 사용한다. native library용 실행 권한은 소유 Besu의 `/tmp` tmpfs에만 적용했으며 host 권한은 변경하지 않았다.
+- image 검증기는 registry manifest digest와 archive의 Docker config ID를 구분해 받는다. mutable tag·zero digest는 거절한다. 최종 runtime image와 약632MiB archive의 실제 ID/hash는 [전달 기록](../artifacts/isolated-runtime-20261101/runtime-transfer.json)에 있다. 이는 **부분 runtime 후보**이며 웹/PBX/TURN 이미지·전체 trust·DB/chain/Anchor 이전 묶음이 아니다. 최종 이미지 build의 pnpm 검사는 통과했으나 그 최종 이미지를 서비스로 재기동하지 않았다.
+
+최종 `pnpm light` **46파일228시험 PASS**, API runtime 타입 검사 PASS. 앞선 검사 수를 합산하지 않는다. 512MiB·128MiB package probe의137 종료 뒤 소유 서비스를 중단했고, 사용자가 허용한 **2GiB·60초 1회** 검증은 성공했다. 이후 서비스 예산을 자동 확대하지 않았다. 잘못된 enum 가정, 빈 DB에 epoch4를 넣어 복구 gate가 차단한 경우, 기관 문맥이 다른 Witness metadata와 API-only 환경 누락은 시험 준비 실패로 보존했다. gate/서명/정족수/기존 배포 identity는 완화하거나 초기화하지 않았다.
+
+종료 시점 표본에서 Besu 각 약400~442MiB, Witness 각 약168~173MiB, Anchor 약53MiB였다. peak·부하·SLA·클라우드 최소 사양이 아니다. 호스트 가용 RAM 약33~34GiB, SSD 여유 약446GiB를 관측했다. swap 사용 증가와 짧은 page-in 관측을 남기고 검증 후 소유 서비스17개를 중단했다. interface·route의 수명 countdown 외 내용과 Docker network ID는 시작과 같고 host port publish는 없었다. 최종 제거 결과는 증거의 cleanup을 따른다. 보호된 시험 키·원본 실패 로그·이미지 archive는 Git에 넣지 않는다.
+
+남은 실제 연결: Asterisk/TURN 이미지·모듈/ODBC와 인증서·접속 경로가 준비되지 않았고, 실제 IdP·외부 AI 자격/비용 승인·GCP 설정도 없다. 실제 미디어·한국어 품질·전체 복원·GCP를 성공으로 표시하지 않는다. 새 bridge/방화벽/공개 포트가 필요한 실행은 별도 승인 전 수행하지 않는다.
+
 ## 2026-11-01 저장소 게시 파일 정리
 
 추적 파일493개의 경로·용도·크기·참조와 중복을 점검했다. 별도 전달용 작업 요약13개(`docs/*-SUMMARY.md`)는 MASTER·이 개발 기록·RUNBOOK·서비스 가이드와 겹치므로 현재 Git 추적에서 제외했다. 파일 원본은 로컬에 그대로 보존하며 게시 당시 내용은 커밋 `602d2fcd8a2379a9b93d8e132fa3c37c93501537`에서 확인할 수 있다. 아래 과거 기록의 요약 파일명은 당시 보존 사실을 가리킨다.

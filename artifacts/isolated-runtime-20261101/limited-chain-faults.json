@@ -1,0 +1,20 @@
+[
+  {
+    "case": "one-owned-node-and-witness-stop",
+    "status": "PASS",
+    "observations": {
+      "oneBesuAndWitnessStopped": true,
+      "heightBefore": "579",
+      "heightAfter": "580",
+      "validSigners": 3
+    }
+  },
+  {
+    "case": "two-owned-witness-stop",
+    "status": "PASS",
+    "observations": {
+      "twoWitnessesStopped": true,
+      "quorumRejected": true
+    }
+  }
+]
