@@ -1,0 +1,1214 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-01T17:38:21.576952+00:00",
+  "executionHead": "a86e4c223872361ec614d0d9e3a24fc13e417415",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "assessmentScope": "selected completed functional scenarios; original failed run remains below; not an overall deployment/host-preservation verdict",
+  "fullServiceVerified": false,
+  "requirements": [
+    "PBX-001",
+    "PBX-002",
+    "PBX-003",
+    "MEDIA-001",
+    "MEDIA-002",
+    "MEDIA-003",
+    "MEDIA-004",
+    "CALL-001",
+    "CALL-002",
+    "CALL-003",
+    "CALL-004",
+    "CALL-005",
+    "CALL-006",
+    "DB-001",
+    "DB-002",
+    "DB-003",
+    "OPS-003",
+    "TEST-001",
+    "TEST-004"
+  ],
+  "sourceFiles": {
+    "infra/deploy/asterisk/asterisk.conf.example": "bb8d8c027d43c7c9c3d0ffec5d98ef5f615656dd438a33ff1bdfe74030609824",
+    "infra/deploy/asterisk/logger.conf.example": "bb17378ed397c4734034813d50ddfbcc3f8afc14bfcc0e07c7c8057f294e4545",
+    "infra/deploy/build-media.sh": "4d74e3c8de4fc77467553c058d58c28dc29d7b99d3d3456668777e52387528e3",
+    "infra/deploy/media.Dockerfile": "8a57c78d52f0d6e8ed706fb65c783493ea8dc2053f6f92ac9821d16c9a86bdf0",
+    "services/api/drizzle/0007_pbx_lease_locks.sql": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+    "services/api/drizzle/0008_pjsip_contact_qualification.sql": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+    "services/api/drizzle/0009_pjsip_boolean_fields.sql": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+    "tests/integration/runtime-media-driver.py": "93bfb232e3f1fbbe6287c77dcd6a60abb088a1368c2d8d8745d2da0d5f895fdd",
+    "tests/integration/runtime-media.test.ts": "5f7d41273ac70478f3fda8d2a26373face6bb50fa02512660eb41514dc025448",
+    "tests/unit/live-media.test.ts": "4a47ca77071c4935b3da0b3f7da33803bae1c1c0ac5481492ddabffcc0a93558",
+    "tests/unit/rtc-certificate.test.ts": "c041bd8cb4831ee854eb1bd792ad335c4813a345b3aad09cdd9bce02c8c2c3f8",
+    ".dockerignore": "94b190db0c9d08117d206a252a18b6858ffff5755f270af399e81d2518ddf8b6",
+    ".env.example": "5516b6125d534a13dac1cc85e38401857ee09caf46acd4145313371bc54548b2",
+    ".github/workflows/ci.yml": "170ef5c7fe770e78ff28bab5bde8cb10359fc2c7c1e89c981e027dcbdbd9c95a",
+    ".github/workflows/integration-manual.yml": "271ff15657924e7a504ccb4b746a9f42ff6eccaa0037f4f5e075726f011c7a4b",
+    ".gitignore": "0a700774e3741fd503b9de41cb7686555fd5a4c83ba01910617a4a8936f37a6c",
+    "apps/web/index.html": "7607ae3df8a67c2a20a8a48207fe6c3719ac87f936ca9fca90ba50a9ef4f5f98",
+    "apps/web/package.json": "fc8e076cf5f812eee6a1095824a74841740e4cc3dccaf78a055c8186c0077d86",
+    "apps/web/src/App.tsx": "6b7224ac141600fafbf5e2ee9b83188aee2360fabafae2fe5893ce31a61e22cb",
+    "apps/web/src/components/Brand.tsx": "66bccacf0258de17409fc0b1510fe4ffbb7a8b1b5576a3d3fe0ce28608abe99d",
+    "apps/web/src/components/ConfigurationReviewPanel.tsx": "5141802e75b8641ae02d42e70908e157742ba48cab3a55192242c606c3ef5209",
+    "apps/web/src/components/RoleTabs.tsx": "640f8a75bebfb33cd414abb7ae4bf11412dc7b0bb56dceeec6762f5e8d28fd56",
+    "apps/web/src/components/ServiceAdministration.tsx": "27807d4900ec1f6fd3e3ebbcaabb30c0d88b38a6dae1be435e2d53438561e9f4",
+    "apps/web/src/components/ServiceNotifications.tsx": "1013af48f3b858ed86d24383727373fe932390e25a66119281fcf1c6efbebe43",
+    "apps/web/src/components/Shell.tsx": "6c767f7ad720f59e4d39a3a889d1442dcd45970221cd9c8a86d2e883e68792a9",
+    "apps/web/src/components/Status.tsx": "814ea9c9c84526ab94b1ed28611cb8027308e69556b8b11268d9a6259938ec0a",
+    "apps/web/src/config.ts": "46ea1cd66a6ca874ec1d096eeb6324dd34bc78c2eeb008b1c2551bdbfcf1a8ae",
+    "apps/web/src/generated/presentation-evidence.json": "1b13be5d8a0647a211c066091663bd9b76532cb10d8586aea33f8ce557cb82b8",
+    "apps/web/src/generated/trust-bundle.json": "0ebb03648a81a1a4b05fcc68f364246026cef195d2b6f1614c7d85d797e501e4",
+    "apps/web/src/lib/api.ts": "c6773d5143dfb0a0b7c4e68562f0fd1f3abca05ac15059490b72bf24e5d0a2e1",
+    "apps/web/src/lib/browserKeys.ts": "4173b58e01dee8cd8f75867b1e00427038ba52f6ee96220efc06dc9914071911",
+    "apps/web/src/lib/configurationReview.ts": "f30c4d632ce97745c21215f2e072475adcb6eaa24557981066d54327f678d24f",
+    "apps/web/src/lib/finalsCall.ts": "7221579743dc288703939bdf0756e61516cfb0e48ec686a2aaa752dfc38ca615",
+    "apps/web/src/lib/liveMedia.ts": "a698b521c6c3997b633cd3f57e6a21078d4ea12912745b4186c11bfb00d33004",
+    "apps/web/src/lib/pbxSip.ts": "1cf883c60bde230829e959828f4950d9ca7229093cc1355b4bdc631a8e13e3c2",
+    "apps/web/src/lib/rtc.ts": "fb93eab337dd62166cfb806ba6bc05784f41ddba19fad68e1a61f346e00b8916",
+    "apps/web/src/lib/serviceCall.ts": "1a2a4f223236b85682bd8853c28cb1b2e80b66bcd13e083f2e8f7671841f679b",
+    "apps/web/src/lib/unicodeEscapes.ts": "b581378c07d19d268c7c050581f624613911243a9dd2180191f063c416d048f5",
+    "apps/web/src/main.tsx": "5c9de61042e0f3270c876a3c23b7a32abd684f0f26df0f495a5ddfb5474e00ad",
+    "apps/web/src/pages/Experience.tsx": "f9813d0638671879832b445b57aa1fed4200cf38ac3109f2dc19fc35c27c2208",
+    "apps/web/src/pages/Finals.tsx": "90b8b1f8b279ad26a4da6a76ed1d823b23b922439dcda947dc80f631cb29e4d7",
+    "apps/web/src/pages/Operations.tsx": "59e5423a42b5e15b1db499ff93e954fa7f456c7b15dcd12bd7a3a1e7707ca021",
+    "apps/web/src/pages/PresentationDemo.tsx": "82e01f35f26ad0c3954083d14cbff1370ba3281ca69cfae83624df0cc163f684",
+    "apps/web/src/pages/Service.tsx": "d25cb62b233f453eb0885fc84362d7c0e9c0b6cf42ddd269ca202fbfc2d29ee7",
+    "apps/web/src/styles.css": "a293cde956c988fff7edb7e59bc3910926eb003a387d2ed5273b65bf1d3c52a8",
+    "apps/web/tsconfig.json": "fa80f7c133195b9e6b3ecefc092198722fd95b2a9908a54462518eb08c26cb86",
+    "apps/web/vite.config.ts": "1767d37c52f18cf470e74f46538ab382777109994f3c33c3e7c3b922465f9bbd",
+    "contracts/src/InstitutionRegistry.sol": "f5307e482d38bc9d590770c21946bb65293ef08a34c1b0dfb2efb080a38546ae",
+    "contracts/src/ServiceRegistry.sol": "4410cd9486d30c71fa5d32de24ce6e503ee1c11258585132a35aea5dc7a46d3d",
+    "contracts/test/InstitutionRegistry.t.sol": "3673c97b20a4e351fb9ab5c709b3e25bbffd1b172ca09ef1ada5271ecd7d2bcf",
+    "contracts/test/ServiceRegistry.t.sol": "6d29eb67fdeb6b6e0abc567c2c7ef6f09681a6541e36b28f4847d8d575f959d9",
+    "contracts/test/ServiceRegistryInterop.t.sol": "768fa077066cbaaea1011660082f562f6c854c5c8b2c390a8880de0f98e43969",
+    "contracts/test/ServiceRegistrySecurity.t.sol": "1107c19578c4c41c6f3ed3ae7c3bac6584631f241ef3289dc6bd25bf3ebe268a",
+    "docs/guide/assets/architecture.svg": "bc3cd566ebb69ed3f3be24a4d91f26c39d2ed37ecb5b606c54743ee3ecb05f08",
+    "foundry.toml": "d0cb3e2a825dc9dadf3ef61ad0719df109252c2265bb139b8e9fc96a645a4855",
+    "infra/besu/network-config.json": "4305422ce958f8f8cf3803beeb81493100d55e65ae112d66dcc959b3aa6cc152",
+    "infra/compose/docker-compose.yml": "83fab77710408f7368d75881d4824a25b716ff1ae75a2399f2162215b35e0b48",
+    "infra/compose/witness.Dockerfile": "90303517109e68ba88cf34a803ff7e190bd9110d92bf5561e50561aff9188a1d",
+    "infra/deploy/Caddyfile": "5302e93efaf1f5d709717840d529419f36ca5fae25ce66ffbd945e669a890c14",
+    "infra/deploy/anchor-schema.sql": "0754ae484d2d9904b7555e6e37ce8d4ed2a02d03a0b638b4bd84f755c581cdac",
+    "infra/deploy/app.Dockerfile": "35aa4ee560bcdc37c00f76b48ca1a80df79054fa5ad4bd4b73a7f2fac8944ebc",
+    "infra/deploy/asterisk/ari.conf.example": "f97b39165ee75783c5b98a111005f71f796015a2c88b24f39b96a414783f6184",
+    "infra/deploy/asterisk/extconfig.conf.example": "0a1509c1246e3cd1a1bd1549c896c6c34c467bd2df4b5f7eb0210894e818214d",
+    "infra/deploy/asterisk/extensions.conf.example": "7a98b9d70cb507b4305f9e8308c1ee7eed87e2728d90cfdb6c99dd2b6dd2727a",
+    "infra/deploy/asterisk/http.conf.example": "522645f78d12cf911e8fcd41212893b63b6057de4c2e7ae43730092de8418c26",
+    "infra/deploy/asterisk/modules.conf.example": "7d84a57d382cb3b0edcb70ac84f2953ea60d20804fa15b28ab503422d6b3516f",
+    "infra/deploy/asterisk/odbc.ini.example": "a1722fcf2fcbd1088efbf9f2d09ae210a344e61c7a02e4058cf7a9ede55f847e",
+    "infra/deploy/asterisk/pjsip.conf.example": "60bafb1fbd6ef93284c60fefe49c51e3dd0195049221e420c5c3e36f251ad9d8",
+    "infra/deploy/asterisk/res_odbc.conf.example": "d67d023a623c2b7f35d21ab3d627d1918f0e74a534429cb3a725246a80091b5c",
+    "infra/deploy/asterisk/rtp.conf.example": "5affb41de4ff333c621c02a636a7d3d3fb8ffd35928cd70585f59d308e041640",
+    "infra/deploy/asterisk/sorcery.conf.example": "8c9aed1cc331f96b1195b41ba42681f53a855c3b327522f9450772c536080b87",
+    "infra/deploy/compose.pbx.yml": "b9ba248a68d5486f3404dff8eb420d076be9e9aaf439d90dfca56aa1e4f2839a",
+    "infra/deploy/compose.yml": "38d31be5a0218e85b87001e484938a5a1fe070498a775f4f166c9e75e05b478f",
+    "infra/deploy/nginx.conf": "b92b75391e799220f4cc5257086bd2b684659de380778fcdfbdc291f1d2538a3",
+    "infra/deploy/provision-logins.sql": "d3ed93683641b8aa689ed7512cfdc4348469a28a09a94e909fd437acc0d4dc5c",
+    "infra/deploy/turnserver.conf.example": "af442c48a6362cb0bffbc159290f1d9d3f7e9cfb99e681b808d24720ad4e78d3",
+    "infra/gcp/callsign.service": "016d61109d0f3cd01a881302ff680165a3ab529ae1428dbdf94967bc125ef128",
+    "infra/gcp/main.tf": "b4305e4ed2e6e258eab4bb6b1a424d37e1404ffa4d4bb3fcba5dbbab8cd77745",
+    "infra/validation/offline.json": "03f6fd86be52d715a03b2e1b5f01614f754c423d461f1a930da0ef0fef76af7d",
+    "infra/validation/test-environment.example.json": "27ca9dea69270afa228c49679a6766e89867678cfd43e0cf3c95de46abc551e8",
+    "package.json": "1ea5c35ca6f78e7f70dc6c2f8ace4e1ca548d39a67948da406daa63b3ad5e871",
+    "packages/protocol/package.json": "a216fc0abe1efe38f8336d87318a52e6d627764f9bf701fdfa495dbaacf23688",
+    "packages/protocol/src/configuration.ts": "82301907315db477ddc25223a1859727e97867dbd36a193402233e4027e28e9a",
+    "packages/protocol/src/finals.ts": "f2cd424e720f4df306ba3253a37b6e910ded066be36e458ed4edac561a6ebbe7",
+    "packages/protocol/src/index.test.ts": "2c2a5c2bfbf9b91a04c205a16f60a82f23b878577dade444690560e2dc326842",
+    "packages/protocol/src/index.ts": "a338e0a8c5cdd3ef62f4907695572feefcc360612ee0eacdd1832d752829f563",
+    "packages/protocol/src/service.ts": "15e2668e42415e781914db52b328fe1a231bed2dd029645fe861aead9a325b71",
+    "packages/verifier/package.json": "1e118dab71d236ec20246be947cd0f832bee8e5395e6d83a939c5970ed5f6779",
+    "packages/verifier/src/finals.ts": "5bea01b076f891872a9a8d9a00238fb2ad87cc3c0c63834ba86479cab235b6ec",
+    "packages/verifier/src/index.test.ts": "be95b8e4e7ccda16ae96413fd8878515e36427aca49bddae739c2cdaa443d7b1",
+    "packages/verifier/src/index.ts": "9a0c9384351ed72b5480bfd03bb8035269a885366e5c4ee6fa9a07b94dd43657",
+    "packages/verifier/src/service.ts": "b9545ea6773cf559562ff7fdde15fd911aeaf1af5f1bbd95dbc2ed1e5408c8e2",
+    "playwright.config.ts": "6cf2d2411561a29b5f12ad109c8a1be3dafd779c8dfff0a18a5e7733ee042224",
+    "playwright.finals.config.ts": "5c3ce4164366b6874dc56dcd7a1eade0161620b29fd8b420721d827805bc35b8",
+    "pnpm-lock.yaml": "46b2f41318c97bfab18ab58aa7d861a7434e9f48fa659b2b9053fa8adbb11541",
+    "pnpm-workspace.yaml": "f05e74c98c4235e0a1adf271aaa0c0d3951ea7a7e4e0c7005465148e320c7881",
+    "scripts/backup-bundle.ts": "019c0704133f59da95c9c3d806b3e59cbe9851ce5b66a1b127d49d4819062b33",
+    "scripts/backup-control.ts": "bc78157a8723a0327952722629a247f8cdf4e611fb949ea987eb8687de9995f8",
+    "scripts/backup.sh": "19de2038dfc2710f03bbc02a599405e62bca0ae1a53de3f73b3ba692511c8149",
+    "scripts/benchmark-verifier.ts": "393859d3ae01bec43cc9bc5f21248e42ca97829fa96c20923707402d651b5b48",
+    "scripts/besu-peers.ts": "33d6a31c665c9c713162e71a07a12e3a5dcbfe1b2dd9ad63355898f06e3220aa",
+    "scripts/check-ledger.ts": "482e0a10fe5593c17dbc7dcf1bc9b269a85072cc5af82d420cc82a0bea58c792",
+    "scripts/check-source.mjs": "5827ac01152cb0129ae8b1065c30874969f0181ee680f6982ac423b2944c3029",
+    "scripts/collect-evidence.ts": "ecefb1df9e7162d933d79c8da4aebb57fbf207821ff6f8602ddd2542aed06e2d",
+    "scripts/contract-interop.ts": "1b9252bda66153b2b826e0978244b7c9fdcbd5e13489f43d36b38392244fada8",
+    "scripts/demo-up.sh": "c0283f1e98de4f43563fdcc3c772d0d8c028d2c82606ad489d298ee4472c97a4",
+    "scripts/deploy-registry.ts": "9ba2738a6626285ed9110e1221ac83bb54d2810a6ef0c00314952db30e7a58c8",
+    "scripts/deploy-service-registry.ts": "4f3cdfc70294c6e642b83f9f0c953415fb4fc76f4ac781423e9adb37f4e3ddf0",
+    "scripts/deployment.sh": "b5407fd55dd4a35b43e55a31371946ab43aa60ef7498c8a19222481069ab32d1",
+    "scripts/doctor.sh": "df0f7800fbae0bacfdc013e882c91d4e070ed1cd73cfd7f1834e6da86ecca93d",
+    "scripts/evaluate-performance.ts": "4aa28234dc3f082eb372fa0af2c91b5c4338c68a3b0cbbba2126fe18477e6aea",
+    "scripts/evaluate-risk.ts": "367bd99df6c7188e66a19592e7e1ccb61d0c240fea5295f98932bc41a44e6e8a",
+    "scripts/execution-input.ts": "cb4ab34cfbb8b63adc85ada3ff4a3c8eb8ebd8f1a947a80dd151632dc3a10bd6",
+    "scripts/generate-besu.sh": "b87b0c5558f4cd7788c28c8454a244603c8d01aa0c26d6c34d18f2675f1893ac",
+    "scripts/generate-submission.ts": "090f5ccb47607678dc7297b154be8680073aaf8a5f83a0405102616dcf1a01e4",
+    "scripts/generate-web-trust.ts": "fc3e9f0c7d9e96f7eca4839202567d1b3d1f1c35208956e2afd26ae7ec114c41",
+    "scripts/image-reference.d.mts": "0dd89d32241688409eea4587a55040ab3067181f6cf71dcfb41db679b684fb5e",
+    "scripts/image-reference.mjs": "2d5503ff701a035f7c870171a3d4882f7aa5d10ad40150bface953d102aa7a2a",
+    "scripts/init-demo-keys.ts": "b31e26d044288d77fc380728fb186933d86e3b04d85381d121182cb55cacd23b",
+    "scripts/latest-state-query.ts": "d5dde84e6a8cc0b23aec22b0a067732a9a72e7f2cd9d35014a0a6d740f9ea303",
+    "scripts/migrate-finals.ts": "2609f7f2f1a3293ca6bfa43d1a82c7da7462cf2a5a7a27c01664a406f86ddb1a",
+    "scripts/migrate.ts": "86b6143b10f848b85076d6856cdb6d0d8fdf90e6fa718c61145c2dfefde7c07c",
+    "scripts/preflight-chain.ts": "fc2e4b574d09d704f5c8131229190bbd4ac675f15708cbf275522173a5430804",
+    "scripts/preflight-requirements.ts": "acb83b5dbd0e4f5a71677b1fa1dd529b6049569fbe1519791e37060e8f3e20e3",
+    "scripts/preflight.ts": "670d42eee93bc35cf954beaccca4b15ab9dc15e13faecb2062991a841d88af27",
+    "scripts/prepare-besu-peers.ts": "572002d9952b2d7aa049dba905b47f87a1de2f2389ba1c737f3257f9b51625d8",
+    "scripts/prepare-execution.ts": "328573cc8d6caf9fb545e299024a0454380cd0c579be73298474f8554e9000d7",
+    "scripts/prepare-finals.ts": "397ea85666d51e7100659b5c52f9f6bd3fef05172c3702747f6fca5e003f5be4",
+    "scripts/prepare-pbx.ts": "24b3d11ea4ea7dd45261b31c9ce02a7ec380d7746b7a71b00b91e65801c2bdfc",
+    "scripts/prepare-service-network.ts": "58dfc8e59e24a85d04f551cbc841deabaeceef7ee8df5d29ca609b93e6bcd7ba",
+    "scripts/provider-smoke.ts": "00fe5d75a1e84a06bd68ca5f05aee7dae2d41d52d586460a8a06241c7c280d99",
+    "scripts/provision-finals.ts": "f1088c602d46a0788b70dca0ae4e0592428dc21a7fab5d0adf5eb243c471d1d8",
+    "scripts/provision-member.ts": "c3e3c182f34187ab2101cdb4990f421edb0b3a81855a8046dece7a5edb844921",
+    "scripts/release-manifest.ts": "c07027ae9d6b9ed7e2a78d0a572a5727635a22e8444a8c2e4335279baf9a793c",
+    "scripts/restore-bundle.ts": "462d6b305a3f41c48594c426a247cefbc465626b37bcad0b42f8f40b6dfec8bc",
+    "scripts/restore.sh": "51c4bd0c943768234b42ae713ac7b385ca1991ed2c162576168f8293fcbeab62",
+    "scripts/restricted.mjs": "72bd70bce33979f6afbba984ba673567a5119f813283e10e82d34e51086a69ee",
+    "scripts/seed.ts": "442a21efb23cc89455422153e8684e6bd10a310f08283a7c9283d5410624c9b7",
+    "scripts/service-worker.ts": "8dff0cdea1487b49e4d49940b12c5c4dbc36cd9387b82ed982b35e28bb67021c",
+    "scripts/setup.sh": "0942dac20f1963f87fd73e3af60dfe0956f15e9b1e782b7814d60ac5bac5f592",
+    "scripts/sign-recovery.ts": "b9924ef24931df44551ea043ccc5e2cc4a8d5b54c6e607e4f32f1538f210900a",
+    "scripts/test-integration.sh": "58f00065068573b73fa21ca46a54ff0100facb7c208782ab72b4139ec6b90521",
+    "scripts/test-witness-failover.sh": "6ff63d7928d67a7081a296f9ebccd56513849e21a6d11857a992c41e78eb553d",
+    "scripts/validation-network-guard.mjs": "ff929cfbe86ea25defcaf70fb03a9b3eefb41f10515d6733a3653ee82855f636",
+    "scripts/validation-runner.ts": "1085c494ce1f07943cd601790d68f5dcc2ba7b9d0364bc9f9302ae8c52b62b73",
+    "scripts/validation-stages.ts": "a13f94ebbd3e5fa7277b43e229b6798f1afb0f9a2c1a9d017c43e1be2fee55b6",
+    "scripts/wait-postgres.sh": "c1625a8481bbec56bcfd07747db03aace2541e2c509b4387fb3c6823ed0820b5",
+    "scripts/write-test-report.ts": "63e39a0a947d24ff48aedd9f8727329eb3d796c73262d97588c2dd75566a8bd6",
+    "services/api/drizzle.config.ts": "152be794038e9e7e117247f51d31070a56ca7b444e256ecd009f4b8fbf89f5a1",
+    "services/api/drizzle/0000_initial.sql": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+    "services/api/drizzle/0001_finals_authority.sql": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+    "services/api/drizzle/0002_session_scopes.sql": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+    "services/api/drizzle/0003_service_runtime.sql": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+    "services/api/drizzle/0004_worker_recovery.sql": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+    "services/api/drizzle/0005_account_management.sql": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+    "services/api/drizzle/0006_backup_drain.sql": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+    "services/api/drizzle/meta/_journal.json": "dac5613163bfce1771738ba47bc78e88114dceaf5a8897422b2214f295437987",
+    "services/api/package.json": "eb8fb6ea9332ed33da3805618f6bbf23d2c225288088e7610723cd0f40fadb95",
+    "services/api/src/account-management.ts": "84f2c482c89f01cb8b07e5a3b3c927a6115e20f8911065073ca728455b8e97b4",
+    "services/api/src/anchor-server.ts": "4f894241d3ce624dc59e031178fb6b6db27a42c0b7dd2f8382f3975a60f4fc63",
+    "services/api/src/asterisk.ts": "f12fcb4ba296d93b387c3dd0ebc2996675790fa1df652456b665ad9c700a520d",
+    "services/api/src/auth.ts": "510c25b4d34fcb467d008f85e4e6b09f74c098033f4e50cebc7cc55dcd126dff",
+    "services/api/src/backup-crypto.ts": "56c92a16a174384fefa86abc593bd843f1f30e2e93ee1d1507762251ba3fa7ce",
+    "services/api/src/backup-drain.ts": "9a94fab15cc3631fbb04f70b7ffac825ea8bbc36d0f31002054232572145a0f6",
+    "services/api/src/configuration-routes.unit.test.ts": "f87bdbfbd6b07f8a18e034720c269e8348e11fa68813e687b9f9e1890524a006",
+    "services/api/src/configuration.ts": "f942904f25daf998f9b961fb54e86948c958f90c1ddaed8c8ca6af3a9e23d868",
+    "services/api/src/consumption-anchor.ts": "c0c8423eef439a52d376da2a23b4a9ca133c17f2564f588fdcd3702f7e5a95d3",
+    "services/api/src/consumption.ts": "0440cdf8d0c22ba7edb27243b2cd54bd1334e9f98f556f02f261d367d5376e75",
+    "services/api/src/db.ts": "a2e2b811702e8b7693366886e0485c8bc414528039ed909d2fc2be4cc659779f",
+    "services/api/src/did.ts": "1fb104329f737dddb958d7b1a08103d620b28258ad8b0e2dd73b0c086395681f",
+    "services/api/src/finals-authority.ts": "98eab3eef02a07d35ad05006acfa906006c07ebc5b45b4973a52791d4edcfebb",
+    "services/api/src/finals-config.ts": "9345d1c8d2c792ea1014a252f925a9b5973b122742b75246141584f02bf25bcc",
+    "services/api/src/finals-model.ts": "cc915bc934a308f3ab96430d98f372e5dc26b0ce21007c22fcbb3c0100c6ce51",
+    "services/api/src/finals-server.ts": "2d4c672ae1251cdf5caac0139388009a854e1b1121cf29bbf036c2fc99855deb",
+    "services/api/src/finals-store.ts": "08f8d1c1e42da41dfa634166cf6ad059293d5fb180e6ddfc10f818240887e5c7",
+    "services/api/src/governance-v2.ts": "112b127512fc5f5a4e595e9544f11476802df3139552ec0087c1b477e13c9771",
+    "services/api/src/keys.ts": "a9d66784f361863d3b4eecbfbc76da051d75ecab194f25083d4fc12f8a69047d",
+    "services/api/src/ledger-events.ts": "5c779da93a330d1f2ee7010ab73745cd9a88ca9a0c0172ca8f75700ff279f511",
+    "services/api/src/ledger-health.ts": "76fc80887af2d3ca138fd69fae289140c1948f310018c9b2479e32ac56d6389d",
+    "services/api/src/ledger.ts": "599dcea1cf7d4b783f0835aa49e0d73ccc57d6ee34153e730f2cf514e65f9b9a",
+    "services/api/src/maintenance.ts": "48f78e432889cfdd45a8740fed8491e8644d86536534c9fa8ed7cbb6d96d555d",
+    "services/api/src/media.ts": "830e453085e7b06c2dedb0ca026f1e93a3c6167c0955a15b626c05a54d953bdc",
+    "services/api/src/notifications.ts": "5faf89200fda319153a51e31bf92aae1a2757a1418dc85e54419b9f1373f26b7",
+    "services/api/src/oidc-flow.ts": "74ccc3b8720076969bd89e5ed2e59659726f7113aee47674c889f93a40005cc0",
+    "services/api/src/operations.ts": "788cc89c9dcf08696616bda08ca2565d1d27c4369e33a65b3a6d66b20118e48c",
+    "services/api/src/pbx-routes.ts": "067e466589128a8f2c8be1779744b4ee30afcb1c250c824759e56df91edaeb7f",
+    "services/api/src/pbx-runtime.ts": "338b8a8221edfa2f3788c1f696f7807cc74de720635f25c734565a2a032595e2",
+    "services/api/src/published-trust.ts": "1420693844ec2d5983deb075a79aca1f16df72a9352e2213341d24fbb6b2aa73",
+    "services/api/src/quota.ts": "9781de8ac4e3a0efe18ddd595748af7265adca23498b36dc0db96e2218703e8c",
+    "services/api/src/retention.ts": "c30c694ef91ae0c1346d2003faa07b86418bad9487a5bbee964292caea9e50c1",
+    "services/api/src/risk.ts": "20396c8fea9a94461e714f2ebaeb7fa212e05917285de2a883be96138475c983",
+    "services/api/src/schema.ts": "73deba954df1be952be67a5f0457471af99c67782dd22130030ff2fd17308b4e",
+    "services/api/src/seed.ts": "e2317c66ece31b58694a3e637719b3a5d3b862342b5fbe25a94eb4a9f47e9479",
+    "services/api/src/server.ts": "2c432d750e5f34c776e087acb255d69cc86a67fd19588baac91d751acb49449c",
+    "services/api/src/service-audio.ts": "9c7390ee226669627a1bd907f01b81dd51ba15fe25bd4269a3ed6d068623c006",
+    "services/api/src/service-authority.ts": "0b8933de93beaa6df2983002de0c11082f1add69ef05ab23990f3c5a069d1fd5",
+    "services/api/src/service-current.ts": "ef502065ea5554a4d27fa8c03dd4d20c3af47bc0e832a90439ea6c10abd2b1e5",
+    "services/api/src/service-management.ts": "65ea2f09a6d688faa029d714f1ece589a27972725ed9c93f7b935defd3f42dd8",
+    "services/api/src/service-routes.ts": "fdf1c3954605fd5f1ed06ead5f0d8fbf0fbb20aff21feae8a0b94ebfadf67a6c",
+    "services/api/src/service-routes.unit.test.ts": "f84cc5f16e943c78fb9115c899d24bc7c41938b2c08d8ce874e0812527ad5e2e",
+    "services/api/src/service-state.ts": "1d2a03b55d57a3f4272c877f3493808288bc6425dea3e3e8c0789b99e57b3478",
+    "services/api/src/service-worker.ts": "7e6ca5de956b53ebeb03798525ec00dee261fb945610a9dd0ad3cba7050c0530",
+    "services/api/src/session-connections.ts": "b2fec7df6837216e925a486915931dbadedc1b631a304f4f1642a72da42cb178",
+    "services/api/src/session-scopes.unit.test.ts": "515206ae8e4b206704ed055609634f0c340d9365b2b9d5a83cc9eb965e5d8fdd",
+    "services/api/src/signing-key.unit.test.ts": "d0acfe0f45c9b8d19eacfdf3a6bb4470804c3696e940f59a6d065ddb686e52ce",
+    "services/api/src/telemetry.ts": "1f3a9d2b9957d654eacc233a6ad61b1c305d579a041633c381bd31799c853311",
+    "services/api/src/transcription.ts": "dc3743595d3e5373a94eb04b79d4a12c342799393a4c193a6ea4b081b6a974e6",
+    "services/api/src/witness-aggregate.ts": "189456f2418e4b04c46165dc13a4a1723eca85f7ee0d6b9e2e0b3149cffed046",
+    "services/api/src/worker-ledger.ts": "92b6f9969de767ef3f6ab221c6c779ef153116ced6b437b742a774057522bcbb",
+    "services/api/test/recovery-process.ts": "5745d043c1120ad774ed90db22160f5166454edd041496e9310962814d01263c",
+    "services/api/tsconfig.json": "9e388ea60852028037c4fd8a6e0311c02d4ff1703d66e5f9b22276b07dcb82d2",
+    "services/api/tsconfig.runtime.json": "357768ed1651e52566b61015dd26279a26de75b3d3aa80ea329e092dcd3be3ba",
+    "services/witness/package.json": "b20a51bdcd21c9457a13473a0bbb2042dbeba6059b0ffe205d428ca7cc9b7ee9",
+    "services/witness/src/server.ts": "a3d42da85230bbfb026ddaa2076b6a0bafa4745b0bd4d93c2ae5c8bc247a943a",
+    "services/witness/tsconfig.json": "055076ab4314c141b41809604316512a8f25456a4f435145d8e154c5db940621",
+    "submission/CallSign_기획제안서.pdf": "51e16c2854242ca5b4e776ff04a9e14b68df8666de639a357fc3c47e477d3297",
+    "submission/CallSign_기획제안서.pptx": "78b15c275bc411f066d5e6cd5357c2447bb9171dc625e579d30496fc7e532bfd",
+    "submission/rendered-pages/page-01.png": "d2150649be528bf2d306d5a0a07158d0fbd6b22b72b4f65a78c15329f5b418b6",
+    "submission/rendered-pages/page-02.png": "729bf0c183a2c59ec6f53b1bc41822ee5a19c811e57431b1f3da64f82815d646",
+    "submission/rendered-pages/page-03.png": "4d52bb923f595c85c7fee2718ae1bbd42a82d83f1fb1412d00cce03dbe5e4355",
+    "submission/rendered-pages/page-04.png": "68a08bcccb6c290692e047e8609f9af369ff64fcfb5d41b2e841be826a16b762",
+    "submission/rendered-pages/page-05.png": "5d30c1d3d7563b7d65f540dda09207bc07a370f1c1401918316920e8669bdb97",
+    "submission/rendered-pages/page-06.png": "0117907e781e53a4a54de0098410f73b37e4da870ad06b0b3c90125b0f7fa9d4",
+    "submission/rendered-pages/page-07.png": "363455e25fe1b772bc5cc0de44479ec02f4bb5957816814c86c1a8f151be73d6",
+    "submission/rendered-pages/page-08.png": "7505643b7888112b9ba6a1eff5f16aa2a5340ce33f69496a2ce5cb76c23fb930",
+    "submission/rendered-pages/page-09.png": "79120ebbde0422e6d38aaf65935535ebdbad31faf776ca60ed6734bdd6ce75d4",
+    "submission/rendered-pages/page-10.png": "e90e003d7ae9484686d2800fdf11ee004d661ebc8ea3c11b467486a085bd14d5",
+    "submission/rendered-pages/page-11.png": "618d3868449b6753fcfa4043028e0122ea92a33957b69903ca07402030f228d7",
+    "tests/e2e/accessibility-layout.spec.ts": "27fcee01c036cf6d61da75fb172e911440a035f894614431e5a2a92247dcbf8a",
+    "tests/e2e/demo-record.spec.ts": "49e2c8281fee85de8735cc13899d88bb13c1e53f2309aa7bae82c8942b74c9e7",
+    "tests/e2e/evidence.spec.ts": "34693f7286b1616b35ce6fe773eb264af55398f7e02a3be98eeb478240caa37d",
+    "tests/e2e/governance-live.spec.ts": "012d4e05a5fdc6450340a81f8850274c5950b5bf7cc2e75ac0c436d0984e4952",
+    "tests/e2e/visual-capture.spec.ts": "909be2cb18d7e82b722c8254b1ca0b336aea1a2b751d010a912fd96fa49a607b",
+    "tests/e2e/webrtc.spec.ts": "ddd0d1b9db69a2a04e740810a7450472dcf586d2e5eacc19b47cfd3ee6d8b8a7",
+    "tests/fixtures/finals-policy-vector.json": "22542a56e7c3aba2cbe7decd2c2f56c97450325a7fcffc7c7110924c0234af18",
+    "tests/fixtures/finals-vc-vector.json": "8b7dbf55825f8931dc88548f178fa698cbbb2bb3927421f0d787b04636389fc2",
+    "tests/fixtures/korean-risk-evaluation.json": "cc2758a8ac5d5cdf8001a1bb8e3379aba5271da1a266ec6515dbab8dabcdbbfc",
+    "tests/integration/api-auth.test.ts": "dc3eebc27643dab24264da5695cbb3451938fb9ff31cef1c844bdb7ae89ac8ef",
+    "tests/integration/chain-runtime.test.ts": "4dfe627e8b36f11691aebb34c5613f7398423d32f1b32eb0f5614baa90906feb",
+    "tests/integration/consumption.test.ts": "2c456a3740d45c3d02c1bf299349012a62259176f0b1307fb6554bd8b5a05112",
+    "tests/integration/database-readiness.test.ts": "34e53717efcd7f5bc944e5515411f0fa0bae69ff1d357e74d20444e83d5b585a",
+    "tests/integration/finals-session-scopes.test.ts": "3fbba3441d0facb9f15a049fb79849fda67016865525a70c5402dd63d16a725c",
+    "tests/integration/finals-store.test.ts": "01d9bf60c957534614e5ead923cf77f30ff84565c11b59d1e1cad2f687dec3ae",
+    "tests/integration/governance.test.ts": "3f4ee8989ee2817c19ec32f7ffcd0c7f2833baaf85a744f819de94cf17a47a38",
+    "tests/integration/independent-anchor.test.ts": "54f2608d7815e1f702d456a13b2f28d693ffb8ea9f80b5240f0a42f1f9858cea",
+    "tests/integration/live-authority-http.test.ts": "afe58ac43d674f0b9fcafef0e132bcef85ddfd75e56d12065444e132b0ccb7f5",
+    "tests/integration/persistent-recovery.test.ts": "4edd0de49701475a7384190cc8d6300464c85812e139e486fdeda3af738f62f4",
+    "tests/integration/recovery-tls-probe.mjs": "c7e921e4813e45eccc21e1d0123d3a3408d4aa9febb5b16ec29a37c2520ffc11",
+    "tests/integration/risk.test.ts": "55a39d16288366f43e9ffd3c9c1c24be0377b6220bd6480996e930afad214d05",
+    "tests/integration/service-boundaries.test.ts": "2313a7423b39ef14ec1cb84cac97c0d401405023080c232fb2a61beac09a2ad9",
+    "tests/integration/service-http-fixture.ts": "b949b30172270b53a1dc1555fc017a494ff1af1b0ae25dddcb5c3d6218875b3a",
+    "tests/integration/service-http.test.ts": "721431b09606c4e30d9bf26abf7e8e081243845281e4a6c444d06b08f757e11a",
+    "tests/integration/service-runtime.test.ts": "82908f572041ed18386f8db32894d66188fd0f7df875402cf14ea6a5d72e61fc",
+    "tests/media/finals-call.spec.ts": "c48ca03809647fa09417dcf94a8a0cb55e3b9ac1a506e2caddb6f89fab2b01f9",
+    "tests/media/service-pbx.spec.ts": "9192b46ec984cbbf075c0a71fefb76fc4a50da72beea2acf9e0937cf8e31b03a",
+    "tests/unit/asterisk.test.ts": "3778786c408c3c46a93fe4d272b9376d63ffe168bc7d32b1479f0ab3e7c9d603",
+    "tests/unit/backup-crypto.test.ts": "dc4dd766706ba6db7532848705e1c08a584aaf13cf25766b5db7ff68a19f8bfc",
+    "tests/unit/besu-peers.test.ts": "183d67db1a91a40c74f307aefb491d4f20c24d8571ddaabda77c6035132cb384",
+    "tests/unit/browser-unicode.test.ts": "5943d7a391f7c75d80c09cd3b83ec0b478bb03b3412ecd08120b04e2a6ed3a72",
+    "tests/unit/chain-preflight.test.ts": "c0da934b7b18977e9fea4d1b6e205fe368890ecfa8349719349cc3b69fff3a2a",
+    "tests/unit/configuration-review.test.ts": "2ff9311551d9dad5593c69d50e768434188f274978a23285d6f37346ad458ba4",
+    "tests/unit/configuration.test.ts": "7814b3f8f1f16d0911f70d496f3d142b831dbffd66a1a83670c8b08e9273a24a",
+    "tests/unit/contract-interop.test.ts": "5866606dff4f4b1cbf6f7886aaea86fd90f8b1a7787e7ad2e10f5af6fe3822fd",
+    "tests/unit/deployment-config.test.ts": "320bbae22dc672738bda114543a7f7d746fa03f1fababf220e9912797fa477dc",
+    "tests/unit/durable-worker.test.ts": "ec533c99915866a1214da0bcd35b0b16b060ddbaa7438d9e200b212abac322ae",
+    "tests/unit/finals.test.ts": "08f4e83c41f7568891eba522e360b5ee3608cfd1c1f84295c5800e25cd1324c2",
+    "tests/unit/governance.test.ts": "0a3818f99b031d406839c6048df285ceda3c2c734c052b7187c1b0d60b0f7cba",
+    "tests/unit/http-adapter-scope.test.ts": "950c6061416dde082133406ec444515044474a6c912b8c2a915fd99e7aec458a",
+    "tests/unit/image-reference.test.ts": "300e948e2338e86784645b5e13f84b4fe3893b7d5990ed11956191230fd025e9",
+    "tests/unit/ledger-health.test.ts": "54a8227c7b7bc9291d478ce948ec9ab36333521723b5cc1c12376bc806bf8dcf",
+    "tests/unit/light-guard.test.ts": "ee1adbd8e587fbc72e2f50918888ada52691d8c1d6f0aad0883d919009054493",
+    "tests/unit/logout-client.test.ts": "7304ff0fda4a3565c720038fe335affbece7bfde8806e5ef8a61c4fb677aaaad",
+    "tests/unit/media.test.ts": "952e487fb327b6e187bd2211d259fb2bc2cc46588d8a9659f05ad3f248da4fc7",
+    "tests/unit/offline.ts": "aac6b4b3cd3000efed6f9f0227c4f80a0edbb7b0a17b3f45775d19e2b5898338",
+    "tests/unit/oidc.test.ts": "70c237cb9fb9c94077d578b8aba5caa06c091f307af77db3c9167b253dd49635",
+    "tests/unit/pbx-endpoint.test.ts": "3485ab4f8c66bbca8d4108ad07c5d16ee338860c780681117fedf4a5f42669f8",
+    "tests/unit/pbx-runtime.test.ts": "b9a12221f199b63a2191a0ed01a44b94db7665979bcaef3fb1386c9d7209b12f",
+    "tests/unit/performance-evidence.test.ts": "2a535c7216506e95ee36949535cd441211b5ca8e7efbcaebdf24eca6830d42ae",
+    "tests/unit/platform.test.ts": "c3a6fa84728594d6ccc0d705f95061726dcd61ca767189a34777247a57c41d42",
+    "tests/unit/preflight.test.ts": "5fd89ea880e78d8b1cdd88ce99a9cf9903b2d8e2b15e838436f466a47cdd2c7f",
+    "tests/unit/preparation-tools.test.ts": "2922cf4b430644565f1a3ae6bd69be00d1a9b6a5fb364ae70fad95931882a8fd",
+    "tests/unit/reauth.test.ts": "174ee1c0475da1c8cf993eaa23319820e4baa5c6fed128c5b8ade993e0484cd0",
+    "tests/unit/registration.test.ts": "e3d6566e2da96c53b47387c46d5d36dae3af80749abd9fb332faf9524d26cbce",
+    "tests/unit/registry-artifact.test.ts": "feacd1f0644e1859de2c2255aa767b1ab8cc2d2dd0a3363ceb2883335e4ecfe4",
+    "tests/unit/revisions.test.ts": "e764eb8f95f3a662b39241779902a974796a92dd882747564851ccd376cdb802",
+    "tests/unit/service-authority.test.ts": "8702eb966e30b8ecee2a97999d520feeb226cb8fc5a207bd54d835861e526e1e",
+    "tests/unit/service-controller.test.ts": "315957d5103deb2a6d4ec345bdc38bffa9949482223272b52d676f7de3afc9fc",
+    "tests/unit/service-fixture.ts": "7d972a4abfa2634a5d7e083d5f59a1f815c4632f6631d33ea8453cf5dfee3e24",
+    "tests/unit/service-recovery.test.ts": "41b26f6ecb5b66f3d6eab1e028a9a964bae541a7e35f78f051a23e8e104d3548",
+    "tests/unit/service-verifier.test.ts": "fc06a7dea2fdcfea5cb7dcb39651ae6c3f7c780d275abbb48f0fe796729e34aa",
+    "tests/unit/session-connections.test.ts": "f7d1e6009c56043e33f235dbbe5e8c44040a3d0aa48d74abe5f5e8180703a816",
+    "tests/unit/sip-dialog.test.ts": "7bd2fb5ac03788b80235d3188d7fdbccd7a5ba3b7c75b7bb20da622bf60daa73",
+    "tests/unit/sip.test.ts": "a95523b47caef79d8e90a75ab6da34ed26c7fa6b41eabdb89038a213406efcf5",
+    "tests/unit/validation-runner.test.ts": "91f3b6cddc2b5708e277e86d37880d3b6ef32fe1aa9886dcaceb9bc6aedf291c",
+    "tests/unit/witness.test.ts": "7a25340c0c8ccb8cef3148d6fcf98aae4b127062e813eab067636591b8ac4192",
+    "tests/unit/workspace.test.ts": "b22a3678ac4d2f9c993d0c7b704c20b61afcad7db625ae92e19e105e79801e01",
+    "tsconfig.base.json": "1ffbd4a305ad5b8162f97527b20131abf13cbf0a59355ee6fd52bf0866912cff",
+    "tsconfig.light.json": "de304913d050c96dcb2242438d131ce1e6b02b977f4c70c8daeff757d3736756",
+    "vercel.json": "0a179aed2d44484072c0edc5367e75930f3b9985c30a057ca2c75b64c0503344",
+    "vitest.chain.config.ts": "781b2115d0d063c7a3aae18de036064cce8332d1d3d266ae4ad829d2de54f935",
+    "vitest.config.ts": "691f366fa9ee8bb8c8e9104113ffd5ffa15646921b25f5f873f3fad4d0baa9e9",
+    "vitest.http.config.ts": "0e6fbb4f7a140017ecc1a687c31a27e89bb8e1e14c77f0d3741c58363ec5d2b6",
+    "vitest.integration.config.ts": "07278435d5e2c6c18f7df211d99a62b4cd27af44c08c443948a73fbba35f798b"
+  },
+  "executedHarnessSourceFiles": {
+    "tests/integration/runtime-media.test.ts": "a73ed18eb3d03dc3b4179e2a94b95e9279682b19798e86a8a7cce746a702c879",
+    "tests/integration/service-http-fixture.ts": "b949b30172270b53a1dc1555fc017a494ff1af1b0ae25dddcb5c3d6218875b3a",
+    "vitest.http.config.ts": "0e6fbb4f7a140017ecc1a687c31a27e89bb8e1e14c77f0d3741c58363ec5d2b6"
+  },
+  "laterHarnessChanges": "current source adds overwrite protection and per-case private diagnostic filenames after these media executions; syntax/type/guard checked separately",
+  "executions": {
+    "firstCompleteScenarioBatch": {
+      "passed": 5,
+      "failed": 1,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after logout",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after work-cancel",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after lease-expiry",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after delegation-revoke",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after emergency-stop",
+          "status": "failed",
+          "failure": "locator.waitFor: Target crashed \nCall log:\n  - waiting for getByText(/PBX 협상 완료/) to be visible\n\n    at /work/tests/integration/runtime-media.test.ts:48:101\n    at /work/node_modules/.pnpm/vitest@5.0.0_@types+node@24.7.0_vite@8.3.0_@types+node@24.7.0_esbuild@0.28.2_jiti@2.7.0_tsx@4.23.13_/node_modules/vitest/dist/chunks/run.CQOUYP-x.js:2783:20"
+        }
+      ]
+    },
+    "targetedEmergencyRetry": {
+      "passed": 2,
+      "failed": 0,
+      "skipped": 4,
+      "cases": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after logout",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after work-cancel",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after lease-expiry",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after delegation-revoke",
+          "status": "skipped",
+          "failure": null
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after emergency-stop",
+          "status": "passed",
+          "failure": null
+        }
+      ]
+    },
+    "databaseRegression": {
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "checks applied migration order and real auth-login least privilege, rather than file presence",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "allows PBX row locks for issuer/worker while denying other lease-field updates and PBX identity reads",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "persists scope and context, rejects swapped cookies and keeps legacy separate",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "enforces OIDC metadata for scoped sessions at the database boundary",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "allows a single concurrent login claim and retains that claim independently of sessions",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "isolates the configured runtime auth login from issuer storage",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "PostgreSQL finals authoritative lock boundary (deferred) serializes racing first bindings and recovers the committed result",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "reserves a shared budget under contention and settles a reservation only once",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "claims a job once across workers and fences an expired claim before committing a result",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "cannot recreate SIP credentials from an idempotent result after terminal cleanup",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "shares authenticated request counters across replicas and minute boundaries",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "keeps the SQL recovery gate closed when intermediate journal and consumption rows are both lost",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "serializes duplicate account onboarding across independent SQL connections, and revokes sessions across reactivation",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "fences a late signed result after the signer lease changes without persisting or broadcasting it",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "bootstraps authority metadata once across two independently connected recovery passes",
+          "status": "passed",
+          "failure": null
+        },
+        {
+          "name": "recovers the same committed signed receipt after the caller loses its response, using an independent SQL store",
+          "status": "passed",
+          "failure": null
+        }
+      ]
+    }
+  },
+  "observations": {
+    "logout": {
+      "outcome": "logout",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.012951450809590847,
+          "self": 1.6735773227724912e-05,
+          "rms": 0.04189141493417132,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.007162206600471067,
+          "self": 2.001929696988924e-05,
+          "rms": 0.023140200652577,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "target": 1e-06,
+        "self": 1e-06,
+        "rms": 0,
+        "receiverTracks": 1,
+        "source": "actual-decoded-remote-track",
+        "syntheticMicrophone": true
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 2336.6081569999988,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    "work-cancel": {
+      "outcome": "work-cancel",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.011555414542014237,
+          "self": 3.072284795378989e-05,
+          "rms": 0.03482607932206248,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.0064246984003557125,
+          "self": 1.987778882588837e-05,
+          "rms": 0.021842207186090114,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "target": 1e-06,
+        "self": 1e-06,
+        "rms": 0,
+        "receiverTracks": 1,
+        "source": "actual-decoded-remote-track",
+        "syntheticMicrophone": true
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 2567.2039339999974,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    "lease-expiry": {
+      "outcome": "lease-expiry",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.01376498763166911,
+          "self": 3.1895347686911744e-05,
+          "rms": 0.04047064002641634,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.0075239675647646295,
+          "self": 1.6965943570641798e-05,
+          "rms": 0.023258254388128893,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "target": 1e-06,
+        "self": 1e-06,
+        "rms": 0,
+        "receiverTracks": 1,
+        "source": "actual-decoded-remote-track",
+        "syntheticMicrophone": true
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 18,
+      "reclaimObservationMs": 22290.199806999997,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    "delegation-revoke": {
+      "outcome": "delegation-revoke",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.012063002600541151,
+          "self": 2.271419250992569e-05,
+          "rms": 0.03766774677242058,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.00751042511593373,
+          "self": 5.708986164051633e-05,
+          "rms": 0.023122206019158337,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "target": 1e-06,
+        "self": 1e-06,
+        "rms": 0,
+        "receiverTracks": 1,
+        "source": "actual-decoded-remote-track",
+        "syntheticMicrophone": true
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 4131.633453000002,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    "emergency-stop": {
+      "outcome": "emergency-stop",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.011658768514453625,
+          "self": 1.6441593580812124e-05,
+          "rms": 0.0357604847100518,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.007474039248685411,
+          "self": 1.9775684078580928e-05,
+          "rms": 0.023688853068214184,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "target": 1e-06,
+        "self": 1e-06,
+        "rms": 0,
+        "receiverTracks": 1,
+        "source": "actual-decoded-remote-track",
+        "syntheticMicrophone": true
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 10872.205137,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    }
+  },
+  "evidenceNotes": [
+    "No addition of test counts across runs. Original batch: common image + four media cases passed; emergency-stop crashed. Targeted retry: common image + emergency-stop passed, other four excluded.",
+    "Tone observations use the actual decoded receiver clone with its own enabled state; UI muting alone cannot establish silence.",
+    "reclaimObservationMs includes polling, audio windows and where applicable confirmation observation; one-sample upper bound, not segment latency or SLA.",
+    "All before/after observations are synthetic. No human microphone or original audio/transcript is published.",
+    "Post-reclamation decoded audio is observed on the recipient side; both endpoints were measured during the active call, but post-reclamation decoding was not separately remeasured on both endpoints."
+  ],
+  "fixtureBoundaries": {
+    "real": [
+      "Besu4/QBFT and ServiceRegistry",
+      "Witness4 queried via actual RPC",
+      "role-specific PostgreSQL logins and migrations 0000..0009",
+      "independent HTTPS Anchor with separate PostgreSQL",
+      "image Platform/Issuer/Sender/worker",
+      "Asterisk22.11.0 with PJSIP/WSS/ARI/SRTP and PostgreSQL ODBC",
+      "coturn4.6.3 relay-only selected candidates",
+      "HTTPS product web and installed Chromium"
+    ],
+    "substituted": [
+      "local HTTPS OIDC provider and synthetic accounts",
+      "distinct 660/990Hz synthetic microphone WAV files"
+    ],
+    "externalNatVerified": false,
+    "externalAiCalled": false
+  },
+  "runtimeTransfer": {
+    "images": {
+      "runtime": "sha256:f14992b5cd5bc85022caf74ec53f14599d6879a598cf157af79b905ab6ccc673",
+      "web": "sha256:004184d50b441cba39ece2b6bfd6c3e50bba21dccf6ebbe484aa0655116eeb74",
+      "asterisk": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "turn": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae"
+    },
+    "identityKind": "Docker configuration IDs, not registry manifest digests",
+    "archive": "runtime-web-media-final.tar",
+    "archiveSha256": "aeb74e1b2f56d8176603f80b9b5cf18e700233b9c81b7d689c8875e4de2b43e3",
+    "archiveBytes": 1500292608,
+    "completeServiceBackup": false,
+    "scope": "disposable same-host loopback integration images; excludes database, chain data, anchor storage, credentials and operating identity",
+    "architecture": "linux/amd64"
+  },
+  "fullFlowCandidateImage": "sha256:39a4730b4355bb9fdffaf7acb1c7981b85687e439f6d4c552dc1502fdd380445",
+  "finalImageFunctionalObservation": {
+    "witnessSigners": 3,
+    "institutionStatus": "suspended",
+    "snapshotStatus": "Suspended",
+    "workerCursorAdvanced": true,
+    "readinessStatus": 200,
+    "scope": "final image actual role startup, verified real Witness signatures and worker event cursor; no new call after emergency stop",
+    "observedAt": "2026-11-01T17:19:17.380Z",
+    "queryScope": "exact synthetic institution, excludes separate DB regression fixture rows"
+  },
+  "finalImageHealth": [
+    {
+      "port": 4100,
+      "status": 200,
+      "body": {
+        "status": "alive",
+        "role": "platform",
+        "protocolVersion": 3
+      }
+    },
+    {
+      "port": 4101,
+      "status": 200,
+      "body": {
+        "status": "alive",
+        "role": "issuer",
+        "protocolVersion": 3
+      }
+    },
+    {
+      "port": 4102,
+      "status": 200,
+      "body": {
+        "status": "alive",
+        "role": "sender",
+        "protocolVersion": 3
+      }
+    },
+    {
+      "port": 4201,
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "witnessId": "witness-1",
+        "kid": "urn:callsign:witness:1#TIWzdM7Mo-Wv740vZsvr6A",
+        "publicJwk": {
+          "crv": "Ed25519",
+          "x": "jGn2ZRmcN7XPZqVEK8v97O_uZjwRvDUNdB3alIkPHfI",
+          "kty": "OKP"
+        },
+        "blockNumber": "2330",
+        "rpcBoundary": "http://127.0.0.1:18541"
+      }
+    },
+    {
+      "port": 4202,
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "witnessId": "witness-2",
+        "kid": "urn:callsign:witness:2#EL-7AcTn2X-hMKXk1-ZdrJ",
+        "publicJwk": {
+          "crv": "Ed25519",
+          "x": "7zt1lnYn2hc3MCJSNBIj3sq8S1qORefZVPcWOGuovsQ",
+          "kty": "OKP"
+        },
+        "blockNumber": "2330",
+        "rpcBoundary": "http://127.0.0.1:18542"
+      }
+    },
+    {
+      "port": 4203,
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "witnessId": "witness-3",
+        "kid": "urn:callsign:witness:3#APd_yLJqZMdreqV0VKFokP",
+        "publicJwk": {
+          "crv": "Ed25519",
+          "x": "DuwmejRNS9awEjAAERCIa1FGmzO5IhL9_ETgiP5dyVM",
+          "kty": "OKP"
+        },
+        "blockNumber": "2330",
+        "rpcBoundary": "http://127.0.0.1:18543"
+      }
+    },
+    {
+      "port": 4204,
+      "status": 200,
+      "body": {
+        "status": "ok",
+        "witnessId": "witness-4",
+        "kid": "urn:callsign:witness:4#Af0QwhllyzJCX9MI1pq-hg",
+        "publicJwk": {
+          "crv": "Ed25519",
+          "x": "C40c_Nz40RjJIALkmh9KRGKH2L0av2NA9XgwMv0k2Gw",
+          "kty": "OKP"
+        },
+        "blockNumber": "2330",
+        "rpcBoundary": "http://127.0.0.1:18544"
+      }
+    }
+  ],
+  "candidateToFinalSourceDifference": [
+    "scripts/validation-stages.ts"
+  ],
+  "finalImageNewMediaCallExecuted": false,
+  "offlineEvidence": "artifacts/isolated-media-source-20261102.json",
+  "failuresPreserved": [
+    "private phase logs/results/screenshots for setup, funding, PBX grants/digest/schema, recvonly negotiation, certificate API and response-size failures",
+    "first complete scenario batch PID-limit crash; no OOM and no limit increase"
+  ],
+  "resources": {
+    "finalPointSamples": [
+      {
+        "CPUPerc": "0.00%",
+        "MemUsage": "420KiB / 64MiB",
+        "PIDs": "1",
+        "role": "net"
+      },
+      {
+        "CPUPerc": "10.73%",
+        "MemUsage": "436.8MiB / 3GiB",
+        "PIDs": "83",
+        "role": "besu1"
+      },
+      {
+        "CPUPerc": "0.35%",
+        "MemUsage": "438.2MiB / 3GiB",
+        "PIDs": "89",
+        "role": "besu2"
+      },
+      {
+        "CPUPerc": "1.94%",
+        "MemUsage": "445MiB / 3GiB",
+        "PIDs": "90",
+        "role": "besu3"
+      },
+      {
+        "CPUPerc": "1.90%",
+        "MemUsage": "432.9MiB / 3GiB",
+        "PIDs": "81",
+        "role": "besu4"
+      },
+      {
+        "CPUPerc": "3.20%",
+        "MemUsage": "119.4MiB / 512MiB",
+        "PIDs": "13",
+        "role": "database"
+      },
+      {
+        "CPUPerc": "0.03%",
+        "MemUsage": "22.34MiB / 512MiB",
+        "PIDs": "7",
+        "role": "anchor-database"
+      },
+      {
+        "CPUPerc": "0.08%",
+        "MemUsage": "63.39MiB / 512MiB",
+        "PIDs": "25",
+        "role": "anchor"
+      },
+      {
+        "CPUPerc": "0.13%",
+        "MemUsage": "61.06MiB / 512MiB",
+        "PIDs": "56",
+        "role": "asterisk"
+      },
+      {
+        "CPUPerc": "0.06%",
+        "MemUsage": "13.18MiB / 256MiB",
+        "PIDs": "39",
+        "role": "turn"
+      },
+      {
+        "CPUPerc": "0.00%",
+        "MemUsage": "11.73MiB / 2GiB",
+        "PIDs": "8",
+        "role": "controller"
+      },
+      {
+        "CPUPerc": "0.00%",
+        "MemUsage": "3.398MiB / 512MiB",
+        "PIDs": "2",
+        "role": "web"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "167MiB / 512MiB",
+        "PIDs": "47",
+        "role": "witness1"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "169.1MiB / 512MiB",
+        "PIDs": "49",
+        "role": "witness2"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "166.9MiB / 512MiB",
+        "PIDs": "50",
+        "role": "witness3"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "171.7MiB / 512MiB",
+        "PIDs": "49",
+        "role": "witness4"
+      },
+      {
+        "CPUPerc": "1.91%",
+        "MemUsage": "197.8MiB / 512MiB",
+        "PIDs": "52",
+        "role": "issuer"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "176.5MiB / 512MiB",
+        "PIDs": "54",
+        "role": "sender"
+      },
+      {
+        "CPUPerc": "0.05%",
+        "MemUsage": "177.7MiB / 512MiB",
+        "PIDs": "54",
+        "role": "platform"
+      },
+      {
+        "CPUPerc": "2.72%",
+        "MemUsage": "182.8MiB / 512MiB",
+        "PIDs": "52",
+        "role": "worker"
+      }
+    ],
+    "controllerBeforeInit": {
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+      "memory.peak": "1647771648",
+      "pids.events": "max 135",
+      "pids.current": "198"
+    },
+    "controllerAfterInit": {
+      "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+      "memory.peak": "1260093440",
+      "pids.events": "max 0",
+      "pids.current": "8"
+    },
+    "pointSamplesAreNotLoadPeakOrMinimumSizing": true,
+    "allCapturedContainersOomKilled": false
+  },
+  "downloads": {
+    "approvedCapBytes": 524288000,
+    "conservativeBytesIncludingMetadata": 474711664,
+    "archives": [
+      {
+        "file": "asterisk-22.11.0.tar.gz",
+        "url": "https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-22.11.0.tar.gz",
+        "bytes": 26724408,
+        "sha256": "3bd5ee040509a3d3cd9b1ba9520c18e6ec0a7e7981ca68c457dcd36ba3c54d94"
+      },
+      {
+        "file": "asterisk-22.11.0.sha256",
+        "url": "https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-22.11.0.sha256",
+        "bytes": 90,
+        "sha256": "ab2da05972d99af11adf4291bade97b6642ef7df3a479b9d0a7c1ef502acee1d"
+      },
+      {
+        "file": "coturn-4.6.3.tar.gz",
+        "url": "https://codeload.github.com/coturn/coturn/tar.gz/refs/tags/4.6.3",
+        "bytes": 535778,
+        "sha256": "dc3a529fd9956dc8771752a7169c5ad4c18b9deef3ec96049de30fabf1637704"
+      }
+    ],
+    "reproduceInputs": {
+      "files": 2706,
+      "manifestSha256": "4bc734bee52976cc6e5c94e8c5616dd076ad22f30cfe7290d200996a7f2cf1a2",
+      "scope": "offline compiler input hashes; original compile logs and source archive hashes retained separately",
+      "guardedWrapperRecompiled": false
+    },
+    "systemPackagesInstalledOnHost": false
+  },
+  "hostPreservation": {
+    "interfacesEqualExceptLifetimeCountdown": false,
+    "routesEqualExceptLifetimeCountdown": false,
+    "dockerNetworkIdsEqual": true,
+    "allOriginalContainerIdsPreserved": true,
+    "remainingOwnedContainers": 0,
+    "scope": "read-only interface/route/Docker ID comparison; no raw topology published; no baseline firewall dump or exhaustive system configuration assertion",
+    "differenceInvestigation": {
+      "replacedInterfacesAreVeth": true,
+      "replacementCount": 1,
+      "sameInterfaceCount": true,
+      "otherRoutesEqual": true,
+      "replacementRouteDifferencesIpv6Only": true,
+      "eventHistoryComplete": false,
+      "attribution": "unconfirmed; Docker keeps a bounded event history; owned containers used none/shared namespace and no published port",
+      "otherContainerRestartPolicyAlwaysObserved": true
+    }
+  },
+  "cleanup": {
+    "removedOwnedVolumes": 2,
+    "remainingOwnedContainers": [],
+    "preserved": [
+      "image archives and image IDs",
+      "source snapshots and offline compile inputs",
+      "private original logs/test keys/certificates",
+      "chain bind-directory remnants (not a complete backup)"
+    ],
+    "deploymentRestorableFromRemnants": false,
+    "existingResourcesTouched": false
+  },
+  "cleanupOwnedContainerCount": 22,
+  "cloudDeploymentVerified": false,
+  "unverified": [
+    "actual external NAT/firewall/TLS/IdP/MFA",
+    "human speech or Korean STT/LLM quality, retention/cancellation/billing",
+    "policy/key change during an active media call",
+    "natural login expiry during media, real PBX control failure, microphone denial/device absence combinations",
+    "entire chain/DB/Anchor/key service transfer and restore into a fresh deployment",
+    "GCP deployment, independent host fault tolerance and performance SLA"
+  ],
+  "retention": "Only redacted summaries/hashes are public. Private original logs, synthetic keys/audio, source snapshots, compiled inputs and image archive stay in the ignored owned directory; remaining chain files are not a complete restorable service."
+}

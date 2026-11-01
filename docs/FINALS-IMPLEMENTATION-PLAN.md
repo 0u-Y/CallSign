@@ -4,6 +4,29 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="isolated-media-20261102"></a>
+
+## 2026-11-02 실제 교환기·합성 음원과 권한 회수
+
+시작 HEAD는 `a86e4c2`이며 이번 시험은 이후 미커밋 소스를 포함한다. [실행 증거](../artifacts/isolated-media-20261102.json)의 시험 소스 hash·이미지별 범위와 [최종 소스 검사](../artifacts/isolated-media-source-20261102.json)를 따른다. 원본 실패·이전 증거는 보존했다. 이 환경은 **폐기 가능한 통합 시험**이며 이전할 서비스 배포 identity가 아니다.
+
+- PBX-001~003·MEDIA-001~004·CALL-001~006: 실제 Besu4/ServiceRegistry/Witness4, 역할별 PostgreSQL LOGIN, 별도 HTTPS Anchor, runtime image의 Platform/Issuer/Sender/worker, Asterisk22.11.0·coturn4.6.3·HTTPS 제품 웹·Chromium을 연결했다. OIDC만 로컬 fixture이며 마이크 입력은 서로 다른660/990Hz 합성 WAV다. TLS는 작업 CA를 Node와 시험 브라우저의 NSS profile에만 등록했고 인증서 오류 무시는 사용하지 않았다.
+- 실제 UI에서 업무·위임 확정·승인→SIP/WSS/DTLS→양측 보고/소유 증명→일회 소비·lease→bridge→상대 합성 음원 디코딩을 확인했다. native DTLS 인증서와 선택한 양쪽 relay candidate를 조회했다. 승인 전 수신 RMS0, 통화 중 상대 주파수가 자기 주파수보다 우세함, 회수 후 수신자 측 RMS0을 기록했다. 회수 후 양쪽의 디코딩을 각각 재측정한 결과는 아니다. 단순 RTP 증가나 화면 문구가 판정 기준이 아니다.
+- 로그아웃·업무 취소·갱신 HTTP 차단 뒤 실제30초 lease 만료·위임 철회·기관 긴급 정지의5개 회수 경계를 확인했다. 위임/정지에서는 실제 worker 확정 작업과 Witness 응답도 확인했다. 회수 관측 시간은 한 controller의 단조 시계로 잰 단일 표본의 상한이며 체인 확정→음성 중단의 분해 지연이나 SLA가 아니다.
+- 첫6시험 실행은 **5 PASS·1 브라우저 crash**다. cgroup OOM은0이고 PID 상한 도달이 관측됐다. 시험 controller에 init을 넣어 자식 프로세스를 회수하고 CPU/RAM/PID 상한을 유지했다. 실패한 긴급 정지만 재실행해 **2 PASS·4 선택 제외**(공통 이미지 시험 포함)를 확인했다. 두 실행의 시험 수를 합산하지 않는다. 실제 DB 회귀는 별도로 **4파일16 PASS**다.
+
+수정한 제품 결함:
+
+1. PBX 자격 행의 `FOR UPDATE`에 필요한 권한이 없어 실제 issuer/worker LOGIN이 거절됐다. `0007_pbx_lease_locks`는 `UPDATE(id)`만 추가한다. `0008/0009`는 실제 PJSIP 연락처 저장 필드와 true/false 폭을 보완한다. 기존0000~0006 hash는 바꾸지 않았다.
+2. SHA-256 digest만 저장하면서 PJSIP의 기본 UAC 알고리즘이 MD5였던 충돌을 양쪽 SHA-256 설정으로 해결했다. 지원 빌드에 없는 Opus 변환 대신 내장 G.711 μ-law를 사용한다. 이 시험은8kHz 코덱 경로이며 한국어 음질 평가가 아니다.
+3. 수신 offer에 연결되지 않는 빈 transceiver 때문에 수신 전용 SDP가 만들어졌다. 꺼진 마이크를 `addTrack`으로 협상하고 검증·수락 후에만 켠다. 기존 mute/동의/종료 조건을 유지한다. 무음/CN RTP와 사람 음성 송신을 구분한다.
+4. 현재 Chromium에서 기존 원격 인증서 접근이 실패했다. 실제 connected DTLS transport의 `remoteCertificateId`가 가리키는 native certificate DER를 직접 해시하도록 보완했다. SDP나 서버 boolean으로 대신하지 않는다. 종료 중 비동기 회수의 거절도 처리한다.
+5. 업무 목록이 과거 SDP·서명까지 포함해 반복 통화 후128KiB 상한을 넘었다. 목록은 표시용 요약이고 전체 검증 자료는 권한 검사된 개별 call-context에서 제공한다. 메모리 기반100시도 회귀와 실제 누적 시험 DB를 통해 확인했으며 대규모 부하 검증은 아니다.
+
+이미지의 범위: 실제 통화는 증거에 기록된 candidate runtime/web 이미지에서 실행했다. 최종 runtime은 같은 제품 코드에 검증 설명 문자열을 반영한 재build이며 API3·Witness4의 실제 entrypoint/health, 실제 Witness 서명3개와 worker cursor 전진을 새로 확인했다. 그 최종 이미지에서 새 통화를 다시 실행한 것으로 기록하지 않는다. runtime/web/PBX/TURN 묶음 archive는 **이미지 전달물**이며 chain·DB·Anchor·키를 포함한 일관 서비스 백업이 아니다. [명령과 전달 경계](RUNBOOK.md#isolated-media-20261102)를 따른다.
+
+외부망/NAT·외부 IdP/MFA·실제 STT/LLM·한국어 품질/비용·GCP·전체 배포 복원은 미실행이다. 통화 중 정책/키 교체, 세션 자연 만료, 실제 PBX 제어 장애, 장치 거절/없음의 전체 조합도 이번 미디어 실행 범위에 포함하지 않았다. 기존 단위/fixture 검증과 구분한다. source·DB·Anchor의 과거 이력 초기화로 연결을 열지 않았다. host 설정과 기존 자원은 읽기 전용으로 유지하고 소유 자원의 종료·정리는 실행 증거에 남긴다. 최종 소스 검사 light는48파일236시험, 웹 build·API runtime 타입 검사는 PASS다. 소유 container22개와 시험 volume2개를 제거했고 실행 중 소유 자원은0이다. 전후 대조에서 Docker network ID와 기존 container ID는 보존됐지만 기존 veth1개와 그 IPv6 경로가 교체됐다. 비소유 restart-always container의 재시작을 관측했으나 직접 대응은 미확정이다. 따라서 host 상태 전체 동일은 미판정이며 네트워크 복구/변경 명령은 수행하지 않았다.
+
 <a id="isolated-runtime-20261101"></a>
 
 ## 2026-11-01 호스트 설정을 보존한 실제 원장·API 연결

@@ -1,5 +1,8 @@
 # CallSign 전체 개발 명세
 
+
+**2026-11-02 추가 검증:** PBX-001~003·MEDIA-001~004·CALL-001~006·DB-001~003·OPS-003·TEST-001/004의 실제 연결 근거를 [이번 기록](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)에 추가했다. 같은 호스트의 실제 Asterisk/TURN·제품 웹에서 서로 다른 합성 음원의 양방향 디코딩과5개 회수 경계를 확인했다. OIDC는 fixture이며 외부망·AI·클라우드·전체 복원과 일부 정책/키/장치 장애 조합은 미검증이다. 요구 ID·완료 기준은 유지하며 전체 개발 완료로 확대하지 않는다.
+
 2026-11-01 검증 추가: CHAIN-001/002·STATE-001/002·OPS-001/003·TEST-001의 [선택 경로를 실제 구성요소로 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)했다. 같은 host의 chain/Witness와 HTTP/SQL/독립 Anchor/실제 worker 경계이며, 미디어·외부 IdP/AI·전체 이전 완료는 아니다. 아래 요구사항·완료 조건은 낮추지 않는다.
 
 ## 서비스 설계 원칙

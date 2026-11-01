@@ -1,6 +1,96 @@
 # 개발·배포·복구 운영 절차
 
+<a id="isolated-media-20261102"></a>
+
+## 2026-11-02 교환기 통합 시험과 이미지 전달
+
+[실행 범위·실패·결과](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)와 [이미지/소스 증거](../artifacts/isolated-media-20261102.json)를 먼저 확인한다. 아래 명령 중 **이후 실행**으로 표시한 것은 이 작업에서 실행한 명령이 아니다. 현재 호스트에 bridge·publish·방화벽·DNS 설정을 적용하지 않는다.
+
+### 확인한 구성과 보존 위치
+
+작업 디렉터리는 `.local/media-20261102-43880954`이며 Git에서 제외한다. 보호 파일·실패 로그·합성 WAV·시험 키와 source snapshot은 공개하지 않는다. `runtime-web-media-final.tar`는 runtime/web/Asterisk/TURN의 linux/amd64 이미지다. Docker config ID와 archive SHA256은 증거에 따로 기록한다. registry manifest digest가 아니다. 이 환경은 합성 일회성 시험이며 이전할 기관 identity가 아니다.
+
+실제 통화에 사용한 candidate runtime과 이후 최종 runtime 재build를 구분한다. 최종 이미지에서도 API/Witness entrypoint·실제 서명·worker cursor를 확인했으나 새 통화를 반복한 것으로 표시하지 않는다. 이미지에는 앱의 설치 의존성이 들어 있고 서비스에 host 소스/node_modules를 mount하지 않았다. controller만 기존 Node/의존성/Chromium을 읽기 전용으로 사용하는 시험 도구다.
+
+### 현재 경로에 필요한 설정
+
+- SQL은0000~0009를 순서대로 적용한다. 기존0000~0006 hash를 바꾸거나 삭제하지 않는다. PBX 잠금에는 issuer/worker의 `UPDATE(id)`가 필요하고 expires_at 등 다른 열의 UPDATE는 허용하지 않는다. `qualify_2xx_only`, `authenticate_qualify`, `prune_on_boot`의 실제 PJSIP true/false 직렬화 폭을 확인한다.
+- `prepare-pbx.ts`가 생성하는 `asterisk.conf`/`logger.conf`를 포함한다. `/var/lib/asterisk`의 image XML 문서를 가리지 않는다. root가 아닌 실행에서 AstDB·socket은 `/var/run/asterisk`, 로그/스풀은 별도 writable 경로다. CallSign 권한·자격의 영속 기준은 PostgreSQL이며 이 임시 AstDB로 진행 통화를 복원하지 않는다. `compose.pbx.yml`은 이 쓰기 경계를 반영한 템플릿이며 현재 호스트에서는 기동하지 않았다.
+- 양쪽 PJSIP digest 기본 알고리즘을 SHA-256으로 맞춘다. 내장 `ulaw`를 사용하며 Opus transcoder는 포함하지 않는다. PBX credential secret은 base64url 해제 후 정확히32byte여야 한다.
+- host Node에는 host CA 경로를 `NODE_EXTRA_CA_CERTS`로 전달하고, 서비스에는 container CA 경로를 전달한다. Nginx는 `/etc/nginx/pbx-ca.pem`으로 upstream 검증을 유지한다. 브라우저 CA는 시험 NSS profile에만 등록한다. 전역 인증서 오류 무시를 사용하지 않는다.
+- Asterisk22.11은 loopback host ICE 후보를 제외한다. 이 시험은 내부 TURN REST 자격을 발급하고 Asterisk에도 실제 TURN을 설정했다. 브라우저의 시험 observer는 relay-only를 강제했고 실제 선택 후보를 확인했다. `allow-loopback-peers`는 이 loopback 시험용 설정에만 한정하며 운영/public TURN에 복사하지 않는다. 외부 NAT 통과 검증은 별도다.
+
+Asterisk의 [공식 WebRTC 설정](https://docs.asterisk.org/Configuration/WebRTC/Configuring-Asterisk-for-WebRTC-Clients/)과 [22.11.0 소스](https://downloads.asterisk.org/pub/telephony/asterisk/), [coturn4.6.3](https://github.com/coturn/coturn/releases/tag/4.6.3)을 사용했다. 받은 소스·PJProject·Ubuntu 서명 검증 dependency/metadata의 합계는 약453MiB로 승인된500MiB 이하다. 실제 SHA256·버전은 실행 증거에 있다. 추가 다운로드를 자동으로 하지 않는다.
+
+### 오프라인 빌드의 재현 자료
+
+`reproduce-media-inputs/`에는 기존에 받은 source·PJ cache·서명 검증 APT 자료/deb와 hash 목록을 보존한다. 원래 성공한2GiB·CPU2·900초 compile 로그와 원본 recipe는 별도 보존했다. 저장소의 `infra/deploy/build-media.sh`는 같은 compile 본문에 host 실행 방지/입력 hash 검사를 붙인 recipe이며 이 guard wrapper 자체의 전체 재compile은 반복하지 않았다. guard·셸 문법은 검사했다. 운영 키/인증서는 build input이 아니다.
+
+**이후 별도 승인된 작업 전용 none build에서만 실행할 예:** 아래 변수는 작업자가 실제 보호 경로와 이미 존재하는 pinned base로 채운다. 기존 container/image를 덮어쓰지 않는다.
+
+```bash
+# No host network, no host package install. The timeout runs INSIDE the owned build container.
+docker run --name "$NEW_MEDIA_BUILD" --label "org.callsign.run-id=$NEW_RUN_ID"   --network none --memory 2g --memory-swap 2g --cpus 2 --pids-limit 512   --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure --env CALLSIGN_OWNED_MEDIA_BUILD=yes   --mount "type=bind,src=$REVIEWED_MEDIA_INPUTS,dst=/sources,readonly"   "$REVIEWED_LOCAL_BUILD_BASE" timeout 900 bash /sources/build-media.sh
+# ExitCode=0, OOMKilled=false, expected modules/ODBC driver/version required before committing this owned build image.
+docker commit "$NEW_MEDIA_BUILD" "$NEW_MEDIA_BUILD_TAG"
+docker build --network=none --pull=false --target asterisk   --build-arg "MEDIA_BUILD_IMAGE=$REVIEWED_MEDIA_BUILD_ID" -f infra/deploy/media.Dockerfile .
+docker build --network=none --pull=false --target turn   --build-arg "MEDIA_BUILD_IMAGE=$REVIEWED_MEDIA_BUILD_ID" -f infra/deploy/media.Dockerfile .
+```
+
+Asterisk/PJSIP/WSS/ARI/SRTP/ODBC와 PostgreSQL Unicode driver를 실제 image에서 확인한다. immutable XML을 숨기거나 권한 검사를 제거해 기동을 통과시키지 않는다. 다운로드 없는 archive load와 container 기동은 서로 다른 실행 단계다.
+
+### 실제 통합 harness
+
+`tests/integration/runtime-media-driver.py`는 기존에 준비한 **고유 disposable none namespace**의 DB/Anchor/chain/Witness/PBX/TURN/controller를 소비한다. 이 파일은 해당 준비를 대신하거나 현재 host의 포트를 공개하지 않는다. `ownership.json`·chain/deployment/public manifest·기관 등록·보호 role URL/secret/TLS·합성 WAV·설치 Node/Chromium이 필요하다. 생성은 기존 준비·migration·LOGIN 도구를 사용하고 새 identity와 기존 배포를 섞지 않는다. 세부 초기 chain/DB 순서는 [소유 원장·API 연결](#owned-ledger-runtime), SQL 준비는 [최소권한/복원 절차](#application-cross-cluster-restore)를 따른다. 이 harness에 전체 stack 자동 bootstrap은 없으며 파일 세트가 없는 다른 장비에서 명령 하나로 재현된다고 보장하지 않는다.
+
+보호된 입력의 경로 계약은 다음과 같다. host의 `REVIEWED_OWNED_RUN_DIR`는 controller 안에서 `/run/callsign`으로 보인다. `REVIEWED_DOCKER_CONFIG_ID`는 공개 실행 증거의 `runtimeTransfer.images.runtime` 또는 보호 디렉터리 `runtime-final-image-id.txt`에서 읽는다. image archive의 네 ID 대조도 그 실행 증거를 사용한다.
+
+| host 작업 디렉터리 아래 파일 | 필수 내용/생성 근거 |
+|---|---|
+| `ownership.json` | runId=`media-*`, directory, scope, 이번 container name/id/role 목록과 volume 이름. `directory`의 끝과 Docker label run-id가 같아야 함 |
+| `synthetic-public-context.json`, `live-http-context.json` | runId/networkId/institutionId/institutionUri/serviceUri, publicAddresses의 administrator/stopper/approver1~3. live 문맥은 실제 기관 등록 transaction/block을 추가하며 기존 배포에서 임의 작성하지 않음 |
+| `data/public-manifest.json`, `data/deployment.json` | 기존 `prepare-finals.ts keys`와 실제 `deploy-service-registry.ts`·공동 등록 결과. genesis/code/artifact hash·chain/registry/institution/profile 일치 필수 |
+| `data/issuer/approval-v1.json`, `data/sender/key.json`, `data/pbx/evidence.json`, Witness key | 역할별 보호 파일. 브라우저에 전달하지 않으며 기존 key를 다시 생성하지 않음 |
+| `private-app.json` | ariPassword, base64url32byte pbxCredentialSecret, turnSecret, platformToken, senderToken. 모두 합성 시험용이며 `.env.example`의 해당 역할 설정에 대응 |
+| `private-database.json` | 별도 시험 database와 anchorToken 및 이번 LOGIN의 보호 자격. DB/Anchor 준비 절차로 생성하며 기존 비밀번호를 복제하지 않음 |
+| `runtime-test.env` | integration·OWNED_LOOPBACK_ONLY·OWNED_FINAL_IMAGE guard, container 기준 ROOT 두 개, TEST_DATABASE_URL(owner)와 ISSUER/AUTH/WORKER_DATABASE_URL, TEST_ANCHOR_TOKEN, NODE_EXTRA_CA_CERTS/PBX_DTLS_CERT_PATH, CALLSIGN_EXPECTED_RUNTIME_IMAGE. HOME/XDG_DATA_HOME은 쓰기 가능한 시험 profile |
+| `tls/`, `asterisk/`, `sender.wav`, `recipient.wav` | 별도 시험 CA/leaf와 생성된 PBX 설정, 합성660/990Hz WAV. 운영 인증서·사람 음성은 사용하지 않음 |
+
+controller는 Node/기존 workspace 의존성/설치 Chromium을 읽기 전용으로 받는 별도 시험 도구다. `ownership.json`에 등록한 `media-*-controller`여야 하고 `--init`이 없으면 driver가 거절한다. 이 controller 생성과 CA 등록은 승인된 작업자가 위 경로 계약을 확인한 뒤 수행하며 driver가 host를 자동 구성하지 않는다.
+
+controller는 `--init`, RAM2GiB·CPU1·PID512, 작업 NSS profile과 loopback CA를 사용한다. 종료된 Chromium 자식을 회수하지 않으면 PID 상한에 도달할 수 있다. 한도를 자동 확대하지 않는다. 앱 역할과 시험 도구의 source mount를 혼동하지 않는다.
+
+```bash
+# AFTER explicit execution approval and owned prerequisite setup, not a bootstrap command.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_RUNTIME_TEST_ROOT="$REVIEWED_OWNED_RUN_DIR" CALLSIGN_EXPECTED_RUNTIME_IMAGE="$REVIEWED_DOCKER_CONFIG_ID" python3 tests/integration/runtime-media-driver.py
+# Target only a previously failed scenario; other cases remain SKIPPED in that distinct report.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_RUNTIME_TEST_ROOT="$REVIEWED_OWNED_RUN_DIR" CALLSIGN_EXPECTED_RUNTIME_IMAGE="$REVIEWED_DOCKER_CONFIG_ID" python3 tests/integration/runtime-media-driver.py --case emergency-stop
+```
+
+driver는 이전 결과가 있으면 중단한다. 원본 로그/결과/request 파일을 보호된 별도 phase로 보존하고 소유 역할만 종료한 뒤 재시도한다. `CALLSIGN_RUNTIME_RESUME_OIDC`는 같은 공개 issuer 주소의 새 fixture를 쓰면서 DB/journal/Anchor를 보존하는 시험 전용 입력이다. 정상 로그인은 실제 start/callback을 다시 거친다. 정지·철회/세대 변경 뒤 과거 상태를 초기화해서 이 harness를 재사용하지 않는다. **이번 환경은 emergency-stop 뒤 시험 DB/Anchor volume까지 정리했으므로 남은 파일로 위 명령을 재실행할 수 없다.** [정책·키·trust 전환](#trust-transition)의 공동 복구/새 trust 또는 별도의 새 disposable identity가 필요하다. 첫 실행의5 PASS는 공통 이미지와 logout/cancel/lease/revoke 네 통화, 재실행의2 PASS는 같은 공통 이미지와 emergency-stop 한 통화다.
+
+실제 DB 회귀는 owner `TEST_DATABASE_URL`과 서로 다른 auth/issuer/worker/PBX `TEST_*_DATABASE_URL`을 요구한다. 모두 같은 `callsign_test_*` 대상이어야 한다. 이 URL은 보호 환경파일에만 둔다. 기존 validation runner와 Compose validation env는 다섯 URL을 소비한다. 새 migration, GRANT, row lock·접촉 저장·금지 UPDATE를 실제 제한 LOGIN으로 확인한다.
+
+### 전달과 클라우드 전환의 남은 gate
+
+**이후 승인된 target에서** archive hash를 확인하고 load한다. load는 기동이나 복원 성공이 아니다.
+
+```bash
+sha256sum "$REVIEWED_IMAGE_ARCHIVE"
+docker image load --input "$REVIEWED_IMAGE_ARCHIVE"
+# Compare each loaded configuration ID with image-transfer-final.json / public evidence.
+```
+
+현재 묶음에는 chain·DB·Anchor·키 전체 일관 snapshot이 없다. 기존 chain 잔여물에 빈 DB를 붙여 사용하거나 Anchor를 DB 백업 시점으로 되돌리지 않는다. 실제 이전은 source drain/fence→일관 chain/DB/key/metadata 준비→독립 Anchor 연속성→target 복구 gate·최소권한 확인→source가 정지한 상태의 target 활성화를 거친다. 기존 백업/복원 절차를 재사용한다. 같은 identity의 source/target 동시 쓰기는 허용하지 않는다.
+
+클라우드에서 바뀔 origin·주소·TLS·OIDC callback·PBX/TURN 접근 정책과 새 공개 trust/web pin을 확인해야 한다. 현재 test web image의 loopback proxy와 합성 trust를 public 운영 값으로 취급하지 않는다. GCP 계정·과금·public exposure를 실행하지 않았다. 관측 RAM 표본/컨테이너 peak는 증거에 있으며 부하 peak·SLA·최소 VM 사양을 뜻하지 않는다. 측정된 idle 표본과 적용한 전체 memory cap의 합계를 참고할 수 있으나 최종 cloud 사양은 실제 외부 연결/부하 확인 전 미정이다.
+
+다음 최소 입력은 외부 origin/TLS·실제 IdP 공개 client/audience/callback과 보호 참조, PBX/TURN의 외부 접근 환경, AI 제공자 보관 조건/보호 자격/소량 예산, 승인된 cloud 대상이다. 공개 DNS·방화벽·host 네트워크 변경과 과금은 별도 명시 승인 전 수행하지 않는다.
+
+
 **현재 단계에서는 아래 실환경 명령을 실행하지 않는다.** 사용자 요청으로 해당 범주 실행이 명시적으로 승인된 뒤 운영자가 수행한다. 자동 차단은 보안 sandbox가 아니라 실수 방지 장치다. 기존 프로세스·키·볼륨·증거를 정리하거나 초기화하지 않는다.
+
+<a id="owned-ledger-runtime"></a>
 
 ## 2026-11-01 격리 실행과 runtime archive의 사용 범위
 
@@ -545,15 +635,15 @@ preflight 준비 분류는 A=코드/템플릿, B=기존 로컬 자료, C=사용�
 | 단계 | 필요한 입력·선행 증거 | 자동 검사와 수동 확인 | 중단 조건·성공 기준 |
 |---|---|---|---|
 | offline | 기존 도구, 명시한 공개/보호 설정 | light·웹 build·runtime 타입·bootstrap preflight·규칙 회귀 | 코드 FAIL은 후속 명령 중단. 설정 BLOCKED는 다른 독립 오프라인 검사를 계속하되 단계는 BLOCKED |
-| database | 소스 검사 통과(전체 설정 PASS와 별개), 별도 `callsign_test_*` DB, owner TEST_DATABASE_URL·별도 TEST_AUTH_DATABASE_URL, migration/GRANT 적용 완료 | 실제 독립 SQL 연결·잠금·소비·commit 후 응답 유실·quota·claim·migration hash·권한 | 모든 실제 assertion 실행/통과. pending/skip은 PASS가 아님. 자동 DB 생성/적용 없음 |
+| database | 소스 검사 통과(전체 설정 PASS와 별개), 별도 `callsign_test_*` DB, owner TEST_DATABASE_URL·별도 auth/issuer/worker/PBX TEST_*_DATABASE_URL, migration/GRANT 적용 완료 | 실제 독립 SQL 연결·잠금·소비·commit 후 응답 유실·quota·claim·migration hash·권한 | 모든 실제 assertion 실행/통과. pending/skip은 PASS가 아님. 자동 DB 생성/적용 없음 |
 | chain | database, 실제 deployment/trust 파일 | 제한된 Foundry 계약 시험; Besu/Witness/정책·키 회수는 MANUAL | 다른 signer2·nonce/domain/legacy 거절; 같은 snapshot3 Witness, 구 VC/lease 회수의 실관측 필요 |
-| media | database+chain, 같은 test 배포의 양측 로그인 storage·할당 업무·확정 위임·trust pin | 실제 PBX 시험은 배포 identity 선검사, 수락 전 sent0/수신 track 차단, 양측 RTP·decoded audio 에너지·logout 회수. TURN·철회/lease 경계는 MANUAL | HTTP200/연결 문구만으로 판정 금지. zero assertions/skip/identity 불일치 차단 |
+| media | database+chain, 같은 test 배포의 양측 로그인 storage·할당 업무·확정 위임·trust pin | 실제 PBX 시험은 배포 identity 선검사, 수락 전 송신 track 비활성/수신 디코딩 무음, 양측 RTP·decoded audio 에너지·logout 회수. TURN·철회/lease 경계는 MANUAL | HTTP200/연결 문구만으로 판정 금지. zero assertions/skip/identity 불일치 차단 |
 | provider | media, 동의받은 작은 WebM/전사, 모델·키 참조, `CONSENTED-SAMPLE-WITH-BUDGET` 확인 | 기존 고정 provider smoke 각1요청; 동의 철회/늦은 응답/보관 조건은 MANUAL | 실제 final 전사·근거 일치 출력. 재시도 전 불명 요청/지출을 확인. 한국어 품질 평가는 별도 |
 | recovery | database+chain, 별도 HTTPS anchor 단일사용 zero fixture | 실제 CAS 시험; 재시작/raw tx/실제 새 대상 복원은 MANUAL | 오래된 DB가 gate를 못 열고 옛 세션이 부활하지 않는 실관측. 원 배포는 정지/수정하지 않음 |
 | performance | media+recovery, 실제 관측 JSON | 실제 측정 수집은 MANUAL, 오프라인 분위수 판정은 자동 | 각 구간100표본 이상·실패 수 포함·같은 monotonic 관측자. 부족하면 BLOCKED |
 | cloud | recovery와 실제 동일 릴리스 manifest, `cloud-test` identity | GCP 이전·재시작·복원은 MANUAL; API/Terraform 자동 호출 없음 | 동일 image/contract/trust, 재초기화 없이 재시작·gate·미디어를 실제 확인 |
 
-이후 **시험 환경의 준비와 별도 실행 승인을 모두 받은 뒤** 첫 서비스 검증 명령은 다음이다. `REVIEWED_TEST_ENV`는 운영 DB와 다른 TEST_DATABASE_URL·TEST_AUTH_DATABASE_URL을 담고, 허용 플래그는 파일 안에 넣지 않는다. 먼저 offline의 light/web/runtime/rules 소스 검사를 통과해야 한다. 전체 서비스 preflight 차단은 DB 검증의 선행 PASS로 요구하지 않는다. DB 전용 입력은 database 단계에서 별도로 검사한다.
+이후 **시험 환경의 준비와 별도 실행 승인을 모두 받은 뒤** 첫 서비스 검증 명령은 다음이다. `REVIEWED_TEST_ENV`는 운영 DB와 다른 owner TEST_DATABASE_URL·별도 auth/issuer/worker/PBX TEST_*_DATABASE_URL을 담고, 허용 플래그는 파일 안에 넣지 않는다. 먼저 offline의 light/web/runtime/rules 소스 검사를 통과해야 한다. 전체 서비스 preflight 차단은 DB 검증의 선행 PASS로 요구하지 않는다. DB 전용 입력은 database 단계에서 별도로 검사한다.
 
 ```sh
 # 아래는 미래 integration 실행 승인 뒤만 사용
@@ -582,6 +672,8 @@ review 파일은 `{"reviewer":"operator:ROLE","observations":[{"id":"besu-witnes
 
 철회는 체인 확정을 관측한 때부터 측정하므로 확정→관측 지연의 상한 `boundaryUncertaintyMs`와 근거 파일 hash도 요구하고 그 상한을 duration에 더한다. 상한을 입증할 수 없으면 BLOCKED다. 서버/브라우저의 시각을 단순 차감하지 않는다. 검증500ms·철회5초는 목표이며 상태 최대10초는 별도 stale/clock-skew 시험이다. 단위 시험의 합성100표본을 실측에 쓰지 않는다.
 
+<a id="trust-transition"></a>
+
 ### 정책·키·trust 전환의 중단과 재개
 
 1. 현재/제안 내용과 기관·chain·계약·action·nonce·deadline·digest를 관리 화면에서 대조하고 제안 파일을 내보낸다. 각 승인자는 같은 내용을 별도 도구로 검토한다. 서명 파일을 가져오면 등록 signer·중복·만료·정족수를 확인한다. 내용 수정 시 이전 서명을 버리고 새 제안을 생성한다. 웹은 개인키를 받지 않는다.
@@ -601,7 +693,7 @@ review 파일은 `{"reviewer":"operator:ROLE","observations":[{"id":"besu-witnes
 |---|---|---|---|---|
 | INPUT-01 배포 identity와 접속 경계 | finals-config, prepare-service-network, deploy-service-registry, Vite config, Compose/nginx | DEPLOYMENT_ID·INSTITUTION_ID·양의 NETWORK_ID·기관/콜센터 HTTPS URI·CALLSIGN_DOMAIN/WEB_ORIGIN·SIP_WSS_URL·PBX 공인IPv4·TURN_URLS. 공개 설정 | 운영자/기관: 새 배포인지 기존 배포 이전인지 먼저 결정. DNS/TLS/주소는 외부 등록·할당 후 확보 | 해당 환경 준비/chain/media. DB 시험 자체에는 불필요. 실제 주소·기관 ID를 생성하지 않음 |
 | INPUT-02 계정과 공동 승인 주체 | assertInitialAccounts, OIDC flow, account-management, governance-v2 | 일반/공식 client/audience 분리·issuer/JWKS/authorize/token HTTPS, 정확한 issuer\|subject 계정 JSON, 서로 다른 EVM 승인자 주소3개. 계정 파일은 개인정보로0600; 공개키 주소는 공개 | 기관·IdP 관리자/독립 승인자: 실제 IdP 계정과 등록 정책을 확인. 이름·이메일 자동 연결 금지 | 최초 계정 준비/auth/기관 등록. 미준비면 해당 로그인·등록 차단, 순수 DB 경계 시험은 가능 |
-| INPUT-03 DB·키·독립 복구의 소유 경계 | migrate-finals, provision-logins.sql, signing-key, postgresAuthorityStore, consumption-anchor | 역할별 DB URL·서로 다른 LOGIN, 보호 키/비밀번호/token 파일 참조, FINALS_ACCOUNTS_PATH, 독립 HTTPS anchor. 비밀/개인정보 보호 | DB owner·역할별 키 소유자·별도 anchor 관리자: 기존 대상의 보존과 새 시험 DB 분리. anchor를 서비스 백업과 함께 복원하지 않음 | 첫 database는 TEST_DATABASE_URL와 TEST_AUTH_DATABASE_URL만 필수. 실제 계정/키/anchor는 이후 해당 단계에서 요구 |
+| INPUT-03 DB·키·독립 복구의 소유 경계 | migrate-finals, provision-logins.sql, signing-key, postgresAuthorityStore, consumption-anchor | 역할별 DB URL·서로 다른 LOGIN, 보호 키/비밀번호/token 파일 참조, FINALS_ACCOUNTS_PATH, 독립 HTTPS anchor. 비밀/개인정보 보호 | DB owner·역할별 키 소유자·별도 anchor 관리자: 기존 대상의 보존과 새 시험 DB 분리. anchor를 서비스 백업과 함께 복원하지 않음 | 첫 database는 owner TEST_DATABASE_URL와 별도 auth/issuer/worker/PBX TEST_*_DATABASE_URL이 필수. 실제 계정/키/anchor는 이후 해당 단계에서 요구 |
 | INPUT-04 실행물·미디어 구성 | app/web Dockerfile, release-manifest, prepare-pbx, asterisk, pbx-routes | 실제 검토 이미지7개 digest·Asterisk22 모듈/ODBC driver·PBX TLS/DTLS/CA 파일·ARI/PBX DB 보호 참조. digest/공개 cert는 공개, key/비밀번호는 비밀 | 운영자/이미지·인증서 관리자: 기존 설치 자료는 파일/메타데이터로 확인 가능하지만 runtime 지원은 미검증. 실제 build/인증서 준비 승인 뒤 산출 | 실제 DB 준비에는 PostgreSQL/기존 도구, PBX 이후에는 해당 모듈·인증서 필요. 전체 스택을 먼저 만들 필요 없음 |
 | INPUT-05 분석 제공자와 보관/시험 예산 | transcription, service-audio, risk, provider-smoke | Deepgram/Anthropic 모델 이름·보호 API key 참조·동의된 소량 입력·보관/예산 정책. 키/입력은 비밀/민감 | 기관 개인정보 책임자/제공자 계정 관리자: 계정 등록·지원 모델/보관 조건 확인 | provider/실제 분석. 없으면 분석 불가를 표시. DB·chain 검증에는 요구하지 않음 |
 
@@ -645,7 +737,7 @@ pnpm validate --stage offline --environment TEST_ENV_JSON --env-file TEST_ENV --
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration pnpm validate --stage database --environment TEST_ENV_JSON --env-file TEST_ENV --prerequisite artifacts/NEW-SOURCE.json --output artifacts/NEW-DATABASE.json --execute
 ```
 
-필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0006 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH_DATABASE_URL=같은 시험 DB의 별도 auth LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
+필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0009 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH/ISSUER/WORKER/PBX_DATABASE_URL=같은 시험 DB의 서로 다른 역할 LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
 
 ### 미커밋 checkpoint의 포함·제외
 
@@ -665,7 +757,7 @@ docker run --pull=never -d --name NAME --label callsign.test=RUN_ID --label com.
 docker exec NAME pg_isready -h 127.0.0.1 -U cs_test_owner -d callsign_test_UNIQUE
 ```
 
-PG_TEST_ENV는0700 임시 디렉터리의0600 파일로 POSTGRES_USER/POSTGRES_DB/POSTGRES_PASSWORD만 담는다. 비밀번호는 시험용으로만 생성하고 명령 argv/증거/Git에 넣지 않는다. 별도 보호 TEST_ENV에는 test: DEPLOYMENT_ID, owner TEST_DATABASE_URL, 같은 DB의 다른 TEST_AUTH_DATABASE_URL을 둔다. Docker internal network에서는 이 환경의 host port mapping이 생성되지 않았으므로 동일 옵션으로 무조건 재시도하지 않는다. localhost port 연결과 시험 DB 이름/label을 확인한 다음에만 migration을 적용한다.
+PG_TEST_ENV는0700 임시 디렉터리의0600 파일로 POSTGRES_USER/POSTGRES_DB/POSTGRES_PASSWORD만 담는다. 비밀번호는 시험용으로만 생성하고 명령 argv/증거/Git에 넣지 않는다. 별도 보호 TEST_ENV에는 test: DEPLOYMENT_ID, owner TEST_DATABASE_URL, 같은 DB의 별도 auth/issuer/worker/PBX TEST_*_DATABASE_URL을 둔다. Docker internal network에서는 이 환경의 host port mapping이 생성되지 않았으므로 동일 옵션으로 무조건 재시도하지 않는다. localhost port 연결과 시험 DB 이름/label을 확인한 다음에만 migration을 적용한다.
 
 해당 보호 프로세스 환경의 MIGRATOR_DATABASE_URL로 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration node --import tsx scripts/migrate-finals.ts --apply`를 실행한다. 이후 owner의 psql로 기존 provision-logins.sql을 적용하며 네 비밀번호는 보호 stdin/env로 전달한다. 기존 LOGIN이 있으면 도구는 덮어쓰지 않는다. 시험 env JSON/URL은 이전 절의 runner 명령에 그대로 사용한다.
 
@@ -749,6 +841,8 @@ DB의 최초 준비 완료는 `pg_isready -h 127.0.0.1 -U TEST_OWNER -d callsign
 
 후속 증거는 [경계 검증 평가](../artifacts/service-boundaries-20261030.json)에 연결한다. 실패 이력도 보존하고 부분 필터 실행의 SKIPPED를 전체 PASS에 합산하지 않는다. 검증 이후에도 실제 체인·독립 anchor·PBX·제공자·운영 IdP 검증은 별도 허가와 설정이 필요하다.
 
+
+<a id="application-cross-cluster-restore"></a>
 
 ## 쓰기 중 백업 준비와 별도 cluster 복원
 

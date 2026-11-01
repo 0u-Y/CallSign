@@ -1,5 +1,8 @@
 # 05. 구현 및 검증 현황
 
+**2026-11-02 추가 검증:** 실제 교환기·TURN·제품 웹에서 합성 음원을 양방향으로 수신하고, 로그아웃·업무 취소·lease 만료·위임 철회·기관 정지 뒤 음성이 멈추는 것을 확인했습니다. 원장·DB·Anchor·worker는 실제 구현이고 OIDC는 로컬 fixture입니다. 외부망·실제 IdP·AI 품질·GCP·전체 이전 성공은 아닙니다. [새 결과와 정확한 이미지/시험 범위](../FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102). 아래 표는 표시된 과거 시점의 기록입니다.
+
+
 **2026-11-01 추가 검증:** 실제 Besu4·계약·Witness 경계5시험, 최소권한 PostgreSQL·독립 HTTPS Anchor·실제 worker·HTTP 연결3시험을 확인했습니다. 업무→위임 원장 확정→Witness 확인→기본 교환기 profile의 승인 발급과 긴급 정지 전파까지입니다. OIDC는 로컬 fixture이고 실제 PBX/음성·외부 AI·GCP는 미검증입니다. 아래 표의 과거 fixture 시험과 합산하지 않습니다. [소스·결과·한계](../FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
 
 

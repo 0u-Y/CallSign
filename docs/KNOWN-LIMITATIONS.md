@@ -1,12 +1,18 @@
 # 현재 구현의 한계
 
-기준일: 2026-11-01. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
+기준일: 2026-11-02. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
-## 실제 원장·API 연결의 검증 범위
+## 실제 미디어 연결의 검증 범위
 
-[2026-11-01 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)에서 같은 host의 Besu4/계약/Witness5시험과 실제 worker·PG·HTTPS Anchor·HTTP3시험을 실행했다. OIDC는 fixture이며 기본 PBX profile의 승인 발급까지만 확인했다. 실제 PBX binding·RTP/음성·외부 IdP·한국어 STT/LLM·GCP·전체 복원은 미검증이다. 제한된 노드/Witness 중단 관측을 독립 host 장애 내성으로 확대하지 않는다.
+[2026-11-02 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)은 실제 원장·DB·HTTPS Anchor·runtime 역할·Asterisk22.11·coturn4.6.3·제품 웹을 연결했다. 양쪽 browser는660/990Hz 합성 마이크를 쓰고 실제 원격 트랙을 디코딩했다. 승인 전 무음, 양방향 상대 음원, 로그아웃·업무 취소·실제 lease 만료·위임 철회·긴급 정지 후 무음을 확인했다. 원장 확정과 실제 Witness 확인도 포함하지만 OIDC는 fixture다.
 
-부분 runtime archive는 생성했으나 웹/PBX/TURN·운영 trust/키·일관된 전체 데이터 이전 패키지는 아니다. 최종 재build image는 오프라인 build만 확인했다. 시점별 RAM 표본을 peak·최소 클라우드 사양·SLA로 쓰지 않는다. 기존 host bridge/route/방화벽/서비스는 보존했으며 공개 네트워크 접근은 검증하지 않았다.
+같은 namespace의 실제 relay 선택은 외부 NAT 통과나 독립 호스트 장애 내성이 아니다. Asterisk는 loopback host ICE 후보를 제외하므로 시험 전용 TURN을 PBX에도 연결했다. `allow-loopback-peers`는 이 격리 설정에만 사용하며 공개 TURN의 기본값으로 옮기지 않는다. 내장 G.711 μ-law의8kHz 음성 경로만 확인했고 Opus 변환·한국어 음질·실제 외부 STT/LLM·제공자 보관/취소/청구는 미검증이다.
+
+통화 중 정책/키 교체·세션 자연 만료·실제 PBX 제어 장애·장치 거절/없음 전체 조합, 외부 IdP/MFA·다른 브라우저·GCP·전체 배포 복원은 남아 있다. 기존 fixture/단위 시험을 이번 실통화 결과로 확대하지 않는다. 실제 사람의 음성을 수집하지 않았다.
+
+최종 이미지의 실제 역할 기동/서명/worker 관측과 앞선 candidate 이미지의 통화 결과를 구분했다. 전달 archive는 runtime/web/PBX/TURN 이미지뿐이며 chain·DB·Anchor·키 전체 백업이 아니다. 시험 controller의 PID 상한 도달 뒤 init으로 회수했고 상한을 늘리지 않았다. 공개 증거에는 관측 표본과 실제 cgroup peak의 출처를 구분한다. 클라우드 최소 사양·SLA는 확정하지 않았다.
+
+전후 host 대조에서는 기존 veth1개와 연결된 IPv6 경로가 달랐다. 다른 route·Docker network ID·기존 container ID는 보존됐다. 비소유 restart-always container의 재시작이 관측됐지만 직접 대응은 미확정이며 host 전체 동일이라고 주장하지 않는다. 소유 none 자원은 모두 정리했고 그 차이를 복구하려고 기존 설정을 바꾸지 않았다.
 
 ## 배포 후보의 차단과 미확인
 
@@ -37,8 +43,8 @@ API/trust 기본 명령·공개 CA mount·worker 보관 기간·Docker 시험/�
 
 ## 현재 서비스
 
-- **인증·HTTP·DB·화면 일부 검증, 전체 서비스 미검증.** 격리 PostgreSQL 회귀15시험과 최초 HTTPS OIDC fixture→실제 API/DB→Chromium 선택 경로7시험은 당시 통과했으며, 후속 경계의 최신 결과는 위 평가와 진행 기록을 따른다. 체인 상태·독립 anchor는 명시적 fixture이며 실제 IdP·Witness·PBX·TURN·외부 AI·GCP·백업/복원은 실행하지 않았다. 합성 통화 binding을 실제 미디어 연결로 확대하지 않는다. [이번 평가](../artifacts/http-validation-20261030.json)를 따른다.
-- **PBX 보장 경계.** Asterisk가 DTLS-SRTP 음성 종단이다. ARI는 채널·Call-ID·bridge를 조회한다. 인증서 지문은 배치한 공개 인증서에서 고정하고 브라우저의 실제 관측과 대조한다. 서버의 독립 DTLS handshake 수집이나 원 상담원의 개인 신원 증명은 아니다. 자체 SIP 모듈은 직접 Asterisk WSS/등록/수신 dialog로 제한하며 proxy route·PSTN·임의 transfer·재협상은 거절한다. 실제 구현 이미지·ODBC·인증서·단말 호환은 검증 전이다.
+- **인증·원장·DB·미디어 선택 경로 검증, 전체 서비스 미검증.** 최신 실제 연결은 상단의2026-11-02 범위를 따른다. OIDC만 fixture이고 원장/Witness·PostgreSQL·HTTPS Anchor·PBX/TURN·합성 원격 음원은 실제 구현이다. 과거 HTTP/복구 평가의 대체 경계는 그 실행 당시의 것이며 최신 미디어 결과나 운영 IdP·외부 AI/GCP·전체 복원 성공으로 합산하지 않는다.
+- **PBX 보장 경계.** Asterisk가 DTLS-SRTP 음성 종단이다. ARI는 채널·Call-ID·bridge를 조회한다. 인증서 지문은 배치한 공개 인증서에서 고정하고 브라우저의 실제 관측과 대조한다. 서버의 독립 DTLS handshake 수집이나 원 상담원의 개인 신원 증명은 아니다. 자체 SIP 모듈은 직접 Asterisk WSS/등록/수신 dialog로 제한하며 proxy route·PSTN·임의 transfer·재협상은 거절한다. 이번 Asterisk/PJSIP·ODBC·작업 CA·Chromium 경로는 확인했다. 운영 인증서·다른 단말·외부망 호환은 검증 전이다.
 - **통화 정책값.** 120초는 attempt 생성부터의 연결 시작 창이다. lease 30초·최대 4시간은 설정 가능한 초기값이며 합의된 SLA가 아니다. 업무·VC가 먼저 만료되면 더 일찍 종료한다. 기관 서비스 재시작 후 기존 PBX 통화는 정리하고 새 시도를 요구한다. 진행 통화의 무중단 복원은 보장하지 않는다.
 - **원장 외부 호출.** 같은 서명 raw tx/hash를 저장한 뒤 제출·조회·재전송한다. 외부 exactly-once는 아니다. 12회 실패는 운영자 확인 상태로 남고, 결과 불명의 signer nonce가 있으면 새 nonce 발급도 차단한다. 다른 도구가 같은 관리자 계정으로 동시에 tx를 제출하는 운영은 지원하지 않는다.
 - **독립 복구 기준.** anchor는 별도 장애·백업 영역에 배치해야 한다. VM 백업 안의 값만으로 차단을 풀지 않는다. 외부 CAS 진행 뒤 DB commit이 불명확하거나 기존 소비 이력과 journal이 다르면 gate를 닫는다. 완전한 최신 이력이 없으면 자동 복구하지 않으며 운영자 재신뢰 판단이 필요하다. 구 배포를 새 구조로 옮길 때 소비 journal 기준도 별도 대조해야 한다.
@@ -72,7 +78,7 @@ API/trust 기본 명령·공개 CA mount·worker 보관 기간·Docker 시험/�
 
 온체인은 정책/공식 경로의 hash와 version을 검증할 뿐 질문·표시 문자열의 의미를 해석하지 않는다. directory-only의 현재 제품 범위는 서버 schema가 제한한 `/official` 표시명 변경이며 임의 외부 경로의 안전성을 증명하지 않는다. 전역 nonce는 기관 간에도 재사용할 수 없다. fuzz는 assume 없는2단계 sequence32회이며 전체 상태 공간의 invariant 증명은 아니다. [현재 증거](../artifacts/contract-validation-20261030.json)를 따른다.
 
-첫 공개 push CI에서 source checker의 rg 의존성이 실패해 Git 기반 목록으로 수정했다. 현재 source hygiene는 Git checkout이 필요하며 rg 설치는 요구하지 않는다. 최신 로컬 light는43파일195시험 PASS이고 원격 CI 상태는 해당 실행 URL을 별도로 확인한다.
+첫 공개 push CI에서 source checker의 rg 의존성이 실패해 Git 기반 목록으로 수정했다. 현재 source hygiene는 Git checkout이 필요하며 rg 설치는 요구하지 않는다. 당시 로컬 light는43파일195시험 PASS이고 원격 CI 상태는 해당 실행 URL을 별도로 확인한다.
 
 ## 인증·화면 시험의 대체 경계
 

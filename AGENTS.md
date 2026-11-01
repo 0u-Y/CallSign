@@ -52,3 +52,7 @@
 ## 2026-11-01 호스트 설정 보존 격리 연결의 한정 예외
 
 이번 사용자 요청은 기존 host/interface/route/DNS/firewall/Docker daemon·기존 서비스/volume을 보존하는 조건으로 작업 전용 none namespace·loopback의 Besu4/Witness4·DB/Anchor/API·worker, 합성 키/계정, 오프라인 app image build·검증과 관련 commit/일반 push/CI 확인을 허용했다. 새 bridge/host port publish·공개 노출·host 설정 변경은 허용하지 않았다. package probe137 종료 후 소유 서비스를 중단했으며 사용자가 명시한2GiB·60초 재검증은1회만 수행했다. 유료 AI/GCP·운영 데이터는 사용하지 않았다. 실행 결과와 남은 media/외부 설정은 진행 기록을 따른다. 이 기록은 후속 세션의 상시 기동 허가가 아니다.
+
+## 2026-11-02 격리 미디어 검증의 한정 예외
+
+이번 사용자 요청은 기존 host/IP/route/DNS/firewall/Docker daemon·기존 자원을 보존하는 조건으로 소유 none namespace의 실제 체인/DB/Anchor/API/worker/Asterisk/TURN/제품 웹·합성 음원 Chromium 시험, 시험 키/CA·오프라인 image build·관련 commit/일반 push/CI 조회를 한정 허용했다. Asterisk22.11.0/coturn4.6.3 및 공식 build 의존성 다운로드는 총500MiB 상한으로 별도 승인했다. public exposure·host 설정 변경·운영 데이터/마이크·외부 유료 AI/GCP는 허용하지 않았다. 실행 guard를 유지하고 소유 자원만 정리한다. 이 기록은 후속 세션의 상시 기동·다운로드 허가가 아니다. 결과·한계는 최신 진행 기록을 따른다.
