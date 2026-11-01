@@ -29,6 +29,10 @@
 
 문서 권위: 사용자 지시와 AGENTS가 실행 범위를 정한다. 이 명세는 전체 제품 요구와 완료 조건의 기준이고, [진행표](FINALS-IMPLEMENTATION-PLAN.md)는 작업 로그, [과거 결과 보고서](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md)는 2026-10-26 개발 특정 블록의 상태 묶음, [runbook](RUNBOOK.md)은 현행 절차의 근거다. 과거 보고서·초안은 날짜별 archive에 보존하고, 원본 기획서와 시험 증거는 유지한다. 충돌은 §3에 명시하고, 앞으로 개발 시 관련 문서를 같은 요구사항 ID로 갱신한다.
 
+### 2026-11-01 첫 체인 준비의 현행 기준
+
+CHAIN-001/002·OPS-001/003·TEST-001: 신규 배포는 `LEDGER_IPV4_PREFIX`로 Compose subnet/validator IP·advertised host와 생성 peer/permissions를 함께 파생한다. 현재 호스트의 기본10.203.0.0/24 충돌은 그대로이며 후보10.206.0.0/24는 읽기 전용 관측에서 비중복, 미적용이다. 기존 genesis·validator/기관 키·epoch는 재생성하지 않는다. `preflight --phase chain --step prepare|nodes|deploy|witness`는 전체 PBX/OIDC/AI 설정과 별개로 단계별 입력/생성물만 검사한다. 첫4노드 추출본은 app image가 없어도 구성 파싱할 수 있다. 체인/Witness bind를 명시해 추출 오분류와 누락 파일 자동 생성을 막았다. 이는 실행 준비 코드이며 실제 합의/계약/Witness 성공이 아니다. [단일 입력표·첫 실행 조건](RUNBOOK.md#2026-11-01-서버용-배포-입력표), [이번 기록](FINALS-IMPLEMENTATION-PLAN.md#chain-preparation-20261101).
+
 ### 2026-10-31 배포 후보의 현행 기준
 
 OPS-001/003/005·DB-004·AUTH-002·TEST-001/004는 [배포 후보 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 추가 근거로 사용한다. 현재 기본 entrypoint/공개 trust 생성, CA bundle 전달·worker 보관 기간·migration0006 준비표·시험 context 배제·시작과 readiness 분리를 정합하게 했다. 이번 검증은 source/타입/단위/웹 build·Compose 정적 파싱뿐이며 과거 로컬 DB/EVM/HTTP/브라우저/복구 증거를 재실행한 것으로 표시하지 않는다. [RUNBOOK](RUNBOOK.md#배포-후보와-실제-연결-순서)의 다섯 의사결정 및 단계별 실제 인프라 검증이 다음 gate다. 현재 host의 ledger subnet 충돌과 사용자/외부 설정은 BLOCKED다. 요구사항 ID·완료 기준은 유지하며 전체 서비스 완료율을 시험 수로 계산하지 않는다.

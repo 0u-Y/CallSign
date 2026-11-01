@@ -4,6 +4,27 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="chain-preparation-20261101"></a>
+
+## 2026-11-01 첫 체인 실행 직전의 입력·네트워크 준비
+
+시작 HEAD `87a2d37d3ec49462925771013aa8e2c8615755c9`와 원격 main 일치를 확인하고 기존 미추적 요약6개·진행 포인터28개를 보존했다. 서버의 실제 설정·네트워크·서비스·volume은 변경하지 않았다. interface/모든 IPv4 route/Docker IPAM 읽기 전용 조회에서 기본10.203.0.0/24 충돌을 재확인했고 신규 prefix10.206.0을 비중복 후보로 제안했다. 숨은 VPN/조직망/향후 GCP에 대한 보장은 아니며 아직 미적용이다.
+
+- CHAIN-001/002·OPS-001/003: `LEDGER_IPV4_PREFIX` 하나로 배포 Compose subnet/static IP·advertised host/host allowlist와 공개키 기반 static peers/permissions를 파생한다. 기본값/과거 호환 Compose를 보존하고 신규 env에서만 선택한다. 기존 genesis·validator/기관 키·epoch를 재생성하지 않고 기존 peer 내용이 다르면 거절한다. 준비 스크립트는 같은 `CALLSIGN_ENV_FILE`/`--env-file` parser를 사용한다.
+- OPS-001·TEST-001: 실제 보간한 추출본에서 짧은 mount가 named volume으로 오분류되어 config가 실패했다. Besu/Witness28개 mount를 명시적 bind·`create_host_path:false`로 바꿨다. 누락된 파일을 디렉터리로 자동 생성하지 않는다. 수정 후 nodes4는 app/OIDC/PBX/AI 값 없이 파싱했고 IP/명령/subnet·고유 project 이름·resource 상한을 대조했다. 중간 Python 검사에서 Compose의 메모리 숫자 문자열을 정수와 직접 비교한 검사 오류도 구분해 수정했다.
+- OPS-003·CHAIN-001/002: 기존 preflight에 chain의 `prepare/nodes/deploy/witness` 단계만 추가했다. 입력 검토 PASS와 생성물 준비·실제 실행 PASS를 분리한다. 배포자 키를 Witness 단계에 요구하지 않으며 chain 단계는 PBX/OIDC/AI/web pin을 요구하지 않는다. 전체 runtime preflight는 그대로 BLOCKED63/PASS16/SKIPPED1이다. [이번 검사별 A~E 원인·주체·소비 단계](../artifacts/chain-preparation-20261101.json)에 파생 오류를 선행 조건으로 묶었다.
+- [RUNBOOK의 단일 입력표](RUNBOOK.md#2026-11-01-서버용-배포-입력표)에 공개 결정·보호 참조·생성값·host/container 경로·OIDC public client/PKCE·CA 전달·역할별 키 소유·독립 Anchor 책임을 정리했다. 기존 추출에4노드 전용 plan을 추가하고 같은 project의 chain9서비스/auth8서비스를 유지한다. 첫 실행의 명령·시간/자원 상한·합의/계약/Witness 별도 assertion·중단·소유 자원 정리 절차를 구체화했다.
+
+### 이번 실제 검사와 남은 조건
+
+최종 `pnpm light`: **45파일225시험 PASS**, 타입 검사 포함. [최종 소스 증거](../artifacts/chain-preparation-final-source-20261101.json)는 실행 HEAD와 dirty 소스 hash/명령을 보존한다. 같은 작업의 선행223시험 [검사](../artifacts/chain-preparation-source-20261101.json)는 당시 기록이며 최종 결과로 합산하지 않는다. RUNBOOK shell/inline JS와 generator bash 구문, 전체 Compose/PBX 및 추출 nodes4/chain9/auth8 구성 검사 PASS. 웹/계약/API runtime은 수정하지 않아 별도 build/계약/통합 시험을 반복하지 않았다. light에 포함된 API/웹/Witness 타입 검사는 실행했다.
+
+24 CPU, available 약35.3GiB, disk 여유453GiB를 읽기 전용으로 관측했다. 짧은 vmstat 후속 두 표본의 swap in/out은0이었지만 누적 swap 사용 약9.9GiB이며 실행 직전 재관측이 필요하다. Besu26.8.1 로컬 RepoDigest는 확인했고 현재 소스의 app runtime 이미지는 미생성이다. 이미지 실행/다운로드/build·키/인증서 생성·어떤 서비스/컨테이너 기동·RPC·배포도 하지 않았다. 임시 Compose JSON은 소유 임시 디렉터리만 제거했다.
+
+검증한 코드·설정은 `8a174ca2bd32469730f99fed61d179fa66a4795d`에 보존했다. 시험은 그 전 `87a2d37` 이후 worktree에서 수행했으며 원본 HEAD·시각·hash를 바꾸지 않았다.
+
+첫 결정은 신규/기존 배포 구분·prefix 후보 승인, 고유 project/host 경로/chain ID, 배포자·공동 승인자·Witness의 책임이다. 실제 image digest/키/public manifest/genesis/계약 metadata/trust pin은 승인된 과정의 산출물이며 임의 값으로 입력하지 않는다. 현재 후보만 주입한 prepare 검사는 공개 결정3개가 BLOCKED이고 nodes/deploy/witness도 생성물 미준비로 BLOCKED다. 이 숫자를 실제 사용자 입력 수나 서비스 완성률로 해석하지 않는다. 호스트 설정 변경·실제 기동은 계속 별도 허가 대상이다.
+
 <a id="release-candidate-20261031"></a>
 
 ## 2026-10-31 실제 인프라 연결 전 배포 후보 검토

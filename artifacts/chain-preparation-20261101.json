@@ -1,0 +1,1210 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-01T11:36:04.217Z",
+  "head": "87a2d37d3ec49462925771013aa8e2c8615755c9",
+  "worktreeDirty": true,
+  "executionScope": "offline-preparation-only",
+  "realEnvironmentVerified": false,
+  "assessment": {
+    "method": "automatic",
+    "executionState": "completed",
+    "verdict": "BLOCKED",
+    "review": "unreviewed"
+  },
+  "hostObservation": {
+    "dockerNetworks": 26,
+    "routeEntries": 81,
+    "interfaceCount": 27,
+    "defaultLedgerConflict": true,
+    "proposedPrefix": "10.206.0",
+    "proposalOverlapsObservedRanges": false,
+    "limits": "IPv4 routes/interfaces/Docker IPAM now visible only; no hidden VPN/organization/future GCP assurance. No host changes."
+  },
+  "fullPreflight": {
+    "scope": "no-user-values",
+    "counts": {
+      "PASS": 16,
+      "FAIL": 0,
+      "BLOCKED": 63,
+      "SKIPPED": 1
+    },
+    "blocked": [
+      {
+        "id": "WEB_ORIGIN",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_ISSUER",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_JWKS_URL",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_AUTHORIZATION_URL",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_TOKEN_URL",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "SIP_WSS_URL",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_CLIENT_ID",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OIDC_AUDIENCE",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OFFICIAL_OIDC_CLIENT_ID",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "OFFICIAL_OIDC_AUDIENCE",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "TURN_URLS",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "SIP_REALM",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "SIP_DOMAIN",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "REGISTRY_APPROVERS",
+        "class": "B",
+        "cause": "joint-approver-owners",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "deploy",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "official-auth-isolation",
+        "class": "B",
+        "cause": "oidc-public-clients",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "CALLSIGN_DOMAIN",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "PBX_PUBLIC_HOST",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "INSTITUTION_ID",
+        "class": "B",
+        "cause": "deployment-institution-identities",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "deploy",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "PBX_PUBLIC_ADDRESS",
+        "class": "B",
+        "cause": "public-network-tls-media",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "trust/media",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "PBX_DB_USER",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "ARI_PASSWORD",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "PBX_DB_PASSWORD",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "MIGRATOR_DB_PASSWORD",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "FINALS_ACCOUNTS_PATH",
+        "class": "D",
+        "cause": "verified-oidc-accounts",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "service-token-separation",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "provider:stt",
+        "class": "D",
+        "cause": "provider-account-model-budget",
+        "producer": "기관/제공자 관리자",
+        "stage": "provider",
+        "consumers": [
+          "STT/LLM adapter"
+        ],
+        "prerequisites": [
+          "모델·보관·동의·예산 결정; 보호 계정 참조"
+        ]
+      },
+      {
+        "id": "provider:llm",
+        "class": "D",
+        "cause": "provider-account-model-budget",
+        "producer": "기관/제공자 관리자",
+        "stage": "provider",
+        "consumers": [
+          "STT/LLM adapter"
+        ],
+        "prerequisites": [
+          "모델·보관·동의·예산 결정; 보호 계정 참조"
+        ]
+      },
+      {
+        "id": "joint-approvers",
+        "class": "B",
+        "cause": "joint-approver-owners",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "deploy",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "ISSUER_DATABASE_URL",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "AUTH_DATABASE_URL",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "WORKER_DATABASE_URL",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "database-account-separation",
+        "class": "D",
+        "cause": "separate-database-logins",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "CALLSIGN_APP_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "deploy/witness",
+        "consumers": [
+          "CALLSIGN_APP_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "CALLSIGN_WEB_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "해당 서비스 단계",
+        "consumers": [
+          "CALLSIGN_WEB_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "ASTERISK_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "해당 서비스 단계",
+        "consumers": [
+          "ASTERISK_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "TURN_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "해당 서비스 단계",
+        "consumers": [
+          "TURN_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "BESU_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "nodes",
+        "consumers": [
+          "BESU_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "POSTGRES_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "해당 서비스 단계",
+        "consumers": [
+          "POSTGRES_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "HTTPS_IMAGE",
+        "class": "C",
+        "cause": "reviewed-images",
+        "producer": "승인된 이미지 build/출처 검토 담당",
+        "stage": "해당 서비스 단계",
+        "consumers": [
+          "HTTPS_IMAGE"
+        ],
+        "prerequisites": [
+          "검토 source/출처; 실제 digest 생성/조회"
+        ]
+      },
+      {
+        "id": "REGISTRY_ADMIN_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "auth/management",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "REGISTRY_OPERATOR_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "auth/management",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "PBX_EVIDENCE_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "trust/media",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "ISSUER_APPROVAL_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "auth/management",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "SENDER_PRIVATE_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "auth/management",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "WITNESS_1_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "witness",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "WITNESS_2_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "witness",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "WITNESS_3_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "witness",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "WITNESS_4_KEY_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "witness",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "PBX_CREDENTIAL_SECRET",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_TOKEN",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "TURN_SECRET",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "PLATFORM_INTERNAL_TOKEN",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "SENDER_INTERNAL_TOKEN",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "CONSUMPTION_ANCHOR_URL",
+        "class": "B",
+        "cause": "independent-anchor-operator",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "ISSUER_URI",
+        "class": "B",
+        "cause": "deployment-institution-identities",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "SERVICE_URI",
+        "class": "B",
+        "cause": "deployment-institution-identities",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "DEPLOYMENT_ID",
+        "class": "B",
+        "cause": "deployment-institution-identities",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "auth/bootstrap",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "NETWORK_ID",
+        "class": "B",
+        "cause": "deployment-institution-identities",
+        "producer": "배포/기관/콜센터/망/IdP 책임자",
+        "stage": "prepare",
+        "consumers": [
+          "각 검사에 대응하는 설정 소비 서비스; RUNBOOK 단일 입력표"
+        ],
+        "prerequisites": [
+          "실제 공개 정보와 운영 책임 결정; 임의 주소/계정 금지"
+        ]
+      },
+      {
+        "id": "PBX_DTLS_CERT_PATH",
+        "class": "C",
+        "cause": "role-keys-certificates",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "trust/media",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "SERVICE_EXTRA_CA_PATH",
+        "class": "D",
+        "cause": "public-tls-trust-reference",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "ARI_AUTHORIZATION",
+        "class": "D",
+        "cause": "role-service-credentials",
+        "producer": "DB/IdP/TLS/역할 운영자",
+        "stage": "database/auth/media/recovery",
+        "consumers": [
+          "역할별 API/worker/PBX"
+        ],
+        "prerequisites": [
+          "공개 identity/소유자 결정; 보호 파일/환경에 준비, 원문 비공개"
+        ]
+      },
+      {
+        "id": "DEPLOYMENT_PATH",
+        "class": "C",
+        "cause": "actual-contract-metadata",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "배포 이후",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      },
+      {
+        "id": "TRUST_BUNDLE_PATH",
+        "class": "C",
+        "cause": "trust-generation",
+        "producer": "각 역할 소유자/승인된 준비 도구",
+        "stage": "trust/media",
+        "consumers": [
+          "역할별 서비스/trust"
+        ],
+        "prerequisites": [
+          "역할/키 소유자 결정; 신규 생성과 기존 복원 구분"
+        ]
+      }
+    ],
+    "runtimeObservation": {
+      "class": "E",
+      "id": "network-and-runtime",
+      "status": "SKIPPED",
+      "producer": "승인된 실환경 실행",
+      "consumers": [
+        "Besu/contract/Witness/TLS/DB/media/provider"
+      ],
+      "prerequisites": [
+        "단계별 실행 허가/설정/실제 산출물"
+      ]
+    }
+  },
+  "fixedSourceDefects": {
+    "class": "A",
+    "items": [
+      "single-prefix Compose/peer consistency",
+      "explicit chain bind mounts before interpolation",
+      "four-node plan independent of generated app image and unrelated services",
+      "phase-specific local checks"
+    ]
+  },
+  "proposalOnlyStageChecks": {
+    "prepare": [
+      {
+        "id": "execution-guard",
+        "status": "PASS",
+        "detail": "preflight에는 실행 허용 변수를 지정하지 않습니다."
+      },
+      {
+        "id": "CALLSIGN_PROJECT",
+        "status": "BLOCKED",
+        "detail": "새 배포의 고유 Compose project. 기존 project 재사용 여부는 운영자가 확인."
+      },
+      {
+        "id": "FINALS_DATA_DIR",
+        "status": "BLOCKED",
+        "detail": "호스트의 배포 전용 절대 경로. container 경로와 구분."
+      },
+      {
+        "id": "NETWORK_ID",
+        "status": "BLOCKED",
+        "detail": "검토한 chain ID. 기존 genesis/identity를 재생성하지 않습니다."
+      },
+      {
+        "id": "ledger-addresses",
+        "status": "PASS",
+        "detail": "10.206.0.0/24; validators .11~.14, RPC는 내부 besu1~4 DNS."
+      },
+      {
+        "id": "ledger-media-separation",
+        "status": "PASS",
+        "detail": "현재 별도 media subnet과도 분리되어야 합니다."
+      },
+      {
+        "id": "ledger-overlap",
+        "status": "PASS",
+        "detail": "전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인."
+      }
+    ],
+    "nodes": [
+      {
+        "id": "execution-guard",
+        "status": "PASS",
+        "detail": "preflight에는 실행 허용 변수를 지정하지 않습니다."
+      },
+      {
+        "id": "CALLSIGN_PROJECT",
+        "status": "BLOCKED",
+        "detail": "새 배포의 고유 Compose project. 기존 project 재사용 여부는 운영자가 확인."
+      },
+      {
+        "id": "FINALS_DATA_DIR",
+        "status": "BLOCKED",
+        "detail": "호스트의 배포 전용 절대 경로. container 경로와 구분."
+      },
+      {
+        "id": "NETWORK_ID",
+        "status": "BLOCKED",
+        "detail": "검토한 chain ID. 기존 genesis/identity를 재생성하지 않습니다."
+      },
+      {
+        "id": "ledger-addresses",
+        "status": "PASS",
+        "detail": "10.206.0.0/24; validators .11~.14, RPC는 내부 besu1~4 DNS."
+      },
+      {
+        "id": "ledger-media-separation",
+        "status": "PASS",
+        "detail": "현재 별도 media subnet과도 분리되어야 합니다."
+      },
+      {
+        "id": "ledger-overlap",
+        "status": "PASS",
+        "detail": "전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인."
+      },
+      {
+        "id": "BESU_IMAGE",
+        "status": "BLOCKED",
+        "detail": "검토한 실제 digest 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인."
+      }
+    ],
+    "deploy": [
+      {
+        "id": "execution-guard",
+        "status": "PASS",
+        "detail": "preflight에는 실행 허용 변수를 지정하지 않습니다."
+      },
+      {
+        "id": "CALLSIGN_PROJECT",
+        "status": "BLOCKED",
+        "detail": "새 배포의 고유 Compose project. 기존 project 재사용 여부는 운영자가 확인."
+      },
+      {
+        "id": "FINALS_DATA_DIR",
+        "status": "BLOCKED",
+        "detail": "호스트의 배포 전용 절대 경로. container 경로와 구분."
+      },
+      {
+        "id": "NETWORK_ID",
+        "status": "BLOCKED",
+        "detail": "검토한 chain ID. 기존 genesis/identity를 재생성하지 않습니다."
+      },
+      {
+        "id": "ledger-addresses",
+        "status": "PASS",
+        "detail": "10.206.0.0/24; validators .11~.14, RPC는 내부 besu1~4 DNS."
+      },
+      {
+        "id": "ledger-media-separation",
+        "status": "PASS",
+        "detail": "현재 별도 media subnet과도 분리되어야 합니다."
+      },
+      {
+        "id": "ledger-overlap",
+        "status": "PASS",
+        "detail": "전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인."
+      },
+      {
+        "id": "BESU_IMAGE",
+        "status": "BLOCKED",
+        "detail": "검토한 실제 digest 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인."
+      },
+      {
+        "id": "CALLSIGN_APP_IMAGE",
+        "status": "BLOCKED",
+        "detail": "deployer/Witness에 실제 runtime 이미지 digest 필요. 웹 pin/PBX/OIDC/AI 불필요."
+      },
+      {
+        "id": "registry-artifact",
+        "status": "PASS",
+        "detail": "로컬 일반 파일 존재 확인."
+      },
+      {
+        "id": "artifact-hash",
+        "status": "PASS",
+        "detail": "실제 파일 SHA-256과 검토 hash 대조; bytecode 배포 증거 아님."
+      },
+      {
+        "id": "joint-approvers",
+        "status": "BLOCKED",
+        "detail": "서로 다른 공동 승인자 공개 주소3개. 서명 개인키는 각 소유자가 보관."
+      },
+      {
+        "id": "INSTITUTION_ID",
+        "status": "BLOCKED",
+        "detail": "해당 단계 입력/생성물을 준비하세요. 값을 출력하지 않습니다."
+      },
+      {
+        "id": "deployer-key",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "DEPLOYMENT_WORK_DIR",
+        "status": "BLOCKED",
+        "detail": "새 release 디렉터리가 필요합니다. 개인키/receipt/pending을 덮어쓰지 않습니다."
+      },
+      {
+        "id": "genesis-observation",
+        "status": "SKIPPED",
+        "detail": "4개 실제 RPC identity 관측 후 EXPECTED_GENESIS_HASH 확정. 지금 값을 만들지 않습니다."
+      }
+    ],
+    "witness": [
+      {
+        "id": "execution-guard",
+        "status": "PASS",
+        "detail": "preflight에는 실행 허용 변수를 지정하지 않습니다."
+      },
+      {
+        "id": "CALLSIGN_PROJECT",
+        "status": "BLOCKED",
+        "detail": "새 배포의 고유 Compose project. 기존 project 재사용 여부는 운영자가 확인."
+      },
+      {
+        "id": "FINALS_DATA_DIR",
+        "status": "BLOCKED",
+        "detail": "호스트의 배포 전용 절대 경로. container 경로와 구분."
+      },
+      {
+        "id": "NETWORK_ID",
+        "status": "BLOCKED",
+        "detail": "검토한 chain ID. 기존 genesis/identity를 재생성하지 않습니다."
+      },
+      {
+        "id": "ledger-addresses",
+        "status": "PASS",
+        "detail": "10.206.0.0/24; validators .11~.14, RPC는 내부 besu1~4 DNS."
+      },
+      {
+        "id": "ledger-media-separation",
+        "status": "PASS",
+        "detail": "현재 별도 media subnet과도 분리되어야 합니다."
+      },
+      {
+        "id": "ledger-overlap",
+        "status": "PASS",
+        "detail": "전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인."
+      },
+      {
+        "id": "BESU_IMAGE",
+        "status": "BLOCKED",
+        "detail": "검토한 실제 digest 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인."
+      },
+      {
+        "id": "CALLSIGN_APP_IMAGE",
+        "status": "BLOCKED",
+        "detail": "deployer/Witness에 실제 runtime 이미지 digest 필요. 웹 pin/PBX/OIDC/AI 불필요."
+      },
+      {
+        "id": "public-manifest",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "deployment",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "witness-1",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "witness-2",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "witness-3",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "witness-4",
+        "status": "BLOCKED",
+        "detail": "역할별 파일 참조가 필요합니다."
+      },
+      {
+        "id": "runtime-consensus-contract-witness",
+        "status": "SKIPPED",
+        "detail": "합의 진행·계약 receipt/code·독립 Witness 서명3/4/freshness는 별개 실행 assertion."
+      }
+    ]
+  },
+  "proposalStageNote": "No real project/path/chain ID or generated key was invented. Missing inputs remain BLOCKED. Local address validation does not authorize startup.",
+  "sourceHashes": {
+    ".env.example": "2be9c39e907fa04ba6bd6f780828d2025e0e7b0208a864e7ec7c8ffadde2721d",
+    "AGENTS.md": "57d15577e1242fbb84695b2ca369d0a7842dc6402ce3ae126504389ad24b6b9e",
+    "docs/ARCHITECTURE.md": "ecf3d7c193b80e72018d55bb6e2ed3f5eaef37c5299710b1dc8d432cdc73e4e0",
+    "docs/KNOWN-LIMITATIONS.md": "f2699fb9ba8c647fecb774855a53d153cff0845836f45fe13b4c2707791e08be",
+    "docs/MASTER-DEVELOPMENT-SPEC.md": "2f555b56e765725ce7fa7e2ffb3b0ffe146f4913ca9ec7d22b12c5e62799ad6b",
+    "docs/RUNBOOK.md": "f34efcfdd85ed6b2ee5c79f166c88bc93c8e59be43a06851b5397ce09015b459",
+    "infra/deploy/compose.yml": "0335834a793db9118d79cd5eacbef399c9b276f048ee937788ba636664fd06af",
+    "scripts/besu-peers.ts": "33d6a31c665c9c713162e71a07a12e3a5dcbfe1b2dd9ad63355898f06e3220aa",
+    "scripts/generate-besu.sh": "55a5e600f311e23d4fc68f60f8ccc498599186153008d2bb48b802d6554e6ce0",
+    "scripts/preflight.ts": "8fba741204c925a1ef5fad7f4727bad902462773b29392ae955596d7c0e31396",
+    "scripts/prepare-besu-peers.ts": "572002d9952b2d7aa049dba905b47f87a1de2f2389ba1c737f3257f9b51625d8",
+    "tests/unit/besu-peers.test.ts": "183d67db1a91a40c74f307aefb491d4f20c24d8571ddaabda77c6035132cb384",
+    "scripts/preflight-chain.ts": "2e832d85814b7554ccded596a729afeff98d5d4718e4a1542c98bbb631be3e88",
+    "tests/unit/chain-preflight.test.ts": "c0da934b7b18977e9fea4d1b6e205fe368890ecfa8349719349cc3b69fff3a2a"
+  },
+  "offlineEvidence": "chain-preparation-final-source-20261101.json",
+  "configurationChecks": {
+    "status": "PASS",
+    "scope": "RUNBOOK shell/JavaScript syntax; original Compose/PBX syntax; extracted nodes4 fully interpolated with parser-only temporary paths; chain9/auth8 un-interpolated syntax; no containers created",
+    "assertions": [
+      "four candidate static IP/advertised host values match subnet",
+      "explicit non-creating chain binds",
+      "nodes plan does not require app/OIDC/PBX/AI",
+      "project override and per-step resource ceilings reviewed"
+    ],
+    "initialFailures": [
+      {
+        "kind": "configuration-defect",
+        "cause": "short FINALS_DATA_DIR mounts classified as named volumes before interpolation",
+        "fix": "explicit bind type and create_host_path=false"
+      },
+      {
+        "kind": "inspection-test-defect",
+        "cause": "Compose JSON memory limit represented as decimal string",
+        "fix": "compare numeric value, preserving budget assertion"
+      }
+    ]
+  },
+  "cleanup": {
+    "temporaryComposeFiles": "removed by owned TemporaryDirectory contexts",
+    "servicesStarted": false,
+    "hostNetworksChanged": false,
+    "keysCreated": false,
+    "imagesBuiltOrDownloaded": false,
+    "existingUntrackedFiles": "preserved"
+  },
+  "deferred": [
+    "actual local image runtime/mount UID/permissions",
+    "key/certificate generation",
+    "Besu consensus and contract RPC/deployment",
+    "Witness signatures/freshness over actual nodes",
+    "all database/API/OIDC/PBX/AI/GCP runtime work"
+  ],
+  "resources": {
+    "logicalCpus": 24,
+    "availableMemoryMiB": 36157,
+    "swapUsedMiB": 10116,
+    "diskAvailableGiBApprox": 453,
+    "load1": 1.23,
+    "shortVmstatFollowupSamplesSwapInOutKiBps": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "scope": "read-only samples, not runtime sizing or startup permission"
+  },
+  "commandsActuallyExecuted": [
+    "pnpm evidence:collect artifacts/chain-preparation-final-source-20261101.json light",
+    "docker compose config --no-interpolate --no-env-resolution --no-path-resolution --no-normalize --format json",
+    "docker compose -p callsign-config-check-only --env-file /dev/null -f TEMP_NODES_PLAN config --format json",
+    "bash -n scripts/generate-besu.sh",
+    "bash -n (RUNBOOK command blocks via stdin)",
+    "node --input-type=module --check (RUNBOOK inline JS via stdin)",
+    "git diff --check",
+    "read-only ip -j -4 address/route and docker network/image metadata queries"
+  ],
+  "codeCheckpointAfterValidation": "8a174ca2bd32469730f99fed61d179fa66a4795d",
+  "localImageObservation": {
+    "tag": "hyperledger/besu:26.8.1",
+    "repoDigest": "hyperledger/besu@sha256:6f3f21ce533383fcc8db3bce02252b59d5a9e776b72b5a1c8ecd2db011600042",
+    "platform": "linux/amd64",
+    "method": "docker image inspect metadata only; no image execution/build/pull",
+    "currentSourceAppImage": "not generated"
+  }
+}

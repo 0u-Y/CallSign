@@ -6,6 +6,102 @@
 
 기준일2026-10-31, 조사 시작 `a6e2452`. 이 절은 현재 코드의 다음 실제 연결 절차이며 **아래 기동·생성·배포 명령은 이번에 실행하지 않았다.** 설정 준비와 소스 검사 통과는 실환경 연결 성공이 아니다. [검증·차단 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 함께 본다.
 
+### 2026-11-01 서버용 배포 입력표
+
+**호스트 설정은 변경하지 않는다.** 현재 신규 배포 후보는 `LEDGER_IPV4_PREFIX=10.206.0`이다. 읽기 전용으로 확인한 interface·모든 IPv4 routing table·Docker IPAM과 비중복이며, 기존 `10.203.0.0/24`는 충돌한다. 숨은 VPN/조직망·미래 GCP까지 보장하지 않는다. 기본값은 기존 배포를 위해 보존했고 신규 env에서만 후보를 선택한다.
+
+체인/Witness mount는 명시적 `type: bind`와 `create_host_path: false`로 선언해 보간 전 추출 시 named volume 오분류와 누락 파일 자동 생성을 막는다. Compose subnet·validator `.11`~`.14`·advertised host·host allowlist·static peers/permissions는 같은 prefix에서 파생된다. Witness와 deployer는 `besu1`~`besu4` 내부 DNS를 사용해 주소 중복 입력이 없다. 과거 호환 `infra/compose/docker-compose.yml`의 고정 주소는 보존하며 신규 배포에 섞지 않는다. **기존 배포 이동 시 genesis·validator 키·기관 identity·epoch를 재생성하지 않는다.** peer 도구는 기존 내용이 다르면 덮어쓰지 않고 중단한다. 기존 배포 이동은 원본 보존·정지 승인·새 peer 파일 검토·Compose 동시 전환의 별도 작업이다.
+
+기준 파일은 기존 `.env.example`, 실제 입력은 Git 밖 보호 `CHAIN_ENV`/배포 env다. env를 `source`하지 않는다. `CHAIN_ENV`는 env 파일 경로, `CALLSIGN_PROJECT`와 아래 plan 경로는 작업자가 정하는 shell 변수다. Compose `-p`에는 env 파일과 같은 project 값을 지정한다. 새 설정 프레임워크나 별도 비밀 저장소는 만들지 않는다.
+
+| 설정 → 소비자 | 공개/보호 참조 | 현재 값·상태 | 최초 단계·결정/생성 주체 | 없으면 막히는 기능 |
+|---|---|---|---|---|
+| `CALLSIGN_PROJECT` → Compose `-p`/chain preflight | 공개 ID | 미정인 고유 project; 기존 project와 겹치지 않게 선택 | 입력 검토·운영자 | 소유 자원 식별 |
+| `LEDGER_IPV4_PREFIX` → Compose/peer generator | 공개 | **제안** `10.206.0`; 기존 기본 `10.203.0` 유지 | 입력 검토·망 관리자 | 주소 일관성/충돌 해소 |
+| `LEDGER_OBSERVED_CIDRS` → preflight만 | 로컬 관측 | 매 실행 직전 아래 명령으로 조회 | 입력 검토·운영자 | 관측된 망과의 중복 판정 |
+| `NETWORK_ID` → genesis/Besu/deployer | 공개 | template `20260914`의 신규 사용 여부 미정; 기존 chain ID는 유지 | 입력 검토·공동 운영자 | chain identity |
+| `FINALS_DATA_DIR` → host bind | 보호 경로 참조 | 미정인 새 전용 절대 경로. container `/network`·`/keys`·`/trust`와 구분 | 입력 검토·운영자 | 준비물 위치·소유권 |
+| `CALLSIGN_NETWORK_CONFIG`, `CALLSIGN_BESU_DIR` → generator | 보호 경로 참조 | 신규 설정 파일과 `${FINALS_DATA_DIR}/besu` | 네트워크 생성·운영자 | 올바른 genesis/키 mount |
+| `BESU_IMAGE` → generator/validator4 | 공개 digest | 아래 로컬 RepoDigest 확인; 실행 지원은 미확인 | nodes·이미지 검토자 | 노드 기동 준비 |
+| `CALLSIGN_APP_IMAGE` → deployer/Witness | 생성 공개 digest | **미생성**. 같은 source의 app Dockerfile runtime target build 후 확정 | deploy·승인된 build 담당 | deploy/Witness; nodes는 불필요 |
+| `DEPLOYER_PUBLIC_ADDRESS`, `INITIAL_BALANCE_WEI` → network-config | 공개 | 미정. 잔액은 합성 네트워크의 배포용이며 실제 자산/보상 아님 | network 생성·배포자 | 배포자 genesis 잔액 |
+| `DEPLOYER_KEY_PATH` → deployer `/deployer/key`만 | 보호 파일 | 미준비; validator/승인자와 별도 키 | deploy·배포자 | 계약 서명. Witness에 전달하지 않음 |
+| `REGISTRY_APPROVERS` → 계약 생성자 | 공개 주소3개 | 서로 다른 키 소유자 미정;2-of-3 유지 | deploy·독립 승인자3명 | 공동 관리 정책 |
+| `INSTITUTION_ID` → metadata/Witness query | 공개 | 미정. 첫 경로 전체에서16~128자 동일 값 | deploy·기관 책임자 | 기관 문맥 조회 |
+| `REGISTRY_ARTIFACT_PATH`, `REGISTRY_ARTIFACT_SHA256` → `/artifact/registry.json` | 공개 파일/hash | template의 실제 오프라인 산출물/hash | deploy·검토자 | artifact 대조 |
+| `DEPLOYMENT_WORK_DIR` → deployer `/release` | 보호 경로 참조 | 미정인 새 디렉터리. 실제 runtime UID가 쓸 수 있어야 함 | deploy·운영자 | 관측/pending/receipt 기록 |
+| `EXPECTED_GENESIS_HASH`, `DEPLOYMENT_PATH` → deployer/trust/Witness | 실행 생성값 | 실제 RPC inspect와 배포 후 생성. host `${FINALS_DATA_DIR}/deployment.json` ↔ Witness `/trust/deployment.json` | deploy 이후·도구/운영자 | 생성 전 미입력은 정상; 생성 후 필수 |
+| `besu/genesis.json`, `besu/keys/node{1..4}/key(.pub)` → validator4 | 키 보호·genesis/pub 공개 | 미생성 또는 기존 자료 검토 전 | nodes 전·승인된 generator/각 소유자 |4노드 준비 |
+| `witness-keys/witness-{1..4}.json`, `public-manifest.json` → Witness/검증자 | 키 보호·manifest 공개 | 미준비. 각 Witness는 자기 RPC·키로 조회/서명 | Witness 전·증언자4명 | 공개키 고정·3-of-4 확인 |
+| 기관 승인/콜센터/PBX/admin/stopper 키 → API/worker | 보호 파일 | 소유자 미정; 승인자·validator·Witness·배포자와 역할 분리 | 기관 등록/API·각 소유자 | 해당 역할만 차단 |
+| `ISSUER_URI`, `SERVICE_URI`, `DEPLOYMENT_ID`, `FINALS_ACCOUNTS_PATH` → manifest/계정/Anchor | URI/ID 공개·accounts 보호 | 미정. 기존 keys 도구가 URI도 요구하므로 Witness 키 준비 전 결정 | keys/auth·기관/콜센터/IdP 관리자 | 해당 준비만 차단; Besu에는 불필요 |
+| `ISSUER_DATABASE_URL`, `AUTH_DATABASE_URL`, `WORKER_DATABASE_URL`, PBX LOGIN/비밀번호, migration owner | 보호 참조 | 미준비. Platform은 DB 계정을 갖지 않음 | database·DB 관리자 | DB/API만 차단 |
+| `WEB_ORIGIN`, `CALLSIGN_DOMAIN`, `PUBLIC_DEPLOYMENT`, `DEMO_MODE` → API/웹 | 공개 | 미정. 비loopback origin은 `true`/`false` 필요 | auth·도메인 운영자 | 실제 공개 인증 |
+| `OIDC_ISSUER`, `OIDC_JWKS_URL`, `OIDC_AUTHORIZATION_URL`, `OIDC_TOKEN_URL`, 업무/공식 client·audience | 공개 등록값 | 미정. **공개 client Authorization Code+PKCE**, 서로 다른 업무/공식 client·audience, `auth_time` 필요. 두 callback 모두 `${WEB_ORIGIN}/service` | auth·IdP 관리자 | 실제 인증; confidential-client 자동 지원 아님 |
+| `SERVICE_EXTRA_CA_PATH` → Compose issuer/worker `/tls/extra-ca.pem`; host `NODE_EXTRA_CA_CERTS` | 공개 CA의 보호 경로 참조 | 미준비. Host Node는 시작 전 직접 지정, Compose만 자동 매핑 | auth/media/recovery·TLS 관리자 | TLS 신뢰. 개인키 포함 금지 |
+| `CONSUMPTION_ANCHOR_URL/TOKEN` → issuer/worker | URL 공개·token 보호 | 별도 수명 HTTPS 저장소/운영자 미정. DB 백업과 함께 rollback 금지 | recovery/auth·독립 운영자 | checkpoint/gate. 같은 host는 host 장애 독립성 아님 |
+| SIP/WSS/realm/domain·PBX 주소·ARI/ODBC/TLS·TURN 주소/자격·image | 주소/cert 공개·자격 보호 | 기본 media10.205.0.20, 나머지 미정. 내부 `https://asterisk:8089`, 브라우저 같은 origin `/pbx/ws` | trust/media·통신 운영자 | trust/media만 차단 |
+| `TRUST_BUNDLE_PATH`, `VITE_SERVICE_TRUST_SHA256`, `CALLSIGN_WEB_IMAGE` → API/웹 | 생성 공개 파일/hash/digest | **미생성**. 계약 metadata+PBX 공개 cert→trust→pin→웹 build | trust/web·준비 도구 | 실제 웹 배포; 첫 chain 단계는 불필요 |
+| STT/LLM key·model, retention/quota | 보호 자격·공개 정책 | 제공자/보관/소량 예산 미정, 기존 보관 기본604800초 | provider·기관/제공자 관리자 | provider만 차단 |
+| GCP 주소/인증서/접근·registry 경로 | 공개 설정/보호 참조 | 미선택. chain/기관/epoch/소비 이력은 유지 | 이전 시·별도 승인 | 현재 서버 첫 단계와 분리 |
+
+#### 기존63개 BLOCKED를 선행 원인으로 묶기
+
+이 표의 A~E는 이번 준비 분류이며 기존 `preparation.category`의 A~F 의미를 바꾸지 않는다. [검사별 매핑](../artifacts/chain-preparation-20261101.json)은 현재 검사 ID 각각을 원인·주체·단계에 연결한다.
+
+| 분류 | 원인과 파생 검사 | 준비 주체·소비 단계 |
+|---|---|---|
+| A 소스/설정 결함 | 고정 ledger 주소 분산·첫 단계와 전체 설정 혼합 | 이번 prefix 파생/chain 점검/4노드 plan으로 수정. host 설정 변경 없음 |
+| B 공개 결정 | DNS/origin·OIDC 등록 및 분리, 기관/콜센터 ID/URI·chain ID·공동 승인자·SIP/TURN/공개 media·Anchor URL | 담당자 결정. nodes는 prefix/project/path/chain ID부터 |
+| C 승인된 생성물 | image digest·역할 키·public manifest·PBX cert·deployment metadata·trust/pin | 승인된 image/key/cert/배포/trust 도구. 임의 값 입력 금지 |
+| D 보호 참조/외부 계정 | accounts JSON·서로 다른 DB LOGIN·ARI/PBX/내부/Anchor token·TURN/provider 자격·공개 CA 참조 | DB/IdP/TLS/provider/역할 운영자. separation 오류는 동일 원인 |
+| E 실행 관측 | image 내용·TLS·RPC/합의·receipt/code·Witness 서명/최신성·GRANT·media/provider | 단계 실행 승인 후. `network-and-runtime`의 SKIPPED는 PASS 아님 |
+
+로컬 Besu tag26.8.1의 실제 RepoDigest: `hyperledger/besu@sha256:6f3f21ce533383fcc8db3bce02252b59d5a9e776b72b5a1c8ecd2db011600042`(linux/amd64). 실행 검증/미래 host 설치 보장은 아니다. 현재 source의 app runtime 이미지는 아직 없다. runtime build는 별도 승인 대상이고 웹 pin·PBX·OIDC를 기다릴 필요가 없다.
+
+#### 기동 없는 단계별 사전 점검
+
+기존 CLI에 `--phase chain --step prepare|nodes|deploy|witness`를 추가했다. 기존 runtime preflight를 완화하지 않는다. 입력 검토/노드 생성물/배포자 준비/Witness 준비를 분리하며 PASS는 로컬 검사 범위다. 매 실행 전 관측을 갱신하고 env에 영구 고정하지 않는다. default route만 제외하며 모든 table의 특정 IPv4 route·interface·Docker IPAM은 포함한다. 조회 실패는 빈 문자열로 진행하지 말고 중단한다.
+
+```sh
+# 읽기 전용. 출력은 CIDR 목록뿐이며 주소/route는 변경하지 않는다.
+export LEDGER_OBSERVED_CIDRS="$(python3 - <<'PY'
+import ipaddress,json,subprocess
+run=lambda args: json.loads(subprocess.check_output(args,text=True))
+ids=subprocess.check_output(['docker','network','ls','-q'],text=True).split()
+nets=run(['docker','network','inspect',*ids]) if ids else []
+routes=run(['ip','-j','-4','route','show','table','all'])
+interfaces=run(['ip','-j','-4','address','show'])
+cidrs={c['Subnet'] for n in nets for c in (n['IPAM'].get('Config') or []) if c.get('Subnet') and ':' not in c['Subnet']}
+cidrs.update(r['dst'] for r in routes if r.get('dst') and r['dst'] not in ['default','0.0.0.0/0'])
+cidrs.update(str(ipaddress.ip_network(f"{a['local']}/{a['prefixlen']}",strict=False)) for n in interfaces for a in n['addr_info'] if a['family']=='inet')
+print(','.join(sorted(cidrs)))
+PY
+)"
+test -n "$LEDGER_OBSERVED_CIDRS" || exit 1
+pnpm preflight --env-file "$CHAIN_ENV" --phase chain --step prepare
+# 아래 검사는 해당 생성물이 준비된 단계에서만 수행한다. 검사 자체는 기동하지 않는다.
+pnpm preflight --env-file "$CHAIN_ENV" --phase chain --step nodes
+pnpm preflight --env-file "$CHAIN_ENV" --phase chain --step deploy
+pnpm preflight --env-file "$CHAIN_ENV" --phase chain --step witness
+```
+
+위 네 검사를 한 번에 통과시키려 하지 않는다. `prepare`에서 결정값을 검토하고 승인된 생성 단계 후 `nodes`, 실제 app image/배포자 준비 후 `deploy`, 실제 metadata·Witness 키 준비 후 `witness`를 실행한다. `generate-besu.sh`에 `CALLSIGN_ENV_FILE="$CHAIN_ENV"`를 전달하면 peer 설정도 같은 env를 읽는다. 직접 준비할 때는 `prepare-besu-peers.ts DIRECTORY --env-file "$CHAIN_ENV" --apply`다. Node/Compose 모두 env 파일보다 process 환경값이 우선이므로 오래된 prefix export를 제거/확인한다. 실행 허용변수는 env 파일에 저장하지 않는다.
+
+신규 생성은 별도 허가 후 `prepare-service-network.ts NEW_CONFIG --apply`→`CALLSIGN_NETWORK_CONFIG`/`CALLSIGN_BESU_DIR`를 지정한 `generate-besu.sh`다. 기존 keys 도구는 **새 빈 배포 디렉터리**를 요구하므로 신규라면 `prepare-finals.ts keys`를 먼저 수행하거나, validator만 먼저 확인할 때는 향후 기관/Witness 키를 별도 새 경로에서 준비한 뒤 역할별 소유권을 검토해 배치한다. 기존 디렉터리에 keys를 재실행하지 않는다. 이번에는 어떤 키/파일 생성 도구도 `--apply`하지 않았다.
+
+검토한 공개 입력은 해당 도구가 실제로 읽는 process 환경에도 전달한다. 아래는 **신규 배포 생성 허가 후**의 명령이며 이번에 실행하지 않았다. `FINALS_DATA_DIR`는 keys 명령에 대해 새 빈 경로여야 하고, `CALLSIGN_NETWORK_CONFIG`는 새 파일 경로다. `NETWORK_ID`·`DEPLOYER_PUBLIC_ADDRESS`·`ISSUER_URI`·`SERVICE_URI`·`BESU_IMAGE`는 위 입력표에서 확정한 값이어야 한다. 기존 키/배포가 있으면 이 블록을 사용하지 않는다.
+
+```sh
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
+  pnpm exec tsx scripts/prepare-finals.ts keys "$FINALS_DATA_DIR" --apply
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
+  pnpm exec tsx scripts/prepare-service-network.ts "$CALLSIGN_NETWORK_CONFIG" --apply
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CHAIN_ENV" \
+  CALLSIGN_BESU_DIR="$FINALS_DATA_DIR/besu" node scripts/restricted.mjs infrastructure \
+  bash scripts/generate-besu.sh
+```
+
 ### 설정·실행물의 연결
 
 | 대상 | 실제 소비 경로·준비 조건 |
@@ -32,7 +128,7 @@ Platform/Web의 시작 의존성은 `service_started`이며 healthcheck는 계�
 
 | 묶음 | 지금 필요한 결정·추천 | 공개 정보/보호 참조 | 첫 차단과 뒤로 미룰 항목 |
 |---|---|---|---|
-| 1 실행 위치·접근 | 기존 서비스와 분리한 시험 호스트 권장. 현재 호스트 기본 ledger 대역10.203.0.0/24는 기존 Docker 망과 중복됨. 기존 망/프로세스를 끄지 않고 별도 호스트 또는 peer/genesis/Compose를 함께 검토한 주소 정책 선택 | 실행 호스트·이미지 registry/접근 참조·충돌 없는 network 계획·소유 자원 식별자 | 첫 체인 기동 차단. GCP project/zone/IAM/VM 선택은 이전 단계까지 미룰 수 있음 |
+| 1 실행 위치·접근 | 기존 서비스와 분리한 시험 호스트 권장. 현재 호스트 기본 ledger 대역10.203.0.0/24는 기존 Docker 망과 중복됨. 신규 prefix10.206.0 제안은 현재 관측에서 비중복이며 아직 미적용. 기존 망/프로세스를 끄지 않고 별도 호스트 또는 peer/genesis/Compose를 함께 검토한 주소 정책 선택 | 실행 호스트·이미지 registry/접근 참조·충돌 없는 network 계획·소유 자원 식별자 | 첫 체인 기동 차단. GCP project/zone/IAM/VM 선택은 이전 단계까지 미룰 수 있음 |
 | 2 DNS·TLS·OIDC | HTTPS origin 하나와 동일 origin WSS 권장. 업무/공식 공개 client·audience 분리 및 auth_time 지원 확인 | 도메인/origin, issuer/JWKS/authorize/token/client/audience/callback 공개값, cert/공개 CA 경로와 비밀 참조 | 인증 단계 차단. 실제 IdP MFA·공개 배포 정책은 해당 provider와 확인. secret 원문은 채팅에 보내지 않음 |
 | 3 기관·콜센터·키 책임 | 모의 기관/콜센터 URI와 검증된 OIDC subject, 별도 기관/콜센터/PBX/Witness/admin/stopper 키 책임. 독립 관리 승인자3명 중2명, Witness4개 중3개 유지 | 등록 URI/기관 ID/승인자 공개 주소, accounts JSON·역할별 보호 파일 참조, 독립 Anchor 관리자/주소 | 키/등록·계약·최초 Anchor 준비 차단. 키·계약 주소·배포 높이는 이후 도구 산출물이지 지금 입력할 값이 아님 |
 | 4 PBX·TURN | 현재 Asterisk PJSIP/WSS+ARI·ODBC 경로 유지. 실제 이미지/모듈·외부 UDP 접근·인증서 이름/fingerprint·TURN relay 경로 검토 | PBX 공개/내부 주소·SIP realm/domain/WSS/TURN URLs, ARI/PBX/TURN 비밀 참조 | trust/web 준비·인증 단계 및 실제 media 단계 차단. PSTN·단말 OS·일반 SIP 확장은 뒤로 미룸 |
@@ -57,41 +153,105 @@ build 후 image digest, 키 생성 후 public manifest, chain 기동/배포 후 
 
 ### 전체 설정에 묶이지 않는 첫 체인 plan
 
-전체 Compose는 선택하지 않은 서비스의 `${VAR:?}`도 해석한다. OIDC/PBX/AI 값을 가짜로 채우지 말고 **원본에서 아래 고정 서비스만 추출**한다. 별도 AUTH_PLAN에는 인증 단계 구성만 넣어 아직 없는 TURN/Asterisk 이미지 때문에 인증 준비를 막지 않는다. PBX 공개 인증서·주소·ARI 보호 참조는 현재 서비스 trust 준비에 필요하다. 이는 운영자의 일회 준비 명령이며 별도 설정 기준/배포 플랫폼이 아니다. 설치 Compose의 `--no-path-resolution` 지원을 확인하고 저장소 루트에서 실행한다. source·출력 파일은 새 보호 경로, `FINALS_DATA_DIR` 등 bind 참조는 절대 경로를 사용한다.
+전체 Compose는 선택하지 않은 서비스의 `${VAR:?}`도 해석한다. OIDC/PBX/AI 값을 가짜로 채우지 말고 **원본에서 아래 고정 서비스만 추출**한다. 별도 AUTH_PLAN에는 인증 단계 구성만 넣어 아직 없는 TURN/Asterisk 이미지 때문에 인증 준비를 막지 않는다. PBX 공개 인증서·주소·ARI 보호 참조는 현재 서비스 trust 준비에 필요하다. 이는 운영자의 일회 준비 명령이며 별도 설정 기준/배포 플랫폼이 아니다. 설치 Compose의 `--no-path-resolution` 지원을 확인하고 저장소 루트에서 실행한다. `RAW_COMPOSE`/`NODES_PLAN`/`CHAIN_PLAN`/`AUTH_PLAN`은 서로 다른 새 절대 경로로 정하고, source·출력 파일은 새 보호 경로, `FINALS_DATA_DIR` 등 bind 참조는 절대 경로를 사용한다.
 
 ```sh
 # 이 두 명령은 기동 없는 로컬 구성 처리다. output 경로는 새 파일을 사용한다.
 docker compose --env-file /dev/null -f infra/deploy/compose.yml \
   config --no-interpolate --no-env-resolution --no-path-resolution --no-normalize --format json > "$RAW_COMPOSE"
-node --input-type=module - "$RAW_COMPOSE" "$CHAIN_PLAN" "$AUTH_PLAN" <<'JS'
+node --input-type=module - "$RAW_COMPOSE" "$CHAIN_PLAN" "$AUTH_PLAN" "$NODES_PLAN" <<'JS'
 import {readFileSync,writeFileSync} from 'node:fs';
 const full=JSON.parse(readFileSync(process.argv[2],'utf8'));
 const names=['besu1','besu2','besu3','besu4','registry-deployer','witness1','witness2','witness3','witness4'];
-const plan={name:full.name,services:Object.fromEntries(names.map(n=>[n,full.services[n]])),networks:{ledger:full.networks.ledger},volumes:Object.fromEntries(['besu1-data','besu2-data','besu3-data','besu4-data'].map(n=>[n,full.volumes[n]]))};
+const plan={name:full.name,services:Object.fromEntries(names.map(n=>[n,{...full.services[n],...(n.startsWith('besu')?{mem_limit:'3g',cpus:2,restart:'no'}:n.startsWith('witness')?{mem_limit:'512m',cpus:0.5,restart:'no'}:n==='registry-deployer'?{mem_limit:'2g',cpus:1}: {})}])),networks:{ledger:full.networks.ledger},volumes:Object.fromEntries(['besu1-data','besu2-data','besu3-data','besu4-data'].map(n=>[n,full.volumes[n]]))};
 writeFileSync(process.argv[3],JSON.stringify(plan,null,2)+'\n',{flag:'wx',mode:0o600});
+const nodes={...plan,services:Object.fromEntries(names.slice(0,4).map(n=>[n,plan.services[n]]))};
+writeFileSync(process.argv[5],JSON.stringify(nodes,null,2)+'\n',{flag:'wx',mode:0o600});
 const authNames=['postgres','migration-runner','issuer','sender','platform','worker','web','https'];
 const auth={name:full.name,services:Object.fromEntries(authNames.map(n=>[n,full.services[n]])),networks:full.networks,volumes:{'postgres-data':full.volumes['postgres-data'],'caddy-data':full.volumes['caddy-data']}};
 writeFileSync(process.argv[4],JSON.stringify(auth,null,2)+'\n',{flag:'wx',mode:0o600});
 JS
 ```
 
-아래부터는 **실제 기동/chain 실행 허가 후에만** 실행한다. `CALLSIGN_PROJECT`는 동일 배포의 고유 이름, `CHAIN_ENV`는 선택한 체인 단계 공개/보호 참조다. image digest·키·artifact는 생성/검토된 실값만 사용한다. subnet 충돌을 해소하기 전에는 실행하지 않는다.
+아래부터는 **실제 기동/chain 실행 허가 후에만** 실행한다. `CALLSIGN_PROJECT`는 동일 배포의 고유 이름, `CHAIN_ENV`는 선택한 체인 단계 공개/보호 참조다. image digest·키·artifact는 생성/검토된 실값만 사용한다. 신규 prefix 선택을 승인하고 해당 env로 peer/plan을 함께 준비하기 전에는 실행하지 않는다.
 
 ```sh
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
-  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" \
-  up -d --no-build --pull never besu1 besu2 besu3 besu4
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$NODES_PLAN" \
+  up -d --no-build --pull never --wait --wait-timeout 120 besu1 besu2 besu3 besu4
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain node scripts/restricted.mjs chain \
   docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" --profile operations \
   run --rm --no-deps --pull never registry-deployer pnpm exec tsx scripts/deploy-service-registry.ts inspect /release/network-observation.json
-# 관측된 genesis/artifact hash를 검토한 뒤 같은 registry-deployer를 기본 명령으로 run하여 --apply 수행
+# 합의 진행은 새 output 이름의 두 관측과 동일 높이 block hash로 별도 판정한다.
+# 관측 genesis hash를 EXPECTED_GENESIS_HASH에 반영하고 artifact/승인자/기관 문맥을 검토한 뒤만 배포:
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain node scripts/restricted.mjs chain \
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" --profile operations \
+  run --rm --no-deps --pull never registry-deployer
 # 새 deployment.json을 검토·배치한 뒤에만 Witness를 기동
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure node scripts/restricted.mjs infrastructure \
   docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" \
-  up -d --no-build --pull never witness1 witness2 witness3 witness4
+  up -d --no-deps --no-build --pull never witness1 witness2 witness3 witness4
 ```
 
 계약 배포 기본 run 명령은 위 inspect 줄의 뒤쪽 `pnpm ... inspect ...` override만 제거한 동일 `registry-deployer` 호출이다. 그 command가 기존 `pnpm ledger:deploy-service --apply`다. 인증 단계는 같은 `-p "$CALLSIGN_PROJECT"`와 위 `AUTH_PLAN`을 사용해 `issuer sender platform web`만 `up --no-deps --no-build --pull never`하고 DB/Anchor 준비를 선행한다. registration 처리를 위해 worker를 별도로 시작한다. media 단계에서 `--profile pbx --profile media`로 `asterisk turn`을 추가하고 OIDC 검증은 HTTPS ingress가 필요하므로 인증 단계에서 승인된 기존 ingress 또는 `AUTH_PLAN`의 `--profile https` 서비스 `https`를 별도로 시작한다. media 추가는 원본 Compose/PBX overlay와 같은 project 이름을 사용한다. 각 `up`은 범주 승인 guard를 사용한다. 일반 `deployment.sh start`는 **전체 설정과 검증을 끝낸 이후**의 전체 기동 편의 명령이지 최초 단계별 검증 명령이 아니다.
+
+### 첫 체인 실행의 자원·판정·정리
+
+이 절의 **기동·RPC·키 생성·배포·정리 명령은 이번에 실행하지 않았다.** 첫 실행은 Besu4만 사용하는 `NODES_PLAN`, 이후 app image가 준비된 `CHAIN_PLAN`으로 deployer/Witness를 추가한다. DB·Anchor·API·웹·OIDC·PBX·TURN·AI는 실행하지 않는다. 전체 Compose의 미입력 값 때문에 첫4노드를 막지 않는다.
+
+현재 설치: Node22.22.2, pnpm11.27.0, Python3.12.3, Docker Compose5.0.0, iproute 도구. source와 lockfile의 설치 의존성을 재사용한다. app image는 미생성이므로 임의의 과거 witness image를 대용하지 않는다. key/cert/image 생성·다운로드는 이번 승인 범위 밖이다. 다음 생성 과정의 역할별 파일 소유자와 container UID 접근을 먼저 확인하고 `chmod 777`로 해결하지 않는다.
+
+첫4노드 plan은 **시험용 상한 제안**으로 각 memory3GiB·CPU2·restart=no를 적용한다. Besu4 합계12GiB, 이후 Witness4 각512MiB·CPU0.5와 deployer2GiB를 합쳐 최대16GiB를 예약하고 기존 작업에 available16GiB 이상을 남기는 조건으로 시작한다. 미실행 Besu의 실제 요구량이 아니라 중단 가능한 시험 예산이다. 첫 노드/계약/Witness 각 단계는 최대10분, TCP health 준비는 최대120초만 기다린다. 시작 직전 자원을 다시 조회하고 여유 부족이면 시작하지 않는다. `vmstat 1 3`, `free -m`, `uptime`, `df -h`, 다음 project 제한 stats로 관측한다.
+
+```sh
+# 허가 후 자원 관측. project label로 이번 컨테이너만 선택하며 env/명령 인자는 출력하지 않음.
+owned_ids="$(docker ps -q --filter "label=com.docker.compose.project=$CALLSIGN_PROJECT")"
+if [ -n "$owned_ids" ]; then docker stats --no-stream $owned_ids; fi
+```
+
+available16GiB 미만, 지속적인 swap in/out 증가, 기존 작업의 영향, OOM/restart, disk 여유20GiB 미만, identity 불일치·height 정지·quorum 부족이면 중단한다. 메모리 제한 때문에 실패하면 그 사실을 남기며 자동 확장/반복 기동하지 않는다. 컨테이너 제한은 합의 성능/SLA 측정이 아니다.
+
+| 순서 | 정확한 실행/관측 | 성공 assertion·산출물 | 실패 시 |
+|---|---|---|---|
+| 1 입력/생성물 검사 | 위 `preflight --phase chain --step prepare`, 승인된 생성 후 `nodes`, node plan `config --quiet` | 새 project·경로·선택 prefix·최신 망 관측·genesis/peer/키 metadata 일치 | BLOCKED/FAIL이면 기동하지 않음 |
+| 2 Besu4 | 아래 NODES_PLAN의4서비스만 기동, `--wait --wait-timeout 120` 추가 가능 | 프로세스 health와 RPC는 생존 증거. 이후 inspect 두 개 시점에서 네 노드의 같은 chain/genesis, 동일 높이의 block hash 일치, 모든 height 전진을 별도로 확인 | TCP만 열렸으면 합의 PASS 금지 |
+| 3 실제 계약 | app image 준비→`deploy` preflight→아래 inspect→관측 genesis hash 검토→같은 deployer 기본 명령 run | receipt success·배포 주소·code hash·PROFILE/초기 정책·생성자 승인자 일치. pending journal/metadata 보존 | 결과 불명은 같은 tx hash 조회. 새 nonce/새 배포로 우회 금지 |
+| 4 Witness4 | metadata를 host `${FINALS_DATA_DIR}/deployment.json`에 검토 배치→`witness` preflight→아래4서비스 | 자기 RPC별 실제 canonical block 대조·고정 공개키의 서로 다른3서명·동일 snapshot·10초 freshness | health200만 PASS 금지. 서명·code/chain 불일치면 중단 |
+
+네 노드의 **동일 높이 block hash 대조**는 실제 RPC `eth_getBlockByNumber`로 한다. 기존 inspect 산출물은 chain/genesis/높이만 기록하므로 그것만으로 동일 높이의 합의나 장애 내성을 판정하지 않는다. 운영자는 두 inspect 사이에 `docker compose ... exec -T besuN`의 설치된 RPC 클라이언트 또는 아래 app 런타임의 viem으로 동일 block을 조회하고 관측값을 evidence에 남긴다. 장애 주입/validator 축소는 이 첫 정상 연결 단계에 포함하지 않는다.
+
+Witness 판정은 기존 `aggregateWitnesses`/`verifyStateBundle`을 재사용한다. 공개 manifest는 API가 돌려준 키가 아니라 각 키 소유자가 검토한 사전 자료다. 다음은 **새로 배포한 미등록 기관 상태만** 확인하는 명령이다. 기관이 이미 등록되어 policyVersion이0이 아니면 이 명령을 수정해 계속하지 말고 별도 current policy/trust 검토 단계로 이동한다. 미등록 상태의 증언 성공은 업무 발신 권한의 성공이 아니다. 기존 failover 스크립트는 이전 Compose/API/DB를 기동하므로 여기서는 사용하지 않는다.
+
+```sh
+# 실제 chain 실행 승인 후에만. 공개 manifest 하나만 추가 mount, 장기 개인키는 읽지 않음.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=chain node scripts/restricted.mjs chain \
+  docker compose -p "$CALLSIGN_PROJECT" --env-file "$CHAIN_ENV" -f "$CHAIN_PLAN" --profile operations \
+  run --rm -T --no-deps --pull never \
+  -v "$FINALS_DATA_DIR/public-manifest.json:/public-manifest.json:ro" \
+  registry-deployer node --import tsx --input-type=module <<'JS'
+import assert from 'node:assert/strict';
+import {readFileSync,writeFileSync} from 'node:fs';
+import {createPublicClient,http} from 'viem';
+import {aggregateWitnesses} from './services/api/src/witness-aggregate.ts';
+import {verifyStateBundle} from './packages/verifier/src/index.ts';
+const d=JSON.parse(readFileSync('/release/deployment.json','utf8'));
+const m=JSON.parse(readFileSync('/public-manifest.json','utf8'));
+const clients=[1,2,3,4].map(n=>createPublicClient({transport:http(`http://besu${n}:8545`,{timeout:2500,retryCount:0})}));
+const heights=await Promise.all(clients.map(c=>c.getBlockNumber()));
+const height=heights.reduce((a,b)=>a<b?a:b);
+const blocks=await Promise.all(clients.map(c=>c.getBlock({blockNumber:height})));
+assert.equal(new Set(blocks.map(b=>b.hash)).size,1);assert.ok(blocks[0].hash);
+const trust={networkId:d.networkId,genesisHash:d.genesisHash,registryAddress:d.registryAddress,registryProfile:d.registryProfile,policyVersion:'0',witnessThreshold:3,supportedProtocolVersions:[1],enrollmentPublicKey:m.publicKeys['issuer/approval-v1'].publicJwk,witnessPublicKeys:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,kid:m.publicKeys[`witness-keys/witness-${n}`].kid,jwk:m.publicKeys[`witness-keys/witness-${n}`].publicJwk}))};
+const delegationId='callsign-bootstrap-absent-delegation';
+const bundle=await aggregateWitnesses({endpoints:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,url:`http://witness${n}:${4200+n}`})),institutionId:process.env.INSTITUTION_ID,delegationId,trust,timeoutMs:5000});
+const result=await verifyStateBundle(bundle,trust,{nowWallSeconds:Math.floor(Date.now()/1000),nowMonotonicMs:performance.now(),expectedInstitutionId:process.env.INSTITUTION_ID,expectedDelegationId:delegationId,maxStateAgeSeconds:10,maxFutureSkewSeconds:0});
+assert.equal(result.snapshot.institutionState.exists,false);assert.equal(result.snapshot.delegationState.exists,false);
+assert.ok(result.signerIds.length>=3);
+writeFileSync('/release/initial-witness-observation.json',JSON.stringify({recordedAt:new Date().toISOString(),scope:'real RPC/signed absent-state; not institution enrollment or fault tolerance',sameHeight:String(height),blockHash:blocks[0].hash,bundle,result},null,2)+'\n',{flag:'wx',mode:0o600});
+JS
+```
+
+각 단계 시작/종료·설정/source/image/contract/manifest hash·성공/실패 assertion·자원 관측을 보존한다. 생성 전 `docker compose ls`, project label의 기존 container/network/volume 목록을 보호 실행기록에 저장한다. **이미 존재하는 project가 있으면 새 시험으로 간주해 정리하지 않는다.** 실패 시 먼저 이번 node/witness 서비스만 `stop -t 20`하고 로그·inspect의 허용 metadata를 보존한다. 이후 운영자가 생성 전 목록과 대조해 이번 container ID만 `docker rm`, 이번 network ID만 `docker network rm`한다. 이 명령에도 infrastructure guard를 적용한다. 체인 named volume/키·genesis·pending tx·metadata는 기본 보존하며, 삭제가 필요하면 별도 소유권·폐기 허가 뒤 정확한 ID에만 `docker volume rm`을 쓴다. `down -v`, prune, 기존 network 삭제는 사용하지 않는다. 이번에는 어떤 stop/rm도 실행하지 않았다.
 
 ## 현재 실행 계약
 
