@@ -21,3 +21,7 @@ infra/compose/volumes/
 # Local private material is never part of a source checkpoint.
 /keys/
 /secrets/
+
+# Personal handoff summaries stay local; canonical docs and evidence remain tracked.
+/docs/*-SUMMARY.md
+/artifacts/*.progress.json
