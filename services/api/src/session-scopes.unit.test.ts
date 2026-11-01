@@ -84,7 +84,7 @@ describe("issuer purpose-bound sessions (offline routes)", () => {
     const app = await server();
     try {
       expect((await app.inject({ url: "/v3/auth/me", headers: headers("ip_session=work") })).statusCode).toBe(400);
-      for (const [cookie, code] of [["ip_session=work", "SESSION_EXPIRED"], ["", "AUTH_REQUIRED"]]) {
+      for (const [cookie, code] of [["ip_session=work", "SESSION_EXPIRED"], ["", "AUTH_REQUIRED"]] as const) {
         const result = await app.inject({ url: "/v3/auth/me?purpose=work", headers: headers(cookie) });
         expect(result.statusCode).toBe(401); expect(result.json().error.code).toBe(code);
       }
