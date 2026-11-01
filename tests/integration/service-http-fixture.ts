@@ -9,22 +9,28 @@ import { initialDirectory } from '../../packages/protocol/src/index.js';
 import postgres from 'postgres';
 const { SignJWT, exportJWK, importJWK, generateKeyPair } = await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js', import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
 import { bankPolicy, hashCanonical, servicePolicy, generateEd25519KeyPair, exportSigningPrivateJwk, signPayload, verifyPayload, serviceReceiptSchema, serviceLeaseSchema, type ServiceBinding } from '../../packages/protocol/src/index.js';
-import { buildFinalsServer } from '../../services/api/src/finals-server.js';
+import { buildFinalsServer, readSigningKey } from '../../services/api/src/finals-server.js';
 import { finalsEnvironment } from '../../services/api/src/finals-config.js';
 import { postgresAuthorityStore } from '../../services/api/src/finals-store.js';
 import { newServiceState } from '../../services/api/src/service-state.js';
-import { assertAnchorMatches, type Anchor } from '../../services/api/src/consumption-anchor.js';
+import { assertAnchorMatches, httpConsumptionAnchor, type Anchor } from '../../services/api/src/consumption-anchor.js';
 import type { InstitutionRecord } from '../../services/api/src/finals-model.js';
 
-export async function createHttpFixture(options:{web?:boolean}={}){
+export async function createHttpFixture(options:{web?:boolean;liveDirectory?:string}={}){
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
 if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
+// Explicit integration-only live option; production never imports this fixture.
+const readLive=async(name:string)=>JSON.parse(await readFile(join(options.liveDirectory!,name),'utf8'));
+const live=options.liveDirectory?{context:await readLive('live-http-context.json'),deployment:await readLive('data/deployment.json'),manifest:await readLive('data/public-manifest.json'),ownership:await readLive('ownership.json')}:undefined;
+if(live&&(!String(live.context.institutionId).startsWith('callsign_test_')||live.ownership.runId!==live.context.runId||live.deployment.networkId!==live.context.networkId||process.env.CALLSIGN_LIVE_AUTHORITY_CONFIRMATION!=='OWNED_LOOPBACK_ONLY'))throw new Error('OWNED_LIVE_AUTHORITY_REQUIRED');
+const institutionUri=live?.context.institutionUri??'https://bank.example',serviceUri=live?.context.serviceUri??'https://center.example';
 const sql=postgres(process.env.TEST_DATABASE_URL,{max:2});
 let runRoot:string;
-const id='test-http-'+randomUUID(), deployment='test:'+id;
+const id=live?.context.institutionId??'test-http-'+randomUUID(), deployment='test:'+id;
 const records:Record<string,Anchor>={};
-const anchor={read:async(i:string)=>structuredClone(records[i]!),advance:async(p:Anchor,n:Anchor)=>{assertAnchorMatches(p,records[p.institutionId]!);records[p.institutionId]=structuredClone(n);}};
+const memoryAnchor={read:async(i:string)=>structuredClone(records[i]!),advance:async(p:Anchor,n:Anchor)=>{assertAnchorMatches(p,records[p.institutionId]!);records[p.institutionId]=structuredClone(n);}};
+const anchor=live?httpConsumptionAnchor({url:'https://127.0.0.1:4300',token:process.env.TEST_ANCHOR_TOKEN??'',deployment}):memoryAnchor;
 const control:{current:'current'|'revoked'|'unavailable';offset:number;witnessSnapshot?:import('../../packages/verifier/src/index.js').StateSnapshot;witnessFault?:'stale'|'signature'}={current:'current',offset:0};
 const registeredDigests=new Set<string>();
 const longSubject='recipient-'+ 'r'.repeat(100);
@@ -32,7 +38,7 @@ let issuerApp:Awaited<ReturnType<typeof buildFinalsServer>>,platform:typeof issu
 let web:{close():Promise<void>;resolvedUrls:{local:string[]}|null};
 let provider:ReturnType<typeof createServer>,origin:string,oidc:string,apiOrigin:string,record:InstitutionRecord;
 let subject='staff',mode='normal',codes=new Map<string,{nonce:string;challenge:string;client:string;redirect:string;subject:string;mode:string}>();
-const issuerKey=await generateEd25519KeyPair(),serviceKey=await generateEd25519KeyPair();
+const issuerKey=live?await readSigningKey(join(options.liveDirectory!,'data/issuer/approval-v1.json')):await generateEd25519KeyPair(),serviceKey=live?await readSigningKey(join(options.liveDirectory!,'data/sender/key.json')):await generateEd25519KeyPair();
 const signing=await generateKeyPair('RS256',{extractable:true}),jwk={...await exportJWK(signing.publicKey),kid:'test-oidc',alg:'RS256',use:'sig'};
 let issuedTokens=0;const usedTokens=new Set<string>();
 const audio={streams:[] as Array<{options:Parameters<import('../../services/api/src/service-audio.js').AudioProviders['stream']>[0];pushes:number;stopped:boolean}>,calls:[] as Array<{signal:AbortSignal;resolve:(r:import('../../services/api/src/risk.js').RiskAnalysis)=>void;reject:(e:Error)=>void}>};
@@ -81,21 +87,31 @@ const start=async()=>{
  }catch{res.writeHead(500);res.end('{}');}});
  oidc=await serverListen(provider);
  // Vite is already installed in the web workspace; no download or webServer hook.
- const {createServer:createVite}=await import('../../apps/web/node_modules/vite/dist/node/index.js');
- const vite=options.web===false?undefined:await createVite({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
+ const createVite=options.web===false?undefined:(await import('../../apps/web/node_modules/vite/dist/node/index.js')).createServer;
+ const vite=options.web===false?undefined:await createVite!({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
  if(vite){web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');}else origin='https://127.0.0.1:1';
- record={registrationState:'confirmed',directory:{hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory},id,did:'https://bank.example',institutionUri:'https://bank.example',authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion:1,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{'https://center.example':{did:'https://center.example',kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
- for(const [s,role] of [['staff','institution'],['agent','gateway'],['recipient','recipient'],['other','recipient'],['inactive','recipient'],['approver-one','approver'],['approver-two','approver'],[longSubject,'recipient']] as const){record.members[uid(s)]={role,active:s!=='inactive',...(role==='gateway'?{serviceDid:'https://center.example'}:{}),permissions:role==='institution'?['contact.manage','delegation.manage','institution.recover','institution.suspend']:role==='approver'?['governance.approve']:[]};await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid(s)},'Synthetic test account',${role},${randomUUID()})`;}
+ record={registrationState:'confirmed',directory:{hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory},id,did:institutionUri,institutionUri:institutionUri,authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion:1,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{[serviceUri]:{did:serviceUri,kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
+ if(live){
+  const {createPublicClient,http,keccak256,stringToHex}=await import('viem');const {serviceRegistryAbi}=await import('../../services/api/src/worker-ledger.js');
+  const client=createPublicClient({transport:http('http://127.0.0.1:18541',{timeout:2500,retryCount:0})}),address=live.deployment.registryAddress as `0x${string}`;
+  const [state,genesis,code,chainId]=await Promise.all([client.readContract({address,abi:serviceRegistryAbi,functionName:'institutions',args:[keccak256(stringToHex(id))]}),client.getBlock({blockNumber:0n}),client.getCode({address}),client.getChainId()]);
+  if(!state[8]||state[0]!==0||state[3]!==`0x${Buffer.from(issuerKey.publicJwk.x!,'base64url').toString('hex')}`||genesis.hash!==live.deployment.genesisHash||!code||keccak256(code)!==live.deployment.registryCodeHash||String(chainId)!==live.context.networkId)throw new Error('LIVE_REGISTRY_PROJECTION_MISMATCH');
+  record.epoch=String(state[1]);record.policy={...bankPolicy,version:Number(state[7])};
+ }
+ for(const [s,role] of [['staff','institution'],['agent','gateway'],['recipient','recipient'],['other','recipient'],['inactive','recipient'],['approver-one','approver'],['approver-two','approver'],[longSubject,'recipient']] as const){record.members[uid(s)]={role,active:s!=='inactive',...(role==='gateway'?{serviceDid:serviceUri}:{}),permissions:role==='institution'?['contact.manage','delegation.manage','institution.recover','institution.suspend']:role==='approver'?['governance.approve']:[]};await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid(s)},'Synthetic test account',${role},${randomUUID()})`;}
  // Same name/email at a different issuer/subject never implies membership in this institution.
  await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid('tenant-b')},'Synthetic test account','institution',${randomUUID()})`;
- records[id]={deployment,institutionId:id,sequence:'0',hash:'0'.repeat(64),epoch:'1'};
+ records[id]={deployment,institutionId:id,sequence:'0',hash:'0'.repeat(64),epoch:record.epoch};
+ if(live){const remote=await anchor.read(id);assertAnchorMatches(records[id]!,remote);}
  await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${id},${sql.json(record as unknown as postgres.JSONValue)})`;await sql`INSERT INTO issuer_v2.recovery_gate VALUES(${id},'blocked',now())`;
  const witnessPairs=await Promise.all([1,2,3,4].map(()=>generateEd25519KeyPair()));const witnessKeys=witnessPairs.map((key,n)=>({witnessId:`w-${n+1}`,kid:key.kid,jwk:key.publicJwk}));
- const trust={enrollmentPublicKey:issuerKey.publicJwk,supportedProtocolVersions:[1,3],networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,genesisHash:`0x${'0'.repeat(64)}`,registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1',policyVersion:String(bankPolicy.version),witnessThreshold:3,witnessPublicKeys:witnessKeys,endpoints:[1,2,3,4].map(n=>({witnessId:`w-${n}`,url:`https://127.0.0.1:1/w-${n}`})),service:{institutionUri:record.institutionUri,issuerKid:issuerKey.kid,issuerPublicKey:issuerKey.publicJwk,approvalKeyVersion:1,serviceUri:'https://center.example',serviceKid:serviceKey.kid,servicePublicKey:serviceKey.publicJwk,serviceKeyVersion:1,policy:servicePolicy}};
- await writeFile(`${runRoot}/trust.json`,JSON.stringify(trust),{mode:0o600});await writeFile(`${runRoot}/approval-v1.json`,JSON.stringify({kid:issuerKey.kid,privateJwk:await exportSigningPrivateJwk(issuerKey),publicJwk:issuerKey.publicJwk}),{mode:0o600});
- await writeFile(`${runRoot}/sender.json`,JSON.stringify({kid:serviceKey.kid,privateJwk:await exportSigningPrivateJwk(serviceKey),publicJwk:serviceKey.publicJwk}),{flag:'wx',mode:0o600});
- Object.assign(process.env,{SENDER_KEY_PATH:`${runRoot}/sender.json`,SERVICE_URI:'https://center.example',REGISTRY_APPROVERS:'0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf,0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF,0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69',SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
- const env=finalsEnvironment({...process.env,SERVICE_ROLE:'issuer',WEB_ORIGIN:origin,PUBLIC_DEPLOYMENT:'true',PLATFORM_INTERNAL_TOKEN:'p'.repeat(40),SENDER_INTERNAL_TOKEN:'s'.repeat(40),ISSUER_URL:'http://127.0.0.1:1',SENDER_URL:'http://127.0.0.1:1',INSTITUTION_ID:id,NETWORK_ID:'31337',REGISTRY_ADDRESS:trust.registryAddress,TRUST_BUNDLE_PATH:`${runRoot}/trust.json`});
+ const trust={enrollmentPublicKey:issuerKey.publicJwk,supportedProtocolVersions:[1,3],networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,genesisHash:`0x${'0'.repeat(64)}`,registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1',policyVersion:String(bankPolicy.version),witnessThreshold:3,witnessPublicKeys:witnessKeys,endpoints:[1,2,3,4].map(n=>({witnessId:`w-${n}`,url:`https://127.0.0.1:1/w-${n}`})),service:{institutionUri:record.institutionUri,issuerKid:issuerKey.kid,issuerPublicKey:issuerKey.publicJwk,approvalKeyVersion:1,serviceUri:serviceUri,serviceKid:serviceKey.kid,servicePublicKey:serviceKey.publicJwk,serviceKeyVersion:1,policy:servicePolicy}};
+ if(live){Object.assign(trust,{networkId:live.deployment.networkId,registryAddress:live.deployment.registryAddress,genesisHash:live.deployment.genesisHash,policyVersion:String(record.policy.version),witnessPublicKeys:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,kid:live.manifest.publicKeys[`witness-keys/witness-${n}`].kid,jwk:live.manifest.publicKeys[`witness-keys/witness-${n}`].publicJwk})),endpoints:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,url:`http://127.0.0.1:${4200+n}`}))});}
+ await writeFile(`${runRoot}/trust.json`,JSON.stringify(trust),{mode:0o600});await writeFile(`${runRoot}/approval-v1.json`,JSON.stringify({kid:issuerKey.kid,privateJwk:live?(await readLive('data/issuer/approval-v1.json')).privateJwk:await exportSigningPrivateJwk(issuerKey as Awaited<ReturnType<typeof generateEd25519KeyPair>>),publicJwk:issuerKey.publicJwk}),{mode:0o600});
+ await writeFile(`${runRoot}/sender.json`,JSON.stringify({kid:serviceKey.kid,privateJwk:live?(await readLive('data/sender/key.json')).privateJwk:await exportSigningPrivateJwk(serviceKey as Awaited<ReturnType<typeof generateEd25519KeyPair>>),publicJwk:serviceKey.publicJwk}),{flag:'wx',mode:0o600});
+ Object.assign(process.env,{SENDER_KEY_PATH:`${runRoot}/sender.json`,SERVICE_URI:serviceUri,REGISTRY_APPROVERS:'0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf,0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF,0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69',SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
+ if(live)Object.assign(process.env,{CONSUMPTION_ANCHOR_URL:'https://127.0.0.1:4300',CONSUMPTION_ANCHOR_TOKEN:process.env.TEST_ANCHOR_TOKEN,REGISTRY_APPROVERS:[1,2,3].map(n=>live.context.publicAddresses[`approver${n}`]).join(',')});
+ const env=finalsEnvironment({...process.env,SERVICE_ROLE:'issuer',WEB_ORIGIN:origin,PUBLIC_DEPLOYMENT:'true',PLATFORM_INTERNAL_TOKEN:'p'.repeat(40),SENDER_INTERNAL_TOKEN:'s'.repeat(40),ISSUER_URL:'http://127.0.0.1:1',SENDER_URL:'http://127.0.0.1:1',INSTITUTION_ID:id,NETWORK_ID:trust.networkId,REGISTRY_ADDRESS:trust.registryAddress,TRUST_BUNDLE_PATH:`${runRoot}/trust.json`});
  const witnessFetch:typeof fetch=async(url,init)=>{
   const u=new URL(String(url)),index=Number(/w-(\d)/.exec(u.pathname)?.[1])-1,snapshot=control.witnessSnapshot;
   if(!snapshot||!witnessPairs[index])throw new Error('EXPLICIT_WITNESS_FIXTURE_NOT_PREPARED');
@@ -103,7 +119,7 @@ const start=async()=>{
   const query=JSON.parse(String(init?.body)),value={...snapshot,institutionId:query.institutionId,delegationId:query.delegationId,...(control.witnessFault==='stale'?{blockTimestamp:Math.floor(Date.now()/1000)-30}:{})};
   return Response.json({witnessId:`w-${index+1}`,snapshot:value,jws:await signPayload(value,control.witnessFault==='signature'?issuerKey:witnessPairs[index]!)});
  };
- issuerApp=await buildFinalsServer(env,{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?control.current:'unavailable',witnessFetch,audioProviders,now:()=>Math.floor(Date.now()/1000)+control.offset});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
+ issuerApp=await buildFinalsServer(env,live?undefined:{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?control.current:'unavailable',witnessFetch,audioProviders,now:()=>Math.floor(Date.now()/1000)+control.offset});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
  senderApp=await buildFinalsServer({...env,SERVICE_ROLE:'sender',ISSUER_URL:upstream});const senderOrigin=await senderApp.listen({host:'127.0.0.1',port:0});
  platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream,SENDER_URL:senderOrigin});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
  if(vite)(vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
