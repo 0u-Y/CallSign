@@ -54,7 +54,7 @@ AWS 초기 준비 전달은 runtime·Besu·PostgreSQL·Asterisk·TURN·nginx의 
 
 ### 개발 서버가 없어도 준비·실행하는 방법
 
-Docker/Compose>=2.33.1·Bash·Node22(설치 의존성 없는 JSON/env 검사 용도)를 새 AWS 호스트에 별도 승인 후 준비한다. npm/pnpm install·소스 checkout·host node_modules는 배포 실행의 선행 조건이 아니다. TypeScript 준비 도구·설치된 pnpm은 runtime 이미지 안에 있다. 공개 파일 tar를 새 release 디렉터리에 풀고 image tar 또는 승인된 ECR에서 이미지를 확보한다. 이미지 전달·보호 파일은 AWS 또는 다른 승인된 보관처에 미리 보관하고 AWS에서 접근·해시 검증을 끝내야 한다. 현재 개발 서버를 다운로드 서버로 사용하지 않는다.
+Docker/Compose>=2.33.1·Bash·Node22.22.2(설치 의존성 없는 JSON/env·native type stripping 검사 용도)를 새 AWS 호스트에 별도 승인 후 준비한다. npm/pnpm install·소스 checkout·host node_modules는 배포 실행의 선행 조건이 아니다. TypeScript 준비 도구·설치된 pnpm은 runtime 이미지 안에 있다. 공개 파일 tar를 새 release 디렉터리에 풀고 image tar 또는 승인된 ECR에서 이미지를 확보한다. 이미지 전달·보호 파일은 AWS 또는 다른 승인된 보관처에 미리 보관하고 AWS에서 접근·해시 검증을 끝내야 한다. 현재 개발 서버를 다운로드 서버로 사용하지 않는다.
 
 아래는 **실제 AWS 생성·업로드·실행 승인 후** 사용할 명령이며 이번에는 실행하지 않는다. `APP`, `NGINX`, `BESU` 등은 inventory의 검토한 실제 불변 참조, `CFG`는 AWS 보호 env, `DATA_PARENT`는 새 EBS mount다. 보호 env는 Docker `--env-file`에서도 읽히는 단순 `KEY=value` 형식을 쓰며 shell 확장·따옴표 해석에 의존하지 않는다. 값·전체 env·shell trace를 로그에 출력하지 않는다.
 

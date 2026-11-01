@@ -3,10 +3,18 @@ set -euo pipefail
 if [ "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != "infrastructure" ]; then echo 'BLOCKED: separate deployment approval required' >&2; exit 78; fi
 : "${CALLSIGN_ENV_FILE:?path to protected deployment.env}"
 command="${1:-}"
+deployment_target="$(node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
+import {readFileSync} from 'node:fs';import {parseEnv} from 'node:util';
+const value=process.env.CALLSIGN_DEPLOYMENT_TARGET??parseEnv(readFileSync(process.argv[2],'utf8')).CALLSIGN_DEPLOYMENT_TARGET??'';
+if(!['','aws'].includes(value))throw new Error('DEPLOYMENT_TARGET_INVALID');process.stdout.write(value);
+JS
+)"
 compose=(docker compose --env-file "$CALLSIGN_ENV_FILE" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml --profile https --profile pbx --profile media)
-if [[ "${CALLSIGN_DEPLOYMENT_TARGET:-}" == aws ]]; then
+if [[ "$deployment_target" == aws ]]; then
   [[ "${CALLSIGN_AWS_TARGET_CONFIRMATION:-}" == AWS-ONLY ]] || { echo 'BLOCKED: AWS target confirmation required; never run on development host' >&2; exit 78; }
-  mountpoint -q "${CALLSIGN_AWS_MOUNT:?AWS persistent mount to check}" || { echo 'BLOCKED: AWS EBS mount missing' >&2; exit 78; }
+  if [[ "$command" == start || "$command" == restart ]]; then
+    mountpoint -q "${CALLSIGN_AWS_MOUNT:?AWS persistent mount to check}" || { echo 'BLOCKED: AWS EBS mount missing' >&2; exit 78; }
+  fi
   compose=(docker compose --env-file "$CALLSIGN_ENV_FILE" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml -f infra/deploy/compose.aws.yml --profile https --profile pbx --profile media)
 fi
 case "$command" in
@@ -17,7 +25,7 @@ import {readFileSync} from 'node:fs';
 import {parseEnv} from 'node:util';
 import {immutableImageReference} from './scripts/image-reference.mjs';
 const env={...parseEnv(readFileSync(process.argv[2],'utf8')),...process.env};
-if(process.env.CALLSIGN_DEPLOYMENT_TARGET==='aws'){
+if(env.CALLSIGN_DEPLOYMENT_TARGET==='aws'){
   const {awsPreflight}=await import('./scripts/preflight-aws.ts');
   if(awsPreflight(env,'runtime',(env.CALLSIGN_FORBIDDEN_HOSTS??'').split(',').filter(Boolean)).some(c=>c.status==='FAIL'||c.status==='BLOCKED'))throw new Error('AWS_RUNTIME_CONFIGURATION_BLOCKED');
 }

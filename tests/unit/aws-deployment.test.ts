@@ -1,5 +1,5 @@
 import {it,expect} from 'vitest';
-import {readFile,mkdtemp,rm} from 'node:fs/promises';
+import {readFile,mkdtemp,rm,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
@@ -35,4 +35,8 @@ it('keeps TLS/port/egress/storage boundaries in the AWS Compose overlay and bloc
  const main=await readFile('infra/deploy/compose.yml','utf8'),aws=await readFile('infra/deploy/compose.aws.yml','utf8'),anchor=await readFile('infra/deploy/compose.anchor.yml','utf8');
  expect(main).toContain("command: ['turnserver', '-c'");expect(main.slice(main.indexOf('  worker:'),main.indexOf('  migration-runner:'))).toContain('networks: [application, ledger, egress]');expect(aws).toContain('ports: !reset []');expect(aws).toContain('AWS_VOLUME_ROOT');expect(anchor).toContain('ANCHOR_HOST: 0.0.0.0');expect(anchor).not.toContain('5432:5432');
  expect(()=>execFileSync('bash',['scripts/deployment.sh','start'],{env:{PATH:process.env.PATH},stdio:'pipe'})).toThrow();
+});
+it('selects AWS from the protected env file and refuses unapproved execution before invoking Docker',async()=>{
+ const root=await mkdtemp(join(tmpdir(),'callsign-aws-target-')),path=join(root,'aws.env');
+ try{await writeFile(path,'CALLSIGN_DEPLOYMENT_TARGET=aws\n',{mode:0o600});try{execFileSync('bash',['scripts/deployment.sh','stop'],{env:{PATH:process.env.PATH,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'infrastructure',CALLSIGN_ENV_FILE:path},stdio:'pipe'});throw Error('AWS_GUARD_MISSING');}catch(e){expect((e as {status:number}).status).toBe(78);expect(String((e as {stderr:Buffer}).stderr)).toContain('AWS target confirmation required');}}finally{await rm(root,{recursive:true});}
 });
