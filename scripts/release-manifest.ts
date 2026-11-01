@@ -17,7 +17,7 @@ if(['--inventory','--bundle'].includes(process.argv[2]??'')){
  if(bundle){
   if(dirty)throw new Error('COMMIT_REVIEWED_SOURCES_BEFORE_TRANSFER_BUNDLE');
   await mkdir(output,{mode:0o700});const files=resolve(output,'deployment-files.tar');
-  const paths=['infra/deploy','infra/besu/network-config.json','scripts/deployment.sh','scripts/generate-besu.sh','scripts/image-reference.mjs','scripts/preflight-aws.ts','scripts/restricted.mjs','docs/RUNBOOK.md','docs/KNOWN-LIMITATIONS.md','artifacts/service-registry-build-20261027.json'];
+  const paths=['.dockerignore','infra/deploy','infra/besu/network-config.json','scripts/deployment.sh','scripts/generate-besu.sh','scripts/image-reference.mjs','scripts/preflight-aws.ts','scripts/restricted.mjs','docs/RUNBOOK.md','docs/KNOWN-LIMITATIONS.md','artifacts/service-registry-build-20261027.json'];
   execFileSync('git',['archive','--format=tar','--output',files,head,...paths],{timeout:30000});
   await writeFile(resolve(output,'images.json'),JSON.stringify(inventory,null,2)+'\n',{flag:'wx',mode:0o600});
   const hashes=[];for(const name of ['deployment-files.tar','images.json'])hashes.push(createHash('sha256').update(await readFile(resolve(output,name))).digest('hex')+'  '+name);

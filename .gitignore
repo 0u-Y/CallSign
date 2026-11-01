@@ -25,3 +25,8 @@ infra/compose/volumes/
 # Personal handoff summaries stay local; canonical docs and evidence remain tracked.
 /docs/*-SUMMARY.md
 /artifacts/*.progress.json
+# Filled deployment inputs stay outside source checkpoints; reviewed templates remain public.
+*.env
+*.env.*
+!.env.example
+!infra/deploy/*.env.example

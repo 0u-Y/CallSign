@@ -45,6 +45,7 @@ AWS preflight는 `--phase aws --step prepare|runtime`으로 실행하며 설정 
 - 공통 구성: `infra/deploy/compose.yml`, `compose.pbx.yml`
 - AWS override: `infra/deploy/compose.aws.yml`, `https-nginx.conf`
 - 별도 Anchor: `infra/deploy/compose.anchor.yml`, `anchor-schema.sql`, `provision-anchor.sql`
+- 채워진 `*.env`/복원 env는 Git·Docker build context에서 제외한다. 실제 보호 파일은 release/source 디렉터리 밖에 두며 공개 예제만 배포 파일에 포함한다.
 - 입력: `aws.env.example`, `anchor.env.example`를 보호 파일로 복사해 채운다. 빈 값은 차단이며 실제 주소/키/digest를 지어 넣지 않는다.
 - 역할 이미지 **7종**: runtime(API/worker/Witness/Anchor/준비 도구), web, Besu, PostgreSQL(서비스·Anchor), Asterisk, TURN, HTTPS nginx. 외부 OIDC를 선택하지 않으면 IdP 실행물·설정은 별도 미완료다.
 - `release-manifest.ts --inventory NEW.json --env-file PROTECTED_ENV`는 실제 local ID/architecture/size를 조사한다. runtime 경로나 CA를 숨겨 mount하지 않고 이미지 안의 설치 의존성을 사용한다. AWS 웹은 현재 trust pin label과 맞지 않으면 BLOCKED다.

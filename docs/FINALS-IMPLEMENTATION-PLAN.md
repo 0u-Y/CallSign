@@ -27,6 +27,8 @@ AWS 빈 template 검사: prepare는 PASS17/BLOCKED15/SKIPPED1, runtime은 PASS17
 
 원본 실패도 보존했다. FROM에 raw config ID를 사용해 registry metadata 조회가 실패한 build는 검토한 기존 local tag/ID 대조로 수정했으며 image 다운로드를 완료한 것은 없다. 초기 AWS preflight의 ambient PATH 오분류와 cloud fixture의 과거 step명 불일치는 회귀로 수정했다. 기존 서버 설정/자원에 대한 변경 명령·새 bridge·port publish·외부 AWS/AI/업로드/과금은 실행하지 않았다. 전체 호스트 상태 동일을 측정한 검증은 아니다.
 
+최종 전달 파일만 새 디렉터리에 풀어 host node_modules 없이 AWS preflight의 미정 입력 차단과 deployment.sh의 AWS 실행 확인 차단을 검증했다. 공개 파일 checksum과 bootstrap image checksum을 함께 대조했다. 뒤이어 채운 `aws.env`/`deployment.env`/복원 env가 Git·Docker context·소스 증거 대상으로 유입되는 경계를 보완했고 공개 예제는 유지했다. 관련 preflight11시험 PASS와 TypeScript 검사를 수행했으며 앞선 전체 light와 합산하지 않는다. runtime image build 당시의 채운 env는 제외된 `.local` 안에만 있었다. 이후 image에 사용하지 않는 host 전달/증거 도구·ignore·문서 변경은 source 관계에서 구분한다. 공개 전달물의 실제 hash/재검증은 보호 작업 디렉터리의 `delivery-check*.json`과 `delivery*/SHA256SUMS`를 따른다. 외부 전송은 아직 하지 않았다.
+
 ### 남은 실행 gate
 
 현재 서버 없이 **준비 도구가 포함된 이미지가 실행되는 범위**만 로컬 확인했다. 새 AWS 전체 초기화·실제 IdP·외부 TLS/NAT/TURN·제품 전체 흐름·EBS 재부팅/복원·외부 보관처에서 전달물을 재수령하는 검증은 남는다. AWS·별도 Anchor host의 실제 기동/권한 검증을 수행하지 않았다. `shower`의 발췌 전달 검토에서 미정 입력·전달 미완성과 checkpoint/판정 설명 부족을 지적받아 명령·완료/중단표를 보완했으며, 이 검토 자체가 실행 검증은 아니다. 실제 입력/실행 허가 없이 배포 완료로 표시하지 않는다.

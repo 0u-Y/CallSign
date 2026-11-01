@@ -670,5 +670,16 @@
     "AWS-specific final web build/pin and metadata",
     "external upload/retrieval of image and protected references; no paid resources or public exposure"
   ],
-  "retention": "Image tar and protected material excluded from Git; keep private logs and checksums under operator retention. No human audio or production credentials generated."
+  "retention": "Image tar and protected material excluded from Git; keep private logs and checksums under operator retention. No human audio or production credentials generated.",
+  "publicEnvironmentProtection": {
+    "status": "PASS",
+    "scope": "11 offline preflight regressions including named aws.env/deployment.env/restored-file exclusion; public templates remain allowed",
+    "gitAndDockerIgnoreUpdated": true,
+    "runtimeImageBuildContext": "No filled deployment env was present outside ignored .local during the recorded image build",
+    "laterHostToolsChanged": [
+      "scripts/collect-evidence.ts",
+      "scripts/release-manifest.ts"
+    ],
+    "notRerun": "whole source suite after these path-filter-only edits; relevant unit test and TypeScript check performed, final CI checked separately"
+  }
 }
