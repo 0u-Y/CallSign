@@ -95,15 +95,18 @@ for previous in ['runtime-media-test.log','runtime-media-results.json','image-se
 log = open(root / 'runtime-media-test.log', 'x', opener=lambda p, f: os.open(p, f, 0o600))
 controller = run_id + '-controller'
 controller_info = inspect(controller)
-if controller_info['Config']['Labels'].get('org.callsign.run-id') != run_id or not controller_info['HostConfig'].get('Init'):
-    raise SystemExit('OWNED_CONTROLLER_INIT_REQUIRED')
+def assert_controller(info):
+    if info['Config']['Labels'].get('org.callsign.run-id') != run_id or not info['HostConfig'].get('Init') or info['Image'] != app_image or info['HostConfig']['NetworkMode'] != 'container:' + keeper['Id'] or not any(c['id'] == info['Id'] for c in owner['containers']):
+        raise RuntimeError('OWNED_CONTROLLER_INIT_REQUIRED')
+assert_controller(controller_info)
 selection = ['--testNamePattern', 'boots final image|after (' + '|'.join(selected_cases) + ')$']
 limit = 3900 if 'session-expiry' in selected_cases else 600
-child = subprocess.Popen(['timeout', str(limit), 'docker', 'exec', '--env-file', str(root / 'runtime-test.env'), controller,
-                          'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
+child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(root / 'runtime-test.env'), controller,
+                          'timeout', '--signal=TERM', '--kill-after=5s', str(limit), 'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
                           '--configLoader', 'runner', '--fsModuleCachePath', '/tmp/callsign-runtime-image-modules',
                           '--cache=false', '--reporter=json', '--outputFile=/run/callsign/runtime-media-results.json'] + selection,
                          stdout=log, stderr=subprocess.STDOUT)
+completed = False
 try:
     deadline = time.monotonic() + 60
     while not (root / 'image-services-request.json').exists():
@@ -217,13 +220,27 @@ try:
     code = child.returncode
     if code:
         raise RuntimeError('RUNTIME_MEDIA_ASSERTIONS_FAILED')
+    completed = True
     print('Owned final-image integration assertions completed.')
 finally:
-    if 'pbx-outage' in selected_cases:
-        pbx = inspect(run_id + '-pbx')
-        if pbx['Config']['Labels'].get('org.callsign.run-id') == run_id and pbx['State']['Paused']:
-            command(['docker','unpause',pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
-    if child.poll() is None:
-        child.terminate()
-        child.wait(timeout=5)
-    log.close()
+    try:
+        if not completed:
+            current = inspect(controller)
+            assert_controller(current)
+            if current['Id'] != controller_info['Id']: raise RuntimeError('CONTROLLER_CHANGED_DURING_TEST')
+            command(['docker','stop','-t','3',current['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
+    finally:
+        try:
+            if 'pbx-outage' in selected_cases:
+                pbx = inspect(run_id + '-pbx')
+                if pbx['Config']['Labels'].get('org.callsign.run-id') == run_id and pbx['State']['Paused']:
+                    command(['docker','unpause',pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
+        finally:
+            try:
+                if child.poll() is None:
+                    child.terminate()
+                    try: child.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        child.kill()
+                        child.wait(timeout=5)
+            finally: log.close()

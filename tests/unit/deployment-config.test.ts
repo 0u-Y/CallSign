@@ -85,3 +85,26 @@ for labels,recorded in [({'org.callsign.run-id':'another-workload'},['unit-volum
 `;
  expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
 });
+
+it('refuses to stop a replaced or foreign observer controller',()=>{
+ const check=`import ast,copy
+from pathlib import Path
+module=ast.parse(Path('tests/integration/runtime-media-driver.py').read_text())
+fn=next(node for node in module.body if isinstance(node,ast.FunctionDef) and node.name=='assert_controller')
+scope={'run_id':'unit-owned','app_image':'reviewed-image','keeper':{'Id':'namespace'},'owner':{'containers':[{'id':'controller-id'}]}}
+exec(compile(ast.Module(body=[fn],type_ignores=[]),'real-controller-guard','exec'),scope)
+info={'Id':'controller-id','Image':'reviewed-image','Config':{'Labels':{'org.callsign.run-id':'unit-owned'}},'HostConfig':{'Init':True,'NetworkMode':'container:namespace'}}
+scope['assert_controller'](info)
+for field in ['id','image','label','init','network']:
+ candidate=copy.deepcopy(info)
+ if field=='id':candidate['Id']='another-controller'
+ if field=='image':candidate['Image']='another-image'
+ if field=='label':candidate['Config']['Labels']['org.callsign.run-id']='another-workload'
+ if field=='init':candidate['HostConfig']['Init']=False
+ if field=='network':candidate['HostConfig']['NetworkMode']='host'
+ try:scope['assert_controller'](candidate)
+ except RuntimeError:continue
+ raise AssertionError('unsafe controller accepted:'+field)
+`;
+ expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
+});

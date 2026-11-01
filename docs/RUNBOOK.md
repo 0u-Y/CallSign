@@ -292,7 +292,37 @@ proof --delivery-files "$ROOT/public" --case pbx-outage device-denied device-abs
 
 정책 변경 후에는 API의 공동 확정·명시 활성화, 새 policy version의 trust 생성, web pin 재build가 필요하다. 키 변경은 자기 기관 정지→공동 복구→확정된 새 key 활성화→새 trust/web 게시 순서다. `key-change` 전에 기존 `prepare-finals.ts approval-key`로 새 **비활성** 버전2 파일과 별도 public manifest를 생성한다. `runtime-test.env`의 `CALLSIGN_PREPARED_TRUST`는 검토한 새 trust 파일 참조로만 변경한다. 구 키/VC/소비 이력·계정·Anchor를 삭제하거나 API가 보낸 키를 자동 신뢰하지 않는다. [권한·trust 전환](#trust-transition)을 따른다.
 
+이번 합성 version1→2 순서는 아래와 같다. `INSTITUTION_ID`는 `$ROOT/synthetic-public-context.json`의 실제 생성값이며 임의 기관 값을 넣지 않는다. controller의 현재 ID/소유 label을 먼저 대조한다. 운영용 키 회전 명령이 아니며 보호 env는 출력하지 않는다.
+
+```bash
+INSTITUTION_ID="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["institutionId"])' "$ROOT/synthetic-public-context.json")"
+proof --archive-phase non-destructive-cases
+proof --delivery-files "$ROOT/public" --case policy-change
+proof --archive-phase policy-change
+docker exec --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
+  --env "INSTITUTION_ID=$INSTITUTION_ID" --env SERVICE_POLICY_VERSION=2 \
+  --env PBX_DTLS_CERT_PATH=/run/callsign/tls/cert.pem "$(basename "$ROOT")-controller" \
+  pnpm exec tsx scripts/prepare-finals.ts trust /run/callsign/data /run/callsign/prepared-trust-policy2.json --apply
+docker exec --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure --env APPROVAL_KEY_VERSION=2 \
+  "$(basename "$ROOT")-controller" pnpm exec tsx scripts/prepare-finals.ts \
+  approval-key /run/callsign/data /run/callsign/public-manifest-v2.json --apply
+# In protected runtime-test.env, select CALLSIGN_PREPARED_TRUST=/run/callsign/prepared-trust-policy2.json.
+proof --delivery-files "$ROOT/public" --case key-change
+proof --archive-phase key-change
+docker exec --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
+  --env "INSTITUTION_ID=$INSTITUTION_ID" --env SERVICE_POLICY_VERSION=2 --env APPROVAL_KEY_VERSION=2 \
+  --env PUBLIC_MANIFEST_PATH=/run/callsign/public-manifest-v2.json \
+  --env PBX_DTLS_CERT_PATH=/run/callsign/tls/cert.pem "$(basename "$ROOT")-controller" \
+  pnpm exec tsx scripts/prepare-finals.ts trust /run/callsign/data /run/callsign/prepared-trust-policy2-key2.json --apply
+# Select the new protected trust reference; the driver builds its corresponding web pin.
+proof --delivery-files "$ROOT/public" --case session-expiry
+```
+
+자연 만료는 `/api/v3/auth/me?purpose=work`로 실제 세션401을 관측한다. `purpose`가 없는400은 인증 만료 판정이 아니다. phase archive는 원본 stderr와 자연 만료 관측 파일도 보존한다. 첫 실패를 삭제하거나 과거 PASS로 대체하지 않고 수정한 observer의 commit/archive hash를 함께 남긴다. 키 복구는 필수 정지에 의한 회수와 새 키 활성화·구 권한 부활 방지를 연결한 시험이며 정지를 생략한 독립 키 교체를 주장하지 않는다.
+
 로컬 차이는 none keeper의 공유 loopback·validator별 RPC/P2P 포트, 합성 URI/OIDC/중앙 시험 승인자, 단기 시험 CA, 같은 호스트의 별도 Anchor 저장소, TURN의 loopback-peer 허용이다. AWS에서는 별도 서비스 주소·실제 origin/TLS/IdP·공개/NAT mapping·loopback 차단을 사용한다. 이미지·서비스 entrypoint·migration·업무/서명 검증 코드는 동일하지만 **AWS Compose override·외부 TLS/NAT/TURN은 이 리허설로 검증되지 않는다**. 웹 builder는 이번 host에서만 자식 환경의 `DOCKER_BUILDKIT=0`와2GiB/CPU1 제한을 사용하며 daemon 설정은 변경하지 않는다. [Docker 공식 build 옵션](https://docs.docker.com/reference/cli/docker/image/build/)을 따른다. 해당 builder가 없는 환경에서 자동 설치/우회하지 않는다.
+
+로컬 nginx는 UID1000·cap-drop과 읽기 전용 root를 위해 pid/cache를 소유 `/tmp`로 옮기는 controller 생성 global config를 사용한다. AWS nginx 기본 실행 설정과 이 차이도 기록한다. 전달된 AWS HTTPS server config를 수정하지 않은 별도 component 시험에서는 명시적 시험 `web` DNS 별칭·합성 인증서로308/HTTPS 제품 파일을 확인했다. 해당 별칭 파일은 그 소유 container에만 mount하며 host/기존 namespace의 hosts/DNS를 변경하지 않는다. 이 component 결과는 AWS override 전체나 외부 인증서 성공이 아니다.
 
 `ownership.json`에 기록한 ID와 현재 label을 대조한 후 이번 container만 stop/rm하고, volume도 같은 소유 label을 재확인한 뒤 제거한다. 증거부터 보존하며 다른 project나 전역 prune/down -v는 사용하지 않는다. 보호 env·signer key·브라우저 profile·합성 WAV·DB/체인 상태는 공개 전달물/Git에 넣지 않는다. 일회성 시험의 잔여 key/chain만으로 서비스 복원이 가능하다고 표시하지 않는다. 공개 전달물과 보호 자료를 분리해 승인된 외부 보관처에서 재수령·checksum 대조하기 전에는 외부 전달 완료로 보고하지 않는다.
 
