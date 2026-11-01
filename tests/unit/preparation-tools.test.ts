@@ -25,3 +25,10 @@ it('inspects a public signing proposal without opening the supplied private-key 
  const value=execFileSync(process.execPath,['--import','tsx','scripts/sign-recovery.ts',path,'/private-key-must-not-be-opened',digest,'configuration'],{encoding:'utf8',timeout:10000,env:{...process.env,NETWORK_ID:String(chain),REGISTRY_ADDRESS:registry}});const report=JSON.parse(value);expect(report.mode).toBe('dry-run');expect(report.privateKeyRead).toBe(false);expect(report.digest).toBe(digest);
  }finally{await rm(dir,{recursive:true});}
 });
+
+it('refuses the offline media package recipe before any host install when owned-container authorization is absent',()=>{
+ try{execFileSync('bash',['infra/deploy/build-media.sh'],{encoding:'utf8',env:{PATH:process.env.PATH},timeout:3000});throw new Error('BUILD_GUARD_MISSING');}catch(error){expect((error as {status:number}).status).toBe(78);}
+});
+it('blocks the final-image media driver before Docker or test preparation without explicit integration authorization',()=>{
+ try{execFileSync('python3',['tests/integration/runtime-media-driver.py'],{encoding:'utf8',env:{PATH:process.env.PATH},timeout:3000});throw new Error('MEDIA_DRIVER_GUARD_MISSING');}catch(error){expect((error as {status:number;stderr:Buffer}).status).toBe(1);expect(String((error as {stderr:Buffer}).stderr)).toContain('INTEGRATION_EXECUTION_BLOCKED');}
+});

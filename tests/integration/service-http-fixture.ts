@@ -4,7 +4,7 @@ import { expect } from 'vitest';
 import { readFile, writeFile, mkdtemp } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createServer } from 'node:https';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash, randomUUID, X509Certificate } from 'node:crypto';
 import { initialDirectory } from '../../packages/protocol/src/index.js';
 import postgres from 'postgres';
 const { SignJWT, exportJWK, importJWK, generateKeyPair } = await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js', import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
@@ -16,7 +16,7 @@ import { newServiceState } from '../../services/api/src/service-state.js';
 import { assertAnchorMatches, httpConsumptionAnchor, type Anchor } from '../../services/api/src/consumption-anchor.js';
 import type { InstitutionRecord } from '../../services/api/src/finals-model.js';
 
-export async function createHttpFixture(options:{web?:boolean;liveDirectory?:string}={}){
+export async function createHttpFixture(options:{web?:boolean;liveDirectory?:string;webOrigin?:string;resumeOidc?:string;startExternal?:(prepared:{environment:NodeJS.ProcessEnv;runRoot:string;origin:string;oidc:string;pin:string})=>Promise<string>}={}){
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
 if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
@@ -24,6 +24,8 @@ if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE
 const readLive=async(name:string)=>JSON.parse(await readFile(join(options.liveDirectory!,name),'utf8'));
 const live=options.liveDirectory?{context:await readLive('live-http-context.json'),deployment:await readLive('data/deployment.json'),manifest:await readLive('data/public-manifest.json'),ownership:await readLive('ownership.json')}:undefined;
 if(live&&(!String(live.context.institutionId).startsWith('callsign_test_')||live.ownership.runId!==live.context.runId||live.deployment.networkId!==live.context.networkId||process.env.CALLSIGN_LIVE_AUTHORITY_CONFIRMATION!=='OWNED_LOOPBACK_ONLY'))throw new Error('OWNED_LIVE_AUTHORITY_REQUIRED');
+if(options.startExternal&&(!live||process.env.CALLSIGN_RUNTIME_IMAGE_CONFIRMATION!=='OWNED_FINAL_IMAGE'||!options.webOrigin||new URL(options.webOrigin).hostname!=='127.0.0.1'||new URL(options.webOrigin).protocol!=='https:'))throw new Error('OWNED_EXTERNAL_IMAGE_CONFIGURATION_REQUIRED');
+if(options.resumeOidc&&(!options.startExternal||new URL(options.resumeOidc).protocol!=='https:'||new URL(options.resumeOidc).hostname!=='127.0.0.1'||!new URL(options.resumeOidc).port))throw new Error('OWNED_OIDC_RESUME_REQUIRED');
 const institutionUri=live?.context.institutionUri??'https://bank.example',serviceUri=live?.context.serviceUri??'https://center.example';
 const sql=postgres(process.env.TEST_DATABASE_URL,{max:2});
 let runRoot:string;
@@ -45,7 +47,7 @@ const audio={streams:[] as Array<{options:Parameters<import('../../services/api/
 const audioProviders:import('../../services/api/src/service-audio.js').AudioProviders={stream(options){const item={options,pushes:0,stopped:false};audio.streams.push(item);return {connect(){options.onReady?.();},push(){item.pushes++;},stop(){item.stopped=true;}};},analyze:async(_text,_policy,signal)=>new Promise((resolve,reject)=>audio.calls.push({signal,resolve,reject}))};
 
 const uid=(s:string)=>`${oidc}|${s}`;
-const serverListen=(server:ReturnType<typeof createServer>)=>new Promise<string>((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',()=>{const a=server.address();if(!a||typeof a==='string')return reject(new Error('NO_PORT'));resolve(`https://127.0.0.1:${a.port}`);});});
+const serverListen=(server:ReturnType<typeof createServer>)=>new Promise<string>((resolve,reject)=>{server.once('error',reject);server.listen(options.resumeOidc?Number(new URL(options.resumeOidc).port):0,'127.0.0.1',()=>{const a=server.address();if(!a||typeof a==='string')return reject(new Error('NO_PORT'));resolve(`https://127.0.0.1:${a.port}`);});});
 interface Client {cookies:Map<string,string>;csrf:string;request(path:string,body?:unknown,headers?:Record<string,string>):Promise<{status:number;body:any;headers:Headers}>}
 function client():Client {
  const c:Client={cookies:new Map(),csrf:'',async request(path,body,headers={}){
@@ -89,7 +91,7 @@ const start=async()=>{
  // Vite is already installed in the web workspace; no download or webServer hook.
  const createVite=options.web===false?undefined:(await import('../../apps/web/node_modules/vite/dist/node/index.js')).createServer;
  const vite=options.web===false?undefined:await createVite!({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
- if(vite){web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');}else origin='https://127.0.0.1:1';
+ if(vite){web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');}else origin=options.webOrigin??'https://127.0.0.1:1';
  record={registrationState:'confirmed',directory:{hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory},id,did:institutionUri,institutionUri:institutionUri,authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion:1,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{[serviceUri]:{did:serviceUri,kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
  if(live){
   const {createPublicClient,http,keccak256,stringToHex}=await import('viem');const {serviceRegistryAbi}=await import('../../services/api/src/worker-ledger.js');
@@ -98,15 +100,18 @@ const start=async()=>{
   if(!state[8]||state[0]!==0||state[3]!==`0x${Buffer.from(issuerKey.publicJwk.x!,'base64url').toString('hex')}`||genesis.hash!==live.deployment.genesisHash||!code||keccak256(code)!==live.deployment.registryCodeHash||String(chainId)!==live.context.networkId)throw new Error('LIVE_REGISTRY_PROJECTION_MISMATCH');
   record.epoch=String(state[1]);record.policy={...bankPolicy,version:Number(state[7])};
  }
+ if(options.resumeOidc){const existing=await state();if(existing.epoch!==record.epoch||hashCanonical(existing.approvalPublicKey)!==hashCanonical(record.approvalPublicKey)||hashCanonical(existing.policy)!==hashCanonical(record.policy))throw new Error('EXISTING_RUNTIME_AUTHORITY_MISMATCH');record=existing;}else{
  for(const [s,role] of [['staff','institution'],['agent','gateway'],['recipient','recipient'],['other','recipient'],['inactive','recipient'],['approver-one','approver'],['approver-two','approver'],[longSubject,'recipient']] as const){record.members[uid(s)]={role,active:s!=='inactive',...(role==='gateway'?{serviceDid:serviceUri}:{}),permissions:role==='institution'?['contact.manage','delegation.manage','institution.recover','institution.suspend']:role==='approver'?['governance.approve']:[]};await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid(s)},'Synthetic test account',${role},${randomUUID()})`;}
  // Same name/email at a different issuer/subject never implies membership in this institution.
  await sql`INSERT INTO public.users(id,display_name,role,demo_code) VALUES(${uid('tenant-b')},'Synthetic test account','institution',${randomUUID()})`;
  records[id]={deployment,institutionId:id,sequence:'0',hash:'0'.repeat(64),epoch:record.epoch};
  if(live){const remote=await anchor.read(id);assertAnchorMatches(records[id]!,remote);}
  await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${id},${sql.json(record as unknown as postgres.JSONValue)})`;await sql`INSERT INTO issuer_v2.recovery_gate VALUES(${id},'blocked',now())`;
+ }
  const witnessPairs=await Promise.all([1,2,3,4].map(()=>generateEd25519KeyPair()));const witnessKeys=witnessPairs.map((key,n)=>({witnessId:`w-${n+1}`,kid:key.kid,jwk:key.publicJwk}));
  const trust={enrollmentPublicKey:issuerKey.publicJwk,supportedProtocolVersions:[1,3],networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,genesisHash:`0x${'0'.repeat(64)}`,registryProfile:'CALLSIGN_SERVICE_JOINT_CONFIGURATION_1',policyVersion:String(bankPolicy.version),witnessThreshold:3,witnessPublicKeys:witnessKeys,endpoints:[1,2,3,4].map(n=>({witnessId:`w-${n}`,url:`https://127.0.0.1:1/w-${n}`})),service:{institutionUri:record.institutionUri,issuerKid:issuerKey.kid,issuerPublicKey:issuerKey.publicJwk,approvalKeyVersion:1,serviceUri:serviceUri,serviceKid:serviceKey.kid,servicePublicKey:serviceKey.publicJwk,serviceKeyVersion:1,policy:servicePolicy}};
  if(live){Object.assign(trust,{networkId:live.deployment.networkId,registryAddress:live.deployment.registryAddress,genesisHash:live.deployment.genesisHash,policyVersion:String(record.policy.version),witnessPublicKeys:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,kid:live.manifest.publicKeys[`witness-keys/witness-${n}`].kid,jwk:live.manifest.publicKeys[`witness-keys/witness-${n}`].publicJwk})),endpoints:[1,2,3,4].map(n=>({witnessId:`witness-${n}`,url:`http://127.0.0.1:${4200+n}`}))});}
+ if(options.startExternal){const key=live!.manifest.publicKeys['pbx/evidence'];Object.assign(trust.service,{pbx:{kid:key.kid,publicKey:key.publicJwk,fingerprint:new X509Certificate(await readFile(process.env.PBX_DTLS_CERT_PATH!)).fingerprint256}});}
  await writeFile(`${runRoot}/trust.json`,JSON.stringify(trust),{mode:0o600});await writeFile(`${runRoot}/approval-v1.json`,JSON.stringify({kid:issuerKey.kid,privateJwk:live?(await readLive('data/issuer/approval-v1.json')).privateJwk:await exportSigningPrivateJwk(issuerKey as Awaited<ReturnType<typeof generateEd25519KeyPair>>),publicJwk:issuerKey.publicJwk}),{mode:0o600});
  await writeFile(`${runRoot}/sender.json`,JSON.stringify({kid:serviceKey.kid,privateJwk:live?(await readLive('data/sender/key.json')).privateJwk:await exportSigningPrivateJwk(serviceKey as Awaited<ReturnType<typeof generateEd25519KeyPair>>),publicJwk:serviceKey.publicJwk}),{flag:'wx',mode:0o600});
  Object.assign(process.env,{SENDER_KEY_PATH:`${runRoot}/sender.json`,SERVICE_URI:serviceUri,REGISTRY_APPROVERS:'0x7E5F4552091A69125d5DfCb7b8C2659029395Bdf,0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF,0x6813Eb9362372EEF6200f3b1dbC3f819671cBA69',SERVICE_PROFILE:'service',DEPLOYMENT_ID:deployment,OIDC_ISSUER:oidc,OIDC_JWKS_URL:oidc+'/jwks',OIDC_AUTHORIZATION_URL:oidc+'/authorize',OIDC_TOKEN_URL:oidc+'/token',OIDC_CLIENT_ID:'work-client',OFFICIAL_OIDC_CLIENT_ID:'official-client',OIDC_AUDIENCE:'work-audience',OFFICIAL_OIDC_AUDIENCE:'official-audience',ISSUER_KEY_DIRECTORY:runRoot,VITE_SERVICE_TRUST_SHA256:hashCanonical(trust)});
@@ -119,12 +124,13 @@ const start=async()=>{
   const query=JSON.parse(String(init?.body)),value={...snapshot,institutionId:query.institutionId,delegationId:query.delegationId,...(control.witnessFault==='stale'?{blockTimestamp:Math.floor(Date.now()/1000)-30}:{})};
   return Response.json({witnessId:`w-${index+1}`,snapshot:value,jws:await signPayload(value,control.witnessFault==='signature'?issuerKey:witnessPairs[index]!)});
  };
+ if(options.startExternal){apiOrigin=await options.startExternal({environment:Object.fromEntries(Object.entries({...process.env,...env}).filter(([,v])=>v!==undefined).map(([k,v])=>[k,String(v)])),runRoot,origin,oidc,pin:hashCanonical(trust)});return;}
  issuerApp=await buildFinalsServer(env,live?undefined:{anchor,current:async(_record,digest)=>registeredDigests.has(digest)?control.current:'unavailable',witnessFetch,audioProviders,now:()=>Math.floor(Date.now()/1000)+control.offset});const upstream=await issuerApp.listen({host:'127.0.0.1',port:0});
  senderApp=await buildFinalsServer({...env,SERVICE_ROLE:'sender',ISSUER_URL:upstream});const senderOrigin=await senderApp.listen({host:'127.0.0.1',port:0});
  platform=await buildFinalsServer({...env,SERVICE_ROLE:'platform',ISSUER_URL:upstream,SENDER_URL:senderOrigin});apiOrigin=await platform.listen({host:'127.0.0.1',port:0});
  if(vite)(vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
 };
-const close=async()=>{await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));const owned=(await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]?.state as InstitutionRecord|undefined;
+const close=async()=>{if(options.startExternal){if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql.end();return;}await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));const owned=(await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]?.state as InstitutionRecord|undefined;
  for(const table of ['usage_reservations','outbox','audit','approval_consumptions','consumption_journal','recovery_gate','identity_links','account_requests','notifications','notification_preferences','configuration_history','worker_status'])await sql`DELETE FROM ${sql('issuer_v2.'+table)} WHERE institution_id=${id}`;
  await sql`DELETE FROM issuer_v2.processed_chain_events WHERE deployment_id=${deployment}`;await sql`DELETE FROM issuer_v2.event_cursor WHERE deployment_id=${deployment}`;
  await sql`DELETE FROM issuer_v2.institutions WHERE id=${id}`;const userIds=Object.keys(owned?.members??record?.members??{}).concat(uid('tenant-b'));if(userIds.length){await sql`DELETE FROM public.sessions WHERE user_id IN ${sql(userIds)}`;await sql`DELETE FROM public.users WHERE id IN ${sql(userIds)}`;}
