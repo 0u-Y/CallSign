@@ -24,9 +24,11 @@ it('refuses unknown stages, overwritten evidence, secrets as attachments, and an
  await expect(runValidation({stage:'offline',environment,env:{},output:output(),attachments:['keys/issuer.json']})).rejects.toThrow('SECRET_OR_PRIVATE');
 });
 it('fences test DB identity, strips provider access, and gives children an explicit network allowlist',()=>{
- const env={DEPLOYMENT_ID:'test:unit',CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'integration',TEST_DATABASE_URL:'postgres://owner:secret@db/callsign_test_unit',TEST_AUTH_DATABASE_URL:'postgres://auth:secret@db/callsign_test_unit',DEEPGRAM_API_KEY:'must-not-inherit'};
+ const env={DEPLOYMENT_ID:'test:unit',CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'integration',TEST_DATABASE_URL:'postgres://owner:secret@db/callsign_test_unit',TEST_AUTH_DATABASE_URL:'postgres://auth:secret@db/callsign_test_unit',TEST_ISSUER_DATABASE_URL:'postgres://issuer:secret@db/callsign_test_unit',TEST_WORKER_DATABASE_URL:'postgres://worker:secret@db/callsign_test_unit',TEST_PBX_DATABASE_URL:'postgres://pbx:secret@db/callsign_test_unit',DEEPGRAM_API_KEY:'must-not-inherit'};
  const target={version:1 as const,kind:'disposable-test' as const,environmentId:'test:unit',deploymentId:'test:unit'};
  const child=childEnvironment('database',env,target);expect(child.MIGRATOR_DATABASE_URL).toBe(env.TEST_DATABASE_URL);expect(child.AUTH_DATABASE_URL).toBe(env.TEST_AUTH_DATABASE_URL);expect(child.DEEPGRAM_API_KEY).toBeUndefined();expect(child.CALLSIGN_VALIDATION_NETWORK).toBe('[{"host":"db","port":5432}]');expect(child.CALLSIGN_ALLOW_EXTERNAL_EXECUTION).toBe('integration');expect(child.pnpm_config_verify_deps_before_run).toBe('error');
+ expect(()=>childEnvironment('database',{...env,TEST_PBX_DATABASE_URL:env.TEST_ISSUER_DATABASE_URL},target)).toThrow('DISTINCT_ROLE_LOGINS');
+ expect(()=>childEnvironment('database',{...env,TEST_PBX_DATABASE_URL:'postgres://pbx:secret@other/callsign_test_unit'},target)).toThrow('DISTINCT_ROLE_LOGINS');
  expect(()=>childEnvironment('database',{...env,ISSUER_DATABASE_URL:env.TEST_DATABASE_URL},target)).toThrow('TEST_DATABASE_MUST_DIFFER');
  expect(()=>childEnvironment('database',{...env,TEST_DATABASE_URL:'postgres://owner:secret@db/live'},target)).toThrow('DISPOSABLE_TEST_DATABASE');
 });

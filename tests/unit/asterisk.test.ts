@@ -23,3 +23,13 @@ describe('Asterisk control and actual channel evidence (fake ARI only)',()=>{
     await expect(ari.originate('channel','PJSIP/trunk',f.attempt)).rejects.toThrow('ARI_ENDPOINT_FORBIDDEN');expect(fetcher).not.toHaveBeenCalled();await expect(ari.channel('channel')).rejects.toThrow('ARI_REQUEST_FAILED');
   });
 });
+
+it('configures both PJSIP authentication directions for the installed SHA-256-only digest',async()=>{
+ const {readFile}=await import('node:fs/promises');const config=await readFile('infra/deploy/asterisk/pjsip.conf.example','utf8');
+ expect(config).toMatch(/^default_auth_algorithms_uac=SHA-256$/m);expect(config).toMatch(/^default_auth_algorithms_uas=SHA-256$/m);
+});
+
+it('keeps immutable PBX data visible and places non-root runtime writes outside it',async()=>{
+ const {readFile}=await import('node:fs/promises');const config=await readFile('infra/deploy/asterisk/asterisk.conf.example','utf8'),compose=await readFile('infra/deploy/compose.pbx.yml','utf8');
+ expect(config).toContain('astdbdir => /var/run/asterisk');expect(config).toContain('astdatadir => /var/lib/asterisk');expect(compose).toContain('/var/run/asterisk:uid=1000,gid=1000');expect(compose).not.toContain(':/var/lib/asterisk');
+});

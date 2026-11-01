@@ -39,6 +39,8 @@ export function childEnvironment(stage:ValidationStage,env:Record<string,string|
   const target=new URL(env.TEST_DATABASE_URL!);if(!/^postgres(ql)?:$/.test(target.protocol)||!/^\/callsign_test_[a-zA-Z0-9_]+$/.test(target.pathname))throw new Error('DISPOSABLE_TEST_DATABASE_REQUIRED');
   for(const key of ['MIGRATOR_DATABASE_URL','DATABASE_URL','ISSUER_DATABASE_URL','AUTH_DATABASE_URL','WORKER_DATABASE_URL'])if(env[key]){const current=new URL(env[key]!);if(current.hostname===target.hostname&&current.port===target.port&&current.pathname===target.pathname)throw new Error('TEST_DATABASE_MUST_DIFFER_FROM_EXISTING_SERVICE');}
   child.MIGRATOR_DATABASE_URL=env.TEST_DATABASE_URL;child.DATABASE_URL=env.TEST_DATABASE_URL;
+  const roleUsers=new Set<string>([target.username]);
+  for(const key of ['TEST_AUTH_DATABASE_URL','TEST_ISSUER_DATABASE_URL','TEST_WORKER_DATABASE_URL','TEST_PBX_DATABASE_URL'])if(env[key]){const role=new URL(env[key]!);if(role.protocol!==target.protocol||role.hostname!==target.hostname||role.port!==target.port||role.pathname!==target.pathname||roleUsers.has(role.username))throw new Error('DISTINCT_ROLE_LOGINS_SAME_TEST_DATABASE_REQUIRED');roleUsers.add(role.username);}
   if(env.TEST_AUTH_DATABASE_URL){const auth=new URL(env.TEST_AUTH_DATABASE_URL);if(auth.hostname!==target.hostname||auth.port!==target.port||auth.pathname!==target.pathname||auth.username===target.username)throw new Error('SEPARATE_AUTH_LOGIN_SAME_TEST_DATABASE_REQUIRED');child.AUTH_DATABASE_URL=env.TEST_AUTH_DATABASE_URL;}
  }
  // Ordinary tests must not reach a paid provider even when the operator shell contains credentials.

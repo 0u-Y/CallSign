@@ -10,7 +10,7 @@ import {serviceFixture} from '../unit/service-fixture.js';
 import { randomUUID } from 'node:crypto';
 import { postgresQuotaStore } from '../../services/api/src/quota.js';
 import { postgresWorkerStore } from '../../services/api/src/service-worker.js';
-// Requires an explicitly provisioned disposable database with migrations through 0005; no startup/migration hooks.
+// Requires an explicitly provisioned disposable database with migrations through 0007; no startup/migration hooks.
 const url=process.env.MIGRATOR_DATABASE_URL;if(!url)throw new Error('EXPLICIT_INTEGRATION_DATABASE_URL_REQUIRED');
 const sql=postgres(url,{max:2}),quota=postgresQuotaStore(url),worker=postgresWorkerStore(url,async()=>{});
 afterAll(async()=>{await worker.close();await quota.close();await sql.end();});
@@ -34,11 +34,13 @@ it('claims a job once across workers and fences an expired claim before committi
 it('cannot recreate SIP credentials from an idempotent result after terminal cleanup',async()=>{
  const f=await serviceFixture(),id=`endpoint-test:${randomUUID()}`,record=await f.store.read(f.institution.institutionId),attempt=record.serviceV3!.attempts[f.attempt.id]!;
  record.id=id;const now=Math.floor(Date.now()/1000);attempt.firstConnectBy=now+120;attempt.callEndBy=now+3600;for(const i of Object.values(record.intents)){i.institutionId=id;i.expiresAt=now+3600;}for(const a of Object.values(record.serviceV3!.authorizations))a.payload.institutionId=id;
- const endpoints=new PbxEndpoints({databaseUrl:url!,secret:Buffer.alloc(32,1).toString('base64url'),realm:'test.example',wssUrl:'wss://test.example/pbx/ws',sipDomain:'test.example',mediaAddress:'10.205.0.20'}),username=`cs-${randomUUID()}`,encrypted=endpoints.generate(username);
+ if(!process.env.TEST_ISSUER_DATABASE_URL)throw new Error('DISTINCT_ISSUER_LOGIN_REQUIRED');const ownerUrl=new URL(url!),issuerUrl=new URL(process.env.TEST_ISSUER_DATABASE_URL);if(!/^\/callsign_test_/.test(ownerUrl.pathname)||issuerUrl.hostname!==ownerUrl.hostname||issuerUrl.port!==ownerUrl.port||issuerUrl.pathname!==ownerUrl.pathname||issuerUrl.username===ownerUrl.username)throw new Error('DISTINCT_ISSUER_LOGIN_SAME_TEST_DATABASE_REQUIRED');
+ const endpoints=new PbxEndpoints({databaseUrl:process.env.TEST_ISSUER_DATABASE_URL,secret:Buffer.alloc(32,1).toString('base64url'),realm:'test.example',wssUrl:'wss://test.example/pbx/ws',sipDomain:'test.example',mediaAddress:'10.205.0.20'}),username=`cs-${randomUUID()}`,encrypted=endpoints.generate(username);
  attempt.pbx={bridgeId:'test-bridge',senderChannelId:'s',recipientChannelId:'r',senderEndpoint:'s',recipientEndpoint:username,state:'reserved',reports:{},credentials:{recipient:encrypted}};
  try{
   await sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${id},${sql.json(record as unknown as postgres.JSONValue)})`;await sql`INSERT INTO issuer_v2.recovery_gate(institution_id,status) VALUES(${id},'ready')`;
   await endpoints.ensure(encrypted,id,attempt.id,f.receiver.userId,attempt.callEndBy);
+  expect((await sql`SELECT allow FROM pbx.ps_endpoints WHERE id=${username}`)[0]!.allow).toBe('ulaw');
   attempt.status='cancelled';await sql`UPDATE issuer_v2.institutions SET state=${sql.json(record as unknown as postgres.JSONValue)} WHERE id=${id}`;await endpoints.remove(attempt.id);
   await expect(endpoints.ensure(encrypted,id,attempt.id,f.receiver.userId,attempt.callEndBy)).rejects.toThrow('PBX_PREPARATION_FORBIDDEN');expect((await sql`SELECT id FROM pbx.endpoint_leases WHERE attempt_id=${attempt.id}`)).toHaveLength(0);
  }finally{await endpoints.remove(attempt.id);await endpoints.close();await sql`DELETE FROM issuer_v2.recovery_gate WHERE institution_id=${id}`;await sql`DELETE FROM issuer_v2.outbox WHERE institution_id=${id}`;await sql`DELETE FROM issuer_v2.institutions WHERE id=${id}`;}

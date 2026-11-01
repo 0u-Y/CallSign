@@ -1,4 +1,4 @@
--- Explicit new-deployment owner operation AFTER migrations 0000..0006.
+-- Explicit new-deployment owner operation AFTER migrations 0000..0009.
 -- psql -X -v ON_ERROR_STOP=1 -f infra/deploy/provision-logins.sql
 -- Read secrets from a protected process environment; never pass -v passwords or echo this session.
 \set ON_ERROR_STOP on

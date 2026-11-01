@@ -1,6 +1,8 @@
 [global]
 type=global
 user_agent=CallSign-PBX
+default_auth_algorithms_uac=SHA-256
+default_auth_algorithms_uas=SHA-256
 endpoint_identifier_order=username,ip,anonymous
 [transport-wss]
 type=transport

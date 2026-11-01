@@ -5,12 +5,18 @@ services:
     profiles: [pbx]
     restart: unless-stopped
     init: true
+    user: '1000:1000'
+    read_only: true
+    tmpfs:
+      - /tmp:uid=1000,gid=1000
+      - /var/run/asterisk:uid=1000,gid=1000
+      - /var/log/asterisk:uid=1000,gid=1000
+      - /var/spool/asterisk:uid=1000,gid=1000
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     volumes:
       - ${FINALS_DATA_DIR}/asterisk:/etc/asterisk:ro
       - ${FINALS_DATA_DIR}/asterisk/odbc.ini:/etc/odbc.ini:ro
-      - asterisk-data:/var/lib/asterisk
     networks:
       application: {}
       public:
@@ -22,4 +28,5 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    # Keep image XML documentation visible; call authority and realtime SIP state live in PostgreSQL.
     # ARI and WSS remain internal; browser WSS is proxied through the same HTTPS origin.
