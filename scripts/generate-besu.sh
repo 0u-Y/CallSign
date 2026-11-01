@@ -7,8 +7,10 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTPUT_DIR="${CALLSIGN_BESU_DIR:-${ROOT_DIR}/.local/besu}"
 NETWORK_CONFIG="${CALLSIGN_NETWORK_CONFIG:-${ROOT_DIR}/infra/besu/network-config.json}"
 GENERATED_DIR="${OUTPUT_DIR}/generated"
+PEER_ARGS=("${OUTPUT_DIR}")
+if [[ -n "${CALLSIGN_ENV_FILE:-}" ]]; then PEER_ARGS+=(--env-file "${CALLSIGN_ENV_FILE}"); fi
 if [[ -f "${OUTPUT_DIR}/genesis.json" && -f "${OUTPUT_DIR}/keys/node4/key" ]]; then
-  pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${OUTPUT_DIR}" --apply
+  pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
   echo "Besu QBFT keys and genesis already exist; reusing ${OUTPUT_DIR}."
   exit 0
 fi
@@ -43,5 +45,5 @@ for index in 0 1 2 3; do
   cp "${KEY_DIRS[$index]}/key.pub" "${OUTPUT_DIR}/keys/node${node}/key.pub"
   chmod 600 "${OUTPUT_DIR}/keys/node${node}/key"
 done
-pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${OUTPUT_DIR}" --apply
+pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
 echo "Generated four local-only QBFT validator keys and genesis."

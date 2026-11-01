@@ -259,17 +259,17 @@ services:
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node1/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.11 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu1,localhost,127.0.0.1,10.203.0.11 --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node1/key --network-id=${NETWORK_ID:-20260914} --p2p-host=${LEDGER_IPV4_PREFIX:-10.203.0}.11 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu1,localhost,127.0.0.1,${LEDGER_IPV4_PREFIX:-10.203.0}.11 --min-gas-price=0"]
     volumes:
-      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node1/key:/network/keys/node1/key:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
-      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
-      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node1/key', target: /network/keys/node1/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node1/key.pub', target: /network/keys/node1/key.pub, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
       - besu1-data:/var/lib/besu
     networks:
       ledger:
-        ipv4_address: 10.203.0.11
+        ipv4_address: ${LEDGER_IPV4_PREFIX:-10.203.0}.11
     healthcheck: &besu-health
       test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8545'"]
       interval: 3s
@@ -280,17 +280,17 @@ services:
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node2/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.12 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu2,localhost,127.0.0.1,10.203.0.12 --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node2/key --network-id=${NETWORK_ID:-20260914} --p2p-host=${LEDGER_IPV4_PREFIX:-10.203.0}.12 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu2,localhost,127.0.0.1,${LEDGER_IPV4_PREFIX:-10.203.0}.12 --min-gas-price=0"]
     volumes:
-      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node2/key:/network/keys/node2/key:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
-      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
-      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node2/key', target: /network/keys/node2/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node1/key.pub', target: /network/keys/node1/key.pub, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
       - besu2-data:/var/lib/besu
     networks:
       ledger:
-        ipv4_address: 10.203.0.12
+        ipv4_address: ${LEDGER_IPV4_PREFIX:-10.203.0}.12
     depends_on: { besu1: { condition: service_healthy } }
     healthcheck: *besu-health
 
@@ -298,17 +298,17 @@ services:
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node3/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.13 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu3,localhost,127.0.0.1,10.203.0.13 --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node3/key --network-id=${NETWORK_ID:-20260914} --p2p-host=${LEDGER_IPV4_PREFIX:-10.203.0}.13 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu3,localhost,127.0.0.1,${LEDGER_IPV4_PREFIX:-10.203.0}.13 --min-gas-price=0"]
     volumes:
-      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node3/key:/network/keys/node3/key:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
-      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
-      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node3/key', target: /network/keys/node3/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node1/key.pub', target: /network/keys/node1/key.pub, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
       - besu3-data:/var/lib/besu
     networks:
       ledger:
-        ipv4_address: 10.203.0.13
+        ipv4_address: ${LEDGER_IPV4_PREFIX:-10.203.0}.13
     depends_on: { besu1: { condition: service_healthy } }
     healthcheck: *besu-health
 
@@ -316,17 +316,17 @@ services:
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
-    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node4/key --network-id=${NETWORK_ID:-20260914} --p2p-host=10.203.0.14 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu4,localhost,127.0.0.1,10.203.0.14 --min-gas-price=0"]
+    command: ["exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/network/keys/node4/key --network-id=${NETWORK_ID:-20260914} --p2p-host=${LEDGER_IPV4_PREFIX:-10.203.0}.14 --p2p-port=30303 --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=0.0.0.0 --rpc-http-port=8545 --rpc-http-api=ETH,NET,WEB3 --host-allowlist=besu4,localhost,127.0.0.1,${LEDGER_IPV4_PREFIX:-10.203.0}.14 --min-gas-price=0"]
     volumes:
-      - ${FINALS_DATA_DIR}/besu/genesis.json:/network/genesis.json:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node4/key:/network/keys/node4/key:ro
-      - ${FINALS_DATA_DIR}/besu/keys/node1/key.pub:/network/keys/node1/key.pub:ro
-      - ${FINALS_DATA_DIR}/besu/static-nodes.json:/network/static-nodes.json:ro
-      - ${FINALS_DATA_DIR}/besu/permissions_config.toml:/var/lib/besu/permissions_config.toml:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node4/key', target: /network/keys/node4/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/keys/node1/key.pub', target: /network/keys/node1/key.pub, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
       - besu4-data:/var/lib/besu
     networks:
       ledger:
-        ipv4_address: 10.203.0.14
+        ipv4_address: ${LEDGER_IPV4_PREFIX:-10.203.0}.14
     depends_on: { besu1: { condition: service_healthy } }
     healthcheck: *besu-health
 
@@ -348,8 +348,8 @@ services:
       WITNESS_KEY_PATH: /keys/witness.json
       DEPLOYMENT_PATH: /trust/deployment.json
     volumes:
-      - ${FINALS_DATA_DIR}/witness-keys/witness-1.json:/keys/witness.json:ro
-      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/witness-keys/witness-1.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
     networks: [ledger]
     depends_on: { besu1: { condition: service_healthy } }
     healthcheck: &witness-health
@@ -377,8 +377,8 @@ services:
       WITNESS_KEY_PATH: /keys/witness.json
       DEPLOYMENT_PATH: /trust/deployment.json
     volumes:
-      - ${FINALS_DATA_DIR}/witness-keys/witness-2.json:/keys/witness.json:ro
-      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/witness-keys/witness-2.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
     networks: [ledger]
     depends_on: { besu2: { condition: service_healthy } }
     healthcheck: *witness-health
@@ -402,8 +402,8 @@ services:
       WITNESS_KEY_PATH: /keys/witness.json
       DEPLOYMENT_PATH: /trust/deployment.json
     volumes:
-      - ${FINALS_DATA_DIR}/witness-keys/witness-3.json:/keys/witness.json:ro
-      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/witness-keys/witness-3.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
     networks: [ledger]
     depends_on: { besu3: { condition: service_healthy } }
     healthcheck: *witness-health
@@ -427,8 +427,8 @@ services:
       WITNESS_KEY_PATH: /keys/witness.json
       DEPLOYMENT_PATH: /trust/deployment.json
     volumes:
-      - ${FINALS_DATA_DIR}/witness-keys/witness-4.json:/keys/witness.json:ro
-      - ${FINALS_DATA_DIR}/deployment.json:/trust/deployment.json:ro
+      - {type: bind, source: '${FINALS_DATA_DIR}/witness-keys/witness-4.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${FINALS_DATA_DIR}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
     networks: [ledger]
     depends_on: { besu4: { condition: service_healthy } }
     healthcheck: *witness-health
@@ -448,4 +448,4 @@ networks:
     ipam: { config: [{ subnet: 10.205.0.0/24, ip_range: 10.205.0.128/25 }] }
   egress: {}
   ledger:
-    ipam: { config: [{ subnet: 10.203.0.0/24 }] }
+    ipam: { config: [{ subnet: '${LEDGER_IPV4_PREFIX:-10.203.0}.0/24' }] }
