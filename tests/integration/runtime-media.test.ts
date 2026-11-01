@@ -93,7 +93,7 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
   if(outcome==='session-expiry'){
    expect(naturalExpiry).toBeDefined();await vi.waitFor(()=>expect(Date.now()).toBeGreaterThanOrEqual(naturalExpiry!),{timeout:65000,interval:250});
    // Independently issued sessions have different expiry instants. Observe both real rejections.
-   await vi.waitFor(async()=>{for(const page of [sender,receiver])expect(await page.evaluate(async()=>{const r=await fetch('/api/v3/auth/me');return r.status;})).toBe(401);},{timeout:5000,interval:100});
+   await vi.waitFor(async()=>{for(const page of [sender,receiver])expect(await page.evaluate(async()=>{const r=await fetch('/api/v3/auth/me?purpose=work');return r.status;})).toBe(401);},{timeout:5000,interval:100});
   }
   if(outcome==='pbx-outage'){
    await writeFile(join(root,'pbx-control-pause.request'),'owned-pbx-only',{flag:'wx',mode:0o600});await vi.waitFor(async()=>expect(JSON.parse(await readFile(join(root,'pbx-control-pause.done'),'utf8')).paused).toBe(true),{timeout:10000,interval:100});

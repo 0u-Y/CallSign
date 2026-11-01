@@ -46,7 +46,7 @@ if options.archive_phase:
         info = json.loads(observed.stdout)[0]
         if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['HostConfig']['NetworkMode'] != 'container:'+keeper['Id'] or not any(c['id']==info['Id'] for c in owner['containers']):
             raise RuntimeError('OWNED_PHASE_RESOURCE_REQUIRED')
-        (phase/(role+'.log')).write_bytes(subprocess.run(['docker','logs',info['Id']],capture_output=True).stdout)
+        (phase/(role+'.log')).write_bytes(subprocess.run(['docker','logs',info['Id']],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout)
         command(['docker','stop','-t','5',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
         command(['docker','rm',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
         if (root/(role+'.env')).exists(): (root/(role+'.env')).rename(phase/(role+'.env'))
@@ -54,7 +54,7 @@ if options.archive_phase:
     if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
-    names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt']
+    names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
     names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','pbx-control-*'] for p in root.glob(pattern)]
     for name in names:
         if (root/name).exists(): (root/name).rename(phase/name)

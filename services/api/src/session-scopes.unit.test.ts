@@ -79,6 +79,17 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("issuer purpose-bound sessions (offline routes)", () => {
+  it("distinguishes a missing purpose from an expired scoped session", async () => {
+    add("work"); fake.state.sessions.get("work")!.expiresAt = new Date(0);
+    const app = await server();
+    try {
+      expect((await app.inject({ url: "/v3/auth/me", headers: headers("ip_session=work") })).statusCode).toBe(400);
+      for (const [cookie, code] of [["ip_session=work", "SESSION_EXPIRED"], ["", "AUTH_REQUIRED"]]) {
+        const result = await app.inject({ url: "/v3/auth/me?purpose=work", headers: headers(cookie) });
+        expect(result.statusCode).toBe(401); expect(result.json().error.code).toBe(code);
+      }
+    } finally { await app.close(); }
+  });
   it("preserves legacy sessions without letting a v2 token enter legacy routes", async () => {
     add("legacy"); add("work");
     expect((await sessionForRequest(fake.db, { cookies: { ip_session: "legacy" } } as any)).purpose).toBe("legacy");
