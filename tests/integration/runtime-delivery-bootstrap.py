@@ -86,6 +86,9 @@ def tool(args,env=None,image=None,network=True,stdin=None,memory='512m',mountroo
  cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--pull=never','--network','container:'+run+'-net' if network else 'none','--memory',memory,'--memory-swap',memory,'--cpus','1','--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,exec,size=268435456,uid=1000,gid=1000']
  if image==images['BESU_IMAGE']:cmd+=['--user','1000:1000']
  if mountroot:cmd+=['--mount',f'type=bind,src={r},dst=/run/callsign']
+ if 'scripts/prepare-pbx.ts' in args and '--turn' in args:
+  target=imageinfo(images['CALLSIGN_APP_IMAGE'])['Config']['WorkingDir']+'/infra/deploy/turnserver.conf.example'
+  cmd+=['--mount',f'type=bind,src={r}/public/infra/deploy/turnserver.conf.example,dst={target},readonly']
  if env:cmd+=['--env-file',envfile('tool-'+str(time.time_ns())+'.env',env)]
  if stdin is not None:cmd+=['-i']
  cmd+=[image or images['CALLSIGN_APP_IMAGE']]+args
@@ -249,7 +252,7 @@ if not (r/'asterisk').exists():
  p=r/'asterisk/rtp.conf';p.write_text(p.read_text().replace('[ice_host_candidates]',f'turnaddr=127.0.0.1:3478\nturnusername={user}\nturnpassword={pw}\n\n[ice_host_candidates]'))
 if not (r/'turn').exists():
  tool(['pnpm','exec','tsx','scripts/prepare-pbx.ts','/run/callsign/turn','--turn','--apply'],env={'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'infrastructure','TURN_SECRET':keys['turnSecret'],'SIP_REALM':'callsign-test','PBX_PUBLIC_ADDRESS':'127.0.0.1','TURN_PRIVATE_ADDRESS':'127.0.0.1'})
- p=r/'turn/turnserver.conf';p.write_text(p.read_text().replace('no-loopback-peers','allow-loopback-peers')+'\npidfile=/tmp/turn.pid\nlog-file=stdout\nno-stdout-log\nuser-quota=12\ntotal-quota=32\n')
+ p=r/'turn/turnserver.conf';p.write_text(p.read_text().replace('allow-loopback-peers=0','allow-loopback-peers=1')+'\npidfile=/tmp/turn.pid\nlog-file=stdout\nno-stdout-log\nuser-quota=12\ntotal-quota=32\n')
  (r/'turn/tls').mkdir(mode=0o700)
 if not (r/'media-tls').exists():
  (r/'media-tls').mkdir(mode=0o700)

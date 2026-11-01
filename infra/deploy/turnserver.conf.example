@@ -12,7 +12,7 @@ min-port=49160
 max-port=49200
 no-cli
 no-multicast-peers
-no-loopback-peers
+allow-loopback-peers=0
 no-tcp-relay
 denied-peer-ip=169.254.0.0-169.254.255.255
 cert=/etc/coturn/tls/fullchain.pem

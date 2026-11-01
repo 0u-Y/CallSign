@@ -96,7 +96,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_TOOL_IMAGE="$APP" CALL
 1. **identity와 키**: AWS용 고유 project/deployment/institution/network ID, 기관/콜센터 URI를 결정한다. 위 NEW 준비 도구를 실행하고 재실행 거절을 확인한다. approver3명은 별도 소유이며 worker에는 admin/stopper만 mount한다. 운영용 보관 참조와 원본 파일을 암호화해 개발 서버 밖에 보존한다.
 2. **체인**: 아래 기존 ‘전체 설정에 묶이지 않는 첫 체인 plan’의 추출 명령에 `-f infra/deploy/compose.pbx.yml -f infra/deploy/compose.aws.yml`을 추가한다. 같은 raw JSON에서 nodes4/chain9를 추출하며 AWS EBS volume/로그 제한을 유지한다. AWS에서만 승인된 bridge를 생성한다. nodes4→실제 높이 전진/동일 높이 hash/chain/genesis 대조→deployer inspect→예상 genesis/artifact hash 검토→계약 deploy 순서다. 기존 pending tx journal은 같은 hash로 재조회하고 새 nonce로 다시 배포하지 않는다.
 3. **계약 metadata·Witness**: 배포 결과를 `${FINALS_DATA_DIR}/deployment.json`에 보존한다. Witness4에 동일 metadata·각기 다른 키를 주고 동일 상태·서로 다른3서명·freshness를 검증한다. 미등록 상태 조회와 등록 후 권한 검증을 구분한다. 계약 주소는 배포 산출물이지 사용자가 미리 작성할 값이 아니다.
-4. **TLS·PBX/TURN**: 웹에는 public 도메인의 PEM fullchain/privkey를 별도 공급하고, PBX 내부 TLS는 SAN=`asterisk`와 고정 DTLS 인증서·CA를 준비한다. Anchor도 자신의 DNS/SAN·별도 키가 필요하다. 인증서를 서로 다른 호스트의 loopback 이름으로 재사용하지 않는다. `tool scripts/prepare-pbx.ts /aws/config/asterisk --apply`, `tool scripts/prepare-pbx.ts /aws/config/turn --turn --apply`로 새 설정을 렌더한 뒤 각 `tls/`에 보호 파일을 배치한다. 웹/Node CA mount를 맞추고 인증서 개인키는 uid1000·0600으로 새 디렉터리에 준비한다. 인증서 교체는 새 trust/web pin과 통화 재검증을 요구한다.
+4. **TLS·PBX/TURN**: 웹에는 public 도메인의 PEM fullchain/privkey를 별도 공급하고, PBX 내부 TLS는 SAN=`asterisk`와 고정 DTLS 인증서·CA를 준비한다. Anchor도 자신의 DNS/SAN·별도 키가 필요하다. 인증서를 서로 다른 호스트의 loopback 이름으로 재사용하지 않는다. `tool scripts/prepare-pbx.ts /aws/config/asterisk --apply`, 아래 TURN 전용 명령으로 공개 template을 명시하여 새 설정을 렌더한 뒤 각 `tls/`에 보호 파일을 배치한다. 웹/Node CA mount를 맞추고 인증서 개인키는 uid1000·0600으로 새 디렉터리에 준비한다. 인증서 교체는 새 trust/web pin과 통화 재검증을 요구한다.
 5. **DB**: 서비스 PostgreSQL만 먼저 기동한다. 아래 `dc`에서 operations profile의 migration-runner로 `scripts/migrate-finals.ts --apply`를 실행한다. 소스 hash 검사를 유지하며 `0000`~`0009`를 적용한다. postgres container의 psql에 보호 환경으로 별도4비밀번호를 전달하고 `provision-logins.sql`을 stdin으로 적용한다. 앱은 migration owner가 아닌 issuer/auth/worker/PBX의 서로 다른 LOGIN을 사용한다.
 6. **독립 Anchor**: 별도 AWS 호스트에서 `compose.anchor.yml`의 anchor-db만 먼저 시작한다. owner psql로 `anchor-schema.sql`, `provision-anchor.sql`을 순서대로 적용한다. 보호 `DEPLOYMENT_ID`·`INSTITUTION_ID`·`ANCHOR_APP_PASSWORD`를 stdin/환경으로 전달한다. 새 zero sequence/hash, epoch1만 최초 INSERT하며 기존 행·LOGIN은 덮지 않는다. 서비스 프로세스는 SELECT/UPDATE만 가능한 별도 LOGIN과 TLS/token을 쓴다. Anchor 서비스 기동 뒤 실제 인증·TLS·CAS/재조회·재시작 보존을 확인한다. 서비스 EC2와 개발 서버 어느 쪽도 Anchor 저장소를 대신하지 않는다.
 7. **OIDC·내부 계정**: 선택한 실제 IdP에서 업무/공식 public client와 audience를 분리한다. 현재 코드의 IdP redirect URI는 두 client 모두 정확히 `${WEB_ORIGIN}/service`다. 브라우저가 code/state를 받아 `/api/v3/auth/callback`으로 교환하며 업무/공식 문맥은 state·pending client·세션 purpose로 분리한다. `/api/auth/callback`이나 별도 official callback을 IdP redirect로 등록하지 않는다. issuer\|subject·역할·권한을 `FINALS_ACCOUNTS_PATH`의 보호 JSON으로 준비하고 migration-runner의 `provision-finals.ts /provision/public-manifest.json /provision/accounts.json --apply`로 신규 내부 계정을 등록한다. 외부 계정 생성과 내부 등록은 별개다. 미등록/비활성 계정·auth_time·PKCE·CSRF/세션 문맥을 실제 제공자로 검증한다.
@@ -139,6 +139,18 @@ docker build --network=none --pull=false -f infra/deploy/web.Dockerfile \
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_DEPLOYMENT_TARGET=aws \
   CALLSIGN_AWS_TARGET_CONFIRMATION=AWS-ONLY CALLSIGN_AWS_MOUNT="$DATA_PARENT" CALLSIGN_ENV_FILE="$CFG" \
   bash scripts/deployment.sh start
+```
+
+TURN 준비는 전달한 공개 template을 사용한다. coturn4.6.3의 지원 옵션은 `allow-loopback-peers=0`이며 `no-loopback-peers`는 지원 옵션이 아니다. 예전 runtime 이미지의 내장 template을 묵시적으로 사용하지 않도록 해당 파일만 preparation container에 읽기 전용으로 지정한다. 서비스에 소스 checkout을 mount하는 절차가 아니다.
+
+```bash
+APP_WORKDIR="$(docker image inspect --format '{{.Config.WorkingDir}}' "$APP")"
+test -n "$APP_WORKDIR" || exit 78
+docker run --rm --pull never --network none --env-file "$CFG" \
+  --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
+  --mount "type=bind,src=$DATA_PARENT,dst=/aws" \
+  --mount "type=bind,src=$PWD/infra/deploy/turnserver.conf.example,dst=$APP_WORKDIR/infra/deploy/turnserver.conf.example,readonly" \
+  "$APP" pnpm exec tsx scripts/prepare-pbx.ts /aws/config/turn --turn --apply
 ```
 
 위 db/contract 시작 명령은 전체 준비를 대신하지 않는다. role 비밀번호·issuer/subject·관리 서명·인증서·EBS mount가 빠지면 해당 단계에서 중단한다. 전제 파일·키/계약을 확인하지 않고 `deployment.sh start`만 실행하는 방식은 제공하지 않는다.
@@ -234,7 +246,7 @@ Asterisk/PJSIP/WSS/ARI/SRTP/ODBC와 PostgreSQL Unicode driver를 실제 image에
 
 ### 전달물만 사용하는 NEW 리허설
 
-이 절차는 **폐기할 합성 배포** 전용이다. AWS override나 host bridge/port publish를 실행하지 않는다. 운영 NEW/RESTORE는 위 AWS 절차를 따른다. 서비스는 전달한 이미지·공개 파일·이번에 생성한 보호 입력만 사용한다. 별도 `observer-tests.tar`와 설치 Chromium·공유 라이브러리·폰트는 시험 controller의 입력이며 서비스 실행 의존성이 아니다.
+이 절차는 **폐기할 합성 배포** 전용이다. AWS override나 host bridge/port publish를 실행하지 않는다. 운영 NEW/RESTORE는 위 AWS 절차를 따른다. 서비스는 전달한 이미지·공개 파일·이번에 생성한 보호 입력만 사용한다. 설치 Chromium·공유 라이브러리·폰트와 assertion 코드는 시험 controller의 입력이다. `observer-tests.tar`의 로컬 OIDC fixture는 controller에서 HTTPS 인증 endpoint를 제공하는 **명시적인 시험 인증 의존성**이며 실제 IdP를 대신 검증한 것은 아니다.
 
 필요한 입력은 checksum에 포함된 `aws-bootstrap-images.tar`, `deployment-files.tar`, `images.json`, `observer-tests.tar`다. 이미지6종은 linux/amd64이며 웹은 새 PBX 인증서·trust에 맞춰 전달 runtime/nginx에서 만든다. 원래 전달물에는 웹이 참조하는 `artifacts/test-results.json`이 빠져 있었으므로 수정된 공개 묶음을 사용한다. 이 JSON은 날짜가 있는 과거 증거이며 현재 배포 결과로 갱신하지 않는다.
 
