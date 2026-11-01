@@ -221,13 +221,7 @@ export async function verifyObservedTransport(peer: RTCPeerConnection, channel: 
     if (report.type === "inbound-rtp" && report.kind === "audio") bytesReceived += Number(report.bytesReceived ?? 0);
   }
   if (!dtlsConnected) throw new Error("DTLS_STATS_NOT_CONNECTED");
-  const receiver = peer.getReceivers().find((item) => item.track?.kind === "audio");
-  const transport = receiver?.transport as (RTCDtlsTransport & { getRemoteCertificates?: () => ArrayBuffer[] }) | null | undefined;
-  if (!transport?.getRemoteCertificates) throw new Error("REMOTE_CERTIFICATE_API_UNSUPPORTED");
-  const certificate = transport.getRemoteCertificates()[0];
-  if (!certificate) throw new Error("REMOTE_CERTIFICATE_UNAVAILABLE");
-  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", certificate));
-  const observed = [...digest].map((byte) => byte.toString(16).padStart(2, "0").toUpperCase()).join(":");
+  const observed = await observedRemoteFingerprint(peer, stats);
   if (observed !== expectedRemoteFingerprint) throw new Error("REMOTE_CERTIFICATE_FINGERPRINT_MISMATCH");
   return { bytesReceived, profile: "chromium-dtls-certificate-v1" };
 }
@@ -235,8 +229,21 @@ export async function verifyObservedTransport(peer: RTCPeerConnection, channel: 
 export async function observePbxTransport(peer:RTCPeerConnection,sipCallId:string){
   if(peer.connectionState!=="connected"||!peer.localDescription||!peer.remoteDescription)throw new Error("PBX_TRANSPORT_NOT_CONNECTED");
   const stats=await peer.getStats();if(![...stats.values()].some(r=>r.type==="transport"&&r.dtlsState==="connected"))throw new Error("DTLS_STATS_NOT_CONNECTED");
-  const transport=peer.getReceivers().find(r=>r.track?.kind==="audio")?.transport as (RTCDtlsTransport&{getRemoteCertificates?:()=>ArrayBuffer[]})|null|undefined;
-  const certificate=transport?.getRemoteCertificates?.()[0];if(!certificate)throw new Error("REMOTE_CERTIFICATE_API_UNSUPPORTED");
-  const bytes=new Uint8Array(await crypto.subtle.digest("SHA-256",certificate));
-  return {connected:true,localSdp:peer.localDescription.sdp,remoteSdp:peer.remoteDescription.sdp,sipCallId,remoteFingerprint:[...bytes].map(b=>b.toString(16).padStart(2,"0").toUpperCase()).join(":")};
+  return {connected:true,localSdp:peer.localDescription.sdp,remoteSdp:peer.remoteDescription.sdp,sipCallId,remoteFingerprint:await observedRemoteFingerprint(peer,stats)};
+}
+
+async function observedRemoteFingerprint(peer:RTCPeerConnection,stats:RTCStatsReport){
+  const transports=[...stats.values()].filter(r=>r.type==='transport'&&r.dtlsState==='connected');
+  if(transports.length!==1)throw new Error('DTLS_TRANSPORT_AMBIGUOUS');
+  const transport=peer.getReceivers().find(r=>r.track?.kind==='audio')?.transport as (RTCDtlsTransport&{getRemoteCertificates?:()=>ArrayBuffer[]})|null|undefined;
+  let certificate=transport?.getRemoteCertificates?.()[0];
+  if(!certificate){
+    // Read DER only from the certificate referenced by the actual native DTLS transport, never SDP/API data.
+    const remote=stats.get(transports[0].remoteCertificateId);
+    if(remote?.type!=='certificate'||typeof remote.base64Certificate!=='string'||!remote.base64Certificate.length||remote.base64Certificate.length>32768||! /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(remote.base64Certificate))throw new Error('REMOTE_CERTIFICATE_API_UNSUPPORTED');
+    certificate=Uint8Array.from(atob(remote.base64Certificate),c=>c.charCodeAt(0)).buffer;
+  }
+  if(!certificate.byteLength||certificate.byteLength>24576)throw new Error('REMOTE_CERTIFICATE_UNAVAILABLE');
+  const bytes=new Uint8Array(await crypto.subtle.digest('SHA-256',certificate));
+  return [...bytes].map(b=>b.toString(16).padStart(2,'0').toUpperCase()).join(':');
 }

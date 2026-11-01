@@ -41,7 +41,7 @@ export class ServiceCall {
       const context=await this.read(),t=context.attempt;if(!t.recipientKey)throw new Error('RECIPIENT_ENROLLMENT_REQUIRED');
       const now=Math.floor(Date.now()/1000),jws=await this.sign({...this.base(context),type:'PbxBrowserReport',role:this.role,attemptId:t.id,sessionId:t.sessionId,connectionGeneration:t.generation,...report,recipientNonce:t.recipientKey.nonce,issuedAt:now,expiresAt:Math.min(t.firstConnectBy,now+30)});
       await this.post('/v3/pbx/report',{attemptId:t.id,jws});
-    },message=>{this.show({connection:message});if(/종료|실패|재검증|초과/.test(message)&&!this.stopped)void this.end('failed','pbx-disconnected');});
+    },message=>{this.show({connection:message});if(/종료|실패|재검증|초과/.test(message)&&!this.stopped)void this.end('failed','pbx-disconnected').catch(()=>this.finish('pbx-disconnected'));});
     let iceStarted=performance.now();this.sip.media.peer.addEventListener('iceconnectionstatechange',()=>{const state=this.sip?.media.peer.iceConnectionState;if(state==='checking')iceStarted=performance.now();if(state==='connected'||state==='completed')this.measure('ice',performance.now()-iceStarted);if(state==='failed')this.measure('ice',performance.now()-iceStarted,'failure');});
     this.sip.media.peer.addEventListener('track',()=>{if(!this.stopped)this.o.remote(this.sip!.media.remote);});
     await this.sip.start();this.alive();this.measure('pbx',performance.now()-this.connectionStarted);document.addEventListener('visibilitychange',this.visibility);this.show({connection:'PBX 등록 완료: 양측 연결 준비를 기다립니다'});this.schedule(0);

@@ -1,14 +1,13 @@
 export class LiveMedia {
   readonly peer: RTCPeerConnection;
   private microphone: MediaStream | undefined;
-  private sender: RTCRtpSender;
+  private sender: RTCRtpSender | undefined;
   private accepted = false;
   private remoteAccepted = false;
   private closed = false;
   readonly remote = new MediaStream();
   constructor(iceServers: RTCIceServer[], private readonly invalidate: (reason: string) => void, factory = (config: RTCConfiguration) => new RTCPeerConnection(config)) {
     this.peer = factory({ bundlePolicy: "max-bundle", iceServers });
-    this.sender = this.peer.addTransceiver("audio", { direction: "sendrecv" }).sender;
     this.peer.ontrack = e => { if (e.track.kind === "audio") {e.track.enabled=this.remoteAccepted;this.remote.addTrack(e.track);} };
     this.peer.onconnectionstatechange = () => { if (["disconnected", "failed", "closed"].includes(this.peer.connectionState)) { this.invalidate("연결 변경: 새 통화 시도와 재검증이 필요합니다."); this.close(); } };
   }
@@ -18,10 +17,15 @@ export class LiveMedia {
     for (const track of stream.getTracks()) track.enabled = false;
     if (this.closed) { stream.getTracks().forEach(t => t.stop()); throw new Error("MEDIA_CLOSED"); }
     this.microphone = stream;
+    const microphone = stream.getAudioTracks()[0];
+    if (!microphone || microphone.readyState !== "live") { this.close(); throw new Error("MICROPHONE_UNAVAILABLE"); }
+    // Negotiate sendrecv with a disabled track; attaching only after acceptance negotiates recvonly.
+    try { this.sender = this.peer.addTrack(microphone, stream); } catch (error) { this.close(); throw error; }
+    if (this.closed) throw new Error("MEDIA_CLOSED");
     for (const track of stream.getTracks()) track.onended = () => { this.invalidate("마이크 장치가 종료됐습니다."); this.close(); };
   }
   async accept(startMuted=false) {
-    if (this.closed || !this.microphone) throw new Error("MICROPHONE_NOT_READY");
+    if (this.closed || !this.microphone || !this.sender) throw new Error("MICROPHONE_NOT_READY");
     const track = this.microphone.getAudioTracks()[0]; if (!track || track.readyState === "ended") throw new Error("MICROPHONE_UNAVAILABLE");
     if(this.accepted)return;
     await this.sender.replaceTrack(track); if (this.closed || this.microphone.getAudioTracks()[0]?.readyState !== "live") throw new Error("MEDIA_CLOSED"); this.accepted = true;track.enabled=!startMuted;if(!startMuted){this.remoteAccepted=true;for(const incoming of this.remote.getTracks())incoming.enabled=true;}
