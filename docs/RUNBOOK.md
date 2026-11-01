@@ -38,6 +38,8 @@ DB5432·RPC8545·P2P30303·Witness4201~4204·API4100~4102·ARI8089·SIP5060은 �
 
 TURN은 container `10.205.0.30`, PBX는 `10.205.0.20`을 제안한다. `prepare-pbx.ts --turn`은 `external-ip=AWS_PUBLIC_IP/TURN_PRIVATE_ADDRESS`를 렌더한다. AWS EIP→호스트 private IP→Docker mapping의 실제 relay candidate·양방향 음원을 외부망에서 검증해야 한다. loopback 시험의 `allow-loopback-peers`를 옮기지 않는다. metadata 주소169.254/16 relay는 거절한다.
 
+AWS preflight는 `--phase aws --step prepare|runtime`으로 실행하며 설정 값 자체를 출력하지 않는다. 이는 AWS 독립성 검사이며 기존 runtime 설정/역할/키/DB 권한 검사나 실제 서비스 검증을 대신하지 않는다. 제공되지 않은 값은 BLOCKED로 유지한다.
+
 ### 기준 파일과 전달물
 
 - 공통 구성: `infra/deploy/compose.yml`, `compose.pbx.yml`
@@ -116,6 +118,18 @@ docker run --rm --pull never --network none --env-file "$CFG" \
   --mount "type=bind,src=$DATA_PARENT,dst=/aws" "$APP" \
   pnpm exec tsx scripts/prepare-finals.ts trust /aws/config --apply
 # 출력한 실제 pin을 CFG/VITE_SERVICE_TRUST_SHA256에 반영한 뒤 build.
+# Raw config IDs are valid for run/load, but FROM needs an existing verified name/digest.
+APP_BUILD_REF="$CALLSIGN_PROJECT-prepared:runtime"
+NGINX_BUILD_REF="$CALLSIGN_PROJECT-prepared:nginx"
+# Create only new task-local aliases. Existing aliases must resolve to the same reviewed config ID.
+for pair in "$APP $APP_BUILD_REF" "$NGINX $NGINX_BUILD_REF"; do
+  read -r image alias <<< "$pair"
+  if docker image inspect "$alias" >/dev/null 2>&1; then
+    test "$(docker image inspect --format '{{.Id}}' "$alias")" = "$(docker image inspect --format '{{.Id}}' "$image")" || exit 78
+  else
+    docker image tag "$image" "$alias"
+  fi
+done
 docker build --network=none --pull=false -f infra/deploy/web.Dockerfile \
   --build-arg PREPARED_RUNTIME_IMAGE="$APP_BUILD_REF" --build-arg NGINX_IMAGE="$NGINX_BUILD_REF" \
   --build-arg VITE_SERVICE_TRUST_SHA256="$REVIEWED_PIN" --iidfile "$NEW_WEB_ID_FILE" .

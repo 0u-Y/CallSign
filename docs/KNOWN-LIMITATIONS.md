@@ -4,7 +4,7 @@
 
 ## AWS 배포 준비의 현재 경계
 
-최종 대상은 AWS이며 현재 서버는 개발/빌드/검증 전용이다. 리전·예산·도메인·IdP는 사용자 답변상 미정이다. AWS override·별도 TLS Anchor·TURN renderer·7종 image inventory·신규/복원 절차를 준비했으나 실제 AWS 자원·외부 업로드·TLS/NAT·IdP·최종 web trust는 미검증/미준비다. 현재 서버 경로가 이미지 내부 설치 layout이나 과거 증거에 나타나는 것과 host bind/실행 연결 의존성을 구분한다. 공개 파일 묶음과 부분 이미지 archive만으로 전체 배포 성공이라고 하지 않는다. [정확한 입력과 gate](RUNBOOK.md#aws-competition).
+최종 대상은 AWS이며 현재 서버는 개발/빌드/검증 전용이다. 리전·예산·도메인·IdP는 사용자 답변상 미정이다. AWS override·별도 TLS Anchor·TURN renderer·7종 image inventory·신규/복원 절차를 준비했으나 실제 AWS 자원·외부 업로드·TLS/NAT·IdP·최종 web trust는 미검증/미준비다. 새 runtime의 이미지 전용 준비 도구·재초기화 거절과6종 bootstrap archive의 hash는 실제 확인했지만 전체 신규 stack 리허설은 아니다. [이번 실제 실행](FINALS-IMPLEMENTATION-PLAN.md#aws-preparation-20261102). 현재 서버 경로가 이미지 내부 설치 layout이나 과거 증거에 나타나는 것과 host bind/실행 연결 의존성을 구분한다. 공개 파일 묶음과 부분 이미지 archive만으로 전체 배포 성공이라고 하지 않는다. [정확한 입력과 gate](RUNBOOK.md#aws-competition).
 
 ## 실제 미디어 연결의 검증 범위
 

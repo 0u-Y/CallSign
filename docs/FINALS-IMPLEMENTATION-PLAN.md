@@ -4,6 +4,33 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="aws-preparation-20261102"></a>
+
+## 2026-11-02 AWS 단독 실행 준비와 전달 이미지
+
+사용자 결정으로 최종 대회 대상은 AWS이며 개발 서버는 빌드/검증 전용이다. 보존하기로 정한 대회 identity가 없으므로 폐기 시험 데이터를 옮기지 않고 AWS용 NEW를 기본으로 한다. 승인된 기존 배포의 RESTORE는 별도다. 리전·기간/예산·도메인·IdP는 사용자 답변상 미정이며 임의 선택/구매하지 않았다. [실행 절차](RUNBOOK.md#aws-competition)와 [이번 증거](../artifacts/aws-deployment-preparation-20261102.json)를 따른다.
+
+- OPS-001/002/003/005/007·PBX-001·MEDIA-003: 기존 Compose에 AWS override와 별도 TLS Anchor profile, EBS bind volume·제한 로그·CPU/RAM·내부 포트 경계를 연결했다. runtime 7종 역할을 조사하고 이미 있는 nginx를 HTTPS ingress로 사용하도록 준비했다. AWS profile의 web host8080을 제거했다. AWS용 네트워크/포트는 현재 서버에 적용하지 않았다.
+- 실제 준비 결함: loopback 전용 Anchor는 별도 호스트 접근이 불가능했다. 기본 loopback은 유지하면서 명시적인 외부 bind에 TLS를 필수로 했다. worker에 별도 Anchor용 egress를 추가했다. TURN command에 실행 binary가 빠져 있던 충돌을 고치고 public/container IP mapping과 metadata peer 차단을 렌더한다. 새 genesis에는 deployer/admin/stopper의 합성 gas allocation을 넣을 수 있다.
+- 신규 앱/관리 키는 기존 경로를 덮지 않으며 독립 approver 키는 중앙 생성하지 않는다. AWS target은 보호 env에서 선택하고 실행 확인·EBS mount gate를 적용한다. 일반 재시작에는 초기화/migration/seed가 없다. preflight는 실제 runtime URL/경로와 개발 도구 PATH를 구분한다. 실제 IdP callback은 두 client 모두 `/service`이며 별도 API callback URL을 IdP redirect로 잘못 등록하지 않도록 기록했다.
+- 공개 파일/계약 artifact 묶음과 실제 image inventory를 기존 release-manifest에 연결했다. AWS web은 실제 PBX cert/metadata/trust pin으로 runtime+nginx에서 재build하고 label을 검사한다. 기존 loopback·합성 trust web은 BLOCKED다. image config ID와 registry manifest digest를 구분한다.
+
+### 이번에 실제 실행한 범위
+
+오프라인 AWS/Anchor Compose 모델(17+2서비스)의 내부 포트·TLS·volume·worker egress·TURN 명령을 검사했다. 최종 runtime `sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f`를 network-none으로 재build했다. runtime의 코드 기준은 `137c402`이며 이후 host용 deployment.sh 선택/중단 guard와 문서·증거 변경을 구분한다. 제품 web/API 소스는 그 뒤 바뀌지 않았다.
+
+새 network-none/읽기 전용 컨테이너에 **host source·node_modules·build cache를 mount하지 않고** 이미지의 도구를 실행했다. 새 앱/관리 키·network-config 생성과 재실행 거절/내용 보존, 원격 Anchor TLS 조건, 미정 AWS 입력의 BLOCKED 유지, 설치 pnpm workspace 실행을 확인했다. 최종 probe는512MiB·CPU1·PID128·60초 제한 안에서 약4.72초, exit0/OOM false였다. 이는 전체 chain/DB/계약/계정/통화 초기화가 아니다. 두 번의 소유 probe container는 제거했고 생성한 volume은0이다. 시험 키는 tmpfs와 함께 폐기됐다.
+
+기본 이미지6종(runtime/Besu/PG/Asterisk/TURN/nginx)을 `aws-bootstrap-images.tar`로 보존했다. **2,317,248,512bytes**, SHA256 `cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21`, archive manifest의 실제6 config hash를 대조했다. `.local/aws-preparation-20261102`의 이 archive는 아직 외부 미전송이며 운영 데이터/비밀/체인 백업이 아니다. 일곱 번째 역할 AWS web은 실제 trust가 나온 뒤 생성한다. 이미지7종 metadata는6 PASS·web1 BLOCKED이며, 단순 metadata PASS는 서비스 기동 성공이 아니다.
+
+AWS 빈 template 검사: prepare는 PASS17/BLOCKED15/SKIPPED1, runtime은 PASS17/BLOCKED27/SKIPPED1이다. 가짜 주소나 비밀값을 채워 수를 줄이지 않았다. 로컬 소스 검사는 `137c402`의 light49파일242시험·웹 build·API runtime 타입 PASS, 뒤의 AWS host wrapper 회귀를 포함한 `abb95c7`의 light49파일243시험 PASS다. 과거 결과와 합산하지 않는다. [첫 소스 검사](../artifacts/aws-deployment-source-20261102.json), [최종 light 검사](../artifacts/aws-deployment-final-source-20261102.json).
+
+원본 실패도 보존했다. FROM에 raw config ID를 사용해 registry metadata 조회가 실패한 build는 검토한 기존 local tag/ID 대조로 수정했으며 image 다운로드를 완료한 것은 없다. 초기 AWS preflight의 ambient PATH 오분류와 cloud fixture의 과거 step명 불일치는 회귀로 수정했다. 기존 서버 설정/자원에 대한 변경 명령·새 bridge·port publish·외부 AWS/AI/업로드/과금은 실행하지 않았다. 전체 호스트 상태 동일을 측정한 검증은 아니다.
+
+### 남은 실행 gate
+
+현재 서버 없이 **준비 도구가 포함된 이미지가 실행되는 범위**만 로컬 확인했다. 새 AWS 전체 초기화·실제 IdP·외부 TLS/NAT/TURN·제품 전체 흐름·EBS 재부팅/복원·외부 보관처에서 전달물을 재수령하는 검증은 남는다. AWS·별도 Anchor host의 실제 기동/권한 검증을 수행하지 않았다. `shower`의 발췌 전달 검토에서 미정 입력·전달 미완성과 checkpoint/판정 설명 부족을 지적받아 명령·완료/중단표를 보완했으며, 이 검토 자체가 실행 검증은 아니다. 실제 입력/실행 허가 없이 배포 완료로 표시하지 않는다.
+
 <a id="isolated-media-20261102"></a>
 
 ## 2026-11-02 실제 교환기·합성 음원과 권한 회수

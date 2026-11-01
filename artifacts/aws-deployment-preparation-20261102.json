@@ -1,0 +1,674 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-01T19:11:07.937924+00:00",
+  "executionHead": "abb95c7fadad25d846e854067480a6145ac95e74",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "assessmentScope": "selected offline configuration checks and final image-only preparation assertions, not AWS or complete service deployment",
+  "awsDeploymentVerified": false,
+  "fullServiceRehearsalVerified": false,
+  "requirements": [
+    "OPS-001",
+    "OPS-002",
+    "OPS-003",
+    "OPS-005",
+    "OPS-007",
+    "MEDIA-003",
+    "PBX-001",
+    "TEST-001"
+  ],
+  "newDeploymentDefault": true,
+  "preservedCompetitionIdentitySelected": false,
+  "userDecisions": {
+    "region": null,
+    "durationAndBudget": null,
+    "domain": null,
+    "oidcProvider": null
+  },
+  "composeChecks": {
+    "scope": "offline Compose configuration using synthetic inputs only; no resources created",
+    "status": "PASS",
+    "primaryServiceCount": 17,
+    "anchorServiceCount": 2,
+    "assertions": [
+      "internal DB/RPC/ARI/API ports",
+      "worker egress for independent Anchor",
+      "TURN binary and static relay address",
+      "AWS TLS ingress config",
+      "separate persistent EBS paths",
+      "remote TLS Anchor listener",
+      "no developer-source/test-runner service mount in active profiles"
+    ]
+  },
+  "finalImageProbe": {
+    "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+    "sourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f",
+    "exitCode": 0,
+    "oomKilled": false,
+    "network": "none",
+    "mounts": [],
+    "memoryLimitBytes": 536870912,
+    "pidsLimit": 128,
+    "durationSeconds": 4.716484266798943,
+    "observations": {
+      "status": "PASS",
+      "scope": "final image offline preparation; not full service bootstrap/recovery",
+      "keyRegenerationRefused": true,
+      "networkOverwriteRefused": true,
+      "remoteAnchorRequiresTls": true,
+      "unconfiguredAwsStillBlocked": true,
+      "ambientDeveloperToolPathsAreNotRuntimeDependencies": true,
+      "pnpmWorkspaceRuns": true,
+      "node": "v22.22.2",
+      "sourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f"
+    }
+  },
+  "initialImageProbe": {
+    "image": "sha256:5a6e65242935d3abc71e9133f258355297768e7c1af351bcaef488d5025fad72",
+    "exitCode": 0,
+    "containerExitCode": 0,
+    "oomKilled": false,
+    "sourceMounts": [],
+    "network": "none",
+    "memoryBudgetBytes": 536870912,
+    "cpuBudgetNano": 1000000000,
+    "pidsLimit": 128,
+    "created": "2026-11-01T18:58:42.65064841Z",
+    "started": "2026-11-01T18:58:42.668721713Z",
+    "finished": "2026-11-01T18:58:47.310030773Z",
+    "assertions": {
+      "status": "PASS",
+      "scope": "image-only offline preparation; not chain/DB/OIDC/PBX initialization",
+      "assertions": [
+        "application keys initialized and repeated request refused without changing manifest",
+        "management keys initialized and repeated request refused without replacing administrator key",
+        "network configuration initialized and repeated request refused without replacement",
+        "remote Anchor requires TLS",
+        "installed pnpm workspace runs Witness command"
+      ],
+      "hostSourceMounts": false,
+      "network": "none",
+      "node": "v22.22.2",
+      "sourceCommit": "4384efbe7550f6ce2d1a31e5f0450dccd3992db3"
+    }
+  },
+  "images": [
+    {
+      "key": "CALLSIGN_APP_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "configId": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 633341949,
+      "repoDigests": [],
+      "sourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f"
+    },
+    {
+      "key": "CALLSIGN_WEB_IMAGE",
+      "status": "BLOCKED",
+      "reference": "sha256:004184d50b441cba39ece2b6bfd6c3e50bba21dccf6ebbe484aa0655116eeb74",
+      "configId": "sha256:004184d50b441cba39ece2b6bfd6c3e50bba21dccf6ebbe484aa0655116eeb74",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 189821706,
+      "repoDigests": [],
+      "sourceCommit": null,
+      "reason": "AWS_WEB_REBUILD_WITH_CURRENT_TRUST_REQUIRED"
+    },
+    {
+      "key": "ASTERISK_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "configId": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 713957956,
+      "repoDigests": [],
+      "sourceCommit": null
+    },
+    {
+      "key": "TURN_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "configId": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 713957956,
+      "repoDigests": [],
+      "sourceCommit": null
+    },
+    {
+      "key": "BESU_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "configId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 552624305,
+      "repoDigests": [
+        "hyperledger/besu@sha256:6f3f21ce533383fcc8db3bce02252b59d5a9e776b72b5a1c8ecd2db011600042"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "key": "POSTGRES_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "configId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 278212934,
+      "repoDigests": [
+        "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "key": "HTTPS_IMAGE",
+      "status": "PASS",
+      "reference": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "configId": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 169475099,
+      "repoDigests": [
+        "nginx@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c"
+      ],
+      "sourceCommit": null
+    }
+  ],
+  "bootstrapArchive": {
+    "archive": "aws-bootstrap-images.tar",
+    "bytes": 2317248512,
+    "sha256": "cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21",
+    "imageConfigIds": [
+      "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7"
+    ],
+    "durationSeconds": 11.474633413134143,
+    "scope": "six bootstrap images; AWS web is generated from runtime+nginx only after actual trust pin",
+    "externalTransfer": "NOT_SENT",
+    "fullServiceBackup": false,
+    "archiveConfigIdentityVerified": true,
+    "manifestImageCount": 6
+  },
+  "preflight": {
+    "prepare": {
+      "scope": "unfilled committed AWS template; no fabricated runtime input",
+      "counts": {
+        "PASS": 17,
+        "BLOCKED": 15,
+        "SKIPPED": 1
+      },
+      "checks": [
+        {
+          "id": "aws-target",
+          "status": "PASS",
+          "detail": "최종 실행 대상은 AWS이며 개발 서버는 runtime에 참여하지 않습니다."
+        },
+        {
+          "id": "aws-mode",
+          "status": "PASS",
+          "detail": "새 초기화와 기존 배포 복원을 명시적으로 구분합니다."
+        },
+        {
+          "id": "aws-public-auth",
+          "status": "PASS",
+          "detail": "공개 배포는 OIDC를 사용하며 데모 로그인을 허용하지 않습니다."
+        },
+        {
+          "id": "AWS_RELEASE_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "AWS_VOLUME_ROOT",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "FINALS_DATA_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "AWS_WEB_TLS_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "WEB_ORIGIN",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_ISSUER",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_JWKS_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_AUTHORIZATION_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_TOKEN_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "CONSUMPTION_ANCHOR_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OFFICIAL_OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OFFICIAL_OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "INSTITUTION_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "DEPLOYMENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "CALLSIGN_PROJECT",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "aws-oidc-separation",
+          "status": "BLOCKED",
+          "detail": "업무/공식 public client와 audience를 분리합니다."
+        },
+        {
+          "id": "SIP_WSS_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "standalone:AWS_RELEASE_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:AWS_VOLUME_ROOT",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:AWS_WEB_TLS_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:DEPLOYMENT_WORK_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:FINALS_ACCOUNTS_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:FINALS_DATA_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:PBX_PRIVATE_ADDRESS",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:REGISTRY_ARTIFACT_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:SERVICE_EXTRA_CA_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:TURN_PRIVATE_ADDRESS",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "aws-external-runtime",
+          "status": "SKIPPED",
+          "detail": "AWS 자원·DNS/TLS·IdP·NAT/TURN·EBS 재시작·전체 통화는 실제 환경에서 별도 판정합니다."
+        }
+      ]
+    },
+    "runtime": {
+      "scope": "unfilled committed AWS template; no fabricated runtime input",
+      "counts": {
+        "PASS": 17,
+        "BLOCKED": 27,
+        "SKIPPED": 1
+      },
+      "checks": [
+        {
+          "id": "aws-target",
+          "status": "PASS",
+          "detail": "최종 실행 대상은 AWS이며 개발 서버는 runtime에 참여하지 않습니다."
+        },
+        {
+          "id": "aws-mode",
+          "status": "PASS",
+          "detail": "새 초기화와 기존 배포 복원을 명시적으로 구분합니다."
+        },
+        {
+          "id": "aws-public-auth",
+          "status": "PASS",
+          "detail": "공개 배포는 OIDC를 사용하며 데모 로그인을 허용하지 않습니다."
+        },
+        {
+          "id": "AWS_RELEASE_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "AWS_VOLUME_ROOT",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "FINALS_DATA_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "AWS_WEB_TLS_DIR",
+          "status": "PASS",
+          "detail": "AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다."
+        },
+        {
+          "id": "WEB_ORIGIN",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_ISSUER",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_JWKS_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_AUTHORIZATION_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_TOKEN_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "CONSUMPTION_ANCHOR_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OFFICIAL_OIDC_CLIENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "OFFICIAL_OIDC_AUDIENCE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "INSTITUTION_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "DEPLOYMENT_ID",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "CALLSIGN_PROJECT",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "aws-oidc-separation",
+          "status": "BLOCKED",
+          "detail": "업무/공식 public client와 audience를 분리합니다."
+        },
+        {
+          "id": "SIP_WSS_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "standalone:AWS_RELEASE_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:AWS_VOLUME_ROOT",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:AWS_WEB_TLS_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:DEPLOYMENT_WORK_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:FINALS_ACCOUNTS_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:FINALS_DATA_DIR",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:PBX_PRIVATE_ADDRESS",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:REGISTRY_ARTIFACT_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:SERVICE_EXTRA_CA_PATH",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "standalone:TURN_PRIVATE_ADDRESS",
+          "status": "PASS",
+          "detail": "실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다."
+        },
+        {
+          "id": "CALLSIGN_APP_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "CALLSIGN_WEB_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "ASTERISK_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "TURN_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "BESU_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "POSTGRES_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "HTTPS_IMAGE",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "aws-web-pin",
+          "status": "BLOCKED",
+          "detail": "새 PBX 인증서·계약·공개키로 만든 trust pin이 필요합니다."
+        },
+        {
+          "id": "ISSUER_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "AUTH_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "WORKER_DATABASE_URL",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "REGISTRY_ADDRESS",
+          "status": "BLOCKED",
+          "detail": "승인된 AWS 입력 또는 보호 파일 참조가 필요합니다."
+        },
+        {
+          "id": "aws-external-runtime",
+          "status": "SKIPPED",
+          "detail": "AWS 자원·DNS/TLS·IdP·NAT/TURN·EBS 재시작·전체 통화는 실제 환경에서 별도 판정합니다."
+        }
+      ]
+    }
+  },
+  "sourceEvidence": [
+    "artifacts/aws-deployment-source-20261102.json",
+    "artifacts/aws-deployment-final-source-20261102.json"
+  ],
+  "imageSourceRelationship": {
+    "sourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f",
+    "laterSourceChange": "scripts/deployment.sh now selects AWS directly from protected env and checks mount only for start/restart; this is a host delivery control script, not executed by the image probe",
+    "webAndApiProductSourcesChangedAfterImageBuild": false
+  },
+  "failuresPreserved": [
+    {
+      "kind": "build invocation",
+      "result": "BLOCKED",
+      "cause": "raw Docker config ID used in FROM was interpreted as a repository and registry metadata lookup failed",
+      "correction": "verified pre-existing local tag against exact config ID; rebuilt with network=none and pull=false; no image download completed"
+    },
+    {
+      "kind": "preflight defect",
+      "result": "corrected",
+      "cause": "ambient developer PATH/NVM/COREPACK tool locations were misclassified as deployed runtime dependencies",
+      "correction": "restrict scan to deployment connection/path fields; regression and final image probe pass"
+    },
+    {
+      "kind": "test fixture",
+      "result": "corrected",
+      "cause": "manual cloud review fixture retained old gcp-same-release step after AWS target rename",
+      "correction": "bind fixture to current aws-same-release; original failed light log retained privately"
+    }
+  ],
+  "cleanup": {
+    "removedOwnedProbeContainers": 2,
+    "remainingOwnedContainers": 0,
+    "createdVolumes": 0,
+    "preserved": [
+      "source-labelled runtime images",
+      "six-image bootstrap archive",
+      "private original build/probe/check logs"
+    ],
+    "testKeys": "probe tmpfs only; removed with owned containers"
+  },
+  "hostPreservation": {
+    "hostConfigurationMutationCommandsExecuted": false,
+    "newBridgeOrPublishedPortUsed": false,
+    "hostSourceOrNodeModulesMountedIntoProbe": false,
+    "completeHostStateEqualityAsserted": false
+  },
+  "externalTransfer": "NOT_SENT",
+  "unverified": [
+    "AWS account/region/budget/domain/IdP selection",
+    "actual AWS TLS/OIDC/WSS/NAT/TURN from external networks",
+    "NEW full chain/DB/Anchor/account/contract bootstrap and full product flow using only delivery materials",
+    "AWS reboot/EBS mount ordering and whole deployment recovery/fencing",
+    "separate-host Anchor HTTPS/SQL grants in the new Compose profile",
+    "AWS-specific final web build/pin and metadata",
+    "external upload/retrieval of image and protected references; no paid resources or public exposure"
+  ],
+  "retention": "Image tar and protected material excluded from Git; keep private logs and checksums under operator retention. No human audio or production credentials generated."
+}

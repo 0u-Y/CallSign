@@ -30,7 +30,7 @@
 - 저장소: <https://github.com/0u-Y/CallSign>. 경로는 저장소 루트를 기준으로 표기한다.
 - 최초 조사 HEAD: `7aa26d90b9156c245e160283b1477360a6697cec`. 당시에는 미커밋 변경이 있어 이 시작 커밋만으로 구현을 재현할 수 없었다. 이후 사용자의 명시적 커밋·push 요청에 따라 기능별로 보존했으며, 이후 코드·시험 기준은 `ab0ec1cc55de26b9be832aa874d786beb9c8921c`였다. 2026-10-27 연결 작업 시작은 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 당시에는 미커밋 코드·문서 변경을 포함했다. 이후 커밋·게시와 추가 검증은 아래 날짜별 현행 기준 및 진행표를 따른다. 당시 검증 artifact의 미커밋 표시는 그 실행 시점의 provenance로 보존한다.
 - 조사 근거는 코드·라우트·설정·시험 소스와 저장된 결과다. 이전 보고서의 ‘구현 완료’를 그대로 승계하지 않았다. 초기 명세 작성에서는 파일 읽기·검색·공식 문서 조사·문서 작성만 수행했다. 이후 사용자의 구현 요청으로 진행한 오프라인 개발은 §2.1에 별도 반영한다. 서비스·실환경 실행 제한은 그대로 유지한다.
-- 환경 목표: RAM 64GB 서버컴에서 개발 후 동일 소스·이미지·구조로 GCP VM 이전. 64GB는 실측 자원 요구나 병렬 부하 허가를 뜻하지 않는다.
+- 환경 목표: 현재 서버컴은 개발·빌드·검증에만 사용하고 대회는 AWS 단독 실행한다. 기본은 새 AWS 대회 identity이며 시험 chain/DB의 이전을 요구하지 않는다. 서버 RAM64GB는 실측 AWS 요구 사양이나 병렬 부하 허가를 뜻하지 않는다.
 - [AGENTS.md](../AGENTS.md)의 제한을 유지한다. 별도 사용자 요청 전 Besu/Anvil/Hardhat, DB/witness/API/웹 전체 스택/Asterisk/TURN/Media Edge 기동, Compose up/down, 이미지 pull/build, migration·체인 초기화·계약 배포·seed, 통합·실통화·장애·부하 시험, STT/LLM 호출·모델 다운로드·추론, GCP 변경을 하지 않는다. 기존 프로세스·컨테이너·볼륨·키·증거를 변경/삭제하지 않고 다른 터미널·원격·CI로 우회하지 않는다.
 - 원본 PPTX의 slide XML을 읽어 기획 내용과 후속 변경을 대조했다. PDF·렌더·기존 영상의 존재와 문서상 provenance를 확인했으며 이번에 재생·렌더·시연 검증하지 않았다. **3회차 멘토링 원문과 최신 제출 양식은 원문 확인 필요**다.
 
@@ -822,7 +822,7 @@ flowchart LR
 
 - **①·②:** DID로 SSRF·무제한 다운로드·stale key·redirect 우회를 하지 못하게 한다.
 - **③·④:** 구현=부분 구현 / 검증=단위 검증 / 범위=기존 필수. `DidResolver.resolve/validate`: local first, 고정 remote pin HTTPS/2초/32KiB/redirect금지, ASCII did:web subset. cache 상태 최신성·DNS/IP egress 정책 보완 필요.
-- **⑤·⑥·⑦:** 등록한 DID→정확한 HTTPS origin/path만 조회, controller/key relationships·duplicate ID 검사. 개발 `.invalid/.example`은 사전 문서만 사용. GCP는 소유 domain·TLS/게시 문서와 별도 신뢰 설정.
+- **⑤·⑥·⑦:** 등록한 DID→정확한 HTTPS origin/path만 조회, controller/key relationships·duplicate ID 검사. 개발 `.invalid/.example`은 사전 문서만 사용. AWS는 소유 domain·TLS/게시 문서와 별도 신뢰 설정.
 - **⑧·⑨:** pin 검사→허용 public egress/DNS 검사→bounded stream→strict document→등록키 비교→기간 한정 캐시. timeout·과대·redirect·private IP·문서 교체는 unavailable/explicit mismatch. local stale doc이 key rotation을 무한 가리지 않게 한다.
 - **⑩·⑪:** IDENTITY-001, OPS-001/003. TTL/keyVersion invalidation·response type·IP/DNS 정책·테스트 벡터·금지 port/encoding 설명 보완. 일반 resolver 라이브러리로 임의 주소 해석을 열지 않는다.
 - **⑫~⑮:** remote allowlist·크기·기한·DNS rebinding 경계와 회전 갱신 시험. TV-02 및 후속 TV-03(외부 DID); E-02/07. did:web은 커뮤니티 사양, 범용 메서드 지원은 신규 제안이다.
@@ -1288,7 +1288,7 @@ flowchart LR
 ### OPS-001 — 공통 실행 구성·환경 검증·공개 접근 경계
 
 - **①·②:** 개발/AWS 환경 차이가 소스 fork·포트 노출·잘못된 origin으로 이어지지 않게 한다.
-- **③·④:** 구현=부분 구현(기본 경로 코드 연결) / 검증=정적 검사·관련 순수 단위 검증 / 범위=기존 필수 또는 확정 서비스 변경. 기본 service Compose와 Asterisk 구성·URI/lease/PBX 환경·HTTPS/WSS·GCP 같은 실행 구조를 연결했다. 실제 기동은 미실행이다. §2.4의 검증 범위를 적용한다.
+- **③·④:** 구현=부분 구현(기본 경로 코드 연결) / 검증=정적 검사·관련 순수 단위 검증 / 범위=기존 필수 또는 확정 서비스 변경. 기본 service Compose와 Asterisk 구성·URI/lease/PBX 환경·HTTPS/WSS·AWS 같은 실행 구조를 연결했다. 실제 기동은 미실행이다. §2.4의 검증 범위를 적용한다.
 - **⑤·⑥·⑦:** 공통 서비스 구조+환경 overlay, typed per-role schema가 required/optional/provider-disabled·public/demo·network/trust metadata consistency 검사. DB/관리RPC/SIP/ARI는 비공개, HTTPS/WSS·TURN만 명시 공개.
 - **⑧·⑨:** 비밀 없는 env template→보호 secret file→정적 config 검증→준비된 이미지/키/데이터 확인→명시 시작. domain/origin/chain/trust 불일치·모의 secret·누락 key는 startup fail, optional AI 미설정은 분석불가.
 - **⑩·⑪:** CHAIN-001/003, AUTH-001, MEDIA-003, PBX-001. role별 전체 env validator·local/AWS overlay·TURN renderer·PBX network·static network conflict 검사·least capabilities/UID 파일권한·readiness 보완.
@@ -1343,7 +1343,7 @@ flowchart LR
 완전한 과거 복원본 안의 노드·DB·trust·watermark끼리 일치한다는 것은 최신성 증거가 아니다. STATE-003/OPS-005의 최종 완료에는 **복원 대상과 별개 수명으로 보존한 recovery anchor**가 필요하다. 이것은 새 합의 프로토콜이 아니라 복원 보장의 필수 신뢰 입력이다. HTTPS 조건부 갱신 anchor 서버·별도 SQL 저장소·역할 구성과 소비/권한 checkpoint 호출 코드는 있다. 실제 독립 배치·계정 권한·복원 동작은 미검증이다.
 
 - anchor payload 기준안: deploymentId/chain/genesis/registry·height/hash·기관별 최소 epoch/keyVersion·철회 tombstone journal sequence/hash·policy/trust version·confirmed tx cursor·recordedAt/anchorVersion. 승인된 canonical payload에 독립 서명하고, 최신 승인 anchor와 증가 journal을 **동일 VM/디스크/backup 세대 밖**에 보존한다. 복구 책임자 검토+공동 승인자2/3 서명은 기존 공동 운영 정책을 재사용하는 **신규 설계 제안**이며, anchor 승인 주체/정족수는 D-05에서 확정한다.
-- 저장 매체 선택은 OPS-007 운영 결정이다. 예를 들어 권한이 분리된 versioned object store 또는 운영자 보관 서명 원장이 가능하다. GCP resource를 이번에 생성하거나 새 SaaS 의존을 자동 추가하지 않는다. 외부성은 별도 컨테이너라는 뜻이 아니라 복원/손상/권한 변경 실패 경계가 달라야 한다는 뜻이다.
+- 저장 매체 선택은 OPS-007 운영 결정이다. 예를 들어 권한이 분리된 versioned object store 또는 운영자 보관 서명 원장이 가능하다. AWS resource를 이번에 생성하거나 새 SaaS 의존을 자동 추가하지 않는다. 외부성은 별도 컨테이너라는 뜻이 아니라 복원/손상/권한 변경 실패 경계가 달라야 한다는 뜻이다.
 - onchain 상태 변경뿐 아니라 offchain 개별 취소·정지 의도를 journal에 포함한다. chain cursor만 저장하면 DB 취소 유실을 복원할 수 없다. outbox는 journal ack/미확정 구간을 기록하고, 복원 시 마지막 backup 이후 모든 연속 sequence를 재적용한다. journal gap이나 불명확한 마지막 확정 구간이 있으면 신규 발신/현재권한 표시는 차단한다.
 - 취소·정지·구키 무효화의 확정 경로는 **권한 검증/operationId 부여→외부 journal에 해당 의도 durable append·ack→공통 DB 잠금 경계에서 상태/audit commit→확정 응답** 순서로 고정한다. 외부 ack 전에도 로컬 송신/신규승인은 즉시 보수적으로 차단할 수 있지만 `pending-durability`로 구분하고 확정 성공을 반환하지 않는다. 단순 비동기 outbox만 남긴 채 확정 응답하는 경로는 금지한다. 외부 append 뒤 DB commit 전 전손이면 복원 시 그 의도를 재적용하고, 동시성/권한 충돌로 적용 불가하면 운영 확인 전 검증할 수 없으면 허용하지 않는 처리 pending으로 유지한다. 동일 operationId 재전송은 중복 append/재활성화를 만들지 않는다.
 - 운영자는 anchor 자체의 생성 시점·출처·최신 version·서명자·폐기 이력을 외부 보관 기준으로 확인하고, restored chain은 anchor보다 낮거나 같은 높이 다른 hash면 공개하지 않는다. 필요하면 surviving 독립 노드에서 sync 후 native proof/승인 checkpoint로 대조한다. 모든 노드가 사라졌다면 임의 재생성으로 같은 chain을 자칭하지 않는다.
@@ -1424,7 +1424,7 @@ flowchart LR
 
 ### TEST-002 — 자동 검사·서비스 계약·실환경 시험 분리
 
-- **①·②:** 일반 PR이 DB/chain/유료 provider/GCP를 시작하거나 거짓 성공을 발행하지 않는다.
+- **①·②:** 일반 PR이 DB/chain/유료 provider/AWS를 시작하거나 거짓 성공을 발행하지 않는다.
 - **③·④:** 구현=부분 구현(기본 경로 코드 연결) / 검증=정적 검사·관련 순수 단위 검증 / 범위=기존 필수 또는 확정 서비스 변경. 신규 SQL quota/claim·PBX 브라우저 시험은 작성·타입 검사만 했다. 모든 실환경 fixture/장애 자동 시험이 완성된 것은 아니다. §2.4의 검증 범위를 적용한다.
 - **⑤·⑥·⑦:** push/PR light·read-only default permission, manual heavy는 protected environment+명시 입력+isolated resources/secret scope+cost/timeout. 승인 없는 fork PR에 secret/배포권한 제공 금지. 같은 test group에서 skip을 성공으로 합산하지 않는다.
 - **⑧·⑨:** 검증한 commit 선택→승인→환경 확인→suite→raw artifact upload even failure→cleanup 자기 resource만. 취소/timeout은 미완료, 외부 process 중지 금지.
@@ -1693,7 +1693,7 @@ native 체인 자체 증명 확장은 과거 전체 명세에 편입됐으나 **
 | chain/trust | genesis/validator pubkeys/network/registry/deploy metadata·ABI/code/layout·승인된 검증한 기준 상태·trust bundle hash |
 | media | TURN URLs/secret/realm/cert·NAT/relay 범위, Asterisk/PJProject version·SIP endpoint/ARI/Edge auth·port 정책 |
 | AI | STT/LLM 계정/API key/model/version·한국어 capability·budget/usage·데이터 처리/보관 동의, 선택 Ollama 모델/실행정책 |
-| GCP/release | project/IAM/service account/zone/VM/VPC/disk/IP·terraform state·image registry/digest·secret/backup 위치 |
+| AWS/release | account/region/IAM role·x86_64 EC2/EBS/VPC/security group/EIP·image registry/config ID/digest·독립 Anchor·secret/backup 위치 |
 | 제출 | 멘토링 원문/날짜·최신4회차/본선 양식·제출 방법·발표시간 |
 
 **실제 비밀값은 이 문서·채팅·Git에 넣지 않는다.** 필요 종류와 준비 책임만 기록하고 보호된 배포 설정으로 전달한다.
@@ -1707,7 +1707,7 @@ native 체인 자체 증명 확장은 과거 전체 명세에 편입됐으나 **
 5. TV-06: HTTPS 별도 기기 직접 WebRTC·수락전0/양방향·거절/음소거/장치오류/lease·background/재접속·강제 TURN relay. 이후 실제 Asterisk+Edge PBX leg·codec·수신 profile 검증.
 6. TV-07/08: 동의된 소량 audio로 STT/LLM 실제 API·format/revision·경고 근거/철회·prompt injection·예산·usage/개인정보 확인, Korean holdout 평가·모바일/키보드/reader 검수.
 7. TV-09: 승인한 격리 환경에만 노드/DB/provider 지연·단절·restart·부분복원/old 검증한 기준 상태·key 손상, 권한 부활/리소스누수 점검.
-8. TV-10: 성공/실패 포함 제한된 부하·장시간·resource/cost 측정, 기준 미충족 수정·재검증. GCP plan/apply·재부팅/복원은 별도 대상 승인 후 같은 절차로 대조.
+8. TV-10: 성공/실패 포함 제한된 부하·장시간·resource/cost 측정, 기준 미충족 수정·재검증. AWS 자원 생성/설정 적용·재부팅/복원은 별도 대상 승인 후 같은 절차로 대조.
 9. TEST-004/SUBMISSION: 릴리스 기준 commit·image 내용 해시·환경·검증 범위 고정, 실제 영상/스크린샷·보고/발표/Q&A의 주장과 raw 결과 연결.
 
 ## 18. 최종 완료 체크리스트
@@ -1725,7 +1725,7 @@ native 체인 자체 증명 확장은 과거 전체 명세에 편입됐으나 **
 - [ ] PBX: 실제 Edge API/미디어 bridge·ARI/SIP/RTP/codec·leg attestation·PBX 전용 SDK/UI·내부경로 보장 한계 검증.
 - [ ] AI: remote-only·동의/철회·format/revision/역순·문맥/부정/인용/정정·LLM output/근거·비용/동시성·privacy·독립 Korean 평가.
 - [ ] UI: 모든 역할·공식/운영/시연의 실제API·권한·상태·오류/빈화면/재시도·모바일/keyboard/접근성·mode provenance.
-- [ ] OPS: source/image/config manifest·키최소권한·재시작 무초기화·readiness/drain·전체 backup/restore/rollback·관측/비용·서버/GCP 동등성.
+- [ ] OPS: source/image/config manifest·키최소권한·재시작 무초기화·readiness/drain·전체 backup/restore/rollback·관측/비용·개발 서버 없이 AWS 단독 실행.
 - [ ] TEST: light/heavy·manualCI 격리, 실제 서비스/PG/체인/media/provider/공격/장애/복원/성능 검증, 실패·skip·원본증거 보존.
 - [ ] SUBMISSION **외부 전달 산출물, 서비스 완료 조건과 별도**: 3회차 원문 대응·기획 변경·4회차 요청·최종 결과보고/발표/대본/Q&A·실제 영상/캡처·릴리스 환경·검증한계 일치.
 
