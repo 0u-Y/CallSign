@@ -10,8 +10,9 @@ case "$command" in
     node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
 import {readFileSync} from 'node:fs';
 import {parseEnv} from 'node:util';
+import {immutableImageReference} from './scripts/image-reference.mjs';
 const env={...parseEnv(readFileSync(process.argv[2],'utf8')),...process.env};
-for(const key of ['CALLSIGN_APP_IMAGE','CALLSIGN_WEB_IMAGE','ASTERISK_IMAGE','TURN_IMAGE','BESU_IMAGE','POSTGRES_IMAGE','HTTPS_IMAGE'])if(!/^[A-Za-z0-9._:/-]+@sha256:[0-9a-f]{64}$/.test(env[key]??''))throw new Error(`REVIEWED_IMAGE_DIGEST_REQUIRED:${key}`);
+for(const key of ['CALLSIGN_APP_IMAGE','CALLSIGN_WEB_IMAGE','ASTERISK_IMAGE','TURN_IMAGE','BESU_IMAGE','POSTGRES_IMAGE','HTTPS_IMAGE'])if(!immutableImageReference(env[key]))throw new Error(`REVIEWED_IMAGE_DIGEST_REQUIRED:${key}`);
 if(!/^[0-9a-f]{64}$/.test(env.VITE_SERVICE_TRUST_SHA256??''))throw new Error('PUBLISHED_TRUST_PIN_REQUIRED_BEFORE_START');
 JS
     "${compose[@]}" up -d --no-build --pull never postgres besu1 besu2 besu3 besu4 witness1 witness2 witness3 witness4 issuer sender worker platform web https turn asterisk ;;

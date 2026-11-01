@@ -46,6 +46,8 @@
     "tests/integration/service-boundaries.test.ts",
     "vitest.http.config.ts",
     "tests/integration/persistent-recovery.test.ts",
-    "services/api/test/recovery-process.ts"
+    "services/api/test/recovery-process.ts",
+    "tests/integration/chain-runtime.test.ts",
+    "vitest.chain.config.ts"
   ]
 }

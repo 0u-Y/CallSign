@@ -1,3 +1,4 @@
+import {immutableImageReference} from './image-reference.mjs';
 // Local files and configuration only. Never reads private key contents or contacts RPC/Docker.
 import {readFile,lstat} from 'node:fs/promises';
 import {resolve,isAbsolute} from 'node:path';
@@ -21,7 +22,7 @@ export async function chainPreflight(env:Record<string,string|undefined>,step:st
  else {const conflicts=ledgerOverlaps(env.LEDGER_IPV4_PREFIX,env.LEDGER_OBSERVED_CIDRS.split(','));check('ledger-overlap',conflicts.length?'FAIL':'PASS',conflicts.length?'관측된 IPv4 망과 중복됩니다.':'전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인.');}
  }catch{check('ledger-addresses','FAIL','private IPv4 세 옥텟 prefix와 유효한 관측 CIDR 필요. 임의 shell 문자열은 거절.');}
  if(step==='prepare')return checks;
- check('BESU_IMAGE',/^[\w./:-]+@sha256:[0-9a-f]{64}$/.test(env.BESU_IMAGE??'')?'PASS':'BLOCKED','검토한 실제 digest 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인.');
+ check('BESU_IMAGE',immutableImageReference(env.BESU_IMAGE)?'PASS':'BLOCKED','검토한 registry digest 또는 archive image ID 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인.');
  const base=env.FINALS_DATA_DIR;
  if(base){try{
  const keys=await Promise.all([1,2,3,4].map(n=>readFile(resolve(base,`besu/keys/node${n}/key.pub`),'utf8'))),expected=besuPeerConfiguration(keys,env.LEDGER_IPV4_PREFIX);
@@ -33,7 +34,7 @@ export async function chainPreflight(env:Record<string,string|undefined>,step:st
  for(const n of [1,2,3,4])await file(`validator-${n}`,resolve(base,`besu/keys/node${n}/key`),true);
  }
  if(step==='nodes')return checks;
- check('CALLSIGN_APP_IMAGE',/^[\w./:-]+@sha256:[0-9a-f]{64}$/.test(env.CALLSIGN_APP_IMAGE??'')?'PASS':'BLOCKED','deployer/Witness에 실제 runtime 이미지 digest 필요. 웹 pin/PBX/OIDC/AI 불필요.');
+ check('CALLSIGN_APP_IMAGE',immutableImageReference(env.CALLSIGN_APP_IMAGE)?'PASS':'BLOCKED','deployer/Witness에 실제 runtime 이미지 digest 필요. 웹 pin/PBX/OIDC/AI 불필요.');
  if(step==='deploy'){
  const defaults=parseEnv(await readFile(resolve(root,'.env.example'),'utf8'));
  const artifact=env.REGISTRY_ARTIFACT_PATH??defaults.REGISTRY_ARTIFACT_PATH,hash=env.REGISTRY_ARTIFACT_SHA256??defaults.REGISTRY_ARTIFACT_SHA256;

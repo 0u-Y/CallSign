@@ -21,7 +21,9 @@ if [[ -f "${OUTPUT_DIR}/genesis.json" || -f "${OUTPUT_DIR}/keys/node1/key" ]]; t
 fi
 mkdir -p "${OUTPUT_DIR}"
 if [[ ! -f "${GENERATED_DIR}/genesis.json" ]]; then
-  docker run --pull=never --rm \
+  docker run --pull=never --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+    --user "$(id -u):$(id -g)" --memory 1g --memory-swap 1g --cpus 1 --pids-limit 256 \
+    --env JAVA_OPTS=-Xmx512m \
     -v "${NETWORK_CONFIG}:/config/network-config.json:ro" \
     -v "${OUTPUT_DIR}:/output" \
     "${BESU_IMAGE:-hyperledger/besu:26.8.1}" \

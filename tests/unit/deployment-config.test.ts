@@ -25,3 +25,18 @@ it('allows the authenticated UI to start before PBX readiness without replacing 
  expect(compose).toContain('issuer: { condition: service_started }');expect(compose).toContain('sender: { condition: service_started }');expect(compose).toContain('depends_on: { platform: { condition: service_started } }');
  expect(compose).toContain('depends_on: { postgres: { condition: service_healthy } }');
 });
+
+it('keeps offline image workspace checks and generator network isolation explicit',()=>{
+ const generator=readFileSync('scripts/generate-besu.sh','utf8');expect(generator).toContain('--network none');expect(generator).toContain('--memory 1g');
+ const dockerfile=readFileSync('infra/deploy/app.Dockerfile','utf8');expect(dockerfile).toContain('AS local-runtime');expect(dockerfile).toContain('LOCAL_WORKSPACE_ROOT');expect(dockerfile).toContain('pnpm --filter @callsign/witness exec node --version');
+ expect(readFileSync('pnpm-workspace.yaml','utf8')).toContain('verifyDepsBeforeRun: error');
+ expect(dockerfile).not.toContain('verify-deps-before-run=false');
+});
+
+it('keeps real chain integration outside light and database suites with an explicit guard',()=>{
+ const pkg=JSON.parse(readFileSync('package.json','utf8'));
+ expect(pkg.scripts['test:chain-runtime']).toContain('scripts/restricted.mjs chain');
+ expect(pkg.scripts['test:chain-runtime']).toContain('--configLoader runner');
+ expect(readFileSync('vitest.integration.config.ts','utf8')).toContain('tests/integration/chain-runtime.test.ts');
+ expect(readFileSync('vitest.chain.config.ts','utf8')).toContain('CHAIN_INTEGRATION_REQUIRED');
+});
