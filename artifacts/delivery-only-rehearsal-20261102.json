@@ -1,0 +1,1551 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-01T23:25:24.560539+00:00",
+  "recordedHead": "853aa1f4640946d6a720d6e4b8fa4531d32a99b7",
+  "executionHead": "23ff2e1b7c3cdc960e25331e901162cf08b24f30",
+  "executionWorktreeDirty": false,
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "review": "unreviewed"
+  },
+  "assessmentScope": "selected NEW delivery-only local product flow and seven unique boundary scenarios; not AWS/external transfer/all requirements",
+  "localDeliveryProductFlowVerified": true,
+  "fullServiceVerified": false,
+  "awsDeploymentVerified": false,
+  "awsOverrideExecuted": false,
+  "externalTransferCompleted": false,
+  "requirements": [
+    "AUTH-002",
+    "CHAIN-001",
+    "CHAIN-002",
+    "STATE-001",
+    "STATE-002",
+    "DB-001",
+    "DB-002",
+    "DB-003",
+    "GOVERNANCE-001",
+    "GOVERNANCE-002",
+    "CALL-001",
+    "CALL-002",
+    "CALL-003",
+    "CALL-004",
+    "CALL-005",
+    "CALL-006",
+    "PBX-001",
+    "PBX-002",
+    "PBX-003",
+    "MEDIA-001",
+    "MEDIA-002",
+    "MEDIA-003",
+    "MEDIA-004",
+    "OPS-001",
+    "OPS-003",
+    "OPS-005",
+    "OPS-007",
+    "TEST-001",
+    "TEST-004"
+  ],
+  "handoffSourceFiles": {
+    "tests/integration/runtime-delivery-bootstrap.py": "beb8b03bcc3fc85c0014500af72de984225cdfdcf9502f15bb042c3f4a5b23d7",
+    "tests/integration/runtime-media-driver.py": "1f951594b4381546cc529b7811f4f877a8ac80e4d36bfa3625c7d028cb59370e",
+    "tests/integration/runtime-media.test.ts": "5214a126e51c46be4c1e7307ad73e1bf4e27e0aa4005f411864857ce56c81b2f",
+    "tests/integration/service-http-fixture.ts": "7b13dae479644bc30108464fda03ff54e8440c4be0ac97bc1bd746a42d3c092a",
+    "services/api/src/session-scopes.unit.test.ts": "5cb0990fbf2e569c046bfe44cd0e72c89959a40826a91339dff6644c316bb319",
+    "infra/deploy/turnserver.conf.example": "835ee177de238624c1f6fa452b78050d19c154aa5329d94fb5ccc3922a1eb865",
+    "infra/deploy/web.Dockerfile": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+    "infra/deploy/app.Dockerfile": "3bd957f12696fce5474ddfb6bb4cab34c38a6c506b6ae82a2d0d4d3504758506",
+    ".dockerignore": "9f9c5752852d6034dc934dc69bb06568c1d35ea765967987d93a0e1b2414bb0c",
+    "scripts/release-manifest.ts": "2e76e18c90206641f421dfcca9faea83a422caebd296344b45e5c21e9c96d8a4"
+  },
+  "executedObserverFiles": {
+    "tests/integration/runtime-media.test.ts": "5214a126e51c46be4c1e7307ad73e1bf4e27e0aa4005f411864857ce56c81b2f",
+    "tests/integration/runtime-media-driver.py": "0639f1868160ac1688d282a1f098338ec9d527b1b31272f02e2634700af62209",
+    "tests/integration/service-http-fixture.ts": "7b13dae479644bc30108464fda03ff54e8440c4be0ac97bc1bd746a42d3c092a",
+    "vitest.http.config.ts": "0e6fbb4f7a140017ecc1a687c31a27e89bb8e1e14c77f0d3741c58363ec5d2b6"
+  },
+  "runtimeImage": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+  "runtimeSourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f",
+  "productionSourceUnchangedSinceRuntimeBuild": true,
+  "deploymentIdentity": {
+    "networkId": "7310755",
+    "genesisHash": "0xef3d082835703d3b794a8027988afd980c6d7d790ccbcfeb239ae28d25f1565f",
+    "registryAddress": "0x10b35ae72db68ea744796fd9548d2fe2d0537d6a",
+    "registryCodeHash": "0x3695876e71bb8a5b141465b7808e73a72ccbdc6973ce67ea2deaef991ece2fbd",
+    "institutionId": "0x5302d5e0d9c1ffd7da466fbad753fc4db0fa99ef6d6f0fc1ee0dd7e7f5212ce8"
+  },
+  "initialObserverHead": "8f67dc6",
+  "correctedObserver": {
+    "sourceCommit": "23ff2e1b7c3cdc960e25331e901162cf08b24f30",
+    "archiveSha256": "345b2d004b168cfffc7d3f0bd27ac94d9ac18194616ed3aa5193e5561394f3d5",
+    "previousEvidence": "phase-natural-expiry-missing-purpose",
+    "applicationImageChanged": false,
+    "reason": "correct scoped auth probe and preserve natural-expiry evidence on phase archive"
+  },
+  "foundation": {
+    "status": "PREPARED_NOT_RUNTIME_VERIFIED",
+    "preparedAtUnixSeconds": 1793567230.201397,
+    "imagesLoadedFromArchive": true,
+    "freshValidatorCount": 4,
+    "newIdentity": "callsign_test_delivery_68b49c9d",
+    "noSourceMounts": true
+  },
+  "database": {
+    "status": "PREPARED_NOT_PRODUCT_PASS",
+    "migrations": "0000..0009",
+    "roles": "distinct issuer/auth/worker/PBX logins",
+    "anchor": "separate PostgreSQL storage/login/TLS",
+    "sessionsInserted": false,
+    "provisioning": "delivered scripts and SQL; existing data never overwritten"
+  },
+  "archiveClosure": {
+    "status": "PASS",
+    "imageCount": 6,
+    "uniqueLayers": 38,
+    "configIds": [
+      "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8"
+    ],
+    "archiveBytes": 2317248512,
+    "elapsedSeconds": 1.7810184669215232,
+    "assertion": "Every configuration and referenced uncompressed layer is physically present in the saved tar and matches its SHA-256; existing daemon cache is not the only copy",
+    "freshDockerDaemonExecuted": false
+  },
+  "tools": {
+    "recordedAt": "2026-11-01T22:32:54.474663+00:00",
+    "docker": "29.1.2 / 29.1.2",
+    "python": "Python 3.12.3",
+    "node": "v22.22.2",
+    "pnpm": "11.27.0",
+    "chromium": "Google Chrome for Testing 153.0.8010.12",
+    "asterisk": "No ethernet interface found for seeding global EID. You will have to set it manually.\nAsterisk 22.11.0 built by root @ 298e9ae472c9 on a x86_64 running Linux on 2026-11-01 15:59:40 UTC",
+    "nginx": "nginx version: nginx/1.30.4",
+    "postgres": "17.6",
+    "besu": "besu/v26.8.1/linux-x86_64/openjdk-java-25",
+    "coturn": "Coturn-4.6.3"
+  },
+  "watchdogFix": {
+    "status": "PASS",
+    "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+    "executionObservedBeforeDisconnect": true,
+    "hostDockerExecClientDisconnected": true,
+    "innerTimeoutSeconds": 1,
+    "killAfterSeconds": 1,
+    "remainingNodeOrTimeoutProcesses": false,
+    "actualControllerOwnershipGuardPassed": true,
+    "ownedControllerStopped": true,
+    "elapsedSeconds": 2.4918739069253206,
+    "scope": "short actual runtime-image watchdog regression; final1hour natural test uses earlier sealed observer and is not retroactively relabeled"
+  },
+  "phaseExecutions": [
+    {
+      "phase": "revoke-pbx-devices",
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "passed": 5,
+      "failed": 0,
+      "intentionallyUnselected": 7,
+      "assertions": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "durationMs": 57.026888999998846
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after delegation-revoke",
+          "status": "passed",
+          "durationMs": 22624.679576
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after pbx-outage",
+          "status": "passed",
+          "durationMs": 25494.512858000002
+        },
+        {
+          "name": "handles microphone failure in the product after device-denied",
+          "status": "passed",
+          "durationMs": 6486.636685999998
+        },
+        {
+          "name": "handles microphone failure in the product after device-absent",
+          "status": "passed",
+          "durationMs": 10999.840790000002
+        }
+      ],
+      "originalResultSha256": "c782c1e88eb352492dc13cca4152d1f18b16089a6a8275cac5972890a592ea07"
+    },
+    {
+      "phase": "policy-change",
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "passed": 2,
+      "failed": 0,
+      "intentionallyUnselected": 10,
+      "assertions": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "durationMs": 67.59603699999934
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after policy-change",
+          "status": "passed",
+          "durationMs": 30110.478101000004
+        }
+      ],
+      "originalResultSha256": "df69c4ca96e6e6f0228e52de73614b33bd1348d4b268eba40d49255283a81f4f"
+    },
+    {
+      "phase": "key-change",
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "passed": 2,
+      "failed": 0,
+      "intentionallyUnselected": 10,
+      "assertions": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "durationMs": 3692.1879100000006
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after key-change",
+          "status": "passed",
+          "durationMs": 39007.20502
+        }
+      ],
+      "originalResultSha256": "4808e358ff926387f2856f656001591a28ca8947d541add8b2ef8cc745f4361d"
+    },
+    {
+      "phase": "session-expiry",
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "passed": 2,
+      "failed": 0,
+      "intentionallyUnselected": 10,
+      "assertions": [
+        {
+          "name": "boots final image roles with real SQL, CA, RPC and processes an actual delegation",
+          "status": "passed",
+          "durationMs": 4451.910843
+        },
+        {
+          "name": "proves decoded relay-only two-way audio and reclamation after session-expiry",
+          "status": "passed",
+          "durationMs": 3606892.675479
+        }
+      ],
+      "originalResultSha256": "3c5c4f647b1ce48b49ac307908d82c12664ae7c7cf3e3f0e26bdf92839ff4095"
+    }
+  ],
+  "phaseCountsMustNotBeSummedAsUniqueTests": true,
+  "uniqueSelectedBoundaryCases": 7,
+  "decodedAudioObservations": [
+    {
+      "outcome": "delegation-revoke",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.005937004668676209,
+          "self": 1.115872744117549e-05,
+          "rms": 0.020018346373739383,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.0057666016565468105,
+          "self": 8.693931865606003e-06,
+          "rms": 0.02034861877354196,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 4345.907056,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    {
+      "outcome": "pbx-outage",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.005936783041006033,
+          "self": 1.3137107564513582e-05,
+          "rms": 0.020018143659075886,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.005766675102265866,
+          "self": 6.105858916146148e-06,
+          "rms": 0.02034765566891996,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 7476.904119999999,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    {
+      "outcome": "policy-change",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.005936858654222491,
+          "self": 7.998733738150921e-06,
+          "rms": 0.020018095780900167,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.005766155937075482,
+          "self": 8.837416066871305e-06,
+          "rms": 0.020345769767928814,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 10517.151819000002,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    {
+      "outcome": "key-change",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.0059368560468541645,
+          "self": 8.762570613393589e-06,
+          "rms": 0.020016313886344346,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.005766171131490225,
+          "self": 9.057508354356728e-06,
+          "rms": 0.020339003538822474,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 19238.642215,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "externalNatVerified": false
+    },
+    {
+      "outcome": "session-expiry",
+      "before": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "during": {
+        "sender": {
+          "target": 0.005937002061243757,
+          "self": 8.292114946577497e-06,
+          "rms": 0.02002206587488003,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 0.005766356000076675,
+          "self": 9.019480070779998e-06,
+          "rms": 0.02034412052938847,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "after": {
+        "sender": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        },
+        "recipient": {
+          "target": 1e-06,
+          "self": 1e-06,
+          "rms": 0,
+          "receiverTracks": 1,
+          "source": "actual-decoded-remote-track",
+          "syntheticMicrophone": true
+        }
+      },
+      "selectedRelay": [
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ],
+        [
+          {
+            "local": "relay",
+            "remote": "relay",
+            "dtls": "connected"
+          }
+        ]
+      ],
+      "blockedRenewals": 0,
+      "reclaimObservationMs": 46578.43496100046,
+      "clock": "one test-controller monotonic clock; one sample, not SLA",
+      "realHumanAudio": false,
+      "naturalExpiry": 1793575278798,
+      "externalNatVerified": false
+    }
+  ],
+  "webBuilds": [
+    {
+      "phase": "revoke-pbx-devices",
+      "runtime": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "nginx": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "web": "sha256:9ac785cc3fea5dee88a665e8238e493bd26205c9015925178dfcb3e63daa8457",
+      "pin": "a18e8ce4d853c6b77200143461b4911677ce457e6b7fc61c86b6826a9719d9f6",
+      "dockerfileSha256": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+      "source": "delivered runtime layers only; public delivery build context",
+      "hostSourceOrNodeModules": false,
+      "awsOverrideExecuted": false
+    },
+    {
+      "phase": "policy-change",
+      "runtime": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "nginx": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "web": "sha256:7d671c87c19b3afbece7d015b4b850bcc4baf6831217692cf9113497a2cd9b05",
+      "pin": "a18e8ce4d853c6b77200143461b4911677ce457e6b7fc61c86b6826a9719d9f6",
+      "dockerfileSha256": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+      "source": "delivered runtime layers only; public delivery build context",
+      "hostSourceOrNodeModules": false,
+      "awsOverrideExecuted": false
+    },
+    {
+      "phase": "key-change",
+      "runtime": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "nginx": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "web": "sha256:6abf0c911179a7284ea988a673e0739e892dde4f3c9e046d65f2efb11686d207",
+      "pin": "019a55af2003920a8f3e13d06b8f73b222dbdc577c20ef88a1859d6de6eb3e8a",
+      "dockerfileSha256": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+      "source": "delivered runtime layers only; public delivery build context",
+      "hostSourceOrNodeModules": false,
+      "awsOverrideExecuted": false
+    },
+    {
+      "phase": "session-expiry",
+      "runtime": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "nginx": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "web": "sha256:0d4bbf8200be555cf9c67bf808a32a7efd14961fe688e295576520403904cee7",
+      "pin": "697192c32b9ff7920588e28091a8f91c2182085ef5aeb5fd3eb66595d0377c11",
+      "dockerfileSha256": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+      "source": "delivered runtime layers only; public delivery build context",
+      "hostSourceOrNodeModules": false,
+      "awsOverrideExecuted": false
+    }
+  ],
+  "initReplay": {
+    "status": "PASS",
+    "checks": [
+      {
+        "operation": "application-keys",
+        "status": "PASS",
+        "exitCode": 1
+      },
+      {
+        "operation": "network-config",
+        "status": "PASS",
+        "exitCode": 1
+      },
+      {
+        "operation": "internal-accounts",
+        "status": "PASS",
+        "exitCode": 1
+      }
+    ],
+    "protectedFilesUnchanged": 33,
+    "existingAuthorityNotReinitialized": true,
+    "scope": "NEW environment actual key/network/account initialization replay refusal"
+  },
+  "ordinaryRestartAfterConsumption": {
+    "status": "PASS",
+    "roles": [
+      "worker",
+      "issuer"
+    ],
+    "runtimeImage": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+    "epochUnchanged": "4",
+    "approvalVersionUnchanged": 2,
+    "consumptionsAndSessionExpiriesUnchanged": true,
+    "gate": "ready",
+    "consumedReceiptsVerified": 5,
+    "noInitializationCommand": true
+  },
+  "postKeyTrustPublication": {
+    "status": "PASS",
+    "epoch": "4",
+    "policyVersion": 2,
+    "approvalKeyVersion": 2,
+    "readinessStatus": 200,
+    "oldAuthorizationCount": 7,
+    "oldAuthorizationsCancelled": true,
+    "existingConsumedReceiptCount": 5,
+    "scope": "actual DB/current issuer readiness after explicit trust publication; receipt preservation asserted separately in actual key-rotation test; final renewed-key call remains a separate pending scenario"
+  },
+  "preNaturalExpiryLease": {
+    "observedAt": "2026-11-01T23:21:14.885Z",
+    "naturalSessionExpiry": "1793575278798",
+    "attempts": [
+      {
+        "status": "accepted",
+        "pbx": "bridged",
+        "leaseExpiresAt": 1793575296,
+        "leaseSequence": 3
+      }
+    ],
+    "leaseValidBeyondNaturalSessionExpiry": true
+  },
+  "turnTemplateRendering": {
+    "status": "PASS",
+    "runtimeImage": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+    "publicTemplateSha256": "835ee177de238624c1f6fa452b78050d19c154aa5329d94fb5ccc3922a1eb865",
+    "network": "none",
+    "sourceMounted": false,
+    "templateMountedAsExplicitPreparationInput": true,
+    "loopbackDeniedByDefault": true,
+    "outputSecretPrinted": false,
+    "timeLimitSeconds": 60,
+    "memoryLimitBytes": 536870912
+  },
+  "awsNginxComponentOnly": {
+    "status": "PASS",
+    "image": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+    "configurationSha256": "5a9a5ba29468788319086aefcb57c122b54a47992714431e2c39439dffd36316",
+    "configurationAltered": false,
+    "http308": true,
+    "httpsVerifiedProductAssets": true,
+    "privateKeyOwnerMode": "UID1000/0600; supplied generated trial file",
+    "namespace": "owned shared none",
+    "hostPortsPublished": false,
+    "awsOverrideExecuted": false,
+    "scope": "delivered AWS nginx component configuration only; synthetic TLS, no external network"
+  },
+  "mountBoundary": {
+    "status": "PASS",
+    "roles": [
+      {
+        "role": "https",
+        "image": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:web-inputs/nginx.conf",
+            "destination": "/etc/nginx/nginx.conf",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:web-inputs/https.conf",
+            "destination": "/etc/nginx/conf.d/default.conf",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/cert.pem",
+            "destination": "/tls/fullchain.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/key.pem",
+            "destination": "/tls/key.pem",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 7962624,
+        "oomKilled": false
+      },
+      {
+        "role": "web",
+        "image": "sha256:0d4bbf8200be555cf9c67bf808a32a7efd14961fe688e295576520403904cee7",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:tls/ca.pem",
+            "destination": "/etc/nginx/pbx-ca.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:web-inputs/nginx.conf",
+            "destination": "/etc/nginx/nginx.conf",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 7884800,
+        "oomKilled": false
+      },
+      {
+        "role": "worker",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:tls/ca.pem",
+            "destination": "/tls/ca.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/deployment.json",
+            "destination": "/ledger/deployment.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:private-keys/administrator.txt",
+            "destination": "/keys/administrator.txt",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:private-keys/stopper.txt",
+            "destination": "/keys/stopper.txt",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 211009536,
+        "oomKilled": false
+      },
+      {
+        "role": "platform",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:run-jbk6Hu/trust.json",
+            "destination": "/trust/trust.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/ca.pem",
+            "destination": "/tls/ca.pem",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 221315072,
+        "oomKilled": false
+      },
+      {
+        "role": "sender",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:run-jbk6Hu/trust.json",
+            "destination": "/trust/trust.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/ca.pem",
+            "destination": "/tls/ca.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/sender/key.json",
+            "destination": "/sender/key.json",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 209809408,
+        "oomKilled": false
+      },
+      {
+        "role": "issuer",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:run-jbk6Hu/trust.json",
+            "destination": "/trust/trust.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/ca.pem",
+            "destination": "/tls/ca.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/issuer",
+            "destination": "/issuer",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/pbx/evidence.json",
+            "destination": "/pbx/evidence.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/cert.pem",
+            "destination": "/tls/cert.pem",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 232157184,
+        "oomKilled": false
+      },
+      {
+        "role": "controller",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OBSERVER_EXTERNAL",
+            "destination": "/host-libs",
+            "writable": false
+          },
+          {
+            "sourceKind": "OBSERVER_EXTERNAL",
+            "destination": "/usr/share/fonts",
+            "writable": false
+          },
+          {
+            "sourceKind": "OBSERVER_EXTERNAL",
+            "destination": "/etc/fonts",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:.",
+            "destination": "/run/callsign",
+            "writable": true
+          },
+          {
+            "sourceKind": "OWNED:controller-code/tests",
+            "destination": "/home/ana/Desktop/yyw/CallSign/tests",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:controller-code/vitest.http.config.ts",
+            "destination": "/home/ana/Desktop/yyw/CallSign/vitest.http.config.ts",
+            "writable": false
+          },
+          {
+            "sourceKind": "OBSERVER_EXTERNAL",
+            "destination": "/opt/browser-cache",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 2147483648,
+        "currentContainerCgroupPeakBytes": 1231478784,
+        "oomKilled": false
+      },
+      {
+        "role": "pbx",
+        "image": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:asterisk",
+            "destination": "/etc/asterisk",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:asterisk/odbc.ini",
+            "destination": "/etc/odbc.ini",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:media-tls",
+            "destination": "/etc/asterisk/tls",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 92123136,
+        "oomKilled": false
+      },
+      {
+        "role": "turn",
+        "image": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:turn",
+            "destination": "/etc/coturn",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:media-tls",
+            "destination": "/etc/coturn/tls",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 17731584,
+        "oomKilled": false
+      },
+      {
+        "role": "witness4",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/witness-keys/witness-4.json",
+            "destination": "/keys/witness.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/deployment.json",
+            "destination": "/ledger/deployment.json",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 201981952,
+        "oomKilled": false
+      },
+      {
+        "role": "witness3",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/witness-keys/witness-3.json",
+            "destination": "/keys/witness.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/deployment.json",
+            "destination": "/ledger/deployment.json",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 202084352,
+        "oomKilled": false
+      },
+      {
+        "role": "witness2",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/deployment.json",
+            "destination": "/ledger/deployment.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/witness-keys/witness-2.json",
+            "destination": "/keys/witness.json",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 205852672,
+        "oomKilled": false
+      },
+      {
+        "role": "witness1",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/deployment.json",
+            "destination": "/ledger/deployment.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/witness-keys/witness-1.json",
+            "destination": "/keys/witness.json",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 205303808,
+        "oomKilled": false
+      },
+      {
+        "role": "anchor",
+        "image": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/home/ana/Desktop/yyw/CallSign",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:tls/key.pem",
+            "destination": "/tls/key.pem",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:tls/cert.pem",
+            "destination": "/tls/cert.pem",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 268435456,
+        "currentContainerCgroupPeakBytes": 248680448,
+        "oomKilled": false
+      },
+      {
+        "role": "anchor-database",
+        "image": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/",
+        "mounts": [
+          {
+            "type": "volume",
+            "destination": "/var/lib/postgresql/data"
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 86716416,
+        "oomKilled": false
+      },
+      {
+        "role": "database",
+        "image": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/",
+        "mounts": [
+          {
+            "type": "volume",
+            "destination": "/var/lib/postgresql/data"
+          }
+        ],
+        "memoryLimitBytes": 536870912,
+        "currentContainerCgroupPeakBytes": 249065472,
+        "oomKilled": false
+      },
+      {
+        "role": "besu4",
+        "image": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/opt/besu",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/besu/genesis.json",
+            "destination": "/network/genesis.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/besu/keys/node4/key",
+            "destination": "/network/key",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-static-nodes.json",
+            "destination": "/network/static-nodes.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-permissions.toml",
+            "destination": "/var/lib/besu/permissions_config.toml",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:state/besu4",
+            "destination": "/var/lib/besu",
+            "writable": true
+          }
+        ],
+        "memoryLimitBytes": 3221225472,
+        "currentContainerCgroupPeakBytes": 571138048,
+        "oomKilled": false
+      },
+      {
+        "role": "besu3",
+        "image": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/opt/besu",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:state/besu3",
+            "destination": "/var/lib/besu",
+            "writable": true
+          },
+          {
+            "sourceKind": "OWNED:data/besu/genesis.json",
+            "destination": "/network/genesis.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/besu/keys/node3/key",
+            "destination": "/network/key",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-static-nodes.json",
+            "destination": "/network/static-nodes.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-permissions.toml",
+            "destination": "/var/lib/besu/permissions_config.toml",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 3221225472,
+        "currentContainerCgroupPeakBytes": 585797632,
+        "oomKilled": false
+      },
+      {
+        "role": "besu2",
+        "image": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/opt/besu",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:data/besu/genesis.json",
+            "destination": "/network/genesis.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/besu/keys/node2/key",
+            "destination": "/network/key",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-static-nodes.json",
+            "destination": "/network/static-nodes.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-permissions.toml",
+            "destination": "/var/lib/besu/permissions_config.toml",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:state/besu2",
+            "destination": "/var/lib/besu",
+            "writable": true
+          }
+        ],
+        "memoryLimitBytes": 3221225472,
+        "currentContainerCgroupPeakBytes": 567431168,
+        "oomKilled": false
+      },
+      {
+        "role": "besu1",
+        "image": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "network": "owned-shared-namespace",
+        "publishedPorts": false,
+        "internalImageWorkdir": "/opt/besu",
+        "mounts": [
+          {
+            "sourceKind": "OWNED:namespace-static-nodes.json",
+            "destination": "/network/static-nodes.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:namespace-permissions.toml",
+            "destination": "/var/lib/besu/permissions_config.toml",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:state/besu1",
+            "destination": "/var/lib/besu",
+            "writable": true
+          },
+          {
+            "sourceKind": "OWNED:data/besu/genesis.json",
+            "destination": "/network/genesis.json",
+            "writable": false
+          },
+          {
+            "sourceKind": "OWNED:data/besu/keys/node1/key",
+            "destination": "/network/key",
+            "writable": false
+          }
+        ],
+        "memoryLimitBytes": 3221225472,
+        "currentContainerCgroupPeakBytes": 558796800,
+        "oomKilled": false
+      },
+      {
+        "role": "net",
+        "image": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "network": "none",
+        "publishedPorts": false,
+        "internalImageWorkdir": "",
+        "mounts": [],
+        "memoryLimitBytes": 33554432,
+        "currentContainerCgroupPeakBytes": 6197248,
+        "oomKilled": false
+      }
+    ],
+    "serviceHostSourceMounts": false,
+    "controllerExceptions": [
+      "test assertion sources",
+      "installed Chromium/shared libraries/fonts",
+      "local HTTPS OIDC fixture (explicit authentication dependency)"
+    ],
+    "freshDockerDaemon": false
+  },
+  "failuresPreserved": {
+    "firstNaturalExpiry": {
+      "passed": 1,
+      "failed": 1,
+      "intentionallyUnselected": 10,
+      "originalResultSha256": "f08f51c51c6cd06e61538bcc0a954ffba731d41094c499772a3cbec81c9d43e2",
+      "cause": "observer omitted required purpose=work; actual product auth polls returned401 and attempt/PBX were ended; incomplete later assertions were not promoted to PASS"
+    },
+    "additionalObserver": {
+      "status": "FAIL",
+      "category": "additional observer expectation",
+      "cause": "incorrectly required receipts for device attempts that failed before consumption; main key-rotation scenario had already passed",
+      "databaseModified": false
+    },
+    "nginxComponentDns": {
+      "status": "FAIL",
+      "category": "local harness DNS preparation",
+      "cause": "shared none namespace has no web hostname alias; AWS network DNS was not exercised",
+      "scope": "component probe; no product or production checks weakened"
+    },
+    "watchdogFirstProbe": {
+      "status": "FAIL",
+      "category": "observer process-list format",
+      "cause": "Docker top requires PID column; first probe cleanup completed; no assertion was marked PASS"
+    },
+    "prototype": "earlier media-delivery-20261102-46a469d9 incomplete/ABORTED and setup failures preserved privately; not counted as final PASS",
+    "sourceChecks": [
+      "first new unit expectation conflated absent and expired cookies; corrected to AUTH_REQUIRED/SESSION_EXPIRED",
+      "TypeScript rejected an inferred string[][] fixture; tuple typing corrected; original failed logs retained"
+    ]
+  },
+  "resourceObservations": {
+    "sampleCount": 3981,
+    "minimumAvailableGiB": 37.526397705078125,
+    "maxSustainedSwapSamples": 2,
+    "resourceStopTriggered": false,
+    "sampling": "approximately2seconds; observed availability and OOM, not workload peak/minimum AWS sizing",
+    "limits": "Besu4 each3GiB; Witness4/API4 each512MiB; PostgreSQL2 each512MiB; controller2GiB; web build2GiB/CPU1/90seconds; guard16GiB available and sustained swap/OOM stop"
+  },
+  "cleanup": {
+    "status": "PASS",
+    "containersRemoved": 21,
+    "volumesRemoved": 2,
+    "remainingOwnedContainers": 0,
+    "existingContainerIdsPreserved": true,
+    "dockerNetworkIdsUnchanged": true,
+    "preserved": "protected synthetic inputs/evidence; not a complete service backup; never a competition identity",
+    "noGlobalPrune": true
+  },
+  "hostComparison": {
+    "recordedAt": "2026-11-01T23:22:39.122519+00:00",
+    "scope": "selected read-only interface/route/Docker-ID comparisons; no complete firewall/NAT/daemon byte comparison",
+    "hostConfigurationModificationCommandsExecuted": false,
+    "newBridgeOrPublishedHostPort": false,
+    "firewallNatGlobalConfigByteComparison": "NOT_MEASURED",
+    "interfaces": {
+      "equalIgnoringLifetimesAndOrdering": true,
+      "beforeEntries": 85,
+      "afterEntries": 85,
+      "beforeNormalizedSha256": "50e9c21e5132432cf76b2e7df0af278b66652b3982d5786987b3f336dc166ace",
+      "afterNormalizedSha256": "50e9c21e5132432cf76b2e7df0af278b66652b3982d5786987b3f336dc166ace"
+    },
+    "routes": {
+      "equalIgnoringLifetimesAndOrdering": true,
+      "beforeEntries": 313,
+      "afterEntries": 313,
+      "beforeNormalizedSha256": "e536169c016f5dd17e517f7b01e0979af7a8b570f055428f941f46ca36b9b6be",
+      "afterNormalizedSha256": "e536169c016f5dd17e517f7b01e0979af7a8b570f055428f941f46ca36b9b6be"
+    },
+    "cleanup": {
+      "status": "PASS",
+      "containersRemoved": 21,
+      "volumesRemoved": 2,
+      "remainingOwnedContainers": 0,
+      "existingContainerIdsPreserved": true,
+      "dockerNetworkIdsUnchanged": true,
+      "preserved": "protected synthetic inputs/evidence; not a complete service backup; never a competition identity",
+      "noGlobalPrune": true
+    },
+    "status": "PASS_SELECTED_OBSERVATIONS",
+    "diskAvailableBytesAfterCleanup": 460450275328
+  },
+  "actualComponents": [
+    "Besu4/current ServiceRegistry",
+    "Witness4 (3-of-4 verified signatures)",
+    "PostgreSQL application and independently stored PostgreSQL HTTPS Anchor",
+    "real authentication/session/CSRF/API/database permissions",
+    "runtime issuer/platform/sender/worker",
+    "Asterisk22.11.0/coturn4.6.3",
+    "pin-built product web/nginx",
+    "Chromium real DTLS/SRTP and decoded synthetic opposite tones"
+  ],
+  "fixtures": [
+    "local HTTPS OIDC provider is an explicit authentication dependency, not an observer-only dependency",
+    "central trial approver keys/synthetic accounts and URIs",
+    "synthetic660/990Hz microphone inputs",
+    "none shared loopback with relay-only ICE and local loopback TURN exception",
+    "controller assertion code/browser/shared libraries/fonts; no application source/node_modules/build-cache mount"
+  ],
+  "localAwsDifferences": [
+    "same host/daemon and none shared loopback instead of AWS bridge/DNS/public network",
+    "synthetic local OIDC/CA/central key custody instead of selected external IdP/certificates/independent owners",
+    "non-root read-only local nginx global temporary pid/cache configuration and alternate listen ports",
+    "separate Anchor process/storage/credentials on same host, not independent-host failure domain",
+    "AWS override/security groups/EBS/NAT/real WAN TURN not executed"
+  ],
+  "notVerified": [
+    "AWS resources/deployment and external TLS/DNS/IdP/NAT/TURN",
+    "independent host/disk/power failures, complete service backup/restore",
+    "external STT/LLM quality, retention, cancellation or billing",
+    "fresh Docker daemon image load; archive layer closure checked on current daemon",
+    "other browsers/real human audio/microphone hardware",
+    "performance SLA/load capacity and cloud minimum sizing"
+  ],
+  "sourceChecks": {
+    "light": {
+      "files": 49,
+      "tests": 248,
+      "status": "PASS",
+      "command": "pnpm light",
+      "logSha256": "06ece14ed8e7d6a0d5b44cb2758b34a65956a860d987923e62ed4ec78e91d277",
+      "executionHead": "f37656e",
+      "executionWorktreeDirty": true,
+      "note": "driver/guard fixture changes then committed as4fec490; final docs-only changes do not imply another source-test run"
+    },
+    "runtimeTypes": {
+      "status": "PASS",
+      "command": "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "webBuild": "actual delivered runtime/nginx image builds per phase, not a separate host-source build"
+  },
+  "delivery": {
+    "recordedAt": "2026-11-01T23:24:28.517003+00:00",
+    "path": ".local/aws-preparation-20261102/delivery-rehearsal-final-853aa1f",
+    "sourceCommit": "853aa1f4640946d6a720d6e4b8fa4531d32a99b7",
+    "status": "SEALED_LOCAL_NOT_SENT",
+    "externalDestination": null,
+    "externalUploadOrRedownloadVerified": false,
+    "files": [
+      {
+        "name": "aws-bootstrap-images.tar",
+        "bytes": 2317248512,
+        "sha256": "cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21"
+      },
+      {
+        "name": "deployment-files.tar",
+        "bytes": 419840,
+        "sha256": "d760e6b49ce49ac42875a5f3e2b2e72250d9c83cdafa564ae1f9b3a0e30d360e"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 122880,
+        "sha256": "437b27b388c7623e7c91c2c0ec322efa9295493df38f4e9405333e6e0b6d2936"
+      },
+      {
+        "name": "images.json",
+        "bytes": 3083,
+        "sha256": "0c430eb867a250aa8aca837d961b8ed38717fbb6c92456004cbf39ad64be1a02"
+      },
+      {
+        "name": "SHA256SUMS",
+        "bytes": 341,
+        "sha256": "d0b017ee2a5937b49991f4ac4a89317a9485e9c4ae6f4503ecb55656651a887d"
+      }
+    ],
+    "totalBytes": 2317794656,
+    "runtimeImageArchiveIdenticalToTestedInput": true,
+    "sixImageArchitectures": "linux/amd64",
+    "awsWebImage": "BLOCKED until actual AWS domain/certificate/metadata/trust; local pin web is not AWS final",
+    "latestBundleScope": "prepared after rehearsal; runtime image archive unchanged; subsequent TURN template rendering/watchdog changes separately verified; documentation and observer metadata updated, not a new full bootstrap execution",
+    "testedInputChecksums": {
+      "deployment-files.tar": "546443503b13dc715c30233d481f8da1d75b30c92b2dc4ceaa42b854773a0229",
+      "observer-tests.tar": "26af1c1c9aaf6de5fe743393eed51ef3338477f060011deb575e9647077ec464",
+      "images.json": "a5aee96e470e969038e56024ce43eaaf72e2e79eab83fbc1a39ce9c4982064c3",
+      "aws-bootstrap-images.tar": "cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21"
+    },
+    "protectedMaterial": "not in public files/Git: role keys, private certificates, tokens/passwords, account mapping, browser storage/audio/raw DB/chain; competition NEW generates its own identity; trial leftovers are diagnostics, not transfer/restore data",
+    "receiptProcedure": "use approved private destination, retrieve into a new directory without development-server access, verify SHA256SUMS and exact file bytes/config image IDs; no external destination has been authorized"
+  },
+  "retention": "No private keys/tokens/session storage/audio/raw DB/chain or image archives in Git. Raw failures/protected synthetic inputs remain only under owned0700 local diagnostics; removed database volumes mean remaining keys/genesis are NOT a service backup or competition identity."
+}
