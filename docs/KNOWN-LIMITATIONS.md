@@ -2,9 +2,13 @@
 
 기준일: 2026-11-02. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
+## 전달물 신규 리허설의 추가 범위
+
+[2026-11-02 새 실행](FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102)은 전달 archive/공개 파일과 새 시험 보호 입력으로 실제 전체 stack·제품 통화를 연결했다. 정책 변경·필수 정지/공동 키 복구·PBX 장애 재시도·장치 거절/없음을 실행했으며 자연 세션 만료는 관측 요청을 수정한 뒤 실제1시간 재검증을 완료했다. 아래 이전 기록의 ‘전체 신규 stack 미실행’은 당시 범위다. 같은 host/daemon의 격리 환경이며 실제 AWS override·외부 보관/재수령·외부 IdP/TLS/NAT/TURN·AI·독립 host 장애 검증으로 확대하지 않는다.
+
 ## AWS 배포 준비의 현재 경계
 
-최종 대상은 AWS이며 현재 서버는 개발/빌드/검증 전용이다. 리전·예산·도메인·IdP는 사용자 답변상 미정이다. AWS override·별도 TLS Anchor·TURN renderer·7종 image inventory·신규/복원 절차를 준비했으나 실제 AWS 자원·외부 업로드·TLS/NAT·IdP·최종 web trust는 미검증/미준비다. 새 runtime의 이미지 전용 준비 도구·재초기화 거절과6종 bootstrap archive의 hash는 실제 확인했지만 전체 신규 stack 리허설은 아니다. [이번 실제 실행](FINALS-IMPLEMENTATION-PLAN.md#aws-preparation-20261102). 현재 서버 경로가 이미지 내부 설치 layout이나 과거 증거에 나타나는 것과 host bind/실행 연결 의존성을 구분한다. 공개 파일 묶음과 부분 이미지 archive만으로 전체 배포 성공이라고 하지 않는다. [정확한 입력과 gate](RUNBOOK.md#aws-competition).
+최종 대상은 AWS이며 현재 서버는 개발/빌드/검증 전용이다. 리전·예산·도메인·IdP는 사용자 답변상 미정이다. AWS override·별도 TLS Anchor·TURN renderer·7종 image inventory·신규/복원 절차를 준비했으나 실제 AWS 자원·외부 업로드·TLS/NAT·IdP·최종 web trust는 미검증/미준비다. 앞선 준비 단계의 이미지 전용 probe/hash 확인 이후, 위 후속 NEW 리허설에서 전체 로컬 stack과 제품 흐름을 추가 연결했다. AWS의 전체 신규 배포를 실행한 것은 아니다. [이번 실제 실행](FINALS-IMPLEMENTATION-PLAN.md#aws-preparation-20261102). 현재 서버 경로가 이미지 내부 설치 layout이나 과거 증거에 나타나는 것과 host bind/실행 연결 의존성을 구분한다. 공개 파일 묶음과 부분 이미지 archive만으로 전체 배포 성공이라고 하지 않는다. [정확한 입력과 gate](RUNBOOK.md#aws-competition).
 
 ## 실제 미디어 연결의 검증 범위
 
@@ -12,9 +16,9 @@
 
 같은 namespace의 실제 relay 선택은 외부 NAT 통과나 독립 호스트 장애 내성이 아니다. Asterisk는 loopback host ICE 후보를 제외하므로 시험 전용 TURN을 PBX에도 연결했다. `allow-loopback-peers`는 이 격리 설정에만 사용하며 공개 TURN의 기본값으로 옮기지 않는다. 내장 G.711 μ-law의8kHz 음성 경로만 확인했고 Opus 변환·한국어 음질·실제 외부 STT/LLM·제공자 보관/취소/청구는 미검증이다.
 
-통화 중 정책/키 교체·세션 자연 만료·실제 PBX 제어 장애·장치 거절/없음 전체 조합, 외부 IdP/MFA·다른 브라우저·GCP·전체 배포 복원은 남아 있다. 기존 fixture/단위 시험을 이번 실통화 결과로 확대하지 않는다. 실제 사람의 음성을 수집하지 않았다.
+초기 미디어 실행에 없었던 정책/키 복구·실제 PBX 제어 장애·장치 거절/없음은 위 전달물 NEW 리허설에서 추가 확인했다. 자연 세션 만료도 수정된 관측으로 실제1시간을 기다려 완료했다. 선택한 사례들의 결과이며 모든 실패 조합을 검증한 것은 아니다. 외부 IdP/MFA·다른 브라우저·AWS 외부망·전체 배포 복원은 별도다. 기존 fixture/단위 시험을 실통화 결과로 확대하지 않으며 실제 사람의 음성을 수집하지 않았다.
 
-최종 이미지의 실제 역할 기동/서명/worker 관측과 앞선 candidate 이미지의 통화 결과를 구분했다. 전달 archive는 runtime/web/PBX/TURN 이미지뿐이며 chain·DB·Anchor·키 전체 백업이 아니다. 시험 controller의 PID 상한 도달 뒤 init으로 회수했고 상한을 늘리지 않았다. 공개 증거에는 관측 표본과 실제 cgroup peak의 출처를 구분한다. 클라우드 최소 사양·SLA는 확정하지 않았다.
+초기 기록은 최종 이미지의 역할 기동/서명/worker 관측과 candidate 이미지의 통화 결과를 구분한다. 이후 전달물 NEW 리허설은 같은 최종 runtime에서 새 통화를 실행했다. 초기4종 archive와 이후6종 bootstrap archive 모두 chain·DB·Anchor·키의 일관 서비스 백업이 아니다. 시험 controller의 PID 상한 도달 뒤 init으로 회수했고 상한을 늘리지 않았다. 공개 증거에는 관측 표본과 실제 cgroup peak의 출처를 구분한다. 클라우드 최소 사양·SLA는 확정하지 않았다.
 
 전후 host 대조에서는 기존 veth1개와 연결된 IPv6 경로가 달랐다. 다른 route·Docker network ID·기존 container ID는 보존됐다. 비소유 restart-always container의 재시작이 관측됐지만 직접 대응은 미확정이며 host 전체 동일이라고 주장하지 않는다. 소유 none 자원은 모두 정리했고 그 차이를 복구하려고 기존 설정을 바꾸지 않았다.
 

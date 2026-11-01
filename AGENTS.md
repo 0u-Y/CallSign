@@ -60,3 +60,7 @@
 ## 2026-11-02 AWS 단독 배포 준비
 
 최종 대회 대상은 AWS이며 개발 서버는 빌드/검증 전용이다. 현재 요청은 코드/설정/문서·기존 도구 수정, 서버 설정을 바꾸지 않는 제한된 로컬 전달 리허설·검사·관련 commit/일반 push/CI 확인을 허용한다. 리전/예산/도메인/IdP는 미정이다. AWS 자원 생성·구매·외부 업로드·공개 노출·유료 AI와 기존 host/network/service/volume 변경은 별도 허가 없이 하지 않는다. 폐기 시험 chain/DB를 대회 배포로 간주하지 않으며 기본 NEW와 승인된 기존 identity RESTORE를 구분한다. 이 기록은 이후 세션의 상시 실행 권한이 아니다.
+
+## 2026-11-02 전달물 신규 전체 리허설의 한정 예외
+
+이번 사용자 요청은 새 폐기 identity의 전달 archive load, 이미지/공개 파일과 합성 보호 입력만으로 소유 none namespace의 chain/DB/Anchor/API/worker/PBX/TURN/제품 웹·설치 Chromium, 기존 최종 runtime/nginx를 이용한 pin 웹 build, 소유 프로세스의 제한된 중단/재시도·실제 자연 세션 만료와 관련 commit/일반 push/CI 확인을 허용한다. host 설정·bridge/port publish·기존 자원·AWS/유료/공개 업로드·실제 IdP/음성/외부 AI·추가 다운로드는 허용하지 않는다. controller의 코드/브라우저와 로컬 OIDC 인증 fixture를 명시하며 소유 label/ID·예산·기한을 유지한다. 원본 실패는 보존하고 이 기록을 다음 세션의 상시 실행 허가로 사용하지 않는다.

@@ -1,8 +1,39 @@
 # 개발 현황과 검증 기록
 
-기준일: **2026-10-30(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 인증 후속 경계 작업 시작은 `a75398d`, 현재 영속 복구 검증 시작은 `c59edac`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
+기준일: **2026-11-02(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 인증 후속 경계 작업 시작은 `a75398d`, 현재 영속 복구 검증 시작은 `c59edac`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+
+<a id="delivery-only-20261102"></a>
+
+## 2026-11-02 전달물만 사용하는 신규 전체 리허설
+
+시작은 `ed234f6`이며 폐기 가능한 새 합성 identity `media-delivery-20261102-68b49c9d`를 사용했다. 이전 chain/DB/Anchor를 재사용하지 않았다. 입력은 실제6종 이미지 archive, checksum으로 봉인한 공개 파일과 observer archive, 이번 작업에서 만든 시험 보호 입력이다. 서비스에 checkout·host node_modules·build cache를 mount하지 않았다. 이미지 내부의 예전 절대 설치 경로는 host 경로 의존성과 다르다. 상세 결과는 [실행 증거](../artifacts/delivery-only-rehearsal-20261102.json)에 연결한다. 마지막 자연 세션 만료 재검증도 실제1시간을 기다린 뒤 **2 PASS·10 선택 제외**로 끝났다. TTL·시계·DB 만료를 바꾸지 않았고, 만료 직전 유효한 lease와 만료 후 양 세션401·양쪽 원격 음원 소멸·ARI 자원404를 함께 확인했다.
+
+- CHAIN-001/002·STATE-001/002·DB-001~003·OPS-001/003: archive를 load하고 linux/amd64 config ID6개, 실제 layer38개의 내용 hash를 대조했다. 새 역할 키·network-config·genesis·Besu4·ServiceRegistry·Witness4, migration0000~0009·서로 다른4 LOGIN, 별도 PostgreSQL/저장소/자격의 HTTPS Anchor를 준비했다. 같은 Docker daemon의 새 환경이며 새로운 daemon/AWS에서 load한 검증은 아니다.
+- AUTH-002·GOVERNANCE-001/002·CALL-001~006·PBX-001~003·MEDIA-001~004: 로컬 HTTPS OIDC 로그인→실제 공동 등록 API/worker/원장/Witness 확정→제품 화면의 업무·위임 발급→승인·SIP/WSS·실제 DTLS/소유 증명·소비·lease→상대 합성 음원 디코딩을 연결했다. 기관·상담원·수신자 화면을 사용했고 별도 시연 화면이나 성공 adapter로 바꾸지 않았다.
+- 위임 철회·PBX 제어 장애/정리 재시도·장치 권한 거절/없음 phase는 **5 PASS·7 선택 제외**, 정책 변경 phase는 **2 PASS·10 선택 제외**, 키 복구 phase와 수정한 자연 만료 phase는 각각 **2 PASS·10 선택 제외**다. 공통 이미지/위임 검사가 phase마다 반복되므로 수를 더해 서로 다른 시험 개수로 발표하지 않는다. 이 작업에서 의도적으로 선택하지 않은 이전 회수 사례는 이번 PASS에 포함하지 않는다.
+- 실제 정책 공동 서명·제출·원장 확정·Witness 확인·명시적 활성화 전후를 구분했다. 새 policy trust/web pin을 게시한 뒤 다음 통화를 생성했다. 키 변경은 설계상 필요한 기관 정지→2인 공동 복구→확정 키 활성화 순서이며, 키 변경만으로 통화가 끊겼다는 독립 인과 시험은 아니다. 구 VC/승인은 무효화되고 소비 영수증은 보존됐다. 구 trust로 신규 업무가 차단되는 것도 확인했다.
+- 통화가 있었던 위 회수 phase는 양 끝점의 원격 트랙을 별도 clone해 실제 디코딩을 관측했다. 양방향 상대660/990Hz 우세, 승인 전 무음, 회수 뒤 양쪽 상대 주파수의 소멸과 실제 ARI의 양 채널/브리지404를 함께 확인했다. UI 트랙 mute나 RTP 증가만으로 판정하지 않았다. 같은 namespace의 relay-only 선택이며 AWS 외부 NAT 성공이 아니다.
+- 초기화 재실행은 기존 키·network-config·계정을 거절했고 보호 파일 hash가 유지됐다. foundation 이후 명시적 resume은 기존 계약·volume·genesis·키를 대조해 재개했다. Issuer/worker의 일반 entrypoint 재시작 뒤 epoch·키 버전·소비·세션 만료 시각·gate를 대조했다. 임의 crash 모든 지점, 서비스 전체 백업/복원, 독립 호스트 장애는 이 리허설 범위가 아니다.
+
+### 실제 수정과 원본 실패
+
+전달 공개 묶음에 웹이 import하는 과거 `artifacts/test-results.json`이 빠졌고 Vite가 읽기 전용 설치 경로에 임시 설정을 만들었다. 공개 파일/Docker context/COPY와 `--configLoader runner`를 함께 수정해 **전달 runtime/nginx만으로 실제 pin 웹을 build·기동**했다. 이 JSON은 과거 결과 원본이며 이번 결과로 바꾸지 않았다. coturn4.6.3가 지원하지 않는 `no-loopback-peers`를 `allow-loopback-peers=0`으로 수정하고, 옛 runtime 내장 template 대신 전달 공개 template만 preparation container에 명시적으로 mount한다. 같은 runtime에서 실제 렌더링과 기본 loopback 차단을 확인했다.
+
+재개 검사는 같은 이름의 volume을 container로 오인하지 않도록 typed inspect와 소유 ID/label/image/network/mount 검사를 사용한다. observer의 브라우저 font와 프로세스 init, phase 로그의 stderr·자연 만료 파일 보존도 보완했다. 후속 cold read가 host `docker exec`에만 있던 timeout과 예시의 기관 ID 할당 누락을 찾았다. `4fec490`은 내부 TERM/KILL timeout·실패 시 소유 controller ID/image/namespace 재검사 후 종료와 명시적 ID 읽기를 연결했다. 실제 짧은 최종 이미지 시험에서 Node/timeout 실행을 먼저 관측하고 host exec 연결을 끊은 뒤 내부 프로세스 부재·소유 controller 종료를 확인했다. 1시간 만료 성공 phase는 기존 봉인 observer `23ff2e1`을 사용했다. 새 watchdog으로 이 긴 phase를 다시 실행했다고 바꾸지 않으며 짧은 별도 실제 회귀와 소유권 거절 검사를 구분한다. 이들은 배포 준비/관측기 수정이며 제품의 인증·서명·freshness 조건을 완화한 변경이 아니다.
+
+원본 prototype의 중단/실패와 실제 자연 만료 phase의 **1 PASS·1 FAIL·10 선택 제외**는 보존했다. 만료 phase에서는 실제 통화가 종료됐지만 관측기가 필수 `purpose=work`를 누락해400을 받았다. 실제 제품 요청의401과 분리하고 관측 요청을 수정했다. 누락 purpose400, 만료 cookie401/SESSION_EXPIRED, cookie 없음401/AUTH_REQUIRED를 포함한 오프라인 route 회귀12개를 확인했다. 세션 TTL/시계/DB 만료를 줄이지 않았다. 첫 만료 직전의 실제 lease는 세션 만료 뒤까지 유효했지만 후반 assertion이 끝나지 않았으므로 그 실행을 전체 PASS로 올리지 않는다.
+
+### 로컬과 AWS, 전달/보존의 경계
+
+런타임은 모든 phase에서 동일한 `ed282c7e…`(제품 소스 `137c402`)다. observer는 첫 phase `8f67dc6`, 관측 수정 이후 `23ff2e1`의 별도 봉인 archive다. host 준비/template 수정과 시험 소스 변경을 runtime 이미지 재build/재시험으로 바꾸어 기록하지 않는다.
+
+로컬만의 설정은 none namespace/loopback·노드별 내부 포트·합성 기관/중앙 시험 승인자·단기 CA·loopback TURN 예외·같은 host의 별도 Anchor 저장소·비root nginx의 임시 pid/cache 설정이다. controller의 브라우저/라이브러리/font와 assertion 코드는 관측 입력이며, 로컬 OIDC fixture는 **실제 시험 인증 의존성**이다. AWS용 nginx 설정 파일 자체의 HTTPS 제품 파일/308 전환도 별도 소유 container에서 확인했지만 AWS override 전체를 기동한 것은 아니다. 이 component probe의 첫 로컬 DNS 별칭 누락 실패도 보존했다. AWS의 실제 DNS/TLS/IdP·Security Group·NAT/TURN·EBS/재부팅·외부망·외부 AI·독립 host 내성은 미검증이다.
+
+외부 보관처는 아직 승인/선택되지 않아 업로드·재수령은 하지 않았다. 이미지 archive는2,317,248,512bytes이며 공개 파일/observer/inventory/checksum을 별도 묶는다. 보호 입력·키·인증서 개인키·로그·음원·DB/chain은 그 공개 전달물과 Git에 넣지 않는다. 대회는 AWS NEW가 기본이며 이 폐기 시험 identity의 남은 키/파일을 서비스 복원 묶음으로 취급하지 않는다. 최종 자원·host 전후 대조·전달 파일 목록은 실행 증거의 종료 결과를 따른다. 최신 소스 검사는 **light49파일248시험**, API runtime 타입 PASS다. 웹은 전달 runtime/nginx에서 각 실제 trust pin으로 build·기동했다. 별도 host 웹 build나 무관한 계약/DB 회귀를 이번에 재실행한 것으로 표시하지 않는다.
+
+종료 확인: 소유 container21개·volume2개를 제거했고 남은 실행 자원은0이다. 관측 약8083.5초의 available RAM 최저는37.53GiB였다. 일시 swap 연속 표본은최대2회로 사전에 정한4회 중단 조건에 미달했고 OOM/자원 중단은 관측하지 않았다. 수명 countdown/정렬을 제외한 interface/route와 기존 container/network ID를 전후 대조했다. 방화벽/NAT/daemon 전체 byte 동일성은 측정하지 않았으며 관련 변경 명령은 수행하지 않았다. 보호된 원본·합성 입력은 `.local/observer-delivery-8f67dc6/.local/media-delivery-20261102-68b49c9d`의 진단 보존물이다. DB volume이 제거됐으므로 남은 genesis/키만으로 서비스를 복원할 수 없고 AWS NEW 입력으로 재사용하지 않는다. 이미지/public 전달물은 별도 `.local/aws-preparation-20261102/delivery-rehearsal-final-*`에서 보존한다. 정확한 파일별 bytes/hash와 미전송 상태는 실행 증거에 기록한다.
 
 <a id="aws-preparation-20261102"></a>
 
