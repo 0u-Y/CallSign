@@ -56,3 +56,7 @@
 ## 2026-11-02 격리 미디어 검증의 한정 예외
 
 이번 사용자 요청은 기존 host/IP/route/DNS/firewall/Docker daemon·기존 자원을 보존하는 조건으로 소유 none namespace의 실제 체인/DB/Anchor/API/worker/Asterisk/TURN/제품 웹·합성 음원 Chromium 시험, 시험 키/CA·오프라인 image build·관련 commit/일반 push/CI 조회를 한정 허용했다. Asterisk22.11.0/coturn4.6.3 및 공식 build 의존성 다운로드는 총500MiB 상한으로 별도 승인했다. public exposure·host 설정 변경·운영 데이터/마이크·외부 유료 AI/GCP는 허용하지 않았다. 실행 guard를 유지하고 소유 자원만 정리한다. 이 기록은 후속 세션의 상시 기동·다운로드 허가가 아니다. 결과·한계는 최신 진행 기록을 따른다.
+
+## 2026-11-02 AWS 단독 배포 준비
+
+최종 대회 대상은 AWS이며 개발 서버는 빌드/검증 전용이다. 현재 요청은 코드/설정/문서·기존 도구 수정, 서버 설정을 바꾸지 않는 제한된 로컬 전달 리허설·검사·관련 commit/일반 push/CI 확인을 허용한다. 리전/예산/도메인/IdP는 미정이다. AWS 자원 생성·구매·외부 업로드·공개 노출·유료 AI와 기존 host/network/service/volume 변경은 별도 허가 없이 하지 않는다. 폐기 시험 chain/DB를 대회 배포로 간주하지 않으며 기본 NEW와 승인된 기존 identity RESTORE를 구분한다. 이 기록은 이후 세션의 상시 실행 권한이 아니다.

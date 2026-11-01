@@ -1,5 +1,7 @@
 # CallSign 전체 개발 명세
 
+**2026-11-02 배포 목표 변경:** 대회는 AWS 단독 실행이며 개발 서버는 실행 의존성이 아니다. 기본은 검증 코드/이미지로 새 AWS 대회 identity를 초기화한다. 폐기 시험 데이터 이전을 요구하지 않는다. NEW와 기존 RESTORE는 분리하고 OPS 요구 ID·복구/서명 기준은 유지한다. [현재 절차](RUNBOOK.md#aws-competition). 과거 날짜의 GCP 시험/계획 기록은 당시 범위로 보존한다.
+
 
 **2026-11-02 추가 검증:** PBX-001~003·MEDIA-001~004·CALL-001~006·DB-001~003·OPS-003·TEST-001/004의 실제 연결 근거를 [이번 기록](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)에 추가했다. 같은 호스트의 실제 Asterisk/TURN·제품 웹에서 서로 다른 합성 음원의 양방향 디코딩과5개 회수 경계를 확인했다. OIDC는 fixture이며 외부망·AI·클라우드·전체 복원과 일부 정책/키/장치 장애 조합은 미검증이다. 요구 ID·완료 기준은 유지하며 전체 개발 완료로 확대하지 않는다.
 
@@ -1262,7 +1264,7 @@ flowchart LR
 - **⑩·⑪:** UI-001~006. structured 상태 model·component 공통 error/empty·모바일 폼/긴 DID 줄바꿈·민감값 masking·키보드/screen-reader·대비 시험 작성.
 - **⑫~⑮:** TV-06/08의 role별 viewport·200% zoom·keyboard·screen reader 수동 확인과 자동 검사, E-05. WCAG 목표 수준·지원 browser는 D-11, 인증 준수라고 미리 발표하지 않는다.
 
-## 11. 서버컴→GCP·배포·운영
+## 11. 개발 서버와 분리된 AWS 배포·운영
 
 ### 11.1 프로세스·환경·volume·network·port 기준
 
@@ -1285,11 +1287,11 @@ flowchart LR
 
 ### OPS-001 — 공통 실행 구성·환경 검증·공개 접근 경계
 
-- **①·②:** 서버컴/GCP 환경 차이가 소스 fork·포트 노출·잘못된 origin으로 이어지지 않게 한다.
+- **①·②:** 개발/AWS 환경 차이가 소스 fork·포트 노출·잘못된 origin으로 이어지지 않게 한다.
 - **③·④:** 구현=부분 구현(기본 경로 코드 연결) / 검증=정적 검사·관련 순수 단위 검증 / 범위=기존 필수 또는 확정 서비스 변경. 기본 service Compose와 Asterisk 구성·URI/lease/PBX 환경·HTTPS/WSS·GCP 같은 실행 구조를 연결했다. 실제 기동은 미실행이다. §2.4의 검증 범위를 적용한다.
 - **⑤·⑥·⑦:** 공통 서비스 구조+환경 overlay, typed per-role schema가 required/optional/provider-disabled·public/demo·network/trust metadata consistency 검사. DB/관리RPC/SIP/ARI는 비공개, HTTPS/WSS·TURN만 명시 공개.
 - **⑧·⑨:** 비밀 없는 env template→보호 secret file→정적 config 검증→준비된 이미지/키/데이터 확인→명시 시작. domain/origin/chain/trust 불일치·모의 secret·누락 key는 startup fail, optional AI 미설정은 분석불가.
-- **⑩·⑪:** CHAIN-001/003, AUTH-001, MEDIA-003, PBX-001. role별 전체 env validator·local/GCP overlay·TURN renderer·PBX network·static network conflict 검사·least capabilities/UID 파일권한·readiness 보완.
+- **⑩·⑪:** CHAIN-001/003, AUTH-001, MEDIA-003, PBX-001. role별 전체 env validator·local/AWS overlay·TURN renderer·PBX network·static network conflict 검사·least capabilities/UID 파일권한·readiness 보완.
 - **⑫~⑮:** 같은 revision/image 구조에서 환경값만 바꿔 동작, 잘못된 public/demo/insecure origin/DB port 노출 거절. TV-01/03/06/09, E-07. 현재 Compose config parse는 이미지 존재/호환·서비스 성공 증거가 아니다.
 
 <a id="ops-002"></a>
@@ -1362,14 +1364,14 @@ flowchart LR
 
 <a id="ops-007"></a>
 
-### OPS-007 — GCP 새 배포·동일 배포 이전·도메인
+### OPS-007 — AWS 새 배포·기존 배포 복원·도메인
 
-- **①·②:** 로컬 개발키를 공개 demo에 복사하거나 새 VM에서 chain trust를 자동 바꾸지 않는다.
-- **③·④:** 구현=부분 구현 / 검증=미검증(Terraform 도구 검증도 없음) / 범위=기존 필수. `infra/gcp/main.tf`: provider6.49.0·VM/data disk200GB·deletion protection/OSlogin/firewall·선택 TURN, `callsign.service`는 자동 bootstrap 없음.
-- **⑤·⑥·⑦:** project/zone/machine exact OS image/service account/VPC/operator CIDR/public IP/DNS/TLS/OIDC/DID/TURN/image digest를 명시. **새 배포**는 새 key/genesis/registry/trust, **기존 이전**은 일관 backup/checkpoint+같은 key/chain을 복원. Terraform state·backup secret 접근 통제.
-- **⑧·⑨:** 승인된 plan 검토→persistent disk mount→기존 소스/이미지→새 준비 또는 복원→preflight→internal 검증→DNS/HTTPS 공개. domain 변경은 DID identifier/VC/trust pin/OIDC redirect/Origin/TURN realm 영향 분석→새 발급 또는 계획된 이관. 부분 복원·DNS 전환 실패는 원본 보존/격리 복구.
-- **⑩·⑪:** OPS-001~006, IDENTITY-001/002, GOVERNANCE-002. static IP·disk mount·권한별 IAM/terraform vars·state backend/lock·새/복원 runbook·자동 시작의 mount 검증·config/env 일치·방화벽 test 작성.
-- **⑫~⑮:** VM reboot/container recreate 후 동일 chain/key/state·무 bootstrap, 외부 HTTPS/WSS/TURN·도메인 trust 정상. TV-01/05/06/09/10, E-07.64GB VM 사양/200GB disk 적정성·비용은 미측정이며 검증 뒤 산정한다. 이 문서 작성 중 validate/plan/apply도 실행하지 않는다.
+- **①·②:** 현재 서버 없이 AWS 또는 명시적으로 선택한 외부 서비스만으로 전체 로그인·업무·통화·복구를 실행한다. 로컬 시험 identity를 자동 이전하거나 새 VM에서 기존 권한 이력을 초기화하지 않는다.
+- **③·④:** 구현=기존 Compose의 AWS/독립 Anchor 구성·준비/전달 도구 연결 / 검증=오프라인 구성·순수 회귀와 전달 이미지 준비 도구의 제한 리허설. 실제 AWS·외부 IdP/TLS/NAT·전체 초기화/복원은 미검증. `infra/gcp`는 비활성 과거 구성이다.
+- **⑤·⑥·⑦:** AWS region/account·기간/예산·x86_64 AMI/EC2·EBS·보안 그룹·EIP/DNS/TLS·실제 OIDC·키 소유·독립 Anchor·7종 image identity를 명시한다. NEW는 새 key/genesis/registry/trust/계정, RESTORE는 승인해 보존한 배포의 일관 backup과 같은 권한 이력을 사용한다. 개발 서버 URL·파일·SSH·cache·다운로드 서버를 runtime에 남기지 않는다.
+- **⑧·⑨:** 공개 입력 검토→새 EBS/mount/키→단계별 chain·계약·DB/최소권한·별도 Anchor→인증·trust/web pin→등록 확정→실제 양방향 미디어·철회 검증. 부분 실패는 진행표·pending tx·기존 파일을 보존하고 미완료 단계만 재개한다. 일반 재시작에 bootstrap/키 생성/seed를 넣지 않는다.
+- **⑩·⑪:** OPS-001~006, IDENTITY-001/002, GOVERNANCE-002. AWS overlay·standalone preflight·전달 inventory·초기/복원 RUNBOOK·로그 제한·EBS mount gate·TURN NAT mapping을 기존 도구에 연결한다. Kubernetes나 자동 failover를 추가하지 않는다.
+- **⑫~⑮:** 개발 서버 접근 불가 상태에서 제품 흐름, AWS reboot 뒤 동일 key/data/Anchor, 외부 TLS/WSS/TURN과 철회·미디어 정지를 확인한다. TV-01/05/06/09/10, E-07. 제안32GiB 서비스/2GiB Anchor·EBS 용량은 idle 관측과 제한값을 참고한 출발점이며 실측 최소 사양·비용 확정이 아니다. AWS 생성·구매·업로드·공개 노출은 별도 허가를 요구한다.
 
 ## 12. 테스트·CI·증거 개발
 
@@ -1659,7 +1661,7 @@ native 체인 자체 증명 확장은 과거 전체 명세에 편입됐으나 **
 | PBX-001~003 | [media.ts](../services/api/src/media.ts), [PBX overlay](../infra/deploy/compose.pbx.yml) | media.test.ts HMAC·ARCHITECTURE | 화면·ARI 사건/재구독·회수·실제 설정/배포·통합 시험 소스 연결. 실제 실행 미검증 |
 | AI-001~005 | [transcription.ts](../services/api/src/transcription.ts), risk.ts·server audio·liveMedia | revisions/risk unit·STANDARDS | remote stream·동의/늦은 결과 취소·영속 공유 예산 연결. 36개 합성 규칙 개발 fixture만 검증, 실provider/재연결 품질 미검증 |
 | UI-001~007 | [Finals.tsx](../apps/web/src/pages/Finals.tsx), App/config/api/styles·Experience/Operations(초기 시연 경로) | legacy layout/evidence specs·DESIGN-QA(초기 시연 경로) | Service.tsx 기본 역할·official action·상태/오류 연결. 관리 JSON 입력 UX·실제 render/a11y 보완 필요 |
-| OPS-001~007 | [infra/deploy](../infra/deploy/compose.yml), [GCP](../infra/gcp/main.tf), deployment/prepare/provision/migrate/backup/restore scripts | finals-validation 정적 기록·RUNBOOK | 역할별 키 격리·전체 암호화 backup/복원 gate·작업 조회 연결. 전체 알림/릴리스 자동화·실제 운영 미검증 |
+| OPS-001~007 | [infra/deploy](../infra/deploy/compose.yml), [AWS](../infra/deploy/compose.aws.yml), deployment/prepare/provision/migrate/backup/restore scripts | finals-validation 정적 기록·RUNBOOK | 역할별 키 격리·전체 암호화 backup/복원 gate·작업 조회 연결. 전체 알림/릴리스 자동화·실제 운영 미검증 |
 | TEST-001~004 | [package.json](../package.json), vitest/playwright configs·restricted/offline·CI | [finals JSON](../artifacts/finals-light-results.json), TEST-RESULTS 역사 | 새 suite·격리·증거 불변 경로·현행 실환경 모두 필요 |
 | SUBMISSION-001~003 | [과거 4회차 초안](archive/2026-10-26/FINALS-ROUND4.md), proposal PPTX/PDF·application/slides/pitch/demo/judge-qa·generate-submission.ts | REQUIREMENTS-CHECK/SELECTED-EVIDENCE/TEAM-INPUTS·기존 영상/캡처 | 멘토 원문/최신양식·현재 릴리스 보고/시연 증거 대기 |
 
@@ -1831,7 +1833,7 @@ native 체인 자체 증명 확장은 과거 전체 명세에 편입됐으나 **
 | [OPS-004](#ops-004) | 생존·기능 준비 상태·정상 종료·의존 장애 |
 | [OPS-005](#ops-005) | 일관 백업·새 환경 복원·소프트웨어 되돌리기·데이터 손실 |
 | [OPS-006](#ops-006) | 로그·메트릭·알림·자원·API 비용 |
-| [OPS-007](#ops-007) | GCP 새 배포·동일 배포 이전·도메인 |
+| [OPS-007](#ops-007) | AWS 새 배포·기존 배포 복원·도메인 |
 | [TEST-001](#test-001) | 가벼운 검사·실환경 시험 분리와 기본 차단 |
 | [TEST-002](#test-002) | 자동 검사·서비스 계약·실환경 시험 분리 |
 | [TEST-003](#test-003) | 독립 시험값·공격·성능 평가 설계 |

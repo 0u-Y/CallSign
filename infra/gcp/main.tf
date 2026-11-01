@@ -1,3 +1,4 @@
+# Historical inactive configuration. Final competition target is AWS; do not apply for this deployment.
 terraform {
   required_version = ">= 1.9, < 2.0"
   required_providers {

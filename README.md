@@ -18,7 +18,7 @@ CallSign은 기관과 위탁 콜센터의 연락 업무를 고객의 통화 세�
 
 기본 업무 화면은 `/service`이며 등록 기관 주소·키 기반 승인, 양측 브라우저의 서명 검증, Asterisk 교환기 연결, 통화 유지 허가와 원격 음성 분석 API에 코드로 연결했습니다. 기관 담당자는 업무·위임을 관리하고 상담원은 할당된 연락을 승인받으며, 수신자는 별도 상태로 승인·연결·분석·위험을 확인합니다. 이전 브라우저 직접 통화 화면은 `/finals` 호환 경로에 보존했습니다.
 
-원장 작업 재처리·사건 cursor, PBX 사건/만료/로그아웃 회수, 공유 사용량 예약·정산, 독립 소비 이력 기준과 암호화 백업·복원 코드도 추가했습니다. 실제 PostgreSQL·계약·Besu/Witness와 인증·HTTP·브라우저의 선택 경로는 검증했습니다. **교환기 경유 실제 음성·외부 IdP/AI·GCP와 전체 서비스 통합은 미검증입니다.** 같은 호스트의 실제 원장·worker·API 연결 범위는 [최신 실행 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)을 따릅니다. 공동 정책·계정 관리의 이행 경계와 남은 코드·실행 대기 항목은 개발 기록에서 구분합니다.
+원장 작업 재처리·사건 cursor, PBX 사건/만료/로그아웃 회수, 공유 사용량 예약·정산, 독립 소비 이력 기준과 암호화 백업·복원 코드도 추가했습니다. 실제 PostgreSQL·계약·Besu/Witness와 인증·HTTP·브라우저의 선택 경로는 검증했습니다. **교환기·TURN 경유 양방향 합성 음원과 선택한 회수 경계는 실제 검증했습니다. 외부 IdP/AI·외부망·AWS 전체 배포는 미검증입니다.** 같은 호스트의 실제 원장·worker·API 연결 범위는 [최신 실행 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)을 따릅니다. 공동 정책·계정 관리의 이행 경계와 남은 코드·실행 대기 항목은 개발 기록에서 구분합니다.
 
 문서에 남긴 통신 형식 번호는 이 구현 차이를 구별하는 값입니다. 사용자에게 보여주는 제품 등급이나 별도 서비스가 아닙니다. [통신 형식과 용어](docs/PROTOCOL.md#protocol-profiles)를 참고하세요.
 
@@ -37,7 +37,7 @@ pnpm light
 
 `light`는 소스 위생·JavaScript 문법, TypeScript, 네트워크 없는 단위 시험입니다. 시험 동시 실행은 최대 2개이며 DB 통합·브라우저·외부 API는 실행하지 않습니다. `lint`는 전체 ESLint 규칙 검사가 아닙니다. 웹 번들만 컴파일하려면 `pnpm --filter @callsign/web build`를 사용합니다.
 
-실행 제한은 [AGENTS.md](AGENTS.md)를 따릅니다. 현재 단계에서 서비스·컨테이너·체인 기동, migration·계약 배포, 실제 통화·제공자 호출·GCP 변경을 실행하지 않습니다.
+실행 제한은 [AGENTS.md](AGENTS.md)를 따릅니다. 현재 단계에서 서비스·컨테이너·체인 기동, migration·계약 배포, 실제 통화·제공자 호출·AWS 변경은 해당 범위의 별도 실행 승인 없이 수행하지 않습니다.
 
 ## 구성과 운영
 
@@ -49,7 +49,7 @@ pnpm light
 - **Asterisk:** 목표 웹 통화의 SIP/WSS·음성 종단과 브리지
 - **음성 분석:** 상대 음성 → 스트리밍 STT(음성→문자 변환) → 전사 수정·정책 규칙/언어 모델 → 위험 근거
 
-서버컴과 GCP는 같은 소스·이미지·배포 구조를 사용하도록 준비합니다. 설정은 [infra/deploy](infra/deploy/compose.yml), GCP 구성은 [infra/gcp](infra/gcp/main.tf), 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 교환기 경유 통화의 코드·배포 구성을 연결했으며 실제 이미지·드라이버·통화 검증은 남아 있습니다.
+최종 대회 실행 환경은 **AWS**이며 현재 서버컴은 개발·빌드·검증에만 사용합니다. 기본 경로는 검증 코드/이미지를 전달한 뒤 AWS용 새 identity·키·genesis·계약·기관·합성 계정을 준비하는 것입니다. 폐기한 시험 데이터를 반드시 이전하지 않습니다. 현재 서버가 꺼져도 로그인·통화·복구가 동작해야 합니다. [AWS 입력·초기화·재시작·복원·전달 절차](docs/RUNBOOK.md#aws-competition)를 따릅니다. 설정은 [infra/deploy](infra/deploy/compose.yml), AWS override와 별도 Anchor는 [infra/deploy](infra/deploy/compose.aws.yml)에 있습니다. `infra/gcp`는 비활성 과거 구성으로 보존하며 현재 배포 대상으로 사용하지 않습니다. 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 공개 도메인·실제 IdP·AWS 외부 TLS/NAT·최종 웹 pin은 준비/실행 대기입니다.
 
 통합·체인·미디어·성능 검증은 기본 차단되며 별도 실행 허가가 필요합니다. 일반 push/PR CI는 light만 실행합니다.
 

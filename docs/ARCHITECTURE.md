@@ -1,5 +1,7 @@
 # 시스템 아키텍처
 
+**현재 배포 목표(2026-11-02):** AWS 단독 실행. 개발 서버는 배포/인증/원장/Anchor/이미지 제공자가 아니다. 서비스 EC2의 기존 Compose와 별도 AWS Anchor/저장소, 선택할 외부 IdP를 기본안으로 준비한다. validator/Witness의 같은 호스트 배치는 독립 호스트 장애 내성이 아니다. 기본 NEW와 보존 배포 RESTORE는 [RUNBOOK](RUNBOOK.md#aws-competition)에서 분리한다. 아래 날짜별 과거 검증 기록은 그 시점의 범위다.
+
 2026-11-01에는 host 설정을 유지한 별도 loopback namespace에서 실제 Besu/Witness·독립 HTTPS Anchor·SQL·worker·HTTP 연결을 검증했다. 아래 과거 fixture 범위와 구분하며, 실제 PBX/음성·외부 IdP/AI·GCP 검증으로 확대하지 않는다. [최신 실행 경계](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
 
 이 문서의 Platform은 요청 중계, Issuer Gateway는 기관 승인, Sender Agent는 콜센터 서명 서비스다. PBX는 교환기이며 Witness는 원장 상태 증언자다. 통신 형식 번호·세션 결합·갱신형 통화 유지 허가 등은 [용어와 형식 대응](PROTOCOL.md#protocol-profiles)을 따른다.

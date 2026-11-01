@@ -1,5 +1,183 @@
 # 개발·배포·복구 운영 절차
 
+<a id="aws-competition"></a>
+
+## AWS 대회 배포: 개발 서버와 완전히 분리
+
+**2026-11-02 변경 결정:** 개발 서버는 코드·빌드·검증용이다. 대회 때는 종료되거나 접근 불가여도 되어야 한다. 최종 대상은 AWS이며 GCP 구성은 과거 보존물이다. 이전 절차가 모든 시험 데이터를 이전하라는 뜻은 아니다. 현재 보존하기로 정한 대회 identity는 없으며, 폐기한 시험 chain/DB/Anchor를 대회 환경에 이어 붙이지 않는다.
+
+### 구성안과 선택 대기
+
+기본안은 기존 Compose를 사용하는 **서비스 EC2 한 대 + 별도 Anchor EC2 한 대 + 명시적으로 선택할 외부 OIDC**다. AWS 계정·리전·기간/예산·도메인·IdP는 미정이다. 아래 용량은 idle 관측과 메모리 제한 합계를 참고한 시작 제안이며 실측 최소 사양/peak나 구매 결정이 아니다.
+
+| 대상 | 제안과 영속 경계 |
+|---|---|
+| 서비스 EC2 | `x86_64`, 8vCPU·32GiB RAM부터 검토. Besu4 각3GiB, Witness4 각512MiB, API3+worker 각512MiB, PG1GiB, PBX/TURN/web/ingress 각512MiB 상한. 동시 CPU quota 합계는 물리 CPU보다 클 수 있으며 부하 여유는 별도 검증 |
+| 저장소 | 암호화 EBS gp3 데이터200GiB + OS/이미지용 여유 공간 제안. 실제 image load·chain 증가·로그·백업 임시 공간을 합산해 승인. 데이터 mount `/srv/callsign`, container volume은 그 아래 bind-backed 경로 |
+| Anchor EC2 | 별도2vCPU·2GiB RAM·별도 암호화 EBS20GiB 시작 제안. 별도 운영 권한/백업 수명. 서비스 DB snapshot/삭제와 함께 과거로 복원하지 않음 |
+| 인증 | 검증된 public Authorization Code + PKCE를 지원하는 외부 OIDC 또는 AWS 안에서 별도 검증한 IdP. 미선택 상태에서 로그인 대체 성공이나 공개 fixture를 제공하지 않음 |
+| 독립성 | 한 EC2의 validator4/Witness4는 독립 기관 운영·호스트 장애 내성을 증명하지 않음. 별도 Anchor도 관리 권한·복원 수명이 분리돼야 함 |
+
+AWS [EBS](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html)는 인스턴스 수명과 분리해 보존할 수 있다. 새 AWS 호스트에서 OS별 mount·새 디렉터리 소유권을 준비하고 `DeleteOnTermination`을 검토한다. 현재 개발 서버의 Docker data-root/mount/권한은 변경하지 않는다. Docker named volume을 EBS로 연결하기 전에 `AWS_VOLUME_ROOT/{postgres,besu1,besu2,besu3,besu4}`를 새로 준비한다. Besu는 실제 이미지 UID에 맞추고 PG는 새 디렉터리 초기화 소유권을 확인한다. **기존 경로에 chown을 반복해 문제를 덮지 않는다.**
+
+[Elastic IP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html)는 region별 고정 public IPv4이며 사용/미사용 모두 비용이 발생한다. 서비스 EIP를 웹 DNS와 PBX/TURN advertised address에 사용한다. 자동 변경 public IP를 그대로 고정 trust로 취급하지 않는다. Anchor URL은 별도 AWS DNS/주소로 정하고 서비스 EC2에서만 접근하도록 제한한다.
+
+### 공개·내부 네트워크
+
+아래는 **AWS에만 적용할 계획**이다. 이 문서 작성 중 AWS CLI·방화벽·라우팅 명령을 실행하지 않았다. VPC CIDR와 Docker ledger/public CIDR가 겹치지 않는지 AWS에서 다시 확인한다. `10.206.0.0/24`, `10.205.0.0/24`는 제안이며 현재 서버에 적용하지 않는다.
+
+| 서비스 EC2 inbound | 용도 |
+|---|---|
+| TCP80/443 | 외부 HTTPS ingress·동일 origin `/api/`·`/pbx/ws`;80은443 redirect |
+| UDP/TCP3478, TCP5349 | TURN 인증·relay 연결 |
+| UDP49160~49200 | TURN relay 범위 |
+| UDP10000~10099 | Asterisk DTLS-SRTP/RTP 범위 |
+| 관리 접근 | 승인된 운영자 CIDR의 SSH 또는 별도로 준비한 AWS 관리 경로만. 개발 서버 터널 불사용 |
+
+DB5432·RPC8545·P2P30303·Witness4201~4204·API4100~4102·ARI8089·SIP5060은 외부에 열지 않는다. Asterisk WSS는 ingress→web→Asterisk 내부 TLS로 프록시한다. `compose.aws.yml`은 web의 host8080 publish를 제거한다. Anchor 호스트는 TLS443만 서비스 호스트의 AWS private 주소/보안 그룹에 허용하고 DB는 publish하지 않는다. [AWS 보안 그룹](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-connection-tracking.html)은 연결 추적을 사용하므로 외부 UDP와 회수 동작을 실제 클라이언트에서 확인해야 한다. NACL을 별도 제한한다면 반환·ephemeral 경로도 검토한다.
+
+TURN은 container `10.205.0.30`, PBX는 `10.205.0.20`을 제안한다. `prepare-pbx.ts --turn`은 `external-ip=AWS_PUBLIC_IP/TURN_PRIVATE_ADDRESS`를 렌더한다. AWS EIP→호스트 private IP→Docker mapping의 실제 relay candidate·양방향 음원을 외부망에서 검증해야 한다. loopback 시험의 `allow-loopback-peers`를 옮기지 않는다. metadata 주소169.254/16 relay는 거절한다.
+
+### 기준 파일과 전달물
+
+- 공통 구성: `infra/deploy/compose.yml`, `compose.pbx.yml`
+- AWS override: `infra/deploy/compose.aws.yml`, `https-nginx.conf`
+- 별도 Anchor: `infra/deploy/compose.anchor.yml`, `anchor-schema.sql`, `provision-anchor.sql`
+- 입력: `aws.env.example`, `anchor.env.example`를 보호 파일로 복사해 채운다. 빈 값은 차단이며 실제 주소/키/digest를 지어 넣지 않는다.
+- 역할 이미지 **7종**: runtime(API/worker/Witness/Anchor/준비 도구), web, Besu, PostgreSQL(서비스·Anchor), Asterisk, TURN, HTTPS nginx. 외부 OIDC를 선택하지 않으면 IdP 실행물·설정은 별도 미완료다.
+- `release-manifest.ts --inventory NEW.json --env-file PROTECTED_ENV`는 실제 local ID/architecture/size를 조사한다. runtime 경로나 CA를 숨겨 mount하지 않고 이미지 안의 설치 의존성을 사용한다. AWS 웹은 현재 trust pin label과 맞지 않으면 BLOCKED다.
+- `release-manifest.ts --bundle NEW_DIR --env-file PROTECTED_ENV`는 clean Git의 공개 배포 파일·계약 artifact를 `deployment-files.tar`에 담고 image inventory·`SHA256SUMS`를 새 디렉터리에 저장한다. **image tar/보호 파일/운영 데이터는 넣지 않는다.** BLOCKED inventory가 있는 파일 묶음은 완성된 릴리스가 아니다.
+
+AWS 초기 준비 전달은 runtime·Besu·PostgreSQL·Asterisk·TURN·nginx의 기본 이미지6종과 web build recipe로도 구성할 수 있다. AWS용 web은 실제 인증서/metadata/trust가 나온 후 같은6종 중 runtime+nginx에서 오프라인 생성하는 산출물이다. 이 경우 inventory의 web BLOCKED는 누락을 숨긴 것이 아니라 아직 생성하지 않은 최종 역할이며, 생성·pin 확인 전 서비스 배포 완료로 판정하지 않는다. 외부 IdP는 별도 선택·등록 gate다.
+
+현재 약1.5GB archive의 web은 loopback·합성 trust용이다. AWS 최종 웹이라고 표시하지 않는다. 최초 앱/미디어 이미지의 ID와 새 source 반영 runtime ID는 실행 증거에서 구분한다. Docker config ID·registry manifest digest·archive SHA256은 서로 다른 값이다.
+
+### 개발 서버가 없어도 준비·실행하는 방법
+
+Docker/Compose>=2.33.1·Bash·Node22(설치 의존성 없는 JSON/env 검사 용도)를 새 AWS 호스트에 별도 승인 후 준비한다. npm/pnpm install·소스 checkout·host node_modules는 배포 실행의 선행 조건이 아니다. TypeScript 준비 도구·설치된 pnpm은 runtime 이미지 안에 있다. 공개 파일 tar를 새 release 디렉터리에 풀고 image tar 또는 승인된 ECR에서 이미지를 확보한다. 이미지 전달·보호 파일은 AWS 또는 다른 승인된 보관처에 미리 보관하고 AWS에서 접근·해시 검증을 끝내야 한다. 현재 개발 서버를 다운로드 서버로 사용하지 않는다.
+
+아래는 **실제 AWS 생성·업로드·실행 승인 후** 사용할 명령이며 이번에는 실행하지 않는다. `APP`, `NGINX`, `BESU` 등은 inventory의 검토한 실제 불변 참조, `CFG`는 AWS 보호 env, `DATA_PARENT`는 새 EBS mount다. 보호 env는 Docker `--env-file`에서도 읽히는 단순 `KEY=value` 형식을 쓰며 shell 확장·따옴표 해석에 의존하지 않는다. 값·전체 env·shell trace를 로그에 출력하지 않는다.
+
+```bash
+# 승인된 보관처에서 받은 공개 파일·이미지의 hash를 대조한 뒤에만 load/extract.
+(cd "$DELIVERY" && sha256sum -c SHA256SUMS)
+tar -xf "$DELIVERY/deployment-files.tar" -C "$NEW_RELEASE_DIR"
+docker image load --input "$REVIEWED_COMPLETE_IMAGE_TAR"
+docker image inspect --format '{{.Id}} {{.Os}}/{{.Architecture}}' "$APP" "$BESU" "$NGINX"
+# 아래 함수는 소스/host node_modules를 mount하지 않는다. 신규 보호 설정만 /aws로 전달한다.
+tool() {
+  docker run --rm -i --pull=never --network none --memory 512m --memory-swap 512m --cpus 1 \
+    --env-file "$CFG" --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
+    --mount "type=bind,src=$DATA_PARENT,dst=/aws" \
+    "$APP" pnpm exec tsx "$@"
+}
+# NEW 모드만: /aws/config가 없어야 한다. 기존 대회 배포에는 실행하지 않는다.
+tool scripts/prepare-finals.ts keys /aws/config --apply
+tool scripts/prepare-finals.ts management-keys /aws/config --apply
+# management-public.json의 공개 deployer/admin/stopper 주소만 검토해 CFG에 반영한다.
+# 공동 승인자3명의 키는 이 도구가 생성하지 않는다. 각각의 소유자가 별도로 보관/서명한다.
+tool scripts/prepare-service-network.ts /aws/network-config.json --apply
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_TOOL_IMAGE="$APP" CALLSIGN_ENV_FILE="$CFG" \
+  CALLSIGN_NETWORK_CONFIG="$DATA_PARENT/network-config.json" CALLSIGN_BESU_DIR="$DATA_PARENT/config/besu" \
+  BESU_IMAGE="$BESU" bash scripts/generate-besu.sh
+```
+
+`prepare-finals keys`·`management-keys`는 기존 파일/진행표가 있으면 재생성하지 않고 중단한다. `generate-besu.sh`는 완성된 기존 genesis/키를 재사용하고 peer 내용이 다르면 중단하며 부분 상태를 덮지 않는다. 부분 생성 실패에서는 생성한 키를 보존하고 진행표·파일·공개키를 대조한다. 디렉터리를 지운 뒤 재실행하는 복구는 제공하지 않는다.
+
+최초 genesis allocation에는 배포자뿐 아니라 `REGISTRY_ADMIN_ADDRESS`, `REGISTRY_OPERATOR_ADDRESS`의 합성 가스 잔액을 넣는다. 이들은 실제 금융 자산이 아니다. 주소·관리 키 파일·계약 등록 요청의 administrator/emergencyStopper가 일치해야 한다.
+
+`docker run`/Compose는 로컬 config ID를 받을 수 있지만 Dockerfile `FROM` 빌드 인자는 검토한 `repository@digest` 또는 로컬 태그를 사용한다. `APP_BUILD_REF`·`NGINX_BUILD_REF`를 지정하기 직전 `docker image inspect --format '{{.Id}}' BUILD_REF`가 inventory의 APP/NGINX config ID와 같은지 확인한다. raw `sha256:...`를 FROM 인자로 넣으면 Docker가 `sha256`이라는 repository를 조회할 수 있다. build는 `--pull=false --network=none`으로 실행하고 cache/base가 없으면 다운로드로 우회하지 않는다.
+
+### NEW 초기 배포 순서
+
+1. **identity와 키**: AWS용 고유 project/deployment/institution/network ID, 기관/콜센터 URI를 결정한다. 위 NEW 준비 도구를 실행하고 재실행 거절을 확인한다. approver3명은 별도 소유이며 worker에는 admin/stopper만 mount한다. 운영용 보관 참조와 원본 파일을 암호화해 개발 서버 밖에 보존한다.
+2. **체인**: 아래 기존 ‘전체 설정에 묶이지 않는 첫 체인 plan’의 추출 명령에 `-f infra/deploy/compose.pbx.yml -f infra/deploy/compose.aws.yml`을 추가한다. 같은 raw JSON에서 nodes4/chain9를 추출하며 AWS EBS volume/로그 제한을 유지한다. AWS에서만 승인된 bridge를 생성한다. nodes4→실제 높이 전진/동일 높이 hash/chain/genesis 대조→deployer inspect→예상 genesis/artifact hash 검토→계약 deploy 순서다. 기존 pending tx journal은 같은 hash로 재조회하고 새 nonce로 다시 배포하지 않는다.
+3. **계약 metadata·Witness**: 배포 결과를 `${FINALS_DATA_DIR}/deployment.json`에 보존한다. Witness4에 동일 metadata·각기 다른 키를 주고 동일 상태·서로 다른3서명·freshness를 검증한다. 미등록 상태 조회와 등록 후 권한 검증을 구분한다. 계약 주소는 배포 산출물이지 사용자가 미리 작성할 값이 아니다.
+4. **TLS·PBX/TURN**: 웹에는 public 도메인의 PEM fullchain/privkey를 별도 공급하고, PBX 내부 TLS는 SAN=`asterisk`와 고정 DTLS 인증서·CA를 준비한다. Anchor도 자신의 DNS/SAN·별도 키가 필요하다. 인증서를 서로 다른 호스트의 loopback 이름으로 재사용하지 않는다. `tool scripts/prepare-pbx.ts /aws/config/asterisk --apply`, `tool scripts/prepare-pbx.ts /aws/config/turn --turn --apply`로 새 설정을 렌더한 뒤 각 `tls/`에 보호 파일을 배치한다. 웹/Node CA mount를 맞추고 인증서 개인키는 uid1000·0600으로 새 디렉터리에 준비한다. 인증서 교체는 새 trust/web pin과 통화 재검증을 요구한다.
+5. **DB**: 서비스 PostgreSQL만 먼저 기동한다. 아래 `dc`에서 operations profile의 migration-runner로 `scripts/migrate-finals.ts --apply`를 실행한다. 소스 hash 검사를 유지하며 `0000`~`0009`를 적용한다. postgres container의 psql에 보호 환경으로 별도4비밀번호를 전달하고 `provision-logins.sql`을 stdin으로 적용한다. 앱은 migration owner가 아닌 issuer/auth/worker/PBX의 서로 다른 LOGIN을 사용한다.
+6. **독립 Anchor**: 별도 AWS 호스트에서 `compose.anchor.yml`의 anchor-db만 먼저 시작한다. owner psql로 `anchor-schema.sql`, `provision-anchor.sql`을 순서대로 적용한다. 보호 `DEPLOYMENT_ID`·`INSTITUTION_ID`·`ANCHOR_APP_PASSWORD`를 stdin/환경으로 전달한다. 새 zero sequence/hash, epoch1만 최초 INSERT하며 기존 행·LOGIN은 덮지 않는다. 서비스 프로세스는 SELECT/UPDATE만 가능한 별도 LOGIN과 TLS/token을 쓴다. Anchor 서비스 기동 뒤 실제 인증·TLS·CAS/재조회·재시작 보존을 확인한다. 서비스 EC2와 개발 서버 어느 쪽도 Anchor 저장소를 대신하지 않는다.
+7. **OIDC·내부 계정**: 선택한 실제 IdP에서 업무/공식 public client와 audience를 분리한다. 현재 코드의 IdP redirect URI는 두 client 모두 정확히 `${WEB_ORIGIN}/service`다. 브라우저가 code/state를 받아 `/api/v3/auth/callback`으로 교환하며 업무/공식 문맥은 state·pending client·세션 purpose로 분리한다. `/api/auth/callback`이나 별도 official callback을 IdP redirect로 등록하지 않는다. issuer\|subject·역할·권한을 `FINALS_ACCOUNTS_PATH`의 보호 JSON으로 준비하고 migration-runner의 `provision-finals.ts /provision/public-manifest.json /provision/accounts.json --apply`로 신규 내부 계정을 등록한다. 외부 계정 생성과 내부 등록은 별개다. 미등록/비활성 계정·auth_time·PKCE·CSRF/세션 문맥을 실제 제공자로 검증한다.
+8. **공개 trust·웹**: PBX 공개 인증서와 실제 deployment metadata가 준비된 뒤 trust를 생성한다. 앱의 service trust 경로와 같은 파일을 사용한다. 생성한 canonical pin을 CFG에 반영하고 아래 web build로 새 AWS 웹을 만든다. 기존 loopback 이미지나 API가 준 새 키를 자동 신뢰하지 않는다.
+9. **앱·등록·검증**: issuer/sender/platform/worker와 PBX/TURN/ingress를 순서대로 기동한다. 관리 준비와 기관 권한 활성화는 다르다. 실제 담당자 로그인→관리 화면의 최초 등록 제안→서로 다른 승인자2명의 별도 서명→`/v3/management/register`→outbox/원장 확정/Witness/DB confirmed를 확인한다. zero Anchor/journal 대조로 gate가 열리는 실제 경로를 사용하고 SQL로 ready를 설정하지 않는다. 새 업무·위임 등록·개별 승인·양방향 합성 통화·철회 후 실제 음성 중단까지 제품 화면에서 확인한다.
+
+```bash
+# AWS 호스트 전용. 새 네트워크/port publish를 개발 서버에서 실행하지 않는다.
+dc() {
+  docker compose --env-file "$CFG" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml \
+    -f infra/deploy/compose.aws.yml --profile operations --profile https --profile pbx --profile media "$@"
+}
+dc up -d --no-build --pull never postgres
+dc run --rm --no-deps --pull never migration-runner
+# DB/공개 manifest/정확한 OIDC 계정 파일 준비 후 한 번만:
+dc run --rm --no-deps --pull never migration-runner pnpm exec tsx scripts/provision-finals.ts /provision/public-manifest.json /provision/accounts.json --apply
+# Trust 생성은 공개 PBX 인증서가 있어야 함. container 경로를 명시한다.
+docker run --rm --pull never --network none --env-file "$CFG" \
+  --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure --env PBX_DTLS_CERT_PATH=/aws/config/asterisk/tls/cert.pem \
+  --mount "type=bind,src=$DATA_PARENT,dst=/aws" "$APP" \
+  pnpm exec tsx scripts/prepare-finals.ts trust /aws/config --apply
+# 출력한 실제 pin을 CFG/VITE_SERVICE_TRUST_SHA256에 반영한 뒤 build.
+docker build --network=none --pull=false -f infra/deploy/web.Dockerfile \
+  --build-arg PREPARED_RUNTIME_IMAGE="$APP_BUILD_REF" --build-arg NGINX_IMAGE="$NGINX_BUILD_REF" \
+  --build-arg VITE_SERVICE_TRUST_SHA256="$REVIEWED_PIN" --iidfile "$NEW_WEB_ID_FILE" .
+# 새 웹 ID를 CFG에 반영한다. AWS target에서는 Docker inspect로 ID/architecture/trust label을 직접 대조한다.
+# release-manifest inventory/bundle 생성은 Git/설치 도구가 있는 빌드 단계이며 AWS runtime 필수 도구가 아니다.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_DEPLOYMENT_TARGET=aws \
+  CALLSIGN_AWS_TARGET_CONFIRMATION=AWS-ONLY CALLSIGN_AWS_MOUNT="$DATA_PARENT" CALLSIGN_ENV_FILE="$CFG" \
+  bash scripts/deployment.sh start
+```
+
+위 db/contract 시작 명령은 전체 준비를 대신하지 않는다. role 비밀번호·issuer/subject·관리 서명·인증서·EBS mount가 빠지면 해당 단계에서 중단한다. 전제 파일·키/계약을 확인하지 않고 `deployment.sh start`만 실행하는 방식은 제공하지 않는다.
+
+### 준비 checkpoint와 다음 행동
+
+| 완료 증거 | 다음 명령/행동 | 중단 조건 |
+|---|---|---|
+| config/public-manifest.json + preparation-state complete | `management-keys`, 이어서 공개 주소로 network-config | 기존/부분 파일이면 재생성 금지·보존 후 소유자 검토 |
+| genesis/validator4/public peers + 두 시점 RPC 관측 | 기존 chain plan의 deployer inspect/--apply | chain/genesis 불일치·높이 정지·기존 pending 의미 불명 |
+| deployment.json의 receipt/code/artifact + Witness3 이상 | PBX 인증서·trust·DB·Anchor 준비 | 서명 부족·stale·다른 snapshot·계약 code 불일치 |
+| PG migration source hash + 서로 다른4 LOGIN | internal account provision | 다른 역할 DB 접근 가능·미적용 migration·과도한 권한 |
+| 별도 Anchor의 인증 조회·CAS·재시작 보존 | 실제 IdP 로그인·관리 등록 | token/TLS 오류·DB/journal과 불일치; ready SQL 우회 금지 |
+| management registration=confirmed + worker/Witness 반영 | 업무→승인→양방향 음원→철회 | pending/unknown/failed를 active로 취급 금지 |
+| 양쪽 원격 음원 디코딩·회수 후 무음·실제 외부 relay | 대회 공개 사용 검토 | UI문구/HTTP200/패킷 증가만으로 합격 금지 |
+
+DB LOGIN 적용은 준비한 PG container ID가 현재 AWS project 소유인지 먼저 확인한다. `DB_ROLE_ENV`는4개 DB 비밀번호만, `ANCHOR_PROVISION_ENV`는 신규 deployment/institution/app-password만 담는0600 파일이다. 전체 운영 env를 psql에 넘기거나 비밀번호를 `-v`/URL argv로 출력하지 않는다.
+
+```bash
+# Future AWS target only. IDs below come from this reviewed Compose project, never another DB.
+PG_ID="$(dc ps -q postgres)"
+docker exec -i --env-file "$DB_ROLE_ENV" "$PG_ID" \
+  psql -X -v ON_ERROR_STOP=1 -U callsign_migrator -d callsign < infra/deploy/provision-logins.sql
+# On the SEPARATE Anchor host, with its own env/project:
+ac() { docker compose --env-file "$ANCHOR_ENV" -f infra/deploy/compose.anchor.yml "$@"; }
+ac up -d --no-build --pull never anchor-db
+ANCHOR_DB_ID="$(ac ps -q anchor-db)"
+docker exec -i "$ANCHOR_DB_ID" psql -X -v ON_ERROR_STOP=1 -U anchor_owner -d callsign_anchor < infra/deploy/anchor-schema.sql
+docker exec -i --env-file "$ANCHOR_PROVISION_ENV" "$ANCHOR_DB_ID" \
+  psql -X -v ON_ERROR_STOP=1 -U anchor_owner -d callsign_anchor < infra/deploy/provision-anchor.sql
+ac up -d --no-build --pull never anchor
+# Later ordinary stop preserves volumes. Review drain/backup before stopping a live service.
+ac stop
+```
+
+Readiness는 실제 issuer의 `/readiness`, 관리 상태는 인증된 `/api/v3/management`와 `/api/v3/management/health`, 업무/통화는 제품 화면에서 확인한다. issuer readiness가200이어도 미등록 기관의 연락 승인이 활성이라는 뜻이 아니다. 운영자의 보호된 관측에서 registration confirmed·기관 epoch·recovery gate·worker jobs·동일 Witness 상태를 함께 확인해야 한다. timeout/조회 장애는 합격이 아니라 차단/미판정이다. 이 표의 단계별 검증을 완료하기 전 ‘대회 배포 완료’라고 발표하지 않는다.
+
+### 재시작·실패 재개·기존 배포 RESTORE
+
+- 일반 `deployment.sh restart`·EC2 재시작은 키·genesis·계약·seed·migration을 실행하지 않는다. AWS EBS mount 누락 시 deployment.sh가 차단한다. 인스턴스 boot에서는 자동 초기화 대신 먼저 mount/비밀/TLS/metadata를 확인한 뒤 명시적으로 시작한다. Docker 자동 재시작과 mount 순서는 실제 AWS reboot에서 검증해야 하며 검증 전 자동 부팅 완료로 표시하지 않는다.
+- migration 재실행은 기존 source hash가 같을 때만 가능하다. 최초 LOGIN/계정/Anchor provision은 기존 상태면 실패한다. 이는 비밀번호 리셋·재초기화 방지다. 진행표/DB migration·등록 상태를 읽고 **미완료 단계만** 이어간다.
+- 계약 제출 응답 유실은 `deployment.json.pending.json`의 같은 raw/hash로 재조회한다. 이미 기록된 deployment는 실제 code/genesis/artifact 일치 여부를 확인한 뒤 재사용한다.
+- 별도로 보존하기로 결정한 대회 identity가 있을 때만 `AWS_DEPLOYMENT_MODE=restore`를 사용한다. 기존 backup/drain/restore 절차대로 source fence→일관 chain/DB/key/metadata 백업→새 empty target/role 복원→독립 최신 Anchor 대조→세션/진행 통화 폐기→target 단독 활성화한다. NEW 키 생성·zero Anchor provision 명령을 실행하지 않는다. Anchor는 서비스 DB와 함께 과거로 복원하지 않는다.
+- 이번에 폐기한 미디어 시험의 잔여 chain/키와 새 AWS DB를 섞지 않는다. 대회 데이터 이전을 결정한 기록이 없다면 NEW가 기본이다.
+
+### 전송·최종 단독 실행 판정·비용 종료
+
+ECR와 archive 중 하나를 승인 후 사용한다. [ECR 공식 절차](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)의 region/account별 저장소와 권한을 먼저 준비하고 `get-login-password | docker login --password-stdin`으로 인증한다. 보호 자격을 argv/Git에 넣지 않는다. 최종 source/pin의 이미지7개를 push한 뒤 실제 registry manifest digest로 다시 고정한다. archive라면 `docker image save --output NEW.tar IMAGE_ID...`로7종을 저장하고 SHA256·크기·linux/amd64/config ID 목록을 보관한다. 원본 source/package·이미지·보호 material은 승인된 외부 보관처에 분리 보존하고 AWS에서 재다운로드/검증한 뒤 개발 서버 접근을 차단한 상태의 전체 흐름을 확인한다. **이 작업에서는 외부 업로드·AWS 생성·과금·공개 노출을 수행하지 않았다.**
+
+최종 판정은 ①개발 서버 주소/SSH/파일 mount가 runtime에 없음, ②새 AWS metadata/key/genesis/계정 일치, ③실제 외부 TLS/OIDC·두 외부망 TURN/미디어, ④철회/정지의 실제 체인→Witness→PBX/음성 회수, ⑤재시작 뒤 key/data/Anchor 연속성, ⑥개발 서버 없이 archive/보호 참조로 재현을 각각 증거로 남긴다. 코드 검사·로컬 none 리허설만으로 AWS 성공을 판정하지 않는다.
+
+종료는 작업 project의 `stop`으로 서비스부터 멈추고, source drain·최신 백업·독립 Anchor 보존을 확인한 뒤 AWS 운영자가 해당 인스턴스·EIP·EBS·snapshot·ECR·외부 IdP/도메인의 보존/삭제를 각각 결정한다. EC2 stop만으로 EBS/EIP/보관 비용이 사라지지 않는다. 전역 prune·`down -v`·다른 project 삭제는 사용하지 않는다. 명시 보존 기간이 지나기 전 키/DB/chain/Anchor를 함께 삭제하지 않는다.
+
+
 <a id="isolated-media-20261102"></a>
 
 ## 2026-11-02 교환기 통합 시험과 이미지 전달

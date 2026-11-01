@@ -2,6 +2,10 @@
 
 기준일: 2026-11-02. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
+## AWS 배포 준비의 현재 경계
+
+최종 대상은 AWS이며 현재 서버는 개발/빌드/검증 전용이다. 리전·예산·도메인·IdP는 사용자 답변상 미정이다. AWS override·별도 TLS Anchor·TURN renderer·7종 image inventory·신규/복원 절차를 준비했으나 실제 AWS 자원·외부 업로드·TLS/NAT·IdP·최종 web trust는 미검증/미준비다. 현재 서버 경로가 이미지 내부 설치 layout이나 과거 증거에 나타나는 것과 host bind/실행 연결 의존성을 구분한다. 공개 파일 묶음과 부분 이미지 archive만으로 전체 배포 성공이라고 하지 않는다. [정확한 입력과 gate](RUNBOOK.md#aws-competition).
+
 ## 실제 미디어 연결의 검증 범위
 
 [2026-11-02 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)은 실제 원장·DB·HTTPS Anchor·runtime 역할·Asterisk22.11·coturn4.6.3·제품 웹을 연결했다. 양쪽 browser는660/990Hz 합성 마이크를 쓰고 실제 원격 트랙을 디코딩했다. 승인 전 무음, 양방향 상대 음원, 로그아웃·업무 취소·실제 lease 만료·위임 철회·긴급 정지 후 무음을 확인했다. 원장 확정과 실제 Witness 확인도 포함하지만 OIDC는 fixture다.
