@@ -3,14 +3,28 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { X509Certificate } from "node:crypto";
 import { resolve, dirname } from "node:path";
 import { keccak256, stringToHex } from "viem";
+import {generatePrivateKey,privateKeyToAccount} from 'viem/accounts';
 import { generateEd25519KeyPair, hashCanonical, exportSigningPrivateJwk, registeredUriSchema, runtimePolicySchema } from "../packages/protocol/src/index.js";
 const apply=process.argv.includes("--apply");
 const [operation, directory, trustOutput] = process.argv.slice(2).filter(a=>a!=="--apply"&&a!=="--dry-run");
-if (!directory || !["keys", "trust", "approval-key", "service-key"].includes(operation ?? "")) throw new Error("Usage: prepare-finals keys|trust NEW-deployment-directory");
+if (!directory || !["keys", "trust", "approval-key", "service-key", "management-keys"].includes(operation ?? "")) throw new Error("Usage: prepare-finals keys|trust|management-keys deployment-directory");
 const root = resolve(directory);
-if(!apply){console.log(JSON.stringify({mode:'dry-run',operation,directory,output:trustOutput??null,requires:operation==='keys'?['ISSUER_URI','SERVICE_URI','NEW empty directory; separate management keys']:operation==='trust'?['public-manifest.json or PUBLIC_MANIFEST_PATH','deployment.json','current SERVICE_POLICY_VERSION','public PBX_DTLS_CERT_PATH']:['existing public manifest','APPROVAL_KEY_VERSION or SERVICE_KEY_VERSION > 1','new key filename and new public manifest output; never auto-activate'],next:'Review inputs and use --apply only after explicit infrastructure authorization. Existing directories/files are never regenerated.'}));process.exit(0);}
+if(!apply){console.log(JSON.stringify({mode:'dry-run',operation,directory,output:trustOutput??null,requires:operation==='management-keys'?['existing newly prepared public-manifest.json','new admin/operator/deployer directories','separate approver owners; no approver keys generated']:operation==='keys'?['ISSUER_URI','SERVICE_URI','NEW empty directory; separate management keys']:operation==='trust'?['public-manifest.json or PUBLIC_MANIFEST_PATH','deployment.json','current SERVICE_POLICY_VERSION','public PBX_DTLS_CERT_PATH']:['existing public manifest','APPROVAL_KEY_VERSION or SERVICE_KEY_VERSION > 1','new key filename and new public manifest output; never auto-activate'],next:'Review inputs and use --apply only after explicit infrastructure authorization. Existing directories/files are never regenerated.'}));process.exit(0);}
 if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=="infrastructure")throw new Error("KEY_PROVISIONING_EXECUTION_BLOCKED");
-if (operation === "keys") {
+if(operation==='management-keys'){
+  await readFile(resolve(root,'public-manifest.json')); // Application keys must already be prepared, never replace that directory.
+  const progressPath=resolve(root,'preparation-management.json'),completed:string[]=[];
+  await writeFile(progressPath,JSON.stringify({status:'in-progress',completed,recovery:'Preserve any generated private files. Derive their public addresses for operator review; never regenerate this directory.'})+'\n',{flag:'wx',mode:0o600});
+  const addresses:Record<string,string>={};
+  for(const [role,name] of [['deployer','deployer/key.txt'],['administrator','admin/administrator.txt'],['emergencyStopper','operator/emergency.txt']] as const){
+    await mkdir(resolve(root,name.split('/')[0]!),{mode:0o700});const key=generatePrivateKey();
+    await writeFile(resolve(root,name),key+'\n',{flag:'wx',mode:0o600});addresses[role]=privateKeyToAccount(key).address;completed.push(name);
+    await writeFile(progressPath,JSON.stringify({status:'in-progress',completed})+'\n',{mode:0o600});
+  }
+  await writeFile(resolve(root,'management-public.json'),JSON.stringify(addresses,null,2)+'\n',{flag:'wx',mode:0o600});
+  await writeFile(progressPath,JSON.stringify({status:'complete',completed:[...completed,'management-public.json'],approvers:'Provision separately under three independent owners; not generated here.'})+'\n',{mode:0o600});
+  console.log('New deployer, administrator and emergency keys prepared in separate files. Joint approver keys remain independently provisioned.');
+}else if (operation === "keys") {
   const issuerDid = registeredUriSchema.parse(process.env.ISSUER_URI??process.env.ISSUER_DID), serviceDid = registeredUriSchema.parse(process.env.SERVICE_URI??process.env.SERVICE_DID);
   if(issuerDid.length>160||serviceDid.length>160)throw new Error("REGISTERED_URI_TOO_LONG_FOR_KEY_ID");
   await mkdir(root, { mode: 0o700 }); // Fails on existing deployment; backup restore is separate.

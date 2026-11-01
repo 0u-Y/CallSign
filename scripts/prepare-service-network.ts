@@ -9,5 +9,6 @@ config.genesis.config.chainId=network;
 // This is a permissioned test-network balance, never a real-money transfer or a reward system.
 const balance=BigInt(process.env.INITIAL_BALANCE_WEI??'1000000000000000000000');if(balance<0n)throw new Error('INITIAL_BALANCE_INVALID');
 config.genesis.alloc={[address.slice(2).toLowerCase()]:{balance:`0x${balance.toString(16)}`}};
+for(const key of ['REGISTRY_ADMIN_ADDRESS','REGISTRY_OPERATOR_ADDRESS']){const value=process.env[key];if(!value)continue;if(!/^0x[0-9a-fA-F]{40}$/.test(value)||/^0x0{40}$/.test(value))throw new Error('INITIAL_OPERATOR_ADDRESS_INVALID');config.genesis.alloc[value.slice(2).toLowerCase()]={balance:`0x${balance.toString(16)}`};}
 await writeFile(path,JSON.stringify(config,null,2)+'\n',{flag:'wx',mode:0o600});
 process.stdout.write('New network configuration written with only the explicitly supplied deployer allocation. No validator keys generated or nodes started.\n');

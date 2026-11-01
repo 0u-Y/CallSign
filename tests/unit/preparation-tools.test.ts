@@ -7,6 +7,7 @@ import {hashTypedData} from 'viem';
 import {hashCanonical,bankPolicy,policyHash,configurationTypedData} from '../../packages/protocol/src/index.js';
 it.each([
  ['service keys',(dir:string)=>['scripts/prepare-finals.ts','keys',join(dir,'keys')]],
+ ['separate management keys',(dir:string)=>['scripts/prepare-finals.ts','management-keys',join(dir,'keys')]],
  ['approval key',(dir:string)=>['scripts/prepare-finals.ts','approval-key',dir,join(dir,'new-manifest.json')]],
  ['PBX',(dir:string)=>['scripts/prepare-pbx.ts',join(dir,'pbx')]],
  ['service network',(dir:string)=>['scripts/prepare-service-network.ts',join(dir,'network.json')]],

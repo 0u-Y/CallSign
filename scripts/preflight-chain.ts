@@ -19,7 +19,7 @@ export async function chainPreflight(env:Record<string,string|undefined>,step:st
  if(!env.LEDGER_IPV4_PREFIX)check('LEDGER_IPV4_PREFIX','BLOCKED','신규 배포 또는 기존 배포의 검토된 prefix가 필요합니다.');else try{const a=ledgerAddresses(env.LEDGER_IPV4_PREFIX);check('ledger-addresses','PASS',`${a.subnet}; validators .11~.14, RPC는 내부 besu1~4 DNS.`);
  check('ledger-media-separation',ledgerOverlaps(env.LEDGER_IPV4_PREFIX,['10.205.0.0/24']).length?'FAIL':'PASS','현재 별도 media subnet과도 분리되어야 합니다.');
  if(!env.LEDGER_OBSERVED_CIDRS)check('ledger-overlap','BLOCKED','같은 호스트의 최신 interface/모든 IPv4 route(Docker 포함) CIDR 관측을 전달하세요. default route는 제외.');
- else {const conflicts=ledgerOverlaps(env.LEDGER_IPV4_PREFIX,env.LEDGER_OBSERVED_CIDRS.split(','));check('ledger-overlap',conflicts.length?'FAIL':'PASS',conflicts.length?'관측된 IPv4 망과 중복됩니다.':'전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/GCP 또는 관측 시각 이후 변경은 미확인.');}
+ else {const conflicts=ledgerOverlaps(env.LEDGER_IPV4_PREFIX,env.LEDGER_OBSERVED_CIDRS.split(','));check('ledger-overlap',conflicts.length?'FAIL':'PASS',conflicts.length?'관측된 IPv4 망과 중복됩니다.':'전달된 CIDR 관측과 비중복. 숨은 VPN/조직망/AWS 또는 관측 시각 이후 변경은 미확인.');}
  }catch{check('ledger-addresses','FAIL','private IPv4 세 옥텟 prefix와 유효한 관측 CIDR 필요. 임의 shell 문자열은 거절.');}
  if(step==='prepare')return checks;
  check('BESU_IMAGE',immutableImageReference(env.BESU_IMAGE)?'PASS':'BLOCKED','검토한 registry digest 또는 archive image ID 필요. 로컬 이미지 존재/아키텍처/모듈은 별도 읽기 전용 확인.');

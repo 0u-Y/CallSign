@@ -1,0 +1,74 @@
+# Only on the separately approved AWS host. Requires Docker Compose >=2.33.1.
+# AWS security groups and EBS mounts are prepared outside Compose, never on the development server.
+name: ${CALLSIGN_PROJECT:?unique competition deployment project}
+x-log: &log
+  driver: json-file
+  options: {max-size: 10m, max-file: '3'}
+x-besu: &besu
+  platform: linux/amd64
+  mem_limit: 3g
+  memswap_limit: 3g
+  cpus: 1.0
+  pids_limit: 256
+  environment: {JAVA_OPTS: '-Xmx2g'}
+  logging: *log
+x-witness: &witness
+  platform: linux/amd64
+  mem_limit: 512m
+  memswap_limit: 512m
+  cpus: 0.5
+  pids_limit: 128
+  logging: *log
+x-api: &api
+  platform: linux/amd64
+  mem_limit: 512m
+  memswap_limit: 512m
+  cpus: 0.5
+  pids_limit: 128
+  logging: *log
+services:
+  platform: {<<: *api}
+  issuer: {<<: *api}
+  sender: {<<: *api}
+  worker: {<<: *api}
+  besu1: {<<: *besu}
+  besu2: {<<: *besu}
+  besu3: {<<: *besu}
+  besu4: {<<: *besu}
+  witness1: {<<: *witness}
+  witness2: {<<: *witness}
+  witness3: {<<: *witness}
+  witness4: {<<: *witness}
+  postgres:
+    platform: linux/amd64
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpus: 1.0
+    pids_limit: 128
+    logging: *log
+  web:
+    <<: *api
+    # HTTPS ingress is the only web host port; no localhost port on the development server is used.
+    ports: !reset []
+  https:
+    <<: *api
+    image: ${HTTPS_IMAGE:?reviewed nginx image config ID or manifest digest}
+    entrypoint: [nginx]
+    command: ['-g', 'daemon off;']
+    volumes: !override
+      - {type: bind, source: '${AWS_RELEASE_DIR:?release files on AWS}/infra/deploy/https-nginx.conf', target: /etc/nginx/conf.d/default.conf, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${AWS_WEB_TLS_DIR:?AWS web certificate directory}', target: /tls, read_only: true, bind: {create_host_path: false}}
+  asterisk:
+    <<: *api
+  turn:
+    <<: *api
+    networks:
+      public: {ipv4_address: '${TURN_PRIVATE_ADDRESS:-10.205.0.30}'}
+volumes:
+  postgres-data: &data
+    driver: local
+    driver_opts: {type: none, o: bind, device: '${AWS_VOLUME_ROOT:?AWS EBS mount root}/postgres'}
+  besu1-data: {<<: *data, driver_opts: {type: none, o: bind, device: '${AWS_VOLUME_ROOT}/besu1'}}
+  besu2-data: {<<: *data, driver_opts: {type: none, o: bind, device: '${AWS_VOLUME_ROOT}/besu2'}}
+  besu3-data: {<<: *data, driver_opts: {type: none, o: bind, device: '${AWS_VOLUME_ROOT}/besu3'}}
+  besu4-data: {<<: *data, driver_opts: {type: none, o: bind, device: '${AWS_VOLUME_ROOT}/besu4'}}

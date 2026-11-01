@@ -6,6 +6,10 @@ const digest=z.string().regex(/^[0-9a-f]{64}$/),id=z.string().min(1).max(200);
 export const anchorSchema=z.object({deployment:id,institutionId:id,sequence:z.string().regex(/^\d+$/),hash:digest,epoch:z.string().regex(/^\d+$/)}).strict();
 export type Anchor=z.infer<typeof anchorSchema>;
 export interface ConsumptionAnchor {read(institutionId:string):Promise<Anchor>;advance(previous:Anchor,next:Anchor):Promise<void>}
+export function anchorListenHost(host='127.0.0.1',tls=false){
+ if(!['127.0.0.1','0.0.0.0'].includes(host)||host==='0.0.0.0'&&!tls)throw new Error('REMOTE_ANCHOR_REQUIRES_TLS');
+ return host;
+}
 export function httpConsumptionAnchor(options:{url:string;token:string;deployment:string;fetcher?:typeof fetch}):ConsumptionAnchor{
  const origin=new URL(options.url);if(origin.protocol!=='https:'||origin.username||origin.password||origin.search||origin.hash||origin.pathname!=='/'||options.token.length<32)throw new Error('ANCHOR_CONFIG_INVALID');
  const request=async(path:string,body?:unknown)=>{

@@ -108,7 +108,7 @@ services:
   worker:
     <<: *app
     command: [pnpm, worker]
-    networks: [application, ledger]
+    networks: [application, ledger, egress]
     healthcheck:
       disable: true
     environment:
@@ -254,7 +254,7 @@ services:
     image: ${TURN_IMAGE:?pin coturn image digest}
     profiles: [media]
     restart: unless-stopped
-    command: ['-c', '/etc/coturn/turnserver.conf']
+    command: ['turnserver', '-c', '/etc/coturn/turnserver.conf']
     volumes: ['${FINALS_DATA_DIR}/turn:/etc/coturn:ro']
     ports: ['3478:3478/udp', '3478:3478/tcp', '5349:5349/tcp', '49160-49200:49160-49200/udp']
     networks: [public]

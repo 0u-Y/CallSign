@@ -1,5 +1,6 @@
 ARG NODE_IMAGE=node:22.22.2-bookworm-slim
 ARG LOCAL_RUNTIME_BASE=ubuntu@sha256:534baea6a22c03a63003dbc8dbe78fe34bc0d7e595d9a9dc9834884ff530eb55
+ARG PREPARED_RUNTIME_IMAGE=node:22.22.2-bookworm-slim
 FROM ${NODE_IMAGE} AS dependencies
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH
 RUN corepack enable && corepack prepare pnpm@11.27.0 --activate
@@ -26,6 +27,17 @@ FROM dependencies AS runtime
 ENV NODE_ENV=production
 USER node
 CMD ["pnpm", "--filter", "@callsign/api", "exec", "tsx", "src/finals-server.ts"]
+# Reuse reviewed installed dependencies without downloading or mounting the developer checkout at runtime.
+FROM ${PREPARED_RUNTIME_IMAGE} AS prepared-runtime
+ARG SOURCE_COMMIT
+LABEL org.callsign.source-commit=${SOURCE_COMMIT}
+COPY packages packages
+COPY services services
+COPY scripts scripts
+COPY apps/web apps/web
+COPY infra/deploy infra/deploy
+COPY infra/besu/network-config.json infra/besu/network-config.json
+RUN node --version && pnpm --filter @callsign/api exec tsx --version
 FROM nginx:1.28.0-alpine AS web
 COPY --from=web-build /app/apps/web/dist /usr/share/nginx/html
 COPY infra/deploy/nginx.conf /etc/nginx/conf.d/default.conf

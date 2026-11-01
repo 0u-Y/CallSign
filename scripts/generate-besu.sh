@@ -9,8 +9,20 @@ NETWORK_CONFIG="${CALLSIGN_NETWORK_CONFIG:-${ROOT_DIR}/infra/besu/network-config
 GENERATED_DIR="${OUTPUT_DIR}/generated"
 PEER_ARGS=("${OUTPUT_DIR}")
 if [[ -n "${CALLSIGN_ENV_FILE:-}" ]]; then PEER_ARGS+=(--env-file "${CALLSIGN_ENV_FILE}"); fi
+prepare_peers() {
+  if [[ -n "${CALLSIGN_TOOL_IMAGE:-}" ]]; then
+    # All TypeScript and installed dependencies are inside the reviewed image, not this host checkout.
+    docker run --pull=never --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+      --user "$(id -u):$(id -g)" --memory 256m --memory-swap 256m --cpus 1 --pids-limit 64 \
+      --env-file "${CALLSIGN_ENV_FILE:?protected deployment env}" --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
+      --mount "type=bind,src=${OUTPUT_DIR},dst=/network" \
+      "$CALLSIGN_TOOL_IMAGE" pnpm exec tsx scripts/prepare-besu-peers.ts /network --apply
+  else
+    pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
+  fi
+}
 if [[ -f "${OUTPUT_DIR}/genesis.json" && -f "${OUTPUT_DIR}/keys/node4/key" ]]; then
-  pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
+  prepare_peers
   echo "Besu QBFT keys and genesis already exist; reusing ${OUTPUT_DIR}."
   exit 0
 fi
@@ -47,5 +59,5 @@ for index in 0 1 2 3; do
   cp "${KEY_DIRS[$index]}/key.pub" "${OUTPUT_DIR}/keys/node${node}/key.pub"
   chmod 600 "${OUTPUT_DIR}/keys/node${node}/key"
 done
-pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
+prepare_peers
 echo "Generated four local-only QBFT validator keys and genesis."
