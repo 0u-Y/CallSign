@@ -153,8 +153,9 @@ it('boundary: stops analysis transport and late model results after consent with
  const before=first.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>first.ws.readyState).toBe(WebSocket.CLOSED);expect(first.messages.filter(m=>m.type==='risk')).toHaveLength(before);
  await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true});const next=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>next.messages.some(m=>m.type==='ready')).toBe(true);next.ws.send(JSON.stringify({type:'consent',consent:true}));await expect.poll(()=>f.audio.streams.length).toBe(2);
  const current=f.audio.streams[1]!,revision=(n:number,text:string,final=true)=>current.options.onRevision({streamId:current.options.streamId,segmentId:'new-seg',revision:n,final,text,source:'remote'});
- revision(1,'OTP',false);revision(2,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(2);revision(3,'OTP를 알려주지 마세요.');await expect.poll(()=>f.audio.calls.length).toBe(3);revision(1,'OTP를 알려주세요.');
- f.audio.calls[1]!.resolve(analyzeWithRules('OTP를 알려주세요.'));f.audio.calls[2]!.reject(new Error('FAKE_PROVIDER_UNAVAILABLE'));
+ revision(1,'OTP',false);revision(2,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(2);revision(3,'OTP를 알려주지 마세요.');expect(f.audio.calls[1]!.signal.aborted).toBe(true);revision(1,'OTP를 알려주세요.');
+ // The bounded context analyser serializes/coalesces revisions, even if an adapter ignores abort.
+ f.audio.calls[1]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FAKE_PROVIDER_UNAVAILABLE'));
  await expect.poll(()=>next.messages.some(m=>m.type==='risk'&&m.event.revision===3&&m.event.status==='unavailable')).toBe(true);expect(next.messages.filter(m=>m.type==='risk').at(-1).event.signals).toEqual([]);
  await call.receiver.c.request('/v3/auth/logout',{purpose:'work'});await expect.poll(()=>next.ws.readyState).toBe(WebSocket.CLOSED);expect(current.stopped).toBe(true);
 },20000);
@@ -195,4 +196,11 @@ it('boundary: recovers a committed creation after a lost response without duplic
  const button=page.getByRole('button',{name:'연락 업무 생성',exact:true});await button.click();await stored;expect(await button.isEnabled()).toBe(false);expect(requests).toHaveLength(1);release();await page.getByRole('alert').waitFor();await expect.poll(()=>button.isEnabled()).toBe(true);await button.click();await expect.poll(()=>requests.length).toBe(2);await expect.poll(()=>button.isEnabled()).toBe(true);
  expect(requests[1]).toEqual(requests[0]);const record=await f.state(),created=requests[0]!.body.id;expect(Object.values(record.intents).filter(i=>i.id===created)).toHaveLength(1);
  const row=page.getByRole('listitem').filter({has:page.getByText(created,{exact:true})});await row.getByRole('button',{name:'연락 취소',exact:true}).click();await expect.poll(async()=>(await f.state()).intents[created]?.status).toBe('cancelled');await expect.poll(()=>row.getByRole('button',{name:'연락 취소',exact:true}).isEnabled()).toBe(false);
+});
+
+it.each(['lease-policy','connection-generation'] as const)('boundary: stops a pending model after %s changes without publishing the late result',async change=>{
+ const call=await acceptedCall();await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true});const active=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>active.messages.some(m=>m.type==='ready')).toBe(true);active.ws.send(JSON.stringify({type:'consent',consent:true}));await expect.poll(()=>f.audio.streams.length).toBe(1);
+ const stream=f.audio.streams[0]!;stream.options.onRevision({streamId:stream.options.streamId,segmentId:'pending',revision:1,final:true,text:'OTP를 알려주세요.',source:'remote'});await expect.poll(()=>f.audio.calls.length).toBe(1);
+ await f.mutate(record=>{const t=record.serviceV3!.attempts[call.attempt.id]!;if(change==='lease-policy')t.lease!.payload.policyHash='0'.repeat(64);else t.generation='changed-generation';});active.ws.send(Buffer.from([0]));await expect.poll(()=>stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);
+ const before=active.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>active.ws.readyState).toBe(WebSocket.CLOSED);expect(active.messages.filter(m=>m.type==='risk')).toHaveLength(before);
 });

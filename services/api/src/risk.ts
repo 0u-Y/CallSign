@@ -1,18 +1,8 @@
 import { z } from "zod";
 
-export const riskCategorySchema = z.enum(["송금 유도", "원격제어 설치", "인증번호 요구", "비밀 유지 강요"]);
+import {riskCategorySchema,riskAnalysisSchema,type RiskAnalysis} from "@callsign/protocol";
+export {riskCategorySchema,riskAnalysisSchema,type RiskAnalysis};
 
-export const riskAnalysisSchema = z.object({
-  signals: z.array(z.object({
-    category: riskCategorySchema,
-    evidenceSpan: z.string().min(1).max(160),
-    explanation: z.string().min(1).max(400),
-  }).strict()).max(8),
-  recommendedAction: z.string().min(1).max(600),
-  limitations: z.string().min(1).max(600),
-}).strict();
-
-export type RiskAnalysis = z.infer<typeof riskAnalysisSchema>;
 export type RiskAnalysisResult = RiskAnalysis & {
   engine: "ollama" | "rules";
   model: string | null;
@@ -26,12 +16,16 @@ const rules: Array<{ category: z.infer<typeof riskCategorySchema>; phrases: stri
   { category: "비밀 유지 강요", phrases: ["아무에게도 말하지", "비밀로", "가족에게 알리지"], explanation: "주변과 상의하지 못하게 하는 요구는 판단을 고립시키는 위험 신호입니다." },
 ];
 
-export function analyzeWithRules(transcript: string): RiskAnalysis {
+export function correctedSentences(transcript:string):string[]{
   const sentences:string[]=[];
   for(const fragment of transcript.match(/[^.!?。\n]+[.!?。]?/g)??[]){
     const correction=/정정합니다|잘못\s*말했습니다|아니요/.exec(fragment);
     if(correction){sentences.pop();const rest=fragment.slice(correction.index+correction[0].length);if(rest.trim())sentences.push(rest);}else sentences.push(fragment);
   }
+  return sentences;
+}
+export function analyzeWithRules(transcript: string): RiskAnalysis {
+  const sentences=correctedSentences(transcript);
   const signals = rules.flatMap((rule) => {
     const evidenceSpan = sentences.find(original => {
       const sentence=original.replace(/“[^”]*”|‘[^’]*’|"[^"]*"/g, "");
