@@ -4,6 +4,16 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="github-publication-20261102"></a>
+
+## 2026-11-02 GitHub 전달 경로와 게시 준비
+
+시작 HEAD는 `9a3fbbd`다. 사용자는 공개 소스/배포 파일을 Git 저장소와 Release에, 기존6종 이미지는 비공개 GHCR에 보관하도록 확정했다. 기존 인증은 저장소/Release 권한은 있으나 package 조회403·package scope 누락이며, 별도 PAT가 아직 없어 가능한 Release 게시부터 진행하도록 답했다. 이미지를 공개로 바꾸거나 CI 권한으로 우회하지 않는다. 현재 게시 전이며 실제 게시/수령 결과는 후속 증거로 구분한다. 운영 절차의 기준은 [RUNBOOK](RUNBOOK.md#github-delivery-20261102)이다.
+
+OPS-001/003·TEST-001/004: AWS bootstrap preflight에 GHCR manifest digest를 요구하고 로컬 config ID/태그를 거절한다. 실제 trust로 AWS에서 만드는 web만 별도다. 공개 파일 검사기는 정해진 checksum 집합·일반 파일·크기/hash를 확인하고 symlink/경로 이탈/변조를 거절한다. image 감사 도구는 서비스 기동/파일 추출 없이 모든 역사 layer/config/history를 읽고 삭제된 보호 값도 검사한다. 공개 배포 묶음에 두 검사기를 포함한다.
+
+현재 작업의 `pnpm light`는 **50개 파일·251개 시험 PASS**, API runtime 타입 검사·Python 컴파일·diff 검사도 통과했다. 검증한 것은 미커밋 게시 준비 소스이며 과거 실제 통화/복구 결과를 이번 HEAD에서 재실행하지 않았다. 실제 image archive6개 config/38개 layer/54,145개 일반 파일과 보존 build input을 검사했다. 알려진 보호 값27개는 검출되지 않았다. GnuTLS의 PEM 형식 경고3건은 보존하고8개 내용 hash를 고정 upstream 공개 self-test 소스와 대조했다. 전체 비밀/악성코드 부재 보증이 아니다. 서비스/컨테이너/이미지 rebuild/host 설정/AWS 자원은 실행하지 않았다.
+
 <a id="delivery-only-20261102"></a>
 
 ## 2026-11-02 전달물만 사용하는 신규 전체 리허설

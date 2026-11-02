@@ -6,6 +6,101 @@
 
 **2026-11-02 변경 결정:** 개발 서버는 코드·빌드·검증용이다. 대회 때는 종료되거나 접근 불가여도 되어야 한다. 최종 대상은 AWS이며 GCP 구성은 과거 보존물이다. 이전 절차가 모든 시험 데이터를 이전하라는 뜻은 아니다. 현재 보존하기로 정한 대회 identity는 없으며, 폐기한 시험 chain/DB/Anchor를 대회 환경에 이어 붙이지 않는다.
 
+<a id="github-delivery-20261102"></a>
+
+### GitHub 보관·전달 경로
+
+최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
+
+- 게시할 고유 버전: `aws-bootstrap-20261102t082954z`. [Release 주소](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z). 기존 tag/Release/asset은 덮어쓰지 않는다.
+- 공개 첨부 파일: `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`. observer는 재현 시험용이며 서비스 실행 의존성이 아니다.
+- 현재 저장소/Release는 공개다. 사용자가 이 공개 파일 전달을 허용한 것과 이미지 공개 허가는 별개다. GHCR 패키지는 새 비공개 package로만 게시하고, 이미 공개인 package나 visibility를 확인할 수 없는 대상에는 게시하지 않는다.
+- **현재 GHCR은 차단**이다. 기존 GitHub 인증은 저장소 관리/Release 게시가 가능하지만 package 조회403이며 `read:packages`/`write:packages`가 없다. 사용자도 별도 토큰이 아직 없다고 답했다. 패키지를 공개로 바꾸거나 workflow로 권한을 우회하지 않는다. `images.json`의 원격 digest/ref는 null이며 bootstrap 이미지의 미게시 상태를 유지한다. 이 Release는 이미지 준비까지 완료된 AWS 실행 릴리스가 아니다.
+- GitHub 최초 container package의 기본 visibility는 private지만 이를 저장소 공개 여부로 추정하지 않는다. 게시 후 API의 실제 visibility와 인증/비인증 접근을 확인한다. 공개 repo 연결/권한 상속은 별도 검토한다. [공식 registry 문서](https://docs.github.com/en/packages/working-with-a-github-packages-registry), [권한/visibility](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages).
+
+게시 전 점검은 실제 image archive의 config/history와 모든 layer(나중에 삭제된 파일도 포함), 보존된 build input, 공개 tar/첨부 파일을 대상으로 한다. `scripts/audit-image-archive.py`는 추출/컨테이너 없이 layer hash·보호 경로·알려진 보호 값·키/token 패턴을 검사한다. 원본 패턴 경고를 삭제하거나 파일명으로 예외 처리하지 않는다. 이번3건의 GnuTLS 바이너리 경고에 포함된8개 서로 다른 PEM 값은 [고정 upstream self-test 소스](https://github.com/gnutls/gnutls/blob/b70f2f47d3bf3d57a4fdcf5fc42c73b8228438f0/lib/crypto-selftests-pk.c)와 **정확한 내용 hash**를 대조해 공개 시험 벡터로 분류했다. 키 내용은 로그/첨부물에 넣지 않는다. 이 검사는 범용 악성코드/모든 비밀정보 부재 보증이 아니다.
+
+#### 공개 Release 수령
+
+아래는 AWS 또는 새 수령 디렉터리에서 사용하는 다운로드/검사 명령이다. 서비스/노드를 기동하지 않으며 개발 서버 주소를 사용하지 않는다. 현재 공개 repo/Release에는 개인 토큰이 필요 없다. Node22·curl을 준비한 뒤, 기존 디렉터리를 재사용하지 않는다.
+
+```bash
+set +x
+umask 077
+TAG=aws-bootstrap-20261102t082954z
+RECEIVED="$(mktemp -d)"
+for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
+  curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
+    --output "$RECEIVED/$FILE" "https://github.com/0u-Y/CallSign/releases/download/$TAG/$FILE"
+done
+curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
+  --output "$RECEIVED/verify-release-files.mjs" \
+  "https://raw.githubusercontent.com/0u-Y/CallSign/$TAG/scripts/verify-release-files.mjs"
+node "$RECEIVED/verify-release-files.mjs" "$RECEIVED"
+```
+
+`verify-release-files.mjs`는 정해진4개 파일의 checksum 집합·크기·일반 파일 여부를 확인하고, 경로 이탈·중복 checksum·symlink·내용 변조를 거절한다. 검증기의 PASS만으로 원격 다운로드를 입증하지 않는다. 실제 네트워크 다운로드 명령/새 디렉터리/수령 bytes/hash를 별도 영수증으로 남긴다. 추출 전에 검사를 마치고, tar entry가 공개 일반 파일/디렉터리인지 확인한다. `images.json`의 `registryReference`가 null이면 아래 이미지 단계에서 중단한다. 개발 서버 tar나 로컬 config ID로 대체하지 않는다.
+
+checksum 파일은 자기 자신을 제외한4개 asset을 기록한다. 아래 검사도 새 디렉터리의 수령 파일에만 수행한다. Python3가 필요하며 내용 추출/실행은 하지 않는다.
+
+```bash
+python3 - "$RECEIVED" <<'CHECK_PUBLIC_TARS'
+import pathlib, sys, tarfile
+root = pathlib.Path(sys.argv[1])
+for name in ('deployment-files.tar', 'observer-tests.tar'):
+    seen = set()
+    with tarfile.open(root / name, 'r:') as archive:
+        for entry in archive:
+            path = pathlib.PurePosixPath(entry.name)
+            if (path.is_absolute() or '..' in path.parts or entry.name in seen
+                    or not (entry.isfile() or entry.isdir())):
+                raise SystemExit('UNSAFE_PUBLIC_TAR_ENTRY')
+            seen.add(entry.name)
+print('PASS: relative regular files/directories only; nothing extracted')
+CHECK_PUBLIC_TARS
+```
+
+GHCR을 게시할 수 있게 되면 원격 검증된 ref/digest를 담은 **새 고유 Release**를 발행한다. 현재 null inventory는 덮어쓰지 않는다. 실제 게시/수령 영수증은 저장소의 `artifacts/github-publication-20261102.json`에 기록하며, 이 문서의 게시 전 bundle에는 후속 영수증이 포함되지 않을 수 있다.
+
+#### AWS의 최소권한 인증
+
+현재 개발 PC의 광범위한 GitHub 토큰을 AWS로 복사하지 않는다. 비공개 소스/Release가 필요해지는 경우에는 해당 repo 하나의 **Contents: read-only** fine-grained PAT 또는 read-only deploy key를 사용한다. GHCR은 별도 classic PAT의 `read:packages`와 해당 비공개 package의 read 권한이 필요하다. 게시용 `write:packages`/삭제 권한은 AWS 수령자에게 주지 않는다. classic PAT는 임의 package 하나로 자동 제한되는 토큰이 아니므로, 전용 배포 계정의 package 접근 범위를 함께 제한한다. [GitHub 권한 기준](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages).
+
+보호 token은0600 파일/승인된 secret 참조로 공급한다. 원문을 CLI 인자·shell history·로그·문서에 넣지 않으며 `set -x`·전체 env 출력은 금지한다. private repo 수령에 gh CLI를 사용할 때는 다음처럼 token을 자식 환경에만 제공하고 결과 파일만 저장할 수 있다. 보호 파일 경로·고유 tag·새 수령 경로만 환경으로 전달한다.
+
+```python
+import os, pathlib, subprocess
+source = pathlib.Path(os.environ['CALLSIGN_GITHUB_READ_TOKEN_FILE'])
+if source.is_symlink() or source.stat().st_mode & 0o077:
+    raise SystemExit('PROTECTED_TOKEN_FILE_REQUIRED')
+child_env = {**os.environ, 'GH_TOKEN': source.read_text().strip()}
+subprocess.run(['gh', 'release', 'download', os.environ['CALLSIGN_RELEASE_TAG'],
+                '--repo', '0u-Y/CallSign', '--dir', os.environ['CALLSIGN_NEW_DOWNLOAD_DIR'],
+                '--pattern', 'deployment-files.tar', '--pattern', 'observer-tests.tar',
+                '--pattern', 'images.json', '--pattern', 'publication-audit.json',
+                '--pattern', 'SHA256SUMS'], env=child_env, check=True)
+```
+
+GHCR 수령 시에는 AWS의 **새 전용** Docker 인증 디렉터리만 사용한다. 이 블록은 현재 서버에서 실행하지 않았다. `GHCR_USER`는 read 권한이 있는 배포 계정이며 token 원문은 stdin으로만 전달한다.
+
+```bash
+set +x
+umask 077
+DOCKER_AUTH_DIR="$(mktemp -d)"
+docker --config "$DOCKER_AUTH_DIR" login ghcr.io --username "$GHCR_USER" \
+  --password-stdin < "$CALLSIGN_GHCR_READ_TOKEN_FILE"
+# REF는 images.json에서 원격 검증된 ghcr.io/...@sha256:... 값만 선택한다.
+# registryReference=null, 비공개 권한 없음, digest/architecture 불일치이면 중단한다.
+docker --config "$DOCKER_AUTH_DIR" pull --platform linux/amd64 "$REF"
+# 수령 종료 후 이 명령이 만든 인증 파일만 정리한다. 전역 docker logout/config 변경은 하지 않는다.
+rm -- "$DOCKER_AUTH_DIR/config.json"
+rmdir -- "$DOCKER_AUTH_DIR"
+```
+
+게시자가 PAT를 준비하면6개 bootstrap 이미지를 비공개 대상으로 push하고 **원격 manifest GET/digest와 config blob의 linux/amd64**를 대조한다. 로컬 config ID는 별도 보존한다. 기존 daemon의 cached layer 확인을 원격 layer 다운로드로 기록하지 않는다. 원격 blob을 새 수령 위치에서 실제 가져오거나 새 AWS 환경의 최초 pull을 관측해야 한다. 새 inventory/고유 Release 버전으로 갱신하고 기존 첨부물을 덮지 않는다.
+
+AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구한다. 실제 trust/인증서 준비 후 AWS에서 생성하는 web만 검토한 local config ID를 사용할 수 있다. 웹은 GitHub에서 받은 공개 recipe와 GHCR runtime/nginx를 사용하고 pin/label·실제 기동을 확인한다. 현재 합성 trust 웹 이미지는 GHCR에 게시하지 않는다. **GHCR 미게시가 해소되기 전에는 AWS 이미지 확보/초기 배포가 차단된다.**
+
 ### 구성안과 선택 대기
 
 기본안은 기존 Compose를 사용하는 **서비스 EC2 한 대 + 별도 Anchor EC2 한 대 + 명시적으로 선택할 외부 OIDC**다. AWS 계정·리전·기간/예산·도메인·IdP는 미정이다. 아래 용량은 idle 관측과 메모리 제한 합계를 참고한 시작 제안이며 실측 최소 사양/peak나 구매 결정이 아니다.
@@ -57,15 +152,15 @@ AWS 초기 준비 전달은 runtime·Besu·PostgreSQL·Asterisk·TURN·nginx의 
 
 ### 개발 서버가 없어도 준비·실행하는 방법
 
-Docker/Compose>=2.33.1·Bash·Node22.22.2(설치 의존성 없는 JSON/env·native type stripping 검사 용도)를 새 AWS 호스트에 별도 승인 후 준비한다. npm/pnpm install·소스 checkout·host node_modules는 배포 실행의 선행 조건이 아니다. TypeScript 준비 도구·설치된 pnpm은 runtime 이미지 안에 있다. 공개 파일 tar를 새 release 디렉터리에 풀고 image tar 또는 승인된 ECR에서 이미지를 확보한다. 이미지 전달·보호 파일은 AWS 또는 다른 승인된 보관처에 미리 보관하고 AWS에서 접근·해시 검증을 끝내야 한다. 현재 개발 서버를 다운로드 서버로 사용하지 않는다.
+Docker/Compose>=2.33.1·Bash·Node22.22.2(설치 의존성 없는 JSON/env·native type stripping 검사 용도)를 새 AWS 호스트에 별도 승인 후 준비한다. npm/pnpm install·소스 checkout·host node_modules는 배포 실행의 선행 조건이 아니다. TypeScript 준비 도구·설치된 pnpm은 runtime 이미지 안에 있다. 위 GitHub Release의 공개 파일을 검증해 새 release 디렉터리에 풀고, 비공개 GHCR의 실제 manifest digest로6개 bootstrap 이미지를 확보한다. GHCR 게시/권한이 없는 현재 상태는 차단이며 개발 서버 tar로 우회하지 않는다. 보호 입력은 별도 참조로 공급하고 대회 키/identity는 AWS NEW에서 생성한다. 현재 개발 서버를 다운로드 서버로 사용하지 않는다.
 
 아래는 **실제 AWS 생성·업로드·실행 승인 후** 사용할 명령이며 이번에는 실행하지 않는다. `APP`, `NGINX`, `BESU` 등은 inventory의 검토한 실제 불변 참조, `CFG`는 AWS 보호 env, `DATA_PARENT`는 새 EBS mount다. 보호 env는 Docker `--env-file`에서도 읽히는 단순 `KEY=value` 형식을 쓰며 shell 확장·따옴표 해석에 의존하지 않는다. 값·전체 env·shell trace를 로그에 출력하지 않는다.
 
 ```bash
-# 승인된 보관처에서 받은 공개 파일·이미지의 hash를 대조한 뒤에만 load/extract.
-(cd "$DELIVERY" && sha256sum -c SHA256SUMS)
+# GitHub Release checksum과 GHCR remote digest/architecture 검증 후에만 추출/실행한다.
+node scripts/verify-release-files.mjs "$DELIVERY"
 tar -xf "$DELIVERY/deployment-files.tar" -C "$NEW_RELEASE_DIR"
-docker image load --input "$REVIEWED_COMPLETE_IMAGE_TAR"
+# APP/BESU/NGINX는 이미 인증된 GHCR에서 digest로 pull한 실제 참조다.
 docker image inspect --format '{{.Id}} {{.Os}}/{{.Architecture}}' "$APP" "$BESU" "$NGINX"
 # 아래 함수는 소스/host node_modules를 mount하지 않는다. 신규 보호 설정만 /aws로 전달한다.
 tool() {

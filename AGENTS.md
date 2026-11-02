@@ -64,3 +64,7 @@
 ## 2026-11-02 전달물 신규 전체 리허설의 한정 예외
 
 이번 사용자 요청은 새 폐기 identity의 전달 archive load, 이미지/공개 파일과 합성 보호 입력만으로 소유 none namespace의 chain/DB/Anchor/API/worker/PBX/TURN/제품 웹·설치 Chromium, 기존 최종 runtime/nginx를 이용한 pin 웹 build, 소유 프로세스의 제한된 중단/재시도·실제 자연 세션 만료와 관련 commit/일반 push/CI 확인을 허용한다. host 설정·bridge/port publish·기존 자원·AWS/유료/공개 업로드·실제 IdP/음성/외부 AI·추가 다운로드는 허용하지 않는다. controller의 코드/브라우저와 로컬 OIDC 인증 fixture를 명시하며 소유 label/ID·예산·기한을 유지한다. 원본 실패는 보존하고 이 기록을 다음 세션의 상시 실행 허가로 사용하지 않는다.
+
+## 2026-11-02 GitHub 산출물 보관·전달 작업
+
+이번 요청은 기존 산출물의 읽기 전용 layer/history/build-input/첨부물 감사, 소스/공개 배포 파일의 commit·일반 push·고유 GitHub Release 게시/재다운로드, 권한이 있을 때만 기존 이미지를 비공개 GHCR에 게시·원격 digest/접근 확인하는 범위다. package 권한이 없는 현재 인증을 공개 전환이나 CI로 우회하지 않는다. token/키/채운 env/개인정보/DB/chain/session/image tar는 Git·공개 첨부물에서 제외한다. 서비스/노드/컨테이너·이미지 rebuild·기존 서버 설정/AWS 자원/과금은 실행하지 않는다. AWS NEW 키/identity는 향후 AWS에서 생성한다.
