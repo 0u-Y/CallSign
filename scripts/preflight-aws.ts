@@ -1,6 +1,6 @@
 // Pure configuration checks. No AWS client, DNS lookup, key generation or service startup.
 import type {PreflightCheck} from './preflight.js';
-import {immutableImageReference} from './image-reference.mjs';
+import {ghcrImageReference,immutableImageReference} from './image-reference.mjs';
 export const deploymentImages=['CALLSIGN_APP_IMAGE','CALLSIGN_WEB_IMAGE','ASTERISK_IMAGE','TURN_IMAGE','BESU_IMAGE','POSTGRES_IMAGE','HTTPS_IMAGE'] as const;
 export function awsPreflight(env:Record<string,string|undefined>,step='prepare',developmentHosts:string[]=[]):PreflightCheck[]{
  if(!['prepare','runtime'].includes(step))throw new Error('AWS_STEP_INVALID');
@@ -18,7 +18,7 @@ export function awsPreflight(env:Record<string,string|undefined>,step='prepare',
  // Scan all supplied connection values as well as the public endpoints above; never print a value.
  for(const [key,value] of Object.entries(env)){if(!value||! /^(?:AWS_|FINALS_|SERVICE_|OIDC_|OFFICIAL_OIDC_|SIP_|PBX_|TURN_|ISSUER_|AUTH_|WORKER_|DATABASE_|MIGRATOR_|BESU_|ANCHOR_|CONSUMPTION_ANCHOR_|REGISTRY_|TRUST_|DEPLOYMENT_)/.test(key)||!/(?:URLS?|ORIGIN|HOST|ADDRESS|PATH|DIR|ROOT)$/.test(key))continue;const hosts=value.split(',').map(v=>{try{return new URL(v).hostname;}catch{return v;}});check('standalone:'+key,!hosts.some(h=>developmentHosts.includes(h))&&!/(?:\/home\/|\/\.local\/|ssh:\/\/|callsign_test_)/.test(value),'실행 연결·경로에서 개발 서버/시험 DB 의존성을 검사합니다.');}
  if(step==='runtime'){
-  for(const key of deploymentImages){const v=required(key);if(v)check(key,immutableImageReference(v),'검토한 이미지 digest/config ID가 필요합니다.');}
+  for(const key of deploymentImages){const v=required(key);if(v)check(key,key==='CALLSIGN_WEB_IMAGE'?immutableImageReference(v):ghcrImageReference(v),key==='CALLSIGN_WEB_IMAGE'?'실제 trust로 AWS에서 생성한 웹의 불변 참조가 필요합니다.':'GHCR의 실제 manifest digest로 고정한 참조가 필요하며 로컬 config ID나 태그는 허용하지 않습니다.');}
   check('aws-web-pin',/^[0-9a-f]{64}$/.test(env.VITE_SERVICE_TRUST_SHA256??''),'새 PBX 인증서·계약·공개키로 만든 trust pin이 필요합니다.',true);
   for(const key of ['ISSUER_DATABASE_URL','AUTH_DATABASE_URL','WORKER_DATABASE_URL','SERVICE_EXTRA_CA_PATH','REGISTRY_ADDRESS'])required(key);
  }

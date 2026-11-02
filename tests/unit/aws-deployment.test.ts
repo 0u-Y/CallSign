@@ -6,6 +6,7 @@ import {execFileSync} from 'node:child_process';
 import {awsPreflight} from '../../scripts/preflight-aws.js';
 import {reviewDeploymentImage} from '../../scripts/image-reference.mjs';
 import {anchorListenHost} from '../../services/api/src/consumption-anchor.js';
+import {deploymentImages} from '../../scripts/preflight-aws.js';
 const env={CALLSIGN_DEPLOYMENT_TARGET:'aws',AWS_DEPLOYMENT_MODE:'new',PUBLIC_DEPLOYMENT:'true',DEMO_MODE:'false',AWS_RELEASE_DIR:'/srv/release',AWS_VOLUME_ROOT:'/srv/volumes',FINALS_DATA_DIR:'/srv/config',AWS_WEB_TLS_DIR:'/srv/tls',WEB_ORIGIN:'https://contest.example',OIDC_ISSUER:'https://id.example',OIDC_JWKS_URL:'https://id.example/jwks',OIDC_AUTHORIZATION_URL:'https://id.example/authorize',OIDC_TOKEN_URL:'https://id.example/token',CONSUMPTION_ANCHOR_URL:'https://anchor.example',OIDC_CLIENT_ID:'work',OFFICIAL_OIDC_CLIENT_ID:'official',OIDC_AUDIENCE:'work-aud',OFFICIAL_OIDC_AUDIENCE:'official-aud',INSTITUTION_ID:'synthetic-institution',DEPLOYMENT_ID:'synthetic-deployment',CALLSIGN_PROJECT:'synthetic-project',SIP_WSS_URL:'wss://contest.example/pbx/ws'};
 it('separates AWS preparation from generated runtime images and rejects developer endpoints including credentialed DB URLs',()=>{
  expect(awsPreflight(env).filter(c=>['FAIL','BLOCKED'].includes(c.status))).toEqual([]);
@@ -19,6 +20,13 @@ it('requires distinct official OIDC context, explicit deployment mode and TLS fo
  expect(awsPreflight({...env,OFFICIAL_OIDC_CLIENT_ID:'work'}).find(c=>c.id==='aws-oidc-separation')?.status).toBe('BLOCKED');
  expect(awsPreflight({...env,AWS_DEPLOYMENT_MODE:'reset'}).find(c=>c.id==='aws-mode')?.status).toBe('FAIL');
  expect(anchorListenHost()).toBe('127.0.0.1');expect(()=>anchorListenHost('0.0.0.0')).toThrow('REMOTE_ANCHOR_REQUIRES_TLS');expect(anchorListenHost('0.0.0.0',true)).toBe('0.0.0.0');
+});
+it('requires GHCR manifest references for AWS bootstrap images while allowing the newly pinned local web',()=>{
+ const digest='1'.repeat(64),images=Object.fromEntries(deploymentImages.map(key=>[key,key==='CALLSIGN_WEB_IMAGE'?`sha256:${digest}`:`ghcr.io/unit/${key.toLowerCase()}@sha256:${digest}`]));
+ const checks=(values:Record<string,string>)=>awsPreflight({...env,...images,...values},'runtime').filter(c=>c.id==='CALLSIGN_APP_IMAGE');
+ expect(checks({})[0]?.status).toBe('PASS');
+ for(const ref of [`sha256:${digest}`,`ghcr.io/unit/app:release`,`other.test/unit/app@sha256:${digest}`,`ghcr.io/unit/../app@sha256:${digest}`,`ghcr.io/unit/app@sha256:${'0'.repeat(64)}`])expect(checks({CALLSIGN_APP_IMAGE:ref})[0]?.status).toBe('FAIL');
+ expect(awsPreflight({...env,...images},'runtime').find(c=>c.id==='CALLSIGN_WEB_IMAGE')?.status).toBe('PASS');
 });
 it('distinguishes amd64 image config identity from registry digest and rejects the old synthetic-trust web image',()=>{
  const id='sha256:'+'1'.repeat(64),pin='a'.repeat(64),info={Id:id,Os:'linux',Architecture:'amd64',RepoDigests:['unit/image@sha256:'+'2'.repeat(64)],Config:{Labels:{'org.callsign.trust-sha256':pin}}};
