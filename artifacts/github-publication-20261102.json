@@ -1,0 +1,386 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-02T08:42:06.742741+00:00",
+  "requirements": [
+    "OPS-001",
+    "OPS-003",
+    "TEST-001",
+    "TEST-004"
+  ],
+  "assessment": {
+    "releasePublicFiles": {
+      "method": "automatic",
+      "execution": "completed",
+      "verdict": "PASS",
+      "evidenceReview": "reviewed"
+    },
+    "ghcrImages": {
+      "method": "automatic",
+      "execution": "blocked",
+      "verdict": null,
+      "evidenceReview": "reviewed",
+      "reason": "Existing GitHub token lacks read:packages/write:packages; package API403; user confirms no separate PAT and requests Release publication first."
+    },
+    "awsDeployment": {
+      "method": "manual",
+      "execution": "not_run",
+      "verdict": null,
+      "evidenceReview": "required"
+    }
+  },
+  "source": {
+    "workStartedAtHead": "9a3fbbd898607afbcef7ccd2ad309407aa8aab89",
+    "testedWithUncommittedChanges": true,
+    "testedCodePreservedAt": "6870477",
+    "sourceFileSha256": {
+      "scripts/audit-image-archive.py": "e015446b6d63ea98b4b9bd45ff43e7be794bf86902d8b30197d1556c81790a28",
+      "scripts/image-reference.d.mts": "fddcd734ff859f2a671bed4f9b28a4305dd5d1dc202afee5c5b7b3edbc2353f8",
+      "scripts/image-reference.mjs": "85d4f575984514239a242a97206866c40b218962d2bf4a77648d2b9502906e22",
+      "scripts/preflight-aws.ts": "190b912238824b889d1d3ad868f14169836d4d5f1201b8f8d9dff06f45670cc7",
+      "scripts/release-manifest.ts": "7851ed75cc3bdd11bbb9613ada575c82c91de815c2f6b69cff5d5558171e8f29",
+      "scripts/verify-release-files.d.mts": "c6abe898be498eb530fbc5e738003388254d056b12967725463d094784f735dd",
+      "scripts/verify-release-files.mjs": "2e83109b6e8a49442938c9361ee8349f30390e06b3ae381c0ce2b523fc169e00",
+      "tests/unit/aws-deployment.test.ts": "a245287a576d402e146436774f7bcf80f003e7806267467722aa443b8468253f",
+      "tests/unit/image-publication.test.ts": "11d8f41ab617a7434946da9cdb69067dc7ed3d5188d3c556b9e6e06be8e8c0c5"
+    },
+    "publishedBundleCommit": "5718e9a8ea29ace3d85c4b2dcc205631920a57b1",
+    "publishedBundleWorktreeDirty": false,
+    "proofRecordIsLaterThanBundle": true,
+    "runtimeImageSourceCommit": "137c402a56c588e0632ea5e3c6e8017dc774847f",
+    "runtimeImageNotRebuilt": true
+  },
+  "release": {
+    "recordedAt": "2026-11-02T08:41:00.647068+00:00",
+    "status": "PASS",
+    "releaseId": 431228724,
+    "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z",
+    "tag": "aws-bootstrap-20261102t082954z",
+    "sourceCommit": "5718e9a8ea29ace3d85c4b2dcc205631920a57b1",
+    "publishedAt": "2026-11-02T08:40:37Z",
+    "assetCount": 5,
+    "totalBytes": 575933,
+    "files": [
+      {
+        "name": "deployment-files.tar",
+        "bytes": 440320,
+        "sha256": "c9551379a502aca977b32c1d163bd3488218b7ccba04d4b6a3fada21e58b5b0c",
+        "assetId": 701076967,
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t082954z/deployment-files.tar",
+        "githubDigest": "sha256:c9551379a502aca977b32c1d163bd3488218b7ccba04d4b6a3fada21e58b5b0c"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 122880,
+        "sha256": "dd62c22e52149da9e186a649eb20bb83fb3cbfd33e733bfd011292bd1ed6f726",
+        "assetId": 701076968,
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t082954z/observer-tests.tar",
+        "githubDigest": "sha256:dd62c22e52149da9e186a649eb20bb83fb3cbfd33e733bfd011292bd1ed6f726"
+      },
+      {
+        "name": "images.json",
+        "bytes": 5183,
+        "sha256": "9093f765870ae6c560cd226aabffc1948f86c6c7f9de07d6058b045028e2ba87",
+        "assetId": 701076965,
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t082954z/images.json",
+        "githubDigest": "sha256:9093f765870ae6c560cd226aabffc1948f86c6c7f9de07d6058b045028e2ba87"
+      },
+      {
+        "name": "publication-audit.json",
+        "bytes": 7211,
+        "sha256": "0b6e2786683fb96d6ea85ab6dae1a9863a510a30cdc14a8c07cf9b5e0706a4bf",
+        "assetId": 701076964,
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t082954z/publication-audit.json",
+        "githubDigest": "sha256:0b6e2786683fb96d6ea85ab6dae1a9863a510a30cdc14a8c07cf9b5e0706a4bf"
+      },
+      {
+        "name": "SHA256SUMS",
+        "bytes": 339,
+        "sha256": "5f74329a866796c6d9458d05f6cfa8224d317b92699c8e5fda1f8c70fe102c35",
+        "assetId": 701076963,
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t082954z/SHA256SUMS",
+        "githubDigest": "sha256:5f74329a866796c6d9458d05f6cfa8224d317b92699c8e5fda1f8c70fe102c35"
+      }
+    ],
+    "freshNetworkDownload": {
+      "command": "gh release download TAG --repo 0u-Y/CallSign --dir NEW_DIR --pattern each of the five exact assets",
+      "newDirectory": true,
+      "overwritesAllowed": false,
+      "receiptSource": "GitHub release asset download; not a local copy",
+      "allReceivedHashesMatchPreuploadHashes": true,
+      "localChecksumVerifier": {
+        "status": "PASS",
+        "scope": "local bytes/checksums only; not proof of a network download, image publication or AWS deployment",
+        "files": [
+          {
+            "name": "deployment-files.tar",
+            "bytes": 440320,
+            "sha256": "c9551379a502aca977b32c1d163bd3488218b7ccba04d4b6a3fada21e58b5b0c"
+          },
+          {
+            "name": "observer-tests.tar",
+            "bytes": 122880,
+            "sha256": "dd62c22e52149da9e186a649eb20bb83fb3cbfd33e733bfd011292bd1ed6f726"
+          },
+          {
+            "name": "images.json",
+            "bytes": 5183,
+            "sha256": "9093f765870ae6c560cd226aabffc1948f86c6c7f9de07d6058b045028e2ba87"
+          },
+          {
+            "name": "publication-audit.json",
+            "bytes": 7211,
+            "sha256": "0b6e2786683fb96d6ea85ab6dae1a9863a510a30cdc14a8c07cf9b5e0706a4bf"
+          }
+        ]
+      },
+      "firstReceiptFileTimestamp": "2026-11-02T08:40:39.194844+00:00",
+      "lastReceiptFileTimestamp": "2026-11-02T08:40:39.287848+00:00"
+    },
+    "anonymousAccess": {
+      "releaseInventory": "PASS",
+      "taggedVerifierSource": "PASS",
+      "authHeaderProvided": false,
+      "expectedBytesMatch": true
+    },
+    "ghcrRemoteVerification": "BLOCKED_NO_PACKAGE_CREDENTIALS"
+  },
+  "publicationAudit": {
+    "version": 1,
+    "recordedAt": "2026-11-02T08:40:06.595218+00:00",
+    "sourceCommit": "5718e9a8ea29ace3d85c4b2dcc205631920a57b1",
+    "sourceWorktreeDirty": false,
+    "publicAssets": {
+      "status": "PASS",
+      "tarEntries": {
+        "deployment-files.tar": {
+          "regularFiles": 42,
+          "sha256": "c9551379a502aca977b32c1d163bd3488218b7ccba04d4b6a3fada21e58b5b0c",
+          "bytes": 440320
+        },
+        "observer-tests.tar": {
+          "regularFiles": 5,
+          "sha256": "dd62c22e52149da9e186a649eb20bb83fb3cbfd33e733bfd011292bd1ed6f726",
+          "bytes": 122880
+        }
+      },
+      "regularFilesScanned": 47,
+      "knownProtectedValuesCompared": 17,
+      "findings": [],
+      "scope": "All public tar entries and file bytes plus inventory; no links, special files, traversal or protected matches. No exhaustive secret/malware guarantee."
+    },
+    "imageArchive": {
+      "sha256": "cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21",
+      "bytes": 2317248512,
+      "uploaded": false,
+      "rawScan": {
+        "version": 1,
+        "status": "BLOCKED",
+        "imageConfigIds": [
+          "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+          "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+          "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+          "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+          "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+          "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8"
+        ],
+        "uniqueLayers": 38,
+        "regularFilesScanned": 54145,
+        "regularFileBytesScanned": 2269368000,
+        "knownProtectedValueCount": 27,
+        "findingCount": 3,
+        "findings": [
+          {
+            "kind": "private-key-material",
+            "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1",
+            "layer": "sha256:d81fb2a7c6ee3be05fdefaa7fd223be219c1ab172083ec1b994c3ecda33ac0a8"
+          },
+          {
+            "kind": "private-key-material",
+            "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1",
+            "layer": "sha256:42724e448bf499ec7d4b3c21d6cc68fe665ef677ed393c3dbb5357394e89ff91"
+          },
+          {
+            "kind": "private-key-material",
+            "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.40.3",
+            "layer": "sha256:bb36f155f1c38b0957e1a623459be5843fb7b247654aee2f5169c651867a9e14"
+          }
+        ],
+        "findingsTruncated": false,
+        "scope": "Every saved layer, including deleted files, plus config/history; known inputs and recognizable private-key/token material. Not a general malware or exhaustive secret audit.",
+        "secretValuesPrinted": false,
+        "servicesStarted": false,
+        "recordedAt": "2026-11-02T08:24:21.506045+00:00"
+      },
+      "contentReview": {
+        "sourceUrl": "https://raw.githubusercontent.com/gnutls/gnutls/b70f2f47d3bf3d57a4fdcf5fc42c73b8228438f0/lib/crypto-selftests-pk.c",
+        "sourceCommit": "b70f2f47d3bf3d57a4fdcf5fc42c73b8228438f0",
+        "sourceSha256": "81765f415dd7a711bee4ce15ad114e99f8feb30d9f647f546dfc35f287000736",
+        "publicSelfTestPemHashes": [
+          "5a09eb5df3674472eda0077d83cbccef72692c3d052ab393368ac57295439c58",
+          "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+          "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+          "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+          "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138",
+          "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+          "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af",
+          "fed7079dd4491609e4c996e232f366ac434fa4cc9df19df363391d079d470964"
+        ],
+        "observedPemHashes": [
+          "5a09eb5df3674472eda0077d83cbccef72692c3d052ab393368ac57295439c58",
+          "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+          "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+          "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+          "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138",
+          "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+          "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af",
+          "fed7079dd4491609e4c996e232f366ac434fa4cc9df19df363391d079d470964"
+        ],
+        "allObservedHashesMatchPublicSelfTests": true,
+        "unmatchedCount": 0,
+        "privateMaterialPrinted": false,
+        "downloadedBytes": 41858,
+        "classification": "public upstream GnuTLS algorithm self-test vectors; no library-wide filename allowlist; raw scanner findings retained"
+      },
+      "operationalKnownProtectedFindings": 0,
+      "scope": "Public upstream self-test content classification only; original scanner BLOCKED warnings retained."
+    },
+    "retainedBuildContextReview": {
+      "recordedAt": "2026-11-02T08:31:12.446637+00:00",
+      "status": "PASS_RETAINED_INPUTS",
+      "contexts": [
+        {
+          "root": ".local/media-20261102-43880954/runtime-image-inputs",
+          "files": 32958,
+          "symlinksNotFollowed": 623,
+          "protectedPaths": [],
+          "knownInputMatches": [],
+          "scope": "retained original build inputs; symlinks not followed; no source/context upload"
+        },
+        {
+          "root": ".local/media-20261102-43880954/build-context",
+          "files": 2707,
+          "symlinksNotFollowed": 21,
+          "protectedPaths": [],
+          "knownInputMatches": [],
+          "scope": "retained original build inputs; symlinks not followed; no source/context upload"
+        }
+      ],
+      "finalImageCoverage": "All actual saved layers/config/history were scanned separately. This does not recreate an unretained historical Docker build-context tar.",
+      "dockerignoreReviewed": [
+        ".git",
+        "**/node_modules",
+        "**/dist",
+        ".local",
+        ".env",
+        ".env.*",
+        "artifacts/*",
+        "!artifacts/test-results.json",
+        "submission",
+        "contracts/out",
+        "contracts/cache",
+        "",
+        "# Integration entrypoints and test sources are host-side validation only.",
+        "services/api/test",
+        "tests",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/.env",
+        "**/.env.*",
+        "**/*.key",
+        "**/*.pem",
+        "**/*.env",
+        "**/*.env.*",
+        "!infra/deploy/*.env.example"
+      ],
+      "dockerfiles": {
+        "infra/deploy/app.Dockerfile": "3bd957f12696fce5474ddfb6bb4cab34c38a6c506b6ae82a2d0d4d3504758506",
+        "infra/deploy/media.Dockerfile": "8a57c78d52f0d6e8ed706fb65c783493ea8dc2053f6f92ac9821d16c9a86bdf0",
+        "infra/deploy/web.Dockerfile": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611"
+      },
+      "knownValuesPrinted": false
+    },
+    "githubPackages": {
+      "status": "BLOCKED",
+      "packagesApiStatus": 403,
+      "missingScopes": [
+        "read:packages",
+        "write:packages"
+      ],
+      "userDecision": "No writer PAT available; publish possible Release files first",
+      "imagesPublished": false,
+      "remoteDigestsVerified": false
+    },
+    "servicesStarted": false,
+    "imagesRebuilt": false,
+    "hostSettingsChanged": false,
+    "awsCalls": false
+  },
+  "checks": {
+    "light": {
+      "command": "pnpm light",
+      "status": "PASS",
+      "files": 50,
+      "tests": 251,
+      "maxWorkers": 2,
+      "logSha256": "6767ea3b9d67b4c86805060306aaef26a878c7353051754df4372550a0ca90ed",
+      "scope": "Offline source checks, types and small unit tests; not infrastructure/media/AWS/GHCR execution"
+    },
+    "apiRuntimeTypes": {
+      "command": "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit",
+      "status": "PASS",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "finalLightTypes": {
+      "command": "pnpm exec tsc -p tsconfig.light.json --noEmit",
+      "status": "PASS",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "pythonCompile": {
+      "command": "python3 -m py_compile scripts/audit-image-archive.py",
+      "status": "PASS"
+    },
+    "bundle": {
+      "command": "pnpm exec tsx scripts/release-manifest.ts --bundle NEW_DIR --env-file LOCAL_IMAGE_REFERENCES",
+      "exitCode": 2,
+      "classification": "Expected BLOCKED final web; public files emitted from clean source; local inventory is not registry evidence"
+    },
+    "freshRemoteFiles": {
+      "status": "PASS",
+      "receivedFiles": 5,
+      "localVerifierFiles": 4,
+      "scope": "GitHub Release assets and tagged verifier actually downloaded. No images pulled remotely."
+    }
+  },
+  "authentication": {
+    "githubRepoVisibility": "public",
+    "repoReleasePermission": true,
+    "packageApiStatus": 403,
+    "packageWriteEnabled": false,
+    "packageVisibilityChanged": false,
+    "tokenPrintedOrCommitted": false,
+    "awsAuthProcedure": "Public Release needs no auth; future GHCR deployment uses separate read:packages classic PAT and explicit package read permission via a protected file and new Docker config directory."
+  },
+  "toolVersions": {
+    "node": "22.22.2",
+    "pnpm": "11.27.0",
+    "python": "3.12.3",
+    "gh": "2.45.0"
+  },
+  "executionBoundaries": {
+    "servicesStarted": false,
+    "containersStarted": false,
+    "imagesLoadedOrBuilt": false,
+    "hostSettingsModified": false,
+    "awsResourcesCreated": false,
+    "protectedInputsGenerated": false,
+    "releasePublicAssetBytes": 575933,
+    "noImageArchiveInGitOrRelease": true,
+    "priorTrialStateUnmodified": true
+  },
+  "remaining": {
+    "ghcr": "Six images unpublished; registryReference and registryManifestDigest null; remote architecture/access/blob receipt not verified. New unique Release inventory required after actual private publication.",
+    "web": "Final AWS web absent; generate only after actual AWS trust/certificate from reviewed runtime/nginx.",
+    "aws": "Region/budget/domain/IdP and actual AWS deployment/network validation remain separate.",
+    "safetyAudit": "Known-secret/key/token/layer/context review is not exhaustive secret absence or malware assurance. Raw GnuTLS warnings retained and exact public content classified."
+  }
+}

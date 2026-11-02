@@ -1,5 +1,7 @@
 # CallSign 전체 개발 명세
 
+**2026-11-02 GitHub 전달:** OPS-001/003·TEST-001/004의 공개 배포 파일은 GitHub Release 게시/재수령 checksum을 확인했다.6종 이미지의 비공개 GHCR 게시는 package 자격 참조가 없어 차단이며 최종 AWS 웹/실행은 미완료다. [현재 절차와 증거](RUNBOOK.md#github-delivery-20261102). 아래 전달 리허설의 외부 보관 미검증 표시는 당시 범위다.
+
 **2026-11-02 전달 리허설:** 새 identity에서 이미지/공개 전달물만으로 원장·최소권한 DB·별도 Anchor·인증 fixture·실제 제품 통화를 연결하고 위임·정책·키·PBX/장치 경계를 실행했다. 실제1시간 세션 자연 만료와 양 끝점 음성/PBX 회수까지 재검증했다. 요구 ID와 완료 기준은 유지하며 [현재 실행·실패·외부 경계](FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102)를 따른다. AWS override 전체·외부 보관/재수령·외부 TLS/IdP/NAT는 아직 검증하지 않았다.
 
 **2026-11-02 배포 목표 변경:** 대회는 AWS 단독 실행이며 개발 서버는 실행 의존성이 아니다. 기본은 검증 코드/이미지로 새 AWS 대회 identity를 초기화한다. 폐기 시험 데이터 이전을 요구하지 않는다. NEW와 기존 RESTORE는 분리하고 OPS 요구 ID·복구/서명 기준은 유지한다. [현재 절차](RUNBOOK.md#aws-competition). 과거 날짜의 GCP 시험/계획 기록은 당시 범위로 보존한다.

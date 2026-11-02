@@ -8,7 +8,9 @@
 
 ## 2026-11-02 GitHub 전달 경로와 게시 준비
 
-시작 HEAD는 `9a3fbbd`다. 사용자는 공개 소스/배포 파일을 Git 저장소와 Release에, 기존6종 이미지는 비공개 GHCR에 보관하도록 확정했다. 기존 인증은 저장소/Release 권한은 있으나 package 조회403·package scope 누락이며, 별도 PAT가 아직 없어 가능한 Release 게시부터 진행하도록 답했다. 이미지를 공개로 바꾸거나 CI 권한으로 우회하지 않는다. 현재 게시 전이며 실제 게시/수령 결과는 후속 증거로 구분한다. 운영 절차의 기준은 [RUNBOOK](RUNBOOK.md#github-delivery-20261102)이다.
+시작 HEAD는 `9a3fbbd`다. 사용자는 공개 소스/배포 파일을 Git 저장소와 Release에, 기존6종 이미지는 비공개 GHCR에 보관하도록 확정했다. 기존 인증은 저장소/Release 권한은 있으나 package 조회403·package scope 누락이며, 별도 PAT가 아직 없어 가능한 Release 게시부터 진행하도록 답했다. 이미지를 공개로 바꾸거나 CI 권한으로 우회하지 않는다. 공개 파일 게시와 재수령은 완료했고 GHCR은 계속 차단이다. 실제 결과는 [게시 증거](../artifacts/github-publication-20261102.json)로 구분한다. 운영 절차의 기준은 [RUNBOOK](RUNBOOK.md#github-delivery-20261102)이다.
+
+공개 파일 Release `aws-bootstrap-20261102t082954z`는 clean source `5718e9a`를 고정했다.5개 파일575,933bytes를 GitHub에서 새 디렉터리에 실제 내려받아 게시 전/hash·GitHub digest와 대조했고 익명 공개 접근도 확인했다. 보호 자료/image tar/합성 trust 웹은 게시하지 않았다. code `6870477`, 운영 문서 `5718e9a`를 일반 push했으며 게시 영수증은 그 이후 문서 커밋에 보존한다. Release 안의 문서는 게시 직전 상태이고 과거 첨부물을 후속 문서로 덮지 않는다. 현재 bootstrap image ref/digest는 null이므로 AWS 초기 배포는 아직 차단이다.
 
 OPS-001/003·TEST-001/004: AWS bootstrap preflight에 GHCR manifest digest를 요구하고 로컬 config ID/태그를 거절한다. 실제 trust로 AWS에서 만드는 web만 별도다. 공개 파일 검사기는 정해진 checksum 집합·일반 파일·크기/hash를 확인하고 symlink/경로 이탈/변조를 거절한다. image 감사 도구는 서비스 기동/파일 추출 없이 모든 역사 layer/config/history를 읽고 삭제된 보호 값도 검사한다. 공개 배포 묶음에 두 검사기를 포함한다.
 

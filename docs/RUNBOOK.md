@@ -12,13 +12,15 @@
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 게시할 고유 버전: `aws-bootstrap-20261102t082954z`. [Release 주소](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z). 기존 tag/Release/asset은 덮어쓰지 않는다.
+- 게시한 고유 버전: `aws-bootstrap-20261102t082954z`. [Release 주소](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z). 기존 tag/Release/asset은 덮어쓰지 않는다.
 - 공개 첨부 파일: `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`. observer는 재현 시험용이며 서비스 실행 의존성이 아니다.
 - 현재 저장소/Release는 공개다. 사용자가 이 공개 파일 전달을 허용한 것과 이미지 공개 허가는 별개다. GHCR 패키지는 새 비공개 package로만 게시하고, 이미 공개인 package나 visibility를 확인할 수 없는 대상에는 게시하지 않는다.
 - **현재 GHCR은 차단**이다. 기존 GitHub 인증은 저장소 관리/Release 게시가 가능하지만 package 조회403이며 `read:packages`/`write:packages`가 없다. 사용자도 별도 토큰이 아직 없다고 답했다. 패키지를 공개로 바꾸거나 workflow로 권한을 우회하지 않는다. `images.json`의 원격 digest/ref는 null이며 bootstrap 이미지의 미게시 상태를 유지한다. 이 Release는 이미지 준비까지 완료된 AWS 실행 릴리스가 아니다.
 - GitHub 최초 container package의 기본 visibility는 private지만 이를 저장소 공개 여부로 추정하지 않는다. 게시 후 API의 실제 visibility와 인증/비인증 접근을 확인한다. 공개 repo 연결/권한 상속은 별도 검토한다. [공식 registry 문서](https://docs.github.com/en/packages/working-with-a-github-packages-registry), [권한/visibility](https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages).
 
 게시 전 점검은 실제 image archive의 config/history와 모든 layer(나중에 삭제된 파일도 포함), 보존된 build input, 공개 tar/첨부 파일을 대상으로 한다. `scripts/audit-image-archive.py`는 추출/컨테이너 없이 layer hash·보호 경로·알려진 보호 값·키/token 패턴을 검사한다. 원본 패턴 경고를 삭제하거나 파일명으로 예외 처리하지 않는다. 이번3건의 GnuTLS 바이너리 경고에 포함된8개 서로 다른 PEM 값은 [고정 upstream self-test 소스](https://github.com/gnutls/gnutls/blob/b70f2f47d3bf3d57a4fdcf5fc42c73b8228438f0/lib/crypto-selftests-pk.c)와 **정확한 내용 hash**를 대조해 공개 시험 벡터로 분류했다. 키 내용은 로그/첨부물에 넣지 않는다. 이 검사는 범용 악성코드/모든 비밀정보 부재 보증이 아니다.
+
+공개 파일 게시와 새 디렉터리의 실제 재다운로드를 완료했다.5개 asset **575,933bytes**의 수령 hash가 게시 전 hash 및 GitHub asset digest와 모두 일치했다. 익명 HTTPS로 inventory와 tag의 verifier도 받아 동일 bytes를 확인했다. source tag는 `5718e9a8ea29ace3d85c4b2dcc205631920a57b1`이며 후속 문서/증거 커밋과 구분한다. [게시·수령 영수증](../artifacts/github-publication-20261102.json). **GHCR 이미지의 원격 다운로드/digest/아키텍처 검증은 실행하지 못했다.**
 
 #### 공개 Release 수령
 
