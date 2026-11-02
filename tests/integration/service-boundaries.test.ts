@@ -9,14 +9,19 @@ import {ledgerEventConsumer,events} from '../../services/api/src/ledger-events.j
 import {postgresWorkerStore} from '../../services/api/src/service-worker.js';
 import {analyzeWithRules} from '../../services/api/src/risk.js';
 import {tokenHash} from '../../services/api/src/auth.js';
-import {createHttpFixture,type HttpFixture} from './service-http-fixture.js';
+import {postgresAuthorityStore} from '../../services/api/src/finals-store.js';
+import {ServiceAuthority} from '../../services/api/src/service-authority.js';
+import {PbxRuntime} from '../../services/api/src/pbx-runtime.js';
+import {AriClient,AsteriskBridge} from '../../services/api/src/asterisk.js';
+import {analysisScopes,postgresQuotaStore} from '../../services/api/src/quota.js';
+import {createHttpFixture,httpBrowserOptions,type HttpFixture} from './service-http-fixture.js';
 const {default:WebSocket}=await import(new URL('../../services/api/node_modules/ws/wrapper.mjs',import.meta.url).href) as typeof import('ws');
 const accounts=[1,2,3,4].map(n=>privateKeyToAccount(`0x${String(n).padStart(64,'0')}`)); // Public, non-operational signing fixtures.
 let f:HttpFixture,browsers:Browser[]=[],pageErrors:string[]=[],browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;
 beforeEach(async()=>{expectedTransportFailure=false;closing=false;pageErrors=[];browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;f=await createHttpFixture();await f.start();},30000);
 afterEach(async()=>{closing=true;for(const b of browsers)await b.close();browsers=[];try{await writeFile(`${f.runRoot}/browser-observations.json`,JSON.stringify({...browserObservations,uncaughtPageErrors:pageErrors.length}),{mode:0o600});expect(pageErrors).toEqual([]);}finally{await f?.close();}});
 async function browserPage(subject='staff'){
- let b=browsers[0];if(!b){b=await chromium.launch({headless:true,args:['--disable-dev-shm-usage','--no-sandbox']});browsers.push(b);}const c=await b.newContext({ignoreHTTPSErrors:true});
+ let b=browsers[0];if(!b){b=await chromium.launch(await httpBrowserOptions());browsers.push(b);}const c=await b.newContext();
  await c.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());c.on('page',p=>{p.on('pageerror',e=>pageErrors.push(e.name));p.on('console',m=>{if(m.type()==='error'){browserObservations.consoleErrors++;if(!/^Failed to load resource: the server responded with a status of (401|403|409|503) \([^)]*\)$/.test(m.text())&&!(expectedTransportFailure&&m.text()==='Failed to load resource: net::ERR_FAILED'))pageErrors.push(`Unexpected browser console error: ${m.text().slice(0,200)}`);}});p.on('requestfailed',r=>{browserObservations.failedRequests++;if(!closing&&!(expectedTransportFailure&&new URL(r.url()).pathname==='/api/v3/intents'))pageErrors.push('Unexpected failed network request');});});const p=await c.newPage();p.setDefaultTimeout(6000);await browserLogin(p,subject);return p;
 }
 async function browserLogin(p:Page,subject:string,official=false){
@@ -203,4 +208,101 @@ it.each(['lease-policy','connection-generation'] as const)('boundary: stops a pe
  const stream=f.audio.streams[0]!;stream.options.onRevision({streamId:stream.options.streamId,segmentId:'pending',revision:1,final:true,text:'OTP를 알려주세요.',source:'remote'});await expect.poll(()=>f.audio.calls.length).toBe(1);
  await f.mutate(record=>{const t=record.serviceV3!.attempts[call.attempt.id]!;if(change==='lease-policy')t.lease!.payload.policyHash='0'.repeat(64);else t.generation='changed-generation';});active.ws.send(Buffer.from([0]));await expect.poll(()=>stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);
  const before=active.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>active.ws.readyState).toBe(WebSocket.CLOSED);expect(active.messages.filter(m=>m.type==='risk')).toHaveLength(before);
+});
+
+async function analysisCall(){
+ const call=await acceptedCall();expect((await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true})).status).toBe(200);
+ const active=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>active.messages.some(m=>m.type==='ready')).toBe(true);active.ws.send(JSON.stringify({type:'consent',consent:true}));await expect.poll(()=>f.audio.streams.length).toBe(1);
+ const stream=f.audio.streams[0]!,revision=(n:number,text:string,id='purpose')=>stream.options.onRevision({streamId:stream.options.streamId,segmentId:id,revision:n,final:true,text,source:'remote'});
+ return {...call,...active,stream,revision};
+}
+const purposeResult=(text:string,relation:'suspected'|'not-detected'|'undetermined'='not-detected',evidenceSpan='')=>({...analyzeWithRules(text),purpose:{relation,evidenceSpan,reason:relation==='suspected'?'승인 목적과 다른 상품 권유':'분석 범위의 관계만 표시'}});
+it('analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence',async()=>{
+ const c=await analysisCall();try{
+  const text='OTP를 알려주세요. 대출 상품을 안내하겠습니다.';c.revision(1,text);await expect.poll(()=>f.audio.calls.length).toBe(1);
+  expect(hashCanonical(f.audio.calls[0]!.policy)).toBe(hashCanonical((await f.state()).policy));
+  f.audio.calls[0]!.resolve(purposeResult(text,'suspected','대출 상품을 안내하겠습니다.'));
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.purpose.relation).toBe('suspected');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+  c.revision(2,text);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(purposeResult(text));
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.purpose.relation).toBe('not-detected');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+  c.revision(3,'OTP를 알려주지 마세요.');await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.resolve(purposeResult('OTP를 알려주지 마세요.'));await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('analyzed');expect(c.messages.findLast(m=>m.type==='risk').event.signals).toEqual([]);
+  c.revision(2,text);c.revision(3,text);expect(f.audio.calls).toHaveLength(3);
+  c.revision(1,'OTP를','1');c.revision(1,'알려주세요.','2');await expect.poll(()=>f.audio.calls.length).toBe(4);expect(f.audio.calls[3]!.text).toContain('OTP를 알려주세요.');f.audio.calls[3]!.reject(new Error('FIXTURE_PROVIDER_TIMEOUT'));
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(c.messages.findLast(m=>m.type==='risk').event).toMatchObject({purpose:{relation:'undetermined'}});expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+ }finally{c.ws.terminate();}
+},20000);
+it.each(['invented-evidence','external-command'] as const)('analysis HTTP/WS: rejects %s while retaining supported rules and product-controlled actions',async mode=>{
+ const c=await analysisCall();try{
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
+  f.audio.calls[0]!.resolve({...purposeResult('OTP를 알려주세요.','suspected',mode==='invented-evidence'?'실제 문맥에 없는 대출 권유':'OTP를 알려주세요.'),recommendedAction:'https://untrusted.invalid/execute',purpose:{relation:'suspected',evidenceSpan:mode==='invented-evidence'?'실제 문맥에 없는 대출 권유':'OTP를 알려주세요.',reason:mode==='external-command'?'https://untrusted.invalid/execute':'분석 근거'}});
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event.purpose.relation).toBe('undetermined');expect(JSON.stringify(event)).not.toContain('untrusted.invalid');expect((await f.state()).status).toBe('active');expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
+ }finally{c.ws.terminate();}
+});
+it.each(['epoch','key-generation','binding'] as const)('analysis HTTP/WS: rejects %s mismatch before forwarding a new frame',async change=>{
+ const c=await analysisCall();try{
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
+  await f.mutate(r=>{const t=r.serviceV3!.attempts[c.attempt.id]!;if(change==='epoch')t.lease!.payload.epoch='999';else if(change==='key-generation')t.lease!.payload.approvalKeyVersion=999;else t.lease!.payload.bindingHash='0'.repeat(64);});
+  c.ws.send(Buffer.from([0,0]));await expect.poll(()=>c.stream.stopped).toBe(true);expect(c.stream.pushes).toBe(0);expect(f.audio.calls[0]!.signal.aborted).toBe(true);
+  const before=c.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.messages.filter(m=>m.type==='risk')).toHaveLength(before);
+ }finally{c.ws.terminate();}
+});
+it('analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work',async()=>{
+ const c=await analysisCall();try{
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
+  expect((await c.manager.c.request('/v3/management/accounts',{issuer:f.oidc,subject:'recipient',displayName:'수신자 시험 계정',role:'recipient',active:false,permissions:[]})).status).toBe(200);
+  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
+ }finally{c.ws.terminate();}
+});
+it('analysis HTTP/WS: enforces the remote context identity cap and releases the stream',async()=>{
+ const c=await analysisCall();try{
+  for(let n=0;n<257;n++){c.revision(1,'정상 확인 안내입니다.',String(n));if(n<256)await expect.poll(()=>c.messages.some(m=>m.type==='revision'&&m.revision.segmentId===String(n))).toBe(true);}
+  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.messages.some(m=>m.type==='unavailable'&&m.code==='ANALYSIS_LIMIT')).toBe(true);expect(c.stream.stopped).toBe(true);expect(f.audio.calls.length).toBeLessThanOrEqual(20);for(const request of f.audio.calls){expect(request.signal.aborted).toBe(true);request.reject(new Error('FIXTURE_CANCELLED'));}
+ }finally{c.ws.terminate();}
+},20000);
+
+it('recall HTTP/SQL: keeps DELETE success, missing resources and unavailable observation distinct through real runtime writes',async()=>{
+ const c=await acceptedCall();await f.mutate(r=>{r.serviceV3!.attempts[c.attempt.id]!.pbx={bridgeId:'fixture-bridge',senderChannelId:'fixture-sender',recipientChannelId:'fixture-recipient',senderEndpoint:'cs-fixture-s',recipientEndpoint:'cs-fixture-r',state:'bridged',reports:{},credentials:{}};});
+ expect((await c.manager.c.request('/v3/cancel',{intentId:c.intentId})).status).toBe(200);
+ const store=postgresAuthorityStore(process.env.ISSUER_DATABASE_URL!,{anchor:f.anchor,deployment:f.deployment}),authority=new ServiceAuthority({store,networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,signingKey:async()=>f.issuerKey,current:async()=>f.control.current,now:f.now});
+ let observation:'present'|'unavailable'|'absent'='present';const requests:string[]=[];
+ const ari=new AriClient({base:new URL('https://ari-fixture.invalid'),application:'callsign',authorization:'synthetic-only',fetcher:async(url,init)=>{requests.push(init!.method+':'+new URL(String(url)).pathname);return init!.method==='DELETE'?new Response(null,{status:204}):new Response('{}',{status:observation==='present'?200:observation==='unavailable'?503:404});}});
+ const bridge=new AsteriskBridge(ari,f.issuerKey,{networkId:'31337',registryAddress:`0x${'1'.repeat(40)}`,pbxFingerprint:'AA:'.repeat(31)+'AA'}),runtime=new PbxRuntime({authority,institutionId:f.id,bridge,endpoints:{remove:async()=>{}},sessionsAlive:async()=>true});runtime.ready=true;
+ const report=async()=>(await c.manager.c.request('/v3/management/recalls?intentId='+encodeURIComponent(c.intentId))).body;
+ try{
+  expect((await report()).attempts[0].media).toBe('requested');await runtime.tick();expect((await report()).attempts[0]).toMatchObject({media:'retry',serverAuthority:'terminal-applied',audioInterruption:'not-observed'});
+  observation='unavailable';await runtime.tick();expect((await report()).attempts[0].media).toBe('retry');observation='absent';await runtime.tick();expect((await report()).attempts[0]).toMatchObject({media:'pbx-absent',mediaObservation:{source:'ari-delete-readback'},audioInterruption:'not-observed'});
+  await runtime.event({type:'ChannelDestroyed',channel:{id:'fixture-sender'}});await runtime.event({type:'StasisEnd',channel:{id:'fixture-recipient'}});expect((await report()).attempts[0]).toMatchObject({status:'cancelled',media:'pbx-absent'});expect(requests.filter(x=>x.startsWith('DELETE:')).length).toBe(9);
+  for(const subject of ['agent','recipient','approver-one'])expect((await (await f.login(subject)).c.request('/v3/management/recalls')).status).toBe(403);
+  expect((await c.manager.c.request('/v3/management/recalls?institutionId=foreign')).status).toBe(400);
+  const foreign='foreign-'+randomUUID();await f.sql`INSERT INTO issuer_v2.institutions(id,state) VALUES(${foreign},${f.sql.json({id:foreign,secretMarker:'FOREIGN_RECALL_MUST_NOT_LEAK'})})`;
+  try{expect(JSON.stringify((await report()))).not.toContain('FOREIGN_RECALL_MUST_NOT_LEAK');}finally{await f.sql`DELETE FROM issuer_v2.institutions WHERE id=${foreign}`;}
+ }finally{runtime.close();await store.close();}
+});
+
+it('recall Chromium: renders real cancellation observations and clears a held response on visibility events and account switch',async()=>{
+ const manager=await f.login('staff'),work='browser-recall-'+randomUUID();expect((await manager.c.request('/v3/intents',{id:work,recipientId:f.uid('recipient'),agentId:f.uid('agent'),serviceUri:'https://center.example',expiresAt:f.now()+600})).status).toBe(200);expect((await manager.c.request('/v3/cancel',{intentId:work})).status).toBe(200);
+ const page=await browserPage();const panel=page.locator('section.service-recalls');await panel.getByText('생성된 통화 시도 없음',{exact:false}).waitFor();expect(await panel.innerText()).toContain(work);expect(await panel.innerText()).toContain('원장 작업 대상 아님');expect(await panel.innerText()).toContain('기관 DB 관측');
+ await page.getByLabel('회수 조회 업무',{exact:true}).focus();expect(await page.getByLabel('회수 조회 업무',{exact:true}).evaluate(e=>e===document.activeElement)).toBe(true);
+ for(const width of [1440,390]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`${f.runRoot}/recall-${width}.png`,fullPage:true});}
+ let release!:()=>void,seen!:()=>void;const gate=new Promise<void>(r=>release=r),waiting=new Promise<void>(r=>seen=r);let held=false;
+ await page.route('**/api/v3/management/recalls*',async route=>{if(held){await route.continue();return;}held=true;const response=await route.fetch();seen();await gate;await route.fulfill({response});});
+ try{
+  await waiting;await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));await panel.getByText('화면을 다시 확인하는 중입니다.',{exact:false}).waitFor();
+  expect(await panel.innerText()).not.toContain(work);
+  await page.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();await page.getByRole('heading',{name:'연락 권한·연결 회수',exact:true}).waitFor({state:'hidden'});release();
+  await browserLogin(page,'recipient');expect(await page.getByRole('heading',{name:'연락 권한·연결 회수',exact:true}).count()).toBe(0);expect(await page.locator('body').innerText()).not.toContain('기관 DB 관측');expect(await page.getByRole('button',{name:'연락 업무 생성',exact:true}).count()).toBe(0);
+ }finally{release?.();await page.unroute('**/api/v3/management/recalls*');}
+});
+it('analysis HTTP/WS: rejects an expired session row and cancels its pending provider result',async()=>{
+ const c=await analysisCall();try{
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
+  const token=c.receiver.c.cookies.get('ip_session')!;await f.sql`UPDATE public.sessions SET expires_at=now()-interval '1 second' WHERE token_hash=${tokenHash(token)}`;
+  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
+ }finally{c.ws.terminate();}
+});
+it('analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter',async()=>{
+ const c=await analysisCall(),quota=postgresQuotaStore(process.env.ISSUER_DATABASE_URL!),reservation='fixture-quota-'+randomUUID();try{
+  await quota.reserve(reservation,f.id,'llm-requests',20,analysisScopes(f.id,f.uid('recipient'),c.attempt.id,'llm-requests',20,f.now()),f.now()+120);
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(f.audio.calls).toHaveLength(0);const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event.purpose.relation).toBe('undetermined');
+ }finally{c.ws.terminate();await quota.settle(reservation,0);await quota.close();}
 });

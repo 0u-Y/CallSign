@@ -5,7 +5,7 @@ import {randomUUID} from 'node:crypto';
 import {chromium} from '@playwright/test';
 import {bankPolicy,hashCanonical,generateEd25519KeyPair,signPayload,verifyPayload,serviceReceiptSchema,serviceLeaseSchema,type ServiceBinding} from '../../packages/protocol/src/index.js';
 import {postgresAuthorityStore} from '../../services/api/src/finals-store.js';
-import {createHttpFixture} from './service-http-fixture.js';
+import {createHttpFixture,httpBrowserOptions} from './service-http-fixture.js';
 const {importJWK}=await import(new URL('../../services/api/node_modules/jose/dist/webapi/index.js',import.meta.url).href) as typeof import('../../services/api/node_modules/jose/dist/types/index.js');
 const f=await createHttpFixture({web:process.env.CALLSIGN_HTTP_API_ONLY!=='true'});
 const {sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject}=f;
@@ -96,7 +96,7 @@ it('blocks new work after trust publication or recovery mismatch without creatin
  const store=postgresAuthorityStore(process.env.ISSUER_DATABASE_URL!,{anchor,deployment});try{await store.verifyRecovery(id);}finally{await store.close();}
 });
 it('renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus',async()=>{
- const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage','--no-sandbox']});const context=await browser.newContext({ignoreHTTPSErrors:true});
+ const browser=await chromium.launch(await httpBrowserOptions());const context=await browser.newContext();
  let allowUnauthenticated=true;const failures:string[]=[],requests:string[]=[],consoleErrors:string[]=[];const page=await context.newPage();page.on('response',r=>{if(r.status()>=400)requests.push(`${r.status()}:${new URL(r.url()).pathname}`);});page.setDefaultTimeout(6000);page.on('pageerror',e=>failures.push(e.message));page.on('console',m=>{if(m.type()==='error'){consoleErrors.push(m.text());const path=new URL(m.location().url||origin).pathname;if(!(allowUnauthenticated&&path==='/api/v3/auth/me'&&/^Failed to load resource: the server responded with a status of 401 \([^)]*\)$/.test(m.text())))failures.push(`${path}:${m.text()}`);}});
  try{
   // No device grants, fake media, route mocks, storage injection or provider calls.
