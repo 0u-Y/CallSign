@@ -1552,7 +1552,7 @@ step http-auth 180 node node_modules/vitest/vitest.mjs run --config vitest.http.
 step http-recall 180 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(recall HTTP/SQL:|boundary: rejects replayed joint|boundary: separates first-connect|boundary: preserves a live synthetic)'
 step analysis-ws 240 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(analysis HTTP/WS:|boundary: stops analysis transport|boundary: stops a pending model)'
 # 보호 environment.json에서 CALLSIGN_HTTP_API_ONLY를 제거한 뒤 실행한다.
-step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
+step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
 ```
 
 E는 같은DB에서 B/C/D 중 영향받는 시나리오만 **새 label**로 재실행하고, 전후에 보호 environment.json에 `CALLSIGN_HTTP_AUDIT_CONFIRMATION=NO_ACTIVE_HTTP_FIXTURES`를 설정해 다음 SQL 감사를 수행한다. 일반 suite 전에 확인값을 제거한다. 시험 전용 빈DB에서 시작하고 active fixture가 없을 때만 권한/outbox/session/미정산quota 잔류를 assert한다. 데이터를 지워 통과시키지 않으며 정당한 usage 정산 이력은 보존한다. 이번E는 미실행이다.
@@ -1565,7 +1565,7 @@ exit 0 # EXIT trap이 정상·실패 모두 소유 cleanup을 실행한다.
 
 자원 중단은 최초 원인을 `environment-stop.json`에 고정하고 새 단계를 거절한다. 실행 중 테스트에 SIGINT로 부분 결과/afterAll 기회를 주고, PID와 start tick이 일치하는 소유 자식만 TERM/KILL한다. 앱 정리가 확인되지 않으면 DB를 먼저 내리지 않고 미완료를 기록한다. Vitest progress에는 시험명/판정만 남기며 기존 FAIL을 환경 BLOCKED로 숨기지 않는다. `resource-samples.jsonl`, `*.result.json`, `environment-cleanup.json`을 대조하고, assertion0은 PASS가 아니다. 프로세스 종료 후에도 자식이 남거나 정리 오류가 있으면 수동 소유 identity 확인이 필요하다. 실제 다중 서비스 정리와 observer 인계는 이번에 실행되지 않았으며 오프라인 자식 취소/부분 결과·차단 회귀만 통과했다.
 
-DB의512MiB/CPU1은 강제 제한, 앱/브라우저/observer 합산RSS3GiB·임시5GiB·RAM reserve8GiB는 관측 상한이다.1초 sampling은 순간 peak를 보장하지 않는다. deadline40초 전부터 새 단계를 차단해 정리 시간을 남긴다. container `OOMKilled`·Node heap 오류·호스트 PSI/swap을 각각 기록하며 서로 원인으로 단정하지 않는다. Python CLOCK_MONOTONIC과 Vitest process hrtime은 관측자/clock 이름을 구별하고 시각을 직접 빼지 않는다.
+DB의512MiB/CPU1은 강제 제한, 앱/브라우저/observer 합산RSS3GiB·임시5GiB·RAM reserve8GiB는 관측 상한이다.1초 sampling은 순간 peak를 보장하지 않는다. deadline40초 전부터 새 단계를 차단해 정리 시간을 남긴다. 임시 디스크 표본은 소유 ROOT/기록 디렉터리의 파일과 PGDATA512MiB 상한을 합산한 범위다. 공유 도구 cache나 ROOT 밖의 브라우저 임시 profile을 포함한 호스트 전체 임시 공간의 peak로 해석하지 않는다. container `OOMKilled`·Node heap 오류·호스트 PSI/swap을 각각 기록하며 서로 원인으로 단정하지 않는다. Python CLOCK_MONOTONIC과 Vitest process hrtime은 관측자/clock 이름을 구별하고 시각을 직접 빼지 않는다.
 
 `cleanup`은 소유 DB를 **중지**하며 container/보호 파일을 임의 제거하지 않는다. 공개 증거를 선별한 뒤 선언한 container ID·label·ROOT와 PID를 대조해 이번 stopped container 및 ROOT만 제거한다. 전역 prune/kill·기존 권한 변경·swap 설정 변경은 하지 않는다. 모든 종료 경로에 cleanup을 `trap`으로 등록하되 비밀 포함 로그는 공개하지 않는다. 중단 latch를 지우거나 새 identity를 자동 생성해 재개하지 않는다.
 
