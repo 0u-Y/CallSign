@@ -1,3 +1,5 @@
+import {recallSnapshot,type RecallJob} from './recall-status.js';
+import {requirePermission} from './finals-model.js';
 import { enterBackupWrite,backupLock } from './backup-drain.js';
 import { randomUUID } from 'node:crypto';
 import { notificationRecipients } from './notifications.js';
@@ -23,6 +25,14 @@ export function postgresAuthorityStore(url: string, options?:{anchor:Consumption
   };
   const closeGate=async(id:string,error:unknown,force=false)=>{if(force||(error instanceof Error&&/ANCHOR|CONSUMPTION_HISTORY|AUTHORITY_METADATA/.test(error.message)))await sql`UPDATE issuer_v2.recovery_gate SET status='blocked' WHERE institution_id=${id}`;};
   return {
+    async recalls(actor,now,intentId){return sql.begin('isolation level repeatable read read only',async tx=>{
+      const rows=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${actor.institutionId}`;
+      const record=rows[0]?.state as InstitutionRecord;if(!record)throw new Error('INSTITUTION_NOT_PROVISIONED');requirePermission(record,actor,'contact.manage');
+      const jobs=await tx`SELECT id,kind,object_id,status,attempts,last_error,receipt_block FROM issuer_v2.outbox WHERE institution_id=${actor.institutionId} AND kind IN ('credential.revoke','institution.suspend','institution.configure','institution.recover','call.cleanup','intent.cancelled','key.activated') ORDER BY created_at DESC LIMIT 100`;
+      const events=await tx`SELECT event FROM issuer_v2.audit WHERE institution_id=${actor.institutionId} AND event->>'event' IN ('intent.cancelled','credential.revoke','institution.suspend','institution.configure','key.activated') ORDER BY recorded_at DESC LIMIT 50`;
+      const safeJobs:RecallJob[]=jobs.map(j=>({id:String(j.id),kind:String(j.kind),objectId:String(j.object_id),status:String(j.status),attempts:Number(j.attempts),error:j.last_error?(/^[A-Z0-9_]{1,100}$/.test(j.last_error)?j.last_error:'WORKER_ERROR'):null,receiptBlock:j.receipt_block===null?null:String(j.receipt_block)}));
+      return recallSnapshot(record,actor,now,intentId,{jobs:safeJobs,audit:events.reverse().map(e=>e.event) as InstitutionRecord['audit']});
+    });},
     async manageAccount(id,actorId,requestId,input){
       let anchorTouched=false;
       try{return await sql.begin(async tx=>{

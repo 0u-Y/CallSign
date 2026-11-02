@@ -22,6 +22,7 @@ export class ServiceAuthority {
   state(r: InstitutionRecord): ServiceState { if (!r.serviceV3 || r.serviceV3.recovery !== "ready") throw new HttpError(503, "CONSUMPTION_HISTORY_RECOVERY_REQUIRED"); return r.serviceV3; }
   event(r: InstitutionRecord, actor: Actor, kind: string, objectId: string, payload: unknown = {}) {
     const id = randomUUID(), at = this.now();
+    const attempt=r.serviceV3?.attempts[objectId];if(kind==="call.cleanup"&&attempt?.pbx&&attempt.cleanup?.status!=="pbx-absent")attempt.cleanup={status:"requested",observedAt:at,source:"server-request",attempts:attempt.cleanup?.attempts??0};
     r.audit.push({ id, at, actor: actor.userId, event: kind, objectId });
     (r.pendingEvents ??= []).push({ id, at, kind, objectId, payload });
   }

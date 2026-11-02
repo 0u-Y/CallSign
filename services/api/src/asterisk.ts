@@ -32,6 +32,7 @@ export class AriClient {
     const p=attempt.pbx;if(!p)return;
     const results=await Promise.allSettled([`channels/${p.senderChannelId}`,`channels/${p.recipientChannelId}`,`bridges/${p.bridgeId}`].map(async path=>{try{await this.request('DELETE',path);}catch(error){if((error as {status?:number}).status!==404)throw error;}}));
     if(results.some(r=>r.status==='rejected'))throw new Error('PBX_CLEANUP_RETRY_REQUIRED');
+    for(const path of [`channels/${p.senderChannelId}`,`channels/${p.recipientChannelId}`,`bridges/${p.bridgeId}`]){try{await this.request('GET',path);}catch(error){if((error as {status?:number}).status===404)continue;throw error;}throw new Error('PBX_CLEANUP_NOT_OBSERVED');}
   }
 }
 export class AsteriskBridge {

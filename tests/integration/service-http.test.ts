@@ -117,3 +117,10 @@ it('renders the actual service in Chromium, completes OIDC login, creates/cancel
   expect(failures).toEqual([]);await writeFile(`${runRoot}/browser-observations.json`,JSON.stringify({uncaughtErrors:failures,consoleErrors,unsuccessfulRequests:requests,viewportChecks:[390,1440],routeMocking:false,externalRequestsBlocked:true,permissions:[],traceStored:false}),{flag:'wx',mode:0o600});
  }catch(error){await writeFile(`${runRoot}/browser-failure.json`,JSON.stringify({failures,consoleErrors,requests}),{flag:'wx',mode:0o600});console.error(JSON.stringify({browserFailure:{path:new URL(page.url()).pathname,alerts:await page.getByRole('alert').allTextContents(),requests,failures}}));throw error;}finally{await context.close();await browser.close();}
 },45000);
+
+it('reads institution recall snapshots through actual sessions and rejects customer access',async()=>{
+ const staff=await login('staff'),recipient=await login('recipient');
+ const workId='recall-read-'+randomUUID();expect((await staff.c.request('/v3/intents',{id:workId,recipientId:uid('recipient'),agentId:uid('agent'),serviceUri:'https://center.example',expiresAt:Math.floor(Date.now()/1000)+600})).status).toBe(200);expect((await staff.c.request('/v3/cancel',{intentId:workId})).status).toBe(200);
+ const report=await staff.c.request('/v3/management/recalls?intentId='+encodeURIComponent(workId));expect(report.status).toBe(200);expect(report.body.consistentRead).toBe(true);expect(report.body.changes.find((x:{objectId:string})=>x.objectId===workId)).toMatchObject({kind:'intent.cancelled',ledger:'not-required'});expect(report.body.source).toBe('institution-database-snapshot');expect(report.body.attempts.length).toBeLessThanOrEqual(100);expect(JSON.stringify(report.body)).not.toContain('proofJws');expect(JSON.stringify(report.body)).not.toContain('credentials');
+ expect((await recipient.c.request('/v3/management/recalls')).status).toBe(403);
+});

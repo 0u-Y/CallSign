@@ -43,12 +43,12 @@ export class PbxRuntime {
         if(terminal(t.status)&&t.pbx!.state!=='ended'){
           // Every resource is attempted even if another cleanup call fails. Next tick retries.
           await measurements.measure('revocation-reclaim',async()=>{await bridge.ari.destroy(t);await endpoints.remove(t.id);});
-          await a.options.store.transact(institutionId,async r=>{const current=r.serviceV3?.attempts[t.id];if(current?.pbx&&terminal(current.status)){current.pbx.state='ended';current.pbx.credentials={};current.pbx.reports={};delete current.pbx.evidence;}});
+          await a.options.store.transact(institutionId,async r=>{const current=r.serviceV3?.attempts[t.id];if(current?.pbx&&terminal(current.status)){current.cleanup={status:'pbx-absent',observedAt:a.now(),source:'ari-delete-readback',attempts:(current.cleanup?.attempts??0)+1};current.pbx.state='ended';current.pbx.credentials={};current.pbx.reports={};delete current.pbx.evidence;}});
         } else if(t.status==='accepted'&&t.pbx!.state==='bridged'){
           if((t.authorityStatus==='unavailable'||(t.authorityUntil??0)<=a.now()||t.lease?.payload.authority==='unavailable')&&!(t.lease?.payload.authority==='unavailable'&&t.unverifiedChoice==='continue')){await bridge.ari.mute(t.pbx!.senderChannelId,true);await bridge.ari.mute(t.pbx!.recipientChannelId,true);}
           else {await bridge.ari.channel(t.pbx!.senderChannelId);await bridge.ari.channel(t.pbx!.recipientChannelId);}
         }
-        }catch{/* A failed cleanup remains pending; it must not terminate unrelated calls. */}
+        }catch{if(terminal(t.status))await a.options.store.transact(institutionId,async r=>{const current=r.serviceV3?.attempts[t.id];if(current&&current.cleanup?.status!=='pbx-absent')current.cleanup={status:'retry',observedAt:a.now(),source:'server-request',attempts:(current.cleanup?.attempts??0)+1};},'cleanup').catch(()=>{});/* Failure to save an observation never becomes successful cleanup. */}
       }
     }catch{
       // Last observed channel IDs remain useful when the DB cannot answer. PBX timeouts also remain armed.

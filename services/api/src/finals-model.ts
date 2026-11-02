@@ -10,6 +10,7 @@ export interface InstitutionRecord {
   authorityCheckpointVersion?:1;
   institutionUri?: string;
   observedEpoch?:string;
+  ledgerObservation?:{event:string;block:string;blockHash:string;transactionHash:string;appliedAt:number;source:"chain-event-consumer"};
   registrationOperation?:string;
   registrationState?:"pending"|"failed"|"confirmed";
   directory?:{hash:string;version:number;entries:import("./configuration.js").ConfigurationContents["directory"]};
@@ -32,6 +33,7 @@ export interface InstitutionRecord {
 export interface AuthorityStore {
   read(institutionId: string): Promise<InstitutionRecord>;
   transact<T>(institutionId: string, operation: (record: InstitutionRecord) => Promise<T>, mode?: "safety" | "cleanup"): Promise<T>;
+  recalls?(actor:Actor,now:number,intentId?:string):Promise<import("./recall-status.js").RecallSnapshot>;
   manageAccount?(institutionId:string,actorId:string,requestId:string,input:unknown):Promise<unknown>;
 }
 // Calls, indexer observations and directory labels are not authority metadata.

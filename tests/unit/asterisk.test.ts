@@ -33,3 +33,9 @@ it('keeps immutable PBX data visible and places non-root runtime writes outside 
  const {readFile}=await import('node:fs/promises');const config=await readFile('infra/deploy/asterisk/asterisk.conf.example','utf8'),compose=await readFile('infra/deploy/compose.pbx.yml','utf8');
  expect(config).toContain('astdbdir => /var/run/asterisk');expect(config).toContain('astdatadir => /var/lib/asterisk');expect(compose).toContain('/var/run/asterisk:uid=1000,gid=1000');expect(compose).not.toContain(':/var/lib/asterisk');
 });
+
+it('requires read-back absence after DELETE and keeps partial cleanup retryable',async()=>{
+ const f=await serviceFixture();const attempt={...f.attempt,pbx:{bridgeId:'b',senderChannelId:'s',recipientChannelId:'r',senderEndpoint:'cs-s',recipientEndpoint:'cs-r',state:'bridged' as const,reports:{},credentials:{}}};let present=true;
+ const ari=new AriClient({base:new URL('https://pbx.example'),authorization:'fixture',application:'callsign',fetcher:async(_url,init)=>init?.method==='DELETE'?new Response(null,{status:204}):new Response(present?'{}':null,{status:present?200:404})});
+ await expect(ari.destroy(attempt)).rejects.toThrow('PBX_CLEANUP_NOT_OBSERVED');present=false;await expect(ari.destroy(attempt)).resolves.toBeUndefined();
+});

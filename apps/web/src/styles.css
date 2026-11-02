@@ -762,3 +762,6 @@ tbody th { color: var(--ink); font-weight: 700; }
 .finals-controls dl { margin: 1rem 0; }
 .finals-controls dd { margin: 0 0 .75rem; }
 .finals-controls table { width: 100%; table-layout: fixed; }
+
+.service-recalls, .service-analysis { min-width: 0; overflow-wrap: anywhere; }
+.service-recalls li { margin-block: 1rem; }

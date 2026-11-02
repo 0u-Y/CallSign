@@ -1,3 +1,4 @@
+import {recallSnapshot} from './recall-status.js';
 import { measurements } from './telemetry.js';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { terminal } from './service-state.js';
@@ -22,6 +23,7 @@ export function registerServiceRoutes(app: FastifyInstance, options: { authority
     const publicAuthorizations = auths.map(({payload,cancelled})=>({authorizationId:payload.authorizationId,attemptId:payload.attemptId,cancelled}));
     return { actor, institutionUri:record.institutionUri??record.did, policy: record.policy, intents, attempts: publicAttempts, authorizations: publicAuthorizations, credentials, permissions: record.members[actor.userId]?.permissions ?? [], runtimePolicy:a.policy, services: actor.role === 'institution' ? Object.keys(record.services) : [], defaultProfile: 'asterisk-webrtc-v3', scenario: '모의 금융기관 이상거래 확인', mode: 'provider-code-unverified' };
   });
+  app.get('/v3/management/recalls',async r=>{const actor=await actorFor(r),query=z.object({intentId:id.optional()}).strict().parse(r.query);return store.recalls?store.recalls(actor,a.now(),query.intentId):recallSnapshot(await store.read(actor.institutionId),actor,a.now(),query.intentId);});
   app.post('/v3/intents', async r => { const b = z.object({id,recipientId:id,agentId:id,serviceUri:registeredUriSchema,expiresAt:z.number().int().positive()}).strict().parse(r.body); return a.createIntent(await actorFor(r,true),requestId(r),{id:b.id,recipientId:b.recipientId,agentId:b.agentId,serviceDid:b.serviceUri,expiresAt:b.expiresAt}); });
   app.post('/v3/credentials', async r => { const b = z.object({serviceUri:registeredUriSchema}).strict().parse(r.body); return a.issueCredential(await actorFor(r,true),requestId(r),b.serviceUri); });
   app.post('/v3/revoke', async r => { const b = z.object({digest}).strict().parse(r.body); return a.revoke(await actorFor(r,true),requestId(r),b.digest); });

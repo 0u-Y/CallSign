@@ -12,6 +12,7 @@ export interface ServiceAttempt {
   renewal?: { nonce: string; sequence: number; priorLeaseHash: string; issuedAt: number; expiresAt: number; proofs: Partial<Record<"sender" | "recipient", string>> };
   ownerSessions?: Partial<Record<"sender" | "recipient", string>>;
   endedAt?: number; reason?: string; consent?: { granted: boolean; generation: number; at: number; streamId?:string }; unverifiedChoice?: "pause" | "continue";
+  cleanup?:{status:"requested"|"retry"|"pbx-absent";observedAt:number;source:"server-request"|"ari-delete-readback";attempts:number};
   pbx?: { bridgeId: string; senderChannelId: string; recipientChannelId: string; senderEndpoint: string; recipientEndpoint: string; state: "reserved" | "prepared" | "bridged" | "ended"; evidence?: string; credentials:Record<string,string>; reports: Record<string, { callId: string; sdp: string; remoteSdp: string; fingerprint: string; proof: string }> };
 }
 export interface ServiceState {

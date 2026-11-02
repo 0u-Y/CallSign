@@ -47,6 +47,7 @@ export function ledgerEventConsumer(options:{databaseUrl:string;client:ReturnTyp
       // Recovery never silently activates a local old key. Explicit key activation verifies fresh quorum evidence.
       record.observedEpoch=String(decoded.args.epoch);record.status='suspended';for(const c of Object.values(s.credentials))c.state='revoked';
     }
+    record.ledgerObservation={event:decoded.eventName,block:String(log.blockNumber),blockHash:log.blockHash,transactionHash:log.transactionHash,appliedAt:Math.floor(Date.now()/1000),source:"chain-event-consumer"};
     for(const t of Object.values(s.attempts)){
       const a=s.authorizations[t.authorizationId??''];if(a&&(record.status!=='active'||s.credentials[a.payload.vcDigest]?.state==='revoked')){a.cancelled=true;if(!['ended','cancelled','declined','failed','no-answer'].includes(t.status)){t.status='cancelled';t.reason='ledger-revocation';t.endedAt=Math.floor(Date.now()/1000);t.revision++;if(t.consent){t.consent.granted=false;t.consent.generation++;}}}
     }
