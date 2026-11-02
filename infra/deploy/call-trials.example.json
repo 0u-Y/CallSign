@@ -1,0 +1,12 @@
+{
+  "environmentId": "test:",
+  "environment": "aws",
+  "transport": "turn",
+  "sourceSha256": "",
+  "images": [],
+  "fixtures": ["synthetic-audio"],
+  "normalAttempts": 3,
+  "maxRetries": 0,
+  "perTryTimeoutMs": 120000,
+  "totalTimeoutMs": 360000
+}

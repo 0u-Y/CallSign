@@ -1,3 +1,5 @@
+import {callPhases,callTrySchema,trialPlanSchema,type CallTry,type TrialPlan} from '../services/api/src/observation-contract.js';
+export {callPhases,callTrySchema,trialPlanSchema,type CallTry,type TrialPlan};
 import {readFile,writeFile} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -13,5 +15,34 @@ export function evaluatePerformance(input:{provenance:'actual-observation';envir
   return {metric,scope,boundaryMissing,revocationUsesConservativeUpperBound:metric==='revocation',count:rows.length,successes:successes.length,failures,p50:percentile(.5),p95:percentile(.95),p99:percentile(.99),targetMs,status:rows.length<100||boundaryMissing?'BLOCKED':failures?'FAIL':targetMs===null?'MEASURED':percentile(.95)!<=targetMs?'PASS':'FAIL'};
  });
  return {version:1,environmentId:input.environmentId,runId:input.runId,method:'Nearest rank ceil(p*n)-1, success samples only; failures reported and prevent PASS; minimum100 samples per metric. Revocation starts when the same observer receives chain confirmation and ends on client acknowledgement. No subtraction of server/browser wall clocks. Revocation requires a reviewed confirmation-observation uncertainty bound and evidence hash; the bound is added to each duration. Without it this is only a proxy and cannot PASS the chain-confirmation-to-screen target.',metrics,targetsAreMeasuredOnlyForThisInput:true,unmeasuredFreshnessBound:'10 seconds is a configured freshness bound; requires separate clock-skew/stale-proof assertions, not a latency percentile.',status:metrics.some(v=>v.status==='FAIL')?'FAIL':metrics.some(v=>v.status==='BLOCKED')?'BLOCKED':'PASS'};
+}
+
+export class CallObserver {
+ private readonly start=performance.now();private readonly events:CallTry['events']=[];
+ constructor(readonly id:string){}
+ mark(phase:typeof callPhases[number],extra:Pick<CallTry['events'][number],'cause'|'interval'>={}){this.events.push({id:String(this.events.length),observer:this.id,phase,atMs:performance.now()-this.start,...extra});}
+ finish(outcome:CallTry['outcome']):CallTry{return {observer:this.id,outcome,finishedMs:performance.now()-this.start,events:this.events};}
+}
+export function aggregateCallTrials(planValue:unknown,rows:Array<{id:string;tries:CallTry[]}>,provenance:'actual-observation'|'synthetic'){
+ const plan=trialPlanSchema.parse(planValue);if(rows.length>plan.normalAttempts||new Set(rows.map(r=>r.id)).size!==rows.length)throw new Error('LOGICAL_ATTEMPT_ID_OR_COUNT_INVALID');
+ const attempts=Array.from({length:plan.normalAttempts},(_,i)=>{
+  const row=rows[i]??{id:'not-started-'+i,tries:[]};if(row.tries.length>plan.maxRetries+1)throw new Error('RETRY_BUDGET_EXCEEDED');
+  const tries=row.tries.map(value=>{const t=callTrySchema.parse(value),unique=new Map<string,typeof t.events[number]>();
+   for(const e of t.events){if(e.observer!==t.observer||e.atMs>t.finishedMs)throw new Error('CROSS_CLOCK_OR_FUTURE_OBSERVATION');if((e.phase==='unavailable-start'||e.phase==='unavailable-end')&&!e.interval)throw new Error('UNAVAILABLE_INTERVAL_REQUIRED');const old=unique.get(e.id);if(old&&JSON.stringify(old)!==JSON.stringify(e))throw new Error('CONFLICTING_EVENT_ID');unique.set(e.id,e);}
+   const events=[...unique.values()].sort((a,b)=>a.atMs-b.atMs),first=(p:typeof callPhases[number])=>events.find(e=>e.phase===p)?.atMs;
+   const duration=(from:typeof callPhases[number],to:typeof callPhases[number])=>{const a=first(from),b=first(to);return a!==undefined&&b!==undefined&&b>=a?b-a:null;};
+   const verified=first('verification-visible'),media=first('remote-decoded-both'),observedAuthority=verified!==undefined&&verified<=plan.perTryTimeoutMs,observedMedia=media!==undefined&&verified!==undefined&&media>=verified&&media<=plan.perTryTimeoutMs;
+   const cleanup=first('resources-reclaimed'),cleanupObserved=cleanup!==undefined&&cleanup<=plan.perTryTimeoutMs;
+   const outcome=t.finishedMs>plan.perTryTimeoutMs?'timeout':t.outcome==='success'&&(!observedAuthority||!observedMedia||!cleanupObserved)?'failure':t.outcome;
+   const starts=[...new Map(events.filter(e=>e.phase==='unavailable-start').map(e=>[e.interval,events.find(x=>x.phase==='unavailable-start'&&x.interval===e.interval)!])).values()];
+   const intervals=starts.map(e=>{const end=events.find(x=>x.phase==='unavailable-end'&&x.interval===e.interval&&x.atMs>=e.atMs)?.atMs??Math.min(t.finishedMs,plan.perTryTimeoutMs);return {cause:e.cause??'other',durationMs:Math.max(0,end-e.atMs)};});
+   return {outcome,authorityVerified:observedAuthority,cleanupObserved,authorityAndRemoteAudio:observedAuthority&&observedMedia,unavailable:intervals,latencyMs:{authorizationToVerification:duration('authorization-request','verification-visible'),connectToVerification:duration('connect-action','verification-visible'),connectToRemoteAudio:duration('connect-action','remote-decoded-both'),revocationToConfirmation:duration('revocation-request','chain-confirmed'),confirmationToServer:duration('chain-confirmed','server-applied'),serverToRejection:duration('server-applied','new-request-rejected'),serverToUi:duration('server-applied','ui-recalled'),revocationToAudio:duration('revocation-request','audio-reclaimed'),terminationToAudio:duration('termination-request','audio-reclaimed'),aiToTranscript:duration('ai-input','transcript'),transcriptToAnalysis:duration('transcript','analysis'),analysisToWarning:duration('analysis','warning-visible')},events};
+  });
+  if(tries.slice(0,-1).some(t=>t.outcome==='success'))throw new Error('RETRY_AFTER_SUCCESS');
+  const successful=tries.findIndex(t=>t.outcome==='success'&&t.authorityAndRemoteAudio),last=tries.at(-1),outcome=successful===0?'first-success':successful>0?'retry-success':last?.outcome==='timeout'?'timeout':last?.outcome==='failure'?'failure':'incomplete';
+  return {id:row.id,outcome,tryCount:tries.length,authorityVerified:tries.some(t=>t.authorityVerified),tries};
+ });
+ const count=(v:string)=>attempts.filter(t=>t.outcome===v).length,joint=attempts.filter(t=>t.tries.some(v=>v.authorityAndRemoteAudio)).length;
+ return {version:1,status:provenance==='synthetic'?'SYNTHETIC':rows.length?'MEASURED':'NOT_RUN',plan,criteria:'Normal logical attempts are the denominator; normal completion requires authorization verification, decoded distinct remote audio AND observed cleanup within the per-try deadline; joint authorization/audio rate is counted independently of cleanup outcome. Failures/timeouts/not-started/incomplete remain in denominator. Explicit retry budget only.',clock:'Each try uses one test-controller monotonic clock. Missing or reversed phase pairs are unmeasured, never zero. Browser/UI reports are untrusted observations.',attempts,summary:{denominator:plan.normalAttempts,totalTries:attempts.reduce((n,t)=>n+t.tryCount,0),firstSuccess:count('first-success'),retrySuccess:count('retry-success'),failure:count('failure'),timeout:count('timeout'),incomplete:count('incomplete'),unavailableAttempts:attempts.filter(t=>t.tries.some(v=>v.unavailable.length>0)).length,authorityVerified:attempts.filter(t=>t.authorityVerified).length,authorityVerifiedRate:attempts.filter(t=>t.authorityVerified).length/plan.normalAttempts,authorityAndRemoteAudio:joint,authorityAndRemoteAudioRate:joint/plan.normalAttempts},sla:'NOT_EVALUATED: bounded observational sample, no SLA or new performance baseline'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){const [input,output]=process.argv.slice(2);if(!input||!output)throw new Error('INPUT_AND_NEW_OUTPUT_REQUIRED');const bytes=await readFile(input);if(bytes.length>16*1024*1024)throw new Error('MEASUREMENT_FILE_TOO_LARGE');const report=evaluatePerformance(JSON.parse(bytes.toString()));await writeFile(output,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});process.stdout.write(JSON.stringify({output,status:report.status})+'\n');if(report.status==='FAIL')process.exitCode=1;else if(report.status==='BLOCKED')process.exitCode=2;}

@@ -50,6 +50,8 @@
     "tests/integration/chain-runtime.test.ts",
     "vitest.chain.config.ts",
     "tests/integration/live-authority-http.test.ts",
-    "tests/integration/runtime-media.test.ts"
+    "tests/integration/runtime-media.test.ts",
+    "scripts/call-trials.ts",
+    "scripts/evaluate-service-analysis.ts"
   ]
 }
