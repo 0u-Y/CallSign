@@ -1,62 +1,71 @@
 # 시스템 아키텍처
 
-**현재 배포 목표(2026-11-02):** AWS 단독 실행. 개발 서버는 배포/인증/원장/Anchor/이미지 제공자가 아니다. 서비스 EC2의 기존 Compose와 별도 AWS Anchor/저장소, 선택할 외부 IdP를 기본안으로 준비한다. validator/Witness의 같은 호스트 배치는 독립 호스트 장애 내성이 아니다. 기본 NEW와 보존 배포 RESTORE는 [RUNBOOK](RUNBOOK.md#aws-competition)에서 분리한다. 아래 날짜별 과거 검증 기록은 그 시점의 범위다.
-
-2026-11-01에는 host 설정을 유지한 별도 loopback namespace에서 실제 Besu/Witness·독립 HTTPS Anchor·SQL·worker·HTTP 연결을 검증했다. 아래 과거 fixture 범위와 구분하며, 실제 PBX/음성·외부 IdP/AI·GCP 검증으로 확대하지 않는다. [최신 실행 경계](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
-
-이 문서의 Platform은 요청 중계, Issuer Gateway는 기관 승인, Sender Agent는 콜센터 서명 서비스다. PBX는 교환기이며 Witness는 원장 상태 증언자다. 통신 형식 번호·세션 결합·갱신형 통화 유지 허가 등은 [용어와 형식 대응](PROTOCOL.md#protocol-profiles)을 따른다.
-
-## 배포 후보 구성의 현재 경계
-
-2026-10-31 검토는 [진행 기록](FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 따른다. 역할/DB/키 구조를 유지하면서 issuer/worker는 PBX·사설 Anchor/OIDC용 공개 CA bundle을 read-only로 받고, worker는 보관 기간을 명시 전달한다. Platform/Web의 시작 의존성과 서비스 readiness를 구분해 인증/관리 준비가 PBX 연결 완료를 기다리지 않도록 했다. readiness 검사는 유지한다. source/target/Anchor의 같은 호스트 분리 cluster 복원은 이전 실제 시험에서 확인했으며, 아래 인증 시점의 메모리 fixture 설명과 구분한다. 전체 image/체인/미디어/provider/GCP 연결은 아직 검증하지 않았다.
-
-신규 배포 ledger 주소는 `LEDGER_IPV4_PREFIX`의 /24와 .11~.14로 파생하며 static peers와 Compose를 함께 맞춘다. Witness/deployer RPC는 내부 Besu DNS로 유지한다. 기본10.203.0 충돌에 대해10.206.0을 현재 관측의 비중복 후보로 제안했으며 실제 host/network는 변경하지 않았다. 기존 genesis·키·기관·epoch를 재생성하는 기능이 아니다. [2026-11-01 준비 기록](FINALS-IMPLEMENTATION-PLAN.md#chain-preparation-20261101).
+기본 제품은 `/service` → `/v3`의 등록 URI·교환기 통화 경로다. 이 문서는 구성·키·데이터·신뢰 경계를 설명한다. 요구는 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 데이터 형식은 [프로토콜](PROTOCOL.md), 실제 실행 범위는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), 설정·기동은 [RUNBOOK](RUNBOOK.md)이 기준이다.
 
 ## 확정 기본 서비스와 이행 상태
 
-2026-10-27: 등록 기관/콜센터 URI·키를 기본으로 하고 DID는 선택 호환 기능이다. VC는 기관→콜센터 업무 위임, 개별 승인은 이번 고객·업무·세션에 한정한다.120초 시작 승인·현재 권한 상태 최신성·진행 통화 lease를 분리한다. 기본 음성은 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이며 Asterisk가 media edge 종단이다. native proof는 별도 후속 확장이다.
+기관→콜센터의 업무 위임 VC와 고객별 개별 연락 승인을 구별한다. 등록 URI·등록 Ed25519 공개키가 기본이고 DID 조회는 선택 호환 기능이다. 120초는 최초 연결 시작 창이며 진행 통화는 같은 binding·권한 세대에 한정한 lease로 갱신한다. 세 형식의 입력은 strict 진입점으로 구분하며 검증 실패 시 이전 형식으로 자동 전환하지 않는다.
 
-기본 `/service` 화면은 URI 기반 위임·개별 승인·수신 nonce·양측 단기키 서명·일회 소비·수신 SDK·통화 유지·PBX·동의 기반 원격 음성 분석으로 연결했다. 영속 worker는 서명 요청/nonce 보존·재조회, 원장 사건 cursor, 회수·사용량·보관 처리를 수행한다. 이는 전체 서비스 성공을 뜻하지 않는다. 실제 PostgreSQL·로컬 HTTPS OIDC·issuer/platform HTTP·Chromium의 선택 경로는 [통합 기록](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030)에서 따로 검증했다. 이 실행의 체인/독립 anchor는 adapter fixture이며 교환기·음성·외부 AI는 실행하지 않았다. 아래 도식의 직접 WebRTC는 `/finals` 호환 경로이고 현재 기본 경로는 서비스 가이드 그림을 따른다. [현재 상태](FINALS-IMPLEMENTATION-PLAN.md#service-20261027), [서비스 구조도](guide/02-ARCHITECTURE.md).
+[현재 서비스 구조도](guide/02-ARCHITECTURE.md)는 통화·분석 경로를, [통화 흐름](guide/03-CALL-FLOW.md)은 준비·소비·수락·미디어 허용 순서를 설명한다. `/finals`의 직접 통화와 초기 시청 시연은 호환·회귀 경로다.
 
-## 보존한 직접 통화 호환 경로
+## 역할·키·저장소 경계
 
-```mermaid
-flowchart LR
-  UI[역할별 React 앱] -->|HTTPS/WSS, 역할 세션| P[Platform: 기관 DB·개인키 없음]
-  P -->|별도 service token + 원래 사용자 세션| I[Issuer Gateway]
-  P -->|다른 서비스 채널| S[Sender Agent]
-  S -->|할당·시도·브라우저 공개키 재검사| I
-  I --> A[(issuer_v2 기관 행 잠금·삭제 없이 추가하는 감사 기록)]
-  I --> U[(별도 auth 계정: users/sessions)]
-  S --> SK[서비스 장기키]
-  I --> IK[기관 승인키 버전별 파일]
-  I --> W[서로 다른 witness 3-of-4]
-  W --> B[Besu QBFT 4개]
-  UI <-->|직접 WebRTC / 수락 후 양방향 마이크| PEER[상대 브라우저 세션키]
-  UI -->|동의한 상대 음성| I
-  I --> STT[Deepgram streaming]
-  STT --> REV[전사 구간·수정 번호·목적 정책]
-  REV --> RULE[규칙 + 선택 Anthropic]
-  RULE -->|근거·revision·철회| UI
-```
+| 구성요소 | 책임과 접근 범위 |
+|---|---|
+| Platform | 인증된 사용자 요청·서명 데이터 중계. DB client나 기관·콜센터 개인키를 생성하지 않음 |
+| Issuer Gateway | 업무·개별 승인·소비·취소·계정 권한 검사. 기관 승인키/PBX 증거키와 issuer/auth의 서로 다른 DB LOGIN 사용 |
+| Sender Agent | 콜센터 장기키 하나와 요청별 서명. 할당·시도·브라우저 공개키를 다시 확인 |
+| worker | 원장 관리자·긴급 정지키, 영속 outbox·서명자 lease·사건 cursor·자원 회수·retention. Issuer에 원장 관리키를 mount하지 않음 |
+| PostgreSQL | 기관별 JSONB 업무 상태, 세션·회원 세대, 공통 소비 식별 범위·영수증·journal·outbox·quota |
+| 별도 HTTPS Anchor | 배포/기관의 journal 순번·hash·권한 기준을 CAS로 전진. DB 백업과 분리된 저장 수명·인증·운영 책임 필요 |
+| Besu·ServiceRegistry | 기관·위임 digest·키·epoch·정책·철회 상태. 고객별 통화·음성·전사 원문을 기록하지 않음 |
+| Witness | 각자의 RPC·고정 키로 같은 체인/블록/상태에 서명. 서로 다른 3-of-4 상태 증언 검증 |
+| 브라우저 | 통화별 단기키, 고정 trust pin, 서명·세션·실제 연결 근거 대조. 서버의 성공 boolean만 신뢰하지 않음 |
 
-같은 소스 이미지를 `SERVICE_ROLE`로 나눈다. Platform 역할은 DB client와 private key를 생성하지 않는다. Sender는 서비스키 한 개만 mount한다. Issuer는 기관 승인키, 업무/소비 쓰기 계정과 auth 별도 계정을 가진다. 원장 관리/긴급 정지 키는 별도 worker에만 mount하며 Issuer에는 mount하지 않는다. PBX 증거키는 Issuer, Asterisk TLS 개인키는 교환기에만 둔다. 공동 승인자 개인키는 어디에도 공유 mount하지 않는다. `scripts/sign-recovery.ts`는 승인자 환경에서 자기 키 하나만 사용한다.
+같은 runtime 이미지를 `SERVICE_ROLE`로 나눈다. 공동 승인자 개인키는 공유 mount하지 않으며 승인자는 [서명 도구](../scripts/sign-recovery.ts)로 자기 키 하나를 사용한다. PBX 증거키와 Asterisk TLS 개인키도 구별한다. 역할별 LOGIN·키 분리는 호스트 관리자 침해나 하드웨어 격리의 증명이 아니다.
 
-기관별 JSONB aggregate에 업무/위임/시도/승인/영수증을 저장하고, `SELECT ... FOR UPDATE` 후 검사·서명·갱신을 같은 transaction에서 수행한다. 감사는 별도 테이블에 append한다. Platform/Sender group에 issuer_v2 schema 접근을 주지 않는다. 실제 DB 계정 격리·경합/가용성은 통합 시험 대기다. JSONB aggregate는 기관 단위로 상태를 직렬화하는 현재 선택이며 대규모 저장소 설계는 아니다.
-
-브라우저는 짧은 세션키만 가진다. 고정한 trust bundle hash에서 기관/서비스/witness키를 얻고 VC·승인·허가·소비영수증·최신 일회성 난수 상태응답·원장 특정 블록의 상태 묶음·SDP·실제 DTLS/datachannel을 직접 대조한다. `/official` 권한은 별도 OIDC audience/cookie와 소유권 조건이다. 브라우저 코드와 trust bundle을 함께 바꿀 수 있는 운영자는 여전히 신뢰 경계다.
+<a id="보존한-직접-통화-호환-경로"></a>
 
 ## 직접 경로와 PBX
 
-직접 경로의 DTLS 종단은 상대 브라우저 PeerConnection이다. ICE 변경·새 연결은 새 승인과 전송 검증이 필요하다. 수락 전 마이크 track을 sender에 부착하지 않고 종료/오류에서 track을 stop한다.
+기본 경로는 상담원 웹 ↔ Asterisk PJSIP/WSS·DTLS-SRTP ↔ 수신 웹이다. [교환기 제어](../services/api/src/asterisk.ts)는 실제 ARI channel·Call-ID·bridge를 조회한다. 준비 단계의 양 채널 mute, 양측 준비 서명·수락·유효 lease 확인, bridge 구성·확인과 음소거 해제, 브라우저의 최종 증거 확인을 구별한다. 취소·철회·로그아웃·만료는 감시와 영속 cleanup에 연결된다.
 
-새 PBX 경로의 종단은 Asterisk다. `asterisk.ts`는 실제 ARI channel·Call-ID·bridge를 조회해 signed browser report와 대조하고 준비 시 두 채널을 mute, 수락/lease 후 bridge 멤버 확인·unmute한다. 별도 PBX Ed25519 키의 JWS를 `verifier/service.ts`가 승인·receipt·통화 유지 허가·state·SIP Call-ID·DTLS 문맥과 대조하는 코드를 작성했다. `pbxSip.ts`는 SHA-256 내용 해시 REGISTER와 수신 INVITE/ACK·WebRTC answer의 제한된 브라우저 모듈이다. `ServiceCall`과 역할 화면, ARI 사건 구독·재구독, 재시작 종료·회수, 철회/logout, realtime endpoint SQL·설정·배포 profile과 브라우저 통합 시험 소스를 연결했다. 실환경 시험은 하지 않았다. 브라우저는 실제 DTLS 인증서를 관측하지만 서버는 ARI 채널/Call-ID/bridge와 사전 고정한 PBX 인증서를 대조한다. 이를 서버가 독립적으로 DTLS handshake를 관측한 것으로 설명하지 않는다.
+서버의 PBX fingerprint 출처는 `configured-certificate`다. 서버는 고정 인증서와 ARI 관측을, 브라우저는 실제 DTLS 인증서·SDP·SIP Call-ID를 대조한다. 서버가 DTLS handshake를 독립 수집했다고 주장하지 않는다. ARI 성공·PeerConnection 상태·RTP 증가만으로 실제 음성 전달을 판정하지 않는다.
 
-이전 `media.ts`의 `AsteriskAdapter`/`MediaEdgeAdapter`는 과거 helper이며 실제 외부 Edge가 존재한다는 근거가 아니다. PBX는 상담원 개인 신원이나 내부 구간의 종단 간 진실을 증명하지 않는다. 역할 분리 직접 통화 경로 consume/SDK는 여전히 PBX profile을 직접 통화로 승인하지 않는다.
+Asterisk는 음성 종단이므로 PBX와 그 운영자는 신뢰 대상이다. `/finals`의 상대 브라우저 직접 DTLS/datachannel 검증과 혼동하지 않는다. 이전 `MediaEdgeAdapter`는 호환 helper이며 별도 외부 Media Edge 서비스가 있다는 근거가 아니다.
+
+<a id="신뢰-경계"></a>
+
+## 분석과 신뢰 경계
+
+수신한 상대 remote stream만 동의 후 분석 경로에 보낸다. Deepgram STT adapter는 음성→전사, 규칙·Anthropic adapter는 전사/목적 정책→위험 근거를 처리한다. 동의·세션·revision이 바뀌면 추가 전송과 늦은 결과 반영을 차단한다. 외부 제공자 품질·보관·취소·비용 조건은 미검증이다.
+
+웹 코드·trust bundle 배포자, 등록 기관/콜센터·PBX·Witness 키, 브라우저/OS, DB/Anchor 운영자는 여전히 신뢰 경계다. Witness 정족수는 native chain proof가 아니고, 한 호스트의 여러 validator/Witness는 독립 운영기관의 장애 내성을 입증하지 않는다. [위협 모델](THREAT-MODEL.md)을 따른다.
+
+## 영속 처리와 복원 경계
+
+기관별 JSONB aggregate를 transaction에서 직렬화하고 업무·소비·취소의 순서를 정한다. `issuer_v2.outbox`의 claim token/만료, 서명 raw transaction/nonce 보존과 재조회로 재처리한다. 외부 호출과 SQL 사이 exactly-once나 분산 원자 commit은 보장하지 않는다.
+
+journal 전체 순번·hash chain·권한 metadata와 독립 Anchor를 대조한다. 읽기 snapshot 검사 뒤 짧은 잠금에서 head/metadata를 재확인하며, CAS 뒤 DB commit이 유실되거나 Anchor가 앞서면 gate를 자동 해제하지 않는다. 백업 drain은 신규 권한 쓰기를 막고 진행 중 CAS/DB·worker를 정리한 뒤 snapshot과 checkpoint를 연결한다. 안전을 위한 종료/철회를 무조건 멈추지 않는다.
+
+복원은 소비 이력·계정/키/epoch를 보존하고 세션·미사용 승인·임시 연결을 폐기한다. 같은 호스트의 별도 cluster·HTTPS Anchor·application 복원 시험과 전체 chain archive/독립 호스트 복원은 다르다. [복구 절차](RUNBOOK.md#쓰기-중-백업-준비와-별도-cluster-복원)를 따른다.
+
+## 공동 설정·내부 계정의 권한 경계
+
+`ServiceRegistry.updateConfiguration`과 복구 등 주요 관리는 서로 다른 유효 관리키 2-of-3의 EIP-712 서명을 요구한다. nonce·이전/다음 상태·정확한 작업 내용과 chain/contract를 결합한다. 제출·receipt·원장 상태·최신 Witness 확인·활성화를 구분한다. 정책 hash 변경은 epoch를 전진시키고 이전 VC/승인/lease를 회수하며 새 trust/web pin이 필요하다.
+
+내부 계정은 검증된 OIDC issuer/subject에 역할을 연결한다. 최근 auth_time·CSRF·기관/역할·회원 세대를 API와 SQL transaction에서 확인한다. 이메일 기반 자동 연결·별도 우회 로그인·일반 관리자의 공동 승인자 임의 생성은 제공하지 않는다.
+
+<a id="배포-후보-구성의-현재-경계"></a>
 
 ## 배포
 
-`infra/deploy/compose.yml`: DB, Besu4, witness4, Issuer/Sender/Platform, web, HTTPS/TURN, 별도 원장 worker 및 PBX overlay의 Asterisk다. 독립 소비 anchor는 같은 VM 백업 밖 별도 저장소와 HTTPS 서비스로 운영해야 한다. DB/RPC는 host에 공개하지 않는다. application network는 내부망이고 provider 통신은 별도 egress network다. 각 witness는 자기 private key와 deployment metadata만 읽는다. 키 누락 시 자동 재발급하지 않는다. 체인·DB는 named volume, 키/trust/genesis는 명시적인 persistent 디렉터리다. GCP 구성은 기존 배포를 재시작할 뿐 bootstrap을 하지 않는다. 자세한 이전/복원은 [runbook](RUNBOOK.md).
+[기본 Compose](../infra/deploy/compose.yml), [PBX overlay](../infra/deploy/compose.pbx.yml), [AWS override](../infra/deploy/compose.aws.yml), [별도 Anchor](../infra/deploy/compose.anchor.yml)를 사용한다. DB/RPC/ARI는 내부 전용이고 브라우저 공개 origin과 내부 DNS를 구별한다. `SERVICE_EXTRA_CA_PATH`는 공개 CA bundle이며 서버 역할에만 mount한다. 서비스 시작과 readiness도 구별한다.
+
+대회 대상은 AWS다. 개발 서버의 IP·파일·DB·Anchor·로그인·이미지 제공 경로에 의존하지 않는다. GitHub Release/비공개 GHCR 전달과 실제 AWS 운영은 별도 단계이며 [현재 고정 버전·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 관리한다. NEW는 새 identity를 준비하고, 일반 재시작/RESTORE는 기존 키·genesis·epoch·소비 이력을 초기화하지 않는다. GCP/Vercel 구성은 과거 보존물이다.
+
+<details>
+<summary>초기 시청 시연의 구성 기록</summary>
 
 ## 초기 시연의 로컬 구성: 과거 코드 보존
 
@@ -92,25 +101,5 @@ flowchart LR
 - 원장: chainId 20260914, QBFT 고정 validator set, 초기 block period 2초, Cancun 활성화, zero base fee 데모 프로파일.
 - 계약과 상태: 고객·연락 데이터는 DB/서명 객체에 있고, 원장에는 기관·위임·정지·복구·directory 상태만 있다.
 
-## 신뢰 경계
 
-수신 앱의 배포 코드와 그 안에 생성된 trust bundle, enrollment 서비스, 기관 승인 시스템, gateway 종단 코드, 브라우저/OS를 신뢰한다. 집계 API의 `verified` 플래그는 존재하지 않으며 브라우저가 서명을 검증한다. 다만 동일 운영자가 웹 코드 배포와 trust bundle까지 교체하면 정상 표시를 위조할 수 있다.
-
-네 witness는 프로세스·키·RPC 경계가 분리됐지만 한 컴퓨터와 한 Compose 운영자 위에 있으므로 현실의 독립 기관 운영을 입증하지 않는다. QBFT 합의와 witness quorum은 서로 다른 신뢰 가정이다.
-
-## 영속 처리와 복원 경계
-
-`issuer_v2.outbox`의 claim token·만료로 작업을 배정하고 제출 전 서명 raw transaction과 nonce를 저장한다. 외부 호출과 SQL 사이 exactly-once를 주장하지 않으며 동일 요청을 재조회·재처리한다. 원장 확인과 Witness 최신 상태 확인은 별개다. 기관 JSONB는 종료된 개인정보를 보관 정책으로 줄이지만 승인 소비 식별 범위와 hash journal은 유지한다.
-
-신규 소비와 계정·키·정책 및 취소/회수 사건은 DB journal과 독립 anchor의 순서·hash에 결합한다. 재시작 검사는 읽기 전용 snapshot에서 500행씩 전체 순번·각 hash 연결·권한 metadata marker를 검증하고 마지막 짧은 잠금에서 head·metadata·검사 token을 재확인하므로 마지막 root만 남은 중간 이력 유실도 거절한다. 복원 검증 전 gate를 닫고 anchor/DB 불일치·anchor 미설정이면 신규 발급·연결을 거절한다. anchor가 먼저 전진한 뒤 DB commit이 유실되면 자동 해제하지 않는다. 이는 가용성보다 재사용 차단을 우선한 설계다. 같은 호스트의 별도 PG volume/LOGIN·HTTPS anchor와 앱 범위 암호화 복원은 [추가 실행 기록](FINALS-IMPLEMENTATION-PLAN.md#persistent-recovery-20261030)에서 검증했다. 실제 chain snapshot 전체 복원·독립 호스트/하드웨어 내성은 미검증이다.
-
-## 공동 설정·내부 계정의 권한 경계
-
-기본 새 `ServiceRegistry`의 `updateConfiguration`은 독립 관리키 2-of-3을 요구한다. 구 directory 단독 변경은 거절한다. 제안/독립 서명/작업 제출과 원장 확정/정책 활성화는 다른 상태다. event의 nonce·정확한 내용과 같은 블록 상태, 최신 Witness profile/policyHash를 대조한 뒤 활성화한다. policyHash 변경은 epoch를 올리고 구 권한을 회수한다. 구 배포에는 proxy upgrade가 없으므로 새 주소와 trust 게시가 필요하다.
-
-내부 계정 화면→Issuer 최근 인증/CSRF→제한된 SQL 함수→기관 aggregate와 세션 generation→권한 checkpoint를 같은 DB transaction으로 연결한다. 외부 IdP 사용자 생성이나 이메일 기반 자동 연결은 없다. 일반 관리자는 공동 승인자 집합을 단독 변경할 수 없다. 플랫폼은 계정/업무 DB에 직접 쓰지 않는다.
-
-원장 서명 준비는 서명자별 영속 lease로 조정하고 RPC 대기 중 전역 DB transaction을 열지 않는다. 늦은 결과는 token·기한을 재검사한 뒤 저장한다. anchor CAS는 DB와 분산 원자성을 제공하지 않으므로 CAS 뒤 commit 유실은 차단 상태다. 이 경계와 새 배포 기준은 [RUNBOOK](RUNBOOK.md)에 있다. 선택 SQL/영속 anchor/앱 복원은 위 추가 기록의 범위에서 실행했으며 실제 체인·전체 배포 복구는 미실행이다.
-
-
-복원 도구는 native pg_restore가 만든 SQL과 gate 차단·세션/임시 연결 정리를 하나의 psql transaction으로 commit한다. 복호화와 archive 검사는 먼저 완료한다. 소비 journal과 계정/키/epoch는 보존하며, 일치하는 외부 anchor 없이는 재개하지 않는다. Worker startup도 journal/anchor를 검증하지만 최초 zero 기준을 만들지 않는다. Issuer가 사전 준비된 독립 zero와 첫 checkpoint를 확인한 뒤 worker를 시작한다. Worker는 gate가 닫히면 신규 원장 작업을 중단하고 terminal cleanup만 남긴다.
+</details>

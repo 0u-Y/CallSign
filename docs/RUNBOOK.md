@@ -1,5 +1,16 @@
 # 개발·배포·복구 운영 절차
 
+## 문서 사용 순서
+
+| 목적 | 시작 위치 |
+|---|---|
+| AWS에서 자료 수령 | [고정 Release·GHCR 참조와 인증](#github-delivery-20261102) |
+| 신규/기존 환경 구별 | [NEW 초기화](#new-초기-배포-순서), [재개·RESTORE](#재시작실패-재개기존-배포-restore) |
+| 서비스 기동 없는 개발 검사 | [실행 범주](#실행-범주), [단계별 판정](#단계별-검증과-판정) |
+| 백업·복구 | [쓰기 drain·별도 cluster 복원](#쓰기-중-백업-준비와-별도-cluster-복원) |
+
+하단의 날짜별 로컬 시험 절차는 해당 환경·실행 허가를 전제로 하는 재현 자료입니다. `.local`·과거 절대 경로는 AWS runtime 의존성으로 옮기지 않습니다. AWS 담당자는 상단의 수령/NEW/재개 절차를 사용하고, 현재 실행 범위는 [AGENTS](../AGENTS.md)와 사용자 지시를 따릅니다. 배포 기준 Release와 과거 명령의 시험 버전을 혼동하지 않습니다.
+
 <a id="aws-competition"></a>
 
 ## AWS 대회 배포: 개발 서버와 완전히 분리
@@ -138,6 +149,8 @@ done < "$RECEIVED/bootstrap-images.tsv"
 Docker pull는 digest에 고정된 manifest/config/layer를 검증하고 새 AWS 호스트에 저장한다. 위 로컬 게시 검증은 Docker cache와 분리한 raw HTTPS blob 다운로드였다. AWS에서의 실제 pull·실행·별도 reader 자격 확인은 다음 실행이다. null ref·미검증 이미지·private 읽기 권한 없음·hash/architecture 불일치는 중단 조건이다. 실패하면 현재 수령 디렉터리/로그를 보존하고 원인을 확인하며 과거 null inventory나 개발 서버 tar로 대체하지 않는다. 임시 인증 디렉터리만 회수하고 원본 token 파일은 삭제하지 않는다.
 
 AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구한다. 실제 trust/인증서 준비 후 AWS에서 생성하는 web만 검토한 local config ID를 사용할 수 있다. 웹은 Release의 공개 recipe와 GHCR runtime/nginx를 사용하고 pin/label·실제 기동을 확인한다. **bootstrap6종의 전달은 검증했으나, web 생성·실제 외부 설정·AWS 실행은 아직 완료하지 않았다.** [공식 인증/visibility 기준](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [package 권한](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
+
+이번 탐색/문구 정리는 README·문서에만 적용했다. 게시한 Release의 source tag·첨부물·6종 image digest는 바꾸지 않았고 새 Release도 발행하지 않았다. 아래 실행 설정/명령의 동작은 동일하다. Git main의 설명과 고정 bundle의 발행 당시 문구를 구별하며, 이 문서 정리만으로 새 이미지/배포 묶음을 요구하지 않는다.
 
 ### 구성안과 선택 대기
 

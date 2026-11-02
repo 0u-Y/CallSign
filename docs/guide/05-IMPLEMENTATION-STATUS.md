@@ -1,80 +1,31 @@
 # 05. 구현 및 검증 현황
 
-**GitHub 전달:** 공개 파일에 이어6종 이미지를 비공개 GHCR에 게시하고 원격 manifest/config/layer·linux/amd64·익명 거절을 확인했습니다. AWS 최종 웹은 실제 trust/인증서로 별도 생성해야 하며, AWS 실행/외부 연결 성공을 뜻하지 않습니다. [현재 전달 상태](../RUNBOOK.md#github-delivery-20261102).
+[서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
-**전달물 신규 리허설:** 이미지와 공개 묶음만으로 새 원장·DB·Anchor·실제 제품 통화를 연결했습니다. 정책·키 복구·PBX 장애·장치 오류 경계를 확인했으며 실제1시간 자연 만료와 양 끝점 음성 회수도 재검증했습니다. 인증은 로컬 fixture이며 AWS 외부 연결이나 외부 보관/재수령 검증은 아닙니다. [정확한 소스·실패·판정](../FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102).
+현재 기본 제품은 `/service` → `/v3`의 등록 URI·Asterisk 통화 경로입니다. 아래 결과는 각 원본에 기록된 소스·환경의 증거이며, 현재 코드 전체나 실제 기관 서비스를 검증했다는 뜻은 아닙니다. 새 변경은 [개발 기록](../FINALS-IMPLEMENTATION-PLAN.md)에 이어 기록합니다.
 
-**배포 목표 변경:** 대회는 AWS에서 단독 실행하며 현재 개발 서버는 사용하지 않습니다. 폐기 시험 데이터를 옮기는 대신 새 대회 배포를 준비하는 것이 기본입니다. AWS 리전·예산·도메인·IdP는 미정이며 실제 AWS 검증은 아직 수행하지 않았습니다. [준비 파일·초기 배포/복원 구분](../RUNBOOK.md#aws-competition).
+## 실제 확인한 것과 남은 경계
 
-**2026-11-02 추가 검증:** 실제 교환기·TURN·제품 웹에서 합성 음원을 양방향으로 수신하고, 로그아웃·업무 취소·lease 만료·위임 철회·기관 정지 뒤 음성이 멈추는 것을 확인했습니다. 원장·DB·Anchor·worker는 실제 구현이고 OIDC는 로컬 fixture입니다. 외부망·실제 IdP·AI 품질·GCP·전체 이전 성공은 아닙니다. [새 결과와 정확한 이미지/시험 범위](../FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102). 아래 표는 표시된 과거 시점의 기록입니다.
-
-
-**2026-11-01 추가 검증:** 실제 Besu4·계약·Witness 경계5시험, 최소권한 PostgreSQL·독립 HTTPS Anchor·실제 worker·HTTP 연결3시험을 확인했습니다. 업무→위임 원장 확정→Witness 확인→기본 교환기 profile의 승인 발급과 긴급 정지 전파까지입니다. OIDC는 로컬 fixture이고 실제 PBX/음성·외부 AI·GCP는 미검증입니다. 아래 표의 과거 fixture 시험과 합산하지 않습니다. [소스·결과·한계](../FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101).
-
-
-인증 후속 검증은 [진행 기록](../FINALS-IMPLEMENTATION-PLAN.md#authenticated-boundaries-20261030)에 별도로 연결했습니다. 공동 변경 파일 검토·독립 승인자 서명·제출/확정/활성화 구분, 다중 탭 계정 전환과 공식 세션 만료, 응답 유실 재시도, 동의 철회 후 분석 중단을 실제 HTTP·SQL·Chromium 경로에서 확인하는 범위입니다. 원장 사건/Witness 전송/분석 제공자는 시험 fixture이며 실제 체인·PBX·음성/AI 품질의 증거는 아닙니다.
-
-[서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md)
-
-아래 초기 표의 기준일: **2026-10-30(KST)**. 당시 인증·HTTP·화면 코드 기준은 `5c2842d`이며, 실제 시험 시점은 직전 HEAD와 미커밋 변경을 포함했습니다. [이번 평가](../../artifacts/http-validation-20261030.json)의 소스 hash·원래 실행 HEAD를 따릅니다. 커밋·게시와 서비스 배포 성공은 구분합니다.
-
-기본 `/service` 화면은 등록 기관 주소·키 기반 위임/승인, Asterisk 교환기 제어·서명 검증, 양측 통화 유지 허가와 원격 음성 분석 API에 연결했습니다. 이전 직접 통화 화면은 `/finals`에 보존했습니다. **코드 연결은 실통화나 실환경 성공을 뜻하지 않습니다.**
-
-| 영역 | 구현·연결 상태 | 확인한 검증 | 남은 작업 | 코드·시험 근거 |
-|---|---|---|---|---|
-| 기관 업무·인증·역할 | 업무 생성·취소·상담원 재할당, 담당/관리 권한, 계정 등록·활성/역할 관리·세션 세대와 회수, 일반/공식 인증 분리·최근 로그인 검사 | 객체 경계 단위 시험 + 실제 HTTPS OIDC fixture·API/PG·CSRF·재인증·계정/세션 세대 회수 | 실제 외부 IdP/MFA·전체 운영 권한 감사. 내부 계정 등록 UI/API는 연결했고 외부 IdP 계정 생성은 포함하지 않음 | [업무·권한](../../services/api/src/service-management.ts), [인증 시험](../../services/api/src/session-scopes.unit.test.ts), [라우트 시험](../../services/api/src/service-routes.unit.test.ts) |
-| 위임·개별 승인·검증 모듈 | URI/등록 키 준비, 업무 위임·요청별 콜센터 서명·개별 승인·nonce·양측 소유 증명·일회 소비·서명 영수증을 기본 화면에 연결 | 변조·다른 수신자/세션/chain·등록 키·세대·영수증 재사용 거절 단위 시험 | 실제 신규 배포 trust·Witness/PBX 세션 검증. 실제 SQL 소비/HTTP 영수증 복구는 확인했으나 외부 권한 상태는 fixture | [서버](../../services/api/src/service-authority.ts), [검증](../../packages/verifier/src/service.ts), [시험](../../tests/unit/service-verifier.test.ts) |
-| 체인·Witness·공동 관리 | 기존 Besu 4개·Witness 3-of-4·주요 관리 2-of-3 유지. 등록/철회/복구·정책/공식 목록 변경의 새 계약·관리 UI·worker·확정 event/state·최신 증언/활성화 연결 | 서명/domain/내용·중복 세 번째 승인자·정책 세대·snapshot 강등 단위 시험. 기존 로컬 EVM21시험·TS/Solidity 호환 확인 | Besu 배포·trust 전환·Witness 정책 hash·회전/복구 전파. 기존 계약은 자동 upgrade되지 않음 | [worker](../../services/api/src/service-worker.ts), [원장](../../services/api/src/worker-ledger.ts), [사건](../../services/api/src/ledger-events.ts), [관리 서명 시험](../../tests/unit/registration.test.ts) |
-| 통화 상태·유지 허가 | 120초 최초 연결과 진행 통화 유지 분리, 양측 갱신 서명, 거절·부재·만료·중복 종료·로그아웃 회수, 숨김/비동기 track 경합 방어·PBX 절대 timeout | 메모리 경계 시험 + 실제 HTTP 양측 proof·서명 lease 발급/DB 저장. 실제 음성 연결 아님 | 실제 장시간/다중 탭/브라우저 절전 동작, 정책값의 운영 승인 | [브라우저 제어](../../apps/web/src/lib/serviceCall.ts), [서버 시험](../../tests/unit/service-authority.test.ts) |
-| Direct WebRTC·PBX | 직접 통화 회귀 보존. 기본 SIP 등록/수신·ARI 채널/Call-ID/bridge·증거·실제 인증서 관측·사건 재구독·자동 회수 코드를 연결 | SIP ACK/CANCEL/BYE dialog·ARI 대체 응답·중복 사건·정리 재시도·양측 SDK 검증 시험 | 실제 Asterisk 이미지/ODBC/인증서·양방향 음성·TURN·지원 브라우저 검증 | [SIP](../../apps/web/src/lib/pbxSip.ts), [PBX](../../services/api/src/pbx-runtime.ts), [시험](../../tests/unit/sip-dialog.test.ts), [미실행 통화 시험](../../tests/media/service-pbx.spec.ts) |
-| STT·AI·위험 안내 | 실제 remote stream 선택→새 오디오 수신→기존 Deepgram/Anthropic→revision·규칙/모델·근거 UI. 동의 철회·종료·권한 회수 시 전송·늦은 결과 중단 | 전사 수정·부정/인용/정정·늦은 결과·근거 정합성 단위 시험, 타입 검사 | 실제 제공자 형식/보관/한국어 품질·비용·분석 장애 통합(별도 guard smoke 소스는 작성). fixture 평가는 독립 품질 증거가 아님 | [분석](../../services/api/src/service-audio.ts), [전사](../../services/api/src/transcription.ts), [개발 fixture](../../tests/fixtures/korean-risk-evaluation.json) |
-| 역할별 화면 | 기관·상담원·수신자·관리 API, 별도 공식 업무, 로딩/실패/빈 목록/재시도·선택 시도와 연결 시도 분리 | 타입/웹 build·단위 시험 + Chromium 실제 로그인·업무 생성/취소·로그아웃·역할 메뉴·모바일 overflow·focus/console | 공동 관리 전체·다른 기기/보조기술 접근성. 계정·재할당은 구조화 양식, 공동 변경 전후 비교·제안 파일 내보내기·서명 파일 가져오기·로컬 digest/서명 확인을 연결. 실제 사용성 확인 필요 | [기본 화면](../../apps/web/src/pages/Service.tsx), [경로](../../apps/web/src/App.tsx) |
-| 영속성·복구·운영 | 기관별 SQL claim·서명자 lease/fencing·동일 raw tx 복구·공유 예약/정산·retention, 계정/키/정책 checkpoint·독립 anchor/gate, manifest 인증·복원 세션 폐기, 기본 배포와 GCP 기동 구성 | worker 재시도/claim 유실·anchor 충돌·암호화 변조 단위 시험, YAML/셸/타입 검사 | PostgreSQL 선택 경계15시험은 실제 실행. 독립 anchor 배치·일관 chain snapshot·GCP 복원은 대기. 외부 알림 채널은 미선택, 내부 알림/설정/읽음/만료와 제한된 오프라인 증거 도구는 구현. 고정 단계 runner/증거 수집을 연결. 전체 장애·복원·측정 수집·GCP 실관측은 수동 확인 단계로 남음 | [SQL](../../services/api/drizzle/0004_worker_recovery.sql), [quota](../../services/api/src/quota.ts), [복구](../../services/api/src/consumption-anchor.ts), [운영](../RUNBOOK.md) |
-
-## 현재 배포 후보의 상태 — 2026-10-31
-
-조사 시작은 `a6e2452`이며 [현재 추가 기록](../FINALS-IMPLEMENTATION-PLAN.md#release-candidate-20261031)을 따릅니다. 이번에는 서비스 기동 없이 light44파일212시험·타입·웹 컴파일·Compose 파싱을 확인했습니다. 실제 배포 pin·이미지·TLS·권한/미디어 연결 성공을 뜻하지 않습니다.
-
-| 구분 | 확인한 내용 | 남은 경계 |
+| 영역 | 구현·실행 근거 | 남아 있는 경계 |
 |---|---|---|
-| 실제 구성요소 | 이전 PostgreSQL 소비/권한/복구25시험, 영속 HTTPS Anchor·별도 cluster/LOGIN·drain. 이전 실제 HTTP/Chromium 선택 흐름 | 같은 호스트·application 복원 및 합성 계정 범위 |
-| fixture 포함 | 로컬 OIDC, 합성 binding·원장/receipt·Witness/분석 adapter. 실제 서버·SQL·서명 verifier는 유지 | 실제 IdP·체인 정족수/epoch 전파·DTLS/RTP·provider 결과와 다름 |
-| 코드/시험은 있음 | PBX 제어/세션 증거·remote audio·STT/LLM·철회 회수·운영/GCP 구성 | 실제 이미지/driver/TLS·통화·한국어 품질·비용·GCP 미실행 |
-| 설정/결정 대기 | 실행 호스트/망, DNS/TLS/OIDC, 기관·콜센터·키 책임, PBX/TURN, AI 보관·예산 | 현재 host의 ledger 대역 충돌 포함. 다음 실행은 [RUNBOOK](../RUNBOOK.md#배포-후보와-실제-연결-순서)의 단계별 승인 후 |
-| 기본 밖의 미지원/확장 | native chain proof, PSTN·단말 OS, 자동 failover, KMS/HSM, 임의 subnet·confidential OIDC client 자동 전환 | 기본 서비스 검증을 대체하거나 새 필수 목표로 편입하지 않음 |
+| 업무·인증·계정·공동 관리 | 실제 HTTP·세션·CSRF·SQL·Chromium에서 역할/기관 경계, 제안/서명/제출/확정/활성화, 권한 회수·다중 탭·늦은 응답을 선택 검증. [인증 후속](../../artifacts/service-boundaries-20261030.json) | 로그인 제공자는 로컬 OIDC fixture. 실제 IdP/MFA·외부 계정 운영은 미검증 |
+| 권한 계약·원장·Witness | 로컬 EVM/TS 서명 호환과 실제 Besu·Witness 연결, 위임·정지 전파를 확인. [계약](../../artifacts/contract-validation-20261030.json), [원장/API 연결](../../artifacts/isolated-runtime-connection-20261101.json) | 같은 호스트의 합성 기관/키. 독립 기관 운영·호스트 장애·native chain proof가 아님 |
+| 소비·quota·worker·복구 | 실제 PostgreSQL 독립 연결의 경합·응답 유실, 별도 HTTPS Anchor CAS·재시작·손상/오래된 백업 차단, drain·별도 cluster 앱 복원. [DB](../../artifacts/local-postgres-result-20261029.json), [복구](../../artifacts/persistent-recovery-20261030.json), [백업 경계](../../artifacts/backup-boundaries-20261030.json) | 외부 CAS/DB 분산 원자성·전체 chain archive 복원·독립 호스트/하드웨어 내성을 보장하지 않음 |
+| 승인·소비·lease·실제 음성 회수 | 전달물만으로 새 원장/DB/Anchor/PBX/TURN·제품 웹을 초기화하고 양 끝점의 서로 다른 합성 음원을 디코딩. 정책/키 복구·철회·세션 자연 만료·PBX 정리 재시도·장치 오류의 선택 경계 확인. [신규 리허설](../../artifacts/delivery-only-rehearsal-20261102.json) | 로컬 OIDC·합성 계정/음원·같은 namespace의 relay. 실제 사람/외부망 NAT·다른 브라우저·모든 장애 조합이 아님 |
+| 동의·전사 수정·위험 안내 | 실제 orchestration/HTTP와 지연·오류 분석 adapter로 동의 철회·세션/revision 변경 후 결과 폐기를 확인. [인증 후속 증거](../../artifacts/service-boundaries-20261030.json) | 외부 STT/LLM은 호출하지 않음. 한국어 음성 품질·정확도·보관/청구·제공자 취소는 미검증 |
+| 이미지·배포 자료 전달 | bootstrap6종의 private GHCR 게시·manifest/config/layer 원격 수령과 공개 Release 재수령 확인. [이미지](../../artifacts/ghcr-images-20261102.json), [전달 영수증](../../artifacts/ghcr-delivery-20261102.json) | AWS 최종 웹·별도 GHCR 수령용 읽기 자격·AWS 실제 배포·외부 TLS/IdP/NAT/TURN은 미완료 |
 
-아래 표와 숫자는 해당 시점의 원본 검증 범위입니다. 현재 전체 완성률이나 최신 HEAD에서 재실행한 결과로 합산하지 않습니다. light CI는 오프라인 검사이며 DB·EVM·HTTP·브라우저·복구의 실환경 증거는 별도의 로컬 실행 기록입니다.
+## 대체한 부분을 구분하기
 
-## 2026-10-30 초기 선택 경로 검증
+- 초기 HTTP/복구 시험의 원장·binding·분석 fixture는 그 실행에만 적용됩니다. 후속 실제 원장/PBX 실행을 거꾸로 이전 시험의 성공으로 합산하지 않습니다.
+- 최신 신규 리허설의 원장·DB·Anchor·worker·PBX/TURN·제품 웹은 실제 구현이며, 인증은 로컬 OIDC 제공자입니다. 합성 음원으로 실제 전달/디코딩을 확인했지만 사람의 실제 마이크를 시험한 결과는 아닙니다.
+- 원격 image receipt는 새 저장 경로의 실제 HTTPS bytes 검사입니다. Docker cache 확인·서비스 기동·AWS 성공과 다릅니다.
+- light CI는 오프라인 소스·타입·단위 시험입니다. 과거 통합 실행·수동 관측·미실행 항목을 대신하지 않습니다.
 
-실제 HTTPS OIDC fixture·issuer/platform/Sender Agent HTTP·PostgreSQL·Chromium의1파일7시험과 DB 회귀4파일15시험이 각각 PASS입니다. 이번 light는44파일197시험, 웹 build·API/runtime/harness 타입도 PASS입니다. [최신 Sender Agent 경로](../../artifacts/http-sender-validation-20261030.json)와 [원본 결과·대체 경계·실패 이력·자원 정리](../../artifacts/http-validation-20261030.json)를 확인할 수 있습니다. 과거 시험과 합산하지 않습니다.
+## 다음 실행에 필요한 것
 
-브라우저는 실제 화면에서 로그인·업무 생성/취소·로그아웃·수신자 메뉴·Secure cookie와390px 화면·Tab/focus를 확인했습니다. API 응답을 mock하지 않았습니다. 이 초기 실행에서는 실제 체인/Witness·PBX/TURN/음성·외부 IdP/MFA·STT/LLM·독립 anchor·복원/GCP를 검증하지 않았습니다. 독립 Anchor·application 복원은 이후 별도 기록에서 확인했습니다. 합성 binding과 서명 lease가 실제 연결 성공을 의미하지 않습니다.
+배포 기준 버전·digest는 이 문서에 복사하지 않고 [RUNBOOK의 전달 기준](../RUNBOOK.md#github-delivery-20261102)에서 확인합니다. AWS 위치/예산·도메인/TLS·IdP·역할별 보호 참조·reader 권한이 필요하며, 실제 trust/PBX 인증서에 맞춰 최종 웹을 생성해야 합니다. [NEW와 재개/RESTORE](../RUNBOOK.md#aws-competition)는 구별합니다.
 
-## 2026-10-29 실행 준비 당시 기록
+외부 제공자·AWS 검증과 코드 미구현은 [알려진 한계](../KNOWN-LIMITATIONS.md)에서 구분합니다. 전체 요구 ID와 완료 조건은 [MASTER](../MASTER-DEVELOPMENT-SPEC.md)이며 시험 개수로 완성률을 계산하지 않습니다.
 
-당시 **`pnpm light`는42개 파일·191개 시험 통과**, 웹 build·API runtime 타입 검사도 통과했습니다. [최종 오프라인 실행](../../artifacts/execution-validation-rechecked-20261029.json)은 설정 누락 때문에 전체 BLOCKED이며 통과한 코드 검사와 구분합니다. runtime preflight는 **BLOCKED62·PASS14·SKIPPED1**입니다. 기존 차단2개는 실제 저장소 artifact/hash·고정 PBX IP로 확인했고 빠져 있던 키/이미지/URI/인증서/provider 검사를 추가했습니다. [항목별 준비 결과](../../artifacts/execution-preparation-rechecked-20261029.json)에 사용자/외부 입력43검사와 이후 생성값19검사를 나눴습니다. 숫자를 줄이기 위한 가짜 주소/digest는 넣지 않았습니다.
-
-[최신 진행표](../FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)와 [RUNBOOK](../RUNBOOK.md#단계별-검증과-판정)이 준비 순서·자동/수동 범위·실패 복구의 기준입니다. [이전10월27일 증거](../../artifacts/pre-execution-20261027.json)의171개 시험과 계약 소스 오프라인 컴파일은 과거 기록입니다. 이번에는 계약 코드를 바꾸지 않아 컴파일을 재실행하지 않았습니다. source/설정/환경 identity와 이번 dry-run은 [증거 색인](../../artifacts/execution-readiness-rechecked-20261029.json)에 있습니다.
-
-이 실행 준비 시점에는 DB·체인·Witness·OIDC·Asterisk·TURN·브라우저/마이크·STT/LLM·GCP·장애/부하·실제 백업/복원이 **미실행**이었습니다. 이후 DB/계약/선택 HTTP·화면 검증은 아래 기록과 구분합니다. 신규 PostgreSQL 계정/세션·quota/claim·signer lease·checkpoint, 독립 HTTPS anchor 시험과 PBX 브라우저 시험은 소스·타입 검사만 했습니다. 검증 p95 500ms, 철회 반영 p95 5초, 상태 최대 수명 10초는 설계 목표이며 실측값이나 SLA가 아닙니다.
-
-PBX 증거는 고정한 인증서와 실제 ARI 관측을 브라우저 DTLS 관측에 대조하는 보장입니다. 서버가 DTLS handshake를 독립 수집했다고 주장하지 않습니다. 별도 외부 미디어 서버를 가정하지 않으며 Asterisk가 음성 종단입니다. 임의 SIP proxy·PSTN·단말 OS·자동 전환은 지원 범위가 아닙니다.
-
-이 표는 [MASTER](../MASTER-DEVELOPMENT-SPEC.md)와 [진행표](../FINALS-IMPLEMENTATION-PLAN.md)의 검토용 설명입니다. 코드·검증을 바꾸면 근거와 함께 갱신하며 별도 완료 기준을 만들지 않습니다.
-
-공식 `/official` 경로의 표시명만 변경하면 기존 통화를 유지합니다. 허용 질문·금지 요구 등 정책 hash가 바뀌면 공동 승인과 새 epoch를 요구해 구 VC/승인/통화를 무효화하고 새 trust/웹 pin을 게시합니다. 신규 배포는 authority checkpoint 기준을 명시하며 구 DB/anchor를 flag 변경만으로 자동 채택하지 않습니다.
-
-신규 발급/연결은 현재 원장 정책·키와 게시한 trust/웹 pin이 일치할 때만 허용합니다. 공동 변경 UI는 사람이 읽는 전후 비교와 파일 교환을 지원하며 장기 개인키는 브라우저에 입력하지 않습니다. 단계 runner가 MANUAL로 표시한 항목은 운영자의 실제 관측과 출처 hash 검토가 필요하고 자동 PASS가 아닙니다.
-
-## 실행 준비 후속 확인
-
-최신 light는42개 파일·193개 시험 통과이며 웹 build/runtime 타입도 통과했습니다. [현재 증거](../../artifacts/readiness-refinement-complete-20261029.json)는 전체 설정 누락으로 BLOCKED이며 실환경 성공이 아닙니다. 수동/자동 방식, 실행 여부, PASS/FAIL/미판정, 증거 검토를 별도로 기록하도록 수정했습니다. 검토된 수동 PASS/FAIL을 표현하며 옛 MANUAL은 미판정으로 읽습니다. 첫 DB 검증은 AI/PBX/전체 배포 설정을 기다리지 않고 소스 통과와 별도 시험 DB 조건을 요구합니다. [최신 진행표](../FINALS-IMPLEMENTATION-PLAN.md#readiness-refinement-20261029)와 [RUNBOOK 입력·첫 검증 절차](../RUNBOOK.md#실행-전-정합성-보완--2026-10-29-후속)를 따릅니다.
-
-## 첫 DB 실검증
-
-2026-10-29 별도 승인 후 격리 PostgreSQL17.6의 선택된4파일15시험이 통과했습니다. 실제 SQL 소비/응답 유실·quota·worker 경합·계정 회수·migration hash와 auth LOGIN 금지 SQL을 확인했습니다. 메모리 anchor와 tmpfs DB이므로 독립 복구·영속 disk 장애·체인·통화·AI 검증으로 확대하지 않습니다. [현재 시도·자원·commit 기록](../FINALS-IMPLEMENTATION-PLAN.md#postgres-validation-20261029)을 따르며 앞선 DB 미실행 문구는 과거 상태입니다.
-
-## 로컬 계약 실행 확인
-
-2026-10-30 Foundry 로컬 EVM에서 권한·서명·상태 전이21시험, 제한 fuzz32회가 통과했습니다. 실제 앱 함수로 생성한 서명·calldata를 계약에 전달하고 consumer event bytes도 대조했습니다. light43파일194시험·웹 build·API runtime 타입도 통과했습니다. [최신 기록](../FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)의 도구·시험 HEAD·커밋 재구성 대응을 따릅니다. 이 결과는 Besu/Witness·배포·통화·AI·독립 복구 성공을 뜻하지 않습니다.
+초기 시청 시연과 직접 통화의 당시 결과·기획·캡처는 [기록 안내](../README.md#기록과-자료)에 보존합니다. 당시 승인/철회 정책·날짜·SHA·결과를 현재 값으로 고치지 않습니다.

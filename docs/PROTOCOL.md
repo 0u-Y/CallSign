@@ -10,9 +10,9 @@
 |---|---|---|
 | 초기 시연 경로 | `version=1`, [서명 형식 코드](../packages/protocol/src/index.ts) | 시청 사례·생성 음원·브라우저 직접 통화. 2026-09-14 증거와 회귀 시험을 보존한다. |
 | 역할 분리 직접 통화 경로 | `version=2`, `/v2`, [직접 통화 형식](../packages/protocol/src/finals.ts) | 기관 승인자·발신 대행·플랫폼을 분리한 업무 화면. `/finals` 호환 화면에서만 사용한다. DID 조회와 짧은 승인 만료에 통화가 종속되는 제약이 남아 있다. |
-| 통화 유지·PBX 경로 | `version=3`, `/v3`, [교환기·유지 형식](../packages/protocol/src/service.ts) | 등록 기관 주소·키, 최초 연결 시작과 통화 유지 허가 분리, Asterisk 교환기 증거. 기본 `/service` 화면·서버·SDK·PBX/worker·배포 코드에 연결했다. 실제 서비스 통합은 미검증이다. |
+| 통화 유지·PBX 경로 | `version=3`, `/v3`, [교환기·유지 형식](../packages/protocol/src/service.ts) | 등록 기관 주소·키, 최초 연결 시작과 통화 유지 허가 분리, Asterisk 교환기 증거. 기본 `/service` 화면·서버·SDK·PBX/worker·배포 코드에 연결했다. 선택한 실제 원장·DB·PBX 연결은 검증했고 외부 IdP/AI·AWS는 미검증이다. [실행 범위](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. |
 
-세 경로는 입력 형식을 엄격하게 구별하며 실패했다고 이전 형식으로 자동 전환하지 않는다. 모든 경로에서 같은 기관·승인 ID의 이중 사용을 막도록 공통 SQL 제약을 작성했지만 실제 DB 검증은 아직 하지 않았다.
+세 경로는 입력 형식을 엄격하게 구별하며 실패했다고 이전 형식으로 자동 전환하지 않는다. 모든 경로는 같은 기관·승인 ID의 이중 사용을 막는 공통 SQL 소비 namespace를 사용한다. 선택한 실제 PostgreSQL 경합·동일 binding 재시도는 검증했으며 [DB 증거](../artifacts/local-postgres-result-20261029.json)를 따른다.
 
 `VC 2.0`의 숫자는 외부 자격 증명 표준의 버전이다. `SignedStateSnapshot`의 `version=1`은 상태 증언 형식이며 통화 형식 번호와 별개다. 기존 코드의 `p0-witness-v1`은 증언자 서명을 검사하는 방식을, `native-qbft`·P2는 아직 구현하지 않은 체인 자체 증명 확장을 가리킨다.
 
@@ -35,7 +35,7 @@
 | SIP / PBX / ARI / RTP | 통화 제어 규약 / 교환기 / Asterisk 제어·사건 인터페이스 / 음성 패킷 전송이다. SIP 제어 성공만으로 음성 전달을 확인한 것은 아니다. |
 | fixture / fake / 회귀 시험 | 고정 시험 데이터 / 메모리 대체 객체 / 기존 동작이 깨지지 않는지 확인하는 시험이다. 실제 기관·DB·통화 성공의 증거가 아니다. |
 
-## 통화 유지·PBX 경로 서비스 프로파일 — 기본 경로, 실환경 미검증
+## 통화 유지·PBX 경로 서비스 프로파일
 
 확정 기본은 등록 기관 URI/콜센터 URI·등록 Ed25519 키이며 DID 조회는 필수가 아니다. `protocol/service.ts`는 업무 위임 `CallCenterDelegation` VC Data Model 2.0/JOSE(`typ=vc+jwt`, `cty=vc`), 요청별 `CallCenterProof`, `ContactStartAuthorization`, `ServiceSessionBinding`, 양측 `ServicePossession`, `ServiceConsumptionReceipt`, `CallLease`, PBX browser report/증거를 strict schema로 분리한다. 정책/VC digest는 전체 payload JCS SHA-256이며 기존 계약 내용 해시→delegation ID 규칙을 유지한다.
 
@@ -43,13 +43,13 @@
 
 `CallLease`는 같은 연결·세대의 통화 유지 허가다. 현재 임시값은 30초이며 순번·난수·수신자 키 소유 증명과 업무/위임/키/현재 권한을 검사한다. 기존 시작 승인 기한이 지났다는 이유만으로 적법한 진행 통화를 거절하지 않는다. 양측 `LeaseRenewalProof`는 이전 lease/최초 영수증 hash·같은 binding·새 nonce·순번·기한에 서명하며 서버가 두 키를 검사한다. 최대 통화 4시간도 임시 정책이며 운영 보장이 아니다.
 
-초기 권한 확인 불가는 거절한다. 이미 `accepted`인 통화에서 원장 조회만 불가하면, 기존 허가가 유효한 동안에만 `authority=unavailable`인 다음 허가와 `choice=pause|continue`를 저장할 수 있다. 미확인 계속은 정상 인증 복구가 아니며, 기관 승인 서비스에 닿지 않아 갱신하지 못하거나 유지 허가가 만료되면 사용자 선택만으로 연장·부활할 수 없다. 명시 철회는 종료 처리 대상이다. 양측 화면·마이크 송신·PBX/분석 회수 코드에 연결했다. 실제 시간 경계는 미검증이다.
+초기 권한 확인 불가는 거절한다. 이미 `accepted`인 통화에서 원장 조회만 불가하면, 기존 허가가 유효한 동안에만 `authority=unavailable`인 다음 허가와 `choice=pause|continue`를 저장할 수 있다. 미확인 계속은 정상 인증 복구가 아니며, 기관 승인 서비스에 닿지 않아 갱신하지 못하거나 유지 허가가 만료되면 사용자 선택만으로 연장·부활할 수 없다. 명시 철회는 종료 처리 대상이다. 양측 화면·마이크 송신·PBX/분석 회수 코드에 연결했다. lease/회수·자연 세션 만료의 선택 경계와 모든 장애/장시간 조합을 구별한다. [실행 범위](guide/05-IMPLEMENTATION-STATUS.md)를 따른다.
 
 PBX는 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이다. browser report는 각 세션키, AsteriskSessionEvidence는 별도 PBX 키가 서명한다. Call-ID·실제 ARI channel/bridge·SDP hash·브라우저 및 PBX fingerprint·수신 일회성 난수·승인·세션 결합·세션·generation·상태·시각을 결합한다. prepared 증거 없이 consume하지 않고 bridged 증거·실제 관측 없이는 정상 표시하지 않는다. 기존 외부 Edge helper는 새 경로의 서버가 아니다.
 
-통화 유지·PBX 경로 verifier는 Witness 관측 age<8초/미래 오차≤1초로 검사한다. 각 시계 오차≤1초일 때 최대10초를 목표로 하는 정책이며 미측정이다. `service-current.ts` checkpoint는 기관 transaction의 DB aggregate에 보존하고 낮은 높이/같은 높이 다른 hash/state/clock rollback을 거절한다. 복원 gate·공통 소비 식별 범위 SQL은 작성만 했으며 독립 HTTPS anchor/CAS·영속 worker를 연결했으나 실제 PG 원자성/복구는 미검증이다.
+통화 유지·PBX 경로 verifier는 Witness 관측 age<8초/미래 오차≤1초로 검사한다. 각 시계 오차≤1초일 때 최대10초를 목표로 하는 정책이며 미측정이다. `service-current.ts` checkpoint는 기관 transaction의 DB aggregate에 보존하고 낮은 높이/같은 높이 다른 hash/state/clock rollback을 거절한다. 복원 gate·공통 소비 식별 범위 SQL·독립 HTTPS Anchor/CAS·영속 worker를 연결했다. 선택한 실제 PG 경합·CAS·앱 복원은 검증했고 외부 CAS/DB의 분산 원자성이나 전체 체인 복원을 뜻하지 않는다.
 
-초기 시연·역할 분리 직접 통화·통화 유지/PBX의 세 형식은 별도 strict 진입점이며 자동 downgrade하지 않는다. 추가 서버 API는 `/v3`이며, 기본 화면은 `/service`, 배포 설정과 서버 호출은 `/v3`를 사용한다. `/finals`만 이전 직접 통화 호환 경로다. SDK 파일 존재·타입 통과만으로 전체 연결 완료라고 보지 않는다. [현행 구현·검증 기록](FINALS-IMPLEMENTATION-PLAN.md#pre-execution-20261027).
+초기 시연·역할 분리 직접 통화·통화 유지/PBX의 세 형식은 별도 strict 진입점이며 자동 downgrade하지 않는다. 추가 서버 API는 `/v3`이며, 기본 화면은 `/service`, 배포 설정과 서버 호출은 `/v3`를 사용한다. `/finals`만 이전 직접 통화 호환 경로다. SDK 파일 존재·타입 통과만으로 전체 연결 완료라고 보지 않는다. [현행 구현·검증 범위](guide/05-IMPLEMENTATION-STATUS.md).
 
 ## 공동 설정·정책과 상태 증언
 
@@ -63,7 +63,7 @@ PBX는 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이다. browser report는 각 �
 
 기관·승인 ID는 모든 형식에서 하나의 SQL 소비 namespace를 쓴다. 새 배포는 소비뿐 아니라 계정/키/정책 변경과 취소/회수 사건을 권한 metadata checkpoint에 묶어 별도 수명 HTTPS anchor의 CAS(이전 값이 같을 때만 갱신)와 대조한다. 관리 API는 계정 SQL 함수와 checkpoint를 동일 DB transaction에서 처리하고 요청 안팎에서 membership generation을 검사한다. 외부 CAS와 DB는 분산 원자 transaction이 아니며 CAS 뒤 DB 응답/이력을 잃으면 gate를 닫는다. CAS 응답 유실은 정확한 next 값 readback만 복구한다.
 
-최초 빈 DB도 검토한 새 기준·독립 zero anchor에 초기 metadata checkpoint를 기록한 뒤 준비 상태가 된다. 구 저널을 자동 새 기준으로 간주하지 않는다. 전체 journal 검사는 읽기 전용 snapshot으로 하고 마지막 짧은 잠금에서 head/metadata/검증 token을 다시 확인한다. 복원 뒤 로그인 세션은 모두 폐기한다. 실제 PG 경합·CAS·복원 보장은 [미실행 시험과 절차](RUNBOOK.md)에 남긴다.
+최초 빈 DB도 검토한 새 기준·독립 zero anchor에 초기 metadata checkpoint를 기록한 뒤 준비 상태가 된다. 구 저널을 자동 새 기준으로 간주하지 않는다. 전체 journal 검사는 읽기 전용 snapshot으로 하고 마지막 짧은 잠금에서 head/metadata/검증 token을 다시 확인한다. 복원 뒤 로그인 세션은 모두 폐기한다. 실제 PG 경합·CAS·복원의 선택 검증과 남은 경계는 [현황표](guide/05-IMPLEMENTATION-STATUS.md), 실행 순서는 [RUNBOOK](RUNBOOK.md)을 따른다.
 
 ## 역할 분리 직접 통화의 서명 형식
 
@@ -79,7 +79,7 @@ PBX는 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이다. browser report는 각 �
 - `SenderSessionPermit`: Sender 장기키가 상담원·업무·시도·browserPublicKey·service keyVersion·VC 내용 해시·policyHash·sessionId를 최대60초 서명한다. VC 복사본만으로 이 서명과 브라우저 세션키 소유 증명을 만들 수 없다.
 - `ContactAuthorization`: issuer가 목적·수신자·업무·시도·VC/정책/permit/browserKey hash·키 버전·권한 세대·session을 서명한다. 발급과 consume에서 위임/기관/키/취소 상태를 다시 검사한다.
 - `SessionBinding`: authorizationHash, 양쪽 SDP SHA-256과 fingerprint, recipientKeyHash/nonce, session, transport profile. 양쪽 세션키의 `PossessionProof`가 같은 bindingHash를 서명한다. 수신자의 인증 세션으로 키를 최초 enrollment하고 교체를 거절한다.
-- `ConsumptionReceipt`: 최초 binding을 transaction 안에서 고정하고 서명 JWS까지 함께 저장한다. 같은 binding은 같은 JWS를 반환하고 다른 binding은409다. 취소와 소비는 같은 기관 행 잠금으로 순서를 정한다. commit 뒤 응답 유실은 재시도로 복구한다. 이 DB 보장은 아직 실제 PostgreSQL에서 검증하지 않았다.
+- `ConsumptionReceipt`: 최초 binding을 transaction 안에서 고정하고 서명 JWS까지 함께 저장한다. 같은 binding은 같은 JWS를 반환하고 다른 binding은409다. 취소와 소비는 같은 기관 행 잠금으로 순서를 정한다. commit 뒤 응답 유실은 재시도로 복구한다. 이하 직접 통화 객체의 설계와 현재 공통 DB의 선택 경합 검증 범위는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 구분한다.
 - `AuthorizationStatus`: 수신자가 만든 새 nonce에 대해 issuer가 소비/취소/종료 상태와 binding을 최대5초 서명한다. SDK는 서버의 성공 문자열 대신 이 서명을 검사한다. 회전·철회·정지·취소 후 정상 표시가 유지되지 않아야 한다.
 - `ChannelChallenge`: 같은 datachannel에서 새 receiverNonce/gatewayNonce와 bindingHash를 양쪽 세션키가 서명한다. SDK의 transport evidence는 실제 certificate/getStats 관측과 함께 대조한다. 미지원 환경은 검증 불가다.
 
@@ -148,4 +148,4 @@ SDP는 수신 문자열의 LF를 CRLF로 바꾼 UTF-8 bytes를 hash한다. `a=fi
 
 관리 EIP-712의 등록/복구와 오프체인 JWS 승인은 별개다. 콜센터 키 목록 활성화는 `ActivateServiceKeys`의 chain/registry/institution·이전/새 epoch·새 issuer JWK digest·정렬한 키 목록 digest·nonce/deadline에 별도 2-of-3 서명을 요구한다. 복구 서명을 이 키 목록 승인으로 확대하지 않는다.
 
-복원 gate는 SQL 소비 식별 범위의 대응 관계와 journal 전체 순번·hash chain·세대 marker, 독립 anchor를 기관 행 잠금 안에서 대조한다. 마지막 root만 같은 것을 정상 복원으로 보지 않는다. 보관 기간이 지난 기본 경로의 영수증 payload는 내용 hash로 최소화하지만 기관/승인 ID·binding hash·journal은 유지하므로 같은 승인 ID를 다시 사용할 수 없다. 실제 PostgreSQL/복원 동작은 미검증이다.
+복원 gate는 SQL 소비 식별 범위의 대응 관계와 journal 전체 순번·hash chain·세대 marker, 독립 anchor를 기관 행 잠금 안에서 대조한다. 마지막 root만 같은 것을 정상 복원으로 보지 않는다. 보관 기간이 지난 기본 경로의 영수증 payload는 내용 hash로 최소화하지만 기관/승인 ID·binding hash·journal은 유지하므로 같은 승인 ID를 다시 사용할 수 없다. 선택한 실제 PostgreSQL/application 복원과 전체 체인/독립 호스트 복원은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 구분한다.

@@ -1,15 +1,8 @@
 # CallSign 전체 개발 명세
 
-**2026-11-02 GitHub 전달:** OPS-001/003·TEST-001/004의 공개 파일 Release 게시·재수령에 이어6종 private GHCR manifest/config/layer의 실제 다운로드와 digest/architecture/private를 확인했다. [현재 절차](RUNBOOK.md#github-delivery-20261102), [새 증거](../artifacts/ghcr-images-20261102.json)를 따른다. 최종 AWS web·별도 reader 자격·AWS 실환경 실행은 미완료다. 이전 미게시/403 기록과 원본 증거는 당시 범위로 보존한다.
+이 문서는 요구사항 ID와 완료 조건의 기준이다. 설명·현황·운영 절차의 역할은 [문서 안내](README.md)에서 구분한다. 현재 구현과 실제 실행/fixture/미검증 범위는 [현황표](guide/05-IMPLEMENTATION-STATUS.md), 원래 SHA·날짜·실패·결과는 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)과 연결된 원본 증거를 따른다. 시험 개수로 전체 완성률을 계산하지 않는다.
 
-**2026-11-02 전달 리허설:** 새 identity에서 이미지/공개 전달물만으로 원장·최소권한 DB·별도 Anchor·인증 fixture·실제 제품 통화를 연결하고 위임·정책·키·PBX/장치 경계를 실행했다. 실제1시간 세션 자연 만료와 양 끝점 음성/PBX 회수까지 재검증했다. 요구 ID와 완료 기준은 유지하며 [현재 실행·실패·외부 경계](FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102)를 따른다. AWS override 전체·외부 보관/재수령·외부 TLS/IdP/NAT는 아직 검증하지 않았다.
-
-**2026-11-02 배포 목표 변경:** 대회는 AWS 단독 실행이며 개발 서버는 실행 의존성이 아니다. 기본은 검증 코드/이미지로 새 AWS 대회 identity를 초기화한다. 폐기 시험 데이터 이전을 요구하지 않는다. NEW와 기존 RESTORE는 분리하고 OPS 요구 ID·복구/서명 기준은 유지한다. [현재 절차](RUNBOOK.md#aws-competition). 과거 날짜의 GCP 시험/계획 기록은 당시 범위로 보존한다.
-
-
-**2026-11-02 추가 검증:** PBX-001~003·MEDIA-001~004·CALL-001~006·DB-001~003·OPS-003·TEST-001/004의 실제 연결 근거를 [이번 기록](FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)에 추가했다. 같은 호스트의 실제 Asterisk/TURN·제품 웹에서 서로 다른 합성 음원의 양방향 디코딩과5개 회수 경계를 확인했다. OIDC는 fixture이며 외부망·AI·클라우드·전체 복원과 일부 정책/키/장치 장애 조합은 미검증이다. 요구 ID·완료 기준은 유지하며 전체 개발 완료로 확대하지 않는다.
-
-2026-11-01 검증 추가: CHAIN-001/002·STATE-001/002·OPS-001/003·TEST-001의 [선택 경로를 실제 구성요소로 실행](FINALS-IMPLEMENTATION-PLAN.md#isolated-runtime-20261101)했다. 같은 host의 chain/Witness와 HTTP/SQL/독립 Anchor/실제 worker 경계이며, 미디어·외부 IdP/AI·전체 이전 완료는 아니다. 아래 요구사항·완료 조건은 낮추지 않는다.
+대회 배포 대상은 AWS이며 개발 서버는 runtime 의존성이 아니다. [고정 Release와 수령/NEW/재개·복구](RUNBOOK.md#aws-competition)는 RUNBOOK에서 관리한다. 아래 날짜별 설계/검토 메모는 해당 시점의 요구·이행 기록이며 현재 실행 결과를 복사하는 영역이 아니다. 사용자 지시와 AGENTS가 실행 허용 범위를 정한다.
 
 ## 서비스 설계 원칙
 

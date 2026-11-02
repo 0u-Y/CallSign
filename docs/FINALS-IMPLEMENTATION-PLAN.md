@@ -4,6 +4,16 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="public-repository-20261102"></a>
+
+## 2026-11-02 공개 저장소의 문서 진입점 정리
+
+시작 HEAD는 `391db16`이다. 추적532개 파일의 역할/크기·문서/배포/CI 참조를 조사하고 README를 서비스 목적·사용자·작은 구조도·가벼운 검사/실제 실행 구분으로 정리했다. 새 `docs/README.md` 한 곳에서 가이드·요구·아키텍처·운영·현황·증거·멘토링/기획으로 안내한다. 현재 상태는 현황표, 요구는 MASTER, 절차/고정 Release는 RUNBOOK, 날짜별 결과는 이 기록과 원본 증거로 구분해 중복·오래된 미검증 표현을 줄였다. 실제 제품/계약/API/인증 정책은 변경하지 않았다.
+
+개인 요약19개와 진행 포인터의 기존 ignore를 유지하고 로컬 파일을 보존했다. artifacts176개(시험 입력·증거·캡처 포함)와 동일 내용의 복구 JSON 한 쌍·영상·기획/렌더 자료는 provenance/참조 때문에 이동·삭제하지 않았다. 실제 웹/배포 입력인 `artifacts/test-results.json`과 계약 artifact도 유지했다. LICENSE는 없으며 새 라이선스/정책 파일을 만들지 않았다.
+
+추적 Markdown과 새 인덱스의 상대 링크/anchor·fence, 새 Mermaid의 정적 구문/노드 연결, README 명령과 package scripts, ignore와 build/fixture 입력, 문서 추가 링크와 diff를 검사했다. `pnpm lint`도 통과했다. Mermaid renderer는 설치돼 있지 않아 렌더 검증은 하지 않았다. 서비스·DB·체인·브라우저·이미지/AWS 실행이나 로컬 통합 시험은 하지 않았고, 일반 push의 light CI만 기존 정책대로 실행한다. 고정 Release·이미지·첨부물·원본 SHA/날짜/결과는 수정하지 않았다. 문서 탐색 변경만으로 새 배포 묶음/Release를 발행하지 않는다.
+
 <a id="ghcr-images-20261102"></a>
 
 ## 2026-11-02 비공개 GHCR 게시와 실제 원격 blob 수령
