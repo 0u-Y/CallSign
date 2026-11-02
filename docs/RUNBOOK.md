@@ -12,7 +12,7 @@
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 현재 이미지/공개 파일 버전: `aws-bootstrap-20261102t093531z`. [새 Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)는 이번 원격 검증 결과로 발행한다. 게시·수령 영수증은 후속 커밋에 보존한다.
+- 현재 이미지/공개 파일 버전: `aws-bootstrap-20261102t093531z`. [새 Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)를 게시하고 새 디렉터리에서5개 파일614,785bytes를 다시 내려받아 checksum과6종 image ref 일치를 확인했다. [게시·수령 영수증](../artifacts/ghcr-delivery-20261102.json).
 - 이전 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 그대로 보존한다. 그 시점의 package403/자격 미준비와 [원본 증거](../artifacts/github-publication-20261102.json)는 과거 결과다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.
 - 아래6종은 동일한 검토 image config ID를 **재build 없이 비공개 GHCR**에 게시했다. package API의 private·연결 repo 없음과 익명 접근 거절을 확인했다. 기존 visibility/권한 상속은 변경하지 않았다.
@@ -73,7 +73,7 @@ print('PASS: relative regular files/directories only; nothing extracted')
 CHECK_PUBLIC_TARS
 ```
 
-원격 검증된 ref/digest는 새 inventory로 고정한다. 이전 null inventory는 덮어쓰지 않는다. 공개 파일의 게시/재수령 영수증은 후속 `artifacts/ghcr-delivery-20261102.json`을 따른다. source bundle은 발행 직전 상태라 후속 영수증을 포함하지 않을 수 있다.
+원격 검증된 ref/digest는 새 inventory로 고정했다. source tag는 `b0a5183802dd2c94e86faf9978111b88928d14e3`이며, 이전 null inventory는 덮어쓰지 않았다. 실제 재수령 파일만으로 checksum 검사·새 디렉터리 추출과 기존 경로 거절을 확인했다. [공개 파일의 게시/재수령 영수증](../artifacts/ghcr-delivery-20261102.json)은 source bundle보다 나중에 기록됐으며, bundle 안의 발행 직전 문서를 후속 문서로 덮지 않는다.
 
 #### AWS의 최소권한 인증
 

@@ -1,0 +1,216 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-02T09:45:41.943232+00:00",
+  "headAtVerification": "b0a5183802dd2c94e86faf9978111b88928d14e3",
+  "worktreeDirtyAtBundle": false,
+  "requirements": [
+    "OPS-001",
+    "OPS-003",
+    "TEST-001",
+    "TEST-004"
+  ],
+  "status": "PASS",
+  "release": {
+    "tag": "aws-bootstrap-20261102t093531z",
+    "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z",
+    "releaseId": 431286160,
+    "publishedAt": "2026-11-02T09:44:54Z",
+    "sourceCommit": "b0a5183802dd2c94e86faf9978111b88928d14e3",
+    "isPrerelease": true,
+    "assets": [
+      {
+        "name": "deployment-files.tar",
+        "bytes": 450560,
+        "sha256": "57ee7e5aa0a4161fc21ee531660caf49a027fa3b7f4a80e0c16054f5a141c894",
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t093531z/deployment-files.tar",
+        "assetId": 701249438,
+        "githubDigest": "sha256:57ee7e5aa0a4161fc21ee531660caf49a027fa3b7f4a80e0c16054f5a141c894"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 122880,
+        "sha256": "87b07aa38277046b232ebe9fa731c411273b327b7a7b0b5732edbc06ac7780c5",
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t093531z/observer-tests.tar",
+        "assetId": 701249425,
+        "githubDigest": "sha256:87b07aa38277046b232ebe9fa731c411273b327b7a7b0b5732edbc06ac7780c5"
+      },
+      {
+        "name": "images.json",
+        "bytes": 7569,
+        "sha256": "ef43826f9627d720686cb2b5bfe5ef9bd7e70623093f48861f051737cac0b998",
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t093531z/images.json",
+        "assetId": 701249434,
+        "githubDigest": "sha256:ef43826f9627d720686cb2b5bfe5ef9bd7e70623093f48861f051737cac0b998"
+      },
+      {
+        "name": "publication-audit.json",
+        "bytes": 33437,
+        "sha256": "87f08c20f246f132922010f295d7820fddf565700411a9307baf05f1d66e0181",
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t093531z/publication-audit.json",
+        "assetId": 701249420,
+        "githubDigest": "sha256:87f08c20f246f132922010f295d7820fddf565700411a9307baf05f1d66e0181"
+      },
+      {
+        "name": "SHA256SUMS",
+        "bytes": 339,
+        "sha256": "4b1828fb083e9d561d909ce4dc2116bdf204d88f5736b1ae40234bcc85fbd24b",
+        "url": "https://github.com/0u-Y/CallSign/releases/download/aws-bootstrap-20261102t093531z/SHA256SUMS",
+        "assetId": 701249426,
+        "githubDigest": "sha256:4b1828fb083e9d561d909ce4dc2116bdf204d88f5736b1ae40234bcc85fbd24b"
+      }
+    ],
+    "totalBytes": 614785,
+    "freshNetworkDownload": true,
+    "allPreuploadAndGithubAndReceiptHashesMatch": true,
+    "anonymousInventoryAndTaggedVerifierAccess": "PASS",
+    "imagesMatchVerifiedGhcrReferences": true,
+    "oldReleaseOverwritten": false
+  },
+  "imageEvidence": {
+    "path": "artifacts/ghcr-images-20261102.json",
+    "sha256": "1e0d88c8c88a1384aabb0dba5c310c21454426d920a7fca267fa08f12eb9b0aa",
+    "images": [
+      {
+        "key": "CALLSIGN_APP_IMAGE",
+        "role": "runtime",
+        "configId": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+        "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:0763dc98310d268cd3e3808c38320baddfa5ab297f69a4c43295d29567ebf90a",
+        "registryManifestDigest": "sha256:0763dc98310d268cd3e3808c38320baddfa5ab297f69a4c43295d29567ebf90a",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      },
+      {
+        "key": "ASTERISK_IMAGE",
+        "role": "asterisk",
+        "configId": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "registryReference": "ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+        "registryManifestDigest": "sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      },
+      {
+        "key": "TURN_IMAGE",
+        "role": "turn",
+        "configId": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "registryReference": "ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+        "registryManifestDigest": "sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      },
+      {
+        "key": "BESU_IMAGE",
+        "role": "besu",
+        "configId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "registryReference": "ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+        "registryManifestDigest": "sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      },
+      {
+        "key": "POSTGRES_IMAGE",
+        "role": "postgres",
+        "configId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "registryReference": "ghcr.io/0u-y/callsign-postgres@sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+        "registryManifestDigest": "sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      },
+      {
+        "key": "HTTPS_IMAGE",
+        "role": "nginx",
+        "configId": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "registryReference": "ghcr.io/0u-y/callsign-nginx@sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+        "registryManifestDigest": "sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+        "remoteOs": "linux",
+        "remoteArchitecture": "amd64",
+        "anonymousAccess": "DENIED"
+      }
+    ],
+    "packageVisibility": "private",
+    "uniqueRemoteObjects": 50,
+    "networkBytesReceived": 952398858,
+    "durationSeconds": 132.563,
+    "dockerCacheUsed": false
+  },
+  "checks": {
+    "publicAssetAudit": {
+      "status": "PASS",
+      "sourceCommit": "b0a5183802dd2c94e86faf9978111b88928d14e3",
+      "releaseTag": "aws-bootstrap-20261102t093531z",
+      "files": [
+        {
+          "name": "deployment-files.tar",
+          "bytes": 450560,
+          "sha256": "57ee7e5aa0a4161fc21ee531660caf49a027fa3b7f4a80e0c16054f5a141c894"
+        },
+        {
+          "name": "observer-tests.tar",
+          "bytes": 122880,
+          "sha256": "87b07aa38277046b232ebe9fa731c411273b327b7a7b0b5732edbc06ac7780c5"
+        },
+        {
+          "name": "images.json",
+          "bytes": 7569,
+          "sha256": "ef43826f9627d720686cb2b5bfe5ef9bd7e70623093f48861f051737cac0b998"
+        },
+        {
+          "name": "publication-audit.json",
+          "bytes": 33437,
+          "sha256": "87f08c20f246f132922010f295d7820fddf565700411a9307baf05f1d66e0181"
+        },
+        {
+          "name": "SHA256SUMS",
+          "bytes": 339,
+          "sha256": "4b1828fb083e9d561d909ce4dc2116bdf204d88f5736b1ae40234bcc85fbd24b"
+        }
+      ],
+      "regularTarFiles": 47,
+      "knownProtectedValueCount": 16,
+      "findings": []
+    },
+    "releaseChecksumVerifier": "PASS",
+    "tarEntryReview": "PASS",
+    "receivedOnlyExtractionWithoutCheckout": "PASS",
+    "existingExtractionDirectoryRejected": "PASS",
+    "documentedInventoryCheck": {
+      "validActualInventory": "PASS",
+      "fiveInvalidCasesRejected": true
+    },
+    "shellBlockSyntax": "PASS",
+    "localLightRepeated": false,
+    "reason": "Only publication records and RUNBOOK changed; product/runtime code is unchanged. CI light runs normally on push."
+  },
+  "authentication": {
+    "temporaryDockerConfigRemoved": true,
+    "passwordStdinUsed": true,
+    "originalProtectedFilePreserved": true,
+    "globalDockerConfigChanged": false,
+    "tokenValuesInPublicFiles": false,
+    "awsReaderCredentialStillSeparate": true
+  },
+  "retainedLocalObjects": {
+    "rawRemoteOciReceipt": "Owner-only .local publication directory; private image content, not Git/Release",
+    "publicReleaseReceipt": "New .local receipt directory",
+    "sourceImageReferences": "Six new published local tags; original image configs preserved",
+    "temporaryAuthenticationFiles": "Removed"
+  },
+  "notExecuted": [
+    "service/container startup",
+    "image rebuild",
+    "AWS resource creation or deployment",
+    "final AWS trust-pinned web build",
+    "separate reader PAT authentication",
+    "external IdP/TLS/NAT/TURN/AI verification"
+  ],
+  "restrictions": {
+    "hostSettingsChanged": false,
+    "existingServicesChanged": false,
+    "packageVisibilityChanged": false,
+    "awsCostsIncurred": false
+  }
+}

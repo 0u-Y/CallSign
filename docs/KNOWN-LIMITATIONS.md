@@ -4,7 +4,7 @@
 
 ## GitHub 전달과 AWS 실행의 남은 경계
 
-비공개 GHCR bootstrap6종의 게시·실제 manifest/config/layer 수령과 linux/amd64·private·익명 거절을 확인했다. [현재 RUNBOOK](RUNBOOK.md#github-delivery-20261102)과 [새 증거](../artifacts/ghcr-images-20261102.json)를 따른다. 기존 null inventory Release·package403/미전송 설명은 이전 시점의 기록으로 보존한다. 새 공개 파일 Release 게시/재수령 결과는 후속 영수증으로 구분한다. 최종 AWS web 생성·별도 reader 자격·실제 AWS 배포/외부 TLS/IdP/NAT/TURN·AI는 아직 미검증이다.
+비공개 GHCR bootstrap6종의 게시·실제 manifest/config/layer 수령과 linux/amd64·private·익명 거절을 확인했다. [현재 RUNBOOK](RUNBOOK.md#github-delivery-20261102)과 [새 증거](../artifacts/ghcr-images-20261102.json)를 따른다. 기존 null inventory Release·package403/미전송 설명은 이전 시점의 기록으로 보존한다. 새 공개 파일 Release 게시/재수령은 [최종 전달 영수증](../artifacts/ghcr-delivery-20261102.json)으로 확인했다. 최종 AWS web 생성·별도 reader 자격·실제 AWS 배포/외부 TLS/IdP/NAT/TURN·AI는 아직 미검증이다.
 
 ## 전달물 신규 리허설의 추가 범위
 
