@@ -12,6 +12,8 @@ AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Relea
 
 ## 최신 기능의 실제 DB 검증과 자원 중단
 
+2026-11-03 후속 재개는 서비스 시작 전 swap3연속 조건으로 차단됐다. HTTP·WS·Chromium은0/BLOCKED이며 원인 계측·취소 전파는 오프라인 검증만 완료했다. [후속 관측과 남은 조건](FINALS-IMPLEMENTATION-PLAN.md#http-resource-preflight-20261103)을 따른다.
+
 2026-11-03 network=none PostgreSQL/전용 Unix socket에서 migration0010·잠금 rollback/재개·기존 데이터 보존과 최소권한을 포함한5파일17시험이 통과했다. 연속 swap 감지로 중단하고 승인된1회 재개 후에도 같은 조건으로 중단해 최신 HTTP·WS·Chromium은 assertion0/BLOCKED다. 기존 HTTP 성공을 이번 소스의 성공으로 복사하지 않는다. 브라우저의 단일 시험 SPKI 예외도 실행 확인 전이며 실제 TLS/IdP 품질 보장이 아니다. [실행 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)과 [증거](../artifacts/mentoring-integration-20261103.json)를 따른다.
 
 ## 4차 반영 소스와 아직 실행하지 않은 경계

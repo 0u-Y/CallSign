@@ -77,3 +77,8 @@
 ## 2026-11-03 최신 기능의 PostgreSQL·HTTP 검증 한정 예외
 
 이번 요청은 새 identity의 network=none PostgreSQL/Unix socket, loopback Platform·Issuer·Sender·HTTPS OIDC/웹·설치 Chromium, 합성 계정/시험키/CA·migration·통합 시험·관련 commit/일반 push/light CI만 허용했다. DB CPU1·RAM/데이터512MiB, 앱 관측3GiB·임시5GiB·가용 RAM8GiB 여유와 지속 swap 중단 조건을 유지한다. 첫 자원 중단 후 사용자가 같은 예산의1회 재개를 승인했으며 재개 후 다시 swap 중단하여 추가 서비스 기동은 하지 않는다. 실제 체인/Witness/PBX/TURN/Anchor·음성장치·외부 IdP/AI/AWS·이미지/Release·기존 서버/자원 변경은 허용하지 않았다. 이 기록은 후속 기동의 상시 허가가 아니다.
+
+
+## 2026-11-03 HTTP 재개 관측의 한정 작업
+
+이번 요청은 기존 자원 기준을 만족할 때 새 소유 identity에서 HTTP/WS/Chromium을1회 재개하고 관련 검사·검토 branch commit/일반 push/light CI 확인을 허용한다. 사전 관측에서 연속 swap 기준이 충족되어 이번에는 서비스·DB·키·컨테이너를 생성/기동하지 않았다. 자동 재개·기준 완화 없이 관측/취소 전파를 오프라인 회귀하고 원인을 보존한다. 기존 host/network/daemon/global auth·서비스/volume·체인/Witness/PBX/TURN/Anchor·외부 제공자/AWS·이미지/Release 변경은 금지이며 이 기록은 후속 기동의 상시 허가가 아니다.

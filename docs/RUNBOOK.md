@@ -1455,9 +1455,89 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=1024   timeout 240s node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts   --reporter=json --outputFile=artifacts/NEW-HTTP.json
 ```
 
-worker1·앱/브라우저 합산3GiB·임시5GiB는 관측 상한이고 DB512MiB는 강제 상한이다. 기존 작업에 RAM8GiB 이상을 남긴다. 실행별 deadline·소유 자식 process group·DB label/ID·보호 ROOT를 기록하고 지속 swap·기존 작업 영향·예산 초과 시 이번 대상만 중단한다. 중단을 SKIP/PASS로 바꾸거나 자동 재개하지 않는다. 이번 watchdog은10초 구간의 swap page 카운터가3구간 연속 바뀌면 중단했다. 정확한 속도와 원인을 보존하지 못했으므로 OOM이나 서버 전체 메모리 부족으로 단정하지 않는다.
+worker1·앱/브라우저 합산3GiB·임시5GiB는 관측 상한이고 DB512MiB는 강제 상한이다. 기존 작업에 RAM8GiB 이상을 남긴다. 실행별 deadline·소유 자식 process group·DB label/ID·보호 ROOT를 기록하고 지속 swap·기존 작업 영향·예산 초과 시 이번 대상만 중단한다. 중단을 SKIP/PASS로 바꾸거나 자동 재개하지 않는다. 앞선 실행의 watchdog은10초 구간의 swap page 카운터가3구간 연속 바뀌면 중단했다. 정확한 속도와 원인을 보존하지 못했으므로 OOM이나 서버 전체 메모리 부족으로 단정하지 않는다.
 
 새 analysis/recall HTTP·Chromium 시험 소스는 타입 검사만 했다. ARI는 DELETE 성공 뒤 GET200/503/404를 fetch fixture로 구분하고 실제 ServiceAuthority/PbxRuntime·SQL 관측을 거치도록 작성했으며 실제 PBX·음성 회수의 성공 증거가 아니다. 최종 통합 검증에는 안정된 허가 환경에서 같은 DB의 재실행/상태 오염과 HTTP/WS/Chromium을 확인해야 한다. runtime에 포함되는 migration CLI가 바뀌므로 향후 새 runtime/공개 묶음에 포함한다. 기존 고정 Release·이미지는 변경하지 않으며 이번에는 발행하지 않는다.
+
+<a id="http-resource-resume-20261103"></a>
+
+### HTTP·WS·Chromium 재개: 자원 관측과 단계별 중단
+
+2026-11-03 후속 사전 관측은 **서비스 시작 전 BLOCKED**다. 10초 swap-in 속도가 약0.00039→0.0498→0.1959MiB/s로 세 구간 연속 증가했고, 마지막 MemAvailable은28.4GiB·memory PSI 평균은0이었다. 관측 대상 앱 RSS는0이며 컨테이너는 없었다. 호스트 전체 swap의 발생 주체나 OOM을 입증하지 않는다. [관측 원본과 검사 결과](../artifacts/http-resource-preflight-20261103.json)를 보존하며 이번에는 재기동하지 않는다.
+
+기존 로컬 watchdog/launcher를 `scripts/validation_resources.py`와 `scripts/validation-resource-control.py`로 공유했다. 최초 표본은 기준점이고 실제 page 크기·monotonic 경과 시간으로 in/out을 따로 계산한다. 기존1초·10초 관측 모두 **어느 방향이든 양의 swap 증분이3구간 연속이면 중단**하며 새 속도 하한은 없다. 카운터 감소/시계 역행은 swap 압력으로 분류하지 않고 관측 불일치로 차단한다. 이 계산 오류가 과거 중단 원인이었다는 증거는 없다.
+
+다음 명령은 **별도의 재개 허가 이후** 사용할 자료다. 이번 자원 중단을 자동 재시험하지 않는다. 첫 명령은 서비스·키·컨테이너 없이 읽기 전용 관측만 한다. 새 보호 디렉터리여야 하며 과거 stop 파일을 지워 재사용하지 않는다.
+
+```bash
+RUN_DIRECTORY="$(pwd)/.local/http-resume-$(date -u +%Y%m%dT%H%M%SZ)"
+python3 scripts/validation-resource-control.py observe "$RUN_DIRECTORY"
+# exit2: BLOCKED. 다음 명령·환경 생성 없이 관측 파일을 보존하고 종료한다.
+```
+
+실제 재개 시에는 위 Unix socket 절의 기존 절차로 **새 identity**를 준비한다. PostgreSQL은 `docker run` 대신 동일 인자의 `docker create --pull=never`로 먼저 생성하되 시작하지 않는다. 기존 local prepare.py는 DB를 즉시 시작하므로 그대로 재사용하지 않는다. 공개 image tag만 믿지 말고 로컬 ID/amd64와 소유 label·NetworkMode=none·PortBindings 없음·CPU1·memory/swap512MiB·PGDATA tmpfs512MiB를 대조한다. 보호 ROOT는0700이고 그 안에 시험 자격/env·localhost CA·socket만 둔다. 보호 자료 생성과 container create는 위 읽기 전용 관측 명령의 동작이 아니며 이번에 수행하지 않았다.
+
+`RUN_DIRECTORY`와 ROOT는 서로 달라도 되지만 `RUN_DIRECTORY`의 basename을 runId·ROOT basename·DB label Docker label key `callsign.test`의 value에 동일하게 사용한다. `identity.json`은 `runId`, `root`(절대 경로), `containerId`(실제 전체 ID), `container`, `bootIdHash`, `deadlineMonotonicNs`를 기록한다. `bootIdHash`는 `/proc/sys/kernel/random/boot_id` 파일 bytes의 SHA-256이며 호스트 재부팅 후 기존 monotonic deadline을 재사용하지 못하게 한다. deadline은 준비 시작 때 `time.monotonic_ns()+5400_000_000_000`으로 계산하며 정리도 포함한다. ROOT의0600 `environment.json`에는 허용된 자식 환경만 기록한다. 이전 셸의 전체 환경/외부 제공자 자격을 복사하지 않는다. 필요한 값은 다음과 같다.
+
+- `PATH`, `HOME` 등 설치 도구에 필요한 비민감 환경, `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration`, `CALLSIGN_HTTP_TEST_ROOT`, `CALLSIGN_TEST_PG_SOCKET`, `NODE_EXTRA_CA_CERTS`, `NODE_OPTIONS=--max-old-space-size=1024`.
+- 동일 `callsign_test_*` DB의 `TEST_DATABASE_URL`·`MIGRATOR_DATABASE_URL`과 서로 다른 `AUTH_DATABASE_URL`·`ISSUER_DATABASE_URL`·`WORKER_DATABASE_URL` 및 대응 `TEST_AUTH/ISSUER/WORKER/PBX_DATABASE_URL`. URL 원문은 보호 파일에만 둔다.
+- 위 migration CLI와 `infra/deploy/provision-logins.sql`이 사용하는 역할별 보호 비밀번호 참조. owner로 앱을 실행하지 않는다. 현재 소스의 socket preload/setup·환경 검사는 그대로 유지한다.
+
+준비가 끝난 뒤 **새 관측을31초 수행하고 즉시 watcher로 인계**한다. 기존 관측 종료 후 준비 작업을 오래 수행한 자료는 재개 근거로 쓰지 않는다. `observe`는 준비된0700 디렉터리도 받지만 이전 관측/stop 파일이 있으면 거절한다. 인계 간격2초 초과·observer 종료·표본 stale이면 새 단계는 차단된다. 명령들은 저장소 루트에서 순서대로 수행하고 **비0 종료 시 뒤 단계는 시작하지 않는다**.
+
+```bash
+set -e
+export CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration
+# 새로 준비한 RUN_DIRECTORY, ROOT, containerId를 대조한 뒤 한 번만 관측한다.
+python3 scripts/validation-resource-control.py observe "$RUN_DIRECTORY"
+python3 scripts/validation-resource-control.py watch "$RUN_DIRECTORY" &
+WATCHER_PID=$!
+cleanup_run() {
+  result=$?
+  trap - EXIT
+  python3 scripts/validation-resource-control.py cleanup "$RUN_DIRECTORY" || result=2
+  wait "$WATCHER_PID" || true
+  exit "$result"
+}
+trap cleanup_run EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+# watcher 실행 직후에만 아래 argv 기반 helper를 사용한다. 설정 문자열을 shell로 평가하지 않는다.
+step() { python3 scripts/validation-resource-control.py run "$RUN_DIRECTORY" "$@"; }
+step startdb 30 docker start "$OWNED_CONTAINER_ID"
+step final-ready 30 python3 scripts/validation-resource-control.py wait-database "$RUN_DIRECTORY"
+# 최종 PG entrypoint + 실제 SELECT 1 이후에만 migration을 시작한다.
+step migrate 60 node --import tsx --import "$(pwd)/tests/integration/postgres-unix.mjs" scripts/migrate-finals.ts --apply
+step roles 45 python3 scripts/validation-resource-control.py provision-logins "$RUN_DIRECTORY"
+# 기존 SQL을 그대로 적용하며 보호 자격은 Docker exec의 환경 참조로만 전달한다.
+step readiness 45 node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts
+```
+
+직접 Docker 하위 명령은 소유 DB `start`만 허용한다. 위 `wait-database`/`provision-logins`는 `run`이 등록한 PID/start의 자식에서만 동작하며 실제 container ID/label/network/budget를 재검사한다. 기존 `infra/deploy/provision-logins.sql`의 기존 LOGIN 거절·transaction을 그대로 사용하며 일반 재시작에 다시 적용하지 않는다. 실제 SQL/hash/역할 확인은 다음 readiness assertion으로 판정한다. 이 준비 하위 명령은 이번에 정적 검사만 했으며 실제 새 DB에서 실행하지 않았다.
+
+A의 actual SQL/hash/LOGIN 확인 후 B→C→D로 나눈다. API-only 단계는 `environment.json`의 `CALLSIGN_HTTP_API_ONLY=true`를 사용해 Vite를 띄우지 않는다. D 직전에 이를 제거한다. 환경 변경은 앞 자식이 종료하고 다음 단계가 시작되기 전에만 한다. 아래 필터는 현재 두 파일의 준비된 모든 시나리오를 B/C/D 중 하나에 배정하며, 선택되지 않은 SKIP은 성공에 합산하지 않는다.
+
+```bash
+step http-auth 180 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-http.test.ts --testNamePattern '^(?!renders the actual service)'
+step http-recall 180 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(recall HTTP/SQL:|boundary: rejects replayed joint|boundary: separates first-connect|boundary: preserves a live synthetic)'
+step analysis-ws 240 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(analysis HTTP/WS:|boundary: stops analysis transport|boundary: stops a pending model)'
+# 보호 environment.json에서 CALLSIGN_HTTP_API_ONLY를 제거한 뒤 실행한다.
+step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
+```
+
+E는 같은DB에서 B/C/D 중 영향받는 시나리오만 **새 label**로 재실행하고, 전후에 보호 environment.json에 `CALLSIGN_HTTP_AUDIT_CONFIRMATION=NO_ACTIVE_HTTP_FIXTURES`를 설정해 다음 SQL 감사를 수행한다. 일반 suite 전에 확인값을 제거한다. 시험 전용 빈DB에서 시작하고 active fixture가 없을 때만 권한/outbox/session/미정산quota 잔류를 assert한다. 데이터를 지워 통과시키지 않으며 정당한 usage 정산 이력은 보존한다. 이번E는 미실행이다.
+
+```bash
+step cleanup-audit 45 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/http-cleanup.test.ts
+# 정상·실패 모두 증거를 먼저 보존한 뒤 소유 앱/브라우저→DB 순으로 정리한다.
+exit 0 # EXIT trap이 정상·실패 모두 소유 cleanup을 실행한다.
+```
+
+자원 중단은 최초 원인을 `environment-stop.json`에 고정하고 새 단계를 거절한다. 실행 중 테스트에 SIGINT로 부분 결과/afterAll 기회를 주고, PID와 start tick이 일치하는 소유 자식만 TERM/KILL한다. 앱 정리가 확인되지 않으면 DB를 먼저 내리지 않고 미완료를 기록한다. Vitest progress에는 시험명/판정만 남기며 기존 FAIL을 환경 BLOCKED로 숨기지 않는다. `resource-samples.jsonl`, `*.result.json`, `environment-cleanup.json`을 대조하고, assertion0은 PASS가 아니다. 프로세스 종료 후에도 자식이 남거나 정리 오류가 있으면 수동 소유 identity 확인이 필요하다. 실제 다중 서비스 정리와 observer 인계는 이번에 실행되지 않았으며 오프라인 자식 취소/부분 결과·차단 회귀만 통과했다.
+
+DB의512MiB/CPU1은 강제 제한, 앱/브라우저/observer 합산RSS3GiB·임시5GiB·RAM reserve8GiB는 관측 상한이다.1초 sampling은 순간 peak를 보장하지 않는다. deadline40초 전부터 새 단계를 차단해 정리 시간을 남긴다. container `OOMKilled`·Node heap 오류·호스트 PSI/swap을 각각 기록하며 서로 원인으로 단정하지 않는다. Python CLOCK_MONOTONIC과 Vitest process hrtime은 관측자/clock 이름을 구별하고 시각을 직접 빼지 않는다.
+
+`cleanup`은 소유 DB를 **중지**하며 container/보호 파일을 임의 제거하지 않는다. 공개 증거를 선별한 뒤 선언한 container ID·label·ROOT와 PID를 대조해 이번 stopped container 및 ROOT만 제거한다. 전역 prune/kill·기존 권한 변경·swap 설정 변경은 하지 않는다. 모든 종료 경로에 cleanup을 `trap`으로 등록하되 비밀 포함 로그는 공개하지 않는다. 중단 latch를 지우거나 새 identity를 자동 생성해 재개하지 않는다.
 
 ### 인증 후속 경계 검증
 

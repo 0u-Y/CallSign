@@ -4,6 +4,18 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="http-resource-preflight-20261103"></a>
+
+## 2026-11-03 HTTP 재개 사전 관측: 서비스 시작 전 차단
+
+시작 HEAD `d170407`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 기존1초/10초 watchdog은 최초 기준점은 올바르지만 구간 증분·속도·PSI 기록이 없고, 카운터 감소도 활동으로 셌으며 DB만 먼저 중단해 후속 suite에서 socket 오류가 생길 수 있었다. 실제 단조 시각/page 크기의 in/out·RSS/PSI·최초 중단 latch를 공유하고, 신규 suite 차단→시험 취소/부분 FAIL 보존→앱/브라우저 정리→소유 DB 중단 순서를 구현했다. 앱 정리 불확실 시 DB만 먼저 중단하지 않는다. 새 속도 하한을 만들거나 기존3연속 조건을 완화하지 않았다.
+
+TEST-001/004·OPS-006: 읽기 전용31초 이내 사전 관측에서10초 구간 swap-in1/128/502page(약0.00039/0.0498/0.1959MiB/s), 가운데 swap-out1page가 기록돼 **SUSTAINED_SWAP/BLOCKED**였다. 마지막 available RAM28.4GiB·memory PSI 평균0, 시험 앱 RSS0·DB 없음이다. 전역 swap 원인이나 OOM/호스트 압박은 확인하지 못했으며 카운터 reset 버그가 이번 중단 원인은 아니다. 새 환경을 생성하거나 추가 관측으로 조용한 시점을 찾아 재개하지 않았다.
+
+현재 **HTTP0·WS0·Chromium0/BLOCKED**, 동일DB 재실행 미실행이다. 기존DB17시험은 관련 DB 구현 변경이 없어 반복하지 않았다. 새 보호 자격/키/서비스/container/network는 없으며 기존 서버 설정은 변경하지 않았다. API-only fixture 선택, 각 단계의 부분 결과 reporter와 독립 SQL 잔류 감사 소스를 준비했으나 실제 서비스 정리·observer 인계·SQL 감사는 미실행이다. 순수/자식 취소/실제 Vitest 부분 결과 보존을 포함한 무기동 light는 **60파일298시험 PASS**다. 의도적 실패 reporter fixture의2건은 내부 회귀 입력이며 제품 통합 성공 수에 합산하지 않는다.
+
+[원본 관측·소스/검사 증거](../artifacts/http-resource-preflight-20261103.json)와 [정확한 다음 관측/단계별 명령](RUNBOOK.md#http-resource-resume-20261103)을 따른다. 소스 checkpoint는 `a5f8afe`(관측/취소 전파)·`1906aff`(단계 분리/잔류 감사)다. 이번 소스는 검토 branch에 보존하며 main 자동 병합·runtime build·Release 발행을 하지 않는다. 안정된 자원에서 별도 재개 허가 또는 중단 정책 변경의 명시적 승인이 필요하며, 최신 HTTP/WS/Chromium 검증 전 main 배포 후보로 판정하지 않는다.
+
 <a id="mentoring-integration-20261103"></a>
 
 ## 2026-11-03 최신 기능 통합 시도: DB 확인·자원 중단

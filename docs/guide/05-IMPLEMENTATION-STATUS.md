@@ -17,6 +17,8 @@
 
 ## 최신 변경의 통합 실행 상태
 
+2026-11-03 후속 재개는 서비스 시작 전 swap3연속 조건으로 차단됐다. HTTP·WS·Chromium은0/BLOCKED이며 원인 계측·취소 전파는 오프라인 검증만 완료했다. [후속 관측과 남은 조건](../FINALS-IMPLEMENTATION-PLAN.md#http-resource-preflight-20261103)을 따른다.
+
 2026-11-03에는 실제 PostgreSQL에서 migration0010의 실패 rollback·재개·재실행·기존 상태 보존과 최소권한을 확인했습니다(5파일17시험). 자원 watchdog의 연속 swap 감지와 승인된1회 재개 후 재중단으로 HTTP·분석 WS·Chromium은 assertion 실행 전에 차단됐습니다. 추가된 해당 시험 소스는 타입 검사만 했으며 최신 기능의 브라우저/회수 통합 성공으로 표시하지 않습니다. [실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)·[증거](../../artifacts/mentoring-integration-20261103.json)를 참고하세요.
 
 ## 4차 반영의 소스 구현
