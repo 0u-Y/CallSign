@@ -10,6 +10,14 @@ AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Relea
 
 같은 호스트의 새 chain/DB/별도 Anchor/PBX·제품 웹 리허설은 실제 구현과 합성 음원/로컬 OIDC를 사용했다. 독립 호스트 장애·실제 IdP·외부망 NAT/TURN·외부 AI·AWS override 전체 성공으로 확대하지 않는다. 기존 null inventory·package403·미전송 설명은 앞선 증거의 당시 상태다.
 
+## 4차 반영 소스와 아직 실행하지 않은 경계
+
+기관 회수 조회, 승인 정책에 결합한 제한 문맥 목적 분석, 통화별 반복/집계·합성 평가 도구를 구현했다. 이번 확인은 타입·순수 로직·Fastify inject(인증 actor/storage/provider fixture)·React 서버 렌더링이다. 실제 PostgreSQL read snapshot/0010 index·HTTP 세션·ARI GET404·브라우저/디코딩·외부 제공자/AWS 통합을 이번에 실행한 것으로 해석하지 않는다. 기존 실제 통합 결과는 당시 소스의 범위다. [최신 반영표](mentoring/README.md)와 [실행 조건](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
+
+분석기는 최근 확정 remote 발화만 사용하므로 고객 앞선 발언·ASR 오인식·복잡한 인용/정정의 의미를 확정할 수 없다. 규칙/LLM의 근거·revision·정책 결합 검사와 실제 한국어 정확도는 다르다. development/evaluation을 나눈 합성14사례도 독립 사람 평가/실음성 gold가 아니다. 실제 통화 성공률/지연 기준선은 NOT_RUN이며 작은 표본의 p95/단일 회수는 SLA가 아니다.
+
+Registry 전역 고정 승인자 교체·기관별 집합·정족수 변경은 미구현이며 이번에 ABI/bytecode/도메인을 바꾸지 않았다. 후속 완료에는 필수 기관 동의 여부를 포함한 운영 정책, 새 계약/신뢰 전환, 대기 서명/구 VC·lease·웹 차단·nonce/키 세대 이행과 회귀가 필요하다. Witness를 직접 체인 proof로 대체하는 작업도 별도다. 실제 CTI는 선택 adapter의 인증·ID 매핑·취소/응답 유실·관측 계약을 검증해야 하며 현재 API 경계 문서만으로 상용 호환성을 선언하지 않는다.
+
 ## 현재 서비스
 
 - **인증·원장·DB·미디어 선택 경로 검증, 전체 서비스 미검증.** 실제 실행 범위는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md)과 각 원본 증거를 따른다. OIDC만 fixture이고 원장/Witness·PostgreSQL·HTTPS Anchor·PBX/TURN·합성 원격 음원은 실제 구현이다. 과거 HTTP/복구 평가의 대체 경계는 그 실행 당시의 것이며 최신 미디어 결과나 운영 IdP·외부 AI/AWS·전체 복원 성공으로 합산하지 않는다.

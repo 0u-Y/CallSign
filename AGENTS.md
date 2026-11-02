@@ -68,3 +68,8 @@
 ## 2026-11-02 GitHub 산출물 보관·전달 작업
 
 이번 요청은 기존 산출물의 읽기 전용 layer/history/build-input/첨부물 감사, 소스/공개 배포 파일의 commit·일반 push·고유 GitHub Release 게시/재다운로드, 권한이 있을 때만 기존 이미지를 비공개 GHCR에 게시·원격 digest/접근 확인하는 범위다. package 권한이 없는 현재 인증을 공개 전환이나 CI로 우회하지 않는다. token/키/채운 env/개인정보/DB/chain/session/image tar는 Git·공개 첨부물에서 제외한다. 서비스/노드/컨테이너·이미지 rebuild·기존 서버 설정/AWS 자원/과금은 실행하지 않는다. AWS NEW 키/identity는 향후 AWS에서 생성한다.
+
+
+## 2026-11-03 4차 반영 소스 작업
+
+이번 요청은 기관 운영 조회·정책 기반 분석·통화별 집계·CTI 계약·배포 재현성의 코드/시험/기존 문서 수정, 설치 의존성의 오프라인 검사/타입/무기동 웹 build와 관련 commit/일반 push·기존 light CI만 허용한다. 모든 서비스/DB/체인/Witness/PBX/TURN/Anchor/브라우저·migration/seed/계약·이미지 build/load/pull/push/Release·AWS/유료 제공자·다운로드·기존 서버/자원 변경은 허용하지 않는다. 신규 index migration은 소스만 작성한다. 실제 연결/모델 품질·산출물 발행은 별도 단계이며 이 기록은 후속 실행의 상시 허가가 아니다.

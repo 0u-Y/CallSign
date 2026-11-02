@@ -149,3 +149,24 @@ SDP는 수신 문자열의 LF를 CRLF로 바꾼 UTF-8 bytes를 hash한다. `a=fi
 관리 EIP-712의 등록/복구와 오프체인 JWS 승인은 별개다. 콜센터 키 목록 활성화는 `ActivateServiceKeys`의 chain/registry/institution·이전/새 epoch·새 issuer JWK digest·정렬한 키 목록 digest·nonce/deadline에 별도 2-of-3 서명을 요구한다. 복구 서명을 이 키 목록 승인으로 확대하지 않는다.
 
 복원 gate는 SQL 소비 식별 범위의 대응 관계와 journal 전체 순번·hash chain·세대 marker, 독립 anchor를 기관 행 잠금 안에서 대조한다. 마지막 root만 같은 것을 정상 복원으로 보지 않는다. 보관 기간이 지난 기본 경로의 영수증 payload는 내용 hash로 최소화하지만 기관/승인 ID·binding hash·journal은 유지하므로 같은 승인 ID를 다시 사용할 수 없다. 선택한 실제 PostgreSQL/application 복원과 전체 체인/독립 호스트 복원은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 구분한다.
+
+<a id="cti-boundary"></a>
+
+## CTI 연동 경계: 현재 제품 API의 책임
+
+현재는 Sender Agent·Asterisk·로그인한 상담원 웹을 연결한다. 임의 상용 CTI, PSTN/우회 발신, 새 machine principal은 구현하지 않았다. 연동 adapter가 발신 이벤트를 받는다고 기관/상담원 권한을 얻지 않는다. 내부 PLATFORM/SENDER token을 외부 CTI에 제공하지 않는다.
+
+| 외부 사건/식별값 | 현재 내부 계약·책임 | 실패/재시도 |
+|---|---|---|
+| 기관·콜센터·상담원·외부 업무 ID | 기관이 등록한 service URI와 OIDC issuer/subject·내부 membership/할당에 명시적으로 매핑. 이메일/표시명이나 body의 기관 ID로 소속 결정 금지 | 미등록/타 기관/소속 변경은 서버 거절. 외부 ID 중복 namespace는 adapter 운영자가 자기 기관 내 안정된 내부 업무 ID로 매핑 |
+| 발신 준비 | 로그인/CSRF→할당 업무→원장 확정 VC→`/v3/attempts`→challenge→Sender proof→개별 authorization | 동일 논리 요청은 같은 idempotency-key와 같은 payload. 같은 key에 다른 payload는409. 승인 전 실제 발신 우회 금지 |
+| 수신·협상 | 수신자 로그인·명시 선택/수락, 양측 공개키·nonce·SIP/SDP 관측·소유 증명→binding→consume→lease→ready/PBX evidence | 수신자 화면 없이 key/수락을 서버가 대신 만들어 주지 않음. endpoint/Call-ID/채널/bridge는 실제 같은 세션에 결합 |
+| 응답 유실·중복 사건 | 저장된 동일 결과 재조회 후 `/v3/call-context`·workspace로 현재 상태 확인 | 과거 성공 응답은 현재 권한이 아님. 취소/만료/다른 binding이면 발신 중단. 새 key로 시작 창을 갱신하지 않음 |
+| 취소·철회·늦은 PBX 사건 | `/v3/cancel`/revoke/outcome·권한 감시·영속 cleanup, terminal 상태를 재활성화하지 않음 | 생성 endpoint/채널·브리지를 정리하고 결과 불명은 retry/미확인으로 유지. 단순 API200을 실제 연결/음성 중단으로 보고하지 않음 |
+| 운영 상태 | `/v3/management/recalls`는 기관 contact.manage, call-context는 할당된 당사자만 | 기관별 제한 목록·오류 코드.401 재로그인,403 소속/권한,409 stale/terminal/idempotency/binding 충돌,503 의존성/복구 gate/cleanup 불가. 숨긴 버튼은 서버 권한 검사의 대체가 아님 |
+
+외부 CTI 검증은 실제 adapter 인증·식별 매핑·오류/응답 유실·중복/취소 경합·미디어 관측을 갖춘 환경에서 별도 수행해야 한다. 이번 재시도 회귀는 현재 API 경로의 단위/작성된 HTTP 시험이며 상용 CTI 연동 완료가 아니다.
+
+## 현재 서비스 분석 이벤트
+
+`packages/protocol/src/analysis.ts`는 연락 승인 JWS·VC·EIP-712와 별개의 보조 분석 결과 계약이다. 위험 signals와 purpose relation(suspected/not-detected/undetermined), 실행 status, policyHash/version, contextId/contextRevision·dependencies와 eventSequence를 분리한다. 같은 문맥의 늦은/역순 사건도 sequence로 걸러낸다. 확률이나 통화 전체 안전 값은 없으며 공식 경로는 제품의 `/official`로 고정한다. 문맥 제한·평가와 실제 실행 조건은 [운영 절차](RUNBOOK.md#mentoring-fourth-validation)를 따른다.

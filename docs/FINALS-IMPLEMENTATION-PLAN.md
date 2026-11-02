@@ -4,6 +4,22 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="mentoring-fourth-20261102"></a>
+
+## 2026-11-02~03 4차 반영: 운영 조회·승인 목적 분석·통화별 측정
+
+시작 HEAD는 `a0a2cde`이며 기존 staging/worktree는 깨끗했다. [멘토링 반영표](mentoring/README.md)에 A~H의 채택/수정 채택/후속·파일·검증 경계를 기록했다. 제품은 연동 콜센터의 승인/회수/추적과 고객 화면의 검증/위험 안내로 한정하며, Registry 전역 고정3명의 대칭2-of-3과 Witness3-of-4·QBFT를 구별했다. 기관별 필수 동의/승인자 교체는 이번 구현이 아니다. 기존 승인 JWS/Ed25519·관리 EIP-712·VC 정책 구조·계약 ABI/bytecode/서명 도메인은 그대로다.
+
+AI-001~005·BUSINESS-003·UI-001: 기본 서비스에 별도 분석 결과 계약, 승인/VC/lease/current policy 결합, 제한된 remote-only 문맥·coalescing/동시1요청·정정/세대/sequence와 늦은 결과 차단을 연결했다. 룰과 목적 이탈을 함께 표시하고 제공자 불가/문맥 부족을 안전/이탈 없음으로 바꾸지 않는다. 소켓 종료는 withdrawn 도착을 기다리지 않고 브라우저가 자체 정리한다. 문맥 revision 통지 때 구 경고를 먼저 지우고 뒤늦은 이전 결과를 거절한다. 분석기 버전은 정책 버전과 별개이며 AI가 통화/원장을 제어하지 않는다. 합성14언어 사례의 개발/평가 구분과 별도 lifecycle 기대/회귀 출처를 기록했지만 실제 모델 정확도나 독립 사람 평가가 아니다.
+
+CALL-005/006·UI-006·OPS-006: 기관 운영 조회는 실제 별도 audit/outbox와 기관 상태를 같은 read-only repeatable snapshot에서 읽고 역할/기관을 재검사한다. 메모리 aggregate에만 감사가 남는다고 가정하지 않았다. 요청·원장 receipt·서버 종료·마지막 PBX 관측을 구별한다. runtime과 durable worker/직접 cleanup 모두 ARI 자원 부재를 확인한 뒤 관측을 저장하며 재시도/오래된 값/조회 실패/화면 숨김을 처리한다. `0010_operation_lookup_indexes`와 migrate/preflight/시험·신규 bootstrap 참조를 추가했으나 SQL 적용은 하지 않았다.
+
+TEST-003/004·OPS-003/006/007: 기존 누적 계측·성능 평가·미디어 suite·guard/process 정리를 재사용해 논리 시도/재시도·실패/timeout/미완료와 동일 controller clock의 관측을 집계한다. 정상 종료 성공과 승인+원격 음성 비율을 별도로 계산해 회수 실패를 숨기지 않는다. 정상 반복은 합성660/990Hz 음원을 서로 구별해 디코딩하고 선택 relay/정리를 검사하도록 소스를 작성했다. 동의 없는 실제 사람 마이크를 쓰지 않는다. 실제 통화 성공률/지연 기준선은 NOT_RUN이다. CTI 식별 매핑/재시도/취소/수신자 증거 책임은 [프로토콜](PROTOCOL.md#cti-boundary)에 정의했으며 상용 adapter를 구현했다고 주장하지 않는다.
+
+최종 `pnpm light`는 **58파일·290시험 PASS**다. 웹 build(기존 chunk/dynamic-import 경고), API runtime 타입, 최종 미디어 시험 소스 타입·Python 구문, 문서/설정/참조/diff 검사를 별도로 확인한다. 제공자 평가 기본 명령은 NOT_RUN·호출0, migration 기본 명령은11개 소스의 dry-run만 출력했다. 실행 guard 없이 runner가 파일 조회/기동 전에 차단되는 회귀를 포함했다. 문장 분할 규칙 누락은 제품 수정으로 해결했고, 모듈 소속의 zod import·watch callback 반환 타입 오류는 코드/시험 연결 오류로 수정했다. 실패 원본/후속 로그·소스 hash는 `.local/mentoring-fourth-20261102/`에 구분 보존하며 과거 시험 수와 합산하지 않는다.
+
+실제 HTTP 세션+PG 회수 조회/정책 변경 중 분석·미디어/정상 반복 시험은 소스와 타입 검사만 수행했다. DB·체인·Witness·API/웹 서버·PBX·TURN·Anchor·브라우저·AWS·외부 IdP/STT/LLM·이미지 build/load/pull/push·Release 발행은 실행하지 않았다. 기존 서버/네트워크/전역 인증·서비스·volume·키·사용자 파일·원본 증거를 변경하지 않았다. source commit/push와 기존 light CI는 허용 범위에서 확인한다. 새 runtime/공개 묶음·observer-tests 발행과 migration0010 실검증이 필요하며 기존 고정 Release와6종 digest는 변경하지 않았다. 새 public 묶음에는 공개 purpose fixture·반복 시험/config를 포함하고5종 infrastructure build 구성은 재사용하되 실제 새 runtime 연동은 별도 검증한다. [실행 순서·입력·판정](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
+
 <a id="aws-final-preparation-20261102"></a>
 
 ## 2026-11-02 AWS 전 입력·재개 경계 점검

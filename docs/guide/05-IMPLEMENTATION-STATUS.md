@@ -15,6 +15,12 @@
 | 동의·전사 수정·위험 안내 | 실제 orchestration/HTTP와 지연·오류 분석 adapter로 동의 철회·세션/revision 변경 후 결과 폐기를 확인. [인증 후속 증거](../../artifacts/service-boundaries-20261030.json) | 외부 STT/LLM은 호출하지 않음. 한국어 음성 품질·정확도·보관/청구·제공자 취소는 미검증 |
 | 이미지·배포 자료 전달 | bootstrap6종의 private GHCR 게시·manifest/config/layer 원격 수령과 공개 Release 재수령 확인. [이미지](../../artifacts/ghcr-images-20261102.json), [전달 영수증](../../artifacts/ghcr-delivery-20261102.json) | AWS 최종 웹·별도 GHCR 수령용 읽기 자격·AWS 실제 배포·외부 TLS/IdP/NAT/TURN은 미완료 |
 
+## 4차 반영의 소스 구현
+
+기관 운영자는 위임·업무·시도와 권한 변경/서버 종료/PBX 회수의 마지막 관측을 따로 조회할 수 있습니다. 고객 화면은 위험 요구와 승인 목적 이탈 의심/분석 범위 미탐지/판단 불가를 구분하며 정책·문맥 수정 번호가 바뀐 이전 결과를 폐기합니다. 인사·반복 설명·종료 안내 자체를 예시 밖이라는 이유로 이탈 처리하지 않습니다. 이는 분석 입력/출력 계약이며 실제 모델 정확도 보장이 아닙니다.
+
+통화별 측정/제한 반복·합성 평가 도구와 실패/취소 경계 회귀를 추가했습니다. 이번 실행은 오프라인 검사/SSR이며 실제 PG·HTTP·브라우저·미디어·모델·AWS는 재실행하지 않았습니다. 새 migration0010과 runtime/공개 묶음 발행이 필요합니다. [채택 내역](../mentoring/README.md)·[검사 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-fourth-20261102)·[입력과 실행 절차](../RUNBOOK.md#mentoring-fourth-validation)를 참고하세요.
+
 ## 대체한 부분을 구분하기
 
 - 초기 HTTP/복구 시험의 원장·binding·분석 fixture는 그 실행에만 적용됩니다. 후속 실제 원장/PBX 실행을 거꾸로 이전 시험의 성공으로 합산하지 않습니다.

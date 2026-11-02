@@ -1,5 +1,8 @@
 # CallSign 전체 개발 명세
 
+4차 반영의 추가 소스 범위는 GOVERNANCE-001/002·BUSINESS-003·CALL-005/006·AI-001~005·UI-001/006·OPS-003/006/007·TEST-003/004에 연결한다. 정책 결합/문맥·회수 운영 조회·통화별 집계는 [반영표](mentoring/README.md)와 [현재 검사 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-fourth-20261102)을 따른다. 실제 PG/ARI/브라우저/제공자/AWS 및 새 산출물 발행은 별도 미검증이며 기존 완료 조건은 유지한다.
+
+
 이 문서는 요구사항 ID와 완료 조건의 기준이다. 설명·현황·운영 절차의 역할은 [문서 안내](README.md)에서 구분한다. 현재 구현과 실제 실행/fixture/미검증 범위는 [현황표](guide/05-IMPLEMENTATION-STATUS.md), 원래 SHA·날짜·실패·결과는 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)과 연결된 원본 증거를 따른다. 시험 개수로 전체 완성률을 계산하지 않는다.
 
 대회 배포 대상은 AWS이며 개발 서버는 runtime 의존성이 아니다. [고정 Release와 수령/NEW/재개·복구](RUNBOOK.md#aws-competition)는 RUNBOOK에서 관리한다. 아래 날짜별 설계/검토 메모는 해당 시점의 요구·이행 기록이며 현재 실행 결과를 복사하는 영역이 아니다. 사용자 지시와 AGENTS가 실행 허용 범위를 정한다.
@@ -1152,7 +1155,7 @@ flowchart LR
 ### AI-003 — 정책 규칙·LLM·근거·경고 수정 번호
 
 - **①·②:** 정상 안내·인용·자기정정을 단순 위험 키워드로 확정하거나 model 지시를 실행하지 않는다.
-- **③·④:** 구현=부분 구현 / 검증=단위 검증 / 범위=기존 필수. `risk.ts`, `RevisionAnalyzer.accept/rules`, `analyzeWithAnthropic`, Ollama adapter(초기 시연 경로). 단일 segment 규칙과 LLM, partial는 경고 없음, 전후 문맥/정책 전체 위반 검증 범위 보완 필요.
+- **③·④:** 구현=부분 구현 / 검증=단위 검증 / 범위=기존 필수. `risk.ts`, `RevisionAnalyzer.accept/rules`, `analyzeWithAnthropic`, Ollama adapter(초기 시연 경로). 보존한 직접 경로는 단일 segment 규칙과 LLM이다. 기본 서비스의 ServiceRevisionAnalyzer는 제한된 remote 문맥·정책 결합·목적 관계/실행 상태·정정/늦은 결과·룰 병합을 구현했다. 오프라인 회귀이며 실제 모델 품질·ASR split/merge 전체는 미검증이다.
 - **⑤·⑥·⑦:** rule은 deterministic 고신뢰 금지요구·부정/인용/정정 처리, LLM은 bounded 문맥의 보조 분류. risk event는 stream/segment/revision/policyHash/category/severity/evidence offsets·원문·상태/engine. LLM은 인증·통화 수락·공식 링크/도구 실행 권한 없음.
 - **⑧·⑨:** 수정 번호 normalize→규칙 즉시 계산→선택 final LLM→strict output+원문/offset 검증→현재 generation/revision과 일치할 때만 update. correction은 warning 수정/철회, stale response 폐기. rules/LLM 불일치는 provenance와 한계 표시; 실패를 empty safe로 바꾸지 않는다.
 - **⑩·⑪:** BUSINESS-003, AI-002/004/005, UI-001. segment 간 문맥/정정 연결·LLM category와 policy filtering·span offsets·event schema·prompt version·정책 목적 일탈 기준 구현. ‘OTP를 알려주지 마세요’, 인용된 사기 예시, ‘송금하…아니 하지 마세요’ 회귀 포함.

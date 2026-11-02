@@ -152,6 +152,115 @@ AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구�
 
 **현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
 
+<a id="mentoring-fourth-validation"></a>
+
+## 기관 운영·목적 분석·통화별 측정의 실행 전 조건
+
+현재 `/service` 제품만 해당한다. `/finals`의 구간별 분석·초기 시연 결과를 이 계약으로 바꿔 읽지 않는다. 운영자는 `contact.manage`로 `/v3/management/recalls?intentId=...`를 조회한다. 실제 PG 경로는 같은 읽기 snapshot의 기관/별도 audit/outbox를 사용한다. 업무/시도100개·변경50개·정책 제안20개로 제한하며, 목록 밖/과거 이력은 완료로 추정하지 않는다. `0010_operation_lookup_indexes`는 기관별 조회 index이며 migration source에 추가했지만 아직 적용/실행 검증하지 않았다. 기존 배포는 승인된 drain/백업·migration 창에서 적용해야 한다.
+
+회수 화면의 요청·원장 작업 pending/failed/확정 receipt·서버 종료·PBX 요청/retry/부재 관측은 서로 다른 상태다. 원장 receipt만으로 Witness 반영이나 새 정책 활성화를 뜻하지 않는다. PBX 완료는 ARI DELETE와 GET404 확인이며 **실제 상대 음성 중단은 별도 관측**이다. 조회 실패·화면 숨김·오래된 snapshot은 현재 성공값으로 유지하지 않는다. 응답의 checkedAt은 DB 관측, mediaObservation.observedAt은 마지막 교환기 관측이며 현재 음성의 신뢰 증명이 아니다.
+
+### 승인 정책 기반 분석과 평가
+
+서버는 분석 시작 시 기관/업무/서명된 승인/VC/lease의 정책 hash를 대조하고 통화 session·connection generation·consent generation을 고정한다. 현재 정책/세대가 바뀌면 전송과 결과 표시를 중단한다. 분석기 `purpose-context-1`은 기관 정책 version/hash와 별개이며 프롬프트 변경만으로 epoch를 올리지 않는다.
+
+최근 확정 상대 발화 최대6개·4000자·60초, 요청 최대20회,250ms coalescing·동시1요청을 사용한다. 한 stream의 서로 다른 segment ID는256개로 제한하며 초과하면 분석 중단을 알리고 새 동의/통화 상태 확인을 요구한다. 기존 통화/사용자/기관/global quota와 제공자4초 timeout도 유지한다. 정책과 문맥 전체 revision/id·event sequence가 맞는 결과만 표시한다. 정정은 이전 근거를 철회하며 제공자 실패 때 규칙 근거와 목적 판단 불가를 함께 표시한다. 목적 이탈 의심은 자동 종료·정지·철회·온체인 변경을 하지 않는다. 원음/문맥은 비영구이며 고객 발화를 추가 수집하지 않는다.
+
+`tests/fixtures/service-purpose-evaluation.json`은 모델이 작성한 합성 텍스트다. development/evaluation을 나눴지만 독립 사람 정답·실음성 품질 평가가 아니다. 초기 dry-run은 제공자를 호출하지 않고 NOT_RUN 보고서만 만든다.
+
+```bash
+node --import tsx scripts/evaluate-service-analysis.ts \
+  tests/fixtures/service-purpose-evaluation.json NEW-AI-RESULT.json
+```
+
+위 명령은 설치된 검증 controller용이다. AWS에서 host node_modules 없이 실행하려면 새 runtime의 내장 scripts/의존성을 쓰고 Release에서 받은 공개 fixture 한 파일과 새 결과 디렉터리만 별도로 mount한다. API 서비스에 host checkout을 mount하지 않는다. 보호 env와 경로는 container 내부 기준이며 network는 승인받은 AWS 평가 egress만 선택한다. 이번에는 container도 실행하지 않았다.
+
+실제 제공자 평가를 승인받은 뒤에만 같은 명령에 `--provider`를 붙인다. 필요한 보호 환경은 기존 `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL`, `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media`, `CALLSIGN_PROVIDER_CONFIRMATION=CONSENTED-SAMPLE-WITH-BUDGET`와 별도의 `CALLSIGN_PURPOSE_EVALUATION_CONFIRMATION=MAX20-SYNTHETIC-TEXT-REQUESTS`다. 실제 source hash `CALLSIGN_EVALUATION_SOURCE_SHA256`와 image 참조 `CALLSIGN_EVALUATION_IMAGE`도 지정한다. 모델은 운영자가 선택하며20회 이하 순차·입력4000자·각4초·재시도 없음이다. 실제 가격/청구·보관 조건은 별도 검토한다. 기존 output은 호출 전에 거절한다.
+
+출력은 위험 요구 오경고/누락, 목적 이탈 오경고/누락, 판단 불가·제공자 불가·미실행을 분리한다. 문맥 부족 정답에 근거 없는 확답은 unsupportedPurposeJudgments로 별도 계산한다. 제공자 응답을 fixture로 대체한 결과는 SYNTHETIC이고 실제 LLM 정확도 PASS가 아니다. 출력에는 원음/전사/키/토큰을 넣지 않으며 실제 source/image identity는 별도 릴리스 영수증과 대조한다.
+
+### 통화 한 건과 제한된 정상 반복
+
+프로세스 누적 `Measurements`와 `/v3/measurements`의 브라우저 duration은 유지한다. UI commit 구간을 전체 대기 시간으로 사용하지 않는다. `scripts/evaluate-performance.ts`의 CallObserver/aggregateCallTrials는 논리적 시도와 재시도를 구별하고 실패·timeout·미완료·미시작을 모두 분모에 남긴다. 원장 확정·서버 적용·UI 반영·음성 회수, AI 입력·전사·분석·경고의 구간은 **같은 시험 controller가 실제로 관측한 이벤트만** 기록한다. 없는/역순 구간은 null이며0이나 성공으로 채우지 않는다. receipt나 UI를 음성 관측으로 대신하지 않는다.
+
+`infra/deploy/call-trials.example.json`의 빈 sourceSha256/images는 의도적으로 차단된다. 검증된 inventory/source hash·test: 배포 ID, local/aws, direct/turn, fixture 범위를 채워 새 보호 plan으로 저장한다. 이 메타데이터는 운영자 선언이며 실제 원격 digest와 환경 identity는 별도 증거로 대조한다. 기본 명령은 NOT_RUN 결과만 만든다.
+
+```bash
+node --import tsx scripts/call-trials.ts REVIEWED-PLAN.json NEW-CALL-RESULT.json
+# 별도 media 실행 허가와 준비된 시험 환경에서만:
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media \
+CALLSIGN_TRIAL_CONFIRMATION=BOUNDED-SYNTHETIC-CALLS \
+  node --import tsx scripts/call-trials.ts REVIEWED-PLAN.json NEW-CALL-RESULT.json --run
+```
+
+실제 runner는 기존 `tests/media/service-pbx.spec.ts`만 실행하며 서비스 시작 hook이 없다. controller에 Node/pnpm 의존성과 설치 Chromium, 해당 TLS 신뢰가 필요하다. 자동 설치·인증서 오류 전체 무시를 하지 않는다. 새 runtime의 도구와 observer-tests의 시험 파일/Playwright config를 쓰며 서비스 container에는 host 소스/node_modules를 mount하지 않는다. controller용 코드/브라우저/시험 자격은 runtime 의존성과 구분한다.
+
+필수 환경은 기존 CALLSIGN_MEDIA_ORIGIN/GATEWAY_STORAGE/RECIPIENT_STORAGE/INTENT_ID/CREDENTIAL_DIGEST, CALLSIGN_VALIDATION_DEPLOYMENT_ID/TRUST_PIN과 합성 `CALLSIGN_MEDIA_SENDER_WAV`(660Hz)·`CALLSIGN_MEDIA_RECIPIENT_WAV`(990Hz)다. 파일은 서로 달라야 하며 사람의 마이크를 사용하지 않는다. 선택 설치 경로는 `CALLSIGN_BROWSER_PATH`다. normal 반복은 로그아웃 대신 통화 종료로 세션을 유지한다. 기본 독립 미디어 회귀는 기존 로그아웃 경계를 유지한다.
+
+성공 조건은 유효 승인/연결 검증 표시와 **양쪽에서 서로 다른 상대 음원을 실제 디코딩**하고 종료/정리를 관측하는 것이다. direct/turn의 실제 선택 candidate를 검사한다. 계획은 최대10논리 시도·재시도 최대1회·각120초·전체10분 이하다. 재시도는 명시된 예산에서만 하며 회수 확인이 없으면 후속 호출을 중단하고 나머지는 incomplete로 남긴다. runner timeout은 자신이 만든 자식 process group만 종료한다. 실제 서비스/DB/PBX는 operator가 소유 identity로 준비하고 해당 자원 정리는 기존 RUNBOOK을 따른다. 자동 drain/서비스 삭제는 하지 않는다.
+
+trial별 events/단계 지연/확인 불가 원인·구간, 정상 확인률과 정상 확인+상대 음성 비율을 함께 기록한다. 정상 종료 성공은 회수 관측까지 요구하며, 승인 확인+상대 음성 비율은 회수 실패와 독립적으로 집계한다. 따라서 실제 연결에 성공했어도 정리 실패가 전체 성공으로 숨겨지지 않는다. 같은 unavailable interval의 중복은 합치고 미종료 구간은 해당 시도 종료/제한 시각까지다. 원인별 구간은 겹칠 수 있어 통화 전체 outage 시간으로 단순 합산하지 않는다. 각 try의 한 monotonic observer만 사용하며 서버/browser wall clock을 직접 빼지 않는다. 작은 표본과 브라우저 관측은 SLA가 아니다. 기존100표본 기준의 성능 평가와 분리하며 **새 실제 성공률·지연 기준선은 NOT_RUN**이다.
+
+### 다음 실제 환경 검증의 순서
+
+공개 설정/보호 참조/AWS 자원 산출물/도구 생성값의 기준은 [AWS 입력 계약](#aws-input-contract)이다. 아래는 실행 허가 전 준비표이며 이번에 어느 서비스도 시작하지 않았다.
+
+| 단계 | 입력·실행 범위 | 성공/중단 판정과 증거 |
+|---|---|---|
+| 1 새 산출물 수령 | 새 고정 Release·6종 digest·별도 reader | checksum/manifest/config/architecture·source 대응. 불일치/권한 부족 중단 |
+| 2 AWS NEW | 승인한 리전·예산·mount·키 소유자, 새 identity | 기존 키/genesis/DB 덮어쓰기 거절·실제 단계 상태 확인. 계약 주소/hash/pin은 생성 결과 |
+| 3 OIDC/TLS | 실제 issuer/client/audience/callback·인증서·공개 origin | 정확한 로그인/목적 문맥·TLS 검증. fixture를 외부 IdP로 기록 금지 |
+| 4 업무·승인·연결 | 실제 기관/담당자·업무/VC/양측 키·고정 trust | 원장/Witness 확인·일회 소비·binding·lease. 미확인/다른 binding 거절 |
+| 5 양방향 TURN | PBX/WSS·public/advertised 주소·미디어 port | 선택 relay와 서로 다른 상대 음원 디코딩. 같은 namespace를 외부 NAT 성공으로 해석 금지 |
+| 6 정상 반복 | 검토 plan·합성 WAV·시험 계정·controller | 실패/timeout/미시작 포함 분모·각 구간·자원. 무제한 반복/자동 한도 확대 금지 |
+| 7 변경·회수 | 취소/정지/정책·키 변경/복구의 기존 경로 | 체인 확정·서버/신규 거절·UI·PBX·양 끝 음성 중단을 별도로 관측 |
+| 8 STT/LLM | remote-only 동의·보호 key/model·비용/보관 허가 | 경고·오류·정정·동의 철회/정책 변경의 늦은 결과 폐기. 품질/보관/청구는 별도 |
+| 9 재시작/복구 | 최신 독립 Anchor·일관 백업·빈 target·source fence | gate/epoch/소비 이력·세션 폐기 확인. 불완전 자료면 차단 |
+| 10 종료/비용 | 생성 resource identity·정리 기록·보존 범위 | 소유 자원만 정리, 외부 비용/키/Anchor 보존 결정. 개발 서버 설정 변경 금지 |
+
+### 새 runtime·공개 묶음 발행 시 확인할 차이
+
+이번 제품·schema·도구·migration0010·웹 소스는 기존 고정 Release에 없다. 새 runtime과 공개 묶음/observer-tests가 필요하며5종 infrastructure Dockerfile은 이번에 바꾸지 않았다. 실제 연동 회귀는 별도다. 새 웹은 여전히 실제 계약/trust/PBX 인증서가 준비된 뒤 runtime/nginx로 생성한다.
+
+발행 허가 뒤에는 clean source commit→새 runtime build/회귀→layer/history/build context 감사→새 비공개 GHCR tag 게시→실제 manifest/config/layer 재수령→검증한 digest inventory→공개 묶음/checksum·새 고유 Release→새 경로 수령/hash 대조 순서다. 기존 inventory/Release는 편집하지 않는다. 공개 파일 생성은 `pnpm exec tsx scripts/release-manifest.ts --bundle NEW-DIRECTORY --env-file PROTECTED-ENV`이며 실제 image metadata와 clean Git source를 확인한다. 이 출력은 local metadata용 inventory다. 최종 웹이 없으면 exit2/BLOCKED일 수 있으며 이를 최종 GHCR bootstrap inventory로 게시하지 않는다.6종의 실제 원격 수령·visibility·manifest/config/layer 대조 후 별도의 새 inventory에 고정하고 최종 웹은 deferred로 표시한다. 이어 기존 publication audit/원격 검증 절차를 사용한다. 미준비 이미지/pin으로 inventory의 BLOCKED를 PASS로 바꾸지 않는다. **이번에는 build/push/Release를 실행하지 않았다.**
+
+아래는 **새 발행을 별도 승인받은 작업자만 실행할 명령**이다. NEW_TAG·검토한 기존 runtime 참조·새 output 경로·게시용 보호 파일은 그 작업에서 준비한다. 기존 private package의 visibility를 게시 전후 확인하고 공개 상태이거나 권한이 없으면 중단한다. writer 인증은 AWS reader와 분리하며 이 명령을 이번 작업에서는 실행하지 않았다.
+
+```bash
+set -eu
+set +x
+umask 077
+# Clean reviewed checkout; no existing tag/output is reused.
+test -z "$(git status --porcelain)"
+SOURCE_COMMIT="$(git rev-parse HEAD)"
+: "${NEW_TAG:?new unique release version}" "${VERIFIED_RUNTIME_BASE:?reviewed installed dependencies}"
+: "${NEW_RUNTIME_ID_FILE:?new path}" "${PUBLISH_DOCKER_CONFIG:?new private auth directory}"
+docker build --network=none --pull=false --target prepared-runtime \
+  --build-arg PREPARED_RUNTIME_IMAGE="$VERIFIED_RUNTIME_BASE" \
+  --build-arg SOURCE_COMMIT="$SOURCE_COMMIT" --iidfile "$NEW_RUNTIME_ID_FILE" \
+  -f infra/deploy/app.Dockerfile .
+# Apply approved final-image runtime/media regressions before publication; offline build alone is insufficient.
+# Inspect history/layers/build inputs; archive and audit output are protected and never Git/Release assets.
+docker image save --output "$NEW_RUNTIME_AUDIT_TAR" "$(cat "$NEW_RUNTIME_ID_FILE")"
+python3 scripts/audit-image-archive.py "$NEW_RUNTIME_AUDIT_TAR" "$NEW_RUNTIME_AUDIT_RESULT"
+# Only after independent review of the audit and current private package visibility:
+docker --config "$PUBLISH_DOCKER_CONFIG" login ghcr.io --username "$GHCR_PUBLISH_USER" \
+  --password-stdin < "$GHCR_PUBLISH_TOKEN_FILE"
+docker image tag "$(cat "$NEW_RUNTIME_ID_FILE")" "ghcr.io/0u-y/callsign-runtime:$NEW_TAG"
+docker --config "$PUBLISH_DOCKER_CONFIG" push "ghcr.io/0u-y/callsign-runtime:$NEW_TAG"
+# Acquire actual manifest digest, then a fresh remote receiver verifies config/layers/amd64/access.
+# Seal the NEW six-image inventory and audit only from those receipts. Never copy PASS flags.
+# After checksum/public asset review and remote receipt, create a NEW Release (no --clobber):
+gh release create "$NEW_TAG" --repo 0u-Y/CallSign --target "$SOURCE_COMMIT" \
+  --title "$NEW_TAG" --notes-file "$REVIEWED_RELEASE_NOTES" \
+  "$NEW_PUBLIC_BUNDLE/deployment-files.tar" "$NEW_PUBLIC_BUNDLE/observer-tests.tar" \
+  "$NEW_PUBLIC_BUNDLE/images.json" "$NEW_PUBLIC_BUNDLE/publication-audit.json" \
+  "$NEW_PUBLIC_BUNDLE/SHA256SUMS"
+# Download that exact tag into a new directory, run its checksum verifier and compare all six refs.
+```
+
+
+
 <a id="aws-input-contract"></a>
 
 ### AWS 입력 계약: 값의 출처와 필요한 시점
@@ -299,7 +408,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_TOOL_IMAGE="$APP" CALL
 2. **체인**: 아래 기존 ‘전체 설정에 묶이지 않는 첫 체인 plan’의 추출 명령에 `-f infra/deploy/compose.pbx.yml -f infra/deploy/compose.aws.yml`을 추가한다. 같은 raw JSON에서 nodes4/chain9를 추출하며 AWS EBS volume/로그 제한을 유지한다. AWS에서만 승인된 bridge를 생성한다. nodes4→실제 높이 전진/동일 높이 hash/chain/genesis 대조→deployer inspect→예상 genesis/artifact hash 검토→계약 deploy 순서다. 기존 pending tx journal은 같은 hash로 재조회하고 새 nonce로 다시 배포하지 않는다.
 3. **계약 metadata·Witness**: 배포 결과를 `${FINALS_DATA_DIR}/deployment.json`에 보존한다. Witness4에 동일 metadata·각기 다른 키를 주고 동일 상태·서로 다른3서명·freshness를 검증한다. 미등록 상태 조회와 등록 후 권한 검증을 구분한다. 계약 주소는 배포 산출물이지 사용자가 미리 작성할 값이 아니다.
 4. **TLS·PBX/TURN**: 웹에는 public 도메인의 PEM fullchain/privkey를 별도 공급하고, PBX 내부 TLS는 SAN=`asterisk`와 고정 DTLS 인증서·CA를 준비한다. Anchor도 자신의 DNS/SAN·별도 키가 필요하다. 인증서를 서로 다른 호스트의 loopback 이름으로 재사용하지 않는다. `tool scripts/prepare-pbx.ts /aws/config/asterisk --apply`, 아래 TURN 전용 명령으로 공개 template을 명시하여 새 설정을 렌더한 뒤 각 `tls/`에 보호 파일을 배치한다. 웹/Node CA mount를 맞추고 인증서 개인키는 uid1000·0600으로 새 디렉터리에 준비한다. 인증서 교체는 새 trust/web pin과 통화 재검증을 요구한다.
-5. **DB**: 서비스 PostgreSQL만 먼저 기동한다. 아래 `dc`에서 operations profile의 migration-runner로 `scripts/migrate-finals.ts --apply`를 실행한다. 소스 hash 검사를 유지하며 `0000`~`0009`를 적용한다. postgres container의 psql에 보호 환경으로 별도4비밀번호를 전달하고 `provision-logins.sql`을 stdin으로 적용한다. 앱은 migration owner가 아닌 issuer/auth/worker/PBX의 서로 다른 LOGIN을 사용한다.
+5. **DB**: 서비스 PostgreSQL만 먼저 기동한다. 아래 `dc`에서 operations profile의 migration-runner로 `scripts/migrate-finals.ts --apply`를 실행한다. 소스 hash 검사를 유지하며 `0000`~`0010`을 적용한다. `0010`은 기관별 회수 조회용 index이며 이번에는 적용하지 않았다. postgres container의 psql에 보호 환경으로 별도4비밀번호를 전달하고 `provision-logins.sql`을 stdin으로 적용한다. 앱은 migration owner가 아닌 issuer/auth/worker/PBX의 서로 다른 LOGIN을 사용한다.
 6. **독립 Anchor**: 별도 AWS 호스트에서 `compose.anchor.yml`의 anchor-db만 먼저 시작한다. owner psql로 `anchor-schema.sql`, `provision-anchor.sql`을 순서대로 적용한다. 보호 `DEPLOYMENT_ID`·`INSTITUTION_ID`·`ANCHOR_APP_PASSWORD`를 stdin/환경으로 전달한다. 새 zero sequence/hash, epoch1만 최초 INSERT하며 기존 행·LOGIN은 덮지 않는다. 서비스 프로세스는 SELECT/UPDATE만 가능한 별도 LOGIN과 TLS/token을 쓴다. Anchor 서비스 기동 뒤 실제 인증·TLS·CAS/재조회·재시작 보존을 확인한다. 서비스 EC2와 개발 서버 어느 쪽도 Anchor 저장소를 대신하지 않는다.
 7. **OIDC·내부 계정**: 선택한 실제 IdP에서 업무/공식 public client와 audience를 분리한다. 현재 코드의 IdP redirect URI는 두 client 모두 정확히 `${WEB_ORIGIN}/service`다. 브라우저가 code/state를 받아 `/api/v3/auth/callback`으로 교환하며 업무/공식 문맥은 state·pending client·세션 purpose로 분리한다. `/api/auth/callback`이나 별도 official callback을 IdP redirect로 등록하지 않는다. issuer\|subject·역할·권한을 `FINALS_ACCOUNTS_PATH`의 보호 JSON으로 준비하고 migration-runner의 `provision-finals.ts /provision/public-manifest.json /provision/accounts.json --apply`로 신규 내부 계정을 등록한다. 외부 계정 생성과 내부 등록은 별개다. 미등록/비활성 계정·auth_time·PKCE·CSRF/세션 문맥을 실제 제공자로 검증한다.
 8. **공개 trust·웹**: PBX 공개 인증서와 실제 deployment metadata가 준비된 뒤 trust를 생성한다. 앱의 service trust 경로와 같은 파일을 사용한다. 생성한 canonical pin을 CFG에 반영하고 아래 web build로 새 AWS 웹을 만든다. 기존 loopback 이미지나 API가 준 새 키를 자동 신뢰하지 않는다.
@@ -434,7 +543,7 @@ Readiness는 실제 issuer의 `/readiness`, 관리 상태는 인증된 `/api/v3/
 
 ### 현재 경로에 필요한 설정
 
-- SQL은0000~0009를 순서대로 적용한다. 기존0000~0006 hash를 바꾸거나 삭제하지 않는다. PBX 잠금에는 issuer/worker의 `UPDATE(id)`가 필요하고 expires_at 등 다른 열의 UPDATE는 허용하지 않는다. `qualify_2xx_only`, `authenticate_qualify`, `prune_on_boot`의 실제 PJSIP true/false 직렬화 폭을 확인한다.
+- SQL은0000~0010을 순서대로 적용한다. 기존0000~0006 hash를 바꾸거나 삭제하지 않는다. PBX 잠금에는 issuer/worker의 `UPDATE(id)`가 필요하고 expires_at 등 다른 열의 UPDATE는 허용하지 않는다. `qualify_2xx_only`, `authenticate_qualify`, `prune_on_boot`의 실제 PJSIP true/false 직렬화 폭을 확인한다.
 - `prepare-pbx.ts`가 생성하는 `asterisk.conf`/`logger.conf`를 포함한다. `/var/lib/asterisk`의 image XML 문서를 가리지 않는다. root가 아닌 실행에서 AstDB·socket은 `/var/run/asterisk`, 로그/스풀은 별도 writable 경로다. CallSign 권한·자격의 영속 기준은 PostgreSQL이며 이 임시 AstDB로 진행 통화를 복원하지 않는다. `compose.pbx.yml`은 이 쓰기 경계를 반영한 템플릿이며 현재 호스트에서는 기동하지 않았다.
 - 양쪽 PJSIP digest 기본 알고리즘을 SHA-256으로 맞춘다. 내장 `ulaw`를 사용하며 Opus transcoder는 포함하지 않는다. PBX credential secret은 base64url 해제 후 정확히32byte여야 한다.
 - host Node에는 host CA 경로를 `NODE_EXTRA_CA_CERTS`로 전달하고, 서비스에는 container CA 경로를 전달한다. Nginx는 `/etc/nginx/pbx-ca.pem`으로 upstream 검증을 유지한다. 브라우저 CA는 시험 NSS profile에만 등록한다. 전역 인증서 오류 무시를 사용하지 않는다.
@@ -1239,7 +1348,7 @@ pnpm validate --stage offline --environment TEST_ENV_JSON --env-file TEST_ENV --
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration pnpm validate --stage database --environment TEST_ENV_JSON --env-file TEST_ENV --prerequisite artifacts/NEW-SOURCE.json --output artifacts/NEW-DATABASE.json --execute
 ```
 
-필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0009 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH/ISSUER/WORKER/PBX_DATABASE_URL=같은 시험 DB의 서로 다른 역할 LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
+필수 조건: test: 배포 ID와 DEPLOYMENT_ID 일치, 운영 DB와 다른 `callsign_test_*` DB에0000~0010 적용 및 역할 GRANT 완료, TEST_DATABASE_URL=시험 owner, TEST_AUTH/ISSUER/WORKER/PBX_DATABASE_URL=같은 시험 DB의 서로 다른 역할 LOGIN. 미래 준비 명령은 기존 migration/provision-logins 절차를 사용한다. AI/OIDC/PBX/기관 등록/실제 trust를 DB 경계 시험 선행 조건으로 추가하지 않는다. 결과는 NEW-DATABASE JSON/고정 sidecar·진행 파일이다. assertion 미실행/skip·권한 과다·hash 불일치·guard/identity 불일치·실패·timeout이면 중단한다.
 
 ### 미커밋 checkpoint의 포함·제외
 
