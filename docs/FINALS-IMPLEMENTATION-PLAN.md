@@ -4,6 +4,18 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="aws-final-preparation-20261102"></a>
+
+## 2026-11-02 AWS 전 입력·재개 경계 점검
+
+시작 HEAD는 `b1c1c4c`이며 기존 worktree는 깨끗했다. `artifacts/test-results.json`은 초기 시연의 보관 기록이고 기본 `/service` 권한 판정에는 사용되지 않는다. 기존 `/evidence`의 날짜·범위를 명시하고 미리보기의 가상4/4 표시와 조회 실패 뒤 남는 LIVE 표시를 제거했다. 원본 JSON과 Docker/배포 fixture 참조는 보존했다.
+
+AWS preflight에 등록 URI·chain identity·origin 검사를 추가하고 예약 예시 도메인을 차단했다. 계약 배포 재개는 pending raw tx의 실제 signer를 복구해 대조하며 기존 metadata/새 receipt에서도 실제 PROFILE·초기 정책·승인자3명의 membership을 조회하도록 보완했다. 실제 RPC 실행은 하지 않았다. 입력 분류·소비/필요 시점·도구와 NEW 실패/응답 유실의 재개 조건은 [RUNBOOK](RUNBOOK.md#aws-input-contract)에 모았고 현재 GitHub 전달 결정과 충돌하던 ECR 안내를 교체했다.
+
+현재 소스에서 `pnpm light` **52파일·258시험 PASS**, 웹 build(기존 chunk 경고 있음), API runtime 타입 검사, shell 구문·diff·문서 상대 링크476개/fence 검사를 통과했다. native Node의 빈 AWS 예제 검사도 실행해 PASS17·BLOCKED19·SKIPPED1, exit2로 미입력을 차단했다. 이 수치는 해당 공개 예제/prepare 단계이며 전체 서비스 준비율이 아니다. raw signer 시험 추가 중 타입 불일치로 첫 최종 light가 실패했고 시험 입력 타입을 맞춘 뒤 위 결과를 얻었다. 로그/입력 판정·소스 hash는 로컬 `.local/aws-final-preparation-20261102/`에 남기며 과거 증거를 덮지 않았다.
+
+명시된 별도 GHCR reader 보호 참조가 없어 인증만 BLOCKED다. 게시용 PAT를 사용하거나 홈에서 자격을 검색하지 않았다. 서버 설정·서비스·DB·체인·브라우저·AWS·이미지 build/push·Release는 실행/변경하지 않았다. 기존 고정 Release/runtime에는 이번 수정이 없으며 AWS 전 새 runtime/공개 묶음 발행이 필요하다. 다른5종 infrastructure 이미지와 과거 실행 증거는 그대로 보존한다. 계약/DB/IdP/미디어/AWS의 실제 재개·연결 성공은 이번 단위 검사 결과로 주장하지 않는다.
+
 <a id="public-repository-20261102"></a>
 
 ## 2026-11-02 공개 저장소의 문서 진입점 정리

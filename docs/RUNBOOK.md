@@ -150,7 +150,58 @@ Docker pull는 digest에 고정된 manifest/config/layer를 검증하고 새 AWS
 
 AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구한다. 실제 trust/인증서 준비 후 AWS에서 생성하는 web만 검토한 local config ID를 사용할 수 있다. 웹은 Release의 공개 recipe와 GHCR runtime/nginx를 사용하고 pin/label·실제 기동을 확인한다. **bootstrap6종의 전달은 검증했으나, web 생성·실제 외부 설정·AWS 실행은 아직 완료하지 않았다.** [공식 인증/visibility 기준](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [package 권한](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
 
-이번 탐색/문구 정리는 README·문서에만 적용했다. 게시한 Release의 source tag·첨부물·6종 image digest는 바꾸지 않았고 새 Release도 발행하지 않았다. 아래 실행 설정/명령의 동작은 동일하다. Git main의 설명과 고정 bundle의 발행 당시 문구를 구별하며, 이 문서 정리만으로 새 이미지/배포 묶음을 요구하지 않는다.
+**현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
+
+<a id="aws-input-contract"></a>
+
+### AWS 입력 계약: 값의 출처와 필요한 시점
+
+실제 변수명/소비 코드의 기준은 `infra/deploy/aws.env.example`, `anchor.env.example`, `compose*.yml`, `finals-config.ts`, `preflight-aws.ts`와 해당 준비 도구다. 이 표는 AWS 입력 분류의 기준이며, 아래 과거 서버용 입력표를 새 AWS 설정으로 복사하지 않는다. **A** 운영자 결정 공개값, **B** 보호 파일/자격, **C** AWS 자원 준비 후 값, **D** 준비 도구의 생성값, **E** 선택 기능이다. `/srv/...`는 AWS 호스트 경로 제안이고 `/aws`, `/keys`, `/trust`, `/tls`, `/provision`은 개별 container mount 경로다.
+
+| 구분 | 실제 변수/파일 | 소비·첫 필요 단계 | 준비/검증 조건 |
+|---|---|---|---|
+| A | `CALLSIGN_DEPLOYMENT_TARGET`, `AWS_DEPLOYMENT_MODE`, `PUBLIC_DEPLOYMENT`, `DEMO_MODE` | aws preflight·deployment.sh, 최초 준비 | AWS/new 또는 restore를 명시. 공개 운영은 true/false, 데모 로그인 금지 |
+| A | `CALLSIGN_PROJECT`, `DEPLOYMENT_ID`, `INSTITUTION_ID`, `NETWORK_ID` | Compose project·기관/Anchor·genesis·계약/서버, NEW | 새 고유 식별자, 기관 ID≥16자, chain ID는 양의 안전 정수. 기존 배포에서는 보존 |
+| A | `ISSUER_URI`, `SERVICE_URI` | prepare-finals keys·Sender·VC/trust, NEW 키 | 실제 등록 HTTPS URI. 기본 경로는 DID 조회 불필요. 예시/예약 도메인 거절 |
+| A | `LEDGER_IPV4_PREFIX`, `PBX_PRIVATE_ADDRESS`, `TURN_PRIVATE_ADDRESS` | peer 생성·Compose·prepare-pbx | VPC/bridge 충돌을 AWS에서 검토. 제안 prefix/사설주소를 실제 승인값으로 간주하지 않음 |
+| A/C | `AWS_RELEASE_DIR`, `AWS_VOLUME_ROOT`, `FINALS_DATA_DIR`, `AWS_WEB_TLS_DIR`, `CALLSIGN_AWS_MOUNT` | Compose mounts·deployment.sh, NEW | 새 AWS 영속 mount와 소유권. home/tmp/.local 거절; start/restart 전에 실제 mount 검사 |
+| A/C | `CALLSIGN_DOMAIN`, `WEB_ORIGIN`, `PBX_PUBLIC_HOST`, `PBX_PUBLIC_ADDRESS`, `SIP_DOMAIN`, `SIP_REALM`, `SIP_WSS_URL`, `TURN_URLS` | nginx·finals config·prepare-pbx·TURN·브라우저, TLS/미디어 | 결정한 DNS와 AWS 공인 IPv4, HTTPS origin에는 path/query 금지. 같은 host의 `wss://HOST/pbx/ws`. 실제 외부 relay는 AWS 실행 검증 필요 |
+| A | `OIDC_ISSUER`, `OIDC_JWKS_URL`, `OIDC_AUTHORIZATION_URL`, `OIDC_TOKEN_URL`, `OIDC_CLIENT_ID`, `OFFICIAL_OIDC_CLIENT_ID`, `OIDC_AUDIENCE`, `OFFICIAL_OIDC_AUDIENCE` | OIDC flow·JWT 검증, 계정 등록 전 | 선택 IdP의 공개 설정. public Authorization Code+PKCE, 업무/공식 client와 audience 분리. 두 redirect는 정확히 `WEB_ORIGIN/service`. 실제 IdP 연계는 미검증 |
+| B | `FINALS_ACCOUNTS_PATH` | provision-finals의 `/provision/accounts.json`, migration 후 | 보호 JSON 배열의 `id=issuer|검증된 subject`, displayName/role/permissions. 최소 manager·gateway·recipient·approver와 실제 permission 조건. 이메일 자동 연결/IdP 사용자 생성 아님 |
+| B | `MIGRATOR_DB_PASSWORD`, `ISSUER_DB_PASSWORD`, `AUTH_DB_PASSWORD`, `WORKER_DB_PASSWORD`, `PBX_DB_PASSWORD`, `PBX_DB_USER` | PostgreSQL·provision-logins·ODBC, DB 준비 | 서로 다른 최소권한 LOGIN. 비밀번호는 보호 env/stdin만, PBX user는 provisioning 결과와 동일 |
+| B | `MIGRATOR_DATABASE_URL`, `ISSUER_DATABASE_URL`, `AUTH_DATABASE_URL`, `WORKER_DATABASE_URL` | migrate/provision·Issuer/auth·worker | host URL과 내부 `postgres:5432`를 구별. 앱을 owner로 실행하지 않음. URL 자체가 보호값 |
+| B | `PLATFORM_INTERNAL_TOKEN`, `SENDER_INTERNAL_TOKEN`, `PBX_CREDENTIAL_SECRET`, `TURN_SECRET`, `ARI_PASSWORD`, `ARI_AUTHORIZATION` | 역할간 인증·SIP 자격 암호화·TURN·ARI, 서비스 준비 | 별도 생성한 보호 비밀. 내부 token은≥32자이며 서로 달라야 함. PBX 암호화키는32-byte base64url. ARI_AUTHORIZATION은 설정한 ARI 사용자/비밀번호와 일치하는 Basic 내용이며 공개값 아님 |
+| B/C | `SERVICE_EXTRA_CA_PATH`, 웹/PBX/Anchor TLS 파일 | Node·nginx·Asterisk·Anchor, trust 전 | 실제 인증서/SAN/CA. 공개 CA bundle과 개인키 분리. Compose Node CA는 `/tls/extra-ca.pem`, host Node를 쓸 때만 host의 `NODE_EXTRA_CA_CERTS` 별도 지정. 전역 trust 비활성화 금지 |
+| B/D | `DEPLOYER_KEY_PATH`, `REGISTRY_ADMIN_KEY_PATH`, `REGISTRY_OPERATOR_KEY_PATH`, `ISSUER_APPROVAL_KEY_PATH`, `SENDER_PRIVATE_KEY_PATH`, `PBX_EVIDENCE_KEY_PATH`, `WITNESS_1_KEY_PATH`~`WITNESS_4_KEY_PATH` | 생성 도구·역할 mounts | 역할별 키는 AWS NEW에서 생성/별도 소유자가 공급. 개인키 파일0600·키 쌍 대조·재생성 금지. container 경로는 Compose가 지정하며 host 경로를 그대로 넣지 않음 |
+| A/B | `REGISTRY_APPROVERS`와 승인자별 키 참조 | registry deploy·공동 서명, 계약 준비 | 독립 소유 EVM 승인자3개의 서로 다른0이 아닌 주소. 승인자 개인키는 공유 env/mount에 넣지 않음 |
+| D | `DEPLOYER_PUBLIC_ADDRESS`, `REGISTRY_ADMIN_ADDRESS`, `REGISTRY_OPERATOR_ADDRESS`, public-manifest/management-public/network-config/genesis/peer 파일 | prepare-service-network·generate-besu | 생성된 관리 공개값을 검토해 보호 CFG에 반영. genesis에 필요한 가스 allocation 포함. 생성물은 미리 지어 넣는 입력이 아님 |
+| D | `EXPECTED_GENESIS_HASH`, `REGISTRY_ARTIFACT_PATH`, `REGISTRY_ARTIFACT_SHA256`, `DEPLOYMENT_WORK_DIR`, `DEPLOYMENT_PATH`, `REGISTRY_ADDRESS`, deployment.json/pending journal | registry-deployer·Witness·trust | 고정 공개 artifact bytes의 hash와4노드 identity를 검토. 계약 주소/code hash/receipt/높이는 실제 배포 산출물. `.pending.json`을 보존해 같은 tx hash로 결과 조회 |
+| D | `CALLSIGN_APP_IMAGE`, `BESU_IMAGE`, `POSTGRES_IMAGE`, `ASTERISK_IMAGE`, `TURN_IMAGE`, `HTTPS_IMAGE` | inventory·Compose·web FROM, 수령 | 새 검증 Release에서 받은 실제 GHCR manifest digest. 로컬 config ID·태그와 구분. AWS NEW가 생성하는 값이 아니라 발행 inventory에서 수령. 새 runtime/묶음 필요 범위는 앞의 전달물 차이를 따름 |
+| D | `TRUST_BUNDLE_PATH`, `TRUST_BUNDLE_FILENAME`, `VITE_SERVICE_TRUST_SHA256`, `CALLSIGN_WEB_IMAGE` | prepare-finals trust·web build·Issuer/SDK | 실제 metadata·공개 키·PBX cert와 정책으로 생성. web/서버를 먼저 띄울 필요 없음. 생성한 pin·웹 label/image ID를 검토해 CFG 반영 |
+| A | `SERVICE_POLICY_VERSION`, `CALL_LEASE_SECONDS`, `CALL_MAX_SECONDS`, `RETENTION_SECONDS` | trust·runtime policy·worker | 공동 정책 버전/설정 범위와 일치.30초/4시간/7일은 초기 정책값이지 SLA나 법정 보관기간 아님 |
+| B/C | `CONSUMPTION_ANCHOR_URL`, `CONSUMPTION_ANCHOR_TOKEN` | Issuer/worker, 최초 checkpoint | 별도 수명 HTTPS Anchor. 아래 Anchor 환경과 deployment/institution/token을 대조. 과거 DB와 함께 Anchor를 되돌리지 않음 |
+| B/C | `CALLSIGN_ANCHOR_PROJECT`, `ANCHOR_VOLUME_ROOT`, `ANCHOR_TLS_DIR`, `ANCHOR_OWNER_PASSWORD`, `ANCHOR_APP_PASSWORD`, `ANCHOR_DATABASE_URL`, `ANCHOR_TOKEN`, `DEPLOYMENT_ID`, `INSTITUTION_ID` | anchor.env·별도 Compose·provision-anchor | 별도 AWS 저장소/운영 책임·최소권한 LOGIN. 신규 zero record만 생성; 기존 역할/이력을 재초기화하지 않음 |
+| B | `CALLSIGN_GHCR_READ_TOKEN_FILE`, `GHCR_USER` | 이미지 수령만 | 별도 읽기 계정의 classic `read:packages`와6개 private package read 권한. 현재 명시적 경로가 없어 인증만 BLOCKED. writer PAT로 대체하지 않음 |
+| E | `DEEPGRAM_API_KEY`, `DEEPGRAM_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | 동의 기반 분석/provider 검증 | 미제공이면 분석 불가. 기본 통화/기관 승인을 막거나 안전 판정으로 바꾸지 않음. 실호출은 비용·보관 허가 후 |
+| E | `BACKUP_ENCRYPTION_KEY_PATH`, `BACKUP_SCOPE`, `CHAIN_SNAPSHOT_ARCHIVE`, `BACKUP_DEPLOYMENT_ENV_PATH`, `RESTORE_DATABASE_URL`, `RESTORE_DATA_DIR`, `RESTORE_BUNDLE` | 승인된 백업/RESTORE만 | NEW와 별개. 보호 key/manifest·파일/이력 검사, 빈 target·현재 독립 Anchor·source fence 필요. 부분 자료로 gate 해제 금지 |
+
+`CALLSIGN_AWS_MOUNT`는 env 파일에서 자동으로 읽지 않으므로 아래 `deployment.sh` 호출처럼 명시적인 실행 환경으로 전달한다.
+
+AWS 호스트의 NEW에는 Docker/Compose≥2.33.1·Bash·Node22.22.2·curl·Python3·tar·mountpoint와 보호 파일/실제 mount가 필요하다. migration/계약/trust 도구와 pnpm 의존성은 runtime 안에 있으며 host checkout/node_modules·Foundry·solc는 NEW의 필수 조건이 아니다. 현재 서버에 도구를 설치하지 않았다. 별도 backup/RESTORE를 실행할 호스트/도구 이미지에는 PostgreSQL17 `pg_dump`/`pg_restore`/`psql`도 필요하며, 그것이 없는 bootstrap 이미지를 완전한 복구 도구로 간주하지 않는다.
+
+수령/추출 후 host의 native TypeScript stripping으로 **이 단계의 공개 설정만** 검사할 수 있다. 값을 출력하지 않으며 AWS 실행 성공을 판정하지 않는다. 초기 chain만 따로 확인할 때는 기존 chain 단계의 더 좁은 선행 조건을 사용한다.
+
+```bash
+node --input-type=module - "$CFG" <<'CHECK_AWS_PUBLIC_INPUTS'
+import {readFileSync} from 'node:fs';
+import {parseEnv} from 'node:util';
+import {awsPreflight} from './scripts/preflight-aws.ts';
+const env={...parseEnv(readFileSync(process.argv[2],'utf8')),...process.env};
+const checks=awsPreflight(env,'prepare',(env.CALLSIGN_FORBIDDEN_HOSTS??'').split(',').filter(Boolean));
+console.log(JSON.stringify({scope:'offline-public-inputs-only',checks}));
+if(checks.some(c=>c.status==='FAIL'||c.status==='BLOCKED'))process.exit(2);
+CHECK_AWS_PUBLIC_INPUTS
+```
 
 ### 구성안과 선택 대기
 
@@ -339,6 +390,19 @@ ac stop
 
 Readiness는 실제 issuer의 `/readiness`, 관리 상태는 인증된 `/api/v3/management`와 `/api/v3/management/health`, 업무/통화는 제품 화면에서 확인한다. issuer readiness가200이어도 미등록 기관의 연락 승인이 활성이라는 뜻이 아니다. 운영자의 보호된 관측에서 registration confirmed·기관 epoch·recovery gate·worker jobs·동일 Witness 상태를 함께 확인해야 한다. timeout/조회 장애는 합격이 아니라 차단/미판정이다. 이 표의 단계별 검증을 완료하기 전 ‘대회 배포 완료’라고 발표하지 않는다.
 
+### NEW 중간 실패·응답 유실의 재개 판정
+
+| 중단 위치 | 실제 확인 후 할 일 | 금지 사항 |
+|---|---|---|
+| keys/management-keys/PBX config의 progress만 있음 | generated private/public 파일·키 쌍·입력/템플릿과 completed 목록을 소유자가 대조. 부분 상태면 수동 검토 | complete flag나 파일 존재만으로 성공 판정·디렉터리 삭제/재생성 |
+| network-config/genesis/peers 존재 | 현재 명시한 chain ID·allocation·생성 network hash/peer와4노드 identity를 대조 | 네트워크 변경을 이유로 키/genesis/epoch 초기화 |
+| migration 응답 유실 | 같은 source hash로 재실행. 각 DDL과 migration row가 같은 transaction이며 적용 hash가 맞으면 건너뜀 | hash 불일치 무시·DB 초기화 |
+| 계약 제출/metadata 기록 전후 | pending raw tx/hash·signer/chain/genesis/data를 보존해 같은 hash로 조회/재전송. 기존 metadata도 현재 code/profile/initialPolicy와3개 승인자 membership 확인 | 새 nonce로 무조건 재배포·metadata complete만 신뢰 |
+| DB LOGIN/계정/Anchor provision 응답 유실 | 해당 transaction의 실제 role/GRANT·issuer subject/role·기관·gate·Anchor record를 대조한 뒤 다음 단계로 이동. 불명확하면 중단 | 중복 role/기관 생성 실패를 성공으로 무시·비밀번호나 Anchor zero 자동 재작성 |
+| trust/web 일부만 생성 | 해당 metadata·현재 public key·PBX cert·policy와 실제 pin/image label을 비교해 게시 여부 결정 | 오래된 trust를 API 응답 키로 자동 교체·새 pin 없이 재개 |
+
+일반 restart는 초기화/migration/seed를 호출하지 않는다. RESTORE는 인증된 bundle과 빈 target, source 쓰기 차단·최신 Anchor 확인을 요구하며 복원 직후 gate는 닫힌다. 이 표는 정적 코드 대조이며 AWS의 실제 RPC/DB/복원 성공을 뜻하지 않는다.
+
 ### 재시작·실패 재개·기존 배포 RESTORE
 
 - 일반 `deployment.sh restart`·EC2 재시작은 키·genesis·계약·seed·migration을 실행하지 않는다. AWS EBS mount 누락 시 deployment.sh가 차단한다. 인스턴스 boot에서는 자동 초기화 대신 먼저 mount/비밀/TLS/metadata를 확인한 뒤 명시적으로 시작한다. Docker 자동 재시작과 mount 순서는 실제 AWS reboot에서 검증해야 하며 검증 전 자동 부팅 완료로 표시하지 않는다.
@@ -349,7 +413,7 @@ Readiness는 실제 issuer의 `/readiness`, 관리 상태는 인증된 `/api/v3/
 
 ### 전송·최종 단독 실행 판정·비용 종료
 
-ECR와 archive 중 하나를 승인 후 사용한다. [ECR 공식 절차](https://docs.aws.amazon.com/AmazonECR/latest/userguide/docker-push-ecr-image.html)의 region/account별 저장소와 권한을 먼저 준비하고 `get-login-password | docker login --password-stdin`으로 인증한다. 보호 자격을 argv/Git에 넣지 않는다. 최종 source/pin의 이미지7개를 push한 뒤 실제 registry manifest digest로 다시 고정한다. archive라면 `docker image save --output NEW.tar IMAGE_ID...`로7종을 저장하고 SHA256·크기·linux/amd64/config ID 목록을 보관한다. 원본 source/package·이미지·보호 material은 승인된 외부 보관처에 분리 보존하고 AWS에서 재다운로드/검증한 뒤 개발 서버 접근을 차단한 상태의 전체 흐름을 확인한다. **이 작업에서는 외부 업로드·AWS 생성·과금·공개 노출을 수행하지 않았다.**
+전달 경로는 [고정 GitHub Release·비공개 GHCR 수령 절차](#github-delivery-20261102)를 사용한다. AWS reader 자격으로 공개 묶음/checksum과6종 manifest digest를 검증하고, AWS에서 실제 trust로 최종 웹을 생성한다. 개발 서버의 checkout·Docker 로그인·이미지 제공 주소는 사용하지 않는다. 이번 main 수정이 포함된 새 runtime/공개 묶음이 발행되기 전에는 기존 Release를 수정본으로 간주하지 않는다. 키·채운 env·계정·DB/chain·Anchor 데이터는 공개 첨부물과 분리하며 AWS NEW에서 생성하거나 승인된 기존 identity의 RESTORE 절차로만 공급한다. **이 작업에서는 이미지/Release 게시·AWS 생성·과금·공개 노출을 수행하지 않았다.**
 
 최종 판정은 ①개발 서버 주소/SSH/파일 mount가 runtime에 없음, ②새 AWS metadata/key/genesis/계정 일치, ③실제 외부 TLS/OIDC·두 외부망 TURN/미디어, ④철회/정지의 실제 체인→Witness→PBX/음성 회수, ⑤재시작 뒤 key/data/Anchor 연속성, ⑥개발 서버 없이 archive/보호 참조로 재현을 각각 증거로 남긴다. 코드 검사·로컬 none 리허설만으로 AWS 성공을 판정하지 않는다.
 

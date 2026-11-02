@@ -26,6 +26,8 @@
 
 배포 기준 버전·digest는 이 문서에 복사하지 않고 [RUNBOOK의 전달 기준](../RUNBOOK.md#github-delivery-20261102)에서 확인합니다. AWS 위치/예산·도메인/TLS·IdP·역할별 보호 참조·reader 권한이 필요하며, 실제 trust/PBX 인증서에 맞춰 최종 웹을 생성해야 합니다. [NEW와 재개/RESTORE](../RUNBOOK.md#aws-competition)는 구별합니다.
 
+후속 화면·preflight·계약 재개 수정은 기존 전달물에 포함되지 않습니다. 새 runtime/공개 묶음 발행이 필요한 범위와 입력의 출처·시점은 [AWS 입력 계약](../RUNBOOK.md#aws-input-contract)을 따릅니다. 이번 오프라인 검사 통과는 AWS 기동이나 reader 인증 성공이 아닙니다.
+
 외부 제공자·AWS 검증과 코드 미구현은 [알려진 한계](../KNOWN-LIMITATIONS.md)에서 구분합니다. 전체 요구 ID와 완료 조건은 [MASTER](../MASTER-DEVELOPMENT-SPEC.md)이며 시험 개수로 완성률을 계산하지 않습니다.
 
 초기 시청 시연과 직접 통화의 당시 결과·기획·캡처는 [기록 안내](../README.md#기록과-자료)에 보존합니다. 당시 승인/철회 정책·날짜·SHA·결과를 현재 값으로 고치지 않습니다.

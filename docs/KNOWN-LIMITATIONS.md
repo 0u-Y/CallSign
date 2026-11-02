@@ -6,6 +6,8 @@
 
 bootstrap6종의 private GHCR 게시·실제 원격 manifest/config/layer 수령과 공개 파일 Release 재수령은 확인했다. [배포 기준·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 고정 버전을 찾는다. 별도 AWS reader 자격·리전/예산·실제 도메인/TLS·OIDC·최종 web pin·AWS 전체 기동은 아직 준비/검증 대기다. 현재 개발 서버 없이 자료를 받을 수 있다는 것과 AWS에서 서비스를 실행했다는 것은 다르다.
 
+AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Release/runtime에 포함되지 않는다. 실제 배포 전 새 runtime과 공개 묶음을 검증·발행해야 한다. 이번에는 build/push/Release를 하지 않았다. 입력 분류와 전달물 차이는 [RUNBOOK](RUNBOOK.md#aws-input-contract)이 기준이다.
+
 같은 호스트의 새 chain/DB/별도 Anchor/PBX·제품 웹 리허설은 실제 구현과 합성 음원/로컬 OIDC를 사용했다. 독립 호스트 장애·실제 IdP·외부망 NAT/TURN·외부 AI·AWS override 전체 성공으로 확대하지 않는다. 기존 null inventory·package403·미전송 설명은 앞선 증거의 당시 상태다.
 
 ## 현재 서비스
