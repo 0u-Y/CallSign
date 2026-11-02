@@ -1,6 +1,6 @@
 # CallSign 전체 개발 명세
 
-**2026-11-02 GitHub 전달:** OPS-001/003·TEST-001/004의 공개 배포 파일은 GitHub Release 게시/재수령 checksum을 확인했다.6종 이미지의 비공개 GHCR 게시는 package 자격 참조가 없어 차단이며 최종 AWS 웹/실행은 미완료다. [현재 절차와 증거](RUNBOOK.md#github-delivery-20261102). 아래 전달 리허설의 외부 보관 미검증 표시는 당시 범위다.
+**2026-11-02 GitHub 전달:** OPS-001/003·TEST-001/004의 공개 파일 Release 게시·재수령에 이어6종 private GHCR manifest/config/layer의 실제 다운로드와 digest/architecture/private를 확인했다. [현재 절차](RUNBOOK.md#github-delivery-20261102), [새 증거](../artifacts/ghcr-images-20261102.json)를 따른다. 최종 AWS web·별도 reader 자격·AWS 실환경 실행은 미완료다. 이전 미게시/403 기록과 원본 증거는 당시 범위로 보존한다.
 
 **2026-11-02 전달 리허설:** 새 identity에서 이미지/공개 전달물만으로 원장·최소권한 DB·별도 Anchor·인증 fixture·실제 제품 통화를 연결하고 위임·정책·키·PBX/장치 경계를 실행했다. 실제1시간 세션 자연 만료와 양 끝점 음성/PBX 회수까지 재검증했다. 요구 ID와 완료 기준은 유지하며 [현재 실행·실패·외부 경계](FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102)를 따른다. AWS override 전체·외부 보관/재수령·외부 TLS/IdP/NAT는 아직 검증하지 않았다.
 

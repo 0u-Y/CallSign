@@ -4,6 +4,16 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="ghcr-images-20261102"></a>
+
+## 2026-11-02 비공개 GHCR 게시와 실제 원격 blob 수령
+
+시작 HEAD는 `5c1ff510bd199448c7eed7996e25882e94632ffc`다. 제공된0600 보호 파일의 classic PAT로 package 조회/쓰기를 확인하고, 작업 전용 Docker config와 password-stdin으로 기존6종을 재build 없이 게시했다. 실제 package visibility는 모두 private, 연결 repository는 없었고 익명 수령은 거절됐다. 기존 token/package/visibility를 변경하지 않았다. 원본 보호 파일은 보존하고 임시 Docker auth만 회수했다.
+
+OPS-001/003·TEST-001/004: 새 빈 경로에 GHCR manifest/config/layer를 실제 HTTPS로 내려받고 SHA256·크기·검토 config ID·linux/amd64를 확인했다. 공통 blob은 같은 실행의 수령 결과 안에서만 재사용했다. 고유 객체50개·수신952,398,858bytes·관측132.563초이며 Docker cache나 과거 tar를 원격 수령으로 계산하지 않았다. [이미지별 digest·실행 증거](../artifacts/ghcr-images-20261102.json), [현재 AWS 수령 절차](RUNBOOK.md#github-delivery-20261102)를 따른다.
+
+새 공개 파일 Release `aws-bootstrap-20261102t093531z`에 실제 ref/digest inventory를 고정한다. 기존 null Release와 과거 package403 증거는 보존한다. web은 AWS 실제 trust/인증서가 나온 뒤 생성하므로 bootstrap 전달과 완성 서비스 배포를 구분한다. 서비스/컨테이너/이미지 build/host 설정/AWS 자원은 실행하지 않았다. 별도 AWS reader 자격·실제 AWS pull/외부 TLS/IdP/NAT/TURN·AI는 미검증이다.
+
 <a id="github-publication-20261102"></a>
 
 ## 2026-11-02 GitHub 전달 경로와 게시 준비

@@ -2,9 +2,9 @@
 
 기준일: 2026-11-02. [현재 구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)과 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)을 함께 갱신한다. ‘부분 구현’은 코드가 남은 상태이며 ‘실환경 미검증’과 다르다.
 
-## GitHub 보관·전달의 현재 차단
+## GitHub 전달과 AWS 실행의 남은 경계
 
-사용자가 Git 저장소/Release/GHCR을 최종 경로로 확정했다. 공개 파일 Release와 실제 수령 검증은 [RUNBOOK의 게시 기록](RUNBOOK.md#github-delivery-20261102)을 따른다. GHCR은 기존 토큰의 package 권한이 없어 차단이며 사용자도 별도 토큰이 아직 없다고 답했다. 로컬 config ID를 원격 manifest digest로 대체하거나 이미지를 공개로 전환하지 않는다. 공개 파일만으로 AWS 이미지 확보가 완료된 것은 아니다. 아래의 보관처 미정/미전송 설명은 앞선 실행 당시 범위다.
+비공개 GHCR bootstrap6종의 게시·실제 manifest/config/layer 수령과 linux/amd64·private·익명 거절을 확인했다. [현재 RUNBOOK](RUNBOOK.md#github-delivery-20261102)과 [새 증거](../artifacts/ghcr-images-20261102.json)를 따른다. 기존 null inventory Release·package403/미전송 설명은 이전 시점의 기록으로 보존한다. 새 공개 파일 Release 게시/재수령 결과는 후속 영수증으로 구분한다. 최종 AWS web 생성·별도 reader 자격·실제 AWS 배포/외부 TLS/IdP/NAT/TURN·AI는 아직 미검증이다.
 
 ## 전달물 신규 리허설의 추가 범위
 

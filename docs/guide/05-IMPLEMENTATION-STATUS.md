@@ -1,6 +1,6 @@
 # 05. 구현 및 검증 현황
 
-**GitHub 전달:** 공개 배포 파일은 Release 게시 후 새 디렉터리에서 내려받아 checksum을 확인했습니다. 비공개 GHCR 이미지는 권한이 없어 아직 게시하지 못했으며, 공개 파일만으로 AWS 기동이 가능한 상태는 아닙니다. [현재 전달 상태](../RUNBOOK.md#github-delivery-20261102).
+**GitHub 전달:** 공개 파일에 이어6종 이미지를 비공개 GHCR에 게시하고 원격 manifest/config/layer·linux/amd64·익명 거절을 확인했습니다. AWS 최종 웹은 실제 trust/인증서로 별도 생성해야 하며, AWS 실행/외부 연결 성공을 뜻하지 않습니다. [현재 전달 상태](../RUNBOOK.md#github-delivery-20261102).
 
 **전달물 신규 리허설:** 이미지와 공개 묶음만으로 새 원장·DB·Anchor·실제 제품 통화를 연결했습니다. 정책·키 복구·PBX 장애·장치 오류 경계를 확인했으며 실제1시간 자연 만료와 양 끝점 음성 회수도 재검증했습니다. 인증은 로컬 fixture이며 AWS 외부 연결이나 외부 보관/재수령 검증은 아닙니다. [정확한 소스·실패·판정](../FINALS-IMPLEMENTATION-PLAN.md#delivery-only-20261102).
 
