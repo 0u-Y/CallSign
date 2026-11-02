@@ -195,9 +195,14 @@ Docker/Compose>=2.33.1·Bash·Node22.22.2(설치 의존성 없는 JSON/env·nati
 아래는 **실제 AWS 생성·업로드·실행 승인 후** 사용할 명령이며 이번에는 실행하지 않는다. `APP`, `NGINX`, `BESU` 등은 inventory의 검토한 실제 불변 참조, `CFG`는 AWS 보호 env, `DATA_PARENT`는 새 EBS mount다. 보호 env는 Docker `--env-file`에서도 읽히는 단순 `KEY=value` 형식을 쓰며 shell 확장·따옴표 해석에 의존하지 않는다. 값·전체 env·shell trace를 로그에 출력하지 않는다.
 
 ```bash
-# GitHub Release checksum과 GHCR remote digest/architecture 검증 후에만 추출/실행한다.
-node scripts/verify-release-files.mjs "$DELIVERY"
-tar -xf "$DELIVERY/deployment-files.tar" -C "$NEW_RELEASE_DIR"
+# 앞서 받은 Release checksum/tar entry와 GHCR digest/architecture 검증 후에만 진행한다.
+# RECEIVED의 verifier는 같은 GitHub source tag에서 다운로드한 파일이다.
+node "$RECEIVED/verify-release-files.mjs" "$RECEIVED"
+# NEW_RELEASE_DIR은 아직 존재하지 않는 새 경로다. 기존 경로를 덮어쓰지 않는다.
+test ! -e "$NEW_RELEASE_DIR"
+mkdir -m 700 -- "$NEW_RELEASE_DIR"
+tar -xf "$RECEIVED/deployment-files.tar" -C "$NEW_RELEASE_DIR"
+cd "$NEW_RELEASE_DIR"
 # APP/BESU/NGINX는 이미 인증된 GHCR에서 digest로 pull한 실제 참조다.
 docker image inspect --format '{{.Id}} {{.Os}}/{{.Architecture}}' "$APP" "$BESU" "$NGINX"
 # 아래 함수는 소스/host node_modules를 mount하지 않는다. 신규 보호 설정만 /aws로 전달한다.

@@ -12,7 +12,7 @@
 
 OPS-001/003·TEST-001/004: 새 빈 경로에 GHCR manifest/config/layer를 실제 HTTPS로 내려받고 SHA256·크기·검토 config ID·linux/amd64를 확인했다. 공통 blob은 같은 실행의 수령 결과 안에서만 재사용했다. 고유 객체50개·수신952,398,858bytes·관측132.563초이며 Docker cache나 과거 tar를 원격 수령으로 계산하지 않았다. [이미지별 digest·실행 증거](../artifacts/ghcr-images-20261102.json), [현재 AWS 수령 절차](RUNBOOK.md#github-delivery-20261102)를 따른다.
 
-새 공개 파일 Release `aws-bootstrap-20261102t093531z`에 실제 ref/digest inventory를 고정한다. 기존 null Release와 과거 package403 증거는 보존한다. web은 AWS 실제 trust/인증서가 나온 뒤 생성하므로 bootstrap 전달과 완성 서비스 배포를 구분한다. 서비스/컨테이너/이미지 build/host 설정/AWS 자원은 실행하지 않았다. 별도 AWS reader 자격·실제 AWS pull/외부 TLS/IdP/NAT/TURN·AI는 미검증이다.
+AWS 수령 예시에서 추출 전의 로컬 `scripts/` 참조와 미정의 DELIVERY를 제거했다. 같은 tag에서 받은 verifier를 RECEIVED에서 실행하고 아직 없는 새 경로에만 추출한 뒤 그 디렉터리로 이동한다. 새 공개 파일 Release `aws-bootstrap-20261102t093531z`에 실제 ref/digest inventory를 고정한다. 기존 null Release와 과거 package403 증거는 보존한다. web은 AWS 실제 trust/인증서가 나온 뒤 생성하므로 bootstrap 전달과 완성 서비스 배포를 구분한다. 서비스/컨테이너/이미지 build/host 설정/AWS 자원은 실행하지 않았다. 별도 AWS reader 자격·실제 AWS pull/외부 TLS/IdP/NAT/TURN·AI는 미검증이다.
 
 <a id="github-publication-20261102"></a>
 
