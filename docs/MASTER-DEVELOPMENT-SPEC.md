@@ -1,5 +1,7 @@
 # CallSign 전체 개발 명세
 
+DB-001/003·TEST-001/004의 최신 실제 PostgreSQL/0010 검증과 HTTP/브라우저의 자원 차단 상태는 [2026-11-03 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)을 따른다. 요구/완료 기준은 유지하며 DB PASS를 전체 통합 PASS로 확대하지 않는다.
+
 4차 반영의 추가 소스 범위는 GOVERNANCE-001/002·BUSINESS-003·CALL-005/006·AI-001~005·UI-001/006·OPS-003/006/007·TEST-003/004에 연결한다. 정책 결합/문맥·회수 운영 조회·통화별 집계는 [반영표](mentoring/README.md)와 [현재 검사 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-fourth-20261102)을 따른다. 실제 PG/ARI/브라우저/제공자/AWS 및 새 산출물 발행은 별도 미검증이며 기존 완료 조건은 유지한다.
 
 

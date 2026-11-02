@@ -10,6 +10,10 @@ AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Relea
 
 같은 호스트의 새 chain/DB/별도 Anchor/PBX·제품 웹 리허설은 실제 구현과 합성 음원/로컬 OIDC를 사용했다. 독립 호스트 장애·실제 IdP·외부망 NAT/TURN·외부 AI·AWS override 전체 성공으로 확대하지 않는다. 기존 null inventory·package403·미전송 설명은 앞선 증거의 당시 상태다.
 
+## 최신 기능의 실제 DB 검증과 자원 중단
+
+2026-11-03 network=none PostgreSQL/전용 Unix socket에서 migration0010·잠금 rollback/재개·기존 데이터 보존과 최소권한을 포함한5파일17시험이 통과했다. 연속 swap 감지로 중단하고 승인된1회 재개 후에도 같은 조건으로 중단해 최신 HTTP·WS·Chromium은 assertion0/BLOCKED다. 기존 HTTP 성공을 이번 소스의 성공으로 복사하지 않는다. 브라우저의 단일 시험 SPKI 예외도 실행 확인 전이며 실제 TLS/IdP 품질 보장이 아니다. [실행 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)과 [증거](../artifacts/mentoring-integration-20261103.json)를 따른다.
+
 ## 4차 반영 소스와 아직 실행하지 않은 경계
 
 기관 회수 조회, 승인 정책에 결합한 제한 문맥 목적 분석, 통화별 반복/집계·합성 평가 도구를 구현했다. 이번 확인은 타입·순수 로직·Fastify inject(인증 actor/storage/provider fixture)·React 서버 렌더링이다. 실제 PostgreSQL read snapshot/0010 index·HTTP 세션·ARI GET404·브라우저/디코딩·외부 제공자/AWS 통합을 이번에 실행한 것으로 해석하지 않는다. 기존 실제 통합 결과는 당시 소스의 범위다. [최신 반영표](mentoring/README.md)와 [실행 조건](RUNBOOK.md#mentoring-fourth-validation)을 따른다.

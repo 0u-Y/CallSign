@@ -1,0 +1,441 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-02T18:54:38.790924+00:00",
+  "executionHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+  "executionWorktreeDirty": true,
+  "sourceFiles": {
+    "scripts/migrate-finals.ts": "93f6ef883f3bcc1588259fcc480c2fd046a6928e1d54b9326d7aab4643e2278d",
+    "tests/integration/migration-upgrade.test.ts": "f7e06245edf93c8c51450ba31da5bd601d42fc6bf1a7a8b7ff4b5a51525e3b76",
+    "tests/integration/postgres-unix.mjs": "d2e52d369f2d36df61ff92b30389730cc085458f5190acc1f24b7a04471e6a28",
+    "tests/integration/postgres-unix-setup.mjs": "e6319469b140727f7177748a5f4b140da5970dc70860365a46a9bac590361453",
+    "tests/integration/service-http-fixture.ts": "aab53a23e568bb41831a9ba0970d869eeb832a72893feec257199057238be9b3",
+    "tests/integration/service-http.test.ts": "a61f5f66a291528836fc7041a9e85d62139bf849dbb8d820a0574a90729273a5",
+    "tests/integration/service-boundaries.test.ts": "edfe676ecbd122b0467b06b1b9e543b6269e8ca2a24a39a4ce9ffe61e4d90372",
+    "tests/integration/database-readiness.test.ts": "e7c7613221c61b9a71da0f70fd29e542a3acd73cfa172b5b07ef0e833760bd5b",
+    "tests/integration/finals-store.test.ts": "01d9bf60c957534614e5ead923cf77f30ff84565c11b59d1e1cad2f687dec3ae",
+    "tests/integration/finals-session-scopes.test.ts": "3fbba3441d0facb9f15a049fb79849fda67016865525a70c5402dd63d16a725c",
+    "tests/integration/service-runtime.test.ts": "82908f572041ed18386f8db32894d66188fd0f7df875402cf14ea6a5d72e61fc",
+    "tests/unit/postgres-unix-guard.test.ts": "55d96a9ea9d07433411b18b95e4e2e9688e91f3f9cfe9ec32dc06ec8d0ac14c3",
+    "services/api/src/finals-store.ts": "5631acc5a87e54325e4b8a50306ac3ded4d4b81fcc54a443166e332cbbad4cb8",
+    "services/api/src/service-audio.ts": "f21731e584c6b7e9d332f90d36ca343bea0f9e8f93be3bb04b5623e6aed11db3",
+    "services/api/src/recall-status.ts": "e131b33077d4e08af3531b87402c956400b8f5552eb6c140afa49ab6ffc58151",
+    "services/api/src/pbx-runtime.ts": "03e84cc05ad6e2fd9c88bedb16af378ddc22bb4d09273e79605cb3c2a7567cb6",
+    "services/api/src/asterisk.ts": "ccf8752ef6a1c41a340fc2f35aee1227bff4481c64d7b72cf48ff9bba14f4733",
+    "vitest.http.config.ts": "a9bb45619adba7d739639c7452748b0eeca91c745b35730d2923c0c57bcc7e51",
+    "vitest.integration.config.ts": "adf72d0656bf888d8443b72b55f5e6319d00020fbda924101dba97d06e400da3",
+    "tsconfig.light.json": "3e97316a5da99f59cb8ae0dd881c657eb06dde4cea3e829e3c83bc7c3444b966",
+    "package.json": "1ea5c35ca6f78e7f70dc6c2f8ace4e1ca548d39a67948da406daa63b3ad5e871",
+    "pnpm-lock.yaml": "46b2f41318c97bfab18ab58aa7d861a7434e9f48fa659b2b9053fa8adbb11541"
+  },
+  "sourceHash": "ee752d1578fb0cc54f0bdf35f2f6d6d14c66c3cb79579d20cd257b6928d819af",
+  "sourceIdentityRule": "Current reviewed source mapping; per-command execution worktree hashes are separate. Later commits are not the execution HEAD. DB implementation and migration test were unchanged after their PASS; HTTP additions were only typechecked. Final socket lstat hardening additionally passed its offline guard test.",
+  "assessment": {
+    "method": "automatic",
+    "execution": "blocked",
+    "verdict": "unjudged",
+    "review": "unreviewed"
+  },
+  "fullServiceVerified": false,
+  "tests": {
+    "database": {
+      "sourceHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+      "dirty": true,
+      "sourceHash": "7eaf15d2ea6c72d84d6e61720aafe30e4adda0a31d8f7552c4596d027d9fc28a",
+      "durationSeconds": 3.226,
+      "timeoutSeconds": 150,
+      "exitCode": 0,
+      "peakObservedRssMiB": 341.89,
+      "minimumAvailableMiB": 30735.18,
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--config",
+        "vitest.integration.config.ts",
+        "tests/integration/finals-store.test.ts",
+        "tests/integration/finals-session-scopes.test.ts",
+        "tests/integration/service-runtime.test.ts",
+        "tests/integration/database-readiness.test.ts",
+        "tests/integration/migration-upgrade.test.ts",
+        "--reporter=json",
+        "--outputFile=.local/mentoring-integration-20261103/db-regression-resume-results.json"
+      ],
+      "logSha256": "7933af59b8818d3c83a4905e6600dc37d873c2f0644a9e35a2268abf2d9d5f4e",
+      "files": 5,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "assertions": [
+        {
+          "file": "database-readiness.test.ts",
+          "name": "checks applied migration order and real auth-login least privilege, rather than file presence",
+          "result": "passed"
+        },
+        {
+          "file": "database-readiness.test.ts",
+          "name": "allows PBX row locks for issuer/worker while denying other lease-field updates and PBX identity reads",
+          "result": "passed"
+        },
+        {
+          "file": "finals-session-scopes.test.ts",
+          "name": "persists scope and context, rejects swapped cookies and keeps legacy separate",
+          "result": "passed"
+        },
+        {
+          "file": "finals-session-scopes.test.ts",
+          "name": "enforces OIDC metadata for scoped sessions at the database boundary",
+          "result": "passed"
+        },
+        {
+          "file": "finals-session-scopes.test.ts",
+          "name": "allows a single concurrent login claim and retains that claim independently of sessions",
+          "result": "passed"
+        },
+        {
+          "file": "finals-session-scopes.test.ts",
+          "name": "isolates the configured runtime auth login from issuer storage",
+          "result": "passed"
+        },
+        {
+          "file": "finals-store.test.ts",
+          "name": "PostgreSQL finals authoritative lock boundary (deferred) serializes racing first bindings and recovers the committed result",
+          "result": "passed"
+        },
+        {
+          "file": "migration-upgrade.test.ts",
+          "name": "upgrades 0009 with preserved authority/session/receipt/cleanup, rolls back blocked 0010 DDL and safely resumes",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "reserves a shared budget under contention and settles a reservation only once",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "claims a job once across workers and fences an expired claim before committing a result",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "cannot recreate SIP credentials from an idempotent result after terminal cleanup",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "shares authenticated request counters across replicas and minute boundaries",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "keeps the SQL recovery gate closed when intermediate journal and consumption rows are both lost",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "serializes duplicate account onboarding across independent SQL connections, and revokes sessions across reactivation",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "fences a late signed result after the signer lease changes without persisting or broadcasting it",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "bootstraps authority metadata once across two independently connected recovery passes",
+          "result": "passed"
+        },
+        {
+          "file": "service-runtime.test.ts",
+          "name": "recovers the same committed signed receipt after the caller loses its response, using an independent SQL store",
+          "result": "passed"
+        }
+      ]
+    },
+    "light": {
+      "sourceHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+      "dirty": true,
+      "sourceHash": "4f28b9b4f5896983e77dead0311d393a48bff0cf7eed0a97dee2ea54016743ab",
+      "durationSeconds": 16.042,
+      "timeoutSeconds": 180,
+      "exitCode": 0,
+      "peakObservedRssMiB": 1169.06,
+      "minimumAvailableMiB": 30264.17,
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "command": [
+        "pnpm",
+        "light"
+      ],
+      "logSha256": "0998303377017004b445a9fdfc68874509359cfa4d0be7b2eae04dd17a245587",
+      "files": 59,
+      "passed": 291,
+      "failed": 0,
+      "skipped": 0
+    },
+    "webBuild": {
+      "sourceHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+      "dirty": true,
+      "sourceHash": "4f28b9b4f5896983e77dead0311d393a48bff0cf7eed0a97dee2ea54016743ab",
+      "durationSeconds": 2.182,
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "peakObservedRssMiB": 621.68,
+      "minimumAvailableMiB": 31131.52,
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "command": [
+        "pnpm",
+        "--filter",
+        "@callsign/web",
+        "build"
+      ],
+      "logSha256": "663e411099e19143a314051c2bc8105def8a95f4768c12e0676c4cc8ac20a0b5"
+    },
+    "apiRuntimeTypes": {
+      "sourceHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+      "dirty": true,
+      "sourceHash": "4f28b9b4f5896983e77dead0311d393a48bff0cf7eed0a97dee2ea54016743ab",
+      "durationSeconds": 1.09,
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "peakObservedRssMiB": 61.18,
+      "minimumAvailableMiB": 31173.02,
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "tsc",
+        "-p",
+        "services/api/tsconfig.runtime.json",
+        "--noEmit"
+      ],
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "integrationSourceTypes": {
+      "sourceHead": "f967e57064d9a46bdba214f9c84ecac3be9c5f86",
+      "dirty": true,
+      "sourceHash": "4f28b9b4f5896983e77dead0311d393a48bff0cf7eed0a97dee2ea54016743ab",
+      "durationSeconds": 1.114,
+      "timeoutSeconds": 120,
+      "exitCode": 0,
+      "peakObservedRssMiB": 80.83,
+      "minimumAvailableMiB": 31331.97,
+      "assessment": {
+        "method": "automatic",
+        "execution": "completed",
+        "verdict": "PASS",
+        "review": "unreviewed"
+      },
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.light.json",
+        "--noEmit"
+      ],
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "httpBrowserAnalysis": {
+      "assessment": {
+        "method": "automatic",
+        "execution": "blocked",
+        "verdict": "unjudged",
+        "review": "unreviewed"
+      },
+      "status": "BLOCKED",
+      "executedAssertions": 0,
+      "passed": 0,
+      "reason": "Watchdog stopped owned PostgreSQL on repeated global swap counter changes, including the explicitly approved single resume; fixture collection found no socket. No further service restart.",
+      "sourceOnlyAdditions": [
+        "ARI DELETE success vs GET present/unavailable/absent via real SQL runtime",
+        "recall visibility/held real response/account-switch Chromium",
+        "purpose and rules/correction/reverse revisions/invalid quotes/URL rejection",
+        "consent/account/session/policy/epoch/key/binding invalidation",
+        "SQL quota and context identity cap"
+      ],
+      "commandsPreparedNotSuccessfullyExecuted": [
+        "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "label": "database-smoke",
+      "reason": "PostgreSQL entrypoint socket mismatch; no assertion executed",
+      "exitCode": 1,
+      "durationSeconds": 1.143,
+      "logSha256": "e52916b99cbe31e04c9225f3316d4439a679a1425deb1d2c1d19cba821dcc107"
+    },
+    {
+      "label": "migrations-new",
+      "reason": "Node loader nesting dependency resolution; no migration applied",
+      "exitCode": 1,
+      "durationSeconds": 1.103,
+      "logSha256": "b7be2bdbba3de79c70e7b79b3c709cd64318020d2ac87ba0c07c9b9fc56a3ddd"
+    },
+    {
+      "label": "db-regression-initial",
+      "reason": "Loader worker heap OOM, not PostgreSQL/container/host OOM",
+      "exitCode": 1,
+      "durationSeconds": 3.235,
+      "logSha256": "04d7f1993b6e726910fbb745a4d9e9e2af19a8410bd9e5c13cc99de743d47e58"
+    },
+    {
+      "label": "db-regression-transport",
+      "reason": "Vitest did not inherit Node resolve hooks; TCP refused; not a product verdict",
+      "exitCode": 1,
+      "durationSeconds": 28.939,
+      "logSha256": "17a56ebb9d5ba0af2f60396533c8e921a3b3e7875416a051cdaf6be3470f2ef4"
+    },
+    {
+      "label": "db-regression-socket",
+      "reason": "Vitest mocking import cycle; owned test group stopped",
+      "exitCode": 143,
+      "durationSeconds": 90.08,
+      "logSha256": "c3df63519c64aa2519570b61ef74623631c55ef1beaac9f2498a48d161cb92c3"
+    },
+    {
+      "label": "http-browser-resume",
+      "reason": "DB stopped by resource watchdog; no HTTP/browser assertion executed",
+      "exitCode": 1,
+      "durationSeconds": 2.171,
+      "logSha256": "1666df97581b0655286ca1769d922660905255269696493cd27c3c0de11ff222"
+    }
+  ],
+  "environment": {
+    "identity": "callsign-mentoring-b99d4c47",
+    "tools": {
+      "node": "22.22.2",
+      "pnpm": "11.27.0",
+      "postgres": "17.6-alpine",
+      "postgresDriver": "3.4.9",
+      "vitest": "5.0.0",
+      "chromium": "installed, NOT_RUN"
+    },
+    "actual": [
+      "owned PostgreSQL with SCRAM LOGINs",
+      "current migration implementation and real PostgreSQL transactions",
+      "real authority/quota/worker/session SQL in selected database regressions"
+    ],
+    "fixturesExecuted": [
+      "synthetic authority/keys and in-memory anchor in selected DB regressions"
+    ],
+    "fixturesPreparedNotExecuted": [
+      "loopback HTTPS OIDC",
+      "signed ledger/Witness state adapter",
+      "ARI fetch responses",
+      "STT/LLM delayed/failure adapter"
+    ],
+    "notStarted": [
+      "Platform",
+      "Issuer Gateway",
+      "Sender Agent",
+      "web",
+      "Chromium",
+      "Besu",
+      "Witness",
+      "PBX",
+      "TURN",
+      "Anchor service",
+      "external IdP/STT/LLM",
+      "AWS"
+    ],
+    "budgets": {
+      "postgresMemoryMiB": 512,
+      "postgresCpu": 1,
+      "postgresDataMiB": 512,
+      "appRssMiBObservedLimit": 3072,
+      "diskMiBObservedLimit": 5120,
+      "availableMemoryMiBMinimum": 8192
+    },
+    "limits": "DB CPU/memory/data tmpfs are enforced; app aggregate RSS, disk and available-host-memory are observed budgets. No host cgroup/swap configuration changes. RSS is sampled, not a measured peak/minimum sizing proof.",
+    "postgresObservedMemoryMiB": 68.5,
+    "postgresObservedCpuPercent": 0.39,
+    "postgresSampleIsPeak": false
+  },
+  "resourceStops": [
+    {
+      "reason": "SUSTAINED_SWAP",
+      "time": 1793644633.9091387
+    },
+    {
+      "reason": "SUSTAINED_SWAP",
+      "time": 1793644876.324289
+    }
+  ],
+  "resourceStopMeaning": "Three consecutive 10-second global swap counter changes; no rate/cause attribution retained, no claim of host memory exhaustion. First stop followed by one explicit user-approved resume; second stop ended service execution.",
+  "cleanup": {
+    "recordedAt": 1793645372.6531384,
+    "runId": "callsign-mentoring-b99d4c47",
+    "containerRemoved": true,
+    "protectedRootRemoved": true,
+    "temporaryProtectedFilesBytes": 11751,
+    "publishedPorts": false,
+    "networkMode": "none",
+    "containerOomKilled": false,
+    "anonymousVolumes": [],
+    "comparison": {
+      "routes": {
+        "available": true,
+        "hashUnchanged": true
+      },
+      "networks": {
+        "available": true,
+        "hashUnchanged": true
+      },
+      "containers": {
+        "available": true,
+        "hashUnchanged": true
+      }
+    },
+    "firstAttemptCleanup": "attempt-1/cleanup.json",
+    "remainingOwnedServiceResources": false
+  },
+  "excluded": [
+    "full integration glob",
+    "legacy API integrations",
+    "real independent Anchor/recovery service",
+    "chain",
+    "media",
+    "external provider",
+    "same-DB full HTTP/browser rerun"
+  ],
+  "releaseImpact": {
+    "existingTag": "aws-bootstrap-20261102t093531z",
+    "changedExistingAssets": false,
+    "newImagesOrReleaseIssued": false,
+    "future": "Migration CLI changes require future runtime and public source bundle; test-controller sources stay outside runtime. Actual trust-bound AWS web remains deferred."
+  },
+  "publication": {
+    "status": "SOURCE_CHECKPOINT_ON_REVIEW_BRANCH",
+    "branch": "verify/mentoring-integration-20261103",
+    "codeCommits": [
+      "ba79e9e",
+      "dd73037"
+    ],
+    "ci": "not yet run at recording",
+    "reason": "HTTP/WS/browser verification remains resource-blocked; main is unchanged. No image or Release issuance."
+  },
+  "rawLogs": "Local .local/mentoring-integration-20261103, protected inputs removed; no credentials/raw browser storage/audio/DB data published."
+}

@@ -73,3 +73,7 @@
 ## 2026-11-03 4차 반영 소스 작업
 
 이번 요청은 기관 운영 조회·정책 기반 분석·통화별 집계·CTI 계약·배포 재현성의 코드/시험/기존 문서 수정, 설치 의존성의 오프라인 검사/타입/무기동 웹 build와 관련 commit/일반 push·기존 light CI만 허용한다. 모든 서비스/DB/체인/Witness/PBX/TURN/Anchor/브라우저·migration/seed/계약·이미지 build/load/pull/push/Release·AWS/유료 제공자·다운로드·기존 서버/자원 변경은 허용하지 않는다. 신규 index migration은 소스만 작성한다. 실제 연결/모델 품질·산출물 발행은 별도 단계이며 이 기록은 후속 실행의 상시 허가가 아니다.
+
+## 2026-11-03 최신 기능의 PostgreSQL·HTTP 검증 한정 예외
+
+이번 요청은 새 identity의 network=none PostgreSQL/Unix socket, loopback Platform·Issuer·Sender·HTTPS OIDC/웹·설치 Chromium, 합성 계정/시험키/CA·migration·통합 시험·관련 commit/일반 push/light CI만 허용했다. DB CPU1·RAM/데이터512MiB, 앱 관측3GiB·임시5GiB·가용 RAM8GiB 여유와 지속 swap 중단 조건을 유지한다. 첫 자원 중단 후 사용자가 같은 예산의1회 재개를 승인했으며 재개 후 다시 swap 중단하여 추가 서비스 기동은 하지 않는다. 실제 체인/Witness/PBX/TURN/Anchor·음성장치·외부 IdP/AI/AWS·이미지/Release·기존 서버/자원 변경은 허용하지 않았다. 이 기록은 후속 기동의 상시 허가가 아니다.

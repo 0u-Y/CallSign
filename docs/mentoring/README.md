@@ -23,3 +23,5 @@
 | G 새 소스와 전달물 정합성 | 채택. 기존 Release/서명 inventory 보존 | release-manifest·Docker context/ignore 검사·RUNBOOK | 새 runtime/공개 묶음 필요.5종 infrastructure build 구성 유지, 이미지/Release 미발행 |
 | H 외부 검증을 단계별로 준비 | 채택. 기존 AWS 입력 계약·guard·시험 lifecycle 재사용 | RUNBOOK·guard 회귀·call/provider runner·기존 통합 시험 소스 | 무기동 준비·검사. AWS/IdP/TURN/제공자/복구 실제 실행은 별도 허가·입력 필요 |
 | 관리 승인자 교체·기관별 집합·정족수 변경·Witness 직접 proof 대체 | 후속. 현재 계약의 보장을 바꾸므로 이번 제외 | KNOWN-LIMITATIONS의 후속 조건 | 새 권한 모델/이행·서명 재사용/구 trust 차단과 독립 운영 검증이 선행되어야 함. ABI·bytecode·서명 도메인 유지 |
+
+최신 실행 후속: migration0010·실제 SQL 경계는5파일17시험 PASS이며 C~E의 최신 HTTP/WS/Chromium은 연속 swap으로 BLOCKED다. [2026-11-03 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)을 따르며 기존 오프라인/과거 통합 결과와 구분한다.

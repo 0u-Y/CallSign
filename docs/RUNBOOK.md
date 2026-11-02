@@ -1426,12 +1426,38 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run 
 
 `NEW-*`는 기존 증거와 겹치지 않는 새 이름으로 바꾼다. HTTP fixture는 고유 기관/계정을 만들고 issuer·platform·Sender Agent·HTTPS 웹·OIDC의 포트를 직접 할당한다. 체인 상태 adapter는 지정한 digest만 확정 상태로 간주하고, 미확정/철회/조회 불가를 따로 시험한다. 앱의 인증·서명 검증을 대체하지 않는다. `test:` 배포 identity와 loopback origin, 같은 `callsign_test_*` DB의 별도 LOGIN이 아니면 adapter 주입을 거절한다. `oidc_state`·세션 row를 정상 로그인 fixture로 직접 주입하지 않는다. discovery 문서는 fixture가 제공하지만 현재 앱은 명시적으로 설정한 authorize/token/JWKS URL을 소비한다.
 
-통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium은 시험 인증서만 허용하도록 해당 context의 `ignoreHTTPSErrors`를 사용하고 Node↔OIDC는 추가 CA로 검증한다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
+통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium 소스는 현재 ROOT의 단일 시험 인증서 SPKI만 자식 browser launch 예외로 허용하고 context 전체 `ignoreHTTPSErrors`를 사용하지 않는다. Node↔OIDC는 추가 CA로 검증한다. 이 시험 SPKI 예외는 운영 인증서 chain/만료 검증이 아니며 최신 Chromium 실행은 아래 자원 차단 기록을 따른다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
 
 각 단계는120초 이내, worker1로 실행한다. DB512MiB 외 Node/브라우저 예산2GiB를 잡고 가용 메모리8GiB 미만·지속적 swap 입출력·기존 작업 영향이면 중단한다. 정상 종료 시 app·Vite·fixture·browser를 닫는다. 강제 timeout 때에는 **이번 실행이 만든 자식 process group**만 회수하고, DB label/identity를 대조한 후 해당 컨테이너만 제거한다. 전역 prune/pkill을 사용하지 않는다.
 
 스크린샷은 ROOT 아래 고유 `run-*` 디렉터리의 `service-mobile.png`/`service-desktop.png`다. cookie/storage/trace는 저장하지 않는다. 공유 전 합성 계정만 들어 있는지 확인하고 실제 API/DB 결과·코드 hash와 함께 보존한다. 보호 ROOT에는 테스트 개인키와 인증서가 있으므로 통째로 커밋하지 않는다. 증거 추출 후 이번 자원과 보호 파일만 제거한다.
 
+
+<a id="mentoring-integration-unix"></a>
+
+### 최신 변경의 Unix socket 검증과 자원 차단
+
+2026-11-03 실제 DB5파일17시험은 통과했지만 HTTP/WS/Chromium은 연속 swap으로 assertion 실행 전 BLOCKED다. 승인된1회 재개도 같은 조건으로 중단했으며 추가 기동하지 않았다. [소스·실행·정리 증거](../artifacts/mentoring-integration-20261103.json)를 따른다. 아래는 **별도 실행 허가와 안정된 자원이 준비된 이후** 사용할 절차이며 지금 실행한 성공 명령 목록이 아니다.
+
+- 기존 로컬 PostgreSQL17.6 이미지만 사용한다. `--network none --cpus 1 --memory 512m --memory-swap 512m --pids-limit 128`, PGDATA tmpfs512MiB, `listen_addresses=''`로 제한한다. 새0700 ROOT의 전용 하위 socket 디렉터리만 `/var/run/postgresql`에 mount한다. root 자신은0700을 유지하며 socket 하위 mount의 초기 권한만 entrypoint 요구에 맞춘다. 사용자 socket/DB·bridge/port publish를 사용하지 않는다.
+- 공식 entrypoint의 임시 초기화 서버와 최종 서버를 구분한다. init 완료와 최종 ready를 확인하고 socket의 단순 존재를 readiness로 간주하지 않는다. `/run/callsign`만 지정하면 entrypoint의 초기 psql이 기본 socket을 찾지 못할 수 있다.
+- `CALLSIGN_TEST_PG_SOCKET`은 위 ROOT 하위 실제 socket 디렉터리다. 테스트 전용 transport는 URL의 시험 DB·서로 다른 LOGIN·비밀번호를 그대로 유지하고 **실제 postgres3.4.9 driver의 host 옵션만 Unix socket으로 지정**한다. DB 응답·권한·transaction을 mock하지 않는다. CLI Node preload와 Vitest setup을 구분하며 production 자동 fallback을 추가하지 않는다.
+- 일반 migration CLI는 명시한 owner URL에 적용한다. `integration` 변수만으로 대상 소유가 자동 확인되는 것은 아니므로 이번 시험에는 위 소유 socket preload를 반드시 함께 사용한다. CLI migration에는 명시적 integration 환경과 owner URL을 사용한다. 기본 명령은 계속 dry-run이며 `--apply`만 전체 적용한다. `applyMigrations`의 prefix 인자는0009→0010 시험 준비용이며 CLI restart/복구가 DB를 다운그레이드하거나 이력을 지우지 않는다.
+- 모든 URL/비밀번호·TLS 키는 ROOT의 보호 파일/환경으로 공급한다. 명령 인자에 원문을 쓰지 않는다. Node22.22.2·설치된 pnpm/의존성으로 확인했으며 Node resolve-hook 미지원 버전은 다운로드로 우회하지 않는다.
+
+```bash
+# Explicitly reviewed protected environment and owned database are already prepared.
+: "${CALLSIGN_HTTP_TEST_ROOT:?owned 0700 root}" "${CALLSIGN_TEST_PG_SOCKET:?socket under root}"
+: "${MIGRATOR_DATABASE_URL:?protected owner URL}" "${NODE_EXTRA_CA_CERTS:?fixture certificate}"
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration   NODE_OPTIONS="--max-old-space-size=512 --import=tsx --import=$(pwd)/tests/integration/postgres-unix.mjs"   timeout 60s node scripts/migrate-finals.ts --apply
+# Vitest config selects guarded socket setup itself; do not also preload tsx/Node hooks into workers.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=1024   timeout 150s node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts   tests/integration/finals-store.test.ts tests/integration/finals-session-scopes.test.ts   tests/integration/service-runtime.test.ts tests/integration/database-readiness.test.ts   tests/integration/migration-upgrade.test.ts --reporter=json --outputFile=artifacts/NEW-DATABASE.json
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=1024   timeout 240s node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts   --reporter=json --outputFile=artifacts/NEW-HTTP.json
+```
+
+worker1·앱/브라우저 합산3GiB·임시5GiB는 관측 상한이고 DB512MiB는 강제 상한이다. 기존 작업에 RAM8GiB 이상을 남긴다. 실행별 deadline·소유 자식 process group·DB label/ID·보호 ROOT를 기록하고 지속 swap·기존 작업 영향·예산 초과 시 이번 대상만 중단한다. 중단을 SKIP/PASS로 바꾸거나 자동 재개하지 않는다. 이번 watchdog은10초 구간의 swap page 카운터가3구간 연속 바뀌면 중단했다. 정확한 속도와 원인을 보존하지 못했으므로 OOM이나 서버 전체 메모리 부족으로 단정하지 않는다.
+
+새 analysis/recall HTTP·Chromium 시험 소스는 타입 검사만 했다. ARI는 DELETE 성공 뒤 GET200/503/404를 fetch fixture로 구분하고 실제 ServiceAuthority/PbxRuntime·SQL 관측을 거치도록 작성했으며 실제 PBX·음성 회수의 성공 증거가 아니다. 최종 통합 검증에는 안정된 허가 환경에서 같은 DB의 재실행/상태 오염과 HTTP/WS/Chromium을 확인해야 한다. runtime에 포함되는 migration CLI가 바뀌므로 향후 새 runtime/공개 묶음에 포함한다. 기존 고정 Release·이미지는 변경하지 않으며 이번에는 발행하지 않는다.
 
 ### 인증 후속 경계 검증
 

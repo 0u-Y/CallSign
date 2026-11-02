@@ -4,6 +4,22 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="mentoring-integration-20261103"></a>
+
+## 2026-11-03 최신 기능 통합 시도: DB 확인·자원 중단
+
+시작 HEAD `f967e57064d9a46bdba214f9c84ecac3be9c5f86`, 기존 worktree/staging은 깨끗했다. 실제 관측은 CPU24·가용 RAM 약30.6GiB·디스크 약409GiB였고 처음 짧은 swap 표본은0이었다. 기존 로컬 PostgreSQL17.6 이미지를 network=none·port publish 없음·전용 Unix socket으로 실행했다. DB CPU1·메모리/데이터512MiB는 강제 제한, 앱3GiB·임시5GiB·가용 RAM8GiB 여유는 관측 중단 예산이다. 호스트 cgroup/네트워크/전역 인증을 변경하지 않았다.
+
+DB-001/003·TEST-001/004: **5파일17시험 PASS**. 빈 DB의0000~0010, 별도 신규 시험 DB의0009→0010, outbox 쓰기 잠금으로0010 실패 시 두 index와 적용 기록의 원자적 rollback, 잠금 해제 후 재개·중복 적용 방지, 업무/세션/소비 영수증/회수 관측 JSON 보존, 실제 LOGIN의 허용/거절 SQL과 기존 소비·quota·worker·복구 경계를 확인했다. migration 실행 본체를 export해 CLI와 upgrade 시험이 같은 코드를 쓰며 기본 CLI 동작/guard/hash 검사는 유지했다. index 생성은 대규모 성능 개선의 증거가 아니다. 같은 DB에서 전체 HTTP/브라우저 suite를 반복한 정리 검증은 실행하지 못했다.
+
+시험 환경 결함은 공식 PostgreSQL entrypoint의 초기화용 socket 위치 충돌, tsx/worker 사전 로더 중첩, Vitest driver import cycle이었다. 기본 container socket mount와 테스트 전용 실제 CJS driver의 transport 주입으로 해결했으며 SQL/LOGIN/인증 middleware를 성공 fake로 바꾸지 않았다. Unix socket preload/setup은 integration·소유0700 ROOT·그 하위 socket·loopback URL·callsign_test_* DB를 검사한다. 보호 파일/DB URL 원문은 공개 증거에 넣지 않았다.
+
+운영 조회의 실제 SQL/runtime·ARI fetch fixture, 목적 분석의 실제 WS·동의·정정·정책/epoch/키/binding·quota·계정/세션 회수, Chromium 회수 표시/보류 응답/모바일 시나리오를 보완했다. Chromium의 전체 인증서 오류 허용을 제거하고 해당 시험 인증서 SPKI에만 자식 브라우저 예외를 한정했다. **이 HTTP/WS/브라우저 소스는 타입 검사만 했다.** 원장·ARI·분석 제공자 fixture 역시 이번 HTTP 시도에서는 실행되지 않았다.
+
+10초 관측의 swap 카운터가 연속 증가하여 소유 DB를 중단했다. 사용자의 명시적1회 재개 후 위 DB17시험이 통과했지만 다시 같은 중단 조건이 발생했다. HTTP 수집 시 socket이 없어 assertion0으로 차단됐으며 PASS/SKIP로 바꾸지 않았다. 이는 OOM/서버 전체 자원 부족을 입증하지 않으며 전역 swap의 원인·정확한 속도는 확정하지 못했다. 추가 서비스 재개는 하지 않았다.
+
+무기동 `pnpm light` **59파일291시험 PASS**, 웹 build·API runtime/통합 소스 타입 검사는 PASS다. 이전 시험 수와 합산하지 않는다. 전체 결과는 [이번 실행 증거](../artifacts/mentoring-integration-20261103.json), 실행 절차는 [RUNBOOK](RUNBOOK.md#mentoring-integration-unix)에 연결한다. 원본 실패·timeout/중단·소스 hash·자원 표본은 `.local/mentoring-integration-20261103/`에 구분 보존한다. 소유 컨테이너2환경과 보호 ROOT·시험키/CA/비밀번호를 제거했고 route/Docker network/기존 실행 container ID 목록의 전후 hash가 같았다. 실제 제품 결함은 확정하지 못했으며 HTTP·브라우저 검증 목표는 BLOCKED로 남는다. 새 runtime/공개 묶음은 향후 필요하고 이미지·Release는 발행하지 않았다. 검증 미완료를 main 완료로 반영하지 않도록 `verify/mentoring-integration-20261103` 검토 branch를 사용한다. 소스 checkpoint는 `ba79e9e`·`dd73037`이며 최종 게시 SHA/CI는 해당 branch와 연결된 실행 결과를 따른다.
+
 <a id="mentoring-fourth-20261102"></a>
 
 ## 2026-11-02~03 4차 반영: 운영 조회·승인 목적 분석·통화별 측정
