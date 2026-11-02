@@ -158,7 +158,7 @@ it('boundary: stops analysis transport and late model results after consent with
  const before=first.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>first.ws.readyState).toBe(WebSocket.CLOSED);expect(first.messages.filter(m=>m.type==='risk')).toHaveLength(before);
  await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true});const next=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>next.messages.some(m=>m.type==='ready')).toBe(true);next.ws.send(JSON.stringify({type:'consent',consent:true}));await expect.poll(()=>f.audio.streams.length).toBe(2);
  const current=f.audio.streams[1]!,revision=(n:number,text:string,final=true)=>current.options.onRevision({streamId:current.options.streamId,segmentId:'new-seg',revision:n,final,text,source:'remote'});
- revision(1,'OTP',false);revision(2,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(2);revision(3,'OTP를 알려주지 마세요.');expect(f.audio.calls[1]!.signal.aborted).toBe(true);revision(1,'OTP를 알려주세요.');
+ revision(1,'OTP',false);revision(2,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(2);revision(3,'OTP를 알려주지 마세요.');await expect.poll(()=>f.audio.calls[1]!.signal.aborted).toBe(true);revision(1,'OTP를 알려주세요.');
  // The bounded context analyser serializes/coalesces revisions, even if an adapter ignores abort.
  f.audio.calls[1]!.resolve(analyzeWithRules('OTP를 알려주세요.'));await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FAKE_PROVIDER_UNAVAILABLE'));
  await expect.poll(()=>next.messages.some(m=>m.type==='risk'&&m.event.revision===3&&m.event.status==='unavailable')).toBe(true);expect(next.messages.filter(m=>m.type==='risk').at(-1).event.signals).toEqual([]);
@@ -255,7 +255,14 @@ it('analysis HTTP/WS: account disable invalidates real authenticated sockets and
 });
 it('analysis HTTP/WS: enforces the remote context identity cap and releases the stream',async()=>{
  const c=await analysisCall();try{
-  for(let n=0;n<257;n++){c.revision(1,'정상 확인 안내입니다.',String(n));if(n<256)await expect.poll(()=>c.messages.some(m=>m.type==='revision'&&m.revision.segmentId===String(n))).toBe(true);}
+  // Wait on actual transport events; polling each of 256 messages needlessly consumes freshness.
+  const received=(segmentId:string)=>new Promise<void>((resolve,reject)=>{
+   const clear=()=>{clearTimeout(timer);c.ws.off('message',message);c.ws.off('close',closed);};
+   const message=(raw:import('ws').RawData)=>{const m=JSON.parse(String(raw));if(m.type==='revision'&&m.revision.segmentId===segmentId){clear();resolve();}};
+   const closed=()=>{clear();reject(new Error('CONTEXT_STREAM_CLOSED_BEFORE_REVISION:'+segmentId));};
+   const timer=setTimeout(()=>{clear();reject(new Error('CONTEXT_REVISION_TIMEOUT:'+segmentId));},1000);c.ws.on('message',message);c.ws.on('close',closed);
+  });
+  for(let n=0;n<257;n++){const pending=n<256?received(String(n)):undefined;c.revision(1,'정상 확인 안내입니다.',String(n));if(pending)await pending;}
   await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.messages.some(m=>m.type==='unavailable'&&m.code==='ANALYSIS_LIMIT')).toBe(true);expect(c.stream.stopped).toBe(true);expect(f.audio.calls.length).toBeLessThanOrEqual(20);for(const request of f.audio.calls){expect(request.signal.aborted).toBe(true);request.reject(new Error('FIXTURE_CANCELLED'));}
  }finally{c.ws.terminate();}
 },20000);
@@ -305,4 +312,39 @@ it('analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the
   await quota.reserve(reservation,f.id,'llm-requests',20,analysisScopes(f.id,f.uid('recipient'),c.attempt.id,'llm-requests',20,f.now()),f.now()+120);
   c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(f.audio.calls).toHaveLength(0);const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event.purpose.relation).toBe('undetermined');
  }finally{c.ws.terminate();await quota.settle(reservation,0);await quota.close();}
+});
+
+it('analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device',async()=>{
+ const c=await acceptedCall(),page=await browserPage('recipient');
+ // Media/PBX are excluded here: the real panel receives the real API socket via a component host.
+ await page.evaluate(async attemptId=>{
+  const response=await fetch('/api/v3/consent',{method:'POST',headers:{'content-type':'application/json','x-csrf-token':sessionStorage.getItem('ip_csrf')??'','idempotency-key':crypto.randomUUID()},body:JSON.stringify({attemptId,granted:true})});if(!response.ok)throw new Error('BROWSER_CONSENT_REJECTED:'+response.status);
+  const loadModule=new Function('url','return import(url)') as (url:string)=>Promise<any>;const component=await loadModule('/src/components/ServiceAnalysisPanel.tsx');
+  const domUrl=performance.getEntriesByType('resource').map(e=>e.name).find(name=>name.includes('react-dom_client'))!;if(!domUrl)throw new Error('PRODUCT_REACT_RUNTIME_NOT_LOADED');
+  const dom=await loadModule(domUrl);const {createRoot}=dom.default??dom;const host=document.createElement('div');host.dataset.testid='live-analysis-component';host.className='finals-workspace';document.body.append(host);const root=createRoot(host);
+  let previous:any,active=true;const state={ready:false,closed:false};(window as any).__analysisTransport=state;root.render(component.ServiceAnalysisPanel({}));
+  const url=new URL('/api/v3/audio',location.href);url.protocol='wss:';url.searchParams.set('attemptId',attemptId);const ws=new window.WebSocket(url);
+  ws.onmessage=raw=>{const message=JSON.parse(String(raw.data));if(message.type==='ready'){state.ready=true;ws.send(JSON.stringify({type:'consent',consent:true}));}if(active&&message.type==='risk'){previous=component.nextAnalysis(previous,message.event);root.render(component.ServiceAnalysisPanel({event:previous}));}};
+  ws.onclose=()=>{active=false;state.closed=true;previous=undefined;root.render(component.ServiceAnalysisPanel({}));};
+ },c.attempt.id);
+ await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.ready)).toBe(true);await expect.poll(()=>f.audio.streams.length).toBe(1);
+ const stream=f.audio.streams[0]!,revision=(n:number)=>stream.options.onRevision({streamId:stream.options.streamId,segmentId:'browser-analysis',revision:n,final:true,text:'OTP를 알려주세요. 대출 상품을 안내하겠습니다.',source:'remote'}),panel=page.getByTestId('live-analysis-component');
+ revision(1);await expect.poll(()=>f.audio.calls.length).toBe(1);f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.','suspected','대출 상품을 안내하겠습니다.'));
+ await panel.getByText('승인 목적 이탈 의심',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ for(const width of [1440,390]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`${f.runRoot}/analysis-component-${width}.png`,fullPage:true});}
+ revision(2);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));await panel.getByText('분석 범위에서 목적 이탈 근거 미탐지 · 안전 판정 아님',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ revision(3);await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FIXTURE_PROVIDER_UNAVAILABLE'));await panel.getByText('목적 분석 불가 · 규칙 근거는 별도 표시',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ revision(4);await expect.poll(()=>f.audio.calls.length).toBe(4);
+ expect(await page.evaluate(async attemptId=>(await fetch('/api/v3/consent',{method:'POST',headers:{'content-type':'application/json','x-csrf-token':sessionStorage.getItem('ip_csrf')??'','idempotency-key':crypto.randomUUID()},body:JSON.stringify({attemptId,granted:false})})).status,c.attempt.id)).toBe(200);
+ await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.closed)).toBe(true);expect(stream.stopped).toBe(true);expect(f.audio.calls[3]!.signal.aborted).toBe(true);f.audio.calls[3]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));
+ await panel.getByText('아직 표시할 분석 결과가 없습니다. 실행 상태는 음성 분석 항목을 확인하세요.',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBe(0);
+ expect(await page.evaluate(async()=>(await navigator.permissions.query({name:'microphone'})).state)).not.toBe('granted');
+},20000);
+
+it('analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort',async()=>{
+ const c=await analysisCall();c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
+ expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBeGreaterThan(0);
+ await f.stopIssuer();expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);
+ expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBe(0);
+ f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
 });

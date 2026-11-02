@@ -144,11 +144,12 @@ const start=async()=>{
  if(vite)(vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
 };
 const close=async()=>{if(options.startExternal){if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql.end();return;}await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));const owned=(await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]?.state as InstitutionRecord|undefined;
+ expect(Number((await sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${id} AND state='reserved'`)[0]!.count),'fixture must not delete unsettled reservations').toBe(0);
  for(const table of ['usage_reservations','outbox','audit','approval_consumptions','consumption_journal','recovery_gate','identity_links','account_requests','notifications','notification_preferences','configuration_history','worker_status'])await sql`DELETE FROM ${sql('issuer_v2.'+table)} WHERE institution_id=${id}`;
  await sql`DELETE FROM issuer_v2.processed_chain_events WHERE deployment_id=${deployment}`;await sql`DELETE FROM issuer_v2.event_cursor WHERE deployment_id=${deployment}`;
  await sql`DELETE FROM issuer_v2.institutions WHERE id=${id}`;const userIds=Object.keys(owned?.members??record?.members??{}).concat(uid('tenant-b'));if(userIds.length){await sql`DELETE FROM public.sessions WHERE user_id IN ${sql(userIds)}`;await sql`DELETE FROM public.users WHERE id IN ${sql(userIds)}`;}
  if(usedTokens.size)await sql`DELETE FROM public.oidc_login_uses WHERE token_hash IN ${sql([...usedTokens])}`;await sql.end();if(runRoot)await writeFile(`${runRoot}/identity.json`,JSON.stringify({institution:id,deployment,screenshots:['service-mobile.png','service-desktop.png'],scope:'synthetic-accounts-local-oidc-real-http-postgres-browser-external-authority-fixtures'}),{flag:'wx',mode:0o600});};
-return {start,close,sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject,control,audio,
+return {start,close,stopIssuer:()=>issuerApp.close(),sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject,control,audio,
  get origin(){return origin;},get apiOrigin(){return apiOrigin;},get oidc(){return oidc;},get runRoot(){return runRoot;},
  setIdentity(s:string,variant='normal'){subject=s;mode=variant;},now:()=>Math.floor(Date.now()/1000)+control.offset};
 }
