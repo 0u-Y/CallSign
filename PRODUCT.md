@@ -30,7 +30,7 @@ TypeScript/pnpm, React/Vite, Fastify, PostgreSQL/Drizzle, Solidity/Foundry, Besu
 
 ## Operating Context
 
-기본 목표는 상담원 웹 ↔ Asterisk 교환기 ↔ 고객 웹이다. 기존 브라우저 직접 통화와 시청 사례·생성 음원은 이전 기능이 깨지지 않는지 검사하는 데 보존한다. 기본 `/service` 화면은 교환기 제어·서명 검증·통화 유지 허가·원격 음성 분석 API에 연결돼 있다. 직접 통화 회귀 화면은 `/finals`에 보존한다. 실제 통화·외부 분석·배포 검증은 아직 하지 않았다. [작업 지침](AGENTS.md)의 실행 제한을 유지한다.
+기본 목표는 상담원 웹 ↔ Asterisk 교환기 ↔ 고객 웹이다. 기존 브라우저 직접 통화와 시청 사례·생성 음원은 이전 기능이 깨지지 않는지 검사하는 데 보존한다. 기본 `/service` 화면은 교환기 제어·서명 검증·통화 유지 허가·원격 음성 분석 API에 연결돼 있다. 직접 통화 회귀 화면은 `/finals`에 보존한다. 같은 호스트의 실제 교환기·합성 음원·선택 회수와 전달물 리허설을 확인했다. 외부 분석·IdP·AWS 배포는 미검증이며 검증 범위는 현황표와 원본 증거를 따른다. [작업 지침](AGENTS.md)의 실행 제한을 유지한다.
 
 ## Capabilities and Constraints
 
@@ -44,7 +44,7 @@ TypeScript/pnpm, React/Vite, Fastify, PostgreSQL/Drizzle, Solidity/Foundry, Besu
 
 ## Brand Commitments
 
-공개 이름은 CallSign, 팀명은 TEAM Signal이다. 밝은 배경, 흰 표면, 짙은 남색 본문, 청록 강조, 호박색 경고, 적색 거절을 사용한다. 자체 심볼을 쓰며 정부 공인 마크나 실제 금융기관 로고로 오해하게 만들지 않는다. 가짜 후기·고객사·장식용 통계를 넣지 않는다.
+공개 이름은 CallSign, 팀명은 Team Signal이다. 밝은 배경, 흰 표면, 짙은 남색 본문, 청록 강조, 호박색 경고, 적색 거절을 사용한다. 자체 심볼을 쓰며 정부 공인 마크나 실제 금융기관 로고로 오해하게 만들지 않는다. 가짜 후기·고객사·장식용 통계를 넣지 않는다.
 
 ## Evidence on Hand
 

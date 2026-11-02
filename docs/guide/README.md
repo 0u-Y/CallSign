@@ -18,6 +18,9 @@ CallSign은 금융기관과 위탁 콜센터의 연락 업무를 고객의 통�
 | [신뢰·보안](04-TRUST-AND-SECURITY.md) | 신뢰 대상·재사용 방지·공동 운영·개인정보 |
 | [구현·검증 현황](05-IMPLEMENTATION-STATUS.md) | 현재 연결된 경로·검증 범위·남은 개발 |
 
-기본 통화는 양측 웹 사이 Asterisk 교환기를 거치도록 개발합니다. 현재 기본 화면은 교환기 경로의 승인·통화 유지·원격 음성 분석 API에 연결했습니다. 선택한 실제 DB·로컬 인증/HTTP/브라우저·영속 Anchor/application 복원 경계는 시험했습니다. 실제 체인/Witness·PBX 음성·외부 AI·GCP 전체 연결은 아직 검증하지 않았습니다. 자세한 구현 상태와 실환경 검증 여부는 [현황표](05-IMPLEMENTATION-STATUS.md)를 참고하세요. 그림의 실선은 코드 연결이며 실제 환경 성공을 뜻하지 않습니다.
+기본 통화는 상담원 웹 ↔ Asterisk ↔ 수신 웹입니다. 선택한 실제 원장·DB·API·교환기와 합성 음원 경로를 같은 호스트에서 확인했으며 인증은 로컬 OIDC fixture였습니다. 외부 IdP·AI·AWS 검증과 구분한 [현재 구현 현황](05-IMPLEMENTATION-STATUS.md)을 확인하세요. 그림은 구성과 신뢰 경계를 설명하며 환경 성공을 뜻하지 않습니다.
 
 개발할 때는 [MASTER 요구사항](../MASTER-DEVELOPMENT-SPEC.md), [개발 현황](../FINALS-IMPLEMENTATION-PLAN.md), [운영 절차](../RUNBOOK.md)를 함께 봅니다. 이 가이드는 같은 서비스의 설명 자료이며 별도 요구사항이나 완료 기준을 만들지 않습니다.
+
+
+개발·AWS 배포·검증 증거·과거 기획 자료는 [전체 문서 안내](../README.md)에서 찾을 수 있습니다.

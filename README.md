@@ -1,64 +1,68 @@
-# CallSign · 업무에 근거한 연락 승인과 통화 검증
+# CallSign
 
-CallSign은 기관과 위탁 콜센터의 연락 업무를 고객의 통화 세션에 연결하는 서비스입니다. 기관이 승인한 업무·수신자·목적과 발신 권한을 확인하고, 통화 중에는 동의한 상대 음성의 위험 요구를 별도로 안내합니다.
+**Team Signal · 기관의 연락 승인과 현재 통화를 함께 확인하는 서비스**
 
-현재는 **모의 금융기관의 이상거래 확인 연락**을 기준으로 개발하고 있습니다. 실제 금융기관·통신사 연동은 없습니다. 기관 승인, 현재 연결, 내용 위험, 분석 상태는 구분해 표시합니다.
+CallSign은 모의 금융기관의 이상거래 확인 연락을 대상으로, 기관이 위탁 콜센터에 맡긴 업무와 이번 고객에게 연락할 권한을 검증합니다. 수신자는 서명된 승인과 실제 통화 연결을 확인하고, 동의한 상대 음성에서 위험한 요구가 발견되면 별도 안내를 받습니다.
 
-## 서비스 흐름
+**기관이 연락을 승인했다는 사실은 통화 내용의 안전을 보장하지 않습니다.** 기관 승인·현재 연결·내용 위험·분석 장애를 구분합니다. 실제 금융기관·통신사와 연동한 서비스나 일반 전화망용 앱은 아닙니다.
 
-1. 기관이 연락 업무와 목적 정책을 만들고 상담원에게 할당합니다.
-2. 콜센터는 위임 범위와 키 소유를 증명하고, 해당 고객에 대한 개별 연락 승인을 받습니다.
-3. 수신자는 승인·현재 권한·세션 연결 근거를 확인하고 통화를 수락합니다.
-4. 동의한 상대 음성에서 위험 요구를 분석하고 발화 근거와 대응 행동을 안내합니다.
-5. 민감한 후속 업무는 별도 인증한 공식 화면에서 처리합니다.
+## 어떻게 사용하나요?
 
-[서비스 가이드](docs/guide/README.md)에서 사용자 흐름, 아키텍처, 통화 처리와 신뢰 경계를 볼 수 있습니다.
+| 사용자 | 하는 일 |
+|---|---|
+| 기관 담당자 | 연락 업무·수신자·목적을 정하고 상담원에게 할당하며 위임·개별 연락을 승인합니다. |
+| 상담원 | 위임과 할당 범위 안에서 승인받은 연락을 시작합니다. |
+| 수신자 | 이번 연락의 승인·현재 권한·연결을 확인해 통화를 수락하고 음성 분석 동의를 선택합니다. |
 
-## 구현 상태
+기본 화면은 `/service`입니다. 업무 위임과 개별 승인을 분리하고, 양측 키 소유 증명·승인 일회 소비·서명 영수증을 통화 세션에 결합합니다. 120초는 **최초 연결 시작 창**이며, 진행 통화에는 별도의 갱신형 유지 허가(lease)를 사용합니다. 명시적 철회·취소·로그아웃은 통화 회수 경로에 연결됩니다.
 
-기본 업무 화면은 `/service`이며 등록 기관 주소·키 기반 승인, 양측 브라우저의 서명 검증, Asterisk 교환기 연결, 통화 유지 허가와 원격 음성 분석 API에 코드로 연결했습니다. 기관 담당자는 업무·위임을 관리하고 상담원은 할당된 연락을 승인받으며, 수신자는 별도 상태로 승인·연결·분석·위험을 확인합니다. 이전 브라우저 직접 통화 화면은 `/finals` 호환 경로에 보존했습니다.
+## 구성과 신뢰 경계
 
-원장 작업 재처리·사건 cursor, PBX 사건/만료/로그아웃 회수, 공유 사용량 예약·정산, 독립 소비 이력 기준과 암호화 백업·복원 코드도 추가했습니다. 실제 PostgreSQL·계약·Besu/Witness와 인증·HTTP·브라우저의 선택 경로는 검증했습니다. **교환기·TURN 경유 양방향 합성 음원과 선택한 회수 경계는 실제 검증했습니다. 외부 IdP/AI·외부망·AWS 전체 배포는 미검증입니다.** 같은 호스트의 실제 원장·worker·API 연결 범위는 [최신 실행 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#isolated-media-20261102)을 따릅니다. 공동 정책·계정 관리의 이행 경계와 남은 코드·실행 대기 항목은 개발 기록에서 구분합니다.
+```mermaid
+flowchart LR
+  ORG["기관·콜센터"] --> AUTH["승인·서명 서비스"]
+  AUTH --> DB["PostgreSQL: 업무·소비·감사"]
+  AUTH --> ANCHOR["별도 HTTPS Anchor: 복구 기준"]
+  LEDGER["Besu: 권한 원장"] --> W["Witness: 서로 다른 3-of-4 서명"]
+  W --> R["수신 웹: 고정 공개키로 검증"]
+  AUTH --> R
+  S["상담원 웹"] <-->|암호화 음성| PBX["Asterisk 교환기"]
+  PBX <-->|암호화 음성| R
+  R -->|동의한 상대 음성| AI["분석 경로: STT·규칙·LLM"]
+```
 
-문서에 남긴 통신 형식 번호는 이 구현 차이를 구별하는 값입니다. 사용자에게 보여주는 제품 등급이나 별도 서비스가 아닙니다. [통신 형식과 용어](docs/PROTOCOL.md#protocol-profiles)를 참고하세요.
+기관·콜센터의 장기 개인키는 서버에 두고 브라우저에는 전달하지 않습니다. 수신 웹은 서버의 성공 표시 대신 서명과 연결 근거를 대조합니다. Asterisk가 음성 종단이며, Witness는 신뢰한 상태 증언자이지 체인 자체 증명은 아닙니다. AI는 연락 권한을 발급하거나 통화의 안전을 확정하지 않습니다. 자세한 역할·키·데이터 경계는 [아키텍처](docs/ARCHITECTURE.md)를 참고하세요.
 
-- [구현·검증 현황](docs/guide/05-IMPLEMENTATION-STATUS.md): 코드·화면 연결·검증과 남은 작업
-- [MASTER 개발 명세](docs/MASTER-DEVELOPMENT-SPEC.md): 전체 요구사항과 완료 조건
-- [개발 기록](docs/FINALS-IMPLEMENTATION-PLAN.md): ID별 진행과 검증 이력
+## 어디까지 확인했나요?
 
-## 개발
+- **실제 구성요소로 확인:** PostgreSQL 경합·선택 복구 경계, 로컬 EVM 계약, Besu·Witness·API·worker 연결, 제품 웹의 양방향 합성 음원과 선택한 권한 회수 경로, 전달물만 사용하는 신규 로컬 리허설.
+- **대체 경계:** 인증은 로컬 OIDC fixture를 사용했습니다. 분석 제공자 응답을 대체한 시험은 실제 STT/LLM 품질 검증이 아닙니다.
+- **전달 검증:** bootstrap 이미지 6종의 비공개 GHCR 게시·실제 원격 수령과 공개 Release 재수령을 확인했습니다.
+- **아직 미확인:** AWS 최종 웹 생성·실제 배포, 별도 GHCR 수령용 읽기 자격 검증, 외부 IdP·TLS/NAT/TURN·AI 품질. 같은 호스트의 여러 노드를 독립 운영기관의 장애 내성으로 해석하지 않습니다.
 
-TypeScript/pnpm, Fastify, React/Vite, PostgreSQL/Drizzle, Solidity/Foundry, Besu를 사용합니다. Node22와 pnpm11.27.0이 필요합니다.
+각 결과의 실행 소스·환경·실패·대체 범위는 [구현·검증 현황](docs/guide/05-IMPLEMENTATION-STATUS.md)에서 원본 증거로 연결합니다. 과거 통과 결과가 현재 코드 전체의 검증을 뜻하지는 않습니다.
+
+## 개발 시작
+
+Node.js 22와 `package.json`에 고정한 pnpm을 사용합니다. 의존성 설치는 네트워크가 필요하며, 기존 의존성이 있으면 설치를 반복할 필요가 없습니다.
 
 ```bash
 pnpm install --frozen-lockfile --ignore-scripts
 pnpm light
 ```
 
-`light`는 소스 위생·JavaScript 문법, TypeScript, 네트워크 없는 단위 시험입니다. 시험 동시 실행은 최대 2개이며 DB 통합·브라우저·외부 API는 실행하지 않습니다. `lint`는 전체 ESLint 규칙 검사가 아닙니다. 웹 번들만 컴파일하려면 `pnpm --filter @callsign/web build`를 사용합니다.
+`light`는 소스 위생·타입 검사·네트워크 없는 단위 시험을 실행하며 worker는 최대 2개입니다. DB·체인·브라우저·서비스를 기동하지 않습니다. 웹 번들만 컴파일하려면 `pnpm --filter @callsign/web build`를 사용합니다.
 
-실행 제한은 [AGENTS.md](AGENTS.md)를 따릅니다. 현재 단계에서 서비스·컨테이너·체인 기동, migration·계약 배포, 실제 통화·제공자 호출·AWS 변경은 해당 범위의 별도 실행 승인 없이 수행하지 않습니다.
+**실제 서비스 실행은 별도 준비가 필요합니다.** 위 명령은 통합 환경을 설치하거나 기동하는 quickstart가 아닙니다. [작업 지침](AGENTS.md)과 [실행 범주·검증 절차](docs/RUNBOOK.md#실행-범주)를 확인하세요. 일반 push/PR CI는 light만 실행합니다.
 
-## 구성과 운영
+## AWS 배포와 산출물 수령
 
-- **Platform:** 인증된 요청 전달. 기관·콜센터 개인키와 소비 DB 쓰기 권한 없음
-- **Issuer Gateway:** 업무·개별 승인·소비·취소와 기관 승인키
-- **Sender Agent:** 콜센터 장기키와 요청별 세션 공개키 증명
-- **PostgreSQL:** 업무·세션·소비 영수증·감사와 재처리 의도
-- **Besu/Witness:** 권한 계약과 서로 다른 상태 증언자 4개 중 3개가 서명한 원장 상태
-- **Asterisk:** 목표 웹 통화의 SIP/WSS·음성 종단과 브리지
-- **음성 분석:** 상대 음성 → 스트리밍 STT(음성→문자 변환) → 전사 수정·정책 규칙/언어 모델 → 위험 근거
+대회 실행 환경은 **AWS**이며 개발 서버는 필요하지 않아야 합니다. Git에는 소스·설정 예제·도구를, 공개 Release에는 배포 파일·inventory·checksum을, **비공개 GHCR**에는 bootstrap 이미지를 보관합니다. 이미지 수령에는 별도의 package 읽기 권한과 보호 자격파일이 필요합니다. 게시용 token을 AWS에 복사하지 않습니다.
 
-최종 대회 실행 환경은 **AWS**이며 현재 서버컴은 개발·빌드·검증에만 사용합니다. 기본 경로는 검증 코드/이미지를 전달한 뒤 AWS용 새 identity·키·genesis·계약·기관·합성 계정을 준비하는 것입니다. 폐기한 시험 데이터를 반드시 이전하지 않습니다. 현재 서버가 꺼져도 로그인·통화·복구가 동작해야 합니다. [AWS 입력·초기화·재시작·복원·전달 절차](docs/RUNBOOK.md#aws-competition)를 따릅니다. 설정은 [infra/deploy](infra/deploy/compose.yml), AWS override와 별도 Anchor는 [infra/deploy](infra/deploy/compose.aws.yml)에 있습니다. `infra/gcp`는 비활성 과거 구성으로 보존하며 현재 배포 대상으로 사용하지 않습니다. 실행·백업·복원·키 회전은 [RUNBOOK](docs/RUNBOOK.md)에 있습니다. 일반 재시작에 초기화·migration·키 재발급을 넣지 않습니다. 공개 도메인·실제 IdP·AWS 외부 TLS/NAT·최종 웹 pin은 준비/실행 대기입니다.
+**[배포 기준 Release·수령 명령](docs/RUNBOOK.md#github-delivery-20261102)**에서 고정 tag와 manifest digest를 확인하세요. GitHub의 `latest`를 배포 기준으로 사용하지 않습니다. 최종 웹은 실제 AWS trust·인증서가 준비된 뒤 생성합니다. [NEW 초기 배포와 기존 환경 재개·복구](docs/RUNBOOK.md#aws-competition)는 서로 다른 절차입니다.
 
-통합·체인·미디어·성능 검증은 기본 차단되며 별도 실행 허가가 필요합니다. 일반 push/PR CI는 light만 실행합니다.
+## 문서 찾기
 
-## 상세 문서
+[전체 문서 안내](docs/README.md) · [서비스 가이드](docs/guide/README.md) · [개발 명세](docs/MASTER-DEVELOPMENT-SPEC.md) · [아키텍처](docs/ARCHITECTURE.md) · [알려진 한계](docs/KNOWN-LIMITATIONS.md)
 
-[아키텍처](docs/ARCHITECTURE.md) · [프로토콜](docs/PROTOCOL.md) · [위협 모델](docs/THREAT-MODEL.md) · [한계](docs/KNOWN-LIMITATIONS.md) · [표준](docs/STANDARDS.md) · [설계 결정](docs/adr/0002-finals-offline.md)
-
-초기 시청 사례·고정 시험 데이터와 과거 시험·기획 자료는 보존합니다. 기본 화면은 `/service`이며 `/finals`는 보존한 역할별 직접 통화 호환 화면입니다. `/demo`는 고정 시험 데이터와 과거 증거를 사용하는 시연 화면입니다. `finals` 경로명은 기존 실행 설정과의 호환을 위해 유지합니다. [과거 시험 기록](docs/TEST-RESULTS.md)과 [보관 문서](docs/archive/2026-10-26/)는 해당 시점의 기록입니다.
-
-공동 정책 변경·내부 계정 관리·복구 checkpoint·오프라인 실행 전 검사의 최신 범위는 [개발 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#pre-execution-20261027)을 따릅니다. `pnpm preflight`는 서비스를 기동하지 않으며 설정 누락을 구체적으로 차단합니다. 실제 실행 준비/성공을 보증하는 검사는 아닙니다.
-
-실행 준비는 [항목별 준비 결과](artifacts/execution-preparation-rechecked-20261029.json)와 [RUNBOOK](docs/RUNBOOK.md#단계별-검증과-판정)을 따른다. `pnpm prepare:execution --dry-run`은 설정의 생성 순서를, `pnpm validate --stage offline --environment infra/validation/offline.json --output artifacts/NEW.json --execute`는 현재 허용된 검사를 실행한다. 나머지 단계는 별도 실행 허가 전 dry-run만 허용하며 누락 설정과 수동 확인을 PASS로 바꾸지 않는다. 최신 검증 수치는 [개발 기록](docs/FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)에 기록한다.
+멘토링·기획서·과거 시연과 검증 증거는 [문서 안내의 기록 보관](docs/README.md#기록과-자료)에서 찾을 수 있습니다. `/finals`는 이전 직접 통화 호환 경로이며 `/demo`는 고정 시험 데이터·과거 증거를 사용하는 시연 화면입니다.
