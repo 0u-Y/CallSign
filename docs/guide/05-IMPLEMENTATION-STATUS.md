@@ -17,9 +17,7 @@
 
 ## 최신 변경의 통합 실행 상태
 
-2026-11-03 후속 재개는 서비스 시작 전 swap3연속 조건으로 차단됐다. HTTP·WS·Chromium은0/BLOCKED이며 원인 계측·취소 전파는 오프라인 검증만 완료했다. [후속 관측과 남은 조건](../FINALS-IMPLEMENTATION-PLAN.md#http-resource-preflight-20261103)을 따른다.
-
-2026-11-03에는 실제 PostgreSQL에서 migration0010의 실패 rollback·재개·재실행·기존 상태 보존과 최소권한을 확인했습니다(5파일17시험). 자원 watchdog의 연속 swap 감지와 승인된1회 재개 후 재중단으로 HTTP·분석 WS·Chromium은 assertion 실행 전에 차단됐습니다. 추가된 해당 시험 소스는 타입 검사만 했으며 최신 기능의 브라우저/회수 통합 성공으로 표시하지 않습니다. [실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)·[증거](../../artifacts/mentoring-integration-20261103.json)를 참고하세요.
+2026-11-03 명시적 시험 압박 정책에서 실제 SQL·인증·HTTP/WS·Chromium을 연결해 HTTP11·WS14·Chromium9가 통과했습니다. 같은 회귀DB3건 재실행과 전후 잔류 감사도 통과했습니다. 초기 quota 잔류17개는 보존하고 종료 시 분석/정산 drain 결함을 수정했으며, 같은 소유 cluster의 추가DB에서 회귀했습니다. Chromium 중1개는 실제 WS 결과를 제품 패널에 렌더링한 component host여서 실제 통화 컨트롤러·음성 경로의 성공으로 확대하지 않습니다. [최신 기록](../FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)·[원본 증거](../../artifacts/http-pressure-integration-20261103.json)를 참고하세요. 과거 PostgreSQL17시험과 swap BLOCKED 기록은 당시 범위로 보존합니다.
 
 ## 4차 반영의 소스 구현
 

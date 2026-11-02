@@ -4,6 +4,24 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="http-pressure-integration-20261103"></a>
+
+## 2026-11-03 명시적 압박 정책으로 HTTP·WS·Chromium 통합 완료
+
+시작 `d9d92f1`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 사용자가 승인한 시험 전용 `--policy integration-pressure-v1`을 명시해5초 표본·60초 사전 관측 뒤 실제 network=none PostgreSQL/Unix socket·최소권한 LOGIN·Platform/Issuer/Sender·HTTPS OIDC fixture·제품 웹·설치 Chromium을 실행했다. 호스트 swap/커널/네트워크 설정을 변경하지 않았고 기본 `swap-activity-v1`과 과거 증거는 보존했다. 원장/ARI/음성 제공자와 binding/Anchor는 명시적 fixture이며 실제 체인·PBX·음성·외부 AI/AWS 검증이 아니다.
+
+UI-001/006·AI-003/005·OPS-006·TEST-004: 회수 필터의 접근 이름과390px select 넘침을 수정했다. 잔류 감사에서 최초DB의 미정산 balance17개를 발견했다. audio 정리보다 quota pool이 먼저 닫힐 수 있던 종료 순서를 고치고, 제공자가 abort를 무시해도 호출자 취소와 보수적 사용량 정산이 완료되도록 했다. STT reserve 도중 종료도 추적하고 정산 실패/5초 drain timeout은 성공으로 숨기지 않는다. fixture도 미정산 예약을 지우기 전 실패하도록 보강했다. 실제 issuer 종료/SQL quota 회귀를 추가했다.
+
+최초 실패DB의 예약 행은 이전 fixture teardown에서 이미 삭제됐으므로 임의 balance 초기화로 복구하지 않았다. **같은 소유 container/cluster·identity 안에 새 회귀DB1개만 추가**해 수정된 코드를 검증했다. 원래DB의 미정산17개는 종료 전까지 그대로였으며 공개 증거에 구분한다. 수정 후 회귀DB는 실제 migration11개·기존 최소권한 LOGIN 재사용·readiness2시험 PASS다. 기존DB17개 전체 회귀는 반복하지 않았다.
+
+최종 소스의 고유 사례는 **HTTP11·WS14·Chromium9 PASS**다. 종전 정적25개 배정은 `it.each`7개를 놓쳤으며 원래 실제 수집은32개, 종료 정산/브라우저 분석 component host2개 추가 후34개다. 모든 이름을 실제 progress와 대조했고 필터 SKIP을 성공에 더하지 않았다. Chromium8개는 실제 제품 화면이고, 추가1개는 실제 브라우저 로그인/WS/동의/SQL/분석 결과를 출하 패널·nextAnalysis에 연결한 component host다. PBX/ServiceCall의 실제 수신 음성→화면 경로는 이번에 확인하지 않았다. SPKI 예외는 실제 로그인에서 작동했으며 전체 TLS 오류 무시는 사용하지 않았다.
+
+같은 회귀DB에서 HTTP/WS/Chromium 각1개 재실행과 전후 SQL 감사 각1개가 통과했다. 기관/outbox/session/예약 행과 미정산 balance는0, scope별 quota used 합계176은 보존됐다(범위 간 중복이며 제공자 호출/청구 수가 아니다). 최초 WS2개는 동기 취소 기대/매 발화 polling으로 freshness 창을 소비하던 시험 문제였고 실제 이벤트 대기로 고쳤다. 최초 UI/감사 실패 및 browser loader 시험 실패를 지우지 않았으며 반복 횟수를 최종34개에 합산하지 않는다.
+
+자원은 약1310초·263표본 관측했다. 최소 MemAvailable37.841GiB, 앱+observer 관측 RSS 최대2339.53MiB, container155.84MiB, 임시 파일+DB 상한522.43MiB였다. PSI full avg10 최대2.14%는1표본이며3연속이 아니었다. host oom_kill 증가0·자원 중단 없음이다. 순간 peak/일반 안전 기준/SLA를 뜻하지 않는다. 소유 DB container·보호 ROOT/키/CA·watcher를 정리했고 route/network/기존 실행 container 목록 전후 hash가 일치했다. 합성 화면19장은 보호된 로컬 기록에만 보존했다.
+
+`pnpm light` **60파일299시험**, API runtime 타입 검사·무기동 웹 build는 PASS다(기존 chunk/dynamic-import 경고 유지). [원본 실패·실제 단계/범위·소스 hash·관측/정리 증거](../artifacts/http-pressure-integration-20261103.json)와 [정책/재현 절차](RUNBOOK.md#http-pressure-policy-20261103)를 따른다. 검증한 파일 내용은 `b11fc72`(명시적 정책)·`e503dae`(정산/화면/통합 회귀)에 보존했다. main 자동 병합·이미지/Release 발행은 하지 않는다. 정책 변경은 이번 시험의 승인이지 후속 기동/임계값 상향의 상시 허가가 아니다. 새 runtime·실제 trust pin 웹/공개 묶음과 이후 실제 원장/PBX 재검증이 필요하다.
+
 <a id="http-resource-preflight-20261103"></a>
 
 ## 2026-11-03 HTTP 재개 사전 관측: 서비스 시작 전 차단

@@ -24,4 +24,4 @@
 | H 외부 검증을 단계별로 준비 | 채택. 기존 AWS 입력 계약·guard·시험 lifecycle 재사용 | RUNBOOK·guard 회귀·call/provider runner·기존 통합 시험 소스 | 무기동 준비·검사. AWS/IdP/TURN/제공자/복구 실제 실행은 별도 허가·입력 필요 |
 | 관리 승인자 교체·기관별 집합·정족수 변경·Witness 직접 proof 대체 | 후속. 현재 계약의 보장을 바꾸므로 이번 제외 | KNOWN-LIMITATIONS의 후속 조건 | 새 권한 모델/이행·서명 재사용/구 trust 차단과 독립 운영 검증이 선행되어야 함. ABI·bytecode·서명 도메인 유지 |
 
-최신 실행 후속: migration0010·실제 SQL 경계는5파일17시험 PASS이며 C~E의 최신 HTTP/WS/Chromium은 연속 swap으로 BLOCKED다. [2026-11-03 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)을 따르며 기존 오프라인/과거 통합 결과와 구분한다.
+최신 실행 후속: 명시적 압박 정책에서 실제 SQL/인증·HTTP11·WS14·Chromium9와 같은DB 재실행/잔류 감사를 확인했다. 초기 quota 누수·회수 필터 접근 이름/390px 넘침을 수정했다. [2026-11-03 통합 기록](../FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)의 실제 구성/fixture/component host 경계를 따르며, 과거 PostgreSQL17시험·swap BLOCKED 원본과 실제 음성/모델/AWS 미검증은 보존한다.

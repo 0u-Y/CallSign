@@ -10,15 +10,17 @@ AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Relea
 
 같은 호스트의 새 chain/DB/별도 Anchor/PBX·제품 웹 리허설은 실제 구현과 합성 음원/로컬 OIDC를 사용했다. 독립 호스트 장애·실제 IdP·외부망 NAT/TURN·외부 AI·AWS override 전체 성공으로 확대하지 않는다. 기존 null inventory·package403·미전송 설명은 앞선 증거의 당시 상태다.
 
-## 최신 기능의 실제 DB 검증과 자원 중단
+## 최신 HTTP·WS·Chromium 통합의 확인 범위
 
-2026-11-03 후속 재개는 서비스 시작 전 swap3연속 조건으로 차단됐다. HTTP·WS·Chromium은0/BLOCKED이며 원인 계측·취소 전파는 오프라인 검증만 완료했다. [후속 관측과 남은 조건](FINALS-IMPLEMENTATION-PLAN.md#http-resource-preflight-20261103)을 따른다.
+사용자가 승인한 시험 전용 압박 정책으로 실제 PostgreSQL/SQL·로그인/CSRF·Platform/Issuer/Sender·WS·Chromium을 연결했다. 최종 고유 사례는 HTTP11·WS14·Chromium9 PASS이고, 같은 회귀DB3건 재실행과 전후 잔류 감사도 통과했다. 초기 quota17개 잔류는 실패로 보존했으며 소켓/분석 drain보다 quota pool이 먼저 닫히던 결함을 수정했다. 실패DB를 초기화하지 않고 같은 소유 cluster의 추가 회귀DB에서 확인했다. [실행/실패/정리 증거](../artifacts/http-pressure-integration-20261103.json)와 [기록](FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)을 따른다.
 
-2026-11-03 network=none PostgreSQL/전용 Unix socket에서 migration0010·잠금 rollback/재개·기존 데이터 보존과 최소권한을 포함한5파일17시험이 통과했다. 연속 swap 감지로 중단하고 승인된1회 재개 후에도 같은 조건으로 중단해 최신 HTTP·WS·Chromium은 assertion0/BLOCKED다. 기존 HTTP 성공을 이번 소스의 성공으로 복사하지 않는다. 브라우저의 단일 시험 SPKI 예외도 실행 확인 전이며 실제 TLS/IdP 품질 보장이 아니다. [실행 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-integration-20261103)과 [증거](../artifacts/mentoring-integration-20261103.json)를 따른다.
+Chromium8개는 실제 제품 화면, 추가1개는 실제 로그인/WS/분석 결과를 출하 패널에 렌더링한 component host다. 후자는 ServiceCall·실제 상대 음성→분석→화면 전체 경로의 성공 증거가 아니다. 실제 마이크/체인/Witness/PBX/TURN/Anchor/외부 IdP/STT/LLM/AWS는 이번에 실행하지 않았다. 정책/hash/시대/동의·정정/늦은 결과의 fixture 검증과 한국어 모델 정확도·실제 음성 회수는 별개다. SPKI 예외의 동작은 해당 시험 인증서에만 확인했다.
+
+이전 PostgreSQL5파일17시험과 구 swap 정책의 assertion0/BLOCKED는 [당시 원본](../artifacts/mentoring-integration-20261103.json), 후속 기동 전 중단은 [별도 관측](../artifacts/http-resource-preflight-20261103.json)에 보존한다. 그 결과를 이번 시험 수에 합산하거나 실패 원본을 최신 값으로 고치지 않는다. 이번 정책의 수치는 보편적인 안전 기준이 아니며5초 sampling의 최대값은 순간 peak나 SLA가 아니다.
 
 ## 4차 반영 소스와 아직 실행하지 않은 경계
 
-기관 회수 조회, 승인 정책에 결합한 제한 문맥 목적 분석, 통화별 반복/집계·합성 평가 도구를 구현했다. 이번 확인은 타입·순수 로직·Fastify inject(인증 actor/storage/provider fixture)·React 서버 렌더링이다. 실제 PostgreSQL read snapshot/0010 index·HTTP 세션·ARI GET404·브라우저/디코딩·외부 제공자/AWS 통합을 이번에 실행한 것으로 해석하지 않는다. 기존 실제 통합 결과는 당시 소스의 범위다. [최신 반영표](mentoring/README.md)와 [실행 조건](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
+기관 회수 조회, 승인 정책에 결합한 제한 문맥 목적 분석, 통화별 반복/집계·합성 평가 도구를 구현했다. 최초 반영 때는 오프라인/SSR만 확인했으며 후속 실제 SQL/HTTP/WS/브라우저의 범위는 위 절을 따른다. ARI GET404는 명시적 응답 fixture이고 실제 PBX·음성 디코딩·외부 제공자·AWS 성공을 뜻하지 않는다. [최신 반영표](mentoring/README.md)와 [실행 조건](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
 
 분석기는 최근 확정 remote 발화만 사용하므로 고객 앞선 발언·ASR 오인식·복잡한 인용/정정의 의미를 확정할 수 없다. 규칙/LLM의 근거·revision·정책 결합 검사와 실제 한국어 정확도는 다르다. development/evaluation을 나눈 합성14사례도 독립 사람 평가/실음성 gold가 아니다. 실제 통화 성공률/지연 기준선은 NOT_RUN이며 작은 표본의 p95/단일 회수는 SLA가 아니다.
 

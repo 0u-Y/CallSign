@@ -82,3 +82,8 @@
 ## 2026-11-03 HTTP 재개 관측의 한정 작업
 
 이번 요청은 기존 자원 기준을 만족할 때 새 소유 identity에서 HTTP/WS/Chromium을1회 재개하고 관련 검사·검토 branch commit/일반 push/light CI 확인을 허용한다. 사전 관측에서 연속 swap 기준이 충족되어 이번에는 서비스·DB·키·컨테이너를 생성/기동하지 않았다. 자동 재개·기준 완화 없이 관측/취소 전파를 오프라인 회귀하고 원인을 보존한다. 기존 host/network/daemon/global auth·서비스/volume·체인/Witness/PBX/TURN/Anchor·외부 제공자/AWS·이미지/Release 변경은 금지이며 이 기록은 후속 기동의 상시 허가가 아니다.
+
+
+## 2026-11-03 명시적 압박 정책의 통합 검증
+
+이번 요청은 `--policy integration-pressure-v1`(5초 표본·60초 사전 관측·명시한 memory/PSI/swap-out/OOM/RSS/disk/timeout 기준)을 선택한 소유 network=none PostgreSQL·loopback API/OIDC/웹·Chromium, 합성 입력·관련 commit/일반 push/light CI를 허용했다. 호스트 설정은 바꾸지 않았고 기본/과거 swap 정책을 보존했다. 최초 quota 실패DB를 초기화하지 않고 같은 소유 cluster에 회귀DB1개를 추가해 검증했으며 소유 자원은 정리했다. 체인/Witness/PBX/TURN/실제 Anchor·음성장치·외부 IdP/AI/AWS·이미지/Release·기존 자원 변경은 금지였다. 이 기록은 다음 실행의 자동 허가가 아니다.

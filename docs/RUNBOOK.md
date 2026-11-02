@@ -1459,6 +1459,36 @@ worker1·앱/브라우저 합산3GiB·임시5GiB는 관측 상한이고 DB512MiB
 
 새 analysis/recall HTTP·Chromium 시험 소스는 타입 검사만 했다. ARI는 DELETE 성공 뒤 GET200/503/404를 fetch fixture로 구분하고 실제 ServiceAuthority/PbxRuntime·SQL 관측을 거치도록 작성했으며 실제 PBX·음성 회수의 성공 증거가 아니다. 최종 통합 검증에는 안정된 허가 환경에서 같은 DB의 재실행/상태 오염과 HTTP/WS/Chromium을 확인해야 한다. runtime에 포함되는 migration CLI가 바뀌므로 향후 새 runtime/공개 묶음에 포함한다. 기존 고정 Release·이미지는 변경하지 않으며 이번에는 발행하지 않는다.
 
+<a id="http-pressure-policy-20261103"></a>
+
+### 이번 통합 시험에 승인된 자원 정책
+
+`integration-pressure-v1`은2026-11-03 시험의 운영 기준이며 보편적인 안전 기준이 아니다. 기본값은 기존 `swap-activity-v1`이다. 새 정책은 **각 observe/watch/run 명령에 `--policy integration-pressure-v1`을 명시**하고, identity의 `resourcePolicy`와 관측/결과 정책이 일치해야 한다. 환경변수만으로 선택되지 않는다. 이전 중단 원본과 기준은 아래 역사 기록에 보존한다. 이번 실행은 종료했으며 다음 기동은 별도 허가 범위를 확인한다.
+
+5초 간격·첫 기준점부터60초 동안 사전 관측한다. MemAvailable<8GiB, 앱/브라우저/observer RSS>3GiB, 임시 디스크>5GiB, 작업 OOM/host oom_kill 증가, PSI some avg10>=10% 또는 full>=2%가3표본 연속, swap-out>=5MiB/s가3구간 연속, 필수 관측 누락/불일치, 명령/전체 deadline, 구체적인 기존 서비스 영향이면 중단한다. swap-in/소량 swap-out만으로 중단하지 않는다. PSI total 증분과 실제 구간 길이/page 크기를 보존한다. DB CPU1/memory512MiB는 강제 제한이고 RSS/disk는 관측 예산이다. 전체5400초에는 정리가 포함된다. watcher 인계 후에도5초 간격을 유지하고 표본 freshness는7초 이내다. Node heap OOM·container OOM·호스트 OOM은 구분한다.
+
+아래 기존 소유 ROOT/Unix socket/migration/provisioning 절차를 그대로 쓰되 승인된 다음 실행에서 명령은 다음처럼 선택한다. 문서 확인을 위해 서비스를 기동하지 않는다.
+
+```bash
+python3 scripts/validation-resource-control.py --policy integration-pressure-v1 observe "$RUN_DIRECTORY"
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 watch "$RUN_DIRECTORY" &
+WATCHER_PID=$!
+# 앞서 설명한 EXIT cleanup trap과 observer PID/freshness 확인을 유지한다.
+step() { CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run "$RUN_DIRECTORY" "$@"; }
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run "$RUN_DIRECTORY" readiness 45 node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts
+```
+
+B/C 필터는 아래 절과 같으며 D에는 새 `analysis Chromium:`을 포함한다. 종전25개 정적 목록은 매개변수 사례7개를 놓쳤다. 현재 실제 사례는 원래32개+추가2개=34개이며 reporter의 실제 이름으로 배정을 대조한다. 추가 분석 Chromium은 실제 WS·동의·분석 결과를 **제품 패널의 component host**로 렌더링하며 ServiceCall/PBX 수신 오디오까지 연결한 시험은 아니다.
+
+```bash
+# 기존 step의 run에 명시적 pressure policy를 적용하고 API_ONLY를 제거한 뒤:
+step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
+```
+
+오디오 종료는 소켓/분석기 중단→진행 작업과 quota 정산 drain→quota pool 종료 순서다. 정산 실패나5초 drain timeout은 종료 성공으로 바꾸지 않는다. 제공자 호출 전 취소는 예약 해제0, 호출 뒤 취소는 기존 보수적 요청 사용량1을 정산하며 실제 제공자 청구/취소 성공을 뜻하지 않는다. fixture teardown은 미정산 예약을 삭제하기 전에 assert한다. 잔류 감사가 실패하면 데이터를 지워 통과시키지 않는다. 이번 최초DB의 balance17개는 수정하지 않고 실패 기록으로 보존했고, 같은 cluster의 추가 회귀DB에서 전체 수정 소스와 동일DB 재실행을 확인했다. 역할 LOGIN은 그대로 재사용하고 migration/table GRANT/readiness를 새 DB에서 확인했다. 기존 LOGIN provisioning SQL을 재적용해 비밀번호를 교체하지 않았다.
+
+[이번 실행 증거](../artifacts/http-pressure-integration-20261103.json)는 HTTP11/WS14/Chromium9, 동일DB3건 재실행과 전후 감사, 초기 실패·자원·정리를 구분한다. 원장/ARI/STT/LLM/Anchor/binding은 fixture이며 실제 음성 회수·한국어 품질·AWS를 검증한 것이 아니다. 새 runtime과 최종 trust/인증서에 맞춘 웹·공개 묶음은 별도 발행이 필요하며 기존 고정 Release/digest는 변경하지 않았다.
+
 <a id="http-resource-resume-20261103"></a>
 
 ### HTTP·WS·Chromium 재개: 자원 관측과 단계별 중단
