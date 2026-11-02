@@ -2,15 +2,27 @@
 import os
 import hashlib
 import time
+import math
 from pathlib import Path
 
+LEGACY_POLICY = "swap-activity-v1"
+PRESSURE_POLICY = "integration-pressure-v1"
+
 class SwapWatch:
-    def __init__(self):
+    def __init__(self, policy=LEGACY_POLICY):
+        if policy not in [LEGACY_POLICY, PRESSURE_POLICY]: raise ValueError("UNKNOWN_RESOURCE_POLICY")
+        self.policy = policy
+        self.pressure_consecutive = 0
+        self.out_consecutive = 0
         self.previous = None
         self.consecutive = 0
         self.stopped = None
 
     def update(self, sample):
+        if self.policy == PRESSURE_POLICY:
+            required = [sample['monotonicNs'], sample['pageBytes'], sample['swapInPagesTotal'], sample['swapOutPagesTotal'], sample['memAvailableBytes'], sample['oomKillTotal']]
+            required += [sample['memoryPSI'][kind][key] for kind in ['some','full'] for key in ['avg10','avg60','avg300','total']]
+            if any(not isinstance(v,(int,float)) or not math.isfinite(v) or v<0 for v in required) or sample['pageBytes']==0: raise ValueError('INVALID_RESOURCE_OBSERVATION')
         previous, self.previous = self.previous, dict(sample)
         result = dict(sample, baseline=previous is None, consecutive=0, intervalSeconds=None,
                       swapInPages=None, swapOutPages=None, swapInMiBPerSecond=None, swapOutMiBPerSecond=None)
@@ -26,9 +38,24 @@ class SwapWatch:
                 result.update(swapInMiBPerSecond=incoming*sample['pageBytes']/1048576/elapsed,
                               swapOutMiBPerSecond=outgoing*sample['pageBytes']/1048576/elapsed)
                 self.consecutive = self.consecutive+1 if incoming > 0 or outgoing > 0 else 0
-                if self.consecutive >= 3:
+                if self.policy == LEGACY_POLICY and self.consecutive >= 3:
                     self.stopped = self.stopped or dict(reason='SUSTAINED_SWAP', firstSatisfiedMonotonicNs=sample['monotonicNs'])
             result['consecutive'] = self.consecutive
+        result['policy'] = self.policy
+        if self.policy == PRESSURE_POLICY:
+            pressure = sample['memoryPSI']['some']['avg10']>=10 or sample['memoryPSI']['full']['avg10']>=2
+            self.pressure_consecutive = self.pressure_consecutive+1 if pressure else 0
+            if previous is not None:
+                result['oomKillDelta'] = sample['oomKillTotal']-previous['oomKillTotal']
+                result['psiTotalDeltaMicroseconds'] = {kind:sample['memoryPSI'][kind]['total']-previous['memoryPSI'][kind]['total'] for kind in ['some','full']}
+                if result['oomKillDelta']<0 or any(v<0 for v in result['psiTotalDeltaMicroseconds'].values()):
+                    self.stopped = self.stopped or dict(reason='HOST_COUNTER_RESET',firstSatisfiedMonotonicNs=sample['monotonicNs'])
+                elif result['oomKillDelta']>0:
+                    self.stopped = self.stopped or dict(reason='HOST_OOM_KILL',firstSatisfiedMonotonicNs=sample['monotonicNs'])
+            self.out_consecutive = self.out_consecutive+1 if (result['swapOutMiBPerSecond'] or 0)>=5 else 0
+            result.update(pressureConsecutive=self.pressure_consecutive,swapOutConsecutive=self.out_consecutive)
+            reason = 'SUSTAINED_MEMORY_PSI' if self.pressure_consecutive>=3 else 'SUSTAINED_SWAP_OUT' if self.out_consecutive>=3 else None
+            if reason:self.stopped = self.stopped or dict(reason=reason,firstSatisfiedMonotonicNs=sample['monotonicNs'])
         if sample['memAvailableBytes'] < 8*1024**3:
             self.stopped = self.stopped or dict(reason='HOST_MEMORY_RESERVE', firstSatisfiedMonotonicNs=sample['monotonicNs'])
         result['stop'] = self.stopped
@@ -49,8 +76,16 @@ def host_sample():
         pass
     observer_rss = int(next(line for line in Path('/proc/self/status').read_text().splitlines() if line.startswith('VmRSS:')).split()[1])*1024
     return dict(bootIdHash=hashlib.sha256(Path('/proc/sys/kernel/random/boot_id').read_bytes()).hexdigest(),clock='linux-CLOCK_MONOTONIC',observerPid=os.getpid(),observerRssBytes=observer_rss,monotonicNs=time.monotonic_ns(), pageBytes=os.sysconf('SC_PAGE_SIZE'),
-                swapInPagesTotal=int(counters['pswpin']), swapOutPagesTotal=int(counters['pswpout']),
+                oomKillTotal=int(counters['oom_kill']),swapInPagesTotal=int(counters['pswpin']), swapOutPagesTotal=int(counters['pswpout']),
                 memAvailableBytes=memory['MemAvailable'], memoryPSI=psi)
+
+def budget_reason(sample, deadline_ns=None):
+    if sample['ownedProcessRssBytes']+sample['observerRssBytes']>3*1024**3:return 'APP_MEMORY_BUDGET'
+    if sample['temporaryTotalUpperBoundBytes']>5*1024**3:return 'DISK_BUDGET'
+    if sample.get('containerOomKilled'):return 'CONTAINER_OOM'
+    if sample.get('databaseUnexpectedlyStopped'):return 'DATABASE_STOPPED'
+    if deadline_ns is not None and sample['monotonicNs']>=deadline_ns-40_000_000_000:return 'RUN_DEADLINE_CLEANUP_RESERVE'
+    return None
 
 # This latch belongs to one owned test directory, not the host or a production service.
 import json

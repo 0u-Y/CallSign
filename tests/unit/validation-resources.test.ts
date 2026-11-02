@@ -140,3 +140,42 @@ with tempfile.TemporaryDirectory() as directory:
  finally:subprocess.run=original;subprocess.check_output=original_output
 `],{stdio:'pipe'});
 });
+
+it('selects the explicit pressure policy without treating historical low swap activity as pressure',()=>{
+ execFileSync('python3',['-c',`
+import json,copy
+from pathlib import Path
+from scripts.validation_resources import SwapWatch,PRESSURE_POLICY,budget_reason
+rows=json.loads(Path('artifacts/http-resource-preflight-20261103.json').read_text())['observations']
+w=SwapWatch(PRESSURE_POLICY)
+for old in [r for r in rows if r['watcher']=='10s']:
+ s=dict(old,oomKillTotal=0);assert w.update(s)['stop'] is None
+
+def sample(n,out=0,some=0,full=0,oom=3):
+ return dict(monotonicNs=n*5_000_000_000,pageBytes=4096,swapInPagesTotal=n,swapOutPagesTotal=out,memAvailableBytes=16*1024**3,oomKillTotal=oom,memoryPSI={k:dict(avg10=v,avg60=0,avg300=0,total=n*100) for k,v in [('some',some),('full',full)]})
+w=SwapWatch(PRESSURE_POLICY);s=sample(0);s['memAvailableBytes']=7*1024**3;assert w.update(s)['stop']['reason']=='HOST_MEMORY_RESERVE'
+for field in ['some','full']:
+ w=SwapWatch(PRESSURE_POLICY);w.update(sample(0))
+ for n in range(1,4):r=w.update(sample(n,**{field:10 if field=='some' else 2}))
+ assert r['stop']['reason']=='SUSTAINED_MEMORY_PSI' and r['psiTotalDeltaMicroseconds']=={'some':100,'full':100}
+w=SwapWatch(PRESSURE_POLICY);w.update(sample(0))
+for n in range(1,4):r=w.update(sample(n,out=n*6400))
+assert r['swapOutMiBPerSecond']==5 and r['stop']['reason']=='SUSTAINED_SWAP_OUT'
+w=SwapWatch(PRESSURE_POLICY);assert w.update(sample(0,oom=3))['stop'] is None;assert w.update(sample(1,oom=4))['stop']['reason']=='HOST_OOM_KILL'
+w=SwapWatch(PRESSURE_POLICY);w.update(sample(1,out=10));assert w.update(sample(2,out=9))['stop']['reason']=='HOST_COUNTER_RESET'
+w=SwapWatch(PRESSURE_POLICY);s=sample(0);s['memoryPSI']=None
+try:w.update(s);raise AssertionError('missing PSI accepted')
+except (TypeError,KeyError):pass
+w=SwapWatch(PRESSURE_POLICY);s=sample(0);s['oomKillTotal']=float('nan')
+try:w.update(s);raise AssertionError('nonfinite counter accepted')
+except ValueError:pass
+base=dict(ownedProcessRssBytes=0,observerRssBytes=0,temporaryTotalUpperBoundBytes=0,monotonicNs=1)
+assert budget_reason(dict(base,ownedProcessRssBytes=3*1024**3+1))=='APP_MEMORY_BUDGET'
+assert budget_reason(dict(base,temporaryTotalUpperBoundBytes=5*1024**3+1))=='DISK_BUDGET'
+assert budget_reason(dict(base,containerOomKilled=True))=='CONTAINER_OOM'
+assert budget_reason(base,deadline_ns=40_000_000_001)=='RUN_DEADLINE_CLEANUP_RESERVE'
+assert budget_reason(base) is None
+try:SwapWatch('from-environment');raise AssertionError('implicit unknown policy accepted')
+except ValueError:pass
+`],{stdio:'pipe'});
+});
