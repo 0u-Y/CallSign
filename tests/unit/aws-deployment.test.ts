@@ -7,7 +7,8 @@ import {awsPreflight} from '../../scripts/preflight-aws.js';
 import {reviewDeploymentImage} from '../../scripts/image-reference.mjs';
 import {anchorListenHost} from '../../services/api/src/consumption-anchor.js';
 import {deploymentImages} from '../../scripts/preflight-aws.js';
-const env={CALLSIGN_DEPLOYMENT_TARGET:'aws',AWS_DEPLOYMENT_MODE:'new',PUBLIC_DEPLOYMENT:'true',DEMO_MODE:'false',AWS_RELEASE_DIR:'/srv/release',AWS_VOLUME_ROOT:'/srv/volumes',FINALS_DATA_DIR:'/srv/config',AWS_WEB_TLS_DIR:'/srv/tls',WEB_ORIGIN:'https://contest.example',OIDC_ISSUER:'https://id.example',OIDC_JWKS_URL:'https://id.example/jwks',OIDC_AUTHORIZATION_URL:'https://id.example/authorize',OIDC_TOKEN_URL:'https://id.example/token',CONSUMPTION_ANCHOR_URL:'https://anchor.example',OIDC_CLIENT_ID:'work',OFFICIAL_OIDC_CLIENT_ID:'official',OIDC_AUDIENCE:'work-aud',OFFICIAL_OIDC_AUDIENCE:'official-aud',INSTITUTION_ID:'synthetic-institution',DEPLOYMENT_ID:'synthetic-deployment',CALLSIGN_PROJECT:'synthetic-project',SIP_WSS_URL:'wss://contest.example/pbx/ws'};
+// Synthetic offline inputs only; no DNS, AWS resource or actual domain is selected.
+const env={CALLSIGN_DEPLOYMENT_TARGET:'aws',AWS_DEPLOYMENT_MODE:'new',PUBLIC_DEPLOYMENT:'true',DEMO_MODE:'false',AWS_RELEASE_DIR:'/srv/release',AWS_VOLUME_ROOT:'/srv/volumes',FINALS_DATA_DIR:'/srv/config',AWS_WEB_TLS_DIR:'/srv/tls',WEB_ORIGIN:'https://contest.callsign-fixture.org',OIDC_ISSUER:'https://identity.callsign-fixture.org',OIDC_JWKS_URL:'https://identity.callsign-fixture.org/jwks',OIDC_AUTHORIZATION_URL:'https://identity.callsign-fixture.org/authorize',OIDC_TOKEN_URL:'https://identity.callsign-fixture.org/token',CONSUMPTION_ANCHOR_URL:'https://anchor.callsign-fixture.org',OIDC_CLIENT_ID:'work',OFFICIAL_OIDC_CLIENT_ID:'official',OIDC_AUDIENCE:'work-aud',OFFICIAL_OIDC_AUDIENCE:'official-aud',INSTITUTION_ID:'synthetic-institution',DEPLOYMENT_ID:'synthetic-deployment',ISSUER_URI:'https://institution.callsign-fixture.org',SERVICE_URI:'https://center.callsign-fixture.org',NETWORK_ID:'20261102',CALLSIGN_PROJECT:'synthetic-project',SIP_WSS_URL:'wss://contest.callsign-fixture.org/pbx/ws'};
 it('separates AWS preparation from generated runtime images and rejects developer endpoints including credentialed DB URLs',()=>{
  expect(awsPreflight(env).filter(c=>['FAIL','BLOCKED'].includes(c.status))).toEqual([]);
  expect(awsPreflight({...env,PATH:'/home/developer/bin',NVM_DIR:'/home/developer/.nvm',COREPACK_ROOT:'/home/developer/tools'}).filter(c=>c.status==='FAIL')).toEqual([]);
@@ -47,4 +48,13 @@ it('keeps TLS/port/egress/storage boundaries in the AWS Compose overlay and bloc
 it('selects AWS from the protected env file and refuses unapproved execution before invoking Docker',async()=>{
  const root=await mkdtemp(join(tmpdir(),'callsign-aws-target-')),path=join(root,'aws.env');
  try{await writeFile(path,'CALLSIGN_DEPLOYMENT_TARGET=aws\n',{mode:0o600});try{execFileSync('bash',['scripts/deployment.sh','stop'],{env:{PATH:process.env.PATH,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'infrastructure',CALLSIGN_ENV_FILE:path},stdio:'pipe'});throw Error('AWS_GUARD_MISSING');}catch(e){expect((e as {status:number}).status).toBe(78);expect(String((e as {stderr:Buffer}).stderr)).toContain('AWS target confirmation required');}}finally{await rm(root,{recursive:true});}
+});
+
+it('blocks documentation hosts, missing NEW identity and malformed origins without exposing supplied values',()=>{
+ for(const value of ['https://bank.example','https://EXAMPLE.com','https://a.example.net','https://a.invalid','https://a.test','https://CHANGEME.org','bank.example:443'])expect(awsPreflight({...env,ISSUER_URI:value}).find(c=>c.id==='ISSUER_URI')?.status).toBe('BLOCKED');
+ for(const key of ['ISSUER_URI','SERVICE_URI','NETWORK_ID']as const)expect(awsPreflight({...env,[key]:''}).some(c=>c.id===key&&c.status==='BLOCKED')).toBe(true);
+ expect(awsPreflight({...env,NETWORK_ID:'9007199254740993'}).find(c=>c.id==='aws-chain-id')?.status).toBe('FAIL');
+ expect(awsPreflight({...env,WEB_ORIGIN:env.WEB_ORIGIN+'/path'}).find(c=>c.id==='aws-web-origin')?.status).toBe('FAIL');
+ expect(awsPreflight({...env,TURN_URLS:'turn:turn.example:3478'},'runtime').find(c=>c.id==='TURN_URLS')?.status).toBe('BLOCKED');
+ expect(awsPreflight({...env,REGISTRY_ADDRESS:'0x'+'0'.repeat(40)},'runtime').find(c=>c.id==='aws-registry-address')?.status).toBe('FAIL');
 });
