@@ -18,7 +18,7 @@ import {createHttpFixture,httpBrowserOptions,type HttpFixture} from './service-h
 const {default:WebSocket}=await import(new URL('../../services/api/node_modules/ws/wrapper.mjs',import.meta.url).href) as typeof import('ws');
 const accounts=[1,2,3,4].map(n=>privateKeyToAccount(`0x${String(n).padStart(64,'0')}`)); // Public, non-operational signing fixtures.
 let f:HttpFixture,browsers:Browser[]=[],pageErrors:string[]=[],browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;
-beforeEach(async()=>{expectedTransportFailure=false;closing=false;pageErrors=[];browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;f=await createHttpFixture();await f.start();},30000);
+beforeEach(async()=>{expectedTransportFailure=false;closing=false;pageErrors=[];browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;f=await createHttpFixture({web:process.env.CALLSIGN_HTTP_API_ONLY!=='true'});await f.start();},30000);
 afterEach(async()=>{closing=true;for(const b of browsers)await b.close();browsers=[];try{await writeFile(`${f.runRoot}/browser-observations.json`,JSON.stringify({...browserObservations,uncaughtPageErrors:pageErrors.length}),{mode:0o600});expect(pageErrors).toEqual([]);}finally{await f?.close();}});
 async function browserPage(subject='staff'){
  let b=browsers[0];if(!b){b=await chromium.launch(await httpBrowserOptions());browsers.push(b);}const c=await b.newContext();

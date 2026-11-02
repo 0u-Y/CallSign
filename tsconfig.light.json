@@ -42,6 +42,7 @@
     "scripts/evaluate-performance.ts",
     "tests/integration/database-readiness.test.ts",
     "tests/integration/migration-upgrade.test.ts",
+    "tests/integration/http-cleanup.test.ts",
     "tests/integration/service-http.test.ts",
     "tests/integration/service-http-fixture.ts",
     "tests/integration/service-boundaries.test.ts",
