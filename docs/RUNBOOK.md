@@ -222,6 +222,8 @@ trial별 events/단계 지연/확인 불가 원인·구간, 정상 확인률과 
 
 이번 제품·schema·도구·migration0010·웹 소스는 기존 고정 Release에 없다. 새 runtime과 공개 묶음/observer-tests가 필요하며5종 infrastructure Dockerfile은 이번에 바꾸지 않았다. 실제 연동 회귀는 별도다. 새 웹은 여전히 실제 계약/trust/PBX 인증서가 준비된 뒤 runtime/nginx로 생성한다.
 
+기존 legacy builder는 `--target` 앞 stage도 실행할 수 있고 `--pull=false`는 없는 FROM 이미지의 수령을 막지 못한다. 오프라인 갱신에는 설치 stage가 없는 `infra/deploy/prepared-runtime.Dockerfile`만 사용하고 base의 실제 로컬 ID를 먼저 확인한다. `--network=none`은 RUN의 네트워크 경계이며 daemon의 image 수령 차단을 대신하지 않는다. 이번 최초 잘못된 경로에서 Node base227,146,390bytes가 추가됐고 원본 실패를 보존했다. 이후 후보에는 이 이미지를 사용하지 않는다.
+
 발행 허가 뒤에는 clean source commit→새 runtime build/회귀→layer/history/build context 감사→새 비공개 GHCR tag 게시→실제 manifest/config/layer 재수령→검증한 digest inventory→공개 묶음/checksum·새 고유 Release→새 경로 수령/hash 대조 순서다. 기존 inventory/Release는 편집하지 않는다. 공개 파일 생성은 `pnpm exec tsx scripts/release-manifest.ts --bundle NEW-DIRECTORY --env-file PROTECTED-ENV`이며 실제 image metadata와 clean Git source를 확인한다. 이 출력은 local metadata용 inventory다. 최종 웹이 없으면 exit2/BLOCKED일 수 있으며 이를 최종 GHCR bootstrap inventory로 게시하지 않는다.6종의 실제 원격 수령·visibility·manifest/config/layer 대조 후 별도의 새 inventory에 고정하고 최종 웹은 deferred로 표시한다. 이어 기존 publication audit/원격 검증 절차를 사용한다. 미준비 이미지/pin으로 inventory의 BLOCKED를 PASS로 바꾸지 않는다. **이번에는 build/push/Release를 실행하지 않았다.**
 
 아래는 **새 발행을 별도 승인받은 작업자만 실행할 명령**이다. NEW_TAG·검토한 기존 runtime 참조·새 output 경로·게시용 보호 파일은 그 작업에서 준비한다. 기존 private package의 visibility를 게시 전후 확인하고 공개 상태이거나 권한이 없으면 중단한다. writer 인증은 AWS reader와 분리하며 이 명령을 이번 작업에서는 실행하지 않았다.
@@ -238,7 +240,7 @@ SOURCE_COMMIT="$(git rev-parse HEAD)"
 docker build --network=none --pull=false --target prepared-runtime \
   --build-arg PREPARED_RUNTIME_IMAGE="$VERIFIED_RUNTIME_BASE" \
   --build-arg SOURCE_COMMIT="$SOURCE_COMMIT" --iidfile "$NEW_RUNTIME_ID_FILE" \
-  -f infra/deploy/app.Dockerfile .
+  -f infra/deploy/prepared-runtime.Dockerfile .
 # Apply approved final-image runtime/media regressions before publication; offline build alone is insufficient.
 # Inspect history/layers/build inputs; archive and audit output are protected and never Git/Release assets.
 docker image save --output "$NEW_RUNTIME_AUDIT_TAR" "$(cat "$NEW_RUNTIME_ID_FILE")"

@@ -108,3 +108,10 @@ for field in ['id','image','label','init','network']:
 `;
  expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
 });
+
+it('keeps the offline runtime recipe independent of dependency-install stages and requires an explicit base',()=>{
+ const source=readFileSync('infra/deploy/prepared-runtime.Dockerfile','utf8');
+ expect(source.match(/^FROM .+$/gm)).toEqual(['FROM ${PREPARED_RUNTIME_IMAGE} AS prepared-runtime']);expect(source).toMatch(/^ARG PREPARED_RUNTIME_IMAGE$/m);expect(source).not.toMatch(/(?:corepack prepare|pnpm install|curl|wget)/);
+ for(const path of ['packages','services','scripts','apps/web','infra/deploy'])expect(source).toContain(`COPY ${path} ${path}`);
+ expect(readFileSync('infra/deploy/app.Dockerfile','utf8')).not.toContain('AS prepared-runtime');
+});
