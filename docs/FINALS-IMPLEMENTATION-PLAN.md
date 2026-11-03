@@ -4,6 +4,66 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="main-review-20261103"></a>
+
+## 2026-11-03 검토 브랜치 리뷰와 main 반영 준비
+
+시작은 `verify/mentoring-integration-20261103`의 `d59e75c`, 원격 main은 `f967e57`이었다. 기존 staging/추적 worktree는 깨끗했으며 사용자 요약/진행 포인터·과거 증거를 보존했다. 두 축의 소스 리뷰에서 consent transaction/세션 조회 도중 종료 후 provider/watch가 다시 시작되는 경합, 실제 LLM 호출 전 마지막 권한 검사 중 취소에도1을 정산하던 경로를 수정했다. 실제 ServiceAuthority를 사용한 제어된 await 단위 시험은 수정 전2실패·수정 후 통과를 확인했다. SQL/계약/권한 정책은 변경하지 않았다.
+
+AI-003/005·OPS-006·TEST-004: launcher의 root 종료 뒤 소유 자식을 놓치는 경로와 종료 handler가 새 helper를 만든 경합도 수정했다. PID/start/session으로 소유 자식을 재발견하고 정리 확인 전 active 기록을 지우지 않으며, root가 먼저 끝난 잔류는 회수해도 FAIL로 남긴다. resource 정책의 수치/명시 선택·원본 중단 기록은 유지했다. 감시 범위는 등록한 root/session·검증한 PID와 기존 기록에 한정되며 임의 daemon/전체 host 메모리를 포괄하지 않는다.
+
+CALL-005/006·AI-001~005·TEST-003/004: 기존 제품/PBX 시험에 상대 track·실제 WS·ServiceCall 패널·동의 철회·늦은 합성 결과·권한 회수·양측 음성/ARI·예약 정리 관측을 연결했다. observer-only 제공자 entrypoint는 명시 flag/소유 token·기존 integration/test DB guard를 요구하고 실제 Anchor/원장 경계를 대체하지 않는다. 통화 집계의 fixture 분석 성공에는 순서가 맞는 입력/전사/분석/경고 관측을 추가로 요구한다. **이 경로는 타입/오프라인 회귀만 했고 실제 PBX·브라우저·외부 모델은 NOT_RUN**이다. [다음 실행 절차](RUNBOOK.md#reviewed-servicecall-analysis)를 따른다.
+
+기존34고유 사례/동일DB3재실행/readiness/과거DB17을 합산하지 않았다. 원본 source hash를 시작 checkpoint 파일과 대조했다. 이번 audio 경합·선택적 제공자-only injection/observer 경로는 그 실제 통합의 새 PASS로 간주하지 않는다. 기존 유지보수의 만료 예약 전액 정산은 확인했지만 강제 종료의 실제 회수는 미실행이며 보존 대상 배포의 영향은 미확인이다. 범용 복구/임의 사용량 초기화 도구는 추가하지 않았다.
+
+현재 경량 검사는 [이번 리뷰 증거](../artifacts/main-review-20261103.json)에 구분한다. 최초 light의 기존 dry-run 시험 timeout과 helper 회귀의 최초 실패를 보존했고 assertion/중단 기준/timeout을 완화하지 않았다. main 반영은 필요한 검사와 원격 차이 확인 후 정상 병합/일반 push로 수행하며 공개 이력은 보존한다. 새 runtime/공개 묶음·실제 trust 웹은 향후 별도 발행이다. 이번에는 서비스/컨테이너·DB·키·이미지·Release·AWS를 생성하지 않았고 기존 서버 설정/자원을 변경하지 않았다.
+
+<a id="http-pressure-integration-20261103"></a>
+
+## 2026-11-03 명시적 압박 정책으로 HTTP·WS·Chromium 통합 완료
+
+시작 `d9d92f1`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 사용자가 승인한 시험 전용 `--policy integration-pressure-v1`을 명시해5초 표본·60초 사전 관측 뒤 실제 network=none PostgreSQL/Unix socket·최소권한 LOGIN·Platform/Issuer/Sender·HTTPS OIDC fixture·제품 웹·설치 Chromium을 실행했다. 호스트 swap/커널/네트워크 설정을 변경하지 않았고 기본 `swap-activity-v1`과 과거 증거는 보존했다. 원장/ARI/음성 제공자와 binding/Anchor는 명시적 fixture이며 실제 체인·PBX·음성·외부 AI/AWS 검증이 아니다.
+
+UI-001/006·AI-003/005·OPS-006·TEST-004: 회수 필터의 접근 이름과390px select 넘침을 수정했다. 잔류 감사에서 최초DB의 미정산 balance17개를 발견했다. audio 정리보다 quota pool이 먼저 닫힐 수 있던 종료 순서를 고치고, 제공자가 abort를 무시해도 호출자 취소와 보수적 사용량 정산이 완료되도록 했다. STT reserve 도중 종료도 추적하고 정산 실패/5초 drain timeout은 성공으로 숨기지 않는다. fixture도 미정산 예약을 지우기 전 실패하도록 보강했다. 실제 issuer 종료/SQL quota 회귀를 추가했다.
+
+최초 실패DB의 예약 행은 이전 fixture teardown에서 이미 삭제됐으므로 임의 balance 초기화로 복구하지 않았다. **같은 소유 container/cluster·identity 안에 새 회귀DB1개만 추가**해 수정된 코드를 검증했다. 원래DB의 미정산17개는 종료 전까지 그대로였으며 공개 증거에 구분한다. 수정 후 회귀DB는 실제 migration11개·기존 최소권한 LOGIN 재사용·readiness2시험 PASS다. 기존DB17개 전체 회귀는 반복하지 않았다.
+
+최종 소스의 고유 사례는 **HTTP11·WS14·Chromium9 PASS**다. 종전 정적25개 배정은 `it.each`7개를 놓쳤으며 원래 실제 수집은32개, 종료 정산/브라우저 분석 component host2개 추가 후34개다. 모든 이름을 실제 progress와 대조했고 필터 SKIP을 성공에 더하지 않았다. Chromium8개는 실제 제품 화면이고, 추가1개는 실제 브라우저 로그인/WS/동의/SQL/분석 결과를 출하 패널·nextAnalysis에 연결한 component host다. PBX/ServiceCall의 실제 수신 음성→화면 경로는 이번에 확인하지 않았다. SPKI 예외는 실제 로그인에서 작동했으며 전체 TLS 오류 무시는 사용하지 않았다.
+
+같은 회귀DB에서 HTTP/WS/Chromium 각1개 재실행과 전후 SQL 감사 각1개가 통과했다. 기관/outbox/session/예약 행과 미정산 balance는0, scope별 quota used 합계176은 보존됐다(범위 간 중복이며 제공자 호출/청구 수가 아니다). 최초 WS2개는 동기 취소 기대/매 발화 polling으로 freshness 창을 소비하던 시험 문제였고 실제 이벤트 대기로 고쳤다. 최초 UI/감사 실패 및 browser loader 시험 실패를 지우지 않았으며 반복 횟수를 최종34개에 합산하지 않는다.
+
+자원은 약1310초·263표본 관측했다. 최소 MemAvailable37.841GiB, 앱+observer 관측 RSS 최대2339.53MiB, container155.84MiB, 임시 파일+DB 상한522.43MiB였다. PSI full avg10 최대2.14%는1표본이며3연속이 아니었다. host oom_kill 증가0·자원 중단 없음이다. 순간 peak/일반 안전 기준/SLA를 뜻하지 않는다. 소유 DB container·보호 ROOT/키/CA·watcher를 정리했고 route/network/기존 실행 container 목록 전후 hash가 일치했다. 합성 화면19장은 보호된 로컬 기록에만 보존했다.
+
+`pnpm light` **60파일299시험**, API runtime 타입 검사·무기동 웹 build는 PASS다(기존 chunk/dynamic-import 경고 유지). [원본 실패·실제 단계/범위·소스 hash·관측/정리 증거](../artifacts/http-pressure-integration-20261103.json)와 [정책/재현 절차](RUNBOOK.md#http-pressure-policy-20261103)를 따른다. 검증한 파일 내용은 `b11fc72`(명시적 정책)·`e503dae`(정산/화면/통합 회귀)에 보존했다. main 자동 병합·이미지/Release 발행은 하지 않는다. 정책 변경은 이번 시험의 승인이지 후속 기동/임계값 상향의 상시 허가가 아니다. 새 runtime·실제 trust pin 웹/공개 묶음과 이후 실제 원장/PBX 재검증이 필요하다.
+
+<a id="http-resource-preflight-20261103"></a>
+
+## 2026-11-03 HTTP 재개 사전 관측: 서비스 시작 전 차단
+
+시작 HEAD `d170407`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 기존1초/10초 watchdog은 최초 기준점은 올바르지만 구간 증분·속도·PSI 기록이 없고, 카운터 감소도 활동으로 셌으며 DB만 먼저 중단해 후속 suite에서 socket 오류가 생길 수 있었다. 실제 단조 시각/page 크기의 in/out·RSS/PSI·최초 중단 latch를 공유하고, 신규 suite 차단→시험 취소/부분 FAIL 보존→앱/브라우저 정리→소유 DB 중단 순서를 구현했다. 앱 정리 불확실 시 DB만 먼저 중단하지 않는다. 새 속도 하한을 만들거나 기존3연속 조건을 완화하지 않았다.
+
+TEST-001/004·OPS-006: 읽기 전용31초 이내 사전 관측에서10초 구간 swap-in1/128/502page(약0.00039/0.0498/0.1959MiB/s), 가운데 swap-out1page가 기록돼 **SUSTAINED_SWAP/BLOCKED**였다. 마지막 available RAM28.4GiB·memory PSI 평균0, 시험 앱 RSS0·DB 없음이다. 전역 swap 원인이나 OOM/호스트 압박은 확인하지 못했으며 카운터 reset 버그가 이번 중단 원인은 아니다. 새 환경을 생성하거나 추가 관측으로 조용한 시점을 찾아 재개하지 않았다.
+
+현재 **HTTP0·WS0·Chromium0/BLOCKED**, 동일DB 재실행 미실행이다. 기존DB17시험은 관련 DB 구현 변경이 없어 반복하지 않았다. 새 보호 자격/키/서비스/container/network는 없으며 기존 서버 설정은 변경하지 않았다. API-only fixture 선택, 각 단계의 부분 결과 reporter와 독립 SQL 잔류 감사 소스를 준비했으나 실제 서비스 정리·observer 인계·SQL 감사는 미실행이다. 순수/자식 취소/실제 Vitest 부분 결과 보존을 포함한 무기동 light는 **60파일298시험 PASS**다. 의도적 실패 reporter fixture의2건은 내부 회귀 입력이며 제품 통합 성공 수에 합산하지 않는다.
+
+[원본 관측·소스/검사 증거](../artifacts/http-resource-preflight-20261103.json)와 [정확한 다음 관측/단계별 명령](RUNBOOK.md#http-resource-resume-20261103)을 따른다. 소스 checkpoint는 `a5f8afe`(관측/취소 전파)·`1906aff`(단계 분리/잔류 감사)다. 이번 소스는 검토 branch에 보존하며 main 자동 병합·runtime build·Release 발행을 하지 않는다. 안정된 자원에서 별도 재개 허가 또는 중단 정책 변경의 명시적 승인이 필요하며, 최신 HTTP/WS/Chromium 검증 전 main 배포 후보로 판정하지 않는다.
+
+<a id="mentoring-integration-20261103"></a>
+
+## 2026-11-03 최신 기능 통합 시도: DB 확인·자원 중단
+
+시작 HEAD `f967e57064d9a46bdba214f9c84ecac3be9c5f86`, 기존 worktree/staging은 깨끗했다. 실제 관측은 CPU24·가용 RAM 약30.6GiB·디스크 약409GiB였고 처음 짧은 swap 표본은0이었다. 기존 로컬 PostgreSQL17.6 이미지를 network=none·port publish 없음·전용 Unix socket으로 실행했다. DB CPU1·메모리/데이터512MiB는 강제 제한, 앱3GiB·임시5GiB·가용 RAM8GiB 여유는 관측 중단 예산이다. 호스트 cgroup/네트워크/전역 인증을 변경하지 않았다.
+
+DB-001/003·TEST-001/004: **5파일17시험 PASS**. 빈 DB의0000~0010, 별도 신규 시험 DB의0009→0010, outbox 쓰기 잠금으로0010 실패 시 두 index와 적용 기록의 원자적 rollback, 잠금 해제 후 재개·중복 적용 방지, 업무/세션/소비 영수증/회수 관측 JSON 보존, 실제 LOGIN의 허용/거절 SQL과 기존 소비·quota·worker·복구 경계를 확인했다. migration 실행 본체를 export해 CLI와 upgrade 시험이 같은 코드를 쓰며 기본 CLI 동작/guard/hash 검사는 유지했다. index 생성은 대규모 성능 개선의 증거가 아니다. 같은 DB에서 전체 HTTP/브라우저 suite를 반복한 정리 검증은 실행하지 못했다.
+
+시험 환경 결함은 공식 PostgreSQL entrypoint의 초기화용 socket 위치 충돌, tsx/worker 사전 로더 중첩, Vitest driver import cycle이었다. 기본 container socket mount와 테스트 전용 실제 CJS driver의 transport 주입으로 해결했으며 SQL/LOGIN/인증 middleware를 성공 fake로 바꾸지 않았다. Unix socket preload/setup은 integration·소유0700 ROOT·그 하위 socket·loopback URL·callsign_test_* DB를 검사한다. 보호 파일/DB URL 원문은 공개 증거에 넣지 않았다.
+
+운영 조회의 실제 SQL/runtime·ARI fetch fixture, 목적 분석의 실제 WS·동의·정정·정책/epoch/키/binding·quota·계정/세션 회수, Chromium 회수 표시/보류 응답/모바일 시나리오를 보완했다. Chromium의 전체 인증서 오류 허용을 제거하고 해당 시험 인증서 SPKI에만 자식 브라우저 예외를 한정했다. **이 HTTP/WS/브라우저 소스는 타입 검사만 했다.** 원장·ARI·분석 제공자 fixture 역시 이번 HTTP 시도에서는 실행되지 않았다.
+
+10초 관측의 swap 카운터가 연속 증가하여 소유 DB를 중단했다. 사용자의 명시적1회 재개 후 위 DB17시험이 통과했지만 다시 같은 중단 조건이 발생했다. HTTP 수집 시 socket이 없어 assertion0으로 차단됐으며 PASS/SKIP로 바꾸지 않았다. 이는 OOM/서버 전체 자원 부족을 입증하지 않으며 전역 swap의 원인·정확한 속도는 확정하지 못했다. 추가 서비스 재개는 하지 않았다.
+
+무기동 `pnpm light` **59파일291시험 PASS**, 웹 build·API runtime/통합 소스 타입 검사는 PASS다. 이전 시험 수와 합산하지 않는다. 전체 결과는 [이번 실행 증거](../artifacts/mentoring-integration-20261103.json), 실행 절차는 [RUNBOOK](RUNBOOK.md#mentoring-integration-unix)에 연결한다. 원본 실패·timeout/중단·소스 hash·자원 표본은 `.local/mentoring-integration-20261103/`에 구분 보존한다. 소유 컨테이너2환경과 보호 ROOT·시험키/CA/비밀번호를 제거했고 route/Docker network/기존 실행 container ID 목록의 전후 hash가 같았다. 실제 제품 결함은 확정하지 못했으며 HTTP·브라우저 검증 목표는 BLOCKED로 남는다. 새 runtime/공개 묶음은 향후 필요하고 이미지·Release는 발행하지 않았다. 검증 미완료를 main 완료로 반영하지 않도록 `verify/mentoring-integration-20261103` 검토 branch를 사용한다. 소스 checkpoint는 `ba79e9e`·`dd73037`이며 최종 게시 SHA/CI는 해당 branch와 연결된 실행 결과를 따른다.
+
 <a id="mentoring-fourth-20261102"></a>
 
 ## 2026-11-02~03 4차 반영: 운영 조회·승인 목적 분석·통화별 측정

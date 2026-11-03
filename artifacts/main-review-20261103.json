@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-03T12:28:50.153579+00:00",
+  "executionHead": "d59e75c17700701d89f537bffd8d0798d70dc742",
+  "executionBranch": "verify/mentoring-integration-20261103",
+  "executionWorktreeDirty": true,
+  "scope": "review, offline units/types, no-service web build; no current live integration execution",
+  "assessment": {
+    "method": "automatic-and-source-review",
+    "verdict": "PASS",
+    "realEnvironmentVerified": false
+  },
+  "sourceFiles": {
+    "AGENTS.md": "c367bec70ff840d1376a180a8e17038512e427d8725f76d03d9a0a60c838ad30",
+    "docs/FINALS-IMPLEMENTATION-PLAN.md": "0d032309b0566821b6aa8cd23ad4ca5571fe3d28a972276724e1ae31924c2e19",
+    "docs/KNOWN-LIMITATIONS.md": "765762c99c30f23f171508ddab6c343d3dc0d53b48b948d910f05d5a3d0c8581",
+    "docs/MASTER-DEVELOPMENT-SPEC.md": "942e6b3424504935b595c674887323095e057eba2868fa4d96078acfec809abb",
+    "docs/RUNBOOK.md": "cf4a3935fe0d6bbbe59ea945eb594d8852e4f849de3944e576d4c50a09b0801b",
+    "docs/guide/05-IMPLEMENTATION-STATUS.md": "e325ed5fc4a8b1c68f381c33fe240c15ad5c07d67297fa0f48be7e8b46d5b860",
+    "infra/deploy/call-trials.example.json": "629164d2ed63252a6e74b1f467c34719349ebdd83505ea01ba6a9cff704da7ab",
+    "scripts/call-trials.ts": "0fa871cd127a1a29853e6c2e8ad51addc89b6f669d8f69c8efb0af93208eeb64",
+    "scripts/evaluate-performance.ts": "c98ab109515e41121889bace26a0e85e3d588ec52168fb6ed61b9f568787fbfd",
+    "scripts/release-manifest.ts": "110ac70713cd245218384785842bde2befabb0c0220716a860f1e988cb4a8ce2",
+    "scripts/validation-resource-control.py": "8c8ebe36a881557d66600353ecc1c8e9ffd4d89180caeb6f2d9e5785718bdf38",
+    "scripts/validation_resources.py": "d59c76383ee408a397587fc3e0292234be9f95f87c72d9ff5d3013efde378508",
+    "services/api/src/finals-server.ts": "9fc4dbb81f9a800f71174eff6369adbe16fc9abce052efc910565fd1a1d0c201",
+    "services/api/src/observation-contract.ts": "f3f57173b3fcd3e923c8f66e61be8b4724251adca7f2f6b6dd82733661e2d226",
+    "services/api/src/service-audio.ts": "608d2938aa6a20975146e0a512910faafe963f4cb8ab460629271786b3b527e3",
+    "tests/integration/runtime-analysis-fixture.ts": "1e7aca197c33c74cd737f52e5aa634d3db2806cd0373a7cea5b5beeb105e8a38",
+    "tests/integration/runtime-delivery-bootstrap.py": "99bc71cf9c9904f9af5ec668f48da8ce112ef5b4081debf3831efb1371a629a1",
+    "tests/integration/runtime-media-driver.py": "bcde6ab5bd6efe7b5bc6b800a28d8a087225b5a12871a0923bd92e6926abe60a",
+    "tests/integration/runtime-media.test.ts": "3638f23cdde34ada7582464694012e445ab1b6100f86c7e5b18474d813269bf2",
+    "tests/media/analysis-path.ts": "65b9028abc0bf474729a2267767a81c583081b9fcc46fa4fc3256c1e8f26262e",
+    "tests/media/service-pbx.spec.ts": "3918d4956db33db85a0dfac0633cc67e5333845f02b5a9e604955e53be89cdeb",
+    "tests/unit/call-trials.test.ts": "3fcda4b2ca605c7b5c42de5f522acbd157aef677f6f7ac1e60778d3286bdab07",
+    "tests/unit/http-adapter-scope.test.ts": "35e8dc20d4de1a101afbf383719e3b907185fe656baacb9087a62795386f7071",
+    "tests/unit/media-analysis-fixture.test.ts": "57c2181b790478d6a3887a8275635f91cc0f813983e33779db38aafc9c5e6187",
+    "tests/unit/service-audio-shutdown.test.ts": "19817e4297908e5b2b3b6f7af37c0c0e56051b98c58f1a287e1fe6065ba2a5b0",
+    "tests/unit/validation-resources.test.ts": "559c44e33049e82b8fdcf9dd0c82d686c09caa4de92057eeecdd6b303b0d1844",
+    "tsconfig.light.json": "4d1ab0b7c93cc4935e2778bd276760db8199458afef3054f5492e683a6b2ffe3"
+  },
+  "sourceHash": "78bacb87a193fd1ad8ed82a19a8fe7c8534fae23592b837800eaffbe3b6d84c8",
+  "sourceHashScope": "Changed code/tests/config/docs only, sorted path->SHA256 canonical JSON; excludes this receipt, ignored local outputs, secrets, images and deployment state. Tested source content, not a full reproducible deployment claim.",
+  "review": {
+    "axes": [
+      "repo standards",
+      "user specification"
+    ],
+    "fixed": [
+      "provider/watch resurrection across awaited shutdown",
+      "pre-provider LLM cancellation settlement charged1",
+      "launcher loses children when root exits or cleanup handler spawns a helper"
+    ],
+    "noSecurityOrResourceThresholdRelaxation": true
+  },
+  "historicalIntegration": {
+    "artifact": "artifacts/http-pressure-integration-20261103.json",
+    "allSelectedSourceHashesMatchStartCheckpoint": true,
+    "matchedFiles": 24,
+    "uniqueCases": {
+      "http": 11,
+      "websocket": 14,
+      "chromium": 9
+    },
+    "componentHostCases": 1,
+    "countsNotRerunOrAdded": true,
+    "newBehaviorNotProvedByHistoricalPass": [
+      "audio shutdown race fixes",
+      "audio-only test adapter injection",
+      "full ServiceCall media-to-analysis panel path",
+      "new observer cleanup behavior"
+    ]
+  },
+  "checks": [
+    {
+      "name": "light",
+      "command": "pnpm light",
+      "status": "PASS",
+      "counts": {
+        "files": 62,
+        "tests": 306
+      },
+      "logSha256": "38c28648e280cd39140c2943f9ac7fbfbbd544b16820b379cdd1c3d338cdbc98",
+      "logLocalOnly": true
+    },
+    {
+      "name": "audio-race-red",
+      "command": "temporary parent audio behavior; targeted deferred-operation unit regression",
+      "status": "EXPECTED_FAIL",
+      "counts": {
+        "failed": 2
+      },
+      "logSha256": "005b2fdf66b206825e882ded14fe0da65b36f9cda27937d7a441b621ea5f6f70",
+      "logLocalOnly": true
+    },
+    {
+      "name": "audio-and-fixture-regression",
+      "command": "pnpm exec vitest run selected unit tests --maxWorkers=1",
+      "status": "FAIL",
+      "counts": {
+        "passed": 22,
+        "failed": 1
+      },
+      "logSha256": "ebe99021de09b5d4f12d1269e0886a8eda361d930389f2aec862d7917cfebc34",
+      "logLocalOnly": true
+    },
+    {
+      "name": "owned-process-and-trials-recheck",
+      "command": "pnpm exec vitest run tests/unit/validation-resources.test.ts tests/unit/call-trials.test.ts --maxWorkers=1",
+      "status": "PASS",
+      "counts": {
+        "files": 2,
+        "passed": 18
+      },
+      "logSha256": "9e69e9f1e47066fb58e5a2b973770b5491a6179842e5fb18a5e46f6231bc5cf0",
+      "logLocalOnly": true
+    },
+    {
+      "name": "initial-light",
+      "command": "pnpm light",
+      "status": "FAIL",
+      "counts": {
+        "passed": 303,
+        "failed": 1
+      },
+      "logSha256": "995b9802cd943c369bce77223b2e3e66db740a4f1b5762f4577f35984f07f4b3",
+      "logLocalOnly": true
+    },
+    {
+      "name": "dry-run-timeout-recheck",
+      "command": "pnpm exec vitest run tests/unit/validation-runner.test.ts --maxWorkers=1",
+      "status": "PASS",
+      "counts": {
+        "passed": 10
+      },
+      "logSha256": "c962b72ffa9ccdaf0fe879194d25eadc318828a090497550abddd724dfe8227c",
+      "logLocalOnly": true
+    },
+    {
+      "name": "api-runtime-types",
+      "command": "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit",
+      "status": "PASS",
+      "counts": null,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logLocalOnly": true
+    },
+    {
+      "name": "media-controller-types",
+      "command": "pnpm exec tsc -p tsconfig.light.json --noEmit",
+      "status": "PASS",
+      "counts": null,
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "logLocalOnly": true
+    },
+    {
+      "name": "web-build",
+      "command": "pnpm --filter @callsign/web build",
+      "status": "PASS",
+      "counts": null,
+      "logSha256": "61ddcc89e96ab3fb1f6e53b63299bae914c028b3d9ef64259624490705dccd88",
+      "logLocalOnly": true
+    },
+    {
+      "name": "new-document-links",
+      "status": "PASS",
+      "newRelativeLinks": 7,
+      "scope": "added/changed relative links/anchors and changed Markdown fences; not a full historical docs audit"
+    }
+  ],
+  "failureInterpretation": {
+    "initialLight": "existing dry-run test exceeded its unchanged5s under the full suite; focused and subsequent full run passed without increasing timeout; root scheduling cause unconfirmed",
+    "ownedHelper": "first regression exposed missing a helper spawned while root exited; source discovery/cancellation fixed, same timeout preserved",
+    "audioRed": "two assertions failed with prior race behavior and passed after the fix; temporary source toggle restored"
+  },
+  "quotaRecovery": {
+    "existingPath": "serviceMaintenance.tick: expired reserved rows locked and settled at full reserved amount; existing worker invokes maintenance",
+    "analysisReservationExpirySeconds": 86400,
+    "crashIntegrationTest": "NOT_RUN",
+    "preservedAffectedDeployment": "NOT_IDENTIFIED; persistent environment impact unconfirmed",
+    "repairFrameworkAdded": false,
+    "balancesOrUsageReset": false
+  },
+  "nextMedia": {
+    "status": "NOT_RUN",
+    "tests": [
+      "tests/media/service-pbx.spec.ts",
+      "tests/integration/runtime-media.test.ts"
+    ],
+    "controllerEntry": "tests/integration/runtime-analysis-fixture.ts",
+    "providers": "explicit synthetic transcript/model only; actual auth/SQL/authority/Anchor/PBX use existing paths",
+    "fullServiceCallRequired": true,
+    "measurements": "existing CallObserver/aggregateCallTrials; new success rates and latency NOT_RUN; reversed or missing observations unmeasured",
+    "externalProviderQuality": "NOT_RUN; separate actual provider consent, credentials, cost authorization and independently labeled input"
+  },
+  "deploymentImpact": {
+    "frozenRelease": "aws-bootstrap-20261102t093531z",
+    "frozenImagesUnchanged": true,
+    "newRuntimeRequired": true,
+    "newObserverAndPublicBundleRequired": true,
+    "infrastructureImages": "Existing Besu/PostgreSQL/Asterisk/TURN/nginx digests can be reused; recipes/inputs not changed by this review. Candidate compatibility still needs execution.",
+    "finalWeb": "deferred until real AWS contract/trust/PBX certificate; rebuild from new runtime and pinned nginx",
+    "newImagesOrReleasePublished": false
+  },
+  "serverProtection": {
+    "servicesStarted": false,
+    "containersOrKeysCreated": false,
+    "hostSettingsMutated": false,
+    "existingResourcesStoppedOrDeleted": false,
+    "offlineChildren": "Owned bounded Python process/cancellation regressions only; no network/listen or service processes",
+    "localOutputs": "ignored .local/merge-review-20261103; prior user material and original evidence untouched"
+  },
+  "publication": {
+    "target": "main after normal reviewed merge",
+    "reviewBranch": "verify/mentoring-integration-20261103",
+    "finalCommit": "resolve via main Git history and linked light CI; not an execution HEAD retrofit"
+  }
+}

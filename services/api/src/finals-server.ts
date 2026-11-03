@@ -64,8 +64,8 @@ function authenticate(supplied: unknown, expected: string) {
   if (typeof supplied !== "string" || Buffer.byteLength(supplied) !== Buffer.byteLength(expected) || !timingSafeEqual(Buffer.from(supplied), Buffer.from(expected))) throw new HttpError(401, "SERVICE_AUTH_INVALID");
 }
 export async function buildFinalsServer(env = finalsEnvironment(process.env), adapters?: {
-  anchor: import("./consumption-anchor.js").ConsumptionAnchor;
-  current: import("./service-authority.js").ServiceAuthorityOptions["current"];
+  anchor?: import("./consumption-anchor.js").ConsumptionAnchor;
+  current?: import("./service-authority.js").ServiceAuthorityOptions["current"];
   witnessFetch?: typeof fetch;
   now?:()=>number;
   audioProviders?: import("./service-audio.js").AudioProviders;
@@ -151,7 +151,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
     return app;
   }
   app.addHook("onRoute", route=>{if(route.method!=="HEAD"&&["/v2/auth/start","/v2/auth/callback","/v2/auth/me","/v2/auth/logout","/v2/login"].includes(route.url))app.route({method:route.method,url:route.url.replace("/v2/","/v3/"),handler:route.handler});});
-  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"),adapters?{anchor:adapters.anchor,deployment:required("DEPLOYMENT_ID")}:process.env.CONSUMPTION_ANCHOR_URL?{anchor:httpConsumptionAnchor({url:required("CONSUMPTION_ANCHOR_URL"),token:required("CONSUMPTION_ANCHOR_TOKEN"),deployment:required("DEPLOYMENT_ID")}),deployment:required("DEPLOYMENT_ID")}:undefined);
+  const store = postgresAuthorityStore(required("ISSUER_DATABASE_URL"),adapters?.anchor?{anchor:adapters.anchor,deployment:required("DEPLOYMENT_ID")}:process.env.CONSUMPTION_ANCHOR_URL?{anchor:httpConsumptionAnchor({url:required("CONSUMPTION_ANCHOR_URL"),token:required("CONSUMPTION_ANCHOR_TOKEN"),deployment:required("DEPLOYMENT_ID")}),deployment:required("DEPLOYMENT_ID")}:undefined);
   if(adapters||process.env.CONSUMPTION_ANCHOR_URL)app.addHook("onReady",()=>store.verifyRecovery(env.INSTITUTION_ID));
   const { db, client } = createDatabase(required("AUTH_DATABASE_URL"));
   let pbxRuntime:PbxRuntime|undefined;

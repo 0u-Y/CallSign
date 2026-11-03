@@ -1,0 +1,490 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-02T20:45:59.889915+00:00",
+  "executionHead": "d9d92f11e44251621ccd4e29aee9c1777716829c",
+  "executionBranch": "verify/mentoring-integration-20261103",
+  "executionWorktreeDirty": true,
+  "scope": "Current-source local PostgreSQL/authentication/HTTP/WebSocket/Chromium integration; explicit external boundary fixtures. No media call or deployment-artifact validation.",
+  "assessment": {
+    "method": "automatic",
+    "execution": "completed",
+    "verdict": "PASS",
+    "evidenceReview": "required"
+  },
+  "sourceFiles": {
+    "scripts/validation_resources.py": "71ff93f122dbce90c4f63a088c4a83c8bf29af5334d90d8d5ca4390d6daae1c9",
+    "scripts/validation-resource-control.py": "63418dd606cb7a4f3fbf8a0ad4ea78f5521a21e7dca40356b701ac4d287700ff",
+    "tests/unit/validation-resources.test.ts": "745eaa4a5b3ccc177581cba9fe6685a53fe3310db50e3b9668e6b10dfb316557",
+    "services/api/src/service-audio.ts": "cbb3ba8c393b459b0995d344baf12eda8448a7f2899eb717b42a40934ed4b579",
+    "services/api/src/quota.ts": "9781de8ac4e3a0efe18ddd595748af7265adca23498b36dc0db96e2218703e8c",
+    "services/api/src/finals-server.ts": "2d4c672ae1251cdf5caac0139388009a854e1b1121cf29bbf036c2fc99855deb",
+    "services/api/src/finals-store.ts": "5631acc5a87e54325e4b8a50306ac3ded4d4b81fcc54a443166e332cbbad4cb8",
+    "services/api/src/service-analysis.ts": "51584db91ace75aed54d505d577645a7f22b3376ceb132a2738c4b1dafcf93d1",
+    "services/api/src/recall-status.ts": "e131b33077d4e08af3531b87402c956400b8f5552eb6c140afa49ab6ffc58151",
+    "apps/web/src/components/ServiceRecallStatus.tsx": "8cba9741a07c4d94438a224f9d694f701f7685ecb4407da7183009ee608bb644",
+    "apps/web/src/components/ServiceAnalysisPanel.tsx": "c9456d4cae8173236904c8044d8905a3d885399996cbb18784d2f593ebfcbe6e",
+    "apps/web/src/pages/Service.tsx": "b3c5da21b0916ff9037776badb1d3b3c6abdf703fee792de018dfd44c808f1e2",
+    "tests/integration/service-http-fixture.ts": "6f36a5106a498b3b9100c6100f80ed8295379b9b64817e72daa1bb255e778c83",
+    "tests/integration/service-http.test.ts": "a61f5f66a291528836fc7041a9e85d62139bf849dbb8d820a0574a90729273a5",
+    "tests/integration/service-boundaries.test.ts": "86e90c79b31722ac93d1d330f0465f5fec34af6cad4c2f1671c482dcc77d87bc",
+    "tests/integration/http-cleanup.test.ts": "7c0f0fbfc640f9675e83b86da525b026563d29d22d416c43f6d3625a2bbefa80",
+    "tests/integration/database-readiness.test.ts": "e7c7613221c61b9a71da0f70fd29e542a3acd73cfa172b5b07ef0e833760bd5b",
+    "tests/integration/progress-reporter.mjs": "c3974942f0b31721cf6ba9d60e8c42c4608aac67c1b2083d2c33ed71d0be3b3e",
+    "tests/integration/postgres-unix.mjs": "d2e52d369f2d36df61ff92b30389730cc085458f5190acc1f24b7a04471e6a28",
+    "tests/integration/postgres-unix-setup.mjs": "e6319469b140727f7177748a5f4b140da5970dc70860365a46a9bac590361453",
+    "vitest.http.config.ts": "f52861e1cf89a8eff6ec7f67cd6646cd6eceb483ef4427b9ca601fa06bdc6f2f",
+    "vitest.integration.config.ts": "53c70bbd0d676736085864b9d5e461ac36e1e8f120ca86031cf637b8be5852fd",
+    "package.json": "1ea5c35ca6f78e7f70dc6c2f8ace4e1ca548d39a67948da406daa63b3ad5e871",
+    "pnpm-lock.yaml": "46b2f41318c97bfab18ab58aa7d861a7434e9f48fa659b2b9053fa8adbb11541"
+  },
+  "sourceHash": "2f236c23885e9a86a566d2e5e392090d4fe4c903f3c9bfdede09eb69e9e8b784",
+  "sourceHashScope": {
+    "files": 319,
+    "rule": "Nonignored versioned code/config/tests/infra/contracts, migrations and lockfiles; excludes private paths/env/keys/symlinks/generated files, docs/evidence and files over2MiB. Complete map retained locally. Not proof of an entire deployable release."
+  },
+  "environment": {
+    "runId": "callsign-pressure-66031d1825",
+    "host": "same development host, loopback only",
+    "postgresImageConfigId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+    "postgresVersion": "17.6-alpine",
+    "postgresTransport": "network=none, owned Unix socket, no bridge or published port",
+    "databases": {
+      "original": "preserved pre-fix failures until final owned container removal",
+      "cleanRegression": "one additional DB in the same owned cluster/identity, same existing minimum-privilege LOGINs, fresh migrations/GRANT verification",
+      "originalDataReset": false,
+      "originalOrphansRepaired": false
+    },
+    "tools": {
+      "node": "22.22.2",
+      "pnpm": "11.27.0",
+      "vitest": "5.0.0",
+      "python": "3.12.3",
+      "playwright": "1.63.0",
+      "bundledChromiumRevision": "1243",
+      "bundledChromiumVersion": "153.0.8010.12"
+    },
+    "preparationScriptSha256": "b9b5cd833d4c8792f5b97e2080c4d3f1fdc9773efb536f6a886943bff070f0f8",
+    "controllerSha256": "4b62686b2ced4e29defb3b34c309e2b13312ae9be16e1d43ba448735ca5f0fa4"
+  },
+  "policy": {
+    "name": "integration-pressure-v1",
+    "selection": "Explicit --policy on every observe/watch/run; no environment-only selection; legacy swap-activity-v1 retained as default",
+    "intervalSeconds": 5,
+    "preflightSeconds": 60,
+    "observedPreflightSeconds": 60.00155474082567,
+    "memAvailableMinimumGiB": 8,
+    "appAndObserverObservedRssMaximumGiB": 3,
+    "temporaryObservedDiskMaximumGiB": 5,
+    "postgresCpuHardLimit": 1,
+    "postgresMemoryHardLimitMiB": 512,
+    "postgresDataTmpfsMaximumMiB": 512,
+    "psiThreshold": {
+      "someAvg10AtLeast": 10,
+      "fullAvg10AtLeast": 2,
+      "consecutiveSamples": 3
+    },
+    "swapOutThresholdMiBps": 5,
+    "swapOutConsecutiveIntervals": 3,
+    "swapInAloneStops": false,
+    "hostOomKillIncreaseStops": true,
+    "mandatoryObservationFailureStops": true,
+    "maximumDeadlineSecondsIncludingCleanup": 5400,
+    "thresholdsRaisedDuringRun": false,
+    "scope": "Approved operational thresholds for this run, not universal host safety criteria"
+  },
+  "resources": {
+    "samplingClock": "Linux CLOCK_MONOTONIC, shared kernel clock on the same boot, preflight and watcher handoff; not subtracted from Vitest process hrtime",
+    "sampleCount": 263,
+    "observedSeconds": 1310.000642053,
+    "minMemAvailableGiB": 37.84095764160156,
+    "maxObservedAppAndObserverRssMiB": 2339.53125,
+    "maxObservedContainerMemoryMiB": 155.8359375,
+    "maxObservedTemporaryUpperBoundMiB": 522.4311285018921,
+    "maxSwapInMiBPerSecond": 0.21093931483748915,
+    "maxSwapOutMiBPerSecond": 0.0007812721667226775,
+    "maxPsiSomeAvg10": 2.26,
+    "maxPsiFullAvg10": 2.14,
+    "maxPressureConsecutive": 1,
+    "maxSwapOutConsecutive": 0,
+    "hostOomKillCounterIncrease": 0,
+    "firstMonotonicNs": 1934437546047716,
+    "lastMonotonicNs": 1935747546689769,
+    "rawSamplesSha256": "aa9e5686e30db913c3beb9c5d7439c2c5ad3b0297fab47edd3f3d38e75fe6513",
+    "resourceStop": false,
+    "limitation": "Five-second observed samples, not instantaneous peaks, a general safety standard, attribution of host activity or an SLA."
+  },
+  "phases": {
+    "HTTP": {
+      "status": "PASS",
+      "uniqueExecutedTests": 11,
+      "cases": [
+        "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+        "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+        "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+        "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+        "requires real recent auth_time and revokes active sessions through the account-management API",
+        "blocks new work after trust publication or recovery mismatch without creating partial state",
+        "reads institution recall snapshots through actual sessions and rejects customer access",
+        "boundary: rejects replayed joint signatures and forged event/state/witness evidence without prematurely activating a directory-only change",
+        "boundary: separates first-connect expiry from lease expiry and never reactivates terminal attempts",
+        "boundary: preserves a live synthetic lease for display changes but revokes it on confirmed policy generation changes",
+        "recall HTTP/SQL: keeps DELETE success, missing resources and unavailable observation distinct through real runtime writes"
+      ],
+      "commands": [
+        {
+          "label": "http-auth-final",
+          "timeoutSeconds": 180,
+          "durationSeconds": 2.004568601027131,
+          "filesystemRecordedAtUtc": "2026-11-02T20:30:43.282335+00:00",
+          "resultSha256": "763b23edae7958c020a6bd974132ecacf23f2e8cc685f17b07e513ecddb29b93",
+          "progressSha256": "204a182e154e6b1c31bcffda3ae36723a4de163d9c4f464c2b084b3df26f7941",
+          "privateLogSha256": "8a7b7b70bb17d5dd1579bf852fd3fb00ff0347016319ec26e4baa25315086355"
+        },
+        {
+          "label": "http-recall-final",
+          "timeoutSeconds": 180,
+          "durationSeconds": 2.606519542867318,
+          "filesystemRecordedAtUtc": "2026-11-02T20:30:45.942257+00:00",
+          "resultSha256": "852bd49bfa70ad16eff63a574c60510f725f1e7a2693c2fa56895763a2ffe01a",
+          "progressSha256": "8913aecf863857cb5de9c450517f591391465a261b777a5e8ee7ed7e40af688b",
+          "privateLogSha256": "950b0eeb4c2f4518f6dc8b50c96f2c8b4f616a309be77a68c4ad96ac5f89c723"
+        }
+      ]
+    },
+    "WebSocket": {
+      "status": "PASS",
+      "uniqueExecutedTests": 14,
+      "cases": [
+        "boundary: stops analysis transport and late model results after consent withdrawal, then isolates new revisions and provider failure",
+        "boundary: stops a pending model after lease-policy changes without publishing the late result",
+        "boundary: stops a pending model after connection-generation changes without publishing the late result",
+        "analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence",
+        "analysis HTTP/WS: rejects invented-evidence while retaining supported rules and product-controlled actions",
+        "analysis HTTP/WS: rejects external-command while retaining supported rules and product-controlled actions",
+        "analysis HTTP/WS: rejects epoch mismatch before forwarding a new frame",
+        "analysis HTTP/WS: rejects key-generation mismatch before forwarding a new frame",
+        "analysis HTTP/WS: rejects binding mismatch before forwarding a new frame",
+        "analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work",
+        "analysis HTTP/WS: enforces the remote context identity cap and releases the stream",
+        "analysis HTTP/WS: rejects an expired session row and cancels its pending provider result",
+        "analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter",
+        "analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort"
+      ],
+      "commands": [
+        {
+          "label": "ws-final",
+          "timeoutSeconds": 240,
+          "durationSeconds": 14.222694549011067,
+          "filesystemRecordedAtUtc": "2026-11-02T20:31:00.212701+00:00",
+          "resultSha256": "8413d3e50e834dd309f112b3f289bcdf928b0ad799ec6211c5bd330a5f9f44a2",
+          "progressSha256": "488cc02b71685fea29d855dbe7f7ce8ef7647df99e27f06efb7f205b4785f39b",
+          "privateLogSha256": "5d41ebd71a92133748f19a822b9dcfb1ec01f5b827a4126818c152568575a228"
+        }
+      ]
+    },
+    "Chromium": {
+      "status": "PASS",
+      "uniqueExecutedTests": 9,
+      "cases": [
+        "boundary: reviews and exports a real proposal, imports independent signatures, then distinguishes submission, confirmation and activation",
+        "boundary: shows durable worker failure instead of active configuration",
+        "boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks",
+        "boundary: drops a held old-account response, clears management drafts on account switch and refuses revoked buttons",
+        "boundary: disables ungranted manager actions, rejects their HTTP bypass and clears work expiry on reload",
+        "boundary: recovers a committed creation after a lost response without duplicating the intent and cancels it safely",
+        "recall Chromium: renders real cancellation observations and clears a held response on visibility events and account switch",
+        "analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device",
+        "renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus"
+      ],
+      "commands": [
+        {
+          "label": "chromium-final",
+          "timeoutSeconds": 300,
+          "durationSeconds": 39.878739214036614,
+          "filesystemRecordedAtUtc": "2026-11-02T20:32:17.332954+00:00",
+          "resultSha256": "e2a26616bb02c9eb89328391fb5c2292d1802d711d84192b826225c2faed774b",
+          "progressSha256": "2699a82c6a89e26a23cd733f3fc9f3b281283d254766bf8378e79739c17aca77",
+          "privateLogSha256": "9aa898df6c485c791680fea9dca5ab88c2ffb5ad0abf8f94abad4aaa22b01b0c"
+        }
+      ]
+    }
+  },
+  "scenarioAccounting": {
+    "priorOrdinaryCases": 25,
+    "priorParameterizedExpandedCases": 7,
+    "originalActualCases": 32,
+    "addedRegressions": 2,
+    "finalUniqueCases": 34,
+    "actualNamesExactlyMatchSource": true,
+    "rerunsAddedToUniqueCount": false,
+    "filteredSkipsAddedToPasses": false
+  },
+  "additionalChecks": {
+    "readiness": {
+      "status": "PASS",
+      "tests": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "resultSha256": "e24297260c1e20892af544a105c73c252a6b9b9d6c17bde163876b2481a72645"
+    },
+    "regression-readiness": {
+      "status": "PASS",
+      "tests": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "resultSha256": "0533bd04a6a53a4f299d2c87be2e4d254651f9b268d9428e5dd01e1f9b4ff925"
+    },
+    "rerun-http": {
+      "status": "PASS",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 25,
+        "pending": 0
+      },
+      "resultSha256": "8db0e32a3c0c4d150ea33138b2b9b0d7841405d173957aeecff895270f7be2cc"
+    },
+    "rerun-ws": {
+      "status": "PASS",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 25,
+        "pending": 0
+      },
+      "resultSha256": "a4c749d880b3ca183aa945c777e36738305633086f0de69e9b60a3e2df74296c"
+    },
+    "rerun-chromium": {
+      "status": "PASS",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 25,
+        "pending": 0
+      },
+      "resultSha256": "602c51fbfd723f5f9355f2f1adfebec308cf9d91503c063af1c408aee15a0807"
+    },
+    "audit-clean-before": {
+      "status": "PASS",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "resultSha256": "c97f5c1577cf097e6fe13a73046c6546af89a1084929064bfe8e93bf40f7e237"
+    },
+    "audit-clean-after": {
+      "status": "PASS",
+      "tests": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "resultSha256": "956a8a25ad014e633ec8cb3e703fa04d042c2b91dc01027484df9bff7ba349dc"
+    }
+  },
+  "databaseFinalCounts": {
+    "originalFailed": {
+      "unsettledBalanceRows": 17,
+      "settledUsage": 180,
+      "reservationRows": 0,
+      "institutionRows": 0,
+      "sessions": 0,
+      "outbox": 0,
+      "migrations": 11
+    },
+    "cleanRegression": {
+      "unsettledBalanceRows": 0,
+      "settledUsage": 176,
+      "reservationRows": 0,
+      "institutionRows": 0,
+      "sessions": 0,
+      "outbox": 0,
+      "migrations": 11
+    }
+  },
+  "databaseCountInterpretation": "The used=176 sum is across overlapping quota scopes; it is not176 provider calls or a billing total. Reservations/outbox/sessions are zero only in the corrected clean regression DB. Original17 orphans were not repaired or reset.",
+  "originalFailures": [
+    {
+      "label": "analysis-ws",
+      "classification": "test",
+      "cause": "Two timing failures: synchronous abort expectation despite async authority check; per-message polling consumed authority freshness before identity-cap boundary.",
+      "originalCounts": {
+        "passed": 11,
+        "failed": 2,
+        "skipped": 11,
+        "pending": 0
+      },
+      "resultSha256": "e0b01374d3b6ceb0bba04b30bb952a98ba5e9151216cb296304dfa61c28a569d",
+      "privateLogSha256": "25bd840bf5a973974802dc4af934d568c547ba7468a85ab7fed9fece2aa2eaf1",
+      "preserved": true
+    },
+    {
+      "label": "chromium",
+      "classification": "product",
+      "cause": "Recall filter accessible name did not match its visible label.",
+      "originalCounts": {
+        "passed": 7,
+        "failed": 1,
+        "skipped": 24,
+        "pending": 0
+      },
+      "resultSha256": "ea7284325c8b01afcf2a384ee382a90361f1b0dc0689f113c074af3b2d7f339d",
+      "privateLogSha256": "c189213b6299e99a47d45656576db6cf06c7b764d2bddd4d71a1bd020a440fe2",
+      "preserved": true
+    },
+    {
+      "label": "recall-browser-regression",
+      "classification": "product",
+      "cause": "390px horizontal overflow from a long native select option.",
+      "originalCounts": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 23,
+        "pending": 0
+      },
+      "resultSha256": "32dc99852f0d1530beb3d9a20a844be15a6d6401a518774e0d3b4386105cd557",
+      "privateLogSha256": "6e8f24bc342816aac967d974a9395a269ace1a8eee806ad3e7db54eca3c813af",
+      "preserved": true
+    },
+    {
+      "label": "analysis-browser",
+      "classification": "test",
+      "cause": "Vitest rewrote dynamic import inside serialized page.evaluate; browser module loader corrected without changing product API.",
+      "originalCounts": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 24,
+        "pending": 0
+      },
+      "resultSha256": "5e6d54278ecccdc34f63e4aec38693f43ca8d84f48dce454c561d9a0281e2004",
+      "privateLogSha256": "3bc9cd69879b007f251c328102a8b77f4c7ee8fac11c097f71066116e42233ff",
+      "preserved": true
+    },
+    {
+      "label": "audit-before-rerun",
+      "classification": "product-and-fixture",
+      "cause": "Audio shutdown could close quota pool before socket settlement; abort-ignoring provider retained reservations. Fixture deleted reserved rows without checking balances. Audit found seventeen nonzero balance rows.",
+      "originalCounts": {
+        "passed": 0,
+        "failed": 1,
+        "skipped": 0,
+        "pending": 0
+      },
+      "resultSha256": "12c0693fc616f8b7eb463589f640d32507466f88e16407dc8f8aa530470f1c9b",
+      "privateLogSha256": "b2fbe3cd8e4735b963ab7a4dfb575d371d4605fac6f8d1ba3112f5087736ef5b",
+      "preserved": true
+    }
+  ],
+  "commands": {
+    "readiness": "node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts",
+    "http-auth-final": "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-http.test.ts --testNamePattern '^(?!renders the actual service)'",
+    "http-recall-final": "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(recall HTTP/SQL:|boundary: rejects replayed joint|boundary: separates first-connect|boundary: preserves a live synthetic)'",
+    "ws-final": "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(analysis HTTP/WS:|boundary: stops analysis transport|boundary: stops a pending model)'",
+    "chromium-final": "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'",
+    "audit": "node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/http-cleanup.test.ts"
+  },
+  "launcherCommand": "python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run OWNED_RUN_DIRECTORY LABEL TIMEOUT_SECONDS COMMAND ...",
+  "actualComponents": [
+    "PostgreSQL migrations0000..0010 and actual role LOGINs/SQL",
+    "Platform -> Sender Agent -> Issuer Gateway real HTTP routing/auth middleware/session/CSRF/tenant permissions",
+    "Actual local HTTPS OIDC discovery/JWKS/code/PKCE/signed JWT exchange fixture",
+    "Actual WebSocket/consent/authority/policy/revision analysis orchestration",
+    "Installed Chromium, real product screens, scoped fixture SPKI exception, no global TLS ignore",
+    "Shipped analysis panel/nextAnalysis in an explicitly identified component host receiving actual authenticated browser WS events"
+  ],
+  "fixtureBoundaries": [
+    "Ledger client/event/Witness responses and signatures, not real chain/Witness services",
+    "ARI DELETE/GET200/503/404 explicit fetch fixture, not actual PBX or voice interruption",
+    "STT/LLM delayed/failure adapters, no external provider or quality measurement",
+    "Synthetic binding and memory CAS Anchor, not actual PBX/media/independent persistent Anchor"
+  ],
+  "chromiumBoundary": {
+    "realProductScreenCases": 8,
+    "componentHostCases": 1,
+    "fullServiceCallPbxMediaToAnalysisToScreen": "NOT_RUN",
+    "micOrCameraUsed": false,
+    "wholeContextTlsErrorsIgnored": false,
+    "desktopAnd390px": true,
+    "screenshots": "19 synthetic images retained only in protected ignored local evidence; no raw images/transcripts published"
+  },
+  "cleanup": {
+    "ownedContainerRemoved": true,
+    "protectedRootRemoved": true,
+    "ownedWatcherExited": true,
+    "activeTestRecordAbsent": true,
+    "screenshotsPreservedPrivate": 19,
+    "hostComparisonHashesEqual": {
+      "routes": true,
+      "networks": true,
+      "containers": true
+    },
+    "cleanupErrors": []
+  },
+  "offlineChecks": {
+    "light": {
+      "command": "pnpm light",
+      "status": "PASS",
+      "files": 60,
+      "tests": 299,
+      "logSha256": "d9008167982653b6db526f627a82dd7416c9ee456f91af2fb8fcf71475a1a52e"
+    },
+    "runtimeTypes": {
+      "command": "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit",
+      "status": "PASS",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "webBuild": {
+      "command": "pnpm --filter @callsign/web build",
+      "status": "PASS",
+      "logSha256": "c89a8355024323e593e4335df1a0f1e3ff83f69e1f594fab44a046aa080595d1",
+      "warnings": "Existing large chunk / ineffective dynamic import warnings; not a final AWS web image"
+    },
+    "policyRegression": {
+      "status": "PASS",
+      "tests": 8,
+      "includedInLight": true,
+      "historicalReplayIsOnlyPolicyTest": true
+    },
+    "documentation": {
+      "status": "PASS",
+      "relativePaths": 335,
+      "newExplicitAnchors": 5,
+      "fences": "PASS",
+      "bashExamples": "syntax checked only, NOT_RUN",
+      "diffCheck": "PASS"
+    }
+  },
+  "notRun": [
+    "Original five-file/seventeen-case DB suite repeated (DB query/migration code unchanged)",
+    "Actual chain/Witness/ARI/PBX/TURN/media/independent Anchor/external IdP/STT/LLM/AWS",
+    "Repair of an already corrupted original quota database",
+    "Rebuilt runtime/pinned web image/public bundle/Release"
+  ],
+  "deploymentImpact": "Requires a new runtime image and final trust/certificate-specific web/public bundle before deployment. Existing bootstrap Release and six GHCR references remain unchanged.",
+  "publication": {
+    "target": "existing review branch only",
+    "mainAutomaticallyMerged": false,
+    "newReleaseOrImagesPublished": false,
+    "sourceCommits": [
+      {
+        "sha": "b11fc728063441a00b3ab2fcb7439cbba221fb3a",
+        "purpose": "Explicit pressure policy and regression"
+      },
+      {
+        "sha": "e503dae3645054d8a3e40373cb967d2cf20d91fc",
+        "purpose": "Quota shutdown/recall UI and real integration regressions"
+      }
+    ],
+    "checkedSourcePreservedInCommits": true
+  },
+  "sourceProvenanceLimit": "Source file hashes identify the final corrected execution source. Initial failures occurred in earlier dirty revisions; full per-failure source manifests were not captured. Original logs/progress/results are preserved separately and are not represented as final-source passes."
+}

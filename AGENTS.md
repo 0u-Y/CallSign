@@ -73,3 +73,22 @@
 ## 2026-11-03 4차 반영 소스 작업
 
 이번 요청은 기관 운영 조회·정책 기반 분석·통화별 집계·CTI 계약·배포 재현성의 코드/시험/기존 문서 수정, 설치 의존성의 오프라인 검사/타입/무기동 웹 build와 관련 commit/일반 push·기존 light CI만 허용한다. 모든 서비스/DB/체인/Witness/PBX/TURN/Anchor/브라우저·migration/seed/계약·이미지 build/load/pull/push/Release·AWS/유료 제공자·다운로드·기존 서버/자원 변경은 허용하지 않는다. 신규 index migration은 소스만 작성한다. 실제 연결/모델 품질·산출물 발행은 별도 단계이며 이 기록은 후속 실행의 상시 허가가 아니다.
+
+## 2026-11-03 최신 기능의 PostgreSQL·HTTP 검증 한정 예외
+
+이번 요청은 새 identity의 network=none PostgreSQL/Unix socket, loopback Platform·Issuer·Sender·HTTPS OIDC/웹·설치 Chromium, 합성 계정/시험키/CA·migration·통합 시험·관련 commit/일반 push/light CI만 허용했다. DB CPU1·RAM/데이터512MiB, 앱 관측3GiB·임시5GiB·가용 RAM8GiB 여유와 지속 swap 중단 조건을 유지한다. 첫 자원 중단 후 사용자가 같은 예산의1회 재개를 승인했으며 재개 후 다시 swap 중단하여 추가 서비스 기동은 하지 않는다. 실제 체인/Witness/PBX/TURN/Anchor·음성장치·외부 IdP/AI/AWS·이미지/Release·기존 서버/자원 변경은 허용하지 않았다. 이 기록은 후속 기동의 상시 허가가 아니다.
+
+
+## 2026-11-03 HTTP 재개 관측의 한정 작업
+
+이번 요청은 기존 자원 기준을 만족할 때 새 소유 identity에서 HTTP/WS/Chromium을1회 재개하고 관련 검사·검토 branch commit/일반 push/light CI 확인을 허용한다. 사전 관측에서 연속 swap 기준이 충족되어 이번에는 서비스·DB·키·컨테이너를 생성/기동하지 않았다. 자동 재개·기준 완화 없이 관측/취소 전파를 오프라인 회귀하고 원인을 보존한다. 기존 host/network/daemon/global auth·서비스/volume·체인/Witness/PBX/TURN/Anchor·외부 제공자/AWS·이미지/Release 변경은 금지이며 이 기록은 후속 기동의 상시 허가가 아니다.
+
+
+## 2026-11-03 명시적 압박 정책의 통합 검증
+
+이번 요청은 `--policy integration-pressure-v1`(5초 표본·60초 사전 관측·명시한 memory/PSI/swap-out/OOM/RSS/disk/timeout 기준)을 선택한 소유 network=none PostgreSQL·loopback API/OIDC/웹·Chromium, 합성 입력·관련 commit/일반 push/light CI를 허용했다. 호스트 설정은 바꾸지 않았고 기본/과거 swap 정책을 보존했다. 최초 quota 실패DB를 초기화하지 않고 같은 소유 cluster에 회귀DB1개를 추가해 검증했으며 소유 자원은 정리했다. 체인/Witness/PBX/TURN/실제 Anchor·음성장치·외부 IdP/AI/AWS·이미지/Release·기존 자원 변경은 금지였다. 이 기록은 다음 실행의 자동 허가가 아니다.
+
+
+## 2026-11-03 검토 브랜치의 main 반영 작업
+
+이번 요청은 branch/main 차이·원본 증거 리뷰, 최소 코드/시험/기존 문서 수정, 무기동 light/타입/웹 build와 정상 main 병합·일반 push·기존 light CI만 허용한다. 실제 통화/분석 시험은 기존 harness에 연결하되 실행하지 않는다. 서비스/DB/브라우저/노드/미디어/Anchor·이미지/Release·AWS·키/자격 생성과 기존 host/global auth/resource 변경은 허용하지 않는다. 과거 통합 증거는 당시 범위를 유지하며 이 기록을 후속 기동 허가로 사용하지 않는다.

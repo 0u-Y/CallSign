@@ -41,6 +41,8 @@
     "scripts/preflight-requirements.ts",
     "scripts/evaluate-performance.ts",
     "tests/integration/database-readiness.test.ts",
+    "tests/integration/migration-upgrade.test.ts",
+    "tests/integration/http-cleanup.test.ts",
     "tests/integration/service-http.test.ts",
     "tests/integration/service-http-fixture.ts",
     "tests/integration/service-boundaries.test.ts",
@@ -51,6 +53,9 @@
     "vitest.chain.config.ts",
     "tests/integration/live-authority-http.test.ts",
     "tests/integration/runtime-media.test.ts",
+    "tests/integration/runtime-analysis-fixture.ts",
+    "tests/media/analysis-path.ts",
+    "tests/media/service-pbx.spec.ts",
     "scripts/call-trials.ts",
     "scripts/evaluate-service-analysis.ts"
   ]

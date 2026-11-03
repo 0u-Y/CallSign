@@ -150,7 +150,7 @@ Docker pull는 digest에 고정된 manifest/config/layer를 검증하고 새 AWS
 
 AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구한다. 실제 trust/인증서 준비 후 AWS에서 생성하는 web만 검토한 local config ID를 사용할 수 있다. 웹은 Release의 공개 recipe와 GHCR runtime/nginx를 사용하고 pin/label·실제 기동을 확인한다. **bootstrap6종의 전달은 검증했으나, web 생성·실제 외부 설정·AWS 실행은 아직 완료하지 않았다.** [공식 인증/visibility 기준](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [package 권한](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
 
-**현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
+**현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 검토 브랜치 반영분에는 migration CLI/0010·회수/목적 분석 제품 코드·audio 종료 정산/경합 수정이 포함되므로 새 runtime이 필요하다. observer 묶음은 기존 시험 외에 `tests/media/analysis-path.ts`·`tests/integration/runtime-analysis-fixture.ts`와 수정된 bootstrap/driver를 포함해야 한다. 통화 집계/자원 launcher는 새 runtime의 scripts로 전달된다. `.dockerignore`는 tests·보호 파일·로컬 증거를 제외하고 제품 소스/SQL·공개 예제를 유지한다. 인프라5종의 이미지 recipe/입력은 이번 반영으로 바뀌지 않아 기존 검증 digest를 재사용할 수 있지만 기동 설정·runtime과의 통합은 새 후보에서 다시 확인한다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
 
 <a id="mentoring-fourth-validation"></a>
 
@@ -649,6 +649,32 @@ proof --delivery-files "$ROOT/public" --case session-expiry
 로컬 nginx는 UID1000·cap-drop과 읽기 전용 root를 위해 pid/cache를 소유 `/tmp`로 옮기는 controller 생성 global config를 사용한다. AWS nginx 기본 실행 설정과 이 차이도 기록한다. 전달된 AWS HTTPS server config를 수정하지 않은 별도 component 시험에서는 명시적 시험 `web` DNS 별칭·합성 인증서로308/HTTPS 제품 파일을 확인했다. 해당 별칭 파일은 그 소유 container에만 mount하며 host/기존 namespace의 hosts/DNS를 변경하지 않는다. 이 component 결과는 AWS override 전체나 외부 인증서 성공이 아니다.
 
 `ownership.json`에 기록한 ID와 현재 label을 대조한 후 이번 container만 stop/rm하고, volume도 같은 소유 label을 재확인한 뒤 제거한다. 증거부터 보존하며 다른 project나 전역 prune/down -v는 사용하지 않는다. 보호 env·signer key·브라우저 profile·합성 WAV·DB/체인 상태는 공개 전달물/Git에 넣지 않는다. 일회성 시험의 잔여 key/chain만으로 서비스 복원이 가능하다고 표시하지 않는다. 공개 전달물과 보호 자료를 분리해 승인된 외부 보관처에서 재수령·checksum 대조하기 전에는 외부 전달 완료로 보고하지 않는다.
+
+<a id="reviewed-servicecall-analysis"></a>
+
+### 검토 소스의 실제 ServiceCall·분석 통합 시험 (미실행)
+
+이 절차는 기존 통합34건의 component host1건이 우회했던 **실제 ServiceCall·상대 음성→분석 패널**을 확인하기 위한 다음 실행이다. 이번 검토에서는 서비스를 기동하지 않았다. 위 NEW 리허설로 준비한 소유 identity·실제 원장/DB/Anchor/PBX/TURN과 **새 runtime/observer 묶음**이 필요하다. 기존 고정 Release에는 아래 추가 observer 파일과 종료 경합 수정이 없다.
+
+```bash
+# Separate execution approval and resource preflight required; not executed during source review.
+# Use the proof() function and immutable APP from the NEW rehearsal above.
+proof --delivery-files "$ROOT/public" --analysis-fixture --case work-cancel
+# After preserving the first phase, select other existing revocation cases individually.
+proof --archive-phase analysis-work-cancel
+proof --delivery-files "$ROOT/public" --analysis-fixture --case emergency-stop
+proof --archive-phase analysis-emergency-stop
+```
+
+`work-cancel`은 인증한 기관 담당자의 업무 취소 API, `emergency-stop`은 기관 정지 API→outbox→원장/Witness 반영을 사용한다. `proof`·ROOT·APP의 정의와 소유 identity 준비는 바로 앞 NEW 절차를 따른다.
+
+`--analysis-fixture`는 별도 observer entrypoint와 작업 전용 보호 token을 명시적으로 mount한다. 서비스 제품 소스/의존성은 runtime 이미지에서 사용하고 인증·SQL·원장·Anchor·PBX는 실제 경로를 유지한다. 이 모드는 일반 issuer entrypoint 기동 검증과 구분한다. flag가 없으면 기존 일반 entrypoint를 사용하며 환경변수만으로 제공자 fixture를 선택하지 않는다. token·ownership·controller 소스는 보호 자료이며 공개 결과에 넣지 않는다.
+
+검증 순서는 제품 로그인/업무/승인·소비/lease→구별되는660/990Hz 상대 음성 디코딩→실제 제품의 분석 동의→**remote receiver track만 MediaRecorder에 전달**→인증 WS 프레임→합성 전사·모델 응답→실제 ServiceCall의 패널→동의 철회/abort/늦은 응답 폐기→재동의 후 권한 회수→양 끝 상대 음성 중단·ARI404·종료 상태·추가 lease 거절·quota 예약0이다. 합성 응답은 정확도를 시험하지 않으며 원음/전사는 결과에 저장하지 않는다. 세션은 종료와 로그아웃을 구별하고, 업무/소비/정산 이력은 삭제하지 않는다. outbox는 해당 위임 철회/정지 작업 완료를 대조하며 다른 기관의 작업을 지우지 않는다.
+
+`call-trial-CASE.json`은 기존 `CallObserver`의 동일 controller 단조 시계를 사용한다. 승인 요청·수락 동작·검증 표시·양방향 상대 음성·분석 입력/전사/결과/경고·회수 요청·화면 종료·실제 음성 회수·정리 관측을 연결한다. 원장 사례의 서버 적용은 `ledgerObservation`의 일치하는 event를 관측한 시점, chain-confirmed는 그 transaction receipt/block hash를 별도 조회해 확인한 시점이다. **조회 순서가 실제 발생 순서와 같지 않을 수 있어 역순 구간은 null이며 실제 확정→전파 지연이 아니다.** 누락 관측을0이나 과거 실측으로 채우지 않는다. 일반 반복 측정은 기존 `scripts/call-trials.ts`와 `infra/deploy/call-trials.example.json`을 사용하고 `analysis: "fixture"`, fixture 목록의 `analysis-adapter`, loopback control URL/보호 token 파일 참조를 명시한다. 이 경우 `ai-input`→`transcript`→`analysis`→`warning-visible` 관측이 순서대로 없으면 전체 성공으로 집계하지 않는다. 실패·timeout·시작 실패·미완료도 논리적 시도 분모에 남기며 재시도는 별도로 센다. 현재 이 새 경로의 성공률·지연은 **NOT_RUN**이다.
+
+실제 외부 STT/LLM은 별도 단계다. 위 fixture 옵션 없이 승인된 제공자 모델/보호 자격·소량 예산·보관 조건과 동의한 한국어 입력을 준비해 [제공자/평가 절차](#mentoring-fourth-validation)를 사용한다. 실제 사람/독립 평가 라벨로 품질을 판단하고, 제공자 취소·보관·청구를 합성 abort 관측으로 대체하지 않는다. 같은 namespace의 TURN은 AWS 외부 NAT 성공이 아니다. 종료 후 원본 실패/부분 관측을 보존하고 위 identity/label 기반 정리만 수행한다.
 
 ### 앞선 준비형 harness와 경로 계약
 
@@ -1426,12 +1452,150 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration timeout 120s pnpm exec vitest run 
 
 `NEW-*`는 기존 증거와 겹치지 않는 새 이름으로 바꾼다. HTTP fixture는 고유 기관/계정을 만들고 issuer·platform·Sender Agent·HTTPS 웹·OIDC의 포트를 직접 할당한다. 체인 상태 adapter는 지정한 digest만 확정 상태로 간주하고, 미확정/철회/조회 불가를 따로 시험한다. 앱의 인증·서명 검증을 대체하지 않는다. `test:` 배포 identity와 loopback origin, 같은 `callsign_test_*` DB의 별도 LOGIN이 아니면 adapter 주입을 거절한다. `oidc_state`·세션 row를 정상 로그인 fixture로 직접 주입하지 않는다. discovery 문서는 fixture가 제공하지만 현재 앱은 명시적으로 설정한 authorize/token/JWKS URL을 소비한다.
 
-통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium은 시험 인증서만 허용하도록 해당 context의 `ignoreHTTPSErrors`를 사용하고 Node↔OIDC는 추가 CA로 검증한다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
+통과 조건은 JWT 실패 경계·정확한 issuer/subject·work/official 분리·CSRF·재인증·계정 회수·실제 DB 행/outbox·동시 소비의 같은 서명 영수증·lease 서명 및 브라우저 클릭 결과다. HTTP200/문구만으로 판정하지 않는다. Chromium 소스는 현재 ROOT의 단일 시험 인증서 SPKI만 자식 browser launch 예외로 허용하고 context 전체 `ignoreHTTPSErrors`를 사용하지 않는다. Node↔OIDC는 추가 CA로 검증한다. 이 시험 SPKI 예외는 운영 인증서 chain/만료 검증이 아니며 최신 Chromium 실행은 아래 자원 차단 기록을 따른다. 운영 TLS/실제 IdP 호환성의 검증이 아니다.
 
 각 단계는120초 이내, worker1로 실행한다. DB512MiB 외 Node/브라우저 예산2GiB를 잡고 가용 메모리8GiB 미만·지속적 swap 입출력·기존 작업 영향이면 중단한다. 정상 종료 시 app·Vite·fixture·browser를 닫는다. 강제 timeout 때에는 **이번 실행이 만든 자식 process group**만 회수하고, DB label/identity를 대조한 후 해당 컨테이너만 제거한다. 전역 prune/pkill을 사용하지 않는다.
 
 스크린샷은 ROOT 아래 고유 `run-*` 디렉터리의 `service-mobile.png`/`service-desktop.png`다. cookie/storage/trace는 저장하지 않는다. 공유 전 합성 계정만 들어 있는지 확인하고 실제 API/DB 결과·코드 hash와 함께 보존한다. 보호 ROOT에는 테스트 개인키와 인증서가 있으므로 통째로 커밋하지 않는다. 증거 추출 후 이번 자원과 보호 파일만 제거한다.
 
+
+<a id="mentoring-integration-unix"></a>
+
+### 최신 변경의 Unix socket 검증과 자원 차단
+
+2026-11-03 실제 DB5파일17시험은 통과했지만 HTTP/WS/Chromium은 연속 swap으로 assertion 실행 전 BLOCKED다. 승인된1회 재개도 같은 조건으로 중단했으며 추가 기동하지 않았다. [소스·실행·정리 증거](../artifacts/mentoring-integration-20261103.json)를 따른다. 아래는 **별도 실행 허가와 안정된 자원이 준비된 이후** 사용할 절차이며 지금 실행한 성공 명령 목록이 아니다.
+
+- 기존 로컬 PostgreSQL17.6 이미지만 사용한다. `--network none --cpus 1 --memory 512m --memory-swap 512m --pids-limit 128`, PGDATA tmpfs512MiB, `listen_addresses=''`로 제한한다. 새0700 ROOT의 전용 하위 socket 디렉터리만 `/var/run/postgresql`에 mount한다. root 자신은0700을 유지하며 socket 하위 mount의 초기 권한만 entrypoint 요구에 맞춘다. 사용자 socket/DB·bridge/port publish를 사용하지 않는다.
+- 공식 entrypoint의 임시 초기화 서버와 최종 서버를 구분한다. init 완료와 최종 ready를 확인하고 socket의 단순 존재를 readiness로 간주하지 않는다. `/run/callsign`만 지정하면 entrypoint의 초기 psql이 기본 socket을 찾지 못할 수 있다.
+- `CALLSIGN_TEST_PG_SOCKET`은 위 ROOT 하위 실제 socket 디렉터리다. 테스트 전용 transport는 URL의 시험 DB·서로 다른 LOGIN·비밀번호를 그대로 유지하고 **실제 postgres3.4.9 driver의 host 옵션만 Unix socket으로 지정**한다. DB 응답·권한·transaction을 mock하지 않는다. CLI Node preload와 Vitest setup을 구분하며 production 자동 fallback을 추가하지 않는다.
+- 일반 migration CLI는 명시한 owner URL에 적용한다. `integration` 변수만으로 대상 소유가 자동 확인되는 것은 아니므로 이번 시험에는 위 소유 socket preload를 반드시 함께 사용한다. CLI migration에는 명시적 integration 환경과 owner URL을 사용한다. 기본 명령은 계속 dry-run이며 `--apply`만 전체 적용한다. `applyMigrations`의 prefix 인자는0009→0010 시험 준비용이며 CLI restart/복구가 DB를 다운그레이드하거나 이력을 지우지 않는다.
+- 모든 URL/비밀번호·TLS 키는 ROOT의 보호 파일/환경으로 공급한다. 명령 인자에 원문을 쓰지 않는다. Node22.22.2·설치된 pnpm/의존성으로 확인했으며 Node resolve-hook 미지원 버전은 다운로드로 우회하지 않는다.
+
+```bash
+# Explicitly reviewed protected environment and owned database are already prepared.
+: "${CALLSIGN_HTTP_TEST_ROOT:?owned 0700 root}" "${CALLSIGN_TEST_PG_SOCKET:?socket under root}"
+: "${MIGRATOR_DATABASE_URL:?protected owner URL}" "${NODE_EXTRA_CA_CERTS:?fixture certificate}"
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration   NODE_OPTIONS="--max-old-space-size=512 --import=tsx --import=$(pwd)/tests/integration/postgres-unix.mjs"   timeout 60s node scripts/migrate-finals.ts --apply
+# Vitest config selects guarded socket setup itself; do not also preload tsx/Node hooks into workers.
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=1024   timeout 150s node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts   tests/integration/finals-store.test.ts tests/integration/finals-session-scopes.test.ts   tests/integration/service-runtime.test.ts tests/integration/database-readiness.test.ts   tests/integration/migration-upgrade.test.ts --reporter=json --outputFile=artifacts/NEW-DATABASE.json
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration NODE_OPTIONS=--max-old-space-size=1024   timeout 240s node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts   --reporter=json --outputFile=artifacts/NEW-HTTP.json
+```
+
+worker1·앱/브라우저 합산3GiB·임시5GiB는 관측 상한이고 DB512MiB는 강제 상한이다. 기존 작업에 RAM8GiB 이상을 남긴다. 실행별 deadline·소유 자식 process group·DB label/ID·보호 ROOT를 기록하고 지속 swap·기존 작업 영향·예산 초과 시 이번 대상만 중단한다. 중단을 SKIP/PASS로 바꾸거나 자동 재개하지 않는다. 앞선 실행의 watchdog은10초 구간의 swap page 카운터가3구간 연속 바뀌면 중단했다. 정확한 속도와 원인을 보존하지 못했으므로 OOM이나 서버 전체 메모리 부족으로 단정하지 않는다.
+
+새 analysis/recall HTTP·Chromium 시험 소스는 타입 검사만 했다. ARI는 DELETE 성공 뒤 GET200/503/404를 fetch fixture로 구분하고 실제 ServiceAuthority/PbxRuntime·SQL 관측을 거치도록 작성했으며 실제 PBX·음성 회수의 성공 증거가 아니다. 최종 통합 검증에는 안정된 허가 환경에서 같은 DB의 재실행/상태 오염과 HTTP/WS/Chromium을 확인해야 한다. runtime에 포함되는 migration CLI가 바뀌므로 향후 새 runtime/공개 묶음에 포함한다. 기존 고정 Release·이미지는 변경하지 않으며 이번에는 발행하지 않는다.
+
+<a id="http-pressure-policy-20261103"></a>
+
+### 이번 통합 시험에 승인된 자원 정책
+
+`integration-pressure-v1`은2026-11-03 시험의 운영 기준이며 보편적인 안전 기준이 아니다. 기본값은 기존 `swap-activity-v1`이다. 새 정책은 **각 observe/watch/run 명령에 `--policy integration-pressure-v1`을 명시**하고, identity의 `resourcePolicy`와 관측/결과 정책이 일치해야 한다. 환경변수만으로 선택되지 않는다. 이전 중단 원본과 기준은 아래 역사 기록에 보존한다. 이번 실행은 종료했으며 다음 기동은 별도 허가 범위를 확인한다.
+
+5초 간격·첫 기준점부터60초 동안 사전 관측한다. MemAvailable<8GiB, 앱/브라우저/observer RSS>3GiB, 임시 디스크>5GiB, 작업 OOM/host oom_kill 증가, PSI some avg10>=10% 또는 full>=2%가3표본 연속, swap-out>=5MiB/s가3구간 연속, 필수 관측 누락/불일치, 명령/전체 deadline, 구체적인 기존 서비스 영향이면 중단한다. swap-in/소량 swap-out만으로 중단하지 않는다. PSI total 증분과 실제 구간 길이/page 크기를 보존한다. DB CPU1/memory512MiB는 강제 제한이고 RSS/disk는 관측 예산이다. 전체5400초에는 정리가 포함된다. watcher 인계 후에도5초 간격을 유지하고 표본 freshness는7초 이내다. Node heap OOM·container OOM·호스트 OOM은 구분한다.
+
+아래 기존 소유 ROOT/Unix socket/migration/provisioning 절차를 그대로 쓰되 승인된 다음 실행에서 명령은 다음처럼 선택한다. 문서 확인을 위해 서비스를 기동하지 않는다.
+
+```bash
+python3 scripts/validation-resource-control.py --policy integration-pressure-v1 observe "$RUN_DIRECTORY"
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 watch "$RUN_DIRECTORY" &
+WATCHER_PID=$!
+# 앞서 설명한 EXIT cleanup trap과 observer PID/freshness 확인을 유지한다.
+step() { CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run "$RUN_DIRECTORY" "$@"; }
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run "$RUN_DIRECTORY" readiness 45 node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts
+```
+
+B/C 필터는 아래 절과 같으며 D에는 새 `analysis Chromium:`을 포함한다. 종전25개 정적 목록은 매개변수 사례7개를 놓쳤다. 현재 실제 사례는 원래32개+추가2개=34개이며 reporter의 실제 이름으로 배정을 대조한다. 추가 분석 Chromium은 실제 WS·동의·분석 결과를 **제품 패널의 component host**로 렌더링하며 ServiceCall/PBX 수신 오디오까지 연결한 시험은 아니다.
+
+```bash
+# 기존 step의 run에 명시적 pressure policy를 적용하고 API_ONLY를 제거한 뒤:
+step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
+```
+
+오디오 종료는 소켓/분석기 중단→진행 작업과 quota 정산 drain→quota pool 종료 순서다. 종료가 consent transaction 또는 session 조회를 기다리는 동안 발생하면 이후 provider/watch를 새로 시작하지 않도록 수정하고 오프라인 경합 회귀로 확인했다. 이 수정 경로의 실제 서비스 재검증은 미실행이다. 최종 권한 검사 중 취소돼 제공자를 호출하지 않은 LLM 예약은0으로 해제한다. 정산 실패나5초 drain timeout은 종료 성공으로 바꾸지 않는다. 제공자 호출 전 취소는 예약 해제0, 호출 뒤 취소는 기존 보수적 요청 사용량1을 정산하며 실제 제공자 청구/취소 성공을 뜻하지 않는다. fixture teardown은 미정산 예약을 삭제하기 전에 assert한다. 잔류 감사가 실패하면 데이터를 지워 통과시키지 않는다. 이번 최초DB의 balance17개는 수정하지 않고 실패 기록으로 보존했고, 같은 cluster의 추가 회귀DB에서 전체 수정 소스와 동일DB 재실행을 확인했다. 역할 LOGIN은 그대로 재사용하고 migration/table GRANT/readiness를 새 DB에서 확인했다. 기존 LOGIN provisioning SQL을 재적용해 비밀번호를 교체하지 않았다.
+
+강제 종료는 graceful drain과 다르다. 기존 worker의 `serviceMaintenance.tick()`은 만료된 reserved 행을 잠그고 전액 사용으로 보수 정산한다. 분석 예약은 현재24시간 뒤 만료되며 정상 worker가 유지보수를 수행해야 한다. 제공자 결과를 모르므로 자동 환불/청구 대조가 아니다. 이번 검토에서 이 crash 경로는 실행하지 않았다. 시험DB의 이미 삭제된 예약17개를 되살리거나 balance를0으로 맞추지 않는다. 저장소에서 영향받은 보존 배포는 확인되지 않았고 기존 영속 환경 영향 여부는 미확인이다.
+
+[이번 실행 증거](../artifacts/http-pressure-integration-20261103.json)는 HTTP11/WS14/Chromium9, 동일DB3건 재실행과 전후 감사, 초기 실패·자원·정리를 구분한다. 원장/ARI/STT/LLM/Anchor/binding은 fixture이며 실제 음성 회수·한국어 품질·AWS를 검증한 것이 아니다. 새 runtime과 최종 trust/인증서에 맞춘 웹·공개 묶음은 별도 발행이 필요하며 기존 고정 Release/digest는 변경하지 않았다.
+
+<a id="http-resource-resume-20261103"></a>
+
+### HTTP·WS·Chromium 재개: 자원 관측과 단계별 중단
+
+2026-11-03 후속 사전 관측은 **서비스 시작 전 BLOCKED**다. 10초 swap-in 속도가 약0.00039→0.0498→0.1959MiB/s로 세 구간 연속 증가했고, 마지막 MemAvailable은28.4GiB·memory PSI 평균은0이었다. 관측 대상 앱 RSS는0이며 컨테이너는 없었다. 호스트 전체 swap의 발생 주체나 OOM을 입증하지 않는다. [관측 원본과 검사 결과](../artifacts/http-resource-preflight-20261103.json)를 보존하며 이번에는 재기동하지 않는다.
+
+기존 로컬 watchdog/launcher를 `scripts/validation_resources.py`와 `scripts/validation-resource-control.py`로 공유했다. 최초 표본은 기준점이고 실제 page 크기·monotonic 경과 시간으로 in/out을 따로 계산한다. 기존1초·10초 관측 모두 **어느 방향이든 양의 swap 증분이3구간 연속이면 중단**하며 새 속도 하한은 없다. 카운터 감소/시계 역행은 swap 압력으로 분류하지 않고 관측 불일치로 차단한다. 이 계산 오류가 과거 중단 원인이었다는 증거는 없다.
+
+다음 명령은 **별도의 재개 허가 이후** 사용할 자료다. 이번 자원 중단을 자동 재시험하지 않는다. 첫 명령은 서비스·키·컨테이너 없이 읽기 전용 관측만 한다. 새 보호 디렉터리여야 하며 과거 stop 파일을 지워 재사용하지 않는다.
+
+```bash
+RUN_DIRECTORY="$(pwd)/.local/http-resume-$(date -u +%Y%m%dT%H%M%SZ)"
+python3 scripts/validation-resource-control.py observe "$RUN_DIRECTORY"
+# exit2: BLOCKED. 다음 명령·환경 생성 없이 관측 파일을 보존하고 종료한다.
+```
+
+실제 재개 시에는 위 Unix socket 절의 기존 절차로 **새 identity**를 준비한다. PostgreSQL은 `docker run` 대신 동일 인자의 `docker create --pull=never`로 먼저 생성하되 시작하지 않는다. 기존 local prepare.py는 DB를 즉시 시작하므로 그대로 재사용하지 않는다. 공개 image tag만 믿지 말고 로컬 ID/amd64와 소유 label·NetworkMode=none·PortBindings 없음·CPU1·memory/swap512MiB·PGDATA tmpfs512MiB를 대조한다. 보호 ROOT는0700이고 그 안에 시험 자격/env·localhost CA·socket만 둔다. 보호 자료 생성과 container create는 위 읽기 전용 관측 명령의 동작이 아니며 이번에 수행하지 않았다.
+
+`RUN_DIRECTORY`와 ROOT는 서로 달라도 되지만 `RUN_DIRECTORY`의 basename을 runId·ROOT basename·DB label Docker label key `callsign.test`의 value에 동일하게 사용한다. `identity.json`은 `runId`, `root`(절대 경로), `containerId`(실제 전체 ID), `container`, `bootIdHash`, `deadlineMonotonicNs`를 기록한다. `bootIdHash`는 `/proc/sys/kernel/random/boot_id` 파일 bytes의 SHA-256이며 호스트 재부팅 후 기존 monotonic deadline을 재사용하지 못하게 한다. deadline은 준비 시작 때 `time.monotonic_ns()+5400_000_000_000`으로 계산하며 정리도 포함한다. ROOT의0600 `environment.json`에는 허용된 자식 환경만 기록한다. 이전 셸의 전체 환경/외부 제공자 자격을 복사하지 않는다. 필요한 값은 다음과 같다.
+
+- `PATH`, `HOME` 등 설치 도구에 필요한 비민감 환경, `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration`, `CALLSIGN_HTTP_TEST_ROOT`, `CALLSIGN_TEST_PG_SOCKET`, `NODE_EXTRA_CA_CERTS`, `NODE_OPTIONS=--max-old-space-size=1024`.
+- 동일 `callsign_test_*` DB의 `TEST_DATABASE_URL`·`MIGRATOR_DATABASE_URL`과 서로 다른 `AUTH_DATABASE_URL`·`ISSUER_DATABASE_URL`·`WORKER_DATABASE_URL` 및 대응 `TEST_AUTH/ISSUER/WORKER/PBX_DATABASE_URL`. URL 원문은 보호 파일에만 둔다.
+- 위 migration CLI와 `infra/deploy/provision-logins.sql`이 사용하는 역할별 보호 비밀번호 참조. owner로 앱을 실행하지 않는다. 현재 소스의 socket preload/setup·환경 검사는 그대로 유지한다.
+
+준비가 끝난 뒤 **새 관측을31초 수행하고 즉시 watcher로 인계**한다. 기존 관측 종료 후 준비 작업을 오래 수행한 자료는 재개 근거로 쓰지 않는다. `observe`는 준비된0700 디렉터리도 받지만 이전 관측/stop 파일이 있으면 거절한다. 인계 간격2초 초과·observer 종료·표본 stale이면 새 단계는 차단된다. 명령들은 저장소 루트에서 순서대로 수행하고 **비0 종료 시 뒤 단계는 시작하지 않는다**.
+
+```bash
+set -e
+export CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration
+# 새로 준비한 RUN_DIRECTORY, ROOT, containerId를 대조한 뒤 한 번만 관측한다.
+python3 scripts/validation-resource-control.py observe "$RUN_DIRECTORY"
+python3 scripts/validation-resource-control.py watch "$RUN_DIRECTORY" &
+WATCHER_PID=$!
+cleanup_run() {
+  result=$?
+  trap - EXIT
+  python3 scripts/validation-resource-control.py cleanup "$RUN_DIRECTORY" || result=2
+  wait "$WATCHER_PID" || true
+  exit "$result"
+}
+trap cleanup_run EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+# watcher 실행 직후에만 아래 argv 기반 helper를 사용한다. 설정 문자열을 shell로 평가하지 않는다.
+step() { python3 scripts/validation-resource-control.py run "$RUN_DIRECTORY" "$@"; }
+step startdb 30 docker start "$OWNED_CONTAINER_ID"
+step final-ready 30 python3 scripts/validation-resource-control.py wait-database "$RUN_DIRECTORY"
+# 최종 PG entrypoint + 실제 SELECT 1 이후에만 migration을 시작한다.
+step migrate 60 node --import tsx --import "$(pwd)/tests/integration/postgres-unix.mjs" scripts/migrate-finals.ts --apply
+step roles 45 python3 scripts/validation-resource-control.py provision-logins "$RUN_DIRECTORY"
+# 기존 SQL을 그대로 적용하며 보호 자격은 Docker exec의 환경 참조로만 전달한다.
+step readiness 45 node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts
+```
+
+직접 Docker 하위 명령은 소유 DB `start`만 허용한다. 위 `wait-database`/`provision-logins`는 `run`이 등록한 PID/start의 자식에서만 동작하며 실제 container ID/label/network/budget를 재검사한다. 기존 `infra/deploy/provision-logins.sql`의 기존 LOGIN 거절·transaction을 그대로 사용하며 일반 재시작에 다시 적용하지 않는다. 실제 SQL/hash/역할 확인은 다음 readiness assertion으로 판정한다. 이 준비 하위 명령은 이번에 정적 검사만 했으며 실제 새 DB에서 실행하지 않았다.
+
+A의 actual SQL/hash/LOGIN 확인 후 B→C→D로 나눈다. API-only 단계는 `environment.json`의 `CALLSIGN_HTTP_API_ONLY=true`를 사용해 Vite를 띄우지 않는다. D 직전에 이를 제거한다. 환경 변경은 앞 자식이 종료하고 다음 단계가 시작되기 전에만 한다. 아래 필터는 현재 두 파일의 준비된 모든 시나리오를 B/C/D 중 하나에 배정하며, 선택되지 않은 SKIP은 성공에 합산하지 않는다.
+
+```bash
+step http-auth 180 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-http.test.ts --testNamePattern '^(?!renders the actual service)'
+step http-recall 180 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(recall HTTP/SQL:|boundary: rejects replayed joint|boundary: separates first-connect|boundary: preserves a live synthetic)'
+step analysis-ws 240 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-boundaries.test.ts --testNamePattern '^(analysis HTTP/WS:|boundary: stops analysis transport|boundary: stops a pending model)'
+# 보호 environment.json에서 CALLSIGN_HTTP_API_ONLY를 제거한 뒤 실행한다.
+step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
+```
+
+E는 같은DB에서 B/C/D 중 영향받는 시나리오만 **새 label**로 재실행하고, 전후에 보호 environment.json에 `CALLSIGN_HTTP_AUDIT_CONFIRMATION=NO_ACTIVE_HTTP_FIXTURES`를 설정해 다음 SQL 감사를 수행한다. 일반 suite 전에 확인값을 제거한다. 시험 전용 빈DB에서 시작하고 active fixture가 없을 때만 권한/outbox/session/미정산quota 잔류를 assert한다. 데이터를 지워 통과시키지 않으며 정당한 usage 정산 이력은 보존한다. 이번E는 미실행이다.
+
+```bash
+step cleanup-audit 45 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/http-cleanup.test.ts
+# 정상·실패 모두 증거를 먼저 보존한 뒤 소유 앱/브라우저→DB 순으로 정리한다.
+exit 0 # EXIT trap이 정상·실패 모두 소유 cleanup을 실행한다.
+```
+
+자원 중단은 최초 원인을 `environment-stop.json`에 고정하고 새 단계를 거절한다. 실행 중 테스트에 SIGINT로 부분 결과/afterAll 기회를 주고, PID와 start tick이 일치하는 소유 자식만 TERM/KILL한다. 앱 정리가 확인되지 않으면 DB를 먼저 내리지 않고 미완료를 기록한다. Vitest progress에는 시험명/판정만 남기며 기존 FAIL을 환경 BLOCKED로 숨기지 않는다. `resource-samples.jsonl`, `*.result.json`, `environment-cleanup.json`을 대조하고, assertion0은 PASS가 아니다. 프로세스 종료 후에도 자식이 남거나 정리 오류가 있으면 수동 소유 identity 확인이 필요하다. 실제 다중 서비스 정리와 observer 인계는 이번에 실행되지 않았으며 오프라인 자식 취소/부분 결과·차단 회귀만 통과했다.
+
+DB의512MiB/CPU1은 강제 제한, 앱/브라우저/observer 합산RSS3GiB·임시5GiB·RAM reserve8GiB는 관측 상한이다.1초 sampling은 순간 peak를 보장하지 않는다. deadline40초 전부터 새 단계를 차단해 정리 시간을 남긴다. 임시 디스크 표본은 소유 ROOT/기록 디렉터리의 파일과 PGDATA512MiB 상한을 합산한 범위다. 공유 도구 cache나 ROOT 밖의 브라우저 임시 profile을 포함한 호스트 전체 임시 공간의 peak로 해석하지 않는다. container `OOMKilled`·Node heap 오류·호스트 PSI/swap을 각각 기록하며 서로 원인으로 단정하지 않는다. Python CLOCK_MONOTONIC과 Vitest process hrtime은 관측자/clock 이름을 구별하고 시각을 직접 빼지 않는다.
+
+`cleanup`은 소유 DB를 **중지**하며 container/보호 파일을 임의 제거하지 않는다. 공개 증거를 선별한 뒤 선언한 container ID·label·ROOT와 PID를 대조해 이번 stopped container 및 ROOT만 제거한다. 전역 prune/kill·기존 권한 변경·swap 설정 변경은 하지 않는다. 모든 종료 경로에 cleanup을 `trap`으로 등록하되 비밀 포함 로그는 공개하지 않는다. 중단 latch를 지우거나 새 identity를 자동 생성해 재개하지 않는다.
 
 ### 인증 후속 경계 검증
 

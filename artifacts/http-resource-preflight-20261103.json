@@ -1,0 +1,1413 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-02T19:51:40.414463+00:00",
+  "executionHead": "d1704070543bbbcdca03ad3b063b51fd31c5070a",
+  "executionBranch": "verify/mentoring-integration-20261103",
+  "executionWorktreeDirty": true,
+  "assessment": {
+    "method": "automatic",
+    "execution": "blocked",
+    "verdict": "unjudged",
+    "review": "required",
+    "reason": "SUSTAINED_SWAP_BEFORE_SERVICE_START"
+  },
+  "scope": "Read-only Linux preflight and offline watchdog/launcher regressions. No integration environment was created.",
+  "sourceFilesAtOfflineVerification": {
+    "scripts/validation_resources.py": "e0adb4b3a2feea749c03aa978691946658d433d3afa4ad97fd5c430757cfb77d",
+    "scripts/validation-resource-control.py": "411193ef7958d2fa4f5fad43afa44ac7881c82ec26b1529dc770cd66c28f59bc",
+    "tests/unit/validation-resources.test.ts": "1fc7c1613e670b3c74bd8b36624c26172b20a1bdba1d799891470a96907ad31d",
+    "tests/integration/progress-reporter.mjs": "c3974942f0b31721cf6ba9d60e8c42c4608aac67c1b2083d2c33ed71d0be3b3e",
+    "tests/fixtures/validation-progress.fixture.ts": "72fff619ed9ff30783add3f096721da67ec0c5a850c2a32faead04da3ea613ba",
+    "tests/integration/http-cleanup.test.ts": "7c0f0fbfc640f9675e83b86da525b026563d29d22d416c43f6d3625a2bbefa80",
+    "tests/integration/service-boundaries.test.ts": "f11f7c18b6ee685c3e138682ffd83f6dcd6efe3fd48862c8a36e2517e13f18ee",
+    "tests/integration/service-http.test.ts": "a61f5f66a291528836fc7041a9e85d62139bf849dbb8d820a0574a90729273a5",
+    "tests/integration/service-http-fixture.ts": "aab53a23e568bb41831a9ba0970d869eeb832a72893feec257199057238be9b3",
+    "tests/integration/postgres-unix.mjs": "d2e52d369f2d36df61ff92b30389730cc085458f5190acc1f24b7a04471e6a28",
+    "tests/integration/postgres-unix-setup.mjs": "e6319469b140727f7177748a5f4b140da5970dc70860365a46a9bac590361453",
+    "vitest.http.config.ts": "f52861e1cf89a8eff6ec7f67cd6646cd6eceb483ef4427b9ca601fa06bdc6f2f",
+    "vitest.integration.config.ts": "53c70bbd0d676736085864b9d5e461ac36e1e8f120ca86031cf637b8be5852fd",
+    "tsconfig.light.json": "91ffcb0d8718b9ee5365e6f41717b56dea316358a7b99a8ed4550c7187d8ab20",
+    "package.json": "1ea5c35ca6f78e7f70dc6c2f8ace4e1ca548d39a67948da406daa63b3ad5e871",
+    "pnpm-lock.yaml": "46b2f41318c97bfab18ab58aa7d861a7434e9f48fa659b2b9053fa8adbb11541"
+  },
+  "preflightProvenance": {
+    "scriptPath": ".local/http-resume-20261103/preflight.py",
+    "scriptSha256": "7e595111d591ac6fccf46da73c55fa3d4ac87375e3320fb089106d7e4bba27db",
+    "rawSamplesSha256": "7700caa17dad51a907c76bd2310c2910039b0a50676d66107de7741da79d1d82",
+    "stopSha256": "b611851aea86ba8af4558fa943194ad1f1e04de0d1c68563ca06d8e25ea31afe",
+    "helperHashAtOriginalSampling": null,
+    "limitation": "Full helper file hash was not captured before later cleanup functions and observer RSS/boot identity fields were added. Original script/raw records are preserved. Replaying recorded samples through the final SwapWatch reproduces the stop; this does not mean later orchestration ran during preflight."
+  },
+  "observations": [
+    {
+      "monotonicNs": 1930837957387647,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410968,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31700004864,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": true,
+      "consecutive": 0,
+      "intervalSeconds": null,
+      "swapInPages": null,
+      "swapOutPages": null,
+      "swapInMiBPerSecond": null,
+      "swapOutMiBPerSecond": null,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930837957387647,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410968,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31700004864,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": true,
+      "consecutive": 0,
+      "intervalSeconds": null,
+      "swapInPages": null,
+      "swapOutPages": null,
+      "swapInMiBPerSecond": null,
+      "swapOutMiBPerSecond": null,
+      "stop": null,
+      "watcher": "10s"
+    },
+    {
+      "monotonicNs": 1930838957792838,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410968,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31656685568,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000405191,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930839958191959,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31643906048,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.000399121,
+      "swapInPages": 1,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0039046915556016364,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930840958557709,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31626260480,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.00036575,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930841958919993,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31605751808,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000362284,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930842959256270,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31694434304,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000336277,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930843959664286,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31684263936,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000408016,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930844960055462,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 31644401664,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000391176,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930845961460812,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 30534729728,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.00140535,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930846964875220,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 28672835584,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263538953.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260734066.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.003414408,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930847965856352,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 28135464960,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263540854.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260735705.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000981132,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930847965856352,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891222,
+      "memAvailableBytes": 28135464960,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263540854.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260735705.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 10.008468705,
+      "swapInPages": 1,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0003902944711260902,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "10s"
+    },
+    {
+      "monotonicNs": 1930848968618495,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410969,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 28011474944,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263546539.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260741271.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.002762143,
+      "swapInPages": 0,
+      "swapOutPages": 1,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.003895490099290675,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930849980395553,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410970,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27248803840,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263554186.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260748501.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 2,
+      "intervalSeconds": 1.011777058,
+      "swapInPages": 1,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0038607813540678243,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930850995493932,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410970,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27278761984,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263557374.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260751688.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.015098379,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930851996202750,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14410970,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27500474368,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263557657.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260751971.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000708818,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930853000463882,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411096,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27512184832,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263564497.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260758721.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.004261132,
+      "swapInPages": 126,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.4900991229440512,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930854001333443,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411096,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27235467264,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263567227.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260761321.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000869561,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930855002955646,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27324346368,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263569066.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260763160.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.001622203,
+      "swapInPages": 1,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.003899923532346058,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930856007550043,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27650412544,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263570796.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260764407.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.004594397,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930857008244654,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27975323648,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263572850.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260766345.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000694611,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930858008928647,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27366080512,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263573658.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260767153.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000683993,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930858008928647,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27366080512,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263573658.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260767153.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 2,
+      "intervalSeconds": 10.043072295,
+      "swapInPages": 128,
+      "swapOutPages": 1,
+      "swapInMiBPerSecond": 0.04978556215799898,
+      "swapOutMiBPerSecond": 0.00038894970435936703,
+      "stop": null,
+      "watcher": "10s"
+    },
+    {
+      "monotonicNs": 1930859009661496,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27656765440,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263580017.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260773266.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000732849,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930860010333020,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411097,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27263107072,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263580758.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260773964.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000671524,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930861011589475,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411098,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27437277184,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.001256455,
+      "swapInPages": 1,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0039013481316332688,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930862013595989,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411098,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27327209472,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.002006514,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930863014267991,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411105,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27408961536,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.000672002,
+      "swapInPages": 7,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.027325387285093643,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930864015417528,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411105,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27313348608,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.001149537,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930865015981938,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411596,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 27436802048,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.00056441,
+      "swapInPages": 491,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 1.916886839898693,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930866016531662,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411596,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 28183560192,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263581982.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260775189.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000549724,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930867016954916,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411596,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 30614200320,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263584634.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260777840.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 0,
+      "intervalSeconds": 1.000423254,
+      "swapInPages": 0,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930868017447034,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411599,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 30522277888,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263584634.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260777840.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 1,
+      "intervalSeconds": 1.000492118,
+      "swapInPages": 3,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.011712985828839884,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": null,
+      "watcher": "1s"
+    },
+    {
+      "monotonicNs": 1930868017447034,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411599,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 30522277888,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263584634.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260777840.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 3,
+      "intervalSeconds": 10.008518387,
+      "swapInPages": 502,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.19592685192516096,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": {
+        "reason": "SUSTAINED_SWAP",
+        "firstSatisfiedMonotonicNs": 1930868017447034
+      },
+      "watcher": "10s"
+    }
+  ],
+  "firstStop": {
+    "reason": "SUSTAINED_SWAP",
+    "firstSatisfiedMonotonicNs": 1930868017447034,
+    "phase": "preflight",
+    "observation": {
+      "monotonicNs": 1930868017447034,
+      "pageBytes": 4096,
+      "swapInPagesTotal": 14411599,
+      "swapOutPagesTotal": 25891223,
+      "memAvailableBytes": 30522277888,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 263584634.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 260777840.0
+        }
+      },
+      "ownedProcessRssBytes": 0,
+      "containerMemoryBytes": null,
+      "phase": "preflight",
+      "baseline": false,
+      "consecutive": 3,
+      "intervalSeconds": 10.008518387,
+      "swapInPages": 502,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.19592685192516096,
+      "swapOutMiBPerSecond": 0.0,
+      "stop": {
+        "reason": "SUSTAINED_SWAP",
+        "firstSatisfiedMonotonicNs": 1930868017447034
+      },
+      "watcher": "10s"
+    },
+    "recordedAt": "2026-11-02T19:14:14.725620+00:00"
+  },
+  "replay": {
+    "status": "PASS",
+    "replayedSamples": 35,
+    "stop": {
+      "watcher": "10s",
+      "reason": "SUSTAINED_SWAP",
+      "firstSatisfiedMonotonicNs": 1930868017447034
+    },
+    "servicesStarted": false,
+    "policyChanged": false
+  },
+  "resourcePolicy": {
+    "watchIntervalsSeconds": [
+      1,
+      10
+    ],
+    "activity": "positive delta in either direction for three consecutive intervals",
+    "rateThreshold": null,
+    "changed": false,
+    "firstSample": "baseline",
+    "counterDecrease": "HOST_COUNTER_RESET, fail closed; not observed in this run",
+    "pageBytes": 4096,
+    "postgresCpuHardLimit": 1,
+    "postgresMemoryHardLimitMiB": 512,
+    "appAndObserverRssObservedLimitMiB": 3072,
+    "temporaryDiskObservedLimitMiB": 5120,
+    "availableMemoryMinimumMiB": 8192,
+    "runtimeLimitsApplied": false,
+    "reason": "No services were started. These remain the future execution budgets."
+  },
+  "interpretation": {
+    "known": "Host-wide positive swap activity met the original ten-second rule before CallSign service startup. MemAvailable at stop was 29108.3125MiB; PSI averages were zero.",
+    "unknown": [
+      "Which process caused the swap activity",
+      "Whether the previous runs had the same rates",
+      "Any Node heap OOM, container OOM or host memory-pressure cause; none established by these samples"
+    ],
+    "observerRssDuringOriginalSampling": "NOT_RECORDED; observer RSS added for future samples, separate post-block diagnostic is not a simultaneous observation",
+    "clockRule": "Linux CLOCK_MONOTONIC for sampling; Vitest process hrtime for its own progress. Never subtract these clocks across observers."
+  },
+  "checks": [
+    {
+      "name": "final-light",
+      "command": "pnpm light",
+      "status": "PASS",
+      "files": 60,
+      "tests": 298,
+      "logSha256": "68ff710e7f27830b427c25c54fbaab0d7c5dd8515ce14b8a4d3f6d5691e98142",
+      "includes": "source hygiene, API/Witness/web/light TypeScript checks and guarded offline tests; no product servers"
+    },
+    {
+      "name": "earlier-light",
+      "command": "pnpm light",
+      "status": "PASS",
+      "files": 60,
+      "tests": 297,
+      "logSha256": "43a05ba36b6bdf3296466d8a30e71863ecc21cd6034f874ae5b4b912fc213794",
+      "scope": "Earlier checkpoint before additional boot/provisioning guards; not added to final count"
+    },
+    {
+      "name": "watchdog-offline-regressions",
+      "status": "PASS",
+      "tests": 7,
+      "scope": "Included in final light, not additional successes. Counter delta/reset/page/time/boot identity; latch/order; owned child cancellation; partial FAIL persistence using actual Vitest reporter; launcher/preparation guards; mock-only SQL command construction. Integration authorization absence also blocks the actual launcher before child startup."
+    },
+    {
+      "name": "reporter-negative-fixture",
+      "status": "EXPECTED_FAILURE",
+      "scope": "Nested offline Vitest fixture deliberately has one passing and one failing synthetic test; outer regression asserts preservation. Neither is a product integration assertion."
+    },
+    {
+      "name": "python-syntax",
+      "status": "PASS",
+      "command": "ast.parse for both resource scripts; no services/imported startup"
+    },
+    {
+      "name": "B-C-D-filter-coverage",
+      "status": "PASS",
+      "preparedScenarios": 25,
+      "executedScenarios": 0,
+      "scope": "Each named existing HTTP/WS/browser scenario matches exactly one phase regex"
+    },
+    {
+      "name": "runbook-shell-examples",
+      "status": "PASS",
+      "command": "bash -n on new fenced examples; commands NOT_RUN"
+    },
+    {
+      "name": "documentation-links",
+      "status": "PASS",
+      "relativePathsChecked": 329,
+      "newExplicitAnchorsChecked": 4,
+      "fences": "PASS"
+    },
+    {
+      "name": "diff-whitespace",
+      "status": "PASS",
+      "command": "git diff --check"
+    }
+  ],
+  "integration": {
+    "database": "NOT_RUN; prior five-file/seventeen-test result stays in artifacts/mentoring-integration-20261103.json; DB implementation unchanged",
+    "http": {
+      "status": "BLOCKED",
+      "executedTests": 0
+    },
+    "websocket": {
+      "status": "BLOCKED",
+      "executedTests": 0
+    },
+    "chromium": {
+      "status": "BLOCKED",
+      "executedTests": 0
+    },
+    "sameDatabaseRerunAndSqlResidueAudit": "NOT_RUN",
+    "actualTlsSpkiException": "NOT_RUN",
+    "wholeServiceCancellationAndObserverHandoff": "NOT_RUN"
+  },
+  "actualComponents": [
+    "Linux read-only proc/memory/pressure observations",
+    "installed Node/pnpm/TypeScript/Vitest/Python for offline checks",
+    "owned offline child process, no socket/listen"
+  ],
+  "fixtureBoundary": [
+    "No OIDC/API/SQL/ledger/ARI/STT/LLM fixture was started in this attempt",
+    "Offline command-construction regression stubs subprocess execution, not real PostgreSQL",
+    "Existing future integration fixtures retain real middleware, PostgreSQL and analysis orchestration; not executed here"
+  ],
+  "cleanup": {
+    "newServiceProcesses": 0,
+    "newContainers": 0,
+    "newDatabases": 0,
+    "newNetworks": 0,
+    "newProtectedServiceRoots": 0,
+    "newKeysOrCertificates": 0,
+    "unitChildAndTemporaryFiles": "Removed by unit finally/TemporaryDirectory cleanup",
+    "localObservationRecords": "Preserved under .local/http-resume-20261103; public selected measurements embedded here",
+    "hostSettingsChanged": false,
+    "proofLimit": "No setting-changing commands were issued. No before/after full host configuration hash was captured for this attempt; do not copy the previous run comparison."
+  },
+  "handoff": {
+    "mainMerge": "BLOCKED pending actual HTTP/WS/Chromium verification",
+    "nextReadOnlyCommand": "python3 scripts/validation-resource-control.py observe NEW_PRIVATE_DIRECTORY",
+    "executionProcedure": "docs/RUNBOOK.md#http-resource-resume-20261103",
+    "newRunPermission": "Required after this resource stop; do not automatically restart or loosen thresholds",
+    "newImagesOrRelease": "NOT_CREATED; prior bootstrap Release remains unchanged; latest product changes still need a verified runtime/public bundle later",
+    "sourceCommits": [
+      "a5f8afe1f04d4cde682b5d1cab995b498bf40378",
+      "1906affe86042967d8dae92de19a2e8166d57444"
+    ]
+  },
+  "auditNotes": {
+    "independence": "Proc counters are observed host values; unit fixtures prove bounded logic/guard behavior, not infrastructure guarantees or service success. The initial private preparation recipe is not reproducibility proof. Tracked guarded preparation entrypoints remain unexecuted.",
+    "coldRead": "Separate context-free read identified missing preparation entrypoints, shutdown criteria and reboot identity; guard/docs updated without starting services."
+  },
+  "tools": {
+    "node": "22.22.2",
+    "pnpm": "11.27.0",
+    "vitest": "5.0.0",
+    "python": "3.12.3",
+    "postgresImage": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+    "postgresImageUse": "Read-only cached image inspection only; no startup"
+  },
+  "originalFailureRecords": [
+    {
+      "path": ".local/validation-resources-red.log",
+      "sha256": "f44c2e5f225fa5bea4a37f891007df1877a951bb9af89a1081d3c83038118566",
+      "classification": "Offline regression failure for a counter decrease before the fail-closed correction; not evidence that a counter reset caused host swap stops."
+    }
+  ]
+}

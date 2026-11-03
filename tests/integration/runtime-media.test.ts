@@ -3,6 +3,8 @@ if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration'||process.env.CA
 import {beforeAll,afterAll,it,expect,vi} from 'vitest';
 import {readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
+import {CallObserver} from '../../scripts/evaluate-performance.js';
+import {analysisControl,exerciseServiceCallAnalysis,installAnalysisTrackObserver} from '../media/analysis-path.js';
 import {createHttpFixture,type HttpFixture} from './service-http-fixture.js';
 const root=process.env.CALLSIGN_CHAIN_TEST_ROOT!;
 let f:HttpFixture;
@@ -33,14 +35,18 @@ it('boots final image roles with real SQL, CA, RPC and processes an actual deleg
 });
 
 it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change'] as const)('proves decoded relay-only two-way audio and reclamation after %s',async outcome=>{
+ let observation:CallObserver|undefined,completed=false;let finishAnalysis:(()=>Promise<void>)|undefined;
  const {chromium}=await import('@playwright/test');
  const browsers=await Promise.all(['sender','recipient'].map(role=>chromium.launch({executablePath:'/opt/browser-cache/chromium-1243/chrome-linux64/chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--allow-loopback-in-peer-connection','--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture=/run/callsign/'+role+'.wav','--autoplay-policy=no-user-gesture-required'],env:{...process.env,LD_LIBRARY_PATH:'/host-libs',HOME:process.env.CALLSIGN_BROWSER_HOME??'/tmp/callsign-media-home'}})));
  const contexts=await Promise.all(browsers.map(b=>b.newContext({permissions:['microphone']})));
+ let lastLease:{body:unknown;csrf:string}|undefined;
  const responses:{path:string;status:number}[]=[];const sipFrames:unknown[]=[];const errors:string[]=[];const failures:{path:string;status:number;code?:string}[]=[];
  try{
+  for(const context of contexts)await installAnalysisTrackObserver(context);
   for(const context of contexts)await context.addInitScript(()=>{const peers:RTCPeerConnection[]=[];(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers=peers;const Native=window.RTCPeerConnection;window.RTCPeerConnection=class extends Native{constructor(c?:RTCConfiguration){super({...c,iceTransportPolicy:'relay'});peers.push(this);const timeline:unknown[]=[];(this as unknown as {timeline:unknown[]}).timeline=timeline;for(const event of ['iceconnectionstatechange','connectionstatechange','signalingstatechange'])this.addEventListener(event,()=>timeline.push({at:performance.now(),event,ice:this.iceConnectionState,connection:this.connectionState,signaling:this.signalingState}));}};});
   const sender=await contexts[0]!.newPage(),receiver=await contexts[1]!.newPage();
   for(const page of [sender,receiver]){page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.stack??e.message));page.on('websocket',ws=>{if(!ws.url().includes('/pbx/ws'))return;const capture=(event:string,frame:{payload:string|Buffer})=>sipFrames.push({event,headers:(String(frame.payload).split('\r\n\r\n')[0]??'').split('\r\n').filter(line=>!/^Authorization:/i.test(line))});ws.on('framereceived',frame=>capture('received',frame));ws.on('framesent',frame=>capture('sent',frame));});page.on('response',async response=>{const path=new URL(response.url()).pathname;if(path.startsWith('/api/'))responses.push({path,status:response.status()});if(path.startsWith('/api/')&&response.status()>=400){const body=await response.json().catch(()=>({}));failures.push({path,status:response.status(),code:body.error?.code});}});}
+  receiver.on('request',request=>{if(request.method()==='POST'&&new URL(request.url()).pathname==='/api/v3/lease')lastLease={body:request.postDataJSON(),csrf:request.headers()['x-csrf-token']??''};});
   const login=async(page:typeof sender,subject:string)=>{f.setIdentity(subject);await page.goto(f.origin+'/service');await page.getByRole('button',{name:'기관 계정 로그인',exact:true}).click();await page.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).waitFor();};
   let naturalExpiry:number|undefined;
   if(outcome==='session-expiry'){
@@ -50,6 +56,7 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
    await writeFile(join(root,'natural-session-wait.json'),JSON.stringify({startedAt:new Date().toISOString(),expiresAt:new Date(naturalExpiry).toISOString(),method:'unmodified real PostgreSQL session expiry; no clock injection or SQL expiry changes'}),{flag:'wx',mode:0o600});
    while(naturalExpiry-Date.now()>60000)await new Promise(r=>setTimeout(r,Math.min(10000,naturalExpiry!-Date.now()-60000)));
   }
+  observation=new CallObserver('runtime-media-'+crypto.randomUUID());
   const contact=JSON.parse(await readFile(join(root,'media-contact.json'),'utf8'));
   const staff=await f.login('staff'),live=JSON.parse(await readFile(join(root,'live-http-context.json'),'utf8'));contact.intentId='media-'+outcome+'-'+crypto.randomUUID();
   if(process.env.CALLSIGN_DELIVERY_NEW){
@@ -64,7 +71,7 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
   }
   await vi.waitFor(async()=>expect((await f.state()).serviceV3!.credentials[contact.digest]!.state).toBe('registered'),{timeout:20000,interval:250});
   if(outcome!=='session-expiry'){await login(sender,'agent');await login(receiver,'recipient');}else{await sender.getByRole('button',{name:'업무 새로고침',exact:true}).click();await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();}
-  await sender.locator('li').filter({hasText:contact.intentId}).getByRole('button',{name:'새 통화 시도'}).click();await sender.getByLabel('위임 증서',{exact:true}).selectOption(contact.digest);await sender.getByRole('button',{name:'개별 연락 승인 받기'}).click();
+  await sender.locator('li').filter({hasText:contact.intentId}).getByRole('button',{name:'새 통화 시도'}).click();await sender.getByLabel('위임 증서',{exact:true}).selectOption(contact.digest);observation!.mark('authorization-request');await sender.getByRole('button',{name:'개별 연락 승인 받기'}).click();
   const attempt=await sender.getByLabel('선택한 통화 시도',{exact:true}).inputValue();expect(attempt).not.toBe('');await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();await receiver.getByLabel('선택한 통화 시도',{exact:true}).selectOption(attempt);
   await sender.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();await receiver.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();
   await sender.getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();await receiver.getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();
@@ -79,13 +86,17 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
    return {target,self,rms,receiverTracks:proof.probes.size,source:'actual-decoded-remote-track',syntheticMicrophone:true};
   },{expectedHz,ownHz});
   const before={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};expect(before.sender.target).toBeLessThan(.003);expect(before.recipient.target).toBeLessThan(.003);
-  await receiver.getByRole('button',{name:'통화 수락 및 검증 시작'}).click();await receiver.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});await sender.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});
+  observation!.mark('connect-action');await receiver.getByRole('button',{name:'통화 수락 및 검증 시작'}).click();await receiver.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});await sender.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});
+  observation!.mark('verification-visible');
   const during={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};
   for(const result of [during.sender,during.recipient]){expect(result.receiverTracks).toBeGreaterThan(0);expect(result.target).toBeGreaterThan(.003);expect(result.target).toBeGreaterThan(result.self*3);expect(result.rms).toBeGreaterThan(.003);}
+  observation!.mark('remote-decoded-both');
+  if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation!);
   const saved=(await f.state()).serviceV3!.attempts[attempt]!;expect(saved.status).toBe('accepted');expect(saved.profile).toBe('asterisk-webrtc-v3');expect(saved.lease?.payload.authority).toBe('current');expect(saved.pbx?.state).toBe('bridged');
   const selectedRelay=await Promise.all([sender,receiver].map(page=>page.evaluate(async()=>{const observations=[];for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers){const stats=await pc.getStats();for(const t of stats.values())if(t.type==='transport'&&t.dtlsState==='connected'){const pair=stats.get(t.selectedCandidatePairId);observations.push({local:stats.get(pair?.localCandidateId)?.candidateType,remote:stats.get(pair?.remoteCandidateId)?.candidateType,dtls:t.dtlsState});}}return observations;})));
   for(const side of selectedRelay){expect(side.length).toBeGreaterThan(0);for(const selected of side){expect(selected.local).toBe('relay');expect(selected.remote).toBe('relay');}}
-  const stop=performance.now();let blockedRenewals=0;
+  const stop=performance.now();observation!.mark('revocation-request');let blockedRenewals=0;
+  const ledgerRevocation=['policy-change','key-change','delegation-revoke','emergency-stop'].includes(outcome);
   if(outcome==='logout')await sender.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();
   if(outcome==='work-cancel')expect((await staff.c.request('/v3/cancel',{intentId:contact.intentId})).status).toBe(200);
   if(outcome==='lease-expiry')await receiver.route('**/api/v3/lease',route=>{blockedRenewals++;return route.abort('failed');});
@@ -117,19 +128,30 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
    const signatures=await Promise.all([1,2].map(async n=>privateKeyToAccount((await readFile(join(root,'private-keys/approver'+n+'.txt'),'utf8')).trim() as `0x${string}`).signTypedData(recoveryTypedData(Number(live.networkId),d.registryAddress,request))));
    const recovered=await staff.c.request('/v3/management/recover',{request,signatures});expect(recovered.status,JSON.stringify(recovered.body)).toBe(200);expect(recovered.body.ledger).toBe('pending');await vi.waitFor(async()=>expect((await f.state()).observedEpoch).toBe(String(BigInt(old.epoch)+2n)),{timeout:20000,interval:250});
    const activated=await staff.c.request('/v3/management/activate-key',{kid:next.kid,publicKey:next.publicJwk,epoch:String(BigInt(old.epoch)+2n),version:2});expect(activated.status,JSON.stringify(activated.body)).toBe(200);const current=await f.state();expect(current.approvalKid).toBe(next.kid);expect(current.approvalKeyVersion).toBe(2);expect(current.serviceV3!.credentials[contact.digest]!.state).toBe('revoked');expect(current.serviceV3!.authorizations[saved.authorizationId!]!.cancelled).toBe(true);expect(current.serviceV3!.consumptions[saved.authorizationId!]).toBeDefined();
-   const stale=await staff.c.request('/v3/intents',{id:'old-trust-'+crypto.randomUUID(),recipientId:f.uid('recipient'),agentId:f.uid('agent'),serviceUri:live.serviceUri,expiresAt:Math.floor(Date.now()/1000)+600});expect(stale.status).toBe(503);expect(stale.body.error.code).toBe('TRUST_PUBLICATION_REQUIRED');
+   const stale=await staff.c.request('/v3/intents',{id:'old-trust-'+crypto.randomUUID(),recipientId:f.uid('recipient'),agentId:f.uid('agent'),serviceUri:live.serviceUri,expiresAt:Math.floor(Date.now()/1000)+600});expect(stale.status).toBe(503);expect(stale.body.error.code).toBe('TRUST_PUBLICATION_REQUIRED');observation!.mark('new-request-rejected');
   }
   if(outcome==='emergency-stop')expect((await staff.c.request('/v3/management/suspend',{})).status).toBe(200);
   await vi.waitFor(async()=>expect((await f.state()).serviceV3!.attempts[attempt]!.pbx!.state).toBe('ended'),{timeout:outcome==='lease-expiry'?40000:15000,interval:250});
   if(outcome==='lease-expiry')expect(blockedRenewals).toBeGreaterThan(0);
   if(outcome!=='session-expiry')await receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/}).waitFor({timeout:10000});
+  if(outcome!=='session-expiry')observation!.mark('ui-recalled');
   let after={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};await vi.waitFor(async()=>{after={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};expect(after.sender.target).toBeLessThan(.003);expect(after.recipient.target).toBeLessThan(.003);},{timeout:5000,interval:100});
+  observation!.mark('audio-reclaimed');if(finishAnalysis)await finishAnalysis();
   const keys=JSON.parse(await readFile(join(root,'private-app.json'),'utf8'));const authorization='Basic '+Buffer.from('callsign:'+keys.ariPassword).toString('base64');for(const path of ['channels/'+saved.pbx!.senderChannelId,'channels/'+saved.pbx!.recipientChannelId,'bridges/'+saved.pbx!.bridgeId]){const observed=await fetch('https://127.0.0.1:8089/ari/'+encodeURI(path),{headers:{authorization},signal:AbortSignal.timeout(4000)});expect(observed.status,'Actual ARI resource must be absent after reclamation').toBe(404);}
   if(['delegation-revoke','emergency-stop'].includes(outcome))await vi.waitFor(async()=>{const jobs=await staff.c.request('/v3/management/jobs');expect(jobs.status).toBe(200);expect(jobs.body.jobs.some((j:{kind:string})=>j.kind===(outcome==='delegation-revoke'?'credential.revoke':'institution.suspend'))).toBe(false);const state=await staff.c.request('/v3/state?digest='+contact.digest);expect(state.status,JSON.stringify(state.body)).toBe(200);expect(state.body.signatures.length).toBeGreaterThanOrEqual(3);if(outcome==='delegation-revoke')expect((await f.state()).serviceV3!.credentials[contact.digest]!.state).toBe('revoked');else expect((await f.state()).status).toBe('suspended');},{timeout:20000,interval:300});
+  if(ledgerRevocation){
+   const applied=await f.state();expect(applied.ledgerObservation?.source).toBe('chain-event-consumer');expect(applied.ledgerObservation?.event).toBe(({ 'policy-change':'ConfigurationUpdated','key-change':'InstitutionRecovered','delegation-revoke':'DelegationRevoked','emergency-stop':'InstitutionSuspended' } as Record<string,string>)[outcome]);observation!.mark('server-applied');
+   const {createPublicClient,http}=await import('viem');const client=createPublicClient({transport:http('http://127.0.0.1:18541',{timeout:4000,retryCount:0})});
+   const receipt=await client.getTransactionReceipt({hash:applied.ledgerObservation!.transactionHash as `0x${string}`});expect(receipt.status).toBe('success');expect(receipt.blockHash).toBe(applied.ledgerObservation!.blockHash);observation!.mark('chain-confirmed');
+  }
+  const terminal=(await f.state()).serviceV3!.attempts[attempt]!;expect(['ended','cancelled','failed','declined','no-answer']).toContain(terminal.status);
+  expect(lastLease).toBeDefined();const late=await receiver.request.post(f.origin+'/api/v3/lease',{headers:{'x-csrf-token':lastLease!.csrf,'idempotency-key':crypto.randomUUID()},data:lastLease!.body});expect([401,403,409,503]).toContain(late.status());observation!.mark('new-request-rejected');
+  await vi.waitFor(async()=>{const rows=await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`;expect(Number(rows[0]!.count)).toBe(0);},{timeout:5000,interval:100});
+  observation!.mark('resources-reclaimed');
   expect(errors).toEqual([]);
-  await writeFile(join(root,'decoded-audio-'+outcome+'.json'),JSON.stringify({outcome,before,during,after,selectedRelay,blockedRenewals,reclaimObservationMs:performance.now()-stop,clock:'one test-controller monotonic clock; one sample, not SLA',realHumanAudio:false,naturalExpiry,externalNatVerified:false}),{flag:'wx',mode:0o600});
+  await writeFile(join(root,'decoded-audio-'+outcome+'.json'),JSON.stringify({outcome,before,during,after,selectedRelay,blockedRenewals,reclaimObservationMs:performance.now()-stop,clock:'one test-controller monotonic clock; one sample, not SLA',realHumanAudio:false,naturalExpiry,externalNatVerified:false}),{flag:'wx',mode:0o600});completed=true;
  }catch(error){await writeFile(join(root,'media-failure-'+outcome+'.json'),JSON.stringify({outcome,failures,errors,responses,sipFrames,peers:await Promise.all(contexts.flatMap(c=>c.pages()).map(p=>p.evaluate(()=>((window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers??[]).map(p=>({ice:p.iceConnectionState,connection:p.connectionState,timeline:(p as unknown as {timeline:unknown[]}).timeline,remoteCandidates:p.remoteDescription?.sdp.split('\r\n').filter(l=>l.startsWith('a=candidate:')),localCandidates:p.localDescription?.sdp.split('\r\n').filter(l=>l.startsWith('a=candidate:'))}))).catch(()=>[]))),state:await f.state()}),{flag:'wx',mode:0o600});for(let i=0;i<contexts.length;i++){const pages=contexts[i]!.pages();for(const page of pages)await page.screenshot({path:join(root,'media-failure-'+outcome+'-'+i+'.png'),fullPage:true}).catch(()=>{});}throw error;}
- finally{await Promise.all(contexts.map(c=>c.close()));await Promise.all(browsers.map(b=>b.close()));}
+ finally{await Promise.all(contexts.map(c=>c.close()));await Promise.all(browsers.map(b=>b.close()));if(observation)await writeFile(join(root,'call-trial-'+outcome+'.json'),JSON.stringify(observation.finish(completed?'success':'failure')),{flag:'wx',mode:0o600});}
 },3800000);
 
 it.each(['device-denied','device-absent'] as const)('handles microphone failure in the product after %s',async mode=>{

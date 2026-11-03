@@ -16,6 +16,15 @@ import { newServiceState } from '../../services/api/src/service-state.js';
 import { assertAnchorMatches, httpConsumptionAnchor, type Anchor } from '../../services/api/src/consumption-anchor.js';
 import type { InstitutionRecord } from '../../services/api/src/finals-model.js';
 
+export async function httpBrowserOptions(){
+ const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
+ if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration'||!root)throw new Error('HTTP_BROWSER_SCOPE_REQUIRED');
+ const cert=new X509Certificate(await readFile(`${root}/tls.crt`));
+ const pin=createHash('sha256').update(cert.publicKey.export({type:'spki',format:'der'})).digest('base64');
+ // Trust only this ephemeral fixture certificate in the child browser, never the host store.
+ return {headless:true,args:['--disable-dev-shm-usage','--no-sandbox',`--ignore-certificate-errors-spki-list=${pin}`]};
+}
+
 export async function createHttpFixture(options:{web?:boolean;liveDirectory?:string;webOrigin?:string;resumeOidc?:string;preparedTrust?:string;startExternal?:(prepared:{environment:NodeJS.ProcessEnv;runRoot:string;origin:string;oidc:string;pin:string})=>Promise<string>}={}){
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
@@ -46,8 +55,8 @@ const approvalKeyVersion=Number(preparedTrust?.service?.approvalKeyVersion??1);i
 const issuerKey=live?await readSigningKey(join(options.liveDirectory!,`data/issuer/approval-v${approvalKeyVersion}.json`)):await generateEd25519KeyPair(),serviceKey=live?await readSigningKey(join(options.liveDirectory!,'data/sender/key.json')):await generateEd25519KeyPair();
 const signing=await generateKeyPair('RS256',{extractable:true}),jwk={...await exportJWK(signing.publicKey),kid:'test-oidc',alg:'RS256',use:'sig'};
 let issuedTokens=0;const usedTokens=new Set<string>();
-const audio={streams:[] as Array<{options:Parameters<import('../../services/api/src/service-audio.js').AudioProviders['stream']>[0];pushes:number;stopped:boolean}>,calls:[] as Array<{signal:AbortSignal;resolve:(r:import('../../services/api/src/risk.js').RiskAnalysis)=>void;reject:(e:Error)=>void}>};
-const audioProviders:import('../../services/api/src/service-audio.js').AudioProviders={stream(options){const item={options,pushes:0,stopped:false};audio.streams.push(item);return {connect(){options.onReady?.();},push(){item.pushes++;},stop(){item.stopped=true;}};},analyze:async(_text,_policy,signal)=>new Promise((resolve,reject)=>audio.calls.push({signal,resolve,reject}))};
+const audio={streams:[] as Array<{options:Parameters<import('../../services/api/src/service-audio.js').AudioProviders['stream']>[0];pushes:number;stopped:boolean}>,calls:[] as Array<{text:string;policy:typeof bankPolicy;signal:AbortSignal;resolve:(r:import('../../packages/protocol/src/index.js').ServiceAnalysis)=>void;reject:(e:Error)=>void}>};
+const audioProviders:import('../../services/api/src/service-audio.js').AudioProviders={stream(options){const item={options,pushes:0,stopped:false};audio.streams.push(item);return {connect(){options.onReady?.();},push(){item.pushes++;},stop(){item.stopped=true;}};},analyze:async(text,policy,signal)=>new Promise((resolve,reject)=>audio.calls.push({text,policy,signal,resolve,reject}))};
 
 const uid=(s:string)=>`${oidc}|${s}`;
 const serverListen=(server:ReturnType<typeof createServer>)=>new Promise<string>((resolve,reject)=>{server.once('error',reject);server.listen(options.resumeOidc?Number(new URL(options.resumeOidc).port):0,'127.0.0.1',()=>{const a=server.address();if(!a||typeof a==='string')return reject(new Error('NO_PORT'));resolve(`https://127.0.0.1:${a.port}`);});});
@@ -135,11 +144,12 @@ const start=async()=>{
  if(vite)(vite.config.server.proxy!['/api'] as {target:string}).target=apiOrigin;
 };
 const close=async()=>{if(options.startExternal){if(provider)await new Promise<void>(r=>provider.close(()=>r()));await sql.end();return;}await web?.close();await platform?.close();await senderApp?.close();await issuerApp?.close();if(provider)await new Promise<void>(r=>provider.close(()=>r()));const owned=(await sql`SELECT state FROM issuer_v2.institutions WHERE id=${id}`)[0]?.state as InstitutionRecord|undefined;
+ expect(Number((await sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${id} AND state='reserved'`)[0]!.count),'fixture must not delete unsettled reservations').toBe(0);
  for(const table of ['usage_reservations','outbox','audit','approval_consumptions','consumption_journal','recovery_gate','identity_links','account_requests','notifications','notification_preferences','configuration_history','worker_status'])await sql`DELETE FROM ${sql('issuer_v2.'+table)} WHERE institution_id=${id}`;
  await sql`DELETE FROM issuer_v2.processed_chain_events WHERE deployment_id=${deployment}`;await sql`DELETE FROM issuer_v2.event_cursor WHERE deployment_id=${deployment}`;
  await sql`DELETE FROM issuer_v2.institutions WHERE id=${id}`;const userIds=Object.keys(owned?.members??record?.members??{}).concat(uid('tenant-b'));if(userIds.length){await sql`DELETE FROM public.sessions WHERE user_id IN ${sql(userIds)}`;await sql`DELETE FROM public.users WHERE id IN ${sql(userIds)}`;}
  if(usedTokens.size)await sql`DELETE FROM public.oidc_login_uses WHERE token_hash IN ${sql([...usedTokens])}`;await sql.end();if(runRoot)await writeFile(`${runRoot}/identity.json`,JSON.stringify({institution:id,deployment,screenshots:['service-mobile.png','service-desktop.png'],scope:'synthetic-accounts-local-oidc-real-http-postgres-browser-external-authority-fixtures'}),{flag:'wx',mode:0o600});};
-return {start,close,sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject,control,audio,
+return {start,close,stopIssuer:()=>issuerApp.close(),sql,id,deployment,anchor,uid,client,login,state,mutate,issuerKey,serviceKey,registeredDigests,longSubject,control,audio,
  get origin(){return origin;},get apiOrigin(){return apiOrigin;},get oidc(){return oidc;},get runRoot(){return runRoot;},
  setIdentity(s:string,variant='normal'){subject=s;mode=variant;},now:()=>Math.floor(Date.now()/1000)+control.offset};
 }

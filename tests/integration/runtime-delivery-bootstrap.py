@@ -14,7 +14,7 @@ if not options.apply:
 if os.environ.get('CALLSIGN_ALLOW_EXTERNAL_EXECUTION')!='integration':raise SystemExit('INTEGRATION_EXECUTION_BLOCKED')
 if os.getuid()!=1000:raise SystemExit('REHEARSAL_REQUIRES_MATCHING_IMAGE_UID_1000_NO_HOST_CHOWN')
 if sys.version_info<(3,12) or not shutil.which('docker'):raise SystemExit('PYTHON_312_AND_INSTALLED_DOCKER_REQUIRED')
-for required in ['tests/integration/runtime-media.test.ts','tests/integration/service-http-fixture.ts','vitest.http.config.ts','/usr/lib/x86_64-linux-gnu','/usr/share/fonts','/etc/fonts']:
+for required in ['tests/integration/runtime-media.test.ts','tests/integration/service-http-fixture.ts','tests/media/analysis-path.ts','vitest.http.config.ts','/usr/lib/x86_64-linux-gnu','/usr/share/fonts','/etc/fonts']:
  if not Path(required).exists():raise SystemExit('OBSERVER_INPUT_MISSING:'+required)
 if not (options.browser_cache/'chromium-1243/chrome-linux64/chrome').is_file():raise SystemExit('INSTALLED_OBSERVER_CHROMIUM_REQUIRED_NO_DOWNLOAD')
 mem={k:int(v.split()[0]) for k,v in (line.split(':',1) for line in Path('/proc/meminfo').read_text().splitlines())}
@@ -278,6 +278,8 @@ print('PBX/TURN prepared from delivered runtime; local-only loopback relay diffe
 images=json.loads((r/'images-loaded.json').read_text());db=json.loads((r/'private-database.json').read_text())
 code=r/'controller-code';(code/'tests/integration').mkdir(parents=True,exist_ok=True)
 for name in ['runtime-media.test.ts','service-http-fixture.ts']:shutil.copyfile(Path('tests/integration')/name,code/'tests/integration'/name)
+(code/'tests/media').mkdir(parents=True,exist_ok=True)
+shutil.copyfile('tests/media/analysis-path.ts',code/'tests/media/analysis-path.ts')
 shutil.copyfile('vitest.http.config.ts',code/'vitest.http.config.ts')
 # Observer-only code/browser mounts. Application services never see these mounts.
 work=imageinfo(images['CALLSIGN_APP_IMAGE'])['Config']['WorkingDir']

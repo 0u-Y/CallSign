@@ -1,6 +1,7 @@
 {
   "environmentId": "test:",
   "environment": "aws",
+  "analysis": "none",
   "transport": "turn",
   "sourceSha256": "",
   "images": [],

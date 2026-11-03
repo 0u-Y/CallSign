@@ -6,6 +6,7 @@ const adapters={anchor:{read:async()=>{throw new Error('MUST_NOT_READ');},advanc
 it('rejects external-adapter injection without integration approval, test identity and loopback origin',async()=>{
  vi.stubEnv('ISSUER_DATABASE_URL','postgres://issuer:fixture@127.0.0.1/callsign_test_scope');vi.stubEnv('AUTH_DATABASE_URL','postgres://auth:fixture@127.0.0.1/callsign_test_scope');vi.stubEnv('CALLSIGN_ALLOW_EXTERNAL_EXECUTION','');vi.stubEnv('DEPLOYMENT_ID','test:unit');
  await expect(buildFinalsServer(env,adapters)).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');
+ await expect(buildFinalsServer(env,{audioProviders:{stream(){throw new Error('MUST_NOT_START');}}})).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');
  vi.stubEnv('CALLSIGN_ALLOW_EXTERNAL_EXECUTION','integration');vi.stubEnv('DEPLOYMENT_ID','production');
  await expect(buildFinalsServer(env,adapters)).rejects.toThrow('TEST_ADAPTER_SCOPE_REQUIRED');
  vi.stubEnv('DEPLOYMENT_ID','test:unit');

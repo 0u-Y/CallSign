@@ -4,6 +4,8 @@
 
 현재 기본 제품은 `/service` → `/v3`의 등록 URI·Asterisk 통화 경로입니다. 아래 결과는 각 원본에 기록된 소스·환경의 증거이며, 현재 코드 전체나 실제 기관 서비스를 검증했다는 뜻은 아닙니다. 새 변경은 [개발 기록](../FINALS-IMPLEMENTATION-PLAN.md)에 이어 기록합니다.
 
+종료 직전 분석 시작/호출 전 정산 경합을 오프라인 회귀로 수정했습니다. 기존 통합 증거와 새 미디어 분석 미실행 경로를 [리뷰 기록](../FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)에서 구별합니다. 실제 ServiceCall→상대 음성→분석 패널·동의 철회·권한 회수의 [다음 시험](../RUNBOOK.md#reviewed-servicecall-analysis)은 실행 허가와 새 후보 이미지가 필요합니다.
+
 ## 실제 확인한 것과 남은 경계
 
 | 영역 | 구현·실행 근거 | 남아 있는 경계 |
@@ -14,6 +16,10 @@
 | 승인·소비·lease·실제 음성 회수 | 전달물만으로 새 원장/DB/Anchor/PBX/TURN·제품 웹을 초기화하고 양 끝점의 서로 다른 합성 음원을 디코딩. 정책/키 복구·철회·세션 자연 만료·PBX 정리 재시도·장치 오류의 선택 경계 확인. [신규 리허설](../../artifacts/delivery-only-rehearsal-20261102.json) | 로컬 OIDC·합성 계정/음원·같은 namespace의 relay. 실제 사람/외부망 NAT·다른 브라우저·모든 장애 조합이 아님 |
 | 동의·전사 수정·위험 안내 | 실제 orchestration/HTTP와 지연·오류 분석 adapter로 동의 철회·세션/revision 변경 후 결과 폐기를 확인. [인증 후속 증거](../../artifacts/service-boundaries-20261030.json) | 외부 STT/LLM은 호출하지 않음. 한국어 음성 품질·정확도·보관/청구·제공자 취소는 미검증 |
 | 이미지·배포 자료 전달 | bootstrap6종의 private GHCR 게시·manifest/config/layer 원격 수령과 공개 Release 재수령 확인. [이미지](../../artifacts/ghcr-images-20261102.json), [전달 영수증](../../artifacts/ghcr-delivery-20261102.json) | AWS 최종 웹·별도 GHCR 수령용 읽기 자격·AWS 실제 배포·외부 TLS/IdP/NAT/TURN은 미완료 |
+
+## 최신 변경의 통합 실행 상태
+
+2026-11-03 명시적 시험 압박 정책에서 실제 SQL·인증·HTTP/WS·Chromium을 연결해 HTTP11·WS14·Chromium9가 통과했습니다. 같은 회귀DB3건 재실행과 전후 잔류 감사도 통과했습니다. 초기 quota 잔류17개는 보존하고 종료 시 분석/정산 drain 결함을 수정했으며, 같은 소유 cluster의 추가DB에서 회귀했습니다. Chromium 중1개는 실제 WS 결과를 제품 패널에 렌더링한 component host여서 실제 통화 컨트롤러·음성 경로의 성공으로 확대하지 않습니다. [최신 기록](../FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)·[원본 증거](../../artifacts/http-pressure-integration-20261103.json)를 참고하세요. 과거 PostgreSQL17시험과 swap BLOCKED 기록은 당시 범위로 보존합니다.
 
 ## 4차 반영의 소스 구현
 

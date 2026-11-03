@@ -1,4 +1,5 @@
 import {writeFile} from 'node:fs/promises';
+import {analysisControl,exerciseServiceCallAnalysis,installAnalysisTrackObserver} from './analysis-path.js';
 import {CallObserver} from '../../scripts/evaluate-performance.js';
 import { expect,test,type Page,type Browser,type BrowserContext } from '@playwright/test';
 test('URI PBX path: no microphone transmission before acceptance, signed connection, logout cleanup',async({playwright},testInfo)=>{
@@ -7,9 +8,10 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
  test.skip(!origin||!senderState||!recipientState||!intentId||!digest,'NOT-RUN: explicitly approved PBX stack, registered URI trust and separately authenticated roles required');
  const waves=[process.env.CALLSIGN_MEDIA_SENDER_WAV,process.env.CALLSIGN_MEDIA_RECIPIENT_WAV];
  if(waves.some(w=>!w)||waves[0]===waves[1])throw new Error('DISTINCT_SYNTHETIC_WAV_FILES_REQUIRED_NO_HUMAN_MICROPHONE');
- const browsers:Browser[]=[],contexts:BrowserContext[]=[];
+ const browsers:Browser[]=[],contexts:BrowserContext[]=[];let finishAnalysis:(()=>Promise<void>)|undefined;
  try{
   for(let i=0;i<2;i++){const b=await playwright.chromium.launch({headless:true,args:['--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture='+waves[i]],...(process.env.CALLSIGN_BROWSER_PATH?{executablePath:process.env.CALLSIGN_BROWSER_PATH}:{})});browsers.push(b);contexts.push(await b.newContext({storageState:[senderState,recipientState][i]!,permissions:['microphone']}));}
+  for(const context of contexts)await installAnalysisTrackObserver(context);
   for(const context of contexts){await context.route('**/*',route=>new URL(route.request().url()).origin===new URL(origin!).origin?route.continue():route.abort('blockedbyclient'));}
   for(const context of contexts)await context.addInitScript(({forceRelay})=>{const peers:RTCPeerConnection[]=[];(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers=peers;const Native=window.RTCPeerConnection;window.RTCPeerConnection=class extends Native{constructor(c?:RTCConfiguration){super({...c,...(forceRelay?{iceTransportPolicy:"relay"}:{})});peers.push(this);}};},{forceRelay:process.env.CALLSIGN_EXPECT_TRANSPORT==='turn'});
   const sender=await contexts[0]!.newPage(),receiver=await contexts[1]!.newPage();await sender.goto(`${origin}/service`);
@@ -31,11 +33,12 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const){await expect.poll(async()=>{const x=await decoded(page,remoteHz,ownHz);return x.remote>.003&&x.remote>x.own*3;}).toBe(true);}
   for(const page of [sender,receiver]){const relayed=await page.evaluate(async()=>{const results:boolean[]=[];for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers){const stats=await pc.getStats();for(const item of stats.values())if(item.type==='transport'&&item.selectedCandidatePairId){const pair=stats.get(item.selectedCandidatePairId);results.push(stats.get(pair?.localCandidateId)?.candidateType==='relay'||stats.get(pair?.remoteCandidateId)?.candidateType==='relay');}}return results;});expect(relayed.length).toBeGreaterThan(0);if(process.env.CALLSIGN_EXPECT_TRANSPORT)expect(relayed.every(v=>v===(process.env.CALLSIGN_EXPECT_TRANSPORT==='turn'))).toBe(true);}
   observation.mark('remote-decoded-both');
+  if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation);
   await testInfo.attach('two-way-decoded-audio',{body:JSON.stringify({sender:await observed(sender),recipient:await observed(receiver)}),contentType:'application/json'});
   observation.mark(process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'termination-request':'revocation-request');await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
   await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.connectionState==='closed'&&pc.getSenders().every(s=>!s.track||s.track.readyState==='ended')))).toBe(true);
-  for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const)await expect.poll(async()=>(await decoded(page,remoteHz,ownHz)).remote).toBeLessThan(.003);observation.mark('audio-reclaimed');outcome='success';
-  // No analysis consent is granted: this test must never contact a paid provider.
+  for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const)await expect.poll(async()=>(await decoded(page,remoteHz,ownHz)).remote).toBeLessThan(.003);observation.mark('audio-reclaimed');if(finishAnalysis)await finishAnalysis();outcome='success';
+  // Default mode grants no consent; fixture mode never contacts a paid provider.
  }catch(error){testFailed=true;if(testInfo.status==='timedOut'||/timeout|timed out/i.test((error as Error).message))outcome='timeout';throw error;}finally{
   const receiver=contexts[1]?.pages()[0];if(receiver&&attempt){try{const session=await receiver.request.get(`${origin}/api/v3/auth/me?purpose=work`);if(session.ok()){const auth=await session.json();await receiver.request.post(`${origin}/api/v3/outcome`,{headers:{'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:{attemptId:attempt,outcome:'failed',reason:'trial-finally-cleanup'}});await expect.poll(async()=>{const r=await receiver.request.get(`${origin}/api/v3/call-context?attemptId=${encodeURIComponent(attempt)}`);return r.ok()&&(await r.json()).attempt.cleanup?.status==='pbx-absent';},{timeout:10000}).toBe(true);reclaimed=true;}}catch{/* Unknown cleanup stops subsequent trials. */}}
   if(reclaimed)observation.mark('resources-reclaimed');else if(outcome!=='timeout')outcome='failure';

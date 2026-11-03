@@ -1,3 +1,3 @@
 import { defineConfig } from "vitest/config";
 if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "integration") throw new Error("INTEGRATION_EXECUTION_BLOCKED");
-export default defineConfig({ test: { include: ["tests/integration/**/*.test.ts"], exclude: ["tests/integration/runtime-media.test.ts","tests/integration/live-authority-http.test.ts","tests/integration/chain-runtime.test.ts","tests/integration/service-http.test.ts","tests/integration/service-boundaries.test.ts"], maxWorkers: 1 } });
+export default defineConfig({ test: { setupFiles:process.env.CALLSIGN_TEST_PG_SOCKET?['tests/integration/postgres-unix-setup.mjs']:[], include: ["tests/integration/**/*.test.ts"], exclude: ["tests/integration/http-cleanup.test.ts","tests/integration/runtime-media.test.ts","tests/integration/live-authority-http.test.ts","tests/integration/chain-runtime.test.ts","tests/integration/service-http.test.ts","tests/integration/service-boundaries.test.ts"], maxWorkers: 1 } });
