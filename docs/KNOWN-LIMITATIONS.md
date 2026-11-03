@@ -6,6 +6,10 @@
 
 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)은 확인한 실행과 원본 증거를, 이 문서는 남은 보장·운영 한계를 설명한다. 코드 미구현과 외부 설정/실환경 미검증을 구별한다. [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)의 과거 SHA·날짜·결과는 해당 실행 범위로 보존한다.
 
+## 현재 후보의 전체 기동 조건
+
+현재 후보의 image/config·archive checksum·일반 entrypoint 파일/권한은 무기동으로 대조했다.90초 현재 호스트 관측은40GiB 시작 조건을 통과했지만, driver의 서비스/웹 build 동시 실행은 앞선 빌드 직렬 조건과 충돌한다. 전체 컨테이너 단계별 한도와 미지정 host 비용은 [단일 예산표](RUNBOOK.md#delivery-memory-budget)를 따른다.40GiB는 실측 최소 RAM이 아닌 운영 정책이며 그대로 유지한다. 웹 build만의 동시 실행 예외·전체24GiB 관측 예산 제안은 미승인이다. 이번에는 서비스/이미지 build/load를 실행하지 않았으며 일반 entrypoint·전체 통화·정상2회 반복은 여전히 NOT_RUN이다. 기존 후보는 보존했고 새 로컬 base 사전 검사는 observer 변경이므로 runtime 재빌드는 필요 없다. 기존 observer archive에 이 검사까지 반영됐다고 주장하지 않는다.
+
 ## AWS 전달과 실행의 남은 경계
 
 bootstrap6종의 private GHCR 게시·실제 원격 manifest/config/layer 수령과 공개 파일 Release 재수령은 확인했다. [배포 기준·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 고정 버전을 찾는다. 별도 AWS reader 자격·리전/예산·실제 도메인/TLS·OIDC·최종 web pin·AWS 전체 기동은 아직 준비/검증 대기다. 현재 개발 서버 없이 자료를 받을 수 있다는 것과 AWS에서 서비스를 실행했다는 것은 다르다.

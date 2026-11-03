@@ -576,7 +576,39 @@ Asterisk/PJSIP/WSS/ARI/SRTP/ODBC와 PostgreSQL Unicode driver를 실제 image에
 
 필요한 입력은 checksum에 포함된 `aws-bootstrap-images.tar`, `deployment-files.tar`, `images.json`, `observer-tests.tar`다. 이미지6종은 linux/amd64이며 웹은 새 PBX 인증서·trust에 맞춰 전달 runtime/nginx에서 만든다. 원래 전달물에는 웹이 참조하는 `artifacts/test-results.json`이 빠져 있었으므로 수정된 공개 묶음을 사용한다. 이 JSON은 날짜가 있는 과거 증거이며 현재 배포 결과로 갱신하지 않는다.
 
-준비 PC에는 Docker, Python3.12 이상, UID1000, 기존 Chromium1243와 `/usr/lib/x86_64-linux-gnu`, `/usr/share/fonts`, `/etc/fonts`가 필요하다. 누락돼도 설치하거나 host 권한을 바꾸지 않는다. 시작 시 available RAM40GiB를 요구한다. 이는 최대 약23GiB의 시험/빌드 예산과16GiB 여유를 확보하는 보수적인 실행 조건이며 서비스 최소 사양이 아니다. `vmstat`·available RAM·소유 container의 OOM을 계속 관측하고 지속 swap·OOM·16GiB 미만 여유·기존 작업 영향이면 소유 시험만 중단한다.
+준비 PC에는 Docker, Python3.12 이상, UID1000, 기존 Chromium1243와 `/usr/lib/x86_64-linux-gnu`, `/usr/share/fonts`, `/etc/fonts`가 필요하다. 누락돼도 설치하거나 host 권한을 바꾸지 않는다. 시작 available RAM **40GiB guard는 유지**한다. 이는 기술적 최소 RAM이나 실측 peak가 아니라, 아래 약23GiB 컨테이너 예산과 기존 작업용16GiB 여유를 올림한 보수적 운영 정책이다. 더 낮은 시작 조건을 입증한 비교 시험은 없다.
+
+<a id="delivery-memory-budget"></a>
+
+현재 `runtime-delivery-bootstrap.py`·`runtime-media-driver.py`의 강제 한도를 GiB로 환산하면 다음과 같다. AWS Compose의 한도와 폐기 시험 launcher의 한도를 혼용하지 않는다.
+
+| 구성 | 개수 × 컨테이너 한도 | 합계 GiB | 포함 시점/별도 조건 |
+|---|---:|---:|---|
+| Besu | 4 × 3GiB | 12 | JVM 각각 `-Xmx2g`; heap과 컨테이너 한도를 중복 합산하지 않음 |
+| Witness | 4 × 512MiB | 2 | 고정 4개 유지 |
+| 서비스/Anchor PostgreSQL | 2 × 512MiB | 1 | 서로 다른 volume; shared memory도 해당 프로세스 관측에 포함 |
+| HTTPS Anchor | 1 × 256MiB | 0.25 | DB와 별도 프로세스 |
+| Asterisk | 1 × 512MiB | 0.5 | 합성 음원 |
+| TURN | 1 × 512MiB | 0.5 | 현재 launcher 기본값; 과거256MiB 표본과 구별 |
+| none namespace keeper | 1 × 32MiB | 0.03125 | bridge/port publish 없음 |
+| 시험 controller | 1 × 2GiB | 2 | Chromium·로컬 OIDC·assertion 포함, host RSS로 다시 더하지 않음 |
+| Issuer/Sender/Platform/worker | 4 × 512MiB | 2 | worker1개; 별도 Node heap 고정은 없음 |
+| **웹 생성 전 기반/앱 소계** | | **20.28125** | 현재 driver는 이 상태에서 웹 build 시작 |
+| 웹 builder | 1 × 2GiB | 2 | build 단계 최대 **22.28125GiB**;90초·CPU1 |
+| web/HTTPS ingress | 2 × 512MiB | 1 | builder 종료 후 기동; 서비스 단계 합 **21.28125GiB** |
+| 직렬 준비 tool | 기본512MiB, Besu generator1GiB | 동시 가산 안 함 | controller/전체 앱 준비 전 종료·제거, 위 최대보다 작음 |
+| 호스트 launcher/감시·Docker daemon 추가 비용 | 미지정 | **기존23GiB에 명시적 포함 근거 없음** | 컨테이너 PID의 host RSS와 중복 합산 금지 |
+
+한도 합은 실제 사용량/메모리 예약/최소 사양이 아니다. 각 `/tmp` tmpfs 한도(bootstrap256MiB, 앱64MiB)는 사용한 만큼 컨테이너 메모리에 반영되므로 별도 전량을 한도 합에 더하지 않는다. PostgreSQL shmem·page cache 역시 실제 cgroup 사용을 관측해야 한다. Docker daemon과 호스트 측 추가 비용이 모두 위 수치 안에서 제한된다고 주장하지 않는다. 과거 전달 리허설의 최소 available37.53GiB, Besu의 약433~445MiB 종료 시점 표본은 다른 소스/이미지의 역사 관측이며 현재 peak·필수 RAM 근거가 아니다. [원본](../artifacts/delivery-only-rehearsal-20261102.json)은 보존한다.
+
+**현재 실행 보류 사유:** 이전 승인에서 빌드와 서비스의 동시 실행을 금지했지만, 이 driver는 trust 준비와 API 기동 후 웹을 build한다.40GiB 충족만으로 그 실행 순서를 승인된 것으로 간주하지 않는다. 기존 후보를 바꾸지 않는 최소 변경안은 이2GiB/90초 웹 생성만 동시 실행 예외로 승인하고, 컨테이너 최대22.28125GiB + 호스트 시험 프로세스 관측 예산1GiB를 올린 **전체 관측 예산24GiB**, 기존 작업용16GiB 여유·40GiB 시작 guard를 함께 유지하는 것이다. **이 제안은 미승인·미적용**이며 Docker daemon 등의 공유 비용은 호스트 available/PSI/OOM 관측으로 별도 감시해야 한다. 승인 전에는 아래 apply/proof를 실행하지 않는다. 예산이나 guard를 자동으로 높이거나 낮추지 않는다.
+
+동일 구성을 별도 장비에서 시험한다면 linux/amd64, Docker/Python3.12+/UID1000, 위 설치 Chromium/라이브러리, 시작 available40GiB와 충분한 CPU 여유가 필요하다. 관측한 호스트는24논리 CPU이며 전용 장비에24 vCPU·64GiB RAM·빈 디스크30GiB 이상을 **준비 제안**으로 삼을 수 있으나 실측 최소 사양은 아니다. 전달 archive2.32GB와 unpacked image·새 chain/DB·로그/웹 build 공간을 확보하고 증가량을 제한한다. 새 identity/키를 만들고 기존 체인·DB·Anchor를 섞지 않는다. 내부 none namespace·loopback와 설치 controller만 사용하므로 개발 서버 IP/인증/키는 필요 없다. 실제 AWS 외부 TLS/NAT 검증은 별도다.
+
+모든 실행은 명령별 timeout과 정리를 포함한 전체 deadline을 고정한다. 기존16GiB 여유 중단, `integration-pressure-v1`의 PSI/swap-out/OOM/관측 오류 조건과 소유 컨테이너 OOM·기존 작업 영향 중단을 유지한다. CPU idle/iowait·runnable/blocked·load 추세도 기록한다. 소량 swap-in만으로 원인을 단정하거나 과거 load138을 현재 부하 원인으로 사용하지 않는다.
+
+전달 driver는 Docker build 전에 **두 FROM의 실제 로컬 config ID와 linux/amd64**를 확인하고, 추가 FROM/외부 COPY·ADD·Dockerfile frontend가 있으면 재검토를 요구한다. `--pull=false`만으로 다운로드 차단을 보장하지 않는다. bootstrap create/run은 `--pull=never`, 배포 start는 `--no-build --pull never`다. 일반 `app.Dockerfile`은 의존성 설치/온라인 base를 사용하는 별도 경로이므로 다운로드 없는 후보 검증에 쓰지 않는다. 기존 observer archive에는 새 사전 검사가 없으므로, 다음 실행은 검토한 새 driver의 source hash를 명시해야 한다. 제품 코드·runtime image는 변경하지 않았고 기존 후보/묶음/checksum은 덮어쓰지 않았다.
+
 
 ```bash
 # All paths are reviewed local delivery/observer paths. No cloud or host configuration command.

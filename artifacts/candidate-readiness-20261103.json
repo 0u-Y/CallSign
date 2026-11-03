@@ -1,0 +1,1442 @@
+{
+  "recordedAtUtc": "2026-11-03T14:18:34.598909+00:00",
+  "sourceHead": "fccf0c1ccbe545123aa05e283df9024716b1d1e1",
+  "worktreeDirty": true,
+  "sourceFileSha256": {
+    "tests/integration/runtime-media-driver.py": "4d9483d293dbd2312f1ce10fff8f1ead047866941efa887c29e35b71c6df66c8",
+    "tests/unit/deployment-config.test.ts": "d302928e4a1928c584aadf09639809a47122027224dbdaff4239503f0ec690a8",
+    "tests/integration/runtime-delivery-bootstrap.py": "99bc71cf9c9904f9af5ec668f48da8ce112ef5b4081debf3831efb1371a629a1",
+    "infra/deploy/web.Dockerfile": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+    "infra/deploy/prepared-runtime.Dockerfile": "0e01bc9523b5a6e798c96e8d0a160343911886ade704c86b85c827e590458f04"
+  },
+  "candidateSource": "e95b653152bff5a79155810fbb60287c1c84fcea",
+  "candidateConfigId": "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c",
+  "candidateChanged": false,
+  "runtimeRebuilt": false,
+  "hostObservation": {
+    "samples": 19,
+    "seconds": 90.000162646,
+    "memAvailableGiB": {
+      "minimum": 41.649784088134766,
+      "maximum": 42.14898681640625
+    },
+    "swapInMiBPerSecondMaximum": 0.0382812817045575,
+    "swapOutMiBPerSecondMaximum": 0.29062362366464306,
+    "memoryPsiAvg10Maximum": {
+      "some": 0.0,
+      "full": 0.0
+    },
+    "memoryPsiTotalDeltaMicroseconds": {
+      "some": 12047.0,
+      "full": 11318.0
+    },
+    "cpuPercentRange": {
+      "busy": [
+        2.1841004184100417,
+        8.348001005783253
+      ],
+      "idle": [
+        91.63523593998826,
+        97.81589958158996
+      ],
+      "iowait": [
+        0.0,
+        0.0587248322147651
+      ]
+    },
+    "cpuPsiSomeAvg10Maximum": 0.0,
+    "cpuPsiSomeTotalDeltaMicroseconds": 190745.0,
+    "runnableRange": [
+      1,
+      12
+    ],
+    "blockedRange": [
+      0,
+      0
+    ],
+    "loadFirst": [
+      0.5,
+      9.64,
+      57.33
+    ],
+    "loadLast": [
+      0.47,
+      7.25,
+      52.07
+    ],
+    "oomKillDelta": 0,
+    "diskAvailableGiBMinimum": 373.216552734375,
+    "resourceStopReasons": [],
+    "currentCpuCount": 24,
+    "servicesStarted": false
+  },
+  "samples": [
+    {
+      "monotonicNs": 1998847790049240,
+      "baseline": true,
+      "intervalSeconds": null,
+      "memAvailableBytes": 45124726784,
+      "swapInPages": null,
+      "swapOutPages": null,
+      "swapInMiBPerSecond": null,
+      "swapOutMiBPerSecond": null,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282526739.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274668769.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": null,
+      "cpuPercent": null,
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.5,
+        9.64,
+        57.33
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 5.42,
+          "total": 13417905144.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": null,
+      "oomKillDelta": null,
+      "diskAvailableBytes": 400803254272,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998852790211828,
+      "baseline": false,
+      "intervalSeconds": 5.000162588,
+      "memAvailableBytes": 44721115136,
+      "swapInPages": 41,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.03203020845449356,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282526807.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274668837.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 68.0,
+        "full": 68.0
+      },
+      "cpuPercent": {
+        "busy": 5.160857908847185,
+        "idle": 94.81400804289544,
+        "iowait": 0.025134048257372654,
+        "steal": 0.0
+      },
+      "runnableTasks": 2,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.54,
+        9.49,
+        57.02
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 5.34,
+          "total": 13417911429.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 6285.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400794152960,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998857790225309,
+      "baseline": false,
+      "intervalSeconds": 5.000013481,
+      "memAvailableBytes": 44919431168,
+      "swapInPages": 23,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.017968701552786875,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282526885.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274668914.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 78.0,
+        "full": 77.0
+      },
+      "cpuPercent": {
+        "busy": 3.1582474658624444,
+        "idle": 96.84175253413756,
+        "iowait": 0.0,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.58,
+        9.35,
+        56.72
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 5.23,
+          "total": 13417919088.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 7659.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400785088512,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998862790204092,
+      "baseline": false,
+      "intervalSeconds": 4.999978783,
+      "memAvailableBytes": 45055008768,
+      "swapInPages": 11,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.008593786466873492,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282527009.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274669038.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 124.0,
+        "full": 124.0
+      },
+      "cpuPercent": {
+        "busy": 2.6212210032660583,
+        "idle": 97.37040448873628,
+        "iowait": 0.008374507997655137,
+        "steal": 0.0
+      },
+      "runnableTasks": 2,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.61,
+        9.21,
+        56.42
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 5.16,
+          "total": 13417927476.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 8388.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400779423744,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998867790212519,
+      "baseline": false,
+      "intervalSeconds": 5.000008427,
+      "memAvailableBytes": 45037076480,
+      "swapInPages": 20,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.015624973665669385,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282527039.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274669068.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 30.0,
+        "full": 30.0
+      },
+      "cpuPercent": {
+        "busy": 3.1752680965147455,
+        "idle": 96.81635388739946,
+        "iowait": 0.008378016085790885,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.56,
+        9.06,
+        56.12
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 5.06,
+          "total": 13417937345.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 9869.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400771485696,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998872790282032,
+      "baseline": false,
+      "intervalSeconds": 5.000069513,
+      "memAvailableBytes": 45150400512,
+      "swapInPages": 17,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.013281065358660745,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282527057.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274669086.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 18.0,
+        "full": 18.0
+      },
+      "cpuPercent": {
+        "busy": 3.2152725445867874,
+        "idle": 96.78472745541322,
+        "iowait": 0.0,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.52,
+        8.91,
+        55.82
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.99,
+          "total": 13417945453.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 8108.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400765788160,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998877790241804,
+      "baseline": false,
+      "intervalSeconds": 4.999959772,
+      "memAvailableBytes": 45073268736,
+      "swapInPages": 17,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.013281356856484723,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282527095.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274669124.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 38.0,
+        "full": 38.0
+      },
+      "cpuPercent": {
+        "busy": 4.851684263448969,
+        "idle": 95.1399363164069,
+        "iowait": 0.008379420144126026,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.55,
+        8.78,
+        55.52
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.89,
+          "total": 13417958176.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 12723.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400758341632,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998882790143433,
+      "baseline": false,
+      "intervalSeconds": 4.999901629,
+      "memAvailableBytes": 45213941760,
+      "swapInPages": 10,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.007812653707711576,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282527176.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274669205.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 81.0,
+        "full": 81.0
+      },
+      "cpuPercent": {
+        "busy": 2.1841004184100417,
+        "idle": 97.81589958158996,
+        "iowait": 0.0,
+        "steal": 0.0
+      },
+      "runnableTasks": 3,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.51,
+        8.63,
+        55.22
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.82,
+          "total": 13417966582.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 8406.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400755838976,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998887790167112,
+      "baseline": false,
+      "intervalSeconds": 5.000023679,
+      "memAvailableBytes": 44917395456,
+      "swapInPages": 29,
+      "swapOutPages": 372,
+      "swapInMiBPerSecond": 0.022656142705039378,
+      "swapOutMiBPerSecond": 0.29062362366464306,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282537525.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274678901.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 10349.0,
+        "full": 9696.0
+      },
+      "cpuPercent": {
+        "busy": 8.348001005783253,
+        "idle": 91.63523593998826,
+        "iowait": 0.01676305422848043,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.55,
+        8.5,
+        54.93
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.72,
+          "total": 13417981054.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 14472.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400744652800,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998892790163474,
+      "baseline": false,
+      "intervalSeconds": 4.999996362,
+      "memAvailableBytes": 44931186688,
+      "swapInPages": 28,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.02187501591626158,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282537525.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274678901.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 0.0,
+        "full": 0.0
+      },
+      "cpuPercent": {
+        "busy": 3.34924223394457,
+        "idle": 96.62563844930085,
+        "iowait": 0.025119316754584276,
+        "steal": 0.0
+      },
+      "runnableTasks": 2,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.51,
+        8.36,
+        54.64
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.65,
+          "total": 13417992852.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 11798.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400738222080,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998897790125959,
+      "baseline": false,
+      "intervalSeconds": 4.999962485,
+      "memAvailableBytes": 45099003904,
+      "swapInPages": 32,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.025000187576407384,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282537555.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274678931.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 30.0,
+        "full": 30.0
+      },
+      "cpuPercent": {
+        "busy": 5.307285989771108,
+        "idle": 94.68432967217238,
+        "iowait": 0.008384338056510439,
+        "steal": 0.0
+      },
+      "runnableTasks": 12,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.46,
+        8.22,
+        54.34
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.56,
+          "total": 13418008150.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 15298.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400781905920,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998902790141543,
+      "baseline": false,
+      "intervalSeconds": 5.000015584,
+      "memAvailableBytes": 45148569600,
+      "swapInPages": 36,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.028124912340273218,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538505.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679829.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 950.0,
+        "full": 898.0
+      },
+      "cpuPercent": {
+        "busy": 4.681208053691275,
+        "idle": 95.26006711409396,
+        "iowait": 0.0587248322147651,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.51,
+        8.1,
+        54.06
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.5,
+          "total": 13418023079.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 14929.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400773971968,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998907790137402,
+      "baseline": false,
+      "intervalSeconds": 4.999995859,
+      "memAvailableBytes": 45257129984,
+      "swapInPages": 49,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.0382812817045575,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538567.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679891.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 62.0,
+        "full": 62.0
+      },
+      "cpuPercent": {
+        "busy": 3.4546369277209457,
+        "idle": 96.53697803119235,
+        "iowait": 0.008385041086701324,
+        "steal": 0.0
+      },
+      "runnableTasks": 3,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.55,
+        7.99,
+        53.77
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.4,
+          "total": 13418032937.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 9858.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400769638400,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998912790187640,
+      "baseline": false,
+      "intervalSeconds": 5.000050238,
+      "memAvailableBytes": 45219971072,
+      "swapInPages": 10,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.007812421503913697,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538580.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679903.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 13.0,
+        "full": 12.0
+      },
+      "cpuPercent": {
+        "busy": 4.62248322147651,
+        "idle": 95.36912751677852,
+        "iowait": 0.008389261744966443,
+        "steal": 0.0
+      },
+      "runnableTasks": 2,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.5,
+        7.85,
+        53.48
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.34,
+          "total": 13418045017.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 12080.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400763461632,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998917790300715,
+      "baseline": false,
+      "intervalSeconds": 5.000113075,
+      "memAvailableBytes": 45017014272,
+      "swapInPages": 19,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.01484341431618524,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538584.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679908.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 4.0,
+        "full": 5.0
+      },
+      "cpuPercent": {
+        "busy": 4.519158212459127,
+        "idle": 95.46407311142785,
+        "iowait": 0.016768676113020877,
+        "steal": 0.0
+      },
+      "runnableTasks": 2,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.46,
+        7.72,
+        53.2
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.25,
+          "total": 13418056881.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 11864.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400843935744,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998922790211308,
+      "baseline": false,
+      "intervalSeconds": 4.999910593,
+      "memAvailableBytes": 45041405952,
+      "swapInPages": 25,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.019531599252338872,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538639.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679963.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 55.0,
+        "full": 55.0
+      },
+      "cpuPercent": {
+        "busy": 5.269772117962466,
+        "idle": 94.72184986595174,
+        "iowait": 0.008378016085790885,
+        "steal": 0.0
+      },
+      "runnableTasks": 3,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.51,
+        7.61,
+        52.91
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.2,
+          "total": 13418065390.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 8509.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400839614464,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998927790142642,
+      "baseline": false,
+      "intervalSeconds": 4.999931334,
+      "memAvailableBytes": 45075038208,
+      "swapInPages": 6,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.004687564375259078,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538672.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274679996.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 33.0,
+        "full": 33.0
+      },
+      "cpuPercent": {
+        "busy": 3.704945515507125,
+        "idle": 96.29505448449288,
+        "iowait": 0.0,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.47,
+        7.48,
+        52.63
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.11,
+          "total": 13418076651.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 11261.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400829804544,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998932790290608,
+      "baseline": false,
+      "intervalSeconds": 5.000147966,
+      "memAvailableBytes": 45108633600,
+      "swapInPages": 40,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.03124907523986661,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538703.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274680027.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 31.0,
+        "full": 31.0
+      },
+      "cpuPercent": {
+        "busy": 2.903522717764204,
+        "idle": 97.08810978160824,
+        "iowait": 0.008367500627562547,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.43,
+        7.36,
+        52.35
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 4.05,
+          "total": 13418084512.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 7861.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400824381440,
+      "stop": null
+    },
+    {
+      "monotonicNs": 1998937790211886,
+      "baseline": false,
+      "intervalSeconds": 4.999921278,
+      "memAvailableBytes": 45163855872,
+      "swapInPages": 39,
+      "swapOutPages": 0,
+      "swapInMiBPerSecond": 0.030469229719740396,
+      "swapOutMiBPerSecond": 0.0,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 282538786.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 274680087.0
+        }
+      },
+      "psiTotalDeltaMicroseconds": {
+        "some": 83.0,
+        "full": 60.0
+      },
+      "cpuPercent": {
+        "busy": 3.9383274677392324,
+        "idle": 96.05329311211665,
+        "iowait": 0.008379420144126026,
+        "steal": 0.0
+      },
+      "runnableTasks": 1,
+      "blockedTasks": 0,
+      "loadAverages": [
+        0.47,
+        7.25,
+        52.07
+      ],
+      "cpuPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 3.97,
+          "total": 13418095889.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.0,
+          "avg300": 0.0,
+          "total": 0.0
+        }
+      },
+      "cpuPsiDeltaMicroseconds": {
+        "some": 11377.0,
+        "full": 0.0
+      },
+      "oomKillDelta": 0,
+      "diskAvailableBytes": 400816934912,
+      "stop": null
+    }
+  ],
+  "localImages": [
+    {
+      "role": "CALLSIGN_APP_IMAGE",
+      "id": "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "1000:1000",
+      "cmd": [
+        "pnpm",
+        "--filter",
+        "@callsign/api",
+        "exec",
+        "tsx",
+        "src/finals-server.ts"
+      ],
+      "sizeBytes": 634537325
+    },
+    {
+      "role": "ASTERISK_IMAGE",
+      "id": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "1000:1000",
+      "cmd": [
+        "/usr/sbin/asterisk",
+        "-f",
+        "-n"
+      ],
+      "sizeBytes": 713957956
+    },
+    {
+      "role": "TURN_IMAGE",
+      "id": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "1000:1000",
+      "cmd": [
+        "/usr/local/bin/turnserver",
+        "-c",
+        "/etc/coturn/turnserver.conf"
+      ],
+      "sizeBytes": 713957956
+    },
+    {
+      "role": "BESU_IMAGE",
+      "id": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "root",
+      "cmd": null,
+      "sizeBytes": 552624305
+    },
+    {
+      "role": "POSTGRES_IMAGE",
+      "id": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": null,
+      "cmd": [
+        "postgres"
+      ],
+      "sizeBytes": 278212934
+    },
+    {
+      "role": "HTTPS_IMAGE",
+      "id": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": null,
+      "cmd": [
+        "nginx",
+        "-g",
+        "daemon off;"
+      ],
+      "sizeBytes": 169475099
+    }
+  ],
+  "archivePermissionObservations": {
+    "package.json": {
+      "mode": "0o664",
+      "uid": 0,
+      "gid": 0,
+      "kind": "file"
+    },
+    "node_modules": {
+      "mode": "0o775",
+      "uid": 1000,
+      "gid": 1000,
+      "kind": "directory"
+    },
+    "pnpm-workspace.yaml": {
+      "mode": "0o664",
+      "uid": 0,
+      "gid": 0,
+      "kind": "file"
+    },
+    "scripts/service-worker.ts": {
+      "mode": "0o664",
+      "uid": 0,
+      "gid": 0,
+      "kind": "file"
+    },
+    "services/api/src/finals-server.ts": {
+      "mode": "0o664",
+      "uid": 0,
+      "gid": 0,
+      "kind": "file"
+    },
+    "services/witness/src/server.ts": {
+      "mode": "0o664",
+      "uid": 0,
+      "gid": 0,
+      "kind": "file"
+    }
+  },
+  "candidateChecks": {
+    "status": "PASS_OFFLINE_ONLY",
+    "fourPayloadChecksumsRehashed": true,
+    "originalObserverMatchedStartingSource": true,
+    "runtimeDefaultCommandAndFilesPresent": true,
+    "runtimeUser": "1000:1000",
+    "runtimeDependencyCacheOwner": "1000:1000",
+    "realLocalBuildBaseInspect": "PASS",
+    "originalSixLayerClosure": "artifacts/candidate-media-20261103.json",
+    "productPathsUnchangedSinceCandidateSource": true
+  },
+  "budget": {
+    "unit": "GiB",
+    "enforcedContainersBeforeWeb": 20.28125,
+    "webBuildPhaseContainers": 22.28125,
+    "servicePhaseContainers": 21.28125,
+    "hostProcessAllowancePreviouslySpecified": false,
+    "startGuardGiB": 40,
+    "startGuardChanged": false,
+    "existingHeadroomStopGiB": 16,
+    "observedHostPolicy": "integration-pressure-v1",
+    "proposedHostProcessBudgetGiB": 1,
+    "proposedRoundedTotalGiB": 24,
+    "proposalApproved": false,
+    "actualPeakMeasured": false
+  },
+  "executionDecision": {
+    "currentMemoryStartGuardSatisfied": true,
+    "fullStack": "BLOCKED_PENDING_EXECUTION_PLAN_APPROVAL",
+    "reason": "Existing driver builds the trust-pinned web alongside foundation/API services, conflicting with the prior no-simultaneous-build-and-services condition. The ~23GiB sum also omitted an explicit host-process allowance. Neither restriction was silently changed.",
+    "proposedOneApproval": "Allow only the pinned web build (2GiB/CPU1/90s) alongside the owned stack under a rounded24GiB total observation budget; keep40GiB startup and16GiB headroom stops and all pressure/OOM/deadline/ownership criteria."
+  },
+  "checks": [
+    {
+      "command": "pnpm exec vitest run tests/unit/deployment-config.test.ts --maxWorkers=1",
+      "status": "PASS",
+      "files": 1,
+      "tests": 13,
+      "finalBoundaryCasesIncluded": [
+        "missing local image",
+        "image ID mismatch",
+        "wrong architecture",
+        "extra FROM",
+        "external Dockerfile frontend",
+        "external COPY source",
+        "remote ADD"
+      ]
+    },
+    {
+      "command": "pnpm light",
+      "status": "PASS",
+      "tests": 308,
+      "scope": "lint/typecheck/offline suite; no service starts",
+      "files": 62
+    },
+    {
+      "command": "Python ast.parse bootstrap/driver",
+      "status": "PASS"
+    },
+    {
+      "command": "git diff --check",
+      "status": "PASS"
+    }
+  ],
+  "notRun": [
+    "candidate normal service entrypoint",
+    "full NEW media stack",
+    "ServiceCall analysis path",
+    "work-cancel",
+    "emergency-stop",
+    "normal calls2/retries0",
+    "AWS",
+    "GHCR/Release publication"
+  ],
+  "cleanup": {
+    "createdServices": [],
+    "createdContainers": [],
+    "createdVolumes": [],
+    "generatedKeys": false,
+    "downloadedImagesOrPackages": false,
+    "hostConfigurationMutationCommands": false,
+    "preservedOriginalCandidateAndEvidence": true,
+    "preservedUserUntrackedFiles": true,
+    "remainingOwnedResource": "read-only observation/evidence files only"
+  }
+}

@@ -4,6 +4,18 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="candidate-readiness-20261103"></a>
+
+## 2026-11-03 현재 후보의 자원/무기동 검토
+
+시작 main/원격은 `fccf0c1`이며 기존 후보 소스 `e95b653`·runtime `sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c`와 사용자 미추적 요약2개를 보존했다.90초/19표본에서 available41.65~42.15GiB, CPU idle91.64~97.82%, iowait최대0.059%, memory/CPU PSI avg10최대0·host OOM 증가0, swap-out최대0.291MiB/s·disk여유최소373.22GiB였다.40GiB guard는 충족했지만 과거 load138의 원인은 이 관측으로 판단하지 않는다. raw total 증분도 보존했으며 avg10=0을 무압박/안전 보장으로 확대하지 않는다.
+
+[단일 예산표](RUNBOOK.md#delivery-memory-budget)로 현재 launcher를 계산하면 기반/앱20.28125GiB, 웹 build 동시 단계22.28125GiB, web/ingress 기동 뒤21.28125GiB다. 약23GiB는 강제 컨테이너 한도에서 나온 근삿값이며 host launcher/감시 추가 예산은 명시되지 않았다.40GiB는 운영 정책이며 guard를 바꾸지 않았다. 이전 빌드/서비스 직렬 조건과 현재 driver의 동시 웹 build가 충돌해 전체 실행은 보류했다. 웹 build2GiB/90초만의 동시 실행 예외와 host1GiB를 포함해 올린 전체24GiB 관측 예산은 **제안·미승인**이며 기존16GiB 여유/압박/OOM/기한 기준은 유지한다.
+
+6종 로컬 config ID·아키텍처,4개 전달 파일 checksum, 원래 observer와 시작 소스 대응, archive의 일반 entrypoint 파일·UID1000 cache 권한을 실제 읽기 전용으로 대조했다. 웹 build의 두 base를 로컬 inspect하고 추가 FROM/외부 COPY/ADD/frontend를 서비스 시작 전에 거절하는 observer 검사를 보완했다. 기존 Compose start는 이미 `--no-build --pull never`, bootstrap은 `--pull=never`였다. 일반 app Dockerfile의 online dependencies 경로를 무다운로드 후보 경로로 쓰지 않는다. 제품 소스/이미지는 바꾸지 않았고 runtime 재빌드는 필요 없다. 새 검사는 기존 observer archive에 들어 있지 않으므로 다음 실행 소스 hash를 명시해야 한다.
+
+`pnpm light`308시험, 영향받은 deployment-config13시험, Python 구문·실제 로컬 base inspect·diff 검사를 통과했다. 새 서비스/DB/키/build/load/download는 없고 전체 통화·분석/회수·정상2회 반복은 NOT_RUN이다. [이번 증거](../artifacts/candidate-readiness-20261103.json)와 기존 후보/실패 증거를 구분한다. 소유 실행 자원은 생성하지 않았으며 읽기 전용 관측/검토 파일만 `.local/`에 보존한다. 원래 후보·고정 Release/GHCR·과거 결과를 수정하지 않았다.
+
 <a id="candidate-media-20261103"></a>
 
 ## 2026-11-03 후보 제작: 실제 SQL·WS 종료 회귀와 전체 미디어 자원 차단
