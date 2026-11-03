@@ -1,5 +1,13 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 5차 후속 실행 경계 확인
+
+작업 branch `feat/mentoring-five-20261104`·시작 `496c576`은 원격과 일치하며 CI 성공이었다. 과거 일회성 기동/이미지 제작 허가를 승계하지 않았다. 현재 요청은 해당 실행을 유효한 허가가 있을 때로 한정하므로 서비스·브라우저·build/load/pull을 실행하지 않았다. 회수 오류 분류는 화면이 실제 호출하는 mapper로 분리해401/403/503/일반 오류와 내부 메시지 비노출을 직접 회귀했다. 기존 제품 동작은 유지했다.
+
+회수 화면 SSR/분류2건·웹 build·diff 검사 PASS. `b6b4eea` Git tree에서 기존 공개/observer 경로 목록대로 실제 archive를 읽어 평가 fixture30개·새 승인 응답/PBX 관측 코드·로컬 image preflight 포함을 확인했다. 이 검사는 source-only 묶음 검사이며 이미지/서비스 실행/공개 Release가 아니다. 기존 runtime e95b653은 최신 UI/observation-contract를 포함하지 않으므로 새 observer와 혼합하지 않는다.
+
+직렬 build 검토에서 controller의 OIDC/시험 문맥·beforeAll120초 대기와 driver의 서비스 선기동→웹 build90초가 연결돼 있음을 확인했다. 전체 정상 중지 후 재개는 이 진행 중인 시험 문맥을 보존하지 못한다. NEW/trust 재생성이나 새 단계 프레임워크로 우회하지 않고 기존 웹 build 동시 예외/24GiB 제안과 기동 허가를 한 묶음으로 요청했다. 승인은 대기 상태이며40GiB guard를 바꾸지 않았다. 추가 실제 통화/HTTP/WS/브라우저/AI/AWS PASS는 없다. 기존 사용자 요약3개·후보/원본 증거·서버 설정을 보존했다.
+
 <a id="mentoring-five-20261104"></a>
 
 ## 2026-11-04 5차 제품·측정·평가 보완

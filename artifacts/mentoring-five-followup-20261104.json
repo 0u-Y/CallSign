@@ -1,0 +1,34 @@
+{
+  "source": "b6b4eeac84fba59d9c2a06497934196307b9d0de",
+  "scope": "git archive source-only inspection; not a runtime image or published bundle",
+  "archives": {
+    "public": {
+      "sha256": "8ce9f51f369e1b747da761b6c51bbdaafde62277287a235e489eebddb192d277",
+      "bytes": 532480,
+      "evaluationCases": 30,
+      "members": 54,
+      "privateFileSuffixCheck": "PASS"
+    },
+    "observer": {
+      "sha256": "2806465b2509b24ecbda66131477ad851ef785dfebd9eb233b0729cae08ec3d4",
+      "bytes": 266240,
+      "evaluationCases": 30,
+      "members": 22,
+      "privateFileSuffixCheck": "PASS"
+    }
+  },
+  "recordedAtUtc": "2026-11-03T15:37:03.927881+00:00",
+  "checks": {
+    "recallSsrAndErrorMapper": "2 PASS; not HTTP or Chromium",
+    "webBuild": "PASS with existing chunk warnings",
+    "gitDiff": "PASS"
+  },
+  "execution": {
+    "servicesStarted": false,
+    "imageBuilt": false,
+    "networkChanged": false,
+    "userFilesPreserved": true,
+    "approval": "pending; no inherited service/build permission"
+  },
+  "serialBuildFinding": "Controller owns live OIDC/test context and waits for services; stopping all processes ends that context, not a resumable beforeAll checkpoint."
+}

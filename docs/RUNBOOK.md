@@ -1826,3 +1826,9 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeou
 NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployment.sh restart`는 Compose restart만 실행하며 migration/seed/key/genesis를 호출하지 않는다. 강제 종료의 quota는 기존 만료 후 보수 정산이며 즉시 환불/청구 대조를 보장하지 않는다. 이번에 재시작·복원·외부 TLS/OIDC/TURN·AWS를 실행하지 않았다.40GiB 시작 guard와 동시 웹 build 예외의 미승인 상태도 변경하지 않았다.
 
 새 observer archive에는 합성 평가 fixture도 포함한다. runtime 안의 평가 도구만 전달하고 입력을 개발 서버 checkout에 남기는 누락을 보완했다. 새 phase를 쓰는 observer와 구 runtime의 observation-contract를 혼합하지 않는다.
+
+### 5차 후속의 직렬 웹 build 검토
+
+`runtime-media.test.ts`의 controller beforeAll은 로컬 OIDC fixture와 준비 문맥을 생성하고 `image-services-started.json`을 최대120초 기다린다. host driver는 그 문맥을 받아 API4개를 기동한 뒤 해당 trust pin으로 최대90초 웹을 build한다. controller를 정상 종료하면 OIDC/시험 실행 문맥도 종료되므로 같은 프로세스를 이어갈 수 없다. 기반 서비스만 종료해도 controller와 builder가 겹치며, 전체 종료 후 NEW를 반복하는 것은 허용된 재개가 아니다. 기존 phase 보관은 이전 시험 종료 후 앱/controller를 재시작하는 절차이지 이 beforeAll 중간을 직렬 checkpoint로 바꾸는 기능이 아니다.
+
+따라서 이번에는 복잡한 단계 분할 도구를 만들거나 실행 예외를 자동 적용하지 않았다. 변경 화면의 격리 HTTP/WS/Chromium, 새 runtime 제작, 전체 미디어 실행은 별도 명시적 허가가 필요하다. 웹 build2GiB/CPU1/90초만 동시 실행 예외·호스트1GiB 포함 전체 관측24GiB 제안은 승인 전까지 미적용이다.40GiB 시작·16GiB 여유·기존 pressure/OOM/timeout·소유 자원 정리 조건은 유지한다. 승인 후에도 최신 자원 관측과 실행 deadline을 고정한 뒤 시작하며, 부족한 로컬 이미지/도구는 다운로드하지 않는다.
