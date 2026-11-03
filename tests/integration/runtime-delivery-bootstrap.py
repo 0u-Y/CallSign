@@ -144,6 +144,8 @@ if not (r/'foundation-complete.json').exists():
  roles=r/'data/roles'
  for child in roles.iterdir():shutil.move(str(child),r/'data'/child.name)
  roles.rmdir()
+ # Inactive recovery fixture only; keep the active v1 manifest/key unchanged.
+ tool(['pnpm','exec','tsx','scripts/prepare-finals.ts','approval-key','/run/callsign/data','/run/callsign/data/public-manifest-v2.json','--apply'],env={'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'infrastructure','APPROVAL_KEY_VERSION':'2'})
  tool(['pnpm','exec','tsx','scripts/prepare-finals.ts','management-keys','/run/callsign/data','--apply'],env={'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'infrastructure'})
  for role,path in [('deployer','deployer/key.txt'),('administrator','admin/administrator.txt'),('stopper','operator/emergency.txt')]:shutil.copyfile(r/'data'/path,r/'private-keys'/f'{role}.txt');(r/'private-keys'/f'{role}.txt').chmod(0o600)
  tool(['node','--input-type=module','-'],stdin="import {generatePrivateKey,privateKeyToAccount} from 'viem/accounts';import {writeFile,readFile} from 'node:fs/promises';const r='/run/callsign';const c=JSON.parse(await readFile(r+'/synthetic-public-context.json'));const p=JSON.parse(await readFile(r+'/data/management-public.json'));c.publicAddresses={deployer:p.deployer,administrator:p.administrator,stopper:p.emergencyStopper};for(let n=1;n<=3;n++){const k=generatePrivateKey();await writeFile(r+'/private-keys/approver'+n+'.txt',k+String.fromCharCode(10),{flag:'wx',mode:0o600});c.publicAddresses['approver'+n]=privateKeyToAccount(k).address;}await writeFile(r+'/synthetic-public-context.json',JSON.stringify(c,null,2)+String.fromCharCode(10));")

@@ -159,3 +159,9 @@ it('probes the normal issuer command before explicitly selecting the media provi
  expect(source.indexOf("probe=start('issuer-entrypoint-probe',issuer,issuer_mounts)")).toBeLessThan(source.indexOf("issuer_command=['pnpm','exec','tsx','tests/integration/runtime-analysis-fixture.ts'"));
  expect(source).toContain("'fixtureMounted':False");expect(source).toContain('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED');
 });
+
+it('prepares an inactive recovery key in NEW media fixtures without replacing the active manifest',()=>{
+ const source=readFileSync('tests/integration/runtime-delivery-bootstrap.py','utf8');
+ expect(source).toContain("'approval-key','/run/callsign/data','/run/callsign/data/public-manifest-v2.json'");expect(source).toContain("'APPROVAL_KEY_VERSION':'2'");
+ expect(source).toContain("if not (r/'foundation-complete.json').exists():");
+});
