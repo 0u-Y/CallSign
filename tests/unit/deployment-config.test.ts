@@ -152,3 +152,10 @@ with tempfile.TemporaryDirectory() as directory:
  expect(driver.indexOf('local_web_build_images(public, app_image')).toBeLessThan(driver.indexOf("keeper = inspect("));
  expect(driver).toContain("nginx_ref = nginx['Id']");
 });
+
+
+it('probes the normal issuer command before explicitly selecting the media provider fixture',()=>{
+ const source=readFileSync('tests/integration/runtime-media-driver.py','utf8');
+ expect(source.indexOf("probe=start('issuer-entrypoint-probe',issuer,issuer_mounts)")).toBeLessThan(source.indexOf("issuer_command=['pnpm','exec','tsx','tests/integration/runtime-analysis-fixture.ts'"));
+ expect(source).toContain("'fixtureMounted':False");expect(source).toContain('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED');
+});
