@@ -1832,3 +1832,11 @@ NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployme
 `runtime-media.test.ts`의 controller beforeAll은 로컬 OIDC fixture와 준비 문맥을 생성하고 `image-services-started.json`을 최대120초 기다린다. host driver는 그 문맥을 받아 API4개를 기동한 뒤 해당 trust pin으로 최대90초 웹을 build한다. controller를 정상 종료하면 OIDC/시험 실행 문맥도 종료되므로 같은 프로세스를 이어갈 수 없다. 기반 서비스만 종료해도 controller와 builder가 겹치며, 전체 종료 후 NEW를 반복하는 것은 허용된 재개가 아니다. 기존 phase 보관은 이전 시험 종료 후 앱/controller를 재시작하는 절차이지 이 beforeAll 중간을 직렬 checkpoint로 바꾸는 기능이 아니다.
 
 따라서 이번에는 복잡한 단계 분할 도구를 만들거나 실행 예외를 자동 적용하지 않았다. 변경 화면의 격리 HTTP/WS/Chromium, 새 runtime 제작, 전체 미디어 실행은 별도 명시적 허가가 필요하다. 웹 build2GiB/CPU1/90초만 동시 실행 예외·호스트1GiB 포함 전체 관측24GiB 제안은 승인 전까지 미적용이다.40GiB 시작·16GiB 여유·기존 pressure/OOM/timeout·소유 자원 정리 조건은 유지한다. 승인 후에도 최신 자원 관측과 실행 deadline을 고정한 뒤 시작하며, 부족한 로컬 이미지/도구는 다운로드하지 않는다.
+
+### 2026-11-04 제품 경로 실행의 한정 승인
+
+이번 로컬 실행에서는 앞선 동시 웹 build/예산 제안이 명시적으로 승인됐다. 시작40GiB·여유16GiB·전체 관측24GiB·호스트 시험 프로세스1GiB와 웹 build2GiB/CPU1/90초만의 동시 예외를 적용한다. 기존 중단 정책을 유지하고 정리 포함90분, 마지막10분은 신규 장기 단계를 시작하지 않는다. 다음 실행의 상시 허가가 아니다. 앞선 미승인 기록은 당시 상태로 보존한다.
+
+기본 제품 경로는 `/service`, 별도 인증 공식 확인은 `/official`이다. 기관·상담원·수신자는 독립 브라우저 프로필에서 실제 로그인한다. 기관은 고객/상담원/콜센터 선택→업무·위임 생성→원장 확정 확인, 상담원은 배정 업무→새 통화→개별 승인→마이크/PBX 등록→발신, 수신자는 자기 통화 선택→마이크/PBX 등록→수락/검증→선택적 분석 동의 순서다. 종료·취소·정지는 각 실제 권한/API로 수행하고 원장/서버/PBX/양 끝 음성 관측을 분리한다. 복구는 현재 proposal/nonce/epoch/만료에 맞는 서로 다른 관리 승인자2명 서명이 필요하며 과거 통화를 재사용하지 않는다. 별도 발표 화면·장면 버튼·기록 재생을 만들지 않는다.
+
+현재 `vercel.json`은 PUBLIC_PREVIEW build, self connect-src, microphone=()다. 실제 AWS API/WSS로 이어진 배포 연결이나 서비스 URL은 확인되지 않았다. 이를 풀어 쿠키/CSRF/origin 정책을 우회하지 않는다. 실제 서비스는 적절한 AWS 동일 origin과 OIDC callback/TLS/WSS/TURN 입력을 준비해 검증해야 하며 Vercel 공개 preview를 통화 성공으로 표시하지 않는다.
