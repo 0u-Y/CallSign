@@ -39,7 +39,7 @@ Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니
 |---|---|
 | GHCR 게시·공개 파일 수령 | [이미지 증거](../artifacts/ghcr-images-20261102.json), [Release 영수증](../artifacts/ghcr-delivery-20261102.json). 태그·digest·config ID를 구분 |
 | 전달물 신규 리허설 | [원본 평가](../artifacts/delivery-only-rehearsal-20261102.json). 실제 원장/DB/PBX·합성 음원, 로컬 OIDC fixture, 같은 호스트 범위 |
-| 앞선 DB·계약·인증·복구 실행 | [진행 기록](FINALS-IMPLEMENTATION-PLAN.md)의 날짜별 링크와 [artifacts](../artifacts/). 실패·중간 결과도 원본으로 보존 |
+| 앞선 DB·계약·인증·복구 실행 | [개발 이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md)과 [artifacts](../artifacts/). 당시 SHA·실패·중간 결과를 보존하고 현재 진행표와 분리 |
 | 초기 시청 시연 | [당시 제품안](PRODUCT.md), [진행](PROGRESS.md), [시험](TEST-RESULTS.md), [화면 검수](DESIGN-QA.md), [디자인 참고](DESIGN-REFERENCES.md), [사실 확인](FACT-CHECK.md). 현행 운영 절차가 아님 |
 | 이전 기획·개발안 | [보관 문서](archive/2026-10-26/), [설계 결정](adr/0002-finals-offline.md), [원장 선택 근거](WHY-BLOCKCHAIN.md) |
 | 멘토링·제출 자료 | [멘토링 진입점](mentoring/README.md), [기획·발표 원본](../submission/). 일정·시연 흐름은 제품 요구와 분리 |

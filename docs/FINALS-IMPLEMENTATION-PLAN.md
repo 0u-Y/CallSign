@@ -16,772 +16,160 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 실제 구성요소는 Besu4·Witness4·PostgreSQL·HTTPS Anchor·API/worker·Asterisk·TURN·제품 웹/Chromium이다. OIDC와 STT/LLM은 명시적 fixture, 음원은 합성이다. 같은 namespace의 TURN과 같은 호스트는 외부 NAT·독립 기관 장애 내성의 증거가 아니다. AWS·실제 IdP·한국어 STT/LLM 품질·새 GHCR/Release 게시는 미실행이다. 새 공개/observer 묶음과 runtime은 같은6e3cd23 소스이며5종 인프라는 재사용했다. 최종 AWS 웹은 실제 AWS metadata/trust/PBX 인증서 뒤에 생성해야 한다. 이전 고정 Release는 이번 소스를 포함하지 않는다.
 
-## 2026-11-04 5차 후속 실행 경계 확인
+## 현재 상태와 다음 단계
 
-작업 branch `feat/mentoring-five-20261104`·시작 `496c576`은 원격과 일치하며 CI 성공이었다. 과거 일회성 기동/이미지 제작 허가를 승계하지 않았다. 현재 요청은 해당 실행을 유효한 허가가 있을 때로 한정하므로 서비스·브라우저·build/load/pull을 실행하지 않았다. 회수 오류 분류는 화면이 실제 호출하는 mapper로 분리해401/403/503/일반 오류와 내부 메시지 비노출을 직접 회귀했다. 기존 제품 동작은 유지했다.
+| 구분 | 상태·다음 작업 |
+|---|---|
+| 제품 소스 | 검증한6e3cd23과 이후 문서/증거 정리를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
+| 로컬 후보 | runtime·공개/observer 묶음과2개 실제 통화/회수 사례 확인. 원격 게시 전 후보이며 AWS 최종 웹 아님 |
+| 원격 전달 | 고정 Release는 이전 소스. 최신 runtime 게시·새 inventory/Release·별도 수령 검증이 남음 |
+| 외부 환경 | AWS 공개 origin/TLS/OIDC/PBX/TURN·reader 보호 참조와 실행 허가 필요. AI 품질·사람 평가도 별도 |
+| 문서 기준 | 요구는 MASTER, 실행은 RUNBOOK, 한계는 KNOWN-LIMITATIONS. 과거 실행 성공을 현재 전체 PASS로 복사하지 않음 |
 
-회수 화면 SSR/분류2건·웹 build·diff 검사 PASS. `b6b4eea` Git tree에서 기존 공개/observer 경로 목록대로 실제 archive를 읽어 평가 fixture30개·새 승인 응답/PBX 관측 코드·로컬 image preflight 포함을 확인했다. 이 검사는 source-only 묶음 검사이며 이미지/서비스 실행/공개 Release가 아니다. 기존 runtime e95b653은 최신 UI/observation-contract를 포함하지 않으므로 새 observer와 혼합하지 않는다.
+문서 정리에서는 진행표의 과거 본문을 보관본으로 분리하고 기존 앵커를 유지했다. 현재 구현 현황의 중복된 NOT_RUN 문장을 최신 소스/과거 증거 표로 정리했다. 요구사항 ID·실행 명령·원본 증거·Release·사용자 기획서는 삭제하지 않았다.
 
-직렬 build 검토에서 controller의 OIDC/시험 문맥·beforeAll120초 대기와 driver의 서비스 선기동→웹 build90초가 연결돼 있음을 확인했다. 전체 정상 중지 후 재개는 이 진행 중인 시험 문맥을 보존하지 못한다. NEW/trust 재생성이나 새 단계 프레임워크로 우회하지 않고 기존 웹 build 동시 예외/24GiB 제안과 기동 허가를 한 묶음으로 요청했다. 승인은 대기 상태이며40GiB guard를 바꾸지 않았다. 추가 실제 통화/HTTP/WS/브라우저/AI/AWS PASS는 없다. 기존 사용자 요약3개·후보/원본 증거·서버 설정을 보존했다.
+## 과거 기록 찾기
+
+이전 진행표의 본문은 [날짜별 보관본](archive/DEVELOPMENT-HISTORY-20261104.md)에 그대로 보존했다. 기존 링크가 끊기지 않도록 아래 앵커를 유지한다. 원본 artifacts와 Release는 이동하거나 덮어쓰지 않았다.
+
+<a id="2026-11-04-5차-후속-실행-경계-확인"></a>
+- [2026-11-04 5차 후속 실행 경계 확인](archive/DEVELOPMENT-HISTORY-20261104.md#2026-11-04-5차-후속-실행-경계-확인)
 
 <a id="mentoring-five-20261104"></a>
-
-## 2026-11-04 5차 제품·측정·평가 보완
-
-시작 main은 전달 기준보다 진행된 `2972a70`이며 `feat/mentoring-five-20261104`에서 사용자 미추적 요약3개와 기존 후보를 보존했다. 기관/상담원/수신자 업무 안내, 권한 제한 설명, 관리 JSON 상세 접기, 회수 조회의401/403/장애 구분과 내부 오류 코드 비노출을 반영했다. 기존 세대·동의·기관 권한 검사와 승인/현재 연결/위험 안내 분리는 유지한다.
-
-실제 결함은 평가 판단 불가율이 미실행 사례까지 분모에 넣던 점과, 최대20회라는 제공자 예산이 주석/기존 fixture 크기에만 의존하던 점이다. 관측 사례 분모로 수정하고 평가 split만 최대20회, 개발/평가 family 혼합은 호출 전 거절한다. 합성30사례 모두 사람 미검토이며 실제 모델/음원 정확도는 NOT_RUN이다. 공개 observer 목록에서 평가 fixture가 빠진 전달 누락도 보완했다. 통화 집계에 승인 응답/서버 적용/PBX 부재 구간과 누락·역순 사유를 추가하고 실제 observer 소스에 응답 성공·ARI404 이후 관측을 연결했다. 전체 통화를 실행한 것은 아니다.
-
-상태: 역할별 UI·집계·평가 보완은 **구현·오프라인 검증 완료**. 실제 ServiceCall·SQL/WS·브라우저 최신 경로는 **구현 완료·실행 미검증**. 실제 외부 제공자/IdP/AWS·새 runtime/Release는 **후속 범위**다. NEW/restart/RESTORE/worker 정산의 기존 경계는 검토 후 유지했으며 새 복구 체계를 만들지 않았다.
-
-최종 `pnpm light`63파일312시험·웹 build·SSR 상태 회귀·diff/링크 검사 통과. 웹 chunk/dynamic import 경고는 남아 있으며 실제 브라우저 렌더 확인은 하지 않았다. 초기 fixture category 오기와 observer 변수 충돌은 시험 소스 결함으로 수정했고 초기 light 로그는 로컬에 보존했다. 무호출 평가 결과는 providerCalls0·NOT_RUN이다. [증거](../artifacts/mentoring-five-20261104.json)는 당시 dirty 소스 hash를 기록한다. 서버/서비스·DB·키·네트워크·전역 인증 변경, 다운로드, 이미지/Release 발행은 없었다.
-
-새 runtime과 AWS trust에 맞춘 web, 공개/observer 묶음이 필요하다. 기존 e95b653 후보·고정 Release는 수정되지 않았고5종 인프라 recipe·ABI·서명 도메인도 변경하지 않았다. 다음 실제 실행의40GiB guard와 웹 build 동시 실행 예외/관측 예산 승인은 여전히 별도 조건이다. [멘토링 반영표](mentoring/README.md)·[실행 인계](RUNBOOK.md#mentoring-five-evaluation)를 따른다.
-
-기준일: **2026-11-02(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 인증 후속 경계 작업 시작은 `a75398d`, 현재 영속 복구 검증 시작은 `c59edac`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
-
-요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
+<a id="2026-11-04-5차-제품측정평가-보완"></a>
+- [2026-11-04 5차 제품·측정·평가 보완](archive/DEVELOPMENT-HISTORY-20261104.md#mentoring-five-20261104)
 
 <a id="candidate-readiness-20261103"></a>
-
-## 2026-11-03 현재 후보의 자원/무기동 검토
-
-시작 main/원격은 `fccf0c1`이며 기존 후보 소스 `e95b653`·runtime `sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c`와 사용자 미추적 요약2개를 보존했다.90초/19표본에서 available41.65~42.15GiB, CPU idle91.64~97.82%, iowait최대0.059%, memory/CPU PSI avg10최대0·host OOM 증가0, swap-out최대0.291MiB/s·disk여유최소373.22GiB였다.40GiB guard는 충족했지만 과거 load138의 원인은 이 관측으로 판단하지 않는다. raw total 증분도 보존했으며 avg10=0을 무압박/안전 보장으로 확대하지 않는다.
-
-[단일 예산표](RUNBOOK.md#delivery-memory-budget)로 현재 launcher를 계산하면 기반/앱20.28125GiB, 웹 build 동시 단계22.28125GiB, web/ingress 기동 뒤21.28125GiB다. 약23GiB는 강제 컨테이너 한도에서 나온 근삿값이며 host launcher/감시 추가 예산은 명시되지 않았다.40GiB는 운영 정책이며 guard를 바꾸지 않았다. 이전 빌드/서비스 직렬 조건과 현재 driver의 동시 웹 build가 충돌해 전체 실행은 보류했다. 웹 build2GiB/90초만의 동시 실행 예외와 host1GiB를 포함해 올린 전체24GiB 관측 예산은 **제안·미승인**이며 기존16GiB 여유/압박/OOM/기한 기준은 유지한다.
-
-6종 로컬 config ID·아키텍처,4개 전달 파일 checksum, 원래 observer와 시작 소스 대응, archive의 일반 entrypoint 파일·UID1000 cache 권한을 실제 읽기 전용으로 대조했다. 웹 build의 두 base를 로컬 inspect하고 추가 FROM/외부 COPY/ADD/frontend를 서비스 시작 전에 거절하는 observer 검사를 보완했다. 기존 Compose start는 이미 `--no-build --pull never`, bootstrap은 `--pull=never`였다. 일반 app Dockerfile의 online dependencies 경로를 무다운로드 후보 경로로 쓰지 않는다. 제품 소스/이미지는 바꾸지 않았고 runtime 재빌드는 필요 없다. 새 검사는 기존 observer archive에 들어 있지 않으므로 다음 실행 소스 hash를 명시해야 한다.
-
-`pnpm light`308시험, 영향받은 deployment-config13시험, Python 구문·실제 로컬 base inspect·diff 검사를 통과했다. 새 서비스/DB/키/build/load/download는 없고 전체 통화·분석/회수·정상2회 반복은 NOT_RUN이다. [이번 증거](../artifacts/candidate-readiness-20261103.json)와 기존 후보/실패 증거를 구분한다. 소유 실행 자원은 생성하지 않았으며 읽기 전용 관측/검토 파일만 `.local/`에 보존한다. 원래 후보·고정 Release/GHCR·과거 결과를 수정하지 않았다.
+<a id="2026-11-03-현재-후보의-자원무기동-검토"></a>
+- [2026-11-03 현재 후보의 자원/무기동 검토](archive/DEVELOPMENT-HISTORY-20261104.md#candidate-readiness-20261103)
 
 <a id="candidate-media-20261103"></a>
-
-## 2026-11-03 후보 제작: 실제 SQL·WS 종료 회귀와 전체 미디어 자원 차단
-
-시작 main은 `da98e2c`이며 사용자 루트 요약은 미추적 상태로 보존했다. 현재 가용 RAM 약24.8GiB·CPU24개에서 관측 load 약138로, 기존 전달 NEW의40GiB 시작 guard를 충족하지 못했다. Besu4/Witness4·PBX/TURN 전체 스택은 시작하지 않았고 guard/정족수/서버 설정을 바꾸지 않았다. 기존 약23GiB 전체 한도·역사 표본은 현재 실측/최소 사양으로 취급하지 않는다.
-
-AI-003/005·TEST-004: 기존 시험에 실제 SQL 잠금 중 consent transaction/세션 조회 종료와 LLM 예약 대기 중 취소를 추가했다. 제공자 호출 전 정산0과 호출 후 정산1, abort 무시/늦은 응답·issuer drain을 실제 최소권한 SQL·인증/CSRF·Platform/Sender/Issuer·WS로 확인했다. 선택5건 PASS이며 readiness2건·잔류 감사1건은 별도다. 원장/Anchor/binding/STT/LLM은 명시 fixture, 브라우저/실제 음성은 미실행이다. 이전34건/DB17을 합산하지 않는다. 시험 상태를 지워 통과시키지 않았고 소유 DB/보호 ROOT는 정리했다.
-
-초기 준비는 하위 CLI에 pressure policy 옵션이 누락돼 SQL readiness 전 `EXPLICIT_RESOURCE_POLICY_MISMATCH`로 차단됐다. 원본을 보존하고 정확한 argv를 수정했으며 자원 중단이나 제품 assertion 실패는 아니었다. 이 호출 주의와 정확한 하위 명령을 RUNBOOK에 반영했다. 초기화 중 남은 소유 socket 파일은 확인된 전용 mount에서만 회수했고 기존 파일의 권한/소유권은 변경하지 않았다. observer 묶음에는 선택 SQL/WS 시험·guard/setup/reporter와 readiness/감사를 포함하도록 보완했다.
-
-후보 생성의 최초 legacy build가 목표 stage 앞의 dependencies를 실행해 로컬에 없던 Node base227,146,390bytes를 자동 수령했다. 사용자에게 즉시 알렸으며 `--network=none`/`--pull=false`를 수령 차단으로 오해한 실행 결함이다. 추가 의존성 요청은 none 네트워크에서 실패했고 원본을 보존했다. prepared-runtime stage를 전용 Dockerfile로 분리해 설치 stage를 평가하지 않도록 수정하고 현재 호출/정적 회귀를 함께 갱신했다. 이 준비 결함을 제품 통합 실패나 성공으로 합산하지 않는다. 분리 후에는 기존 base의 root 소유 pnpm cache 디렉터리가 UID1000 검증을 막는 EACCES가 재현됐다. 새 후보 layer의 해당 디렉터리만 UID1000으로 맞추며 기존 host 파일/base image/lockfile/verify 설정은 변경하지 않는다.
-
-후보 제품 소스는 `e95b653` clean checkout이며 runtime local config ID는 `sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c`(linux/amd64)다. 버전 probe를 포함한 빌드는 종료5.42초로 기록했고 실제 서비스 entrypoint는 기동하지 않았다. 실제 image의 제품/도구7개와 migration11개 hash, fixture entrypoint 미포함, 새6종 archive의 config/layer closure를 확인했다. raw image 감사의 libgnutls1건은 기존에 검토한 공개 self-test PEM8개 hash와 일치했으며 원본 BLOCKED 출력을 보존하고 별도 검토로 분류했다.
-
-공개 묶음512000bytes·observer256000bytes·inventory3654bytes와6종 image archive2318664192bytes를 새 로컬 후보 디렉터리에 생성했다. producer의3파일 checksum은 별도 보존하고 NEW bootstrap이 요구하는 archive 포함4payload `SHA256SUMS`를 만들었다. 신규 AWS/local trial 웹·registry digest·게시 영수증을 만들어 쓰지 않았다. 전체 실제 ServiceCall/양방향 음성/목적 분석/회수·2회 반복은 **BLOCKED/NOT_RUN**이며 기존 실제 통합 수와 합산하지 않는다.
-
-SQL 관측70초/15표본에서 최소 RAM22.63GiB·앱/observer 관측 RSS549.41MiB·DB90.77MiB·PSI0·host oom 증가0이었다. swap-out 최대13.29MiB/s는3연속이 아니었고 자원 중단은 없었다. 최종 빌드 관측의 최소RAM32.97GiB·controller/client17.75MiB는 표본이며 builder peak는 미관측이다. 전체 실행은 시작하지 않았고 기존40GiB guard를 낮추지 않았다. Docker network/route/기존 실행 container ID hash는 일치했다. 인터페이스 raw JSON hash는 달랐으며1초 재관측에서 lifetime 두 필드만 변했지만 최초 자료가 hash뿐이라 전체 normalized interface 동일성은 입증하지 못했다. host 설정 변경 명령은 실행하지 않았고 추가 인프라 기동도 하지 않는다.
-
-소유 DB/보호 ROOT/CA·실패 socket·빌드 컨테이너는 회수했고 기존6종 image는 보존했다. 새 후보 image/archive·clean 소스와 비밀 없는 검증 기록은 `.local/candidate-media-20261103T124742Z-dfcfb3/`에 남긴다. 시험 chain/DB/Anchor identity는 생성하지 않았으며 이 묶음은 서비스 백업이 아니다. [이번 소스/후보/실패/정리 증거](../artifacts/candidate-media-20261103.json)를 따른다. 기존 Release/GHCR는 변경하지 않고 source만 일반 push한다.
+<a id="2026-11-03-후보-제작-실제-sqlws-종료-회귀와-전체-미디어-자원-차단"></a>
+- [2026-11-03 후보 제작: 실제 SQL·WS 종료 회귀와 전체 미디어 자원 차단](archive/DEVELOPMENT-HISTORY-20261104.md#candidate-media-20261103)
 
 <a id="main-review-20261103"></a>
-
-## 2026-11-03 검토 브랜치 리뷰와 main 반영
-
-시작은 `verify/mentoring-integration-20261103`의 `d59e75c`, 원격 main은 `f967e57`이었다. 기존 staging/추적 worktree는 깨끗했으며 사용자 요약/진행 포인터·과거 증거를 보존했다. 두 축의 소스 리뷰에서 consent transaction/세션 조회 도중 종료 후 provider/watch가 다시 시작되는 경합, 실제 LLM 호출 전 마지막 권한 검사 중 취소에도1을 정산하던 경로를 수정했다. 실제 ServiceAuthority를 사용한 제어된 await 단위 시험은 수정 전2실패·수정 후 통과를 확인했다. SQL/계약/권한 정책은 변경하지 않았다.
-
-AI-003/005·OPS-006·TEST-004: launcher의 root 종료 뒤 소유 자식을 놓치는 경로와 종료 handler가 새 helper를 만든 경합도 수정했다. PID/start/session으로 소유 자식을 재발견하고 정리 확인 전 active 기록을 지우지 않으며, root가 먼저 끝난 잔류는 회수해도 FAIL로 남긴다. resource 정책의 수치/명시 선택·원본 중단 기록은 유지했다. 감시 범위는 등록한 root/session·검증한 PID와 기존 기록에 한정되며 임의 daemon/전체 host 메모리를 포괄하지 않는다.
-
-CALL-005/006·AI-001~005·TEST-003/004: 기존 제품/PBX 시험에 상대 track·실제 WS·ServiceCall 패널·동의 철회·늦은 합성 결과·권한 회수·양측 음성/ARI·예약 정리 관측을 연결했다. observer-only 제공자 entrypoint는 명시 flag/소유 token·기존 integration/test DB guard를 요구하고 실제 Anchor/원장 경계를 대체하지 않는다. 통화 집계의 fixture 분석 성공에는 순서가 맞는 입력/전사/분석/경고 관측을 추가로 요구한다. **이 경로는 타입/오프라인 회귀만 했고 실제 PBX·브라우저·외부 모델은 NOT_RUN**이다. [다음 실행 절차](RUNBOOK.md#reviewed-servicecall-analysis)를 따른다.
-
-기존34고유 사례/동일DB3재실행/readiness/과거DB17을 합산하지 않았다. 원본 source hash를 시작 checkpoint 파일과 대조했다. 이번 audio 경합·선택적 제공자-only injection/observer 경로는 그 실제 통합의 새 PASS로 간주하지 않는다. 기존 유지보수의 만료 예약 전액 정산은 확인했지만 강제 종료의 실제 회수는 미실행이며 보존 대상 배포의 영향은 미확인이다. 범용 복구/임의 사용량 초기화 도구는 추가하지 않았다.
-
-현재 경량 검사는 [이번 리뷰 증거](../artifacts/main-review-20261103.json)에 구분한다. 최초 light의 기존 dry-run 시험 timeout과 helper 회귀의 최초 실패를 보존했고 assertion/중단 기준/timeout을 완화하지 않았다. 리뷰 수정은 `5df9f69`·`ed0d5eb`·`303e8a9`, 증거/절차는 `d27ed54`에 보존했고 `7a987bf`에서 main에 정상 병합·일반 push했다. 해당 merge의 light CI는 성공했다. 최종 명령 대조에서 미디어 observer의 직접 HTTP 정리/늦은 lease 요청에 정확한 Origin을 추가했다. 늦은 lease는 CSRF 오류나 임의503이 아니라 실제 세션 만료/종료 권한 오류인지 검사하며 정리 POST 실패도 숨기지 않는다. 이 observer 보완은 타입/무기동 검사만 했고 실제 통화 재실행은 하지 않았다. 새 runtime/공개 묶음·실제 trust 웹은 향후 별도 발행이다. 이번에는 서비스/컨테이너·DB·키·이미지·Release·AWS를 생성하지 않았고 기존 서버 설정/자원을 변경하지 않았다.
+<a id="2026-11-03-검토-브랜치-리뷰와-main-반영"></a>
+- [2026-11-03 검토 브랜치 리뷰와 main 반영](archive/DEVELOPMENT-HISTORY-20261104.md#main-review-20261103)
 
 <a id="http-pressure-integration-20261103"></a>
-
-## 2026-11-03 명시적 압박 정책으로 HTTP·WS·Chromium 통합 완료
-
-시작 `d9d92f1`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 사용자가 승인한 시험 전용 `--policy integration-pressure-v1`을 명시해5초 표본·60초 사전 관측 뒤 실제 network=none PostgreSQL/Unix socket·최소권한 LOGIN·Platform/Issuer/Sender·HTTPS OIDC fixture·제품 웹·설치 Chromium을 실행했다. 호스트 swap/커널/네트워크 설정을 변경하지 않았고 기본 `swap-activity-v1`과 과거 증거는 보존했다. 원장/ARI/음성 제공자와 binding/Anchor는 명시적 fixture이며 실제 체인·PBX·음성·외부 AI/AWS 검증이 아니다.
-
-UI-001/006·AI-003/005·OPS-006·TEST-004: 회수 필터의 접근 이름과390px select 넘침을 수정했다. 잔류 감사에서 최초DB의 미정산 balance17개를 발견했다. audio 정리보다 quota pool이 먼저 닫힐 수 있던 종료 순서를 고치고, 제공자가 abort를 무시해도 호출자 취소와 보수적 사용량 정산이 완료되도록 했다. STT reserve 도중 종료도 추적하고 정산 실패/5초 drain timeout은 성공으로 숨기지 않는다. fixture도 미정산 예약을 지우기 전 실패하도록 보강했다. 실제 issuer 종료/SQL quota 회귀를 추가했다.
-
-최초 실패DB의 예약 행은 이전 fixture teardown에서 이미 삭제됐으므로 임의 balance 초기화로 복구하지 않았다. **같은 소유 container/cluster·identity 안에 새 회귀DB1개만 추가**해 수정된 코드를 검증했다. 원래DB의 미정산17개는 종료 전까지 그대로였으며 공개 증거에 구분한다. 수정 후 회귀DB는 실제 migration11개·기존 최소권한 LOGIN 재사용·readiness2시험 PASS다. 기존DB17개 전체 회귀는 반복하지 않았다.
-
-최종 소스의 고유 사례는 **HTTP11·WS14·Chromium9 PASS**다. 종전 정적25개 배정은 `it.each`7개를 놓쳤으며 원래 실제 수집은32개, 종료 정산/브라우저 분석 component host2개 추가 후34개다. 모든 이름을 실제 progress와 대조했고 필터 SKIP을 성공에 더하지 않았다. Chromium8개는 실제 제품 화면이고, 추가1개는 실제 브라우저 로그인/WS/동의/SQL/분석 결과를 출하 패널·nextAnalysis에 연결한 component host다. PBX/ServiceCall의 실제 수신 음성→화면 경로는 이번에 확인하지 않았다. SPKI 예외는 실제 로그인에서 작동했으며 전체 TLS 오류 무시는 사용하지 않았다.
-
-같은 회귀DB에서 HTTP/WS/Chromium 각1개 재실행과 전후 SQL 감사 각1개가 통과했다. 기관/outbox/session/예약 행과 미정산 balance는0, scope별 quota used 합계176은 보존됐다(범위 간 중복이며 제공자 호출/청구 수가 아니다). 최초 WS2개는 동기 취소 기대/매 발화 polling으로 freshness 창을 소비하던 시험 문제였고 실제 이벤트 대기로 고쳤다. 최초 UI/감사 실패 및 browser loader 시험 실패를 지우지 않았으며 반복 횟수를 최종34개에 합산하지 않는다.
-
-자원은 약1310초·263표본 관측했다. 최소 MemAvailable37.841GiB, 앱+observer 관측 RSS 최대2339.53MiB, container155.84MiB, 임시 파일+DB 상한522.43MiB였다. PSI full avg10 최대2.14%는1표본이며3연속이 아니었다. host oom_kill 증가0·자원 중단 없음이다. 순간 peak/일반 안전 기준/SLA를 뜻하지 않는다. 소유 DB container·보호 ROOT/키/CA·watcher를 정리했고 route/network/기존 실행 container 목록 전후 hash가 일치했다. 합성 화면19장은 보호된 로컬 기록에만 보존했다.
-
-`pnpm light` **60파일299시험**, API runtime 타입 검사·무기동 웹 build는 PASS다(기존 chunk/dynamic-import 경고 유지). [원본 실패·실제 단계/범위·소스 hash·관측/정리 증거](../artifacts/http-pressure-integration-20261103.json)와 [정책/재현 절차](RUNBOOK.md#http-pressure-policy-20261103)를 따른다. 검증한 파일 내용은 `b11fc72`(명시적 정책)·`e503dae`(정산/화면/통합 회귀)에 보존했다. main 자동 병합·이미지/Release 발행은 하지 않는다. 정책 변경은 이번 시험의 승인이지 후속 기동/임계값 상향의 상시 허가가 아니다. 새 runtime·실제 trust pin 웹/공개 묶음과 이후 실제 원장/PBX 재검증이 필요하다.
+<a id="2026-11-03-명시적-압박-정책으로-httpwschromium-통합-완료"></a>
+- [2026-11-03 명시적 압박 정책으로 HTTP·WS·Chromium 통합 완료](archive/DEVELOPMENT-HISTORY-20261104.md#http-pressure-integration-20261103)
 
 <a id="http-resource-preflight-20261103"></a>
-
-## 2026-11-03 HTTP 재개 사전 관측: 서비스 시작 전 차단
-
-시작 HEAD `d170407`·검토 branch `verify/mentoring-integration-20261103`를 유지했다. 기존1초/10초 watchdog은 최초 기준점은 올바르지만 구간 증분·속도·PSI 기록이 없고, 카운터 감소도 활동으로 셌으며 DB만 먼저 중단해 후속 suite에서 socket 오류가 생길 수 있었다. 실제 단조 시각/page 크기의 in/out·RSS/PSI·최초 중단 latch를 공유하고, 신규 suite 차단→시험 취소/부분 FAIL 보존→앱/브라우저 정리→소유 DB 중단 순서를 구현했다. 앱 정리 불확실 시 DB만 먼저 중단하지 않는다. 새 속도 하한을 만들거나 기존3연속 조건을 완화하지 않았다.
-
-TEST-001/004·OPS-006: 읽기 전용31초 이내 사전 관측에서10초 구간 swap-in1/128/502page(약0.00039/0.0498/0.1959MiB/s), 가운데 swap-out1page가 기록돼 **SUSTAINED_SWAP/BLOCKED**였다. 마지막 available RAM28.4GiB·memory PSI 평균0, 시험 앱 RSS0·DB 없음이다. 전역 swap 원인이나 OOM/호스트 압박은 확인하지 못했으며 카운터 reset 버그가 이번 중단 원인은 아니다. 새 환경을 생성하거나 추가 관측으로 조용한 시점을 찾아 재개하지 않았다.
-
-현재 **HTTP0·WS0·Chromium0/BLOCKED**, 동일DB 재실행 미실행이다. 기존DB17시험은 관련 DB 구현 변경이 없어 반복하지 않았다. 새 보호 자격/키/서비스/container/network는 없으며 기존 서버 설정은 변경하지 않았다. API-only fixture 선택, 각 단계의 부분 결과 reporter와 독립 SQL 잔류 감사 소스를 준비했으나 실제 서비스 정리·observer 인계·SQL 감사는 미실행이다. 순수/자식 취소/실제 Vitest 부분 결과 보존을 포함한 무기동 light는 **60파일298시험 PASS**다. 의도적 실패 reporter fixture의2건은 내부 회귀 입력이며 제품 통합 성공 수에 합산하지 않는다.
-
-[원본 관측·소스/검사 증거](../artifacts/http-resource-preflight-20261103.json)와 [정확한 다음 관측/단계별 명령](RUNBOOK.md#http-resource-resume-20261103)을 따른다. 소스 checkpoint는 `a5f8afe`(관측/취소 전파)·`1906aff`(단계 분리/잔류 감사)다. 이번 소스는 검토 branch에 보존하며 main 자동 병합·runtime build·Release 발행을 하지 않는다. 안정된 자원에서 별도 재개 허가 또는 중단 정책 변경의 명시적 승인이 필요하며, 최신 HTTP/WS/Chromium 검증 전 main 배포 후보로 판정하지 않는다.
+<a id="2026-11-03-http-재개-사전-관측-서비스-시작-전-차단"></a>
+- [2026-11-03 HTTP 재개 사전 관측: 서비스 시작 전 차단](archive/DEVELOPMENT-HISTORY-20261104.md#http-resource-preflight-20261103)
 
 <a id="mentoring-integration-20261103"></a>
-
-## 2026-11-03 최신 기능 통합 시도: DB 확인·자원 중단
-
-시작 HEAD `f967e57064d9a46bdba214f9c84ecac3be9c5f86`, 기존 worktree/staging은 깨끗했다. 실제 관측은 CPU24·가용 RAM 약30.6GiB·디스크 약409GiB였고 처음 짧은 swap 표본은0이었다. 기존 로컬 PostgreSQL17.6 이미지를 network=none·port publish 없음·전용 Unix socket으로 실행했다. DB CPU1·메모리/데이터512MiB는 강제 제한, 앱3GiB·임시5GiB·가용 RAM8GiB 여유는 관측 중단 예산이다. 호스트 cgroup/네트워크/전역 인증을 변경하지 않았다.
-
-DB-001/003·TEST-001/004: **5파일17시험 PASS**. 빈 DB의0000~0010, 별도 신규 시험 DB의0009→0010, outbox 쓰기 잠금으로0010 실패 시 두 index와 적용 기록의 원자적 rollback, 잠금 해제 후 재개·중복 적용 방지, 업무/세션/소비 영수증/회수 관측 JSON 보존, 실제 LOGIN의 허용/거절 SQL과 기존 소비·quota·worker·복구 경계를 확인했다. migration 실행 본체를 export해 CLI와 upgrade 시험이 같은 코드를 쓰며 기본 CLI 동작/guard/hash 검사는 유지했다. index 생성은 대규모 성능 개선의 증거가 아니다. 같은 DB에서 전체 HTTP/브라우저 suite를 반복한 정리 검증은 실행하지 못했다.
-
-시험 환경 결함은 공식 PostgreSQL entrypoint의 초기화용 socket 위치 충돌, tsx/worker 사전 로더 중첩, Vitest driver import cycle이었다. 기본 container socket mount와 테스트 전용 실제 CJS driver의 transport 주입으로 해결했으며 SQL/LOGIN/인증 middleware를 성공 fake로 바꾸지 않았다. Unix socket preload/setup은 integration·소유0700 ROOT·그 하위 socket·loopback URL·callsign_test_* DB를 검사한다. 보호 파일/DB URL 원문은 공개 증거에 넣지 않았다.
-
-운영 조회의 실제 SQL/runtime·ARI fetch fixture, 목적 분석의 실제 WS·동의·정정·정책/epoch/키/binding·quota·계정/세션 회수, Chromium 회수 표시/보류 응답/모바일 시나리오를 보완했다. Chromium의 전체 인증서 오류 허용을 제거하고 해당 시험 인증서 SPKI에만 자식 브라우저 예외를 한정했다. **이 HTTP/WS/브라우저 소스는 타입 검사만 했다.** 원장·ARI·분석 제공자 fixture 역시 이번 HTTP 시도에서는 실행되지 않았다.
-
-10초 관측의 swap 카운터가 연속 증가하여 소유 DB를 중단했다. 사용자의 명시적1회 재개 후 위 DB17시험이 통과했지만 다시 같은 중단 조건이 발생했다. HTTP 수집 시 socket이 없어 assertion0으로 차단됐으며 PASS/SKIP로 바꾸지 않았다. 이는 OOM/서버 전체 자원 부족을 입증하지 않으며 전역 swap의 원인·정확한 속도는 확정하지 못했다. 추가 서비스 재개는 하지 않았다.
-
-무기동 `pnpm light` **59파일291시험 PASS**, 웹 build·API runtime/통합 소스 타입 검사는 PASS다. 이전 시험 수와 합산하지 않는다. 전체 결과는 [이번 실행 증거](../artifacts/mentoring-integration-20261103.json), 실행 절차는 [RUNBOOK](RUNBOOK.md#mentoring-integration-unix)에 연결한다. 원본 실패·timeout/중단·소스 hash·자원 표본은 `.local/mentoring-integration-20261103/`에 구분 보존한다. 소유 컨테이너2환경과 보호 ROOT·시험키/CA/비밀번호를 제거했고 route/Docker network/기존 실행 container ID 목록의 전후 hash가 같았다. 실제 제품 결함은 확정하지 못했으며 HTTP·브라우저 검증 목표는 BLOCKED로 남는다. 새 runtime/공개 묶음은 향후 필요하고 이미지·Release는 발행하지 않았다. 검증 미완료를 main 완료로 반영하지 않도록 `verify/mentoring-integration-20261103` 검토 branch를 사용한다. 소스 checkpoint는 `ba79e9e`·`dd73037`이며 최종 게시 SHA/CI는 해당 branch와 연결된 실행 결과를 따른다.
+<a id="2026-11-03-최신-기능-통합-시도-db-확인자원-중단"></a>
+- [2026-11-03 최신 기능 통합 시도: DB 확인·자원 중단](archive/DEVELOPMENT-HISTORY-20261104.md#mentoring-integration-20261103)
 
 <a id="mentoring-fourth-20261102"></a>
-
-## 2026-11-02~03 4차 반영: 운영 조회·승인 목적 분석·통화별 측정
-
-시작 HEAD는 `a0a2cde`이며 기존 staging/worktree는 깨끗했다. [멘토링 반영표](mentoring/README.md)에 A~H의 채택/수정 채택/후속·파일·검증 경계를 기록했다. 제품은 연동 콜센터의 승인/회수/추적과 고객 화면의 검증/위험 안내로 한정하며, Registry 전역 고정3명의 대칭2-of-3과 Witness3-of-4·QBFT를 구별했다. 기관별 필수 동의/승인자 교체는 이번 구현이 아니다. 기존 승인 JWS/Ed25519·관리 EIP-712·VC 정책 구조·계약 ABI/bytecode/서명 도메인은 그대로다.
-
-AI-001~005·BUSINESS-003·UI-001: 기본 서비스에 별도 분석 결과 계약, 승인/VC/lease/current policy 결합, 제한된 remote-only 문맥·coalescing/동시1요청·정정/세대/sequence와 늦은 결과 차단을 연결했다. 룰과 목적 이탈을 함께 표시하고 제공자 불가/문맥 부족을 안전/이탈 없음으로 바꾸지 않는다. 소켓 종료는 withdrawn 도착을 기다리지 않고 브라우저가 자체 정리한다. 문맥 revision 통지 때 구 경고를 먼저 지우고 뒤늦은 이전 결과를 거절한다. 분석기 버전은 정책 버전과 별개이며 AI가 통화/원장을 제어하지 않는다. 합성14언어 사례의 개발/평가 구분과 별도 lifecycle 기대/회귀 출처를 기록했지만 실제 모델 정확도나 독립 사람 평가가 아니다.
-
-CALL-005/006·UI-006·OPS-006: 기관 운영 조회는 실제 별도 audit/outbox와 기관 상태를 같은 read-only repeatable snapshot에서 읽고 역할/기관을 재검사한다. 메모리 aggregate에만 감사가 남는다고 가정하지 않았다. 요청·원장 receipt·서버 종료·마지막 PBX 관측을 구별한다. runtime과 durable worker/직접 cleanup 모두 ARI 자원 부재를 확인한 뒤 관측을 저장하며 재시도/오래된 값/조회 실패/화면 숨김을 처리한다. `0010_operation_lookup_indexes`와 migrate/preflight/시험·신규 bootstrap 참조를 추가했으나 SQL 적용은 하지 않았다.
-
-TEST-003/004·OPS-003/006/007: 기존 누적 계측·성능 평가·미디어 suite·guard/process 정리를 재사용해 논리 시도/재시도·실패/timeout/미완료와 동일 controller clock의 관측을 집계한다. 정상 종료 성공과 승인+원격 음성 비율을 별도로 계산해 회수 실패를 숨기지 않는다. 정상 반복은 합성660/990Hz 음원을 서로 구별해 디코딩하고 선택 relay/정리를 검사하도록 소스를 작성했다. 동의 없는 실제 사람 마이크를 쓰지 않는다. 실제 통화 성공률/지연 기준선은 NOT_RUN이다. CTI 식별 매핑/재시도/취소/수신자 증거 책임은 [프로토콜](PROTOCOL.md#cti-boundary)에 정의했으며 상용 adapter를 구현했다고 주장하지 않는다.
-
-최종 `pnpm light`는 **58파일·290시험 PASS**다. 웹 build(기존 chunk/dynamic-import 경고), API runtime 타입, 최종 미디어 시험 소스 타입·Python 구문, 문서/설정/참조/diff 검사를 별도로 확인한다. 제공자 평가 기본 명령은 NOT_RUN·호출0, migration 기본 명령은11개 소스의 dry-run만 출력했다. 실행 guard 없이 runner가 파일 조회/기동 전에 차단되는 회귀를 포함했다. 문장 분할 규칙 누락은 제품 수정으로 해결했고, 모듈 소속의 zod import·watch callback 반환 타입 오류는 코드/시험 연결 오류로 수정했다. 실패 원본/후속 로그·소스 hash는 `.local/mentoring-fourth-20261102/`에 구분 보존하며 과거 시험 수와 합산하지 않는다.
-
-실제 HTTP 세션+PG 회수 조회/정책 변경 중 분석·미디어/정상 반복 시험은 소스와 타입 검사만 수행했다. DB·체인·Witness·API/웹 서버·PBX·TURN·Anchor·브라우저·AWS·외부 IdP/STT/LLM·이미지 build/load/pull/push·Release 발행은 실행하지 않았다. 기존 서버/네트워크/전역 인증·서비스·volume·키·사용자 파일·원본 증거를 변경하지 않았다. source commit/push와 기존 light CI는 허용 범위에서 확인한다. 새 runtime/공개 묶음·observer-tests 발행과 migration0010 실검증이 필요하며 기존 고정 Release와6종 digest는 변경하지 않았다. 새 public 묶음에는 공개 purpose fixture·반복 시험/config를 포함하고5종 infrastructure build 구성은 재사용하되 실제 새 runtime 연동은 별도 검증한다. [실행 순서·입력·판정](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
+<a id="2026-11-0203-4차-반영-운영-조회승인-목적-분석통화별-측정"></a>
+- [2026-11-02~03 4차 반영: 운영 조회·승인 목적 분석·통화별 측정](archive/DEVELOPMENT-HISTORY-20261104.md#mentoring-fourth-20261102)
 
 <a id="aws-final-preparation-20261102"></a>
-
-## 2026-11-02 AWS 전 입력·재개 경계 점검
-
-시작 HEAD는 `b1c1c4c`이며 기존 worktree는 깨끗했다. `artifacts/test-results.json`은 초기 시연의 보관 기록이고 기본 `/service` 권한 판정에는 사용되지 않는다. 기존 `/evidence`의 날짜·범위를 명시하고 미리보기의 가상4/4 표시와 조회 실패 뒤 남는 LIVE 표시를 제거했다. 원본 JSON과 Docker/배포 fixture 참조는 보존했다.
-
-AWS preflight에 등록 URI·chain identity·origin 검사를 추가하고 예약 예시 도메인을 차단했다. 계약 배포 재개는 pending raw tx의 실제 signer를 복구해 대조하며 기존 metadata/새 receipt에서도 실제 PROFILE·초기 정책·승인자3명의 membership을 조회하도록 보완했다. 실제 RPC 실행은 하지 않았다. 입력 분류·소비/필요 시점·도구와 NEW 실패/응답 유실의 재개 조건은 [RUNBOOK](RUNBOOK.md#aws-input-contract)에 모았고 현재 GitHub 전달 결정과 충돌하던 ECR 안내를 교체했다.
-
-현재 소스에서 `pnpm light` **52파일·258시험 PASS**, 웹 build(기존 chunk 경고 있음), API runtime 타입 검사, shell 구문·diff·문서 상대 링크476개/fence 검사를 통과했다. native Node의 빈 AWS 예제 검사도 실행해 PASS17·BLOCKED19·SKIPPED1, exit2로 미입력을 차단했다. 이 수치는 해당 공개 예제/prepare 단계이며 전체 서비스 준비율이 아니다. raw signer 시험 추가 중 타입 불일치로 첫 최종 light가 실패했고 시험 입력 타입을 맞춘 뒤 위 결과를 얻었다. 로그/입력 판정·소스 hash는 로컬 `.local/aws-final-preparation-20261102/`에 남기며 과거 증거를 덮지 않았다.
-
-명시된 별도 GHCR reader 보호 참조가 없어 인증만 BLOCKED다. 게시용 PAT를 사용하거나 홈에서 자격을 검색하지 않았다. 서버 설정·서비스·DB·체인·브라우저·AWS·이미지 build/push·Release는 실행/변경하지 않았다. 기존 고정 Release/runtime에는 이번 수정이 없으며 AWS 전 새 runtime/공개 묶음 발행이 필요하다. 다른5종 infrastructure 이미지와 과거 실행 증거는 그대로 보존한다. 계약/DB/IdP/미디어/AWS의 실제 재개·연결 성공은 이번 단위 검사 결과로 주장하지 않는다.
+<a id="2026-11-02-aws-전-입력재개-경계-점검"></a>
+- [2026-11-02 AWS 전 입력·재개 경계 점검](archive/DEVELOPMENT-HISTORY-20261104.md#aws-final-preparation-20261102)
 
 <a id="public-repository-20261102"></a>
-
-## 2026-11-02 공개 저장소의 문서 진입점 정리
-
-시작 HEAD는 `391db16`이다. 추적532개 파일의 역할/크기·문서/배포/CI 참조를 조사하고 README를 서비스 목적·사용자·작은 구조도·가벼운 검사/실제 실행 구분으로 정리했다. 새 `docs/README.md` 한 곳에서 가이드·요구·아키텍처·운영·현황·증거·멘토링/기획으로 안내한다. 현재 상태는 현황표, 요구는 MASTER, 절차/고정 Release는 RUNBOOK, 날짜별 결과는 이 기록과 원본 증거로 구분해 중복·오래된 미검증 표현을 줄였다. 실제 제품/계약/API/인증 정책은 변경하지 않았다.
-
-개인 요약19개와 진행 포인터의 기존 ignore를 유지하고 로컬 파일을 보존했다. artifacts176개(시험 입력·증거·캡처 포함)와 동일 내용의 복구 JSON 한 쌍·영상·기획/렌더 자료는 provenance/참조 때문에 이동·삭제하지 않았다. 실제 웹/배포 입력인 `artifacts/test-results.json`과 계약 artifact도 유지했다. LICENSE는 없으며 새 라이선스/정책 파일을 만들지 않았다.
-
-추적 Markdown과 새 인덱스의 상대 링크/anchor·fence, 새 Mermaid의 정적 구문/노드 연결, README 명령과 package scripts, ignore와 build/fixture 입력, 문서 추가 링크와 diff를 검사했다. `pnpm lint`도 통과했다. Mermaid renderer는 설치돼 있지 않아 렌더 검증은 하지 않았다. 서비스·DB·체인·브라우저·이미지/AWS 실행이나 로컬 통합 시험은 하지 않았고, 일반 push의 light CI만 기존 정책대로 실행한다. 고정 Release·이미지·첨부물·원본 SHA/날짜/결과는 수정하지 않았다. 문서 탐색 변경만으로 새 배포 묶음/Release를 발행하지 않는다.
+<a id="2026-11-02-공개-저장소의-문서-진입점-정리"></a>
+- [2026-11-02 공개 저장소의 문서 진입점 정리](archive/DEVELOPMENT-HISTORY-20261104.md#public-repository-20261102)
 
 <a id="ghcr-images-20261102"></a>
-
-## 2026-11-02 비공개 GHCR 게시와 실제 원격 blob 수령
-
-시작 HEAD는 `5c1ff510bd199448c7eed7996e25882e94632ffc`다. 제공된0600 보호 파일의 classic PAT로 package 조회/쓰기를 확인하고, 작업 전용 Docker config와 password-stdin으로 기존6종을 재build 없이 게시했다. 실제 package visibility는 모두 private, 연결 repository는 없었고 익명 수령은 거절됐다. 기존 token/package/visibility를 변경하지 않았다. 원본 보호 파일은 보존하고 임시 Docker auth만 회수했다.
-
-OPS-001/003·TEST-001/004: 새 빈 경로에 GHCR manifest/config/layer를 실제 HTTPS로 내려받고 SHA256·크기·검토 config ID·linux/amd64를 확인했다. 공통 blob은 같은 실행의 수령 결과 안에서만 재사용했다. 고유 객체50개·수신952,398,858bytes·관측132.563초이며 Docker cache나 과거 tar를 원격 수령으로 계산하지 않았다. [이미지별 digest·실행 증거](../artifacts/ghcr-images-20261102.json), [현재 AWS 수령 절차](RUNBOOK.md#github-delivery-20261102)를 따른다.
-
-AWS 수령 예시에서 추출 전의 로컬 `scripts/` 참조와 미정의 DELIVERY를 제거했다. 같은 tag에서 받은 verifier를 RECEIVED에서 실행하고 아직 없는 새 경로에만 추출한 뒤 그 디렉터리로 이동한다. 새 공개 파일 [Release `aws-bootstrap-20261102t093531z`](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)에 실제 ref/digest inventory를 고정했다. clean source `b0a5183`의5개 파일614,785bytes를 새 디렉터리에 실제 재수령하고 게시 전/GitHub digest·6종 참조 일치를 확인했다. 수령 파일만으로 추출 전 검증·새 경로 추출·기존 경로 거절도 확인했다. [최종 전달 영수증](../artifacts/ghcr-delivery-20261102.json)은 공개 bundle 이후의 기록이다. 기존 null Release와 과거 package403 증거는 보존한다. web은 AWS 실제 trust/인증서가 나온 뒤 생성하므로 bootstrap 전달과 완성 서비스 배포를 구분한다. 서비스/컨테이너/이미지 build/host 설정/AWS 자원은 실행하지 않았다. 별도 AWS reader 자격·실제 AWS pull/외부 TLS/IdP/NAT/TURN·AI는 미검증이다.
+<a id="2026-11-02-비공개-ghcr-게시와-실제-원격-blob-수령"></a>
+- [2026-11-02 비공개 GHCR 게시와 실제 원격 blob 수령](archive/DEVELOPMENT-HISTORY-20261104.md#ghcr-images-20261102)
 
 <a id="github-publication-20261102"></a>
-
-## 2026-11-02 GitHub 전달 경로와 게시 준비
-
-시작 HEAD는 `9a3fbbd`다. 사용자는 공개 소스/배포 파일을 Git 저장소와 Release에, 기존6종 이미지는 비공개 GHCR에 보관하도록 확정했다. 기존 인증은 저장소/Release 권한은 있으나 package 조회403·package scope 누락이며, 별도 PAT가 아직 없어 가능한 Release 게시부터 진행하도록 답했다. 이미지를 공개로 바꾸거나 CI 권한으로 우회하지 않는다. 공개 파일 게시와 재수령은 완료했고 GHCR은 계속 차단이다. 실제 결과는 [게시 증거](../artifacts/github-publication-20261102.json)로 구분한다. 운영 절차의 기준은 [RUNBOOK](RUNBOOK.md#github-delivery-20261102)이다.
-
-공개 파일 Release `aws-bootstrap-20261102t082954z`는 clean source `5718e9a`를 고정했다.5개 파일575,933bytes를 GitHub에서 새 디렉터리에 실제 내려받아 게시 전/hash·GitHub digest와 대조했고 익명 공개 접근도 확인했다. 보호 자료/image tar/합성 trust 웹은 게시하지 않았다. code `6870477`, 운영 문서 `5718e9a`를 일반 push했으며 게시 영수증은 그 이후 문서 커밋에 보존한다. Release 안의 문서는 게시 직전 상태이고 과거 첨부물을 후속 문서로 덮지 않는다. 현재 bootstrap image ref/digest는 null이므로 AWS 초기 배포는 아직 차단이다.
-
-OPS-001/003·TEST-001/004: AWS bootstrap preflight에 GHCR manifest digest를 요구하고 로컬 config ID/태그를 거절한다. 실제 trust로 AWS에서 만드는 web만 별도다. 공개 파일 검사기는 정해진 checksum 집합·일반 파일·크기/hash를 확인하고 symlink/경로 이탈/변조를 거절한다. image 감사 도구는 서비스 기동/파일 추출 없이 모든 역사 layer/config/history를 읽고 삭제된 보호 값도 검사한다. 공개 배포 묶음에 두 검사기를 포함한다.
-
-현재 작업의 `pnpm light`는 **50개 파일·251개 시험 PASS**, API runtime 타입 검사·Python 컴파일·diff 검사도 통과했다. 검증한 것은 미커밋 게시 준비 소스이며 과거 실제 통화/복구 결과를 이번 HEAD에서 재실행하지 않았다. 실제 image archive6개 config/38개 layer/54,145개 일반 파일과 보존 build input을 검사했다. 알려진 보호 값27개는 검출되지 않았다. GnuTLS의 PEM 형식 경고3건은 보존하고8개 내용 hash를 고정 upstream 공개 self-test 소스와 대조했다. 전체 비밀/악성코드 부재 보증이 아니다. 서비스/컨테이너/이미지 rebuild/host 설정/AWS 자원은 실행하지 않았다.
+<a id="2026-11-02-github-전달-경로와-게시-준비"></a>
+- [2026-11-02 GitHub 전달 경로와 게시 준비](archive/DEVELOPMENT-HISTORY-20261104.md#github-publication-20261102)
 
 <a id="delivery-only-20261102"></a>
-
-## 2026-11-02 전달물만 사용하는 신규 전체 리허설
-
-시작은 `ed234f6`이며 폐기 가능한 새 합성 identity `media-delivery-20261102-68b49c9d`를 사용했다. 이전 chain/DB/Anchor를 재사용하지 않았다. 입력은 실제6종 이미지 archive, checksum으로 봉인한 공개 파일과 observer archive, 이번 작업에서 만든 시험 보호 입력이다. 서비스에 checkout·host node_modules·build cache를 mount하지 않았다. 이미지 내부의 예전 절대 설치 경로는 host 경로 의존성과 다르다. 상세 결과는 [실행 증거](../artifacts/delivery-only-rehearsal-20261102.json)에 연결한다. 마지막 자연 세션 만료 재검증도 실제1시간을 기다린 뒤 **2 PASS·10 선택 제외**로 끝났다. TTL·시계·DB 만료를 바꾸지 않았고, 만료 직전 유효한 lease와 만료 후 양 세션401·양쪽 원격 음원 소멸·ARI 자원404를 함께 확인했다.
-
-- CHAIN-001/002·STATE-001/002·DB-001~003·OPS-001/003: archive를 load하고 linux/amd64 config ID6개, 실제 layer38개의 내용 hash를 대조했다. 새 역할 키·network-config·genesis·Besu4·ServiceRegistry·Witness4, migration0000~0009·서로 다른4 LOGIN, 별도 PostgreSQL/저장소/자격의 HTTPS Anchor를 준비했다. 같은 Docker daemon의 새 환경이며 새로운 daemon/AWS에서 load한 검증은 아니다.
-- AUTH-002·GOVERNANCE-001/002·CALL-001~006·PBX-001~003·MEDIA-001~004: 로컬 HTTPS OIDC 로그인→실제 공동 등록 API/worker/원장/Witness 확정→제품 화면의 업무·위임 발급→승인·SIP/WSS·실제 DTLS/소유 증명·소비·lease→상대 합성 음원 디코딩을 연결했다. 기관·상담원·수신자 화면을 사용했고 별도 시연 화면이나 성공 adapter로 바꾸지 않았다.
-- 위임 철회·PBX 제어 장애/정리 재시도·장치 권한 거절/없음 phase는 **5 PASS·7 선택 제외**, 정책 변경 phase는 **2 PASS·10 선택 제외**, 키 복구 phase와 수정한 자연 만료 phase는 각각 **2 PASS·10 선택 제외**다. 공통 이미지/위임 검사가 phase마다 반복되므로 수를 더해 서로 다른 시험 개수로 발표하지 않는다. 이 작업에서 의도적으로 선택하지 않은 이전 회수 사례는 이번 PASS에 포함하지 않는다.
-- 실제 정책 공동 서명·제출·원장 확정·Witness 확인·명시적 활성화 전후를 구분했다. 새 policy trust/web pin을 게시한 뒤 다음 통화를 생성했다. 키 변경은 설계상 필요한 기관 정지→2인 공동 복구→확정 키 활성화 순서이며, 키 변경만으로 통화가 끊겼다는 독립 인과 시험은 아니다. 구 VC/승인은 무효화되고 소비 영수증은 보존됐다. 구 trust로 신규 업무가 차단되는 것도 확인했다.
-- 통화가 있었던 위 회수 phase는 양 끝점의 원격 트랙을 별도 clone해 실제 디코딩을 관측했다. 양방향 상대660/990Hz 우세, 승인 전 무음, 회수 뒤 양쪽 상대 주파수의 소멸과 실제 ARI의 양 채널/브리지404를 함께 확인했다. UI 트랙 mute나 RTP 증가만으로 판정하지 않았다. 같은 namespace의 relay-only 선택이며 AWS 외부 NAT 성공이 아니다.
-- 초기화 재실행은 기존 키·network-config·계정을 거절했고 보호 파일 hash가 유지됐다. foundation 이후 명시적 resume은 기존 계약·volume·genesis·키를 대조해 재개했다. Issuer/worker의 일반 entrypoint 재시작 뒤 epoch·키 버전·소비·세션 만료 시각·gate를 대조했다. 임의 crash 모든 지점, 서비스 전체 백업/복원, 독립 호스트 장애는 이 리허설 범위가 아니다.
-
-### 실제 수정과 원본 실패
-
-전달 공개 묶음에 웹이 import하는 과거 `artifacts/test-results.json`이 빠졌고 Vite가 읽기 전용 설치 경로에 임시 설정을 만들었다. 공개 파일/Docker context/COPY와 `--configLoader runner`를 함께 수정해 **전달 runtime/nginx만으로 실제 pin 웹을 build·기동**했다. 이 JSON은 과거 결과 원본이며 이번 결과로 바꾸지 않았다. coturn4.6.3가 지원하지 않는 `no-loopback-peers`를 `allow-loopback-peers=0`으로 수정하고, 옛 runtime 내장 template 대신 전달 공개 template만 preparation container에 명시적으로 mount한다. 같은 runtime에서 실제 렌더링과 기본 loopback 차단을 확인했다.
-
-재개 검사는 같은 이름의 volume을 container로 오인하지 않도록 typed inspect와 소유 ID/label/image/network/mount 검사를 사용한다. observer의 브라우저 font와 프로세스 init, phase 로그의 stderr·자연 만료 파일 보존도 보완했다. 후속 cold read가 host `docker exec`에만 있던 timeout과 예시의 기관 ID 할당 누락을 찾았다. `4fec490`은 내부 TERM/KILL timeout·실패 시 소유 controller ID/image/namespace 재검사 후 종료와 명시적 ID 읽기를 연결했다. 실제 짧은 최종 이미지 시험에서 Node/timeout 실행을 먼저 관측하고 host exec 연결을 끊은 뒤 내부 프로세스 부재·소유 controller 종료를 확인했다. 1시간 만료 성공 phase는 기존 봉인 observer `23ff2e1`을 사용했다. 새 watchdog으로 이 긴 phase를 다시 실행했다고 바꾸지 않으며 짧은 별도 실제 회귀와 소유권 거절 검사를 구분한다. 이들은 배포 준비/관측기 수정이며 제품의 인증·서명·freshness 조건을 완화한 변경이 아니다.
-
-원본 prototype의 중단/실패와 실제 자연 만료 phase의 **1 PASS·1 FAIL·10 선택 제외**는 보존했다. 만료 phase에서는 실제 통화가 종료됐지만 관측기가 필수 `purpose=work`를 누락해400을 받았다. 실제 제품 요청의401과 분리하고 관측 요청을 수정했다. 누락 purpose400, 만료 cookie401/SESSION_EXPIRED, cookie 없음401/AUTH_REQUIRED를 포함한 오프라인 route 회귀12개를 확인했다. 세션 TTL/시계/DB 만료를 줄이지 않았다. 첫 만료 직전의 실제 lease는 세션 만료 뒤까지 유효했지만 후반 assertion이 끝나지 않았으므로 그 실행을 전체 PASS로 올리지 않는다.
-
-### 로컬과 AWS, 전달/보존의 경계
-
-런타임은 모든 phase에서 동일한 `ed282c7e…`(제품 소스 `137c402`)다. observer는 첫 phase `8f67dc6`, 관측 수정 이후 `23ff2e1`의 별도 봉인 archive다. host 준비/template 수정과 시험 소스 변경을 runtime 이미지 재build/재시험으로 바꾸어 기록하지 않는다.
-
-로컬만의 설정은 none namespace/loopback·노드별 내부 포트·합성 기관/중앙 시험 승인자·단기 CA·loopback TURN 예외·같은 host의 별도 Anchor 저장소·비root nginx의 임시 pid/cache 설정이다. controller의 브라우저/라이브러리/font와 assertion 코드는 관측 입력이며, 로컬 OIDC fixture는 **실제 시험 인증 의존성**이다. AWS용 nginx 설정 파일 자체의 HTTPS 제품 파일/308 전환도 별도 소유 container에서 확인했지만 AWS override 전체를 기동한 것은 아니다. 이 component probe의 첫 로컬 DNS 별칭 누락 실패도 보존했다. AWS의 실제 DNS/TLS/IdP·Security Group·NAT/TURN·EBS/재부팅·외부망·외부 AI·독립 host 내성은 미검증이다.
-
-외부 보관처는 아직 승인/선택되지 않아 업로드·재수령은 하지 않았다. 이미지 archive는2,317,248,512bytes이며 공개 파일/observer/inventory/checksum을 별도 묶는다. 보호 입력·키·인증서 개인키·로그·음원·DB/chain은 그 공개 전달물과 Git에 넣지 않는다. 대회는 AWS NEW가 기본이며 이 폐기 시험 identity의 남은 키/파일을 서비스 복원 묶음으로 취급하지 않는다. 최종 자원·host 전후 대조·전달 파일 목록은 실행 증거의 종료 결과를 따른다. 최신 소스 검사는 **light49파일248시험**, API runtime 타입 PASS다. 웹은 전달 runtime/nginx에서 각 실제 trust pin으로 build·기동했다. 별도 host 웹 build나 무관한 계약/DB 회귀를 이번에 재실행한 것으로 표시하지 않는다.
-
-종료 확인: 소유 container21개·volume2개를 제거했고 남은 실행 자원은0이다. 관측 약8083.5초의 available RAM 최저는37.53GiB였다. 일시 swap 연속 표본은최대2회로 사전에 정한4회 중단 조건에 미달했고 OOM/자원 중단은 관측하지 않았다. 수명 countdown/정렬을 제외한 interface/route와 기존 container/network ID를 전후 대조했다. 방화벽/NAT/daemon 전체 byte 동일성은 측정하지 않았으며 관련 변경 명령은 수행하지 않았다. 보호된 원본·합성 입력은 `.local/observer-delivery-8f67dc6/.local/media-delivery-20261102-68b49c9d`의 진단 보존물이다. DB volume이 제거됐으므로 남은 genesis/키만으로 서비스를 복원할 수 없고 AWS NEW 입력으로 재사용하지 않는다. 이미지/public 전달물은 별도 `.local/aws-preparation-20261102/delivery-rehearsal-final-*`에서 보존한다. 정확한 파일별 bytes/hash와 미전송 상태는 실행 증거에 기록한다.
+<a id="2026-11-02-전달물만-사용하는-신규-전체-리허설"></a>
+- [2026-11-02 전달물만 사용하는 신규 전체 리허설](archive/DEVELOPMENT-HISTORY-20261104.md#delivery-only-20261102)
 
 <a id="aws-preparation-20261102"></a>
-
-## 2026-11-02 AWS 단독 실행 준비와 전달 이미지
-
-사용자 결정으로 최종 대회 대상은 AWS이며 개발 서버는 빌드/검증 전용이다. 보존하기로 정한 대회 identity가 없으므로 폐기 시험 데이터를 옮기지 않고 AWS용 NEW를 기본으로 한다. 승인된 기존 배포의 RESTORE는 별도다. 리전·기간/예산·도메인·IdP는 사용자 답변상 미정이며 임의 선택/구매하지 않았다. [실행 절차](RUNBOOK.md#aws-competition)와 [이번 증거](../artifacts/aws-deployment-preparation-20261102.json)를 따른다.
-
-- OPS-001/002/003/005/007·PBX-001·MEDIA-003: 기존 Compose에 AWS override와 별도 TLS Anchor profile, EBS bind volume·제한 로그·CPU/RAM·내부 포트 경계를 연결했다. runtime 7종 역할을 조사하고 이미 있는 nginx를 HTTPS ingress로 사용하도록 준비했다. AWS profile의 web host8080을 제거했다. AWS용 네트워크/포트는 현재 서버에 적용하지 않았다.
-- 실제 준비 결함: loopback 전용 Anchor는 별도 호스트 접근이 불가능했다. 기본 loopback은 유지하면서 명시적인 외부 bind에 TLS를 필수로 했다. worker에 별도 Anchor용 egress를 추가했다. TURN command에 실행 binary가 빠져 있던 충돌을 고치고 public/container IP mapping과 metadata peer 차단을 렌더한다. 새 genesis에는 deployer/admin/stopper의 합성 gas allocation을 넣을 수 있다.
-- 신규 앱/관리 키는 기존 경로를 덮지 않으며 독립 approver 키는 중앙 생성하지 않는다. AWS target은 보호 env에서 선택하고 실행 확인·EBS mount gate를 적용한다. 일반 재시작에는 초기화/migration/seed가 없다. preflight는 실제 runtime URL/경로와 개발 도구 PATH를 구분한다. 실제 IdP callback은 두 client 모두 `/service`이며 별도 API callback URL을 IdP redirect로 잘못 등록하지 않도록 기록했다.
-- 공개 파일/계약 artifact 묶음과 실제 image inventory를 기존 release-manifest에 연결했다. AWS web은 실제 PBX cert/metadata/trust pin으로 runtime+nginx에서 재build하고 label을 검사한다. 기존 loopback·합성 trust web은 BLOCKED다. image config ID와 registry manifest digest를 구분한다.
-
-### 이번에 실제 실행한 범위
-
-오프라인 AWS/Anchor Compose 모델(17+2서비스)의 내부 포트·TLS·volume·worker egress·TURN 명령을 검사했다. 최종 runtime `sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f`를 network-none으로 재build했다. runtime의 코드 기준은 `137c402`이며 이후 host용 deployment.sh 선택/중단 guard와 문서·증거 변경을 구분한다. 제품 web/API 소스는 그 뒤 바뀌지 않았다.
-
-새 network-none/읽기 전용 컨테이너에 **host source·node_modules·build cache를 mount하지 않고** 이미지의 도구를 실행했다. 새 앱/관리 키·network-config 생성과 재실행 거절/내용 보존, 원격 Anchor TLS 조건, 미정 AWS 입력의 BLOCKED 유지, 설치 pnpm workspace 실행을 확인했다. 최종 probe는512MiB·CPU1·PID128·60초 제한 안에서 약4.72초, exit0/OOM false였다. 이는 전체 chain/DB/계약/계정/통화 초기화가 아니다. 두 번의 소유 probe container는 제거했고 생성한 volume은0이다. 시험 키는 tmpfs와 함께 폐기됐다.
-
-기본 이미지6종(runtime/Besu/PG/Asterisk/TURN/nginx)을 `aws-bootstrap-images.tar`로 보존했다. **2,317,248,512bytes**, SHA256 `cb23d8fa623f547285a6d595c659bd36f398cfaeb3ff1446b60596ebc1b0ec21`, archive manifest의 실제6 config hash를 대조했다. `.local/aws-preparation-20261102`의 이 archive는 아직 외부 미전송이며 운영 데이터/비밀/체인 백업이 아니다. 일곱 번째 역할 AWS web은 실제 trust가 나온 뒤 생성한다. 이미지7종 metadata는6 PASS·web1 BLOCKED이며, 단순 metadata PASS는 서비스 기동 성공이 아니다.
-
-AWS 빈 template 검사: prepare는 PASS17/BLOCKED15/SKIPPED1, runtime은 PASS17/BLOCKED27/SKIPPED1이다. 가짜 주소나 비밀값을 채워 수를 줄이지 않았다. 로컬 소스 검사는 `137c402`의 light49파일242시험·웹 build·API runtime 타입 PASS, 뒤의 AWS host wrapper 회귀를 포함한 `abb95c7`의 light49파일243시험 PASS다. 과거 결과와 합산하지 않는다. [첫 소스 검사](../artifacts/aws-deployment-source-20261102.json), [최종 light 검사](../artifacts/aws-deployment-final-source-20261102.json).
-
-원본 실패도 보존했다. FROM에 raw config ID를 사용해 registry metadata 조회가 실패한 build는 검토한 기존 local tag/ID 대조로 수정했으며 image 다운로드를 완료한 것은 없다. 초기 AWS preflight의 ambient PATH 오분류와 cloud fixture의 과거 step명 불일치는 회귀로 수정했다. 기존 서버 설정/자원에 대한 변경 명령·새 bridge·port publish·외부 AWS/AI/업로드/과금은 실행하지 않았다. 전체 호스트 상태 동일을 측정한 검증은 아니다.
-
-최종 전달 파일만 새 디렉터리에 풀어 host node_modules 없이 AWS preflight의 미정 입력 차단과 deployment.sh의 AWS 실행 확인 차단을 검증했다. 공개 파일 checksum과 bootstrap image checksum을 함께 대조했다. 뒤이어 채운 `aws.env`/`deployment.env`/복원 env가 Git·Docker context·소스 증거 대상으로 유입되는 경계를 보완했고 공개 예제는 유지했다. 관련 preflight11시험 PASS와 TypeScript 검사를 수행했으며 앞선 전체 light와 합산하지 않는다. runtime image build 당시의 채운 env는 제외된 `.local` 안에만 있었다. 이후 image에 사용하지 않는 host 전달/증거 도구·ignore·문서 변경은 source 관계에서 구분한다. 공개 전달물의 실제 hash/재검증은 보호 작업 디렉터리의 `delivery-check*.json`과 `delivery*/SHA256SUMS`를 따른다. 외부 전송은 아직 하지 않았다.
-
-### 남은 실행 gate
-
-현재 서버 없이 **준비 도구가 포함된 이미지가 실행되는 범위**만 로컬 확인했다. 새 AWS 전체 초기화·실제 IdP·외부 TLS/NAT/TURN·제품 전체 흐름·EBS 재부팅/복원·외부 보관처에서 전달물을 재수령하는 검증은 남는다. AWS·별도 Anchor host의 실제 기동/권한 검증을 수행하지 않았다. `shower`의 발췌 전달 검토에서 미정 입력·전달 미완성과 checkpoint/판정 설명 부족을 지적받아 명령·완료/중단표를 보완했으며, 이 검토 자체가 실행 검증은 아니다. 실제 입력/실행 허가 없이 배포 완료로 표시하지 않는다.
+<a id="2026-11-02-aws-단독-실행-준비와-전달-이미지"></a>
+- [2026-11-02 AWS 단독 실행 준비와 전달 이미지](archive/DEVELOPMENT-HISTORY-20261104.md#aws-preparation-20261102)
 
 <a id="isolated-media-20261102"></a>
-
-## 2026-11-02 실제 교환기·합성 음원과 권한 회수
-
-시작 HEAD는 `a86e4c2`이며 이번 시험은 이후 미커밋 소스를 포함한다. [실행 증거](../artifacts/isolated-media-20261102.json)의 시험 소스 hash·이미지별 범위와 [최종 소스 검사](../artifacts/isolated-media-source-20261102.json)를 따른다. 원본 실패·이전 증거는 보존했다. 이 환경은 **폐기 가능한 통합 시험**이며 이전할 서비스 배포 identity가 아니다.
-
-- PBX-001~003·MEDIA-001~004·CALL-001~006: 실제 Besu4/ServiceRegistry/Witness4, 역할별 PostgreSQL LOGIN, 별도 HTTPS Anchor, runtime image의 Platform/Issuer/Sender/worker, Asterisk22.11.0·coturn4.6.3·HTTPS 제품 웹·Chromium을 연결했다. OIDC만 로컬 fixture이며 마이크 입력은 서로 다른660/990Hz 합성 WAV다. TLS는 작업 CA를 Node와 시험 브라우저의 NSS profile에만 등록했고 인증서 오류 무시는 사용하지 않았다.
-- 실제 UI에서 업무·위임 확정·승인→SIP/WSS/DTLS→양측 보고/소유 증명→일회 소비·lease→bridge→상대 합성 음원 디코딩을 확인했다. native DTLS 인증서와 선택한 양쪽 relay candidate를 조회했다. 승인 전 수신 RMS0, 통화 중 상대 주파수가 자기 주파수보다 우세함, 회수 후 수신자 측 RMS0을 기록했다. 회수 후 양쪽의 디코딩을 각각 재측정한 결과는 아니다. 단순 RTP 증가나 화면 문구가 판정 기준이 아니다.
-- 로그아웃·업무 취소·갱신 HTTP 차단 뒤 실제30초 lease 만료·위임 철회·기관 긴급 정지의5개 회수 경계를 확인했다. 위임/정지에서는 실제 worker 확정 작업과 Witness 응답도 확인했다. 회수 관측 시간은 한 controller의 단조 시계로 잰 단일 표본의 상한이며 체인 확정→음성 중단의 분해 지연이나 SLA가 아니다.
-- 첫6시험 실행은 **5 PASS·1 브라우저 crash**다. cgroup OOM은0이고 PID 상한 도달이 관측됐다. 시험 controller에 init을 넣어 자식 프로세스를 회수하고 CPU/RAM/PID 상한을 유지했다. 실패한 긴급 정지만 재실행해 **2 PASS·4 선택 제외**(공통 이미지 시험 포함)를 확인했다. 두 실행의 시험 수를 합산하지 않는다. 실제 DB 회귀는 별도로 **4파일16 PASS**다.
-
-수정한 제품 결함:
-
-1. PBX 자격 행의 `FOR UPDATE`에 필요한 권한이 없어 실제 issuer/worker LOGIN이 거절됐다. `0007_pbx_lease_locks`는 `UPDATE(id)`만 추가한다. `0008/0009`는 실제 PJSIP 연락처 저장 필드와 true/false 폭을 보완한다. 기존0000~0006 hash는 바꾸지 않았다.
-2. SHA-256 digest만 저장하면서 PJSIP의 기본 UAC 알고리즘이 MD5였던 충돌을 양쪽 SHA-256 설정으로 해결했다. 지원 빌드에 없는 Opus 변환 대신 내장 G.711 μ-law를 사용한다. 이 시험은8kHz 코덱 경로이며 한국어 음질 평가가 아니다.
-3. 수신 offer에 연결되지 않는 빈 transceiver 때문에 수신 전용 SDP가 만들어졌다. 꺼진 마이크를 `addTrack`으로 협상하고 검증·수락 후에만 켠다. 기존 mute/동의/종료 조건을 유지한다. 무음/CN RTP와 사람 음성 송신을 구분한다.
-4. 현재 Chromium에서 기존 원격 인증서 접근이 실패했다. 실제 connected DTLS transport의 `remoteCertificateId`가 가리키는 native certificate DER를 직접 해시하도록 보완했다. SDP나 서버 boolean으로 대신하지 않는다. 종료 중 비동기 회수의 거절도 처리한다.
-5. 업무 목록이 과거 SDP·서명까지 포함해 반복 통화 후128KiB 상한을 넘었다. 목록은 표시용 요약이고 전체 검증 자료는 권한 검사된 개별 call-context에서 제공한다. 메모리 기반100시도 회귀와 실제 누적 시험 DB를 통해 확인했으며 대규모 부하 검증은 아니다.
-
-이미지의 범위: 실제 통화는 증거에 기록된 candidate runtime/web 이미지에서 실행했다. 최종 runtime은 같은 제품 코드에 검증 설명 문자열을 반영한 재build이며 API3·Witness4의 실제 entrypoint/health, 실제 Witness 서명3개와 worker cursor 전진을 새로 확인했다. 그 최종 이미지에서 새 통화를 다시 실행한 것으로 기록하지 않는다. runtime/web/PBX/TURN 묶음 archive는 **이미지 전달물**이며 chain·DB·Anchor·키를 포함한 일관 서비스 백업이 아니다. [명령과 전달 경계](RUNBOOK.md#isolated-media-20261102)를 따른다.
-
-외부망/NAT·외부 IdP/MFA·실제 STT/LLM·한국어 품질/비용·GCP·전체 배포 복원은 미실행이다. 통화 중 정책/키 교체, 세션 자연 만료, 실제 PBX 제어 장애, 장치 거절/없음의 전체 조합도 이번 미디어 실행 범위에 포함하지 않았다. 기존 단위/fixture 검증과 구분한다. source·DB·Anchor의 과거 이력 초기화로 연결을 열지 않았다. host 설정과 기존 자원은 읽기 전용으로 유지하고 소유 자원의 종료·정리는 실행 증거에 남긴다. 최종 소스 검사 light는48파일236시험, 웹 build·API runtime 타입 검사는 PASS다. 소유 container22개와 시험 volume2개를 제거했고 실행 중 소유 자원은0이다. 전후 대조에서 Docker network ID와 기존 container ID는 보존됐지만 기존 veth1개와 그 IPv6 경로가 교체됐다. 비소유 restart-always container의 재시작을 관측했으나 직접 대응은 미확정이다. 따라서 host 상태 전체 동일은 미판정이며 네트워크 복구/변경 명령은 수행하지 않았다.
+<a id="2026-11-02-실제-교환기합성-음원과-권한-회수"></a>
+- [2026-11-02 실제 교환기·합성 음원과 권한 회수](archive/DEVELOPMENT-HISTORY-20261104.md#isolated-media-20261102)
 
 <a id="isolated-runtime-20261101"></a>
+<a id="2026-11-01-호스트-설정을-보존한-실제-원장api-연결"></a>
+- [2026-11-01 호스트 설정을 보존한 실제 원장·API 연결](archive/DEVELOPMENT-HISTORY-20261104.md#isolated-runtime-20261101)
 
-## 2026-11-01 호스트 설정을 보존한 실제 원장·API 연결
-
-작업 시작 HEAD `36e88bd` 이후 미커밋 소스를 사용했다. 중간 문서 보존·정리 커밋 이후 실제 worker/API 시험 HEAD는 `e4771be`다. 각 시험의 원래 HEAD·dirty 소스 hash는 [이번 증거](../artifacts/isolated-runtime-connection-20261101.json)와 [최종 오프라인 검사](../artifacts/isolated-runtime-final-source-20261101.json)에 보존한다. 커밋 후 재실행한 것처럼 바꾸지 않는다.
-
-- CHAIN-001/002·STATE-001/002: bridge 생성·host port publish 없이 Docker `none` namespace를 공유했다. 실제 Besu4의 동일 chain/genesis·높이 전진·동일 높이 hash·validator4, 현재 artifact 배포 receipt/code/profile, 등록/위임/공동 정책 변경/정지/공동 복구와 실제 Witness 서명을 **5시험 PASS**로 확인했다. 소유 Besu1개+Witness1개 중단 시 잔여3개 제공, Witness2개 중단 시 정족수 거절을 별도2관측으로 남긴다. 같은 호스트의 제한 시험이며 독립 기관·호스트 장애 내성이 아니다.
-- OPS-001/003·TEST-001: 실제 HTTPS OIDC fixture→Platform/Issuer/Sender→역할별 PostgreSQL LOGIN→독립 HTTPS Anchor→실제 worker 프로세스→Besu/Witness 경로 **3시험 PASS**. 업무/위임 pending 저장, 실제 raw transaction·확정 receipt·Witness3개 이상 확인 후 기본 `asterisk-webrtc-v3` 개별 승인 발급, HTTP 긴급 정지→원장/Witness→DB 권한 회수를 확인했다. 실제 PBX 연결·소비 binding·음성은 포함하지 않는다. 기존 HTTP API 회귀는 **6 PASS·브라우저1 SKIPPED**이며 외부 권한/통화 binding은 명시적 fixture다.
-- 실제 결함: worker가 원장 작업만 처리해도 ARI 설정을 요구했다. PBX 미준비 상태에서 원장 작업은 시작하되 PBX cleanup이 필요한 작업은 `PBX_CLEANUP_UNAVAILABLE`로 재시도하고 성공 처리하지 않도록 수정했다. API-only 시험도 Vite를 무조건 import하던 경계를 필요한 경우에만 읽도록 고쳤다.
-- runtime image를 `/app`으로 옮기자 설치된 pnpm workspace metadata 검사가 거절했다. 검사를 끄지 않고 설치 layout을 이미지 안에서 보존하는 `local-runtime` target을 추가했다. 기존 Node·의존성·고정 Ubuntu base만 쓰고 build network/download를 차단했다. Besu 생성기는 task UID·network none·CPU/RAM/PID 상한을 사용한다. native library용 실행 권한은 소유 Besu의 `/tmp` tmpfs에만 적용했으며 host 권한은 변경하지 않았다.
-- image 검증기는 registry manifest digest와 archive의 Docker config ID를 구분해 받는다. mutable tag·zero digest는 거절한다. 최종 runtime image와 약632MiB archive의 실제 ID/hash는 [전달 기록](../artifacts/isolated-runtime-20261101/runtime-transfer.json)에 있다. 이는 **부분 runtime 후보**이며 웹/PBX/TURN 이미지·전체 trust·DB/chain/Anchor 이전 묶음이 아니다. 최종 이미지 build의 pnpm 검사는 통과했으나 그 최종 이미지를 서비스로 재기동하지 않았다.
-
-최종 `pnpm light` **46파일228시험 PASS**, API runtime 타입 검사 PASS. 앞선 검사 수를 합산하지 않는다. 512MiB·128MiB package probe의137 종료 뒤 소유 서비스를 중단했고, 사용자가 허용한 **2GiB·60초 1회** 검증은 성공했다. 이후 서비스 예산을 자동 확대하지 않았다. 잘못된 enum 가정, 빈 DB에 epoch4를 넣어 복구 gate가 차단한 경우, 기관 문맥이 다른 Witness metadata와 API-only 환경 누락은 시험 준비 실패로 보존했다. gate/서명/정족수/기존 배포 identity는 완화하거나 초기화하지 않았다.
-
-종료 시점 표본에서 Besu 각 약400~442MiB, Witness 각 약168~173MiB, Anchor 약53MiB였다. peak·부하·SLA·클라우드 최소 사양이 아니다. 호스트 가용 RAM 약33~34GiB, SSD 여유 약446GiB를 관측했다. swap 사용 증가와 짧은 page-in 관측을 남기고 검증 후 소유 서비스17개를 중단했다. interface·route의 수명 countdown 외 내용과 Docker network ID는 시작과 같고 host port publish는 없었다. 최종 제거 결과는 증거의 cleanup을 따른다. 보호된 시험 키·원본 실패 로그·이미지 archive는 Git에 넣지 않는다.
-
-남은 실제 연결: Asterisk/TURN 이미지·모듈/ODBC와 인증서·접속 경로가 준비되지 않았고, 실제 IdP·외부 AI 자격/비용 승인·GCP 설정도 없다. 실제 미디어·한국어 품질·전체 복원·GCP를 성공으로 표시하지 않는다. 새 bridge/방화벽/공개 포트가 필요한 실행은 별도 승인 전 수행하지 않는다.
-
-## 2026-11-01 저장소 게시 파일 정리
-
-추적 파일493개의 경로·용도·크기·참조와 중복을 점검했다. 별도 전달용 작업 요약13개(`docs/*-SUMMARY.md`)는 MASTER·이 개발 기록·RUNBOOK·서비스 가이드와 겹치므로 현재 Git 추적에서 제외했다. 파일 원본은 로컬에 그대로 보존하며 게시 당시 내용은 커밋 `602d2fcd8a2379a9b93d8e132fa3c37c93501537`에서 확인할 수 있다. 아래 과거 기록의 요약 파일명은 당시 보존 사실을 가리킨다.
-
-실행·빌드 소스, lockfile, migration, 계약·시험 fixture, 배포 템플릿은 유지했다. 과거 기획서·PDF/PPTX·렌더 이미지·검증 artifact155개는 원본 증거와 참조를 보존하기 위해 유지했다. 복구 관측 JSON 두 개가 동일한 내용이어도 과거 증거 경로를 바꾸지 않았다. 임시 `artifacts/*.progress.json`은 게시 대상에서 제외하며 로컬 원본을 삭제하지 않는다.
-
-추적 파일의 비밀 경로·대표 토큰 및 개인키 블록 패턴도 점검했다. 발견한 개인키 헤더는 CA 파일 거절을 검사하는 단위 시험의 비밀값 없는 문자열이었다. 이 점검은 전체 보안 감사나 Git 과거 이력의 비밀정보 부재 보증이 아니다. 현재 연결 검증의 미커밋 소스·증거와 서버 설정·실행 자원은 변경하지 않았다. 이번 정리를 위해 서비스나 통합 시험을 기동하지 않는다.
+<a id="2026-11-01-저장소-게시-파일-정리"></a>
+- [2026-11-01 저장소 게시 파일 정리](archive/DEVELOPMENT-HISTORY-20261104.md#2026-11-01-저장소-게시-파일-정리)
 
 <a id="chain-preparation-20261101"></a>
-
-## 2026-11-01 첫 체인 실행 직전의 입력·네트워크 준비
-
-시작 HEAD `87a2d37d3ec49462925771013aa8e2c8615755c9`와 원격 main 일치를 확인하고 기존 미추적 요약6개·진행 포인터28개를 보존했다. 서버의 실제 설정·네트워크·서비스·volume은 변경하지 않았다. interface/모든 IPv4 route/Docker IPAM 읽기 전용 조회에서 기본10.203.0.0/24 충돌을 재확인했고 신규 prefix10.206.0을 비중복 후보로 제안했다. 숨은 VPN/조직망/향후 GCP에 대한 보장은 아니며 아직 미적용이다.
-
-- CHAIN-001/002·OPS-001/003: `LEDGER_IPV4_PREFIX` 하나로 배포 Compose subnet/static IP·advertised host/host allowlist와 공개키 기반 static peers/permissions를 파생한다. 기본값/과거 호환 Compose를 보존하고 신규 env에서만 선택한다. 기존 genesis·validator/기관 키·epoch를 재생성하지 않고 기존 peer 내용이 다르면 거절한다. 준비 스크립트는 같은 `CALLSIGN_ENV_FILE`/`--env-file` parser를 사용한다.
-- OPS-001·TEST-001: 실제 보간한 추출본에서 짧은 mount가 named volume으로 오분류되어 config가 실패했다. Besu/Witness28개 mount를 명시적 bind·`create_host_path:false`로 바꿨다. 누락된 파일을 디렉터리로 자동 생성하지 않는다. 수정 후 nodes4는 app/OIDC/PBX/AI 값 없이 파싱했고 IP/명령/subnet·고유 project 이름·resource 상한을 대조했다. 중간 Python 검사에서 Compose의 메모리 숫자 문자열을 정수와 직접 비교한 검사 오류도 구분해 수정했다.
-- OPS-003·CHAIN-001/002: 기존 preflight에 chain의 `prepare/nodes/deploy/witness` 단계만 추가했다. 입력 검토 PASS와 생성물 준비·실제 실행 PASS를 분리한다. 배포자 키를 Witness 단계에 요구하지 않으며 chain 단계는 PBX/OIDC/AI/web pin을 요구하지 않는다. 전체 runtime preflight는 그대로 BLOCKED63/PASS16/SKIPPED1이다. [이번 검사별 A~E 원인·주체·소비 단계](../artifacts/chain-preparation-20261101.json)에 파생 오류를 선행 조건으로 묶었다.
-- [RUNBOOK의 단일 입력표](RUNBOOK.md#2026-11-01-서버용-배포-입력표)에 공개 결정·보호 참조·생성값·host/container 경로·OIDC public client/PKCE·CA 전달·역할별 키 소유·독립 Anchor 책임을 정리했다. 기존 추출에4노드 전용 plan을 추가하고 같은 project의 chain9서비스/auth8서비스를 유지한다. 첫 실행의 명령·시간/자원 상한·합의/계약/Witness 별도 assertion·중단·소유 자원 정리 절차를 구체화했다.
-
-### 이번 실제 검사와 남은 조건
-
-최종 `pnpm light`: **45파일225시험 PASS**, 타입 검사 포함. [최종 소스 증거](../artifacts/chain-preparation-final-source-20261101.json)는 실행 HEAD와 dirty 소스 hash/명령을 보존한다. 같은 작업의 선행223시험 [검사](../artifacts/chain-preparation-source-20261101.json)는 당시 기록이며 최종 결과로 합산하지 않는다. RUNBOOK shell/inline JS와 generator bash 구문, 전체 Compose/PBX 및 추출 nodes4/chain9/auth8 구성 검사 PASS. 웹/계약/API runtime은 수정하지 않아 별도 build/계약/통합 시험을 반복하지 않았다. light에 포함된 API/웹/Witness 타입 검사는 실행했다.
-
-24 CPU, available 약35.3GiB, disk 여유453GiB를 읽기 전용으로 관측했다. 짧은 vmstat 후속 두 표본의 swap in/out은0이었지만 누적 swap 사용 약9.9GiB이며 실행 직전 재관측이 필요하다. Besu26.8.1 로컬 RepoDigest는 확인했고 현재 소스의 app runtime 이미지는 미생성이다. 이미지 실행/다운로드/build·키/인증서 생성·어떤 서비스/컨테이너 기동·RPC·배포도 하지 않았다. 임시 Compose JSON은 소유 임시 디렉터리만 제거했다.
-
-검증한 코드·설정은 `8a174ca2bd32469730f99fed61d179fa66a4795d`에 보존했다. 시험은 그 전 `87a2d37` 이후 worktree에서 수행했으며 원본 HEAD·시각·hash를 바꾸지 않았다.
-
-첫 결정은 신규/기존 배포 구분·prefix 후보 승인, 고유 project/host 경로/chain ID, 배포자·공동 승인자·Witness의 책임이다. 실제 image digest/키/public manifest/genesis/계약 metadata/trust pin은 승인된 과정의 산출물이며 임의 값으로 입력하지 않는다. 현재 후보만 주입한 prepare 검사는 공개 결정3개가 BLOCKED이고 nodes/deploy/witness도 생성물 미준비로 BLOCKED다. 이 숫자를 실제 사용자 입력 수나 서비스 완성률로 해석하지 않는다. 호스트 설정 변경·실제 기동은 계속 별도 허가 대상이다.
+<a id="2026-11-01-첫-체인-실행-직전의-입력네트워크-준비"></a>
+- [2026-11-01 첫 체인 실행 직전의 입력·네트워크 준비](archive/DEVELOPMENT-HISTORY-20261104.md#chain-preparation-20261101)
 
 <a id="release-candidate-20261031"></a>
-
-## 2026-10-31 실제 인프라 연결 전 배포 후보 검토
-
-시작 HEAD `a6e2452db2691d5102ff076ea1f23dd89761b3a4`, 원격 main과 일치했으며 기존 미추적 요약5개·진행 포인터28개는 보존한다. 이번에는 서비스·DB·Anchor·브라우저·체인·이미지를 실행하지 않고 로컬 구성 파싱·소스/타입·단위·웹 build만 수행했다. 과거 통합 결과는 당시 source hash와 경계 그대로 보존한다. [이번 검토 증거](../artifacts/release-candidate-review-20261031.json), [소스 검사](../artifacts/release-candidate-retention-source-20261031.json), [설정 차단](../artifacts/release-candidate-retention-preflight-20261031.json)을 따른다.
-
-### 수정한 실제 불일치
-
-- OPS-001/003: API 기본 `start`를 실제 서비스 entrypoint로 수정하고 이전 서버는 `start:legacy`로 보존했다. root trust 생성도 현재 URI/등록 키 준비 도구가 기본이며 구 test-key 도구는 `trust:generate:legacy`다.
-- OPS-001/005·AUTH-002: Issuer/Worker의 추가 CA가 PBX 파일 하나로 고정되어 있던 경계를 `SERVICE_EXTRA_CA_PATH` 공개 PEM bundle→read-only `/tls/extra-ca.pem`으로 연결했다. PBX·사설 Anchor/OIDC CA를 함께 준비할 수 있고 Node 기본 공용 roots는 유지한다. 실제 handshake는 미확인이다.
-- DB-004·OPS-003: Worker `RETENTION_SECONDS` 전달 누락과 잘못된 값의 maintenance DB 클라이언트 생성 전 거절을 보완하고, 준비표의 migration0005 종료 표기를0006까지 수정했다. 복원 전 roles-only와 신규 설치 migration의 차이를 유지한다.
-- OPS-001·TEST-001: Docker context에서 integration entrypoint/시험 소스·중첩 env·PEM/key를 제외했다. 기존 adapter 주입은 integration 허가+test identity+loopback/test DB 범위를 계속 요구한다. 운영 DB/내부 container DB를 지정하면 scope 단계에서 거절하는 회귀를 보강했다. 이미지를 build하거나 내부 파일을 검사한 증거는 아니다.
-- OPS-003·UI-005: Platform/Web 시작 의존성을 `service_started`로 분리했다. healthcheck는 `/readiness`, DB는 `service_healthy`를 유지해 PBX 준비를 기다리는 동안 인증/관리 UI의 시작이 막히지 않게 했다. 시작 성공을 준비 완료로 표시하지 않는다.
-
-### 이번 실제 검사와 다음 차단
-
-`pnpm light`44파일212시험·API runtime 타입·웹 build PASS. 웹 build는 실제 배포 pin을 주입하지 않은 컴파일 검사이며 deployable image/pin 생성이 아니다. 전체 Compose/PBX overlay와 원본에서 고정 추출한 chain9개·auth8개 구성은 `config --no-interpolate --no-env-resolution --no-path-resolution`으로 정적 파싱했다. 추출 전 `--no-normalize`로 resource 이름을 특정 project에 고정하지 않아 원본과 같은 명시적 project를 사용할 수 있다. 실제 서비스는 시작하지 않았다.
-
-사용자 배포값 없는 preflight는 BLOCKED63·PASS16·SKIPPED1이다. 이 숫자를 사용자 입력 개수로 요구하지 않는다. [RUNBOOK의 다섯 결정 묶음](RUNBOOK.md#배포-후보와-실제-연결-순서)은 실행 호스트/접근, DNS/TLS/OIDC, 기관·콜센터·키 소유/독립 Anchor, PBX/TURN, AI/보관/예산이다. image digest·키·genesis·계약 주소/높이·trust pin은 이후 생성값이다. 현재 호스트의 기본10.203.0.0/24는 기존 Docker network와 중복되어 첫 체인 기동을 차단한다. 기존 network·서비스는 변경하지 않았다. 새 호스트 또는 peer/Compose/genesis를 함께 검토한 네트워크 결정을 기다린다.
-
-코드/설정은 `1149314`와 `ddda697e17dcf64c192291ff515a5dfffceec7fd`에 보존했다. 최종 light/타입은1149314 이후 worktree에서 실행했으며, 웹 build는 그 전 같은 웹 소스로 실행했다. 변경 코드/설정12개 파일의 hash를 최종 검사 snapshot과 대조했다. 임시 공개 Compose JSON8개는 제거했고 서비스·키·DB/volume은 생성·기동·변경하지 않았다. 기존 미추적33개 파일은 보존했다.
-
-### 요구사항별 적용 범위
-
-| 요구 ID·사용자 흐름 | 실제/fixture 검증 근거 | 이번 이후 상태 |
-|---|---|---|
-| CONTRACT-001/002·GOVERNANCE-001/002 | 과거 로컬 EVM21 및 앱 EIP-712/calldata/event 호환. 계약 source와 검토 artifact source hash 일치 | Besu 배포·epoch→Witness→실제 통화 회수 미실행 |
-| AUTH-001/002·BUSINESS-001~003·UI-001~005 | 과거 실제 SQL·HTTP/Chromium·local HTTPS OIDC. 인증/권한/CSRF 실제 구현, 원장·초기 Anchor/binding fixture | 실제 IdP/auth_time·운영 TLS·이번 container entrypoint/CA/start 순서는 실제 재검증 필요 |
-| CALL-001~005·STATE-001~003 | 서명 verifier·합성 binding·lease/취소 경계, DB 소비/응답 유실. 실제 영속 HTTPS Anchor와별도 cluster 복구는 과거25시험 | DTLS/RTP와 실제 Witness freshness/철회 전파·다기기 미실행 |
-| AI-001~005 | orchestration·동의/revision/근거·취소·quota의 단위/fixture | 실제 provider/한국어 품질·보관·청구 미검증. 제공자 정보는 해당 단계만 차단 |
-| DB-001~004·OPS-003/005 | 과거 실제25복구/DB,6HTTP, drain/CAS·암호화 별도cluster·least privilege | 같은 호스트·application 범위. 전체 chain/운영 키/GCP·호스트 내성 아님 |
-| OPS-001~007·TEST-001/004 | 이번 source/Compose/entrypoint/CA/fixture 배제·기존 light CI | 외부 정보·이미지/키/배포 산출물·실제 환경 검증 BLOCKED. 코드 검사 PASS와 구분 |
-
-기본 경로의 다음 실행을 위해 새 프로토콜/복구 플랫폼을 추가할 이유는 발견하지 않았다. 이는74개 전체 요구사항 완료 선언이 아니다. Asterisk 실제 이미지/driver, 실제 IdP·provider의 선택/지원, 준비된 CA/키·trust·계약 배포가 남는다. 임의 CIDR 전환·OIDC confidential client·PSTN/native proof/KMS/HSM/자동 failover는 기본 지원으로 가정하지 않는다. [RUNBOOK](RUNBOOK.md#배포-후보와-실제-연결-순서)에 단계별 구성·명령·assertion·중단/소유 자원 정리·전달 증거를 정리했다.
+<a id="2026-10-31-실제-인프라-연결-전-배포-후보-검토"></a>
+- [2026-10-31 실제 인프라 연결 전 배포 후보 검토](archive/DEVELOPMENT-HISTORY-20261104.md#release-candidate-20261031)
 
 <a id="backup-boundaries-20261030"></a>
-
-## 2026-10-30 쓰기 중 drain·별도 cluster 복원·Anchor 잠금 후속
-
-시작 HEAD는 `ac31f254b225813380088b12a34a78d0833bc028`다. 기존 미추적 문서4개·진행 포인터28개는 보존하며 이번 커밋에 포함하지 않는다. 아래는 그 이후 worktree의 검증이며 [이번 실행 증거](../artifacts/backup-boundaries-20261030.json)에 실행별 소스·명령·결과를 연결한다. 앞 절의 고정 fixture/같은 cluster 한계는 당시 기록이며 이번에 추가로 확인한 범위와 구분한다.
-
-- OPS-003/005·DB-001/003: migration `0006_backup_drain`의 DB 공통 admission 상태와 shared/exclusive advisory lock으로 모든 동일 DB 서비스 인스턴스의 권한 transaction·외부 Anchor CAS·commit을 백업 snapshot 앞에서 정리한다. `drain`은 준비 완료가 아니라 유입 차단이다. 일반 쓰기/신규 일반 worker claim은 거절하고 이미 처리 중인 작업은 완료/명확한 재시도로 남긴다. 종료·동의 철회·업무 취소·위임 철회·긴급 정지와 관련 안전 작업은 draining 동안 허용한다. snapshot의 짧은 배타 구간은 `BACKUP_SNAPSHOT_BUSY_RETRY`로 명시 재시도를 요구한다. 처리 중 claim·진행 통화 또는 잠금 기한 초과는 백업 성공 manifest를 만들지 않는다.
-- CALL-002·AUTH-002·STATE-003: Anchor timeout이 통화 종료까지 막던 결함을 수정했다. 종료/동의 철회/재시작 정리는 등록 권한·키·기관 상태와 소비 권한을 변경하지 못하는 별도 mode로 수행하고 신규 권한 쓰기는 여전히 독립 Anchor 검사를 요구한다. 위임 철회·기관 정지 등 권한 이력 변경은 기존 Anchor/journal 확인을 유지한다.
-- OPS-005·DB-001: 복원은 source 소유자와 비밀번호를 복제하지 않고 `pg_restore --no-owner`와 target의 새 owner/NOLOGIN 그룹/독립 LOGIN을 사용한다. 기존 provisioning 도구에 새 빈 cluster의 그룹 준비 옵션만 추가했다. 복원 SQL은 admission을 fenced로 유지한다. archived issuer 키 참조가 없거나 실제 개인키가 공개키와 맞지 않으면 SQL 복원 전에 거절한다. 새 키로 대체하지 않는다.
-- OPS-003/005: `scripts/backup-control.ts`는 owner 전용 status/drain/resume/fence/activate 명령이다. 복원된 target은 최신 Anchor와 모든 recovery gate 확인 및 운영자의 source 정지·fence 확인 후 명시 활성화한다. source의 fenced 상태는 일반 resume으로 해제하지 못한다. 자동 failover나 source 생존 여부를 원격 증명하는 장치는 추가하지 않았다.
-
-### 시험과 관측
-
-동일 기관 API 프로세스2개, 실제 PostgreSQL worker claim/완료, 진행 중 authority transaction에서 drain을 시작했다. 양쪽 API의 새 발급·소비는503이고 DB 소비 행이 증가하지 않는다. 준비가 덜 된 backup은 실패하며, 진행 transaction의 CAS/commit과 worker 완료·종료/철회/취소/cleanup 후 실제 암호화 snapshot의 checkpoint와 Anchor가 일치한다. 잘못된 drain token과 snapshot 배타 구간 요청은 거절하고, 백업만 수행하는 source는 올바른 token으로 명시 재개한다.
-
-source/target/Anchor는 서로 다른 PostgreSQL 프로세스·volume·자격을 사용한다. target의 owner와 issuer/auth/worker LOGIN으로 실제 SQL·HTTP 동작, superuser/createdb/createrole 불허, 금지 SQL42501, 역할 GRANT 누락42501, migration hash, 소비·철회·계정 비활성/세대·epoch·세션 폐기·gate, 비어 있지 않은 대상 거절을 확인한다. source를 fenced로 만든 뒤 target만 활성화하며, target 전진 후 과거 백업은 Anchor 불일치로 차단한다.
-
-Anchor proxy는 실제 HTTPS Anchor로 전달하되 특정 기관 요청만 제어한다. 정상·지연·timeout·저장 후 응답 유실·접근 불가에서 실제 HTTP 종료와 `pg_stat_activity`/`pg_blocking_pids`의 행 잠금 대기를 확인한다. 다른 기관 요청은 진행하고 timeout은 rollback하며 후속 요청이 성공한다. HTTP 취소는 즉시 서버 transaction 취소가 아니라 제한된 Anchor timeout 뒤 rollback되는 경계다. per-request 관측값은 증거에 남기며 SLA·분위수·부하 시험으로 해석하지 않는다. 기관 잠금 밖으로 Anchor 조회를 이동하지 않았다.
-
-### 최종 실행 결과
-
-| 검사 | 이번 결과 | 범위 |
-|---|---|---|
-| 복구·DB 통합 | 5파일25 PASS, 실패/skip0 | 복구10 + 기존 DB15를 같은 명령에서 실행 |
-| 영향받은 HTTP | 6 PASS, 브라우저1 의도적 제외 | 실제 인증·세션·CSRF·SQL, local OIDC/원장/Anchor fixture |
-| light·runtime 타입 | 44파일207 PASS·runtime PASS | 네트워크/listen 차단과 기존 worker 제한 유지 |
-| target URL guard 음성 시험 | 잘못된 대상이 setup 전에 거절됨 | 자식 runner의 예상 실패를 확인. 실행 시험 수에 합산하지 않음 |
-
-최종 복구 source hash는 `6fff6a4f79047655a2c5e515e763beed42534befc74b21ff425b1ce2654cd931`다. HTTP 이후 변경은 복구 시험 파일의 대상/역할 URL guard뿐이며 제품 코드는 같다. 중간 fixture의 `.intent.id` 참조 오류는 `.attempt.intentId`로 고쳤고 취소 assertion은 유지했다. 최초 HTTP 실행은 보호 root 입력 누락으로 기존 guard가 거절했으며 이후 해당 입력과 API-only 모드를 명시했다. 원본 실패 기록을 보존하고 과거/중간 PASS를 합산하지 않는다.
-
-마지막 소수 요청 표본은 정상53.9ms, 제어 지연 전체168.0ms, 다른 기관51.2ms, timeout2505.7ms, timeout 뒤 종료 정리6.1ms였다. 실제 행 lock 대기를 관측했지만 이 값은 단일 실행의 예시이며 p95/SLA·큰 pool 내성으로 확대하지 않는다. 시작 available38118MiB·disk507GiB, 종료 available41121MiB·세 DB96.91/57.29/18.52MiB를 관측했다. DB 제한은512/512/256MiB·합계CPU2, Node heap2048MiB·integration worker1이다. swap 사용량은13023→15182MiB로 늘었고 표본 si156→28KiB/s·so0이었다. 호스트 전체 swap 증가를 시험에 귀속하거나 지속 활동0으로 표현하지 않는다.
-
-코드·설정·시험은 `9c764107d66e97a6b87ac7dbe7ff233580ce071d`에 보존했고 최종 source259개 파일 hash가 해당 커밋과 일치함을 확인했다. 이번 identity의 애플리케이션 프로세스 잔존0을 확인한 뒤 컨테이너3개·volume3개·임시 백업·평문·키·인증서·자격·보호 root를 정리했다. 기존 자원과 미추적32개 파일은 보존했다. 실행 결과·최종 정리는 이 절과 연결된 증거의 최신 완료 기록을 따른다. 실제 체인·Witness·PBX·RTP·외부 AI/IdP·GCP·전원/호스트/디스크 장애는 실행하지 않는다. 같은 호스트의 별도 cluster 검증이며 독립 호스트 내성이 아니다. source 정지 확인은 승인된 운영자의 수동 절차에 의존하고, 무단 owner SQL/구버전 writer/별도 source가 같은 Anchor 자격으로 쓰는 것을 자동 차단하는 failover 보장은 없다.
+<a id="2026-10-30-쓰기-중-drain별도-cluster-복원anchor-잠금-후속"></a>
+- [2026-10-30 쓰기 중 drain·별도 cluster 복원·Anchor 잠금 후속](archive/DEVELOPMENT-HISTORY-20261104.md#backup-boundaries-20261030)
 
 <a id="persistent-recovery-20261030"></a>
-
-## 2026-10-30 영속 anchor·프로세스 재시작·앱 백업/복원
-
-이번 시작 HEAD는 `c59edac6475bd49f450a2836e6fd7e67df80b2c0`다. 기존 사용자 요약3개와 진행 포인터28개는 보존한다. 시험은 해당 HEAD 이후 미커밋 코드로 수행했으며 [평가·실행별 source hash](../artifacts/persistent-recovery-20261030.json)에 당시 상태와 실패 이력을 구분한다. 뒤의 커밋을 시험 HEAD로 바꾸지 않는다. 코드·설정·시험은 `37d01d682e55f78035181997766604095120cf50`에 보존했으며 final source 집합의 파일 hash가 이 커밋 내용과 일치함을 확인했다. 이번 identity의 컨테이너2개·volume2개·임시 백업·평문·키·인증서와 보호 경로를 정리했고 기존 자원은 변경하지 않았다.
-
-### 결함 수정과 연결
-
-- STATE-003/DB-003: gate가 이미 ready인 동안 새 승인·업무 쓰기가 anchor 접근 불가를 확인하지 않는 경계를 수정했다. 기관 행 잠금 아래 현재 journal head/epoch와 독립 anchor를 대조한 뒤 operation을 수행한다. 불일치·조회 실패는 신규 작업을 거절하고 gate를 닫는다. 이 네트워크 대기는 기관별 잠금에서 client 최대2.5초로 제한되며 전체 요청의 지연·경합 실측 보장은 아니다.
-- STATE-003/OPS-005: anchor client는 CAS409, 인증401, timeout, 접근 불가, 응답/domain 불일치를 구분한다. 저장 성공 후 응답 유실은 정확한 next 상태를 재조회해 확인하고 추가 checkpoint를 만들지 않는다. 기존 PostgreSQL anchor 서비스에 선택적 직접 TLS를 연결했으며 기존 HTTPS reverse proxy 경로도 유지한다.
-- OPS-005: `pg_dump`에 URL을 `PGDATABASE`로만 전달해 root 계정 연결을 시도하던 실제 결함을 수정했다. 비밀번호 없는 명시적 DB 주소와 별도 `PGPASSWORD`로 연결한다. manifest는 필수 payload/tag·각 hash/크기·migration source hash를 인증하며 symlink/특수 파일·잘못된 경로를 거절한다. 모든 GCM payload 인증과 archive 검사를 SQL 복원 전에 완료한다.
-- AUTH-002/CALL-002/005/OPS-005: SQL 복원과 gate 차단·세션 삭제·임시 PBX 행/이전 challenge·request cache·lease/소유 세션 제거·옛 승인 취소를 단일 transaction으로 묶었다. 소비 영수증/journal, 회원 상태·epoch·승인키 version과 공개키는 유지한다. 진행 outbox claim은 해제하지만 저장된 raw/nonce/결과 불명 이력은 버리지 않는다. startup은 독립 anchor 확인 후 중단된 통화를 failed로 만들고 새 시도를 요구한다. PBX 없는 직접 경로도 동일한 재시작 정리를 사용한다.
-- DB-003/OPS-003: worker startup은 실제 journal/anchor를 검증하되 zero checkpoint를 발급하지 않는다. Issuer가 최초 checkpoint를 준비해야 한다. gate가 닫히면 일반 작업 claim·renew·서명 보존·완료를 거절하며 terminal cleanup은 허용한다. 기존 최소권한 LOGIN을 유지하고 worker에 issuer 권한/키를 추가하지 않았다.
-
-### 실행 결과
-
-| 범위 | 이번 결과 | 실제 환경과 대체 경계 |
-|---|---|---|
-| 영속 복구 전용 | 1파일7시험 PASS | 서로 다른 PostgreSQL 프로세스/volume/LOGIN, 실제 HTTPS·native dump/restore·API/worker 자식 프로세스 |
-| 기존 DB 회귀 | 4파일15시험 PASS | 위7시험과 같은 최종 명령에서 총5파일22시험, 실패/skip0. 서로 더한 과거 결과가 아님 |
-| 영향받은 HTTP 회귀 | 6시험 PASS, 브라우저1시험 의도적 제외 | 실제 platform/issuer/Sender·SQL·HTTPS OIDC fixture. API-only 모드로 Vite/Chromium 기동 없음 |
-| 추가 anchor domain 확인 | 별도 필터 실행 | 다른 기관으로 바꾼 raw HTTPS CAS409와 상태 불변을 추가 확인. 필터의 SKIPPED를 전체 PASS에 합산하지 않음 |
-| light·API runtime 타입 | 44파일207시험 PASS·runtime 타입 PASS | [오프라인 검사](../artifacts/persistent-recovery-source-20261030.json). 웹·계약 소스 미변경으로 전체 브라우저/계약 시험 반복 없음 |
-
-복구 전용 `persistent-recovery.test.ts`는 integration guard와 `callsign_test_*`·loopback·보호 ROOT를 요구한다. 실제 업무 라우트/ServiceAuthority·최소권한 SQL·복구/worker 로직을 실행한다. 복구 API 프로세스의 actor 인증은 합성 bearer fixture이며 OIDC 재검증을 주장하지 않는다. 세션 폐기는 실제 `sessionForRequest`로401을 확인했고 별도 기존 HTTP 회귀로 실제 인증 흐름을 확인했다. 원장 current/transaction/receipt와 통화 binding은 명시적 fixture이며 실제 체인·PBX·음성은 실행하지 않았다. Worker의 transaction 문자열은 외부 adapter 표식이므로 EVM 서명·체인 적용 횟수 증거가 아니다.
-
-HTTPS CAS는 같은 이전 상태의 서로 다른 next 후보 중1개 성공, 오래된 CAS·교차 기관/배포·잘못된 인증/TLS 거절, 실제 서버 timeout 구분, anchor 프로세스 재시작 후 sequence2 유지, 별도 LOGIN의 SELECT/UPDATE 허용·INSERT/DELETE 불허 및 superuser=false, 응답 유실 뒤POST1회/정확한 next 조회를 확인했다. anchor만 전진한 뒤 DB transaction이 rollback된 경우, 중간 journal 누락/변조, 미준비 zero checkpoint, anchor 불가 때 실제 업무/승인 API503과 DB 무변경·gate 차단을 확인했다.
-
-실제 암호화한 `application` 백업을 새 DB에 복원해 소비 영수증, 철회 VC, 비활성 계정, membership generation2, epoch2·승인키 version2/공개키를 대조했다. 옛 로그인 session은0행/실제 조회401, 연결 상태는 terminal, 새 시도 없이 lease를 복구하지 않는다. 복원 직후 gate는 blocked, 최신 anchor 일치 후만 ready이며 더 오래된 백업은 blocked다. 동일 승인의 무조건 재사용을 허용하지 않으며 회수된 할당으로 consume을 다시 시도하면 거절된다. 권한 세대/키 변경은 시험 상태 준비이며 실제 공동 계약 회전 검증으로 확대하지 않는다.
-
-잘못된 키, ciphertext/manifest 변조, 누락 파일, symlink, traversal/특수 tar entry, 필수 inventory 누락, MAC은 맞지만 GCM tag가 잘못된 경우 모두 거절하고 새 대상 DB의 사용자 테이블0행과 복원 평문 임시 폴더 제거를 확인했다. Worker는 실제 claim 프로세스를 SIGKILL하고 원래45초 lease 만료 후 새 프로세스로 회수했다. 늦은 소유자의 완료는 거절하고, 결과 불명 재시도에서 보존된 transaction을 다시 사용하여 prepare1회만 확인했다.
-
-### 실패·한계·자원
-
-초기 실패는 `pg_dump` 연결 전달 결함, 시험의 consumed 통화를 accepted로 가정한 종료 요청, fixture block 문자열의 bigint 불일치였다. 컨테이너 native 도구가 root 소유의 restore.sql을 만들던 환경 문제는 wrapper의 실행 UID/GID를 맞춰 해결했다. 복원 후 비활성 상담원에게 동일 consume을 허용해야 한다는 시험 가정은 잘못이므로 정상적으로 거절됨과 저장된 영수증 보존을 구분했다. node/tsx cache와 복원 평문 디렉터리도 구분했다. 임시 관측 파일의 고정 이름을 실행별 UUID+wx로 바꿔 후속 실행이 덮지 않게 했다. 원본 실패 JSON/로그는 새 증거에 별도로 보존한다.
-
-시작 CPU24·available41896MiB·load0.47/0.58/0.73·disk526GiB, swap 사용8263MiB와 두 표본 si/so0을 관측했다. 서비스 DB512MiB/CPU1, anchor DB256MiB/CPU0.5·각 named volume, Node 예산2GiB·worker1·명령240초/시험 최대65초다. 후반 available41282MiB·DB약97.96/22.04MiB를 관측했다. swap 사용량은 증가했으나 표본의 지속 입출력은 관측하지 못했다. 전 기간 swap0이나 강제 Node cgroup 적용을 주장하지 않는다.
-
-같은 호스트의 분리 저장소·자격·복원 수명 검증이며 독립 기관 운영·호스트 장애 격리·전원/디스크 내구성 증거가 아니다. 실제 체인 snapshot 전체 복원, 원장 서명/확정/전파, PBX/RTP 회수, 외부 AI, 실제 IdP, GCP·하드웨어/장기 부하·모든 crash 지점은 미실행이다. source guard/추가 관측 assertion만 바뀐 후속 필터 실행은 별도 source hash로 기록한다. 최종 cleanup은 평가의 owned identity/label 대조 결과를 따른다.
+<a id="2026-10-30-영속-anchor프로세스-재시작앱-백업복원"></a>
+- [2026-10-30 영속 anchor·프로세스 재시작·앱 백업/복원](archive/DEVELOPMENT-HISTORY-20261104.md#persistent-recovery-20261030)
 
 <a id="authenticated-boundaries-20261030"></a>
-
-## 2026-10-30 공동 관리·세션·분석의 인증 후속 경계
-
-시작 HEAD는 `a75398d03faaf1a36735edb6fced60700afea752`이며 이번 실행은 해당 HEAD 뒤의 미커밋 소스를 대상으로 했다. 실행 후 구현·회귀 시험은 `bcdbd6b`에 보존했고, 기록된 소스 파일 hash가 해당 커밋의 blob과 일치함을 대조했다. 시험 HEAD를 새 커밋으로 바꾸지 않았다. 기존 미추적 진행 포인터28개·사용자 요약2개와 과거 증거를 보존하고 stage에서 제외한다. 평가의 source hash는 소스·시험·설정/lockfile 집합을 식별하며 HEAD만으로 시험 당시 상태가 재현된다고 주장하지 않는다.
-
-### 실제 수정한 결함
-
-- CONTRACT-002/GOVERNANCE-002/UI-004: 표시 정보만 변경하면 정책 버전이 같다는 이유로 Witness 확인 없이 활성화하던 조기 반환을 제거했다. 확인된 이벤트 높이 이후의 현재 상태·정책 버전/세대·등록 키·directory를 확인하고 `activatedAt`을 저장한다. 표시 변경은 기존 lease를 유지하고 권한 정책 변경은 확정 이벤트에서 이전 통화를 취소한 뒤 별도 활성화한다. API의 outbox object ID를 사용해 화면에 처리 중·확정·실패·활성화를 구분하며, 제안/서명 파일 처리 중 입력을 잠근다.
-- AUTH-001/002/UI-001/003/005: 다른 탭의 계정 전환 후 이전 workspace 응답·입력 초안이 복원되거나 옛 비동기 작업이 새 요청 잠금을 해제하는 경계를 막았다. 기존 BroadcastChannel과 요청 세대만 사용한다. 공식 업무의 개발 StrictMode 초기 효과 재실행에서 pending이 남아 목록을 읽지 못하던 결함을 수정했다. 공식 세션 만료 시 업무/CSRF를 비우고 재로그인을 안내하며 로그아웃 후 버튼 잠금을 해제한다. 일반/공식 쿠키·채널은 분리한다.
-- BUSINESS-001/UI-002: 역할만으로 보이던 업무 생성·취소·위임 발급 버튼을 서버 permission과 일치시켰다. 실제 HTTP403 검사는 그대로 유지한다.
-- AI-001/002/CALL-005: REST 동의 철회 후 감시 주기까지 새 프레임이 전송되거나 늦은 전사/LLM 결과가 반영되지 않도록 각 경계에서 현재 세션·동의·revision을 검사한다. stop은 transport/analyzer를 먼저 중단하고 AbortSignal을 전달한다. WebSocket의 중첩 처리·buffer 한도는 분석 불가로 종료하며 안전 판정으로 바꾸지 않는다.
-- TEST-001/004/OPS-001: 기존 실제 HTTP fixture를 별도 helper로 옮겨 시나리오별 기관·계정을 격리했다. Chromium 프로세스는 재사용하고 승인자 context는 분리한다. DB 준비 확인은 초기 임시 Unix socket 대신 loopback TCP로 바꿨다. Compose/대기 스크립트는 정적으로 수정했으며 Compose를 실행하지 않았다.
-
-### 실행 결과와 대체 경계
-
-| 검사 | 이번 결과 | 증거 |
-|---|---|---|
-| 실제 HTTPS OIDC fixture·platform/issuer/Sender·최소권한 PostgreSQL·Chromium | 2파일17시험 PASS, 실패/skip0 | [HTTP 원본](../artifacts/service-boundaries-20261030/http-results.json) |
-| 기존 범위 지정 PostgreSQL 회귀 | 4파일15시험 PASS, 실패/skip0 | [DB 원본](../artifacts/service-boundaries-20261030/database-results.json) |
-| light | 통합 시점44파일198시험 PASS, 준비 CLI 분리 후44파일205시험 PASS | [최종 소스 검사](../artifacts/service-boundary-source-final-20261030.json) |
-| 웹 build·API runtime 타입 검사 | PASS | 같은 소스 검사. 기존 번들 크기·중복 dynamic import 경고는 빌드 실패가 아님 |
-
-[이번 평가·source hash·명령·환경·정리](../artifacts/service-boundaries-20261030.json)를 따른다. 공동 관리 화면은 전후 비교·chain/contract/action/nonce/만료/digest·제안 내보내기·독립 서명 가져오기·정족수·중복 제출·처리 중·확정 후 활성화·실패를 실제 API/SQL과 연결해 확인했다. 중복/미등록/다른 작업·기관·내용/만료 서명, stale 경쟁 제안, 잘못된 이벤트·계약 조회·Witness 서명/freshness/directory는 거절했다.
-
-일반 로그아웃의 다른 탭 거절과 공식 세션 유지, 계정 전환 후 보류 응답 폐기·비활성 계정의 옛 요청 거절, 일반/공식 만료 후 화면 비우기, 저장 후 응답 유실의 동일 요청 재시도·단일 업무·취소 상태를 확인했다. 합성 승인/서명 lease 경로로 최초120초와 lease 만료·terminal 재활성화 거절을 확인했다. 분석은 실제 WS·동의·quota·revision orchestration에 지연/실패 provider fixture를 넣어 동의 전0연결·철회 후0push·AbortSignal·늦은 위험 결과 폐기·수정 전사/분석 불가를 검사했다.
-
-원장 RPC/log·Witness 전송과 최신 상태 adapter·memory anchor·합성 binding/STT/LLM은 fixture다. Witness는 실제 시험키 JWS와 집계/verifier를 실행하지만 실제 Witness 서비스·합의 증거가 아니다. provider 키/외부 요청·실제 오디오 장치/RTP는 사용하지 않았다. 브라우저에서 실제 API 본문을 성공 응답으로 바꾸지 않고, 늦은 응답/유실만 transport에서 제어했다. 서버 권한 회수는 즉시 거절되지만 다른 탭 UI 인지는 broadcast 또는 다음 보호 요청/5초 refresh에 의존한다.
-
-### 실패·환경·보존
-
-초기 PG 준비는 이미지 초기화용 소켓과 실제 TCP 시작 사이의 경합으로 connection reset이 있었다. fixture 파일 로딩 전 상태 대기·hidden option·UI3초 polling보다 짧은 시험 polling·상수 transaction hash에 의한 중복 이벤트 fixture 문제는 시험 결함으로 수정했다. 초기 test payload/선택 필드 TypeScript 오류도 수정했다. 범위 없이 integration config 전체를 선택해 별도 시연 로그인/독립 HTTPS anchor 환경이 필요한5시험이 실패한 실행은 별도 보존하고 PASS로 바꾸지 않았다. 올바른 기존 네 파일15시험의 결과만 DB 회귀로 집계한다.
-
-공식 목록 비어 있음은 실제 StrictMode pending 결함이었다. 탐색 중 빈 화면·로그인 버튼 timeout은 추가로 관측됐으며 원인을 확정하지 못했다. 진단을 저장하고 한 Chromium 내 독립 context로 자원을 줄인 최종 전체 실행은 통과했다. 과거 heading timeout을 해결했다고 단정하지 않으며 제한 시간 확대·무제한 retry는 하지 않았다. 강화한 콘솔 검사에서는 계정 회수 시험의 빈 본문이 형식400을 먼저 반환함을 확인해 유효 본문·정확한401 검증으로 수정했다. 별도 전체 실행에서 Chromium `ERR_NETWORK_CHANGED`가 로그인 요청을 중단한 환경 실패도 보존하고, 검사 완화 없이 제한된 재실행으로 확인했다. 중간 실패/부분 필터의 SKIPPED와 최종 시험 수는 합산하지 않는다.
-
-서버 CPU24, 시작 available39503MiB·load1.19/1.31/1.15·disk533GiB, 관측 swap 입출력0이었다. PG512MiB/CPU1/tmpfs256MiB·worker1·각 명령120초·Node/브라우저 예산2GiB로 제한했으며 후반 available38979MiB·DB약98.01MiB였다. Node 예산은 운영 중단 판단 기준이며 강제 메모리 cgroup을 적용했다고 주장하지 않는다. 이번 identity는 `callsign_test_ecd6632fa7`이며 label 대조 후 컨테이너/tmpfs·보호 키/인증서/임시 도구를 제거한 결과를 평가에 기록한다. 기존 프로세스·자료·volume은 변경하지 않는다.
-
-게시 `343feb2`의 CI에서는 준비 도구8개를 한 시험에서 순차 실행하던 기존 회귀가5초를 초과했다. [CI 실패 원본](../artifacts/service-boundaries-20261030/ci-preparation-failure.json)을 보존하고 같은 명령/조건을8개의 독립 parameterized 시험으로 분리했다. timeout/worker/guard/assertion은 완화하지 않았다. [후속 light 결과](../artifacts/service-boundary-ci-source-20261030.json)를 따르며 시험 분리로 늘어난 개수를 새로운 제품 보장으로 세지 않는다. HTTP/DB 소스는 바뀌지 않아 통합 서버를 다시 기동하지 않았다.
-
-실제 체인/전파·PBX/TURN/음성·운영 IdP/MFA/TLS·외부 제공자·독립 anchor 복원·장애/성능/GCP는 여전히 미검증이다. 계약/typed-data를 바꾸지 않아 기존 로컬 EVM 시험은 반복하지 않았다. 다음 실행은 해당 인프라의 주소·공개 trust/인증서·역할별 보호 파일과 별도 허가가 필요하며 이 결과를 전체 배포 완료로 사용하지 않는다.
+<a id="2026-10-30-공동-관리세션분석의-인증-후속-경계"></a>
+- [2026-10-30 공동 관리·세션·분석의 인증 후속 경계](archive/DEVELOPMENT-HISTORY-20261104.md#authenticated-boundaries-20261030)
 
 <a id="authenticated-http-validation-20261030"></a>
-
-## 2026-10-30 실제 인증·HTTP·PostgreSQL·브라우저 검증
-
-사용자의 이번 한정 허가로 로컬 PostgreSQL17.6·issuer/platform API·HTTPS 웹·HTTPS OIDC fixture·설치된 Chromium을 실행했다. 체인/Witness/PBX/TURN/음성장치·외부 AI/GCP는 실행하지 않았다. 서버 초기 CPU24·load0.34·available39553MiB·disk533GiB, swap 사용7604MiB였으나 관측 구간 si/so는0이었다. DB512MiB·CPU1·tmpfs256MiB, Node/브라우저 예산2GiB·단계 timeout120초·worker1로 실행했고 DB 관측은 약95.68MiB였다.
-
-### 수정과 실제 확인 범위
-
-- AUTH-001/002: OIDC state/code/JWT 불일치를401로 분리하고 provider429/5xx는503 계열 의존성 실패로 보존했다. 실제 HTTPS RS256 JWKS·code 교환·PKCE·nonce·issuer/audience/client·만료/서명·callback 재사용·정확한 issuer/subject·미등록/비활성 계정·공식 인증 분리·실제 auth_time 재인증·CSRF·로그아웃·membership generation 회수를 HTTP로 확인했다. 정상 로그인에 session row를 주입하지 않았다. discovery 문서는 fixture가 제공하지만 앱은 설정된 endpoint를 직접 소비한다.
-- BUSINESS-001/002: 등록된 계정 ID는200자까지인데 업무 생성 내부에서100자로 제한하던 불일치를 수정했다. 100자를 넘는 합성 issuer/subject로 실제 화면의 업무 생성·취소를 확인했다. 다른 기관 subject/수신자·할당·역할 상승 거절, strict schema와 같은 요청의 중복/다른 payload 충돌을 검사했다.
-- CALL-004/005·DB-001/003: 실제 platform→issuer→최소권한 SQL을 통해 서명 승인·수신 nonce/키·합성 binding·양측 소유 증명·동시 consume·새 HTTP 요청에서 동일 영수증 복구·다른 binding 거절·양측 갱신 proof와 서명 lease 발급을 확인했다. DB의 소비 row/outbox와 서명 내용을 assertion으로 검사했다. 합성 binding은 실제 WebRTC/PBX 연결 증거가 아니다.
-- UI-001/002/003: 콜센터/위임/시도 select의 접근 가능한 이름이 option 텍스트에 섞이는 문제를 명시적 label로 수정했다. 실제 `/service`에서 기관 로그인·업무 생성/취소·로그아웃·수신자 메뉴 분리·HTTPS Secure/HttpOnly/SameSite cookie·390px 화면 overflow·키보드 Tab/focus·uncaught/console 오류를 확인했다. API 응답을 browser route mock으로 대체하지 않았다. 기본 인증 전/로그아웃 단계의 정확한 `/auth/me` 401만 예상 오류로 기록했다.
-- TEST-001/004·OPS-001: `test:http`/전용 Vitest config를 추가하고 기존 light·database 구성에서는 HTTP/브라우저 시작을 제외했다. 외부 adapter 주입은 integration guard·test 배포·loopback·같은 `callsign_test_*`의 별도 issuer/auth LOGIN을 요구한다. 보호 키·스크린샷은 고유 run 디렉터리에 쓴다. 운영 기본값에서 fixture 선택이나 실패 후 fake fallback은 없다.
-
-추가 경로 점검에서 시험 자체의 서비스 키 서명 대신 실제 Sender Agent HTTP 교환을 연결했다. platform `/v3/sender-proof`→Sender Agent `/service-proof`→issuer의 비공개 context를 거치며, 원래 세션·CSRF와 서로 다른 서비스 token을 그대로 검사한다. 다른 수신자의 proof 요청403과 platform의 비공개 context404도 확인했다. 새 격리 DB에서 같은7시험을 다시 실행해 모두 통과했다. [최신 Sender Agent 포함 증거](../artifacts/http-sender-validation-20261030.json)가 현재 HTTP 결과이며 앞선7시험과 합산하지 않는다. 첫 부팅에서 DB readiness 전에 migration을 시도한 환경 실패는 별도 보존하고 `pg_isready` 확인 뒤 진행했다. 두 번째 identity의 자원·키도 정리했다. 첫 게시 `2188336`의 light CI는 성공했고 후속 게시의 CI는 해당 commit 실행을 별도로 확인한다.
-
-### 결과와 실패 이력
-
-| 실행 | 실제 결과 | 근거 |
-|---|---|---|
-| HTTPS OIDC + HTTP API + PostgreSQL + Chromium | 1파일7시험 PASS, 실패/skip0 | [원본](../artifacts/http-validation-20261030/http-results.json) |
-| 기존 PostgreSQL 경계 회귀 | 4파일15시험 PASS, 실패/skip0 | [원본](../artifacts/http-validation-20261030/database-results.json) |
-| light | 44파일197시험 PASS | [소스 검사](../artifacts/http-source-validation-20261030.json) |
-| 웹 build·API runtime 타입·최종 harness 타입 | PASS | 소스 검사와 [평가/파일 hash](../artifacts/http-validation-20261030.json) |
-
-개발 중 root의 jose 모듈 해석, 공식 로그인 후 work CSRF 선택, Vite proxy 객체 교체, 기존 버튼을 새 업무 완료 신호로 사용한 시험 race를 수정했다. select의 실제 label 문제와 계정 길이 불일치·인증 오류 의미는 제품 수정이다. 중간 브라우저 heading timeout1회는 독립 원인을 확정하지 못했으며 기한을 늘리지 않은 후속 순차 실행에서 재현되지 않았다. console 검사에서 HTTPS의 비어 있는401 reason phrase를 잘못 분류한 [실패 원본](../artifacts/http-validation-20261030/development-console-failure.json)도 따로 보존했다. 모든 시도의 시험 수를 합산하지 않는다.
-
-실제 구성은 issuer/auth 별도 LOGIN이며 superuser/bypassrls=false였다. 원장 최신 상태는 digest별 current/미확정/철회/불가 fixture, 독립 anchor는 memory CAS fixture다. 실제 Witness 서명 정족수·체인 확정/전파·PBX/음성·실제 IdP/MFA/운영 TLS·STT/LLM·독립 복원·성능/GCP는 미검증이다. issuer 전체 readiness는 PBX 없이 통과시켰다고 보고하지 않는다.
-
-증거를 비밀값 없이 보존한 뒤 label/identity가 일치하는 이번 시험 컨테이너만 제거했다. tmpfs 외 volume은 없었고 기존 서비스는 중지하지 않았다. app·Vite·OIDC·browser는 시험 finally에서 닫았고 보호 환경/시험 개인키/프로필을 제거했다. 종료 전 pending/processing outbox는0이었다. [평가와 정리 기록](../artifacts/http-validation-20261030.json), [실행 절차](RUNBOOK.md#authenticated-http-tests)를 따른다.
+<a id="2026-10-30-실제-인증httppostgresql브라우저-검증"></a>
+- [2026-10-30 실제 인증·HTTP·PostgreSQL·브라우저 검증](archive/DEVELOPMENT-HISTORY-20261104.md#authenticated-http-validation-20261030)
 
 <a id="contract-validation-20261030"></a>
+<a id="2026-10-30-커밋-정리와-로컬-evm-계약-실행"></a>
+- [2026-10-30 커밋 정리와 로컬 EVM 계약 실행](archive/DEVELOPMENT-HISTORY-20261104.md#contract-validation-20261030)
 
-## 2026-10-30 커밋 정리와 로컬 EVM 계약 실행
-
-이 절이 아래의 계약 미실행 기록보다 최신이다. 사용자는 이번 작업에 한해 설치된 도구의 프로세스 내부 EVM·제한 fuzz·Git fetch/일반 push를 허용했다. DB/체인/Witness/API/PBX/브라우저/AI/GCP·RPC/fork·실제 배포는 수행하지 않았다. 현재41GiB 안팎의 available memory·CPU24/load1.26·disk533GiB를 재확인했고, forge threads1·메모리 상한2GiB·timeout90초를 적용했다.
-
-### 커밋 보존과 재구성
-
-fetch 결과 origin/main은 `a9d67f0`, 로컬 원본3개는 모두 미공개였다. `backup/pre-contract-audit-20261030` ref로 원본 tip `ea55736`을 보존하고 미추적29개는 보호된 로컬 사본/hash 목록으로 보존했다. 기존 staging은 없었다.
-
-| 재구성 commit | 책임 | 원본 대응 |
-|---|---|---|
-| `c357f3839aec2e8cda0dd3a6518e5cd21ad9d108` | 서비스 권한/통화/영속 처리와 실행 준비의 코드·시험·설정 | 원본819a825·7c1df4f의 최종 코드와 의존성. protocol→API→web과 준비/배포 시험이 연결되어 함께 보존 |
-| `4fdb828597ca660c28c90309d947d4a84bfc1865` | 기존 오프라인·PostgreSQL 증거 | 원본3개 커밋의 artifact를 내용 변경 없이 보존 |
-| `75d245f07c19765350b587dc46fa8cdd6c129e7f` | 제품/운영 문서 | 원본3개 커밋의 문서·그림을 내용 변경 없이 보존 |
-
-재구성 tip과 원본ea55736의 Git tree가 정확히 같음을 확인했다. 공개된 a9d67f0 이하 이력은 재작성하지 않았다. 원본 증거의 HEAD·시각·결과도 바꾸지 않았다. 후속 계약/호환성 검증 코드는 `d673c9a`에 별도로 기록했다.
-
-### 실제 계약 검증
-
-기존10시험을 먼저 실행해10 PASS를 확인했다. 보강 후 중복 상속 실행을 제거한 **21개 시험 PASS·FAIL0·SKIP0**를 확인했다. 도구는 forge1.7.1, 설치된 Solc0.8.30+73712a01, EVM target cancun, optimizer10000이다. FFI=false·fork/RPC 없음·compiler/dependency 다운로드 없음·운영키 접근 없음이다.
-
-| 요구 ID·보장 | 실행한 경계 |
-|---|---|
-| CONTRACT-001/004, GOVERNANCE-001 | 등록/공동 변경/복구의0/1 서명 거절, 서로 다른2명·순서 독립·3명 수락, 중복/미등록·유효2개 뒤 무효 추가 서명 거절 |
-| CONTRACT-003/004 | 짧은 서명·zero 복구·잘못된 v·high-S 거절. 실제 상태 변경 함수에서 OpenZeppelin ECDSA 오류 확인 |
-| CONTRACT-004 | 다른 chain/contract/실제로 등록된 다른 기관/action·변경 내용·회복 후 현재 epoch에 맞지 않는 옛 서명을 거절. 유효한 현재 문맥의 정상 대조군은 성공 |
-| BUSINESS-003, CONTRACT-003 | 정책 hash/version 변경은 epoch 증가·구 위임 무효화, directory-only 변경은 유지. legacy 관리자+1승인자 경로는 기본 ServiceRegistry에서 거절 |
-| GOVERNANCE-001/002 | 자기 기관 stopper의 정지와 타 기관/관리자 단독 정지 거절, 공동 복구/새 관리자·승인키·epoch 반영, 옛 관리자·위임 ID·철회 위임 부활 거절 |
-| CONTRACT-004, TEST-002 | nonce 재사용·경쟁 제안/옛 version/hash/epoch 거절, 실패한 nonce 미소비, 기한 직전 수락/동일·직후·600초 초과 거절, revert 전후 상태/nonce 동일·실패 event 없음 |
-
-fuzz는 seed `0x20261030`, runs32, 명시적 sequence depth2, assume0이다. 각 case에서 directory 변경과 policy 변경의 성공을 각각 assert하여 **성공 configuration 호출64개**를 확인했다. setup 등록 호출을 그 숫자에 섞지 않았고 전체 invariant 증명이라고 부르지 않는다.
-
-새 시험의 첫 실행에서3개 실패가 있었다. 원인은 Solidity memory struct alias, 다른 기관 정상 대조군이 전역 nonce를 먼저 소비한 것, 인자가 있는 custom error에 대한 Foundry exact/partial 매칭 차이였다. 시험을 수정해 의도한 문맥/오류 selector와 원자성을 검사했다. 계약 본체의 권한 조건은 완화하지 않았다. TS검사에서 decoder 결과 unknown 좁히기 오류1개도 수정했다. 원본 실패 출력은 [검증 기록](../artifacts/contract-validation-20261030.json)에 보존했다.
-
-### 실제 앱과 계약의 호환성
-
-`contract-interop.ts`가 현재 registrationTypedData/configurationTypedData/recoveryTypedData, worker의 serviceRegistryAbi, event consumer의 기존 ABI로 fixture를 생성한다. 공개 고정 시험키1/2와 CREATE 주소용99만 사용하며 운영키/env/RPC를 읽지 않는다. 컴파일된 ABI를 통한 calldata 재인코딩이 worker ABI의 bytes와 같은지 확인했다.
-
-Solidity 시험은 이 fixture의 등록→정책 변경→정지/복구 calldata를 실제 계약에 실행한다. digest와 signer 복구를 비교하고 변조된 정책 요청을 거절한 뒤 정상 요청을 수락한다. 실제 ConfigurationUpdated의 topic/indexed 기관/data를 consumer ABI가 만든 bytes와 비교했다. TS 단위 시험은 fixture와 현재 앱 함수의 출력을 다시 비교하여 같은 수동 상수만 복사한 통과를 방지한다.
-
-계약 본체·ABI·bytecode는 기존 `service-registry-build-20261027.json`과 정확히 같다. 검토 artifact hash도 유지한다. 새 배포 주소나 배포 이력은 생성하지 않았다. 새 API 변경은 기존 event ABI export뿐이며 SQL/DB 실행 경로를 바꾸지 않았고 DB를 다시 기동하지 않았다. 과거DB15 PASS는 당시 검증 범위 그대로다.
-
-최신 소스 검사: **light43파일194시험 PASS**, 웹 build·API runtime 타입·규칙 회귀 PASS. 전체 preflight는 외부 설정 미입력으로 BLOCKED이며 계약 PASS와 별개다. [EVM 원본](../artifacts/contract-evm-results-20261030.json), [소스 검증](../artifacts/contract-source-verification-20261030.json), [실패/파일 hash·도구/커밋 대응](../artifacts/contract-validation-20261030.json)을 연결한다. 이 결과는 Besu/QBFT·Witness·브라우저 통화/VC/lease 실제 회수·성능·배포 성공을 뜻하지 않는다.
-
-### push 후 CI 이식성 수정
-
-첫 일반 push는 origin/main의 `dccca63849e24416dbb2acba273450ef530b48ab`와 로컬 SHA 일치를 확인했다. 새 [CI 실행](https://github.com/0u-Y/CallSign/actions/runs/40903996280)은 source hygiene 단계에서 `spawnSync rg ENOENT`로 실패했다. GitHub runner의 미설치 검색 도구를 암묵 전제로 사용한 결함이다.
-
-`check-source.mjs`의 파일 나열을 이미 checkout에 필요한 Git의 NUL 구분 목록으로 바꾸고 기존 conflict marker/JS syntax 검사를 유지했다. 시스템 패키지 설치로 우회하지 않았다. PATH에 Git만 둔 실제 자식 검사 회귀를 추가해 **최신 light43파일195시험 PASS**를 확인했다. 계약/Solidity/서명 규약은 바꾸지 않았으므로 로컬 EVM21시험의 적용 코드 범위는 그대로다. [CI 실패·로컬 수정 증거](../artifacts/ci-portability-20261030.json)를 추가하고 후속 일반 push/최신 CI 상태는 별도로 확인한다.
-
-일반 push 대상은 유일한 origin의 main이며 push 전 재fetch/fast-forward 관계·공개 파일을 검토한다. 실제 원격 SHA와 CI 상태는 push 후 확인하여 최종 응답에 구분한다. backup ref는 로컬에만 남기며 force push하지 않는다.
-
-## 실행 제한
-
-[AGENTS.md](../AGENTS.md)를 유지한다. DB·체인·Witness·Asterisk·TURN·IdP·API/웹 서버·브라우저·마이크·외부 AI·GCP를 실행하지 않았다. migration 적용, 이미지 다운로드/빌드, 배포, 기존 프로세스·키·볼륨 변경도 하지 않았다. `pnpm light`의 fetch/TCP/listen/UDP 차단과 worker 2 제한을 보존했다. 새 작업·백업·복원·anchor 진입점에도 명시적 실행 guard가 있다.
+<a id="실행-제한"></a>
+- [실행 제한](archive/DEVELOPMENT-HISTORY-20261104.md#실행-제한)
 
 <a id="postgres-validation-20261029"></a>
-
-## 로컬 보존과 첫 PostgreSQL 검증 (2026-10-29)
-
-이 절은 아래의 DB 미실행 기록보다 최신이다. 사용자 한정 허가에 따라 기존 Docker/로컬 PostgreSQL17.6 이미지로 전용 시험 DB만 기동했다. Besu/Witness/PBX/TURN/IdP/API/웹/브라우저/AI/클라우드·계약 배포·실제 복구는 수행하지 않았다. 기존 실행 중인 컨테이너와 서비스는 조회만 했다.
-
-- 기준 `a9d67f0`의 관련201개 파일을 로컬 checkpoint `819a825`로 보존했다. 기존 staging은 없었고 경로 목록을 검토해 명시적으로 추가했다. 키/보호 env/DB 데이터/브라우저 세션은 포함하지 않았다. 진행 포인터14개는 디스크에 보존하고 커밋하지 않았다. 기존 요약의 Markdown 줄바꿈/EOF 공백은 보존했으며 commit hook 우회나 Git 설정 변경은 하지 않았다.
-- 실제 초기 여유: CPU24·load 약1.0, available41663MiB·disk534GiB, swap7804MiB 사용 중이나 짧은 관측에서 si/so0. DB512MiB/CPU1/no extra swap, 시험 worker1. 첫 소스 검사는 합산 RSS1GiB 한도를 넘겨 중단했고 실패로 보존했다. 여유를 재확인해 시험 budget2GiB로 조정했다. available8GiB 미만·지속 swap·시간/예산 초과 시 이번 프로세스만 중단하는 감시를 적용했다.
-- 첫 Docker internal network는 host port mapping이 생기지 않아 해당 생성 자원만 정리했다. 별도 bridge(no IP masquerade)·loopback 임의 포트·tmpfs PG data·로컬 image ID·watchtower 제외 label로 준비했다. 초기 readiness 재시도 문제 이후 TCP readiness로 확인했다. 실제 서비스키는 생성하지 않았고 시험 비밀번호만 보호된 임시 파일에 저장했다.
-- 실제0000~0005 migration과 issuer/auth/worker/PBX LOGIN provisioning을 적용했다. 초기 DB15시험 중1개가 work-session fixture의 OIDC 필드 누락으로 실패했다. 제약조건을 유지하고 issuer/client/audience/authenticated_at을 fixture에 추가했다.
-- 재시도에서는 이전 retry fixture의 outbox가 global worker claim에 섞였다. 생산 claim 규칙/동시성은 바꾸지 않고 각 fixture 기관/작업의 outbox를 finally에서 정리했다. 실패/큐 관측을 보존한 뒤 첫 DB와 network는299초 내 정리했다. 다른 자원은 건드리지 않았다.
-- **최신 첫 통과: 실제 DB4파일·15시험 PASS, FAIL0·pending0.** 독립 소비/다른 binding 거절·commit 후 응답 유실/다른 연결 복구·quota 예약/정산·claim/서명자 lease·계정 회수·migration source hash를 확인했다. 별도 auth LOGIN으로 SELECT/session DELETE를 실행하고 users/issuer UPDATE가 SQLSTATE42501로 거절되는지 보강했다. 그 외 production LOGIN 전체의 모든 SQL 권한까지 검증했다고 주장하지 않는다.
-- 같은 실행에서 light42파일193시험·웹 build·runtime 타입·규칙 회귀 PASS. 전체 설정 preflight는 BLOCKED이며 전체 서비스 준비와 별개다. 메모리 anchor 구간은 실제 SQL을 썼지만 독립 HTTPS anchor/복원 증거는 아니다. tmpfs DB는 영속 disk 장애/전원 손실 내성을 입증하지 않는다.
-
-수정은 `tests/integration/service-runtime.test.ts`와 `database-readiness.test.ts`의 fixture·정리·권한 assertion이다. [자원/시도 기록](../artifacts/local-postgres-checkpoint-20261029.json)에 첫 실패와 최신 통과의 원본 파일을 연결했다. 후속 수정은 로컬 `7c1df4f`에 보존했고 그 HEAD에서 같은 DB를 재검증해15/15(PASS·FAIL0·pending0), 남은 pending/processing outbox0을 확인했다. [최종 DB 결과/정리](../artifacts/local-postgres-result-20261029.json)에 관측과 근거를 묶었다. DB container/network와 보호 임시 자격 파일을 전부 제거했다. 첫 DB는299초, 두 번째는304초로5분 목표를4초 넘긴 정리 시각도 숨기지 않았다. 후속 증거 commit은 시험 HEAD와 구별하고 소스 hash로 연결한다. push하지 않는다.
+<a id="로컬-보존과-첫-postgresql-검증-2026-10-29"></a>
+- [로컬 보존과 첫 PostgreSQL 검증 (2026-10-29)](archive/DEVELOPMENT-HISTORY-20261104.md#postgres-validation-20261029)
 
 <a id="readiness-refinement-20261029"></a>
-
-## 실행 준비 후속 수정 (2026-10-29)
-
-이번 후속 기록이 아래191개 시험 기록보다 최신이다. HEAD는 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a` 그대로이며 기존 worktree를 보존했다. 새 종합 Markdown은 만들지 않았다.
-
-- **TEST-001/004, OPS-004/006:** runner 결과의 method/execution/verdict/review 네 축을 추가했다. status=MANUAL은 호환 표기이며, 출처·같은 환경·명시적 PASS/FAIL·요구별 boolean assertion·검토 기록을 확인한 메타데이터 검토만 수동 판정을 기록한다. 미실행/구 MANUAL은 unjudged다. 수동 FAIL도 보존하고 선행 통과로 인정하지 않는다. execute와 review를 섞는 진입을 거절한다.
-- **TEST-001/004, DB-001:** 첫 database의 선행 조건을 light/web/runtime/rules 소스 검사로 한정했다. unrelated preflight BLOCKED를 소스 PASS로 바꾸지는 않지만 DB를 막지 않게 했다. DB 전용 URL·test identity·guard·최소권한/적용 이력은 그대로 요구한다. HEAD/소스/공개 파일 변경·오래된 증거·assertion 누락은 거절한다.
-- **OPS-001/002/003/005:** 입력을 기존 env 기준의 다섯 결정 묶음으로 RUNBOOK에 정리했다. C43/D19검사를43/19개 사용자 질문으로 바꾸지 않았다. 로컬 확인·외부 등록·나중 생성·GCP 전용을 구분했다. 주소·키·digest를 만들거나 실제 계정을 조회하지 않았다.
-- **OPS-007, TEST-004:** identity에 sourceFiles 목록을 기록하고 artifacts 아래 실제 선택한 계약 artifact도 publicFiles에 결합했다. 큰 소스·symlink를 조용히 누락하지 않고 검토를 요구한다. 기존 collector의 `.env.test` 같은 파일 제외 패턴을 수정하고 테스트했다. 루트 keys/secrets ignore를 보강했다. tracked private-looking 경로는 발견하지 않았고 실제 비밀 내용은 출력하지 않았다. 이 경로 검사는 저장소 전체 비밀 스캐너가 아니다.
-- **CALL-004/005/006, AI-001/004, LEDGER-002, STATE-003:** 기존 소비/응답 유실·epoch·숨김/늦은 응답·동의 revision·claim 유실·anchor mismatch·trust publication 시험을 확인했다. 같은 순수 보장을 다시 구현하지 않았다. 실제 media/CAS/DB 관측이 필요한 경계는 기존 harness와 MANUAL 절차로 남는다.
-
-최신 실행은 [후속 offline 증거](../artifacts/readiness-refinement-complete-20261029.json)에 있다. **42개 파일·193개 시험 PASS**, 웹 build/runtime 타입/규칙 회귀 PASS. 전체 offline은 설정 누락으로 BLOCKED, assessment는 automatic/blocked/unjudged/unreviewed다. 기존62/14/1 설정 snapshot을 새 실환경 성공으로 해석하지 않는다. 수동 PASS/FAIL·구 MANUAL 보수 거절·DB 소스 선행 분리·비밀 경로 제외의 회귀를 검사했다. 실제 DB/체인/PBX/브라우저/provider/클라우드·키 생성·migration·backup/restore·commit/push는 수행하지 않았다.
-
-[RUNBOOK 후속 절](RUNBOOK.md#실행-전-정합성-보완--2026-10-29-후속)이 입력 ID/소비처/형식/비밀 여부/준비 책임/최초 단계, 첫 DB CLI·중단 조건, GCP 이전과 checkpoint 포함·제외 기준이다. 현재 결과는 code checks PASS이지 설정 준비 또는 실환경 PASS가 아니다. [인계용 증거](../artifacts/readiness-refinement-checkpoint-20261029.json)는 tracked/untracked 구분과 기존 요약 보존 hash를 담는다.
+<a id="실행-준비-후속-수정-2026-10-29"></a>
+- [실행 준비 후속 수정 (2026-10-29)](archive/DEVELOPMENT-HISTORY-20261104.md#readiness-refinement-20261029)
 
 <a id="execution-readiness-20261029"></a>
-
-## 2026-10-29 실행 준비·검증 체계
-
-HEAD `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a` 이후 미커밋 작업을 이어 수정했다. 아래 10월27일 기록은 당시 결과로 보존한다. `WORK-SUMMARY.md`, `PRODUCT-CONNECTION-WORK-SUMMARY.md`, `DEVELOPMENT-REVIEW-SUMMARY.md`와 기존 artifact는 덮지 않았다. 별도 요약 Markdown을 만들지 않았다.
-
-| 요구 ID | 이번 실제 수정·연결 | 검증 범위 |
-|---|---|---|
-| OPS-001/002/004/007, TEST-001/004 | preflight 항목별 A~F 준비 주체/입력/선행 조건/다음 절차, bootstrap/runtime 분리, 고정 PBX IP·실제 ABI/hash 확인; 준비 도구 default dry-run/기존 경로 충돌·0600·진행 기록; 실제 최소권한 LOGIN SQL | 누락/guard·기본 dry-run 시험, YAML·셸·설정 정적 검사. 비밀값 생성·SQL 적용·이미지/체인 기동은 안 함 |
-| TEST-001~004, OPS-005/006 | 고정 argv 8단계 runner·guard·test identity·부모/자식 제한·timeout·중단/진행 파일·출력 redaction·선행 증거/재실행·MANUAL 관측 근거 | 네트워크 sentinel·명령 미실행 dry-run·실패 전파·identity·원본 hash 변조 단위 시험. 실제 실환경 단계는 미실행 |
-| GOVERNANCE-001/002, BUSINESS-003, UI-003/004 | 공동 변경 전후 구조화 비교·chain/registry/action/nonce/deadline/digest 표시·제안 export/서명 import·중복/만료/등록 키 로컬 검증; protocol의 공통 payload 재사용 | 실제 로컬 EIP-712 서명/변조 시험·타입·웹 build. 브라우저/PBX/체인 성공 아님 |
-| CALL-001/004/006, STATE-003, OPS-002/005 | 신규 업무·위임·시도·challenge·승인·소비에 게시 trust/pin/현재 키·정책 일치 검사; 불일치 중 관리/복구 유지. 최초 provisioning gate는 blocked로 두고 실제 anchor 검사로만 해제 | stale publication/초기 계정·gate 경계 단위 검증. 실제 rollout/zero anchor/readiness 미검증 |
-| DB-001/003, CALL-004, MEDIA-002, PBX-001/003 | 실제 migration source hash·auth GRANT 검사 소스, 독립 PG 연결 commit 후 응답 유실 retry, 실제 test 배포 identity 선검사·양측 decoded audio/RTP·수락 전 수신 track 차단 증거 | 소스·타입만. 실제 PG/PBX/브라우저는 실행 안 함 |
-| TEST-003, OPS-006 | 최소100표본/성공·실패/nearest rank·단일 monotonic clock, 철회 관측 경계 불확실성 상한을 포함한 성능 판정 | 합성 입력으로 계산/거절 로직만 단위 검증. 실측값 생성·부하·목표 달성 주장 없음 |
-
-### 이번 검사와 차단 분류
-
-[최종 오프라인 실행](../artifacts/execution-validation-rechecked-20261029.json): light **42파일·191시험 PASS**, 웹 build PASS, API runtime 타입 PASS, 합성 규칙36문장 FP0/FN0·providerCalls0. bootstrap preflight는 미입력 C 때문에 BLOCKED이며 나머지 독립 offline 검사는 실행했다. 단계 전체를 PASS로 바꾸지 않았다. [항목별 준비 결과](../artifacts/execution-preparation-rechecked-20261029.json), [통합 증거 색인](../artifacts/execution-readiness-rechecked-20261029.json)을 기준으로 한다. 이번에 Solidity를 바꾸지 않아 계약 컴파일/시험을 재실행하지 않았다. 10월27일 compiler 결과는 과거 증거다.
-
-| 분류 | 현재 결과·변화 |
-|---|---|
-| A 코드/템플릿 | guard·정책·플랫폼 DB 격리 등 로컬 검사. bootstrap 순환 의존/적용 플래그/검사 누락을 실제 수정. 잔여 BLOCKED0 |
-| B 기존 자료 | 이전 BLOCKED `PBX_PRIVATE_ADDRESS`와 `REGISTRY_ARTIFACT_PATH`를 기본 overlay 고정 IPv4 및 실제 오프라인 artifact/검토 SHA-256으로 확인. 내부 ARI 주소도 실제 Compose 기본값으로 확인. 실제 네트워크/배포 검증으로 확대하지 않음 |
-| C 사용자/외부 입력 | **43개 검사 BLOCKED**. 같은 OIDC/DB/승인자/내부 비밀값·PBX/최초 계정의 존재/상호 격리를 별도 검사하므로 입력43종이라는 뜻은 아님 |
-| D 이후 생성값 | **19개 검사 BLOCKED**. 이미지7·역할키9·PBX 공개 인증서1·실제 deployment/trust2. 지금 주소/digest/키를 추측해 요구하지 않음 |
-| E 실환경 | network-and-runtime **SKIPPED1**. DB/체인/Witness/PBX/TURN/OIDC/anchor·이미지 내용은 실행 뒤만 판정 |
-| F 선택 | DID 확장/native proof/PSTN/외부 메시징은 기본 준비 의존성에 추가하지 않음. 필수 AI provider 준비는 C이며 bootstrap 보류만 허용 |
-
-현재 runtime preflight는 **BLOCKED62·PASS14·SKIPPED1**이다. 시작 시 재실행한38/10/3에서 기존 차단2개를 해소했으나 누락된 키·이미지·기관 URI/배포·체인 ID·ARI·인증서·필수 provider 검사를 추가했다. 마지막 구성 대조에서 PBX 공개 주소·ARI/DB template 비밀 참조·최초 accounts 파일이 빠져 있음을 찾아 검사를 추가했고, 고정 내부 ARI 주소는 실제 Compose 값으로 확인했다. 숫자를 줄이려고 예제 digest/주소를 넣거나 검사를 삭제하지 않았다. [7개 후속 단계 dry-run](../artifacts/execution-readiness-rechecked-20261029.json)은 전부 SKIPPED이며 자식을 실행하지 않았다.
-
-### 실행 제한과 검사 중 발견한 도구 동작
-
-서비스/노드·DB·PBX·브라우저/마이크·외부 AI·클라우드·이미지·migration·실제 backup/restore·commit/push는 수행하지 않았다. 다만 UI 지침의 context 보조 도구에 자동 버전 조회 경로가 있음을 실행 뒤 발견했다. 캐시 또는 실제 HTTP 조회였는지는 확인하지 못해 이 도구를 완전한 오프라인 검사로 주장하지 않는다. 재실행하지 않았고 이후 Node 자식 검사에 전송/listen 차단을 적용했다.
-
-타입 검사 시작 시 pnpm11의 기본 의존성 자동 확인이 install 경로로 진입해 `Already up to date`를 출력했다. 신규 대형 다운로드를 요청하지 않았으며 이후 workspace `verifyDepsBeforeRun: error`와 offline/ignore-scripts 환경을 적용해 명령 실행이 설치/lifecycle을 암묵 수행하지 않게 했다. 웹의 viem은 이미 설치된 같은 버전을 직접 의존성으로 명시했다. tsx CLI의 IPC listen은 차단되어 실패했으므로 runner/오프라인 명령은 `node --import tsx`로 변경했다. 이 실패·타입 수정·guard 회귀 이력도 증거 색인에 기록한다.
-
-### 남은 범위
-
-- **코드 미구현/수동 절차:** Besu/Witness 전체 장애·TURN/철회/lease 종합·실제 동의 중단·재시작/복원·실측 수집·GCP 이행은 자동 시험 runner로 구현 완료라고 하지 않는다. 고정 runner의 MANUAL 단계와 관측/첨부 계약이 있고 운영자 실행/독립 검토가 필요하다. OS 수준의 범용 네트워크 sandbox는 제공하지 않는다.
-- **사용자/외부 정보:** DNS/HTTPS·기관/콜센터 URI·배포/기관/chain ID·일반/공식 OIDC 등록 및 실제 issuer/subject·승인자 공개 주소3개·역할별 비밀 참조·최초 accounts 파일·PBX 공개 주소/DB 로그인·독립 anchor 관리 위치·provider 모델/보관/소량 예산. 비밀값은 채팅으로 받지 않는다.
-- **실행 생성값/검증:** 이미지 digest·키/공개 manifest·인증서·genesis/실제 계약 metadata·공개 trust/pin·웹 이미지·릴리스 및 실제 모든 환경 시험. 지금 BLOCKED를 해제하지 않는다.
-- **기본 범위 밖:** DID/native proof/PSTN/동적 validator/KMS/HSM·외부 문자/메일·청구 정산은 이번에 추가하지 않았다.
-
-다음은 새 기능 추가보다 **실제 설정 준비와 단계별 실행 검증**이다. 최초 준비/변경/재개·정확한 명령·성공 기준은 [RUNBOOK](RUNBOOK.md#단계별-검증과-판정)에 둔다. 수동 관측을 포함한 최종 서비스 성공은 아직 없다.
+<a id="2026-10-29-실행-준비검증-체계"></a>
+- [2026-10-29 실행 준비·검증 체계](archive/DEVELOPMENT-HISTORY-20261104.md#execution-readiness-20261029)
 
 <a id="pre-execution-20261027"></a>
+<a id="2026-10-27-실행-전-마무리-기록"></a>
+- [2026-10-27 실행 전 마무리 기록](archive/DEVELOPMENT-HISTORY-20261104.md#pre-execution-20261027)
 
-## 2026-10-27 실행 전 마무리 기록
-
-같은 시작 HEAD 이후의 미커밋 작업이다. `WORK-SUMMARY.md`, `PRODUCT-CONNECTION-WORK-SUMMARY.md`와 과거 artifacts는 그 시점의 기록으로 보존한다. 아래에 있는 ‘이전 연결 작업’의 34개 파일·148개 시험을 이번 결과로 재사용하지 않는다. 서비스 기동·외부 제공자 호출·migration·계약 배포·commit·push는 하지 않았다.
-
-| 요구 ID | 구현과 실제 호출 연결 | 검증 및 남은 경계 |
-|---|---|---|
-| CONTRACT-001~005, GOVERNANCE-001/002, BUSINESS-003 | `ServiceRegistry.sol` 새 배포 계약, 기존 directory 단독 경로 거절. `updateConfiguration`에 2-of-3·chain/registry/기관/종류/정확한 이전·다음 hash/version/epoch/nonce/deadline 결합. API 제안→개별 서명 수집→worker 제출→확정 이벤트+같은 블록 상태 대조→최신 Witness 확인→정책 활성화→새 trust 게시 | 실제 서명·중복/다른 작업/내용/nonce 경계 단위 시험, 계약·시험 소스 오프라인 컴파일. 계약 시험·배포·체인 동작은 미실행 |
-| STATE-001~003, CALL-006 | 새 registry profile·정책 hash를 동일 블록 Witness 증언에 포함. SDK가 구 profile 대체·policy hash 불일치를 거절. 공동 정책 변경을 단순 조회 장애와 구분해 구 통화를 회수 | 서명한 정책 변조·profile downgrade·권한 변경 단위 시험. 실제 Witness·철회 전파는 검증 대기 |
-| AUTH-001/002, BUSINESS-001/002, UI-003/004 | 기관 계정 화면→최근 인증/CSRF→서버 객체 경계→제한된 DB 함수. 외부 issuer/subject 사전 연결, 내부 역할/활성 상태 변경, 자기 권한 상승/일반 관리자의 공동 승인자 생성 차단. 세션 세대 재검사와 통화·동의 회수 | 외부 IdP 계정을 만드는 기능은 아니다. 첫 로그인 토큰으로 subject를 검증한다. 실제 SQL 함수·권한·독립 연결 경합 시험은 작성·타입 검사만 |
-| DB-001/002/004, LEDGER-001~003 | 서명자별 준비 lease, RPC 대기 중 전역 DB 트랜잭션 잠금 제거, 늦은 준비 결과의 fencing, 기관별 worker claim, 동일 순서의 기관→outbox 잠금. 공동 변경 이력 분리 보관과 aggregate 개수 제한 | 실제 PG nonce/잠금·역순 event·재시작 검증 대기. 외부 signer 도구와 관리자 nonce를 공유하지 않는다 |
-| STATE-003, OPS-005 | 소비뿐 아니라 계정·키·정책 및 취소/회수 사건도 독립 anchor journal에 결합. 계정 SQL 변경과 checkpoint를 같은 트랜잭션에서 처리. 전체 이력은 읽기 전용 snapshot으로 검사하고 마지막에 head·metadata·복구 token 재검사. CAS 응답 유실은 정확한 next readback으로만 복구 | CAS가 전진한 뒤 DB commit을 잃고 정확한 이력이 사라지면 자동 복구하지 않는다. 기존 authority metadata 기준 없는 DB는 차단하고 명시적 새 신뢰 이행 필요 |
-| MEDIA-002/003, PBX-001~003, CALL-002/005, UI-001/002/007 | 비동기 track 부착 중 음소거/숨김/기한 만료 경합 수정. 검증 전 수신 오디오도 차단. Asterisk 절대 통화 timeout 설정/조회 후 bridge 허용, DB 장애 시 기존 채널 음소거. 업무 자동 갱신과 늦은 응답 방어, 업무 생성 재시도의 동일 ID 보존 | PBX timeout은 서명 기한에서 ARI 전송 여유를 뺀다. 120초를 보장된 연결 대기 시간으로 늘리지 않는다. 실제 Asterisk 함수/드라이버·양방향 RTP·종료·브라우저 검증 대기 |
-| OPS-005/006, DB-002, UI-006 | manifest HMAC·archive 링크 거절, 복원 뒤 모든 로그인 세션 폐기. 영속 웹 알림·읽음·설정·만료·중복 억제. 고정 차원 처리 시간/실패·상관 ID·worker 오류/queue·process 자원 조회 | 외부 문자/메일 공급자는 미선택·미호출. 브라우저 표본은 비신뢰 관측이며 서로 다른 시계를 빼지 않는다. 전구간 성능 목표 달성을 뜻하지 않는다 |
-| AI-001~005, TEST-001~004 | 36개 합성 한국어 개발 회귀, 인용 밖의 실제 요구와 국소 자기정정 처리. 오프라인 preflight, 제한된 검사 증거 수집·dry-run. PG 계정/CAS/claim, 독립 HTTPS anchor, 실제 양방향 RTP 시험 소스 보강 | 제공자·독립 사람 평가·실제 음성/품질·비용은 미검증. 개발 문장을 독립 평가 자료라고 표시하지 않는다 |
-
-### 실제 실행한 검사
-
-[이번 증거](../artifacts/pre-execution-20261027.json)는 dirty worktree의 파일별 hash·실행별 출력·수정 전 실패 이력을 보존한다. 최종 source manifest SHA-256은 `4ecc1987946f4f87408ae863b6080e55b1a2846ee6ab35e30853023818d4d536`다. 현재 HEAD만으로 이 상태가 재현되지는 않는다.
-
-| 명령/정적 확인 | 최신 결과 | 정확한 검증 범위 |
-|---|---|---|
-| `pnpm light` | PASS: **38개 파일·171개 시험** | source hygiene·API/Witness/웹/시험 타입·오프라인 단위 시험. fetch/TCP/UDP/listen 차단·worker2 유지 |
-| `pnpm --filter @callsign/web build` | PASS | 실제 브라우저 미기동. chunk 크기·정적/동적 import 관련 Vite 경고는 남음 |
-| `pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit` | PASS | API runtime 타입. 서버/DB 미기동 |
-| `pnpm exec tsx scripts/preflight.ts` | BLOCKED: 설정 미주입38, 로컬 PASS10, 환경 확인 SKIPPED3 | HTTP/API/DB/비밀키 로딩 없음. 잘못된 조합 FAIL과 누락 BLOCKED를 구분 |
-| `pnpm exec tsx scripts/evaluate-risk.ts` | PASS: 합성 개발36문장, FP0/FN0·providerCalls0 | 규칙 회귀만. 독립 정답·실제 한국어 STT/LLM 품질이 아님 |
-| `forge build --offline contracts/test/ServiceRegistry.t.sol --out /tmp/callsign-preexecution-contracts --cache-path /tmp/callsign-preexecution-contract-cache` | PASS | 기존 도구의 오프라인 계약/시험 소스 컴파일만. 계약 시험·노드·fork·RPC 없음 |
-| `bash -n`, YAML parser, 문서 링크/ID, `git diff --check` | PASS: 셸10·YAML5·문서15·고유 요구 ID74 | 서비스·컨테이너 미기동. YAML 파싱은 실제 Compose/GCP 동작을 보장하지 않음 |
-
-preflight 보강 중 발견한 implicit-any 타입 오류는 수정했고 최종 light를 다시 통과했다. 이 실패도 증거의 validationHistory에 남겼다. 이전 148/82/66/44개 시험을 최신 결과로 합산하지 않는다. 독립 검토에서 지적한 현재 결과·source 식별·실행 준비 조건을 본문과 서비스 가이드에 보완했다. 추가 표준 사실은 Asterisk 공식 문서와 대조했다. 규칙 fixture의 작성자/정답/검사자가 독립적이지 않은 한계를 명시했으며 개발 회귀를 독립 품질 평가로 부르지 않는다. 상태·시험 수의 기준은 이 실행 artifact, 요구의 기준은 MASTER이며 새 기준 문서를 추가하지 않았다.
-
-### 작성했지만 실행하지 않은 시험
-
-- `contracts/test/ServiceRegistry.t.sol`: 동일 서명자/다른 작업·기관·내용·옛 nonce·legacy 우회·정책 세대. 소스 컴파일만 했다.
-- `tests/integration/service-runtime.test.ts`: 실제 독립 PG 연결의 account/세션·claim·서명자 lease·quota·초기 checkpoint·commit 경계. memory anchor 구간의 독립성 한계를 별도 표시했다.
-- `tests/integration/independent-anchor.test.ts`: 별도 HTTPS anchor·단일사용 zero fixture와 실제 DB 과거 복원 대조. init/reset/자동 기동 없음.
-- `tests/media/service-pbx.spec.ts`: 양방향 실제 RTP·수락 전 송신0·철회/로그아웃/종료 track 정리. 브라우저·PBX 미실행.
-- 기존 제공자 smoke·체인·통합·장애/성능 소스와 절차는 보존한다. 실제 제공자·전체 장애/클라우드 복구 runner·성능은 통과했다고 쓰지 않는다.
-
-이후 실행 단계별 설정·명령·성공 조건은 [RUNBOOK](RUNBOOK.md#실행-허가-후-추가로-확인할-시험)에 연결한다.
-### 배포·정책 이행의 중요한 결정
-
-- 구 `InstitutionRegistry`는 회귀 대상으로 남는다. 업그레이드 proxy가 없으므로 새 `ServiceRegistry` 주소·code hash·생성자 초기 정책 hash·배포 시작 블록·3명의 승인자를 검토하고 trust를 명시적으로 전환한다. 오프라인 ABI/bytecode/layout 산출물은 `artifacts/service-registry-build-20261027.json`이다. 실제 배포 이력은 아니다.
-- 현재 구현된 공식 동작은 `/official` 하나다. 목록의 표시명 변경은 그 경로를 유지하며 기존 통화를 끊지 않는다. 허용 질문·금지 요구·정책 버전 등은 전부 서명·위임 범위이므로 정책 hash 변경은 epoch를 증가시키고 구 VC/승인/통화를 무효화한다. 새 위임·업무와 policy version에 맞는 trust/웹 pin 게시가 필요하다. 존재하지 않는 공식 경로를 UI에 광고하지 않는다.
-- 새 SQL은 `0005_account_management.sql`까지다. 기존 데이터의 사용자 소속이 중복되면 migration을 실패시킨다. 기존 저널에 authority checkpoint가 없거나 record가 새 기준을 증명하지 못하면 일반 재시작으로 자동 채택하지 않는다. 새 기본 배포는 검토한 새 초기 신뢰와 빈 DB·독립 zero anchor에서만 준비한다.
-- 업무 계정의 운영 중 추가는 인증된 관리 API를 사용한다. `provision-member.ts`로 새 checkpoint 배포를 우회해 수정하지 못한다. 최초 공동 승인자/키 집합의 bootstrap은 별도 운영 절차다.
-
-### 남은 항목 분류
-
-| 분류 | 내용 |
-|---|---|
-| 코드 미구현 | 일반 SIP proxy/PSTN·자동 transfer·무중단 진행 통화 복원은 지원하지 않는다. 기본 범위 밖 기능을 구현 완료로 세지 않는다. 이 당시에는 단계 runner가 없었다. 현재 고정 단계/수동 관측의 범위는 2026-10-29 기록을 따른다 |
-| 사용자·외부 정보 필요 | 실제 검토한 Asterisk/ODBC/PJProject·앱/웹/TURN 이미지 digest, OIDC issuer/client/audience/auth_time 정책, DNS/TLS/DTLS/TURN 주소, 역할별 DB 로그인/키, 별도 수명·관리 권한의 anchor, 제공자 모델/보관·예산. 멘토링 원문/최종 제출 양식은 원문 확인 필요 |
-| 실제 실행 검증 대기 | migration 최소 권한·SQL 경합/응답 유실·새 계약·Witness·키/정책 회전·PBX/RTP/브라우저·실제 IdP·제공자·장시간/장애/백업·복원·GCP. preflight는 이 성공을 입증하지 않는다 |
-| 기본 범위 밖 확장 | native chain proof, 선택 DID 추가 DNS 방어, 외부 알림 채널 채택, KMS/HSM·동적 validator/승인자 집합 변경·일반 SIP 상호운용 |
-
-## 이전 연결 작업의 기록
+<a id="이전-연결-작업의-기록"></a>
+- [이전 연결 작업의 기록](archive/DEVELOPMENT-HISTORY-20261104.md#이전-연결-작업의-기록)
 
 <a id="service-20261027"></a>
+<a id="이전-연결-시점의-기능"></a>
+- [이전 연결 시점의 기능](archive/DEVELOPMENT-HISTORY-20261104.md#service-20261027)
 
-## 이전 연결 시점의 기능
+<a id="중요한-정책과-경계"></a>
+- [중요한 정책과 경계](archive/DEVELOPMENT-HISTORY-20261104.md#중요한-정책과-경계)
 
-기본 웹 경로는 `/service`, 기본 배포 profile은 `service`다. 기관 URI·등록 키 준비 → 기관 최초 등록의 공동 서명 제출 → 업무 위임 발급/원장 작업 → 상담원 개별 승인 → 수신 nonce/공개키 등록 → PBX 세션/양측 소유 증명 → 일회 소비/영수증 → 양측 검증·수락 → 통화 유지·원격 음성 분석 → 종료/회수 코드를 연결했다. `/finals` 직접 통화와 초기 시연 회귀는 보존하며, 기본 서비스에서 이전 형식으로 변경 요청을 우회하지 않는다. 실제 통화 성공을 확인한 것은 아니다.
+<a id="이번-실제-검증"></a>
+- [이번 실제 검증](archive/DEVELOPMENT-HISTORY-20261104.md#이번-실제-검증)
 
-| 요구 ID | 코드·사용자 동작 연결 | 구현·검증 상태 | 외부 검증 또는 남은 범위 |
-|---|---|---|---|
-| IDENTITY-001/003, CALL-001 | `prepare-finals.ts`의 URI/public manifest/PBX 키·인증서 pin, `Service.tsx`→challenge→Sender 서명→기관 승인 | 기본 경로 코드 연결, 단위·타입 검사 | 실제 신규 키 준비/기관 공동 등록/VC 등록 미실행. 선택 DID 캐시/DNS 추가 방어는 별도 남음 |
-| CALL-002~006 | `serviceCall.ts`, authority/routes, SDK. 수신 nonce·양측 PoP·초기 소비·양측 갱신 서명·같은 binding lease·terminal 회수 | 코드 연결, 서명/세대/세션/체인/nonce 변조·정족수·상충/오래된 상태·재시도·만료 단위 검증 | 실제 기기·다중 탭·백그라운드 타이머·장시간 통화 검증 대기 |
-| PBX-001~003, MEDIA-001~004 | SIP 등록/수신 INVITE/ACK/CANCEL/BYE, ARI 사건 구독·재구독·채널/Call-ID/bridge 조회·기한 감시·정리 | 코드·구성 연결, 가짜 ARI와 SIP dialog·중복 사건·cleanup 재시도 검증 | Asterisk 이미지·ODBC·실제 DTLS/오디오·TURN·브라우저 검증 대기. 임의 SIP proxy/trunk/transfer는 지원하지 않고 거절 |
-| LEDGER-001~003, DB-002 | worker가 outbox claim/fence/backoff/영구 실패/운영자 재처리, 서명 raw tx 영속 후 동일 hash 재조회·재전송, 영속 event cursor | 처리 코드 연결, 응답 유실·중복·claim 유실·체인 실패 단위 검증 | 실제 nonce·RPC·DB claim 경합·event consumer 재시작 대기 |
-| DB-001/003/004 | `0004_worker_recovery.sql`, quota 예약/정산·중복 정산 거절, 민감 aggregate 정리·SQL 소비 namespace 보존 | SQL·호출 연결, 정적/일부 단위 검증 | 신규 PostgreSQL quota/claim 통합 시험은 작성·타입 검사만. 실제 제공자 청구 단위/가격 정산은 미구현이며 요청·초·입력 바이트를 계측 |
-| STATE-003, OPS-005 | 외부 HTTPS anchor CAS, 소비 journal, 시작 시 대조 및 gate, AES-GCM 전체 구성/DB/체인 snapshot bundle | 코드 연결, anchor 충돌·암호화 변조 단위 검증, 백업/복원 자체는 정적 검사 | 독립 저장소를 실제로 별도 장애/복구 영역에 준비해야 함. anchor만 앞선 불명 commit은 자동 해제하지 않음 |
-| AUTH-002, BUSINESS-001/002 | 최근 OIDC auth_time 검사, 담당/관리 permission, 계정 비활성/권한 변경·상담원 재할당 시 회수, 공식 인증·업무 소유권 | API·화면 연결, 권한·소유권·시간·공식 완료 회수 단위 검증 | 실제 IdP 설정·MFA 정책 검증 대기. 새 로그인 계정·기본 role 추가는 명시적 사전 provisioning (`provision-member.ts`로 기존 기관에 새 계정 추가 가능) |
-| GOVERNANCE-001/002, OPS-002 | 최초 등록/자기 기관 긴급 정지/2-of-3 복구/새 기관키/콜센터키 활성화 API·worker, 구 VC/승인/통화 무효화 | 코드 연결, 등록 서명·중복 signer·잘못된 chain/key 거절 단위 검증 | 실제 계약/키 회전·새 trust rollout 대기. directory/policy version 변경 전체 워크플로는 미구현 |
-| AI-001~004, UI-001~005/007 | 실제 remote stream→새 오디오 WS→기존 Deepgram/Anthropic, 동의·중단·늦은 결과 폐기, 별도 상태·공식 업무 | 기본 화면·provider 호출 코드 연결, 기존 revision 시험+타입 검사 | 외부 제공자는 호출하지 않음. 실제 분석 재연결/한국어 품질/보관/청구는 미검증 |
-| AI-005, TEST-001~004 | 9개 한국어 개발 fixture/오프라인 규칙 평가, 새로운 DB·PBX 시험 소스, guard 회귀 | 개발 fixture 결과 9개·오탐/미탐 0, 외부 호출 0. 독립 품질 평가가 아님 | 실제 한국어 음성 holdout·사람의 독립 정답·실측 지연/자원/가격 필요 |
-| OPS-001/003/004/006/007 | Asterisk realtime/WSS/ARI 설정, worker와 키 mount 분리, 서버/GCP 동일 compose, readiness와 운영 작업/사용량 조회 | 구성·웹 빌드·타입 검사 | 이미지/인증서/DB 계정/독립 anchor/실 GCP 미실행. 관리 화면의 작업·사용량·노드/gate 조회와 오프라인 manifest 작성 도구는 구현. 외부 알림 전송/이미지·실환경 증거 자동 수집은 미완성 |
+<a id="코드-미구현과-외부-검증의-구분"></a>
+- [코드 미구현과 외부 검증의 구분](archive/DEVELOPMENT-HISTORY-20261104.md#코드-미구현과-외부-검증의-구분)
 
-## 중요한 정책과 경계
+<a id="앞선-인증조회세션-회수-구현"></a>
+- [앞선 인증·조회·세션 회수 구현](archive/DEVELOPMENT-HISTORY-20261104.md#앞선-인증조회세션-회수-구현)
 
-- 120초는 **attempt 생성 시점부터의 최초 연결 창**이다. 유지 허가 30초·최대 4시간은 설정 가능한 초기값이며 운영 합의·실측값이 아니다. 업무 만료/VC 만료가 더 이르면 그 시각이 상한이다.
-- 양측이 현재 binding·이전 lease hash·새 nonce·순번에 각각 서명해야 갱신한다. 최초 bridge는 양측 SDK 검증 준비와 현재 권한 확인 후만 허용한다. 조회 장애는 명시적 철회가 아니다. freshness가 지나면 기본 음성/분석을 멈추고, 이전에 검증한 같은 통화에 대해 사용자가 명시한 유지 선택만 별도 허용한다. lease 자체가 만료되면 새 시도가 필요하다.
-- PBX 인증서 지문은 **설정한 Asterisk 인증서에서 고정**하며 양측 브라우저의 실제 DTLS 관측과 비교한다. ARI는 채널·Call-ID·bridge를 독립 조회하지만 서버가 DTLS handshake를 직접 관측했다고 주장하지 않는다. PBX와 증거 서명자를 신뢰하는 보장이다.
-- Issuer에는 기관 승인키와 PBX 증거키, Sender에는 콜센터 키, worker에는 원장 관리자/정지 키만 mount한다. worker의 endpoint 삭제에는 SIP 비밀번호 암호화 키가 필요 없다. 공동 승인자 키·Witness 키는 각각 독립 보유한다.
-- anchor는 VM 백업에 넣지 않는 **별도 권위 저장소**다. 같은 서버/같은 오래된 백업으로 함께 복원하면 독립성 보장이 없다. 외부 CAS가 진행되고 DB commit이 불명확하면 gate를 닫는다. 최신 일관 이력 또는 검토한 재신뢰 절차 없이 SQL 값만 고쳐 열면 안 된다.
-- 실제 DB·체인 원자 commit이나 외부 호출 exactly-once는 주장하지 않는다. 서명된 같은 tx를 재조회/재전송하고, 불명 결과·영구 실패·재처리를 구분한다.
-- 백업 도구는 보호한 외부 32-byte 암호화 키, 정지된 체인의 snapshot archive, 운영자의 maintenance 확인을 요구한다. DB 읽기 snapshot/공유 잠금 중 dump·키/설정을 묶으며 chain snapshot의 실제 정합성은 이후 복원 대조로 검증한다. 기존 데이터나 실행 중 프로세스를 이 작업에서 조작하지 않았다.
+<a id="검증-이력"></a>
+- [검증 이력](archive/DEVELOPMENT-HISTORY-20261104.md#검증-이력)
 
-## 이번 실제 검증
-
-- `pnpm light`: **34개 파일·148개 테스트 통과**. 원본 출력·변경 소스 hash는 [이번 결과](../artifacts/product-connection-20261027.json)에 보존한다. 초기 실패(인증 HEAD 중복, 오프라인 mock 경계/기대값, 새 도구 타입 오류)는 수정 후 재검사했다. 실패 시험을 삭제하거나 network guard를 완화하지 않았다.
-- `pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit`: 성공. Dockerfile의 런타임 검사는 unit fixture를 가져오지 않는 이 설정을 사용한다. 이미지 build는 실행하지 않았다.
-- `pnpm --filter @callsign/web build`: 성공. 브라우저에서 Node `punycode`가 빠지던 경고 원인을 기존 JSON 해석기의 Unicode 연산 대체로 수정했다. 기존 큰 chunk·효과 없는 동적 import 경고는 남는다.
-- `pnpm exec tsx scripts/evaluate-risk.ts`: 개발 fixture 9개, 오탐 0·미탐 0, provider 호출 0. 실제 모델 품질·한국어 STT 품질·독립 평가 통과가 아니다.
-- Compose YAML 2개(기본 서비스 정의 19개·PBX overlay 1개) 정적 파싱, `bash -n scripts/backup.sh scripts/restore.sh scripts/generate-besu.sh scripts/deployment.sh`: 성공. Compose 실행·이미지 유효성·DB SQL 적용·실제 백업 성공의 증거가 아니다.
-- `tests/integration/service-runtime.test.ts`, `tests/media/service-pbx.spec.ts`: 작성·타입 검사만. 기존 직접 통화 시험도 보존했다. DB/체인/Witness/PBX/TURN/OIDC/브라우저/외부 AI/GCP는 모두 미실행이다.
-
-## 코드 미구현과 외부 검증의 구분
-
-현재 기본 업무·승인·유지·교환기·분석 호출 코드를 연결했지만 전체 74개 요구사항의 완료 선언은 하지 않는다. 여전히 코드가 없는 항목은 정책 version/공식 directory 변경의 공동 승인 전체 흐름, 일반 계정/기본 role의 동적 생성 UI(운영자 추가 도구는 구현), 외부 알림 전송/이미지·실환경 증거 자동 수집이다. 오프라인 release manifest 작성 도구와 관리 노드 관측은 구현했다. 선택 DID 추가 방어와 native proof는 기본 서비스 밖의 별도 범위다. 제출물의 실제 영상·성능·장애·복구 수치는 실제 실행 뒤만 작성한다.
-
-외부 설정 또는 실행이 필요한 항목은 실제 DB/LOGIN·인증서·Asterisk 빌드/ODBC driver·PBX 공개 주소/TURN·OIDC auth_time·관리자/승인자 계정·독립 anchor·STT/LLM 계정/model/보관 정책·GCP DNS/VM·실측이다. 비밀값을 채팅에 요청하지 않는다. 다음 실행 명령과 순서는 RUNBOOK에 둔다.
-
-## 앞선 인증·조회·세션 회수 구현
-
-| 요구 ID | 작성한 경계 | 검증·한계 |
-|---|---|---|
-| AUTH-002 | 일반/공식/이전 로그인 용도·발급자·대상 분리, 용도별 로그아웃·CSRF, 별도 토큰 재사용 기록 | 쿠키·용도·로그아웃 단위 시험. 주요 작업 재인증·실제 로그인/DB 남음 |
-| BUSINESS-001 | `workspaceFor`가 수신자·상담원에게 접근 가능한 업무·승인·위임만 반환 | `workspace.test.ts`의 타 기관·미할당·불일치 관계 거절. 전체 역할 관리 남음 |
-| CALL-006/MEDIA/AI | 세션 폐기 시 열린 웹소켓·분석 중단, 현재 DB 권한 재검사 | `session-connections.test.ts`의 시간 초과·즉시 회수·정리. 실제 통화·새 교환기 회수 남음 |
-| GOVERNANCE-002 | 실제 개인키 서명과 공개키 검증으로 키 쌍 일치 확인 | `signing-key.unit.test.ts`. 실제 키 교체·체인 전이 미실행 |
-| UI | 선택한 시도와 실제 연결 시도 분리, 로그아웃 후 늦은 응답 폐기 | 타입·API 도우미 단위 검사. 실제 화면·다중 탭 경합 미검증 |
-| DB | `0002_session_scopes.sql`과 공통 구조 변경 적용 도구 | 작성·타입 검사만. 실제 적용/GRANT/동시성 미실행 |
-
-## 검증 이력
-
-| 시점·범위 | 당시 결과 | 원본 |
-|---|---|---|
-| 2026-10-27 서비스 확장 | 18개 파일·82개 통과 | [서비스 결과](../artifacts/master-implementation-20261027-service.json) |
-| 2026-10-27 인증 경계 | 15개 파일·66개 통과 | [인증 결과](../artifacts/master-implementation-20261027-auth.json) |
-| 2026-10-26 직접 통화 개발 | 10개 파일·44개 통과, 당시 웹/Compose/셸 정적 검사 | [보고서 보관본](archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md), [시험 원본](../artifacts/finals-light-results.json), [환경 요약](../artifacts/finals-validation.json) |
-| 2026-09-14 초기 시청 시연 | 당시 별도 환경의 실행 결과 | [과거 시험 기록](TEST-RESULTS.md) |
-
-각 결과는 누적 재검사 수이며 서로 더하지 않는다. 원본 기획 PPTX/PDF·영상·시험 증거는 유지한다. 기능 변경은 `7fb20f7`, `3339e90`, `3235b6d`, `ab0ec1c`, 문서는 `40d490c`부터 구분해 기록했다. 커밋·공개는 배포 성공을 뜻하지 않는다.
-
-## 문서 관리와 다음 개발
-
-서비스 설명은 `docs/guide/`, 요구·완료 기준은 MASTER, 진행·검증 이력은 이 문서, 실행 명령은 RUNBOOK에서 관리한다. 멘토링 질문·대회 원고는 서비스 완료와 분리하고 과거 자료에는 기준 시점을 표시한다. `finals`·형식 번호가 들어간 실제 파일명·API·설정은 호환성을 위해 보존하고 설명은 동작 이름으로 쓴다.
-
-2026-10-27 문서 정리에서는 추적 중인 Markdown 39개를 읽고 제품 등급처럼 보이던 형식 번호를 동작 중심 이름으로 풀었다. 실제 코드의 식별값·명령은 보존하고, 초기 시연의 철회 후 통화 유지 정책과 현재 종료 목표를 구분했다. 명세의 옛 API 초안·미구현 표시를 실제 `/v3` 서버 코드와 대조했으며, 원본 시험 결과·기획서·영상은 수정하지 않았다. 상대 링크·74개 요구 ID/앵커·표·코드 구획·변경 범위를 정적으로 검사했다. 독립 문서 검토에서 수락/거절 순서·허가 만료·120초 시작 시점·제공자별 데이터 범위를 보완했다. 실제 서비스·브라우저·기능 시험을 새로 실행하지 않았다.
-
-다음 구현은 새 화면·양측 수락/갱신 → DB/원장 작업 재처리·독립 복구 → 교환기 사건/자동 회수·배포 → 관리 재인증·권한/키 분리 → 전체 통합 시험 소스 순이다. 기존 `demo:up`은 초기 시연 초기화 도구이며 일반 재시작 명령이 아니다. 실제 실행은 별도 허가 뒤 운영 절차를 따른다.
-
-### 이번 연결 작업의 후반 검토
-
-보완한 경계: 예상 수신자/업무를 승인서 자체와 독립적으로 고정, 불명 POST 동일 request ID 재시도, 승인 준비 키/과제 보존, 숨긴 화면 송신 중단과 복귀 재검증, 종료 후 연결·분석 표시 제거, 공식 업무의 늦은 응답/다중 탭 로그아웃, 종료된 endpoint 자격의 재생성 거절, 소비 journal 중간 유실 검출, 다른 관리 명령 calldata의 영수증 전용 거절. worker는 체인 event 조회 장애 중에도 maintenance/cleanup을 처리한다. 공개키 기반 고정 peer·node allowlist와 제한된 RPC 설정을 추가했으나 실제 Besu 적용은 하지 않았다.
-
-요청 한도는 1초 관측 경로에 맞춰 세션 임시 제한·인증 후 SQL 사용자/분 quota·공개 IP 제한을 분리했다. 새 PostgreSQL 시험은 분 경계·공유 예산 경합과 종료 후 SIP 자격 재생성 거절까지 포함하나 실행하지 않았다. 실제 제공자 계약 검증용 `provider-smoke.ts`는 이중 guard·작은 입력/요청/연결 한도와 비식별 결과 저장을 구현했으며 호출하지 않았다. 전체 journal의 중간 구멍/변조를 검사한 뒤 복원 gate를 열고, 기간이 지난 신규 승인 영수증은 식별 범위·내용 hash만 남긴다.
-
-API/worker 저장소의 SQL statement timeout 5초·lock timeout 2초와 제한된 연결 pool을 설정했다. 이는 초기 운영 제한이며 실제 DB 경합/장시간 작업에 맞는 조정 검증은 남아 있다. `provider-smoke.ts` 및 새 PG 5개 시험은 소스/타입 검사만 수행했다.
-
-운영 경로 정합성도 보완했다. 호스트에 내부 DB/RPC를 공개하지 않은 구성에서 관리 CLI를 실행할 수 있도록 명시적 operations profile의 migration-runner/registry-deployer를 추가했다. 일반 기동에는 포함하지 않고 자격·mount를 제한했다. app runtime과 web pin 빌드 stage를 분리해 최초 계약 배포/trust 생성의 순환 의존을 제거했다. 실제 이미지/컨테이너 실행은 하지 않았다. Compose 변수의 `.env.example` 누락 회귀도 검사한다.
-
-실행 허가 후의 검증도 내부망에서 수행할 수 있도록 별도 validation profile의 test-runner를 구성했다. TEST_DATABASE_URL만 사용하고 기본 운영 DB 자격/키를 전달하지 않는다. 실제 시험 DB·컨테이너 기동이나 시험 실행은 하지 않았다.
+<a id="문서-관리와-다음-개발"></a>
+- [문서 관리와 다음 개발](archive/DEVELOPMENT-HISTORY-20261104.md#문서-관리와-다음-개발)
