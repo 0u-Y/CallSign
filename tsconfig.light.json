@@ -53,6 +53,9 @@
     "vitest.chain.config.ts",
     "tests/integration/live-authority-http.test.ts",
     "tests/integration/runtime-media.test.ts",
+    "tests/integration/runtime-analysis-fixture.ts",
+    "tests/media/analysis-path.ts",
+    "tests/media/service-pbx.spec.ts",
     "scripts/call-trials.ts",
     "scripts/evaluate-service-analysis.ts"
   ]

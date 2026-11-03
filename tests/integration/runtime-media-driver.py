@@ -4,6 +4,7 @@ from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--case', nargs='+', choices=['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change','device-denied','device-absent'])
+parser.add_argument('--analysis-fixture',action='store_true',help='Explicit observer-only provider adapter entrypoint; never a production fallback')
 parser.add_argument('--archive-phase', help='Preserve prior private evidence and stop only owned application/controller processes before an explicit new phase')
 parser.add_argument('--delivery-files', type=Path, help='Extracted, checksum-verified public delivery directory; build web only from delivered runtime/nginx')
 options = parser.parse_args()
@@ -55,7 +56,7 @@ if options.archive_phase:
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
-    names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','pbx-control-*'] for p in root.glob(pattern)]
+    names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','pbx-control-*','call-trial-*'] for p in root.glob(pattern)]
     for name in names:
         if (root/name).exists(): (root/name).rename(phase/name)
     if (root/'controller-code').exists(): shutil.copytree(root/'controller-code',phase/'controller-code')
@@ -101,7 +102,16 @@ def assert_controller(info):
 assert_controller(controller_info)
 selection = ['--testNamePattern', 'boots final image|after (' + '|'.join(selected_cases) + ')$']
 limit = 3900 if 'session-expiry' in selected_cases else 600
-child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(root / 'runtime-test.env'), controller,
+test_environment = root/'runtime-test.env'
+if options.analysis_fixture:
+    import secrets
+    token_path=root/'analysis-fixture.token'
+    if not token_path.exists():
+        with open(token_path,'x',opener=lambda p,f:os.open(p,f,0o600)) as output:output.write(secrets.token_urlsafe(32))
+    values=dict(line.split('=',1) for line in test_environment.read_text().splitlines() if '=' in line)
+    values.update(CALLSIGN_MEDIA_ANALYSIS_MODE='fixture',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL='http://127.0.0.1:4101/__fixture/analysis',CALLSIGN_MEDIA_ANALYSIS_TOKEN_FILE='/run/callsign/analysis-fixture.token')
+    test_environment=write_env('runtime-analysis-test',values)
+child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(test_environment), controller,
                           'timeout', '--signal=TERM', '--kill-after=5s', str(limit), 'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
                           '--configLoader', 'runner', '--fsModuleCachePath', '/tmp/callsign-runtime-image-modules',
                           '--cache=false', '--reporter=json', '--outputFile=/run/callsign/runtime-media-results.json'] + selection,
@@ -142,7 +152,17 @@ try:
     for key, value in prepared['environment'].items():
         if key.startswith('OIDC_') or key.startswith('OFFICIAL_OIDC_'):
             issuer[key] = value
-    start('issuer', issuer, public_mounts + [(root / 'data/issuer', '/issuer'), (root / 'data/pbx/evidence.json', '/pbx/evidence.json'), (root / 'tls/cert.pem', '/tls/cert.pem')])
+    issuer_mounts=public_mounts+[(root/'data/issuer','/issuer'),(root/'data/pbx/evidence.json','/pbx/evidence.json'),(root/'tls/cert.pem','/tls/cert.pem')]
+    issuer_command=None
+    if options.analysis_fixture:
+        entry=Path(__file__).resolve().parent/'runtime-analysis-fixture.ts'
+        if not entry.is_file():raise RuntimeError('OBSERVER_ANALYSIS_ENTRY_MISSING')
+        issuer.update(CALLSIGN_ALLOW_EXTERNAL_EXECUTION='integration',CALLSIGN_RUNTIME_IMAGE_CONFIRMATION='OWNED_FINAL_IMAGE',CALLSIGN_MEDIA_FIXTURE_RUN_ID=run_id,CALLSIGN_MEDIA_FIXTURE_TOKEN_FILE='/observer/token',CALLSIGN_MEDIA_FIXTURE_OWNERSHIP='/observer/ownership.json')
+        work=json.loads(subprocess.check_output(['docker','image','inspect',app_image]))[0]['Config']['WorkingDir']
+        if not work.startswith('/') or '..' in Path(work).parts:raise RuntimeError('RUNTIME_WORKING_DIRECTORY_REQUIRED')
+        issuer_mounts += [(entry,work.rstrip('/')+'/tests/integration/runtime-analysis-fixture.ts'),(root/'analysis-fixture.token','/observer/token'),(root/'ownership.json','/observer/ownership.json')]
+        issuer_command=['pnpm','exec','tsx','tests/integration/runtime-analysis-fixture.ts','--owned-analysis-fixture']
+    start('issuer',issuer,issuer_mounts,issuer_command)
     start('sender', {**common, 'SERVICE_ROLE': 'sender', 'PORT': '4102', 'SENDER_INTERNAL_TOKEN': keys['senderToken'], 'SERVICE_URI': state['serviceUri'], 'SENDER_KEY_PATH': '/sender/key.json'}, public_mounts + [(root / 'data/sender/key.json', '/sender/key.json')])
     start('platform', {**common, 'SERVICE_ROLE': 'platform', 'PORT': '4100'}, public_mounts)
     health = "const end=Date.now()+20000;for(;;){try{await Promise.all([4100,4101,4102].map(p=>fetch('http://127.0.0.1:'+p+'/health').then(r=>{if(!r.ok)throw Error()})));break;}catch{if(Date.now()>end)throw Error('ROLE_HEALTH_TIMEOUT');await new Promise(r=>setTimeout(r,200));}}"
@@ -203,7 +223,7 @@ try:
     service_info = [inspect(i) for i in service_ids]
     if any(any(mount['Destination'].startswith('/work') or 'node_modules' in mount['Destination'] for mount in item['Mounts']) for item in service_info):
         raise RuntimeError('APPLICATION_SOURCE_MOUNT_FORBIDDEN')
-    report = {'appImage':app_image,'webImage':web_image,'noApplicationSourceMounts':True,'serviceImages':{item['Name']:item['Image'] for item in service_info},'roleEnvironmentNames':{item['Name']:[e.split('=',1)[0] for e in item['Config']['Env']] for item in service_info},'configScope':'owned-loopback-test-only'}
+    report = {'appImage':app_image,'webImage':web_image,'noApplicationSourceMounts':True,'serviceImages':{item['Name']:item['Image'] for item in service_info},'roleEnvironmentNames':{item['Name']:[e.split('=',1)[0] for e in item['Config']['Env']] for item in service_info},'configScope':'owned-loopback-test-only','analysisProvider':'explicit-observer-fixture-entrypoint' if options.analysis_fixture else 'production-entrypoint-no-fixture'}
     (root/'image-services-started.json').write_text(json.dumps(report,indent=2)+'\n')
     deadline = time.monotonic() + limit
     while child.poll() is None:
