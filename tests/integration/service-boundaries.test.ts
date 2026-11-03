@@ -346,5 +346,43 @@ it('analysis HTTP/WS: drains real quota before issuer shutdown even when a provi
  expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBeGreaterThan(0);
  await f.stopIssuer();expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);
  expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBe(0);
+ const model=await f.sql`SELECT state,actual FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND unit='llm-requests'`;expect(model).toHaveLength(1);expect(model[0]!.state).toBe('settled');expect(Number(model[0]!.actual)).toBe(1);
  f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
+});
+
+async function holdAnalysisSql(take:(tx:import('postgres').TransactionSql)=>Promise<unknown>){
+ let release!:()=>void,ready!:()=>void,failed!:(error:unknown)=>void;const gate=new Promise<void>(r=>{release=r;}),locked=new Promise<void>((r,j)=>{ready=r;failed=j;});
+ const done=f.sql.begin(async tx=>{await take(tx);ready();await gate;});void done.catch(failed);await locked;
+ return async()=>{release();await done;};
+}
+it('analysis HTTP/WS: shutdown during a locked consent transaction never starts STT and releases its SQL reservation',async()=>{
+ const call=await acceptedCall();expect((await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true})).status).toBe(200);
+ const active=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>active.messages.some(m=>m.type==='ready')).toBe(true);
+ const release=await holdAnalysisSql(tx=>tx`SELECT id FROM issuer_v2.institutions WHERE id=${f.id} FOR NO KEY UPDATE`);
+ try{
+  active.ws.send(JSON.stringify({type:'consent',consent:true}));
+  await expect.poll(async()=>Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count),{timeout:1500,interval:20}).toBe(1);
+  await expect.poll(async()=>Number((await f.sql`SELECT count(*) AS count FROM pg_stat_activity WHERE usename='callsign_issuer_login' AND wait_event_type='Lock'`)[0]!.count),{timeout:1500,interval:20}).toBeGreaterThan(0);
+  const closing=f.stopIssuer();await expect.poll(()=>active.ws.readyState,{timeout:1500,interval:20}).toBe(WebSocket.CLOSED);await release();await closing;
+  expect(f.audio.streams).toHaveLength(0);const rows=await f.sql`SELECT unit,state,actual FROM issuer_v2.usage_reservations WHERE institution_id=${f.id}`;expect(rows).toHaveLength(1);expect(rows[0]).toMatchObject({unit:'stt-seconds',state:'released'});expect(Number(rows[0]!.actual)).toBe(0);
+ }finally{await release();active.ws.terminate();}
+});
+it('analysis HTTP/WS: shutdown during a locked session lookup leaves no provider or reservation',async()=>{
+ const call=await acceptedCall();expect((await call.receiver.c.request('/v3/consent',{attemptId:call.attempt.id,granted:true})).status).toBe(200);
+ const release=await holdAnalysisSql(tx=>tx`LOCK TABLE public.sessions IN ACCESS EXCLUSIVE MODE`);let active:ReturnType<typeof socket>|undefined;
+ try{
+  active=socket(call.receiver.c,call.attempt.id);await expect.poll(()=>active!.ws.readyState,{timeout:1500,interval:20}).toBe(WebSocket.OPEN);
+  await expect.poll(async()=>Number((await f.sql`SELECT count(*) AS count FROM pg_stat_activity WHERE usename='callsign_auth_login' AND wait_event_type='Lock'`)[0]!.count),{timeout:1500,interval:20}).toBeGreaterThan(0);
+  const closing=f.stopIssuer();await expect.poll(()=>active!.ws.readyState,{timeout:1500,interval:20}).toBe(WebSocket.CLOSED);await release();await closing;
+  expect(f.audio.streams).toHaveLength(0);expect(f.audio.calls).toHaveLength(0);expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id}`)[0]!.count)).toBe(0);
+ }finally{await release();active?.ws.terminate();}
+});
+it('analysis HTTP/WS: cancellation while model reservation is blocked releases zero without invoking the provider',async()=>{
+ const c=await analysisCall(),quotaId=`llm:${c.stream.options.streamId}:1`;
+ const release=await holdAnalysisSql(tx=>tx`SELECT pg_advisory_xact_lock(hashtextextended(${quotaId},0))`);
+ try{
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(async()=>Number((await f.sql`SELECT count(*) AS count FROM pg_stat_activity WHERE usename='callsign_issuer_login' AND wait_event='advisory'`)[0]!.count),{timeout:1500,interval:20}).toBeGreaterThan(0);
+  const closing=f.stopIssuer();await expect.poll(()=>c.ws.readyState,{timeout:1500,interval:20}).toBe(WebSocket.CLOSED);await release();await closing;
+  expect(f.audio.calls).toHaveLength(0);const rows=await f.sql`SELECT state,actual FROM issuer_v2.usage_reservations WHERE id=${quotaId}`;expect(rows).toHaveLength(1);expect(rows[0]!.state).toBe('released');expect(Number(rows[0]!.actual)).toBe(0);expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBe(0);
+ }finally{await release();c.ws.terminate();}
 });

@@ -1504,6 +1504,13 @@ step() { CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validatio
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py --policy integration-pressure-v1 run "$RUN_DIRECTORY" readiness 45 node node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts tests/integration/database-readiness.test.ts
 ```
 
+압박 정책을 선택한 `run`의 하위 준비 CLI에도 같은 옵션을 명시한다. 바깥 launcher의 옵션은 별도 자식 argv로 자동 전달되지 않는다. 누락하면 `EXPLICIT_RESOURCE_POLICY_MISMATCH`로 차단되며 DB readiness나 migration 성공으로 기록하지 않는다.
+
+```bash
+step final-ready 30 python3 scripts/validation-resource-control.py --policy integration-pressure-v1 wait-database "$RUN_DIRECTORY"
+step roles 45 python3 scripts/validation-resource-control.py --policy integration-pressure-v1 provision-logins "$RUN_DIRECTORY"
+```
+
 B/C 필터는 아래 절과 같으며 D에는 새 `analysis Chromium:`을 포함한다. 종전25개 정적 목록은 매개변수 사례7개를 놓쳤다. 현재 실제 사례는 원래32개+추가2개=34개이며 reporter의 실제 이름으로 배정을 대조한다. 추가 분석 Chromium은 실제 WS·동의·분석 결과를 **제품 패널의 component host**로 렌더링하며 ServiceCall/PBX 수신 오디오까지 연결한 시험은 아니다.
 
 ```bash

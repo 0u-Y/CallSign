@@ -4,6 +4,18 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="candidate-media-20261103"></a>
+
+## 2026-11-03 후보 제작: 실제 SQL·WS 종료 회귀와 전체 미디어 자원 차단
+
+시작 main은 `da98e2c`이며 사용자 루트 요약은 미추적 상태로 보존했다. 현재 가용 RAM 약24.8GiB·CPU24개에서 관측 load 약138로, 기존 전달 NEW의40GiB 시작 guard를 충족하지 못했다. Besu4/Witness4·PBX/TURN 전체 스택은 시작하지 않았고 guard/정족수/서버 설정을 바꾸지 않았다. 기존 약23GiB 전체 한도·역사 표본은 현재 실측/최소 사양으로 취급하지 않는다.
+
+AI-003/005·TEST-004: 기존 시험에 실제 SQL 잠금 중 consent transaction/세션 조회 종료와 LLM 예약 대기 중 취소를 추가했다. 제공자 호출 전 정산0과 호출 후 정산1, abort 무시/늦은 응답·issuer drain을 실제 최소권한 SQL·인증/CSRF·Platform/Sender/Issuer·WS로 확인했다. 선택5건 PASS이며 readiness2건·잔류 감사1건은 별도다. 원장/Anchor/binding/STT/LLM은 명시 fixture, 브라우저/실제 음성은 미실행이다. 이전34건/DB17을 합산하지 않는다. 시험 상태를 지워 통과시키지 않았고 소유 DB/보호 ROOT는 정리했다.
+
+초기 준비는 하위 CLI에 pressure policy 옵션이 누락돼 SQL readiness 전 `EXPLICIT_RESOURCE_POLICY_MISMATCH`로 차단됐다. 원본을 보존하고 정확한 argv를 수정했으며 자원 중단이나 제품 assertion 실패는 아니었다. 이 호출 주의와 정확한 하위 명령을 RUNBOOK에 반영했다. 초기화 중 남은 소유 socket 파일은 확인된 전용 mount에서만 회수했고 기존 파일의 권한/소유권은 변경하지 않았다. observer 묶음에는 선택 SQL/WS 시험·guard/setup/reporter와 readiness/감사를 포함하도록 보완했다.
+
+runtime·공개/observer 후보는 이 소스를 clean checkout으로 고정한 뒤 로컬에서만 생성·검사한다. 후보의 실제 image/config/hash·보호 자료 감사와 미실행 미디어 범위는 이번 후보 증거에 기록하며 기존 Release/GHCR는 변경하지 않는다.
+
 <a id="main-review-20261103"></a>
 
 ## 2026-11-03 검토 브랜치 리뷰와 main 반영

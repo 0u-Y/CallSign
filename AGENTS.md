@@ -92,3 +92,8 @@
 ## 2026-11-03 검토 브랜치의 main 반영 작업
 
 이번 요청은 branch/main 차이·원본 증거 리뷰, 최소 코드/시험/기존 문서 수정, 무기동 light/타입/웹 build와 정상 main 병합·일반 push·기존 light CI만 허용한다. 실제 통화/분석 시험은 기존 harness에 연결하되 실행하지 않는다. 서비스/DB/브라우저/노드/미디어/Anchor·이미지/Release·AWS·키/자격 생성과 기존 host/global auth/resource 변경은 허용하지 않는다. 과거 통합 증거는 당시 범위를 유지하며 이 기록을 후속 기동 허가로 사용하지 않는다.
+
+
+## 2026-11-03 후보 제작과 선택 SQL·WS 회귀
+
+이번 요청은 기존 서버/자원을 보존하는 소유 none namespace의 후보 runtime build·공개/observer 로컬 묶음, 합성 입력의 제한된 SQL/HTTP/WS·실제 미디어 시험과 관련 commit/일반 push/light CI를 조건부 허용한다. 기존 전체 NEW의40GiB 시작 guard는 유지하며 현재 부족한 자원에서 전체 스택을 시작하거나 예산을 임의 변경하지 않는다. 작은 SQL 시험은 기존512MiB DB/3GiB 앱·명시적 integration-pressure-v1을 적용한다. 기존 자원·host/global auth 변경, 다운로드·외부 제공자/AWS·GHCR push/Release는 금지다. 과거 증거를 현재 PASS로 복사하지 않으며 후속 기동의 상시 허가가 아니다.
