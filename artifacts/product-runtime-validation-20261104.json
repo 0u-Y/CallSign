@@ -1,0 +1,2012 @@
+{
+  "recordedAtUtc": "2026-11-03T17:02:56.273819+00:00",
+  "productRoute": "/service",
+  "officialRoute": "/official",
+  "presentationChangesWithdrawn": true,
+  "runtimeCandidates": {
+    "initial": {
+      "source": "252fd59f7f33f213ae6d7e95479be268a1380304",
+      "configId": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+      "registryManifestDigest": null,
+      "architecture": "linux/amd64",
+      "buildStatus": "BUILT_NOT_RUNTIME_VERIFIED",
+      "buildMemoryHardLimitGiB": 2,
+      "buildCpuHardLimit": 1,
+      "buildTimeoutSeconds": 90,
+      "matchedSourceFiles": 19,
+      "reviewedImageMaterial": "PUBLIC_SELFTEST_VECTORS_ONLY",
+      "rawImageAuditStatus": "BLOCKED",
+      "publicSelftestHashesMatched": 8,
+      "localDelivery": ".local/presentation-run-20261103T155054Z-209fa1/delivery-candidate",
+      "files": {
+        "observer-tests.tar": {
+          "bytes": 266240,
+          "sha256": "e74ce06dd31d490b5421ca2c4a8a439b5faf400cbd31eade48f191033bb815c0"
+        },
+        "images.json": {
+          "bytes": 3654,
+          "sha256": "92284fd5f3e27414369fdd7c8899bdd75ea3575abb71b96a2e1b0a1125f2633f"
+        },
+        "deployment-files.tar": {
+          "bytes": 532480,
+          "sha256": "2c806942f4c56c2e9ac9c6d98694105c175d8de71a6c3990cc4e7e0a552d6e51"
+        },
+        "aws-bootstrap-images.tar": {
+          "bytes": 2318667264,
+          "sha256": "39e7957ba18dac66f35a256d9e0ab7b19e45662a5a3b0475b18b05850f7a3704"
+        },
+        "SHA256SUMS": {
+          "bytes": 341,
+          "sha256": "bd3979203f42af77a4e2ce2d7e01eb0578ae29b3bf79b7232c92507dee39fd5e"
+        }
+      },
+      "finalAwsWeb": "NOT_GENERATED"
+    },
+    "final": {
+      "source": "6e3cd238e95457406134e8ef37730fd6d251209a",
+      "configId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+      "registryManifestDigest": null,
+      "architecture": "linux/amd64",
+      "buildStatus": "BUILT_NOT_RUNTIME_VERIFIED",
+      "buildMemoryHardLimitGiB": 2,
+      "buildCpuHardLimit": 1,
+      "buildTimeoutSeconds": 90,
+      "matchedSourceFiles": 20,
+      "reviewedImageMaterial": "PUBLIC_SELFTEST_VECTORS_ONLY",
+      "rawImageAuditStatus": "BLOCKED",
+      "publicSelftestHashesMatched": 8,
+      "localDelivery": ".local/presentation-run-20261103T155054Z-209fa1/candidate-final-209fa1/delivery-final",
+      "files": {
+        "observer-tests.tar": {
+          "bytes": 276480,
+          "sha256": "d89340b2e1a8dd9a11b266ef54f5db08a0de4c9272a7193c5f3f227708dc2482"
+        },
+        "images.json": {
+          "bytes": 3654,
+          "sha256": "72f452e1fd8a50e340580987c492410b0fe90dff62377bafd85ad7f289166275"
+        },
+        "deployment-files.tar": {
+          "bytes": 532480,
+          "sha256": "01ab65a19ca15e5543335fb2d14c4996a3607bb205893216d12dbdb0d7264255"
+        },
+        "aws-bootstrap-images.tar": {
+          "bytes": 2318667264,
+          "sha256": "99997510c9815c4557d4b54291e9d720ba77b6209cd9b6ba9ca70ef61c4c5b40"
+        },
+        "SHA256SUMS": {
+          "bytes": 341,
+          "sha256": "025d67d3a01e5a77f55b5c99dfd800fe26f1f7e26f10bc1c8eb815008713cd70"
+        }
+      },
+      "finalAwsWeb": "NOT_GENERATED"
+    }
+  },
+  "http": {
+    "first": {
+      "phase": {
+        "exitCode": 2,
+        "resourceStop": "HOST_1_GIB_BUDGET",
+        "policy": "integration-pressure-v1",
+        "automaticRestart": false
+      },
+      "results": [
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.2092405199073255
+        },
+        {
+          "status": "BLOCKED",
+          "reason": "HOST_1_GIB_BUDGET",
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 6,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 3.5704958220012486
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.40212320419959724
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 2,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 0.5039082400035113
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.9025543839670718
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.2194465370848775
+        }
+      ],
+      "progress": {
+        "readiness.progress.jsonl": [
+          {
+            "name": "checks applied migration order and real auth-login least privilege, rather than file presence",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005244170866989"
+          },
+          {
+            "name": "allows PBX row locks for issuer/worker while denying other lease-field updates and PBX identity reads",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005244170927284"
+          }
+        ],
+        "product-http.progress.jsonl": [
+          {
+            "name": "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005245869273359"
+          },
+          {
+            "name": "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005245869328233"
+          },
+          {
+            "name": "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005246096744390"
+          },
+          {
+            "name": "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005246096781451"
+          },
+          {
+            "name": "requires real recent auth_time and revokes active sessions through the account-management API",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005246226269556"
+          },
+          {
+            "name": "blocks new work after trust publication or recovery mismatch without creating partial state",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005246226315093"
+          }
+        ]
+      },
+      "minimumAvailableGiB": 49.75830078125,
+      "hostObservedRssMiBMaximum": 1425.0078125,
+      "cleanup": {
+        "containerRemoved": true,
+        "privateRootRemoved": true,
+        "appsBeforeDatabase": true,
+        "resourceCause": "HOST_1_GIB_BUDGET"
+      }
+    },
+    "resume": {
+      "phase": {
+        "exitCode": 2,
+        "resourceStop": null,
+        "policy": "integration-pressure-v1",
+        "automaticRestart": false
+      },
+      "results": [
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.3152799061499536
+        },
+        {
+          "status": "FAIL",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 21,
+              "failed": 8,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 77.21143566188402
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 8,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 5.510583647992462
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.4033234540838748
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 2,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 0.509289565961808
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.9036461710929871
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.22205005213618279
+        }
+      ],
+      "progress": {
+        "readiness.progress.jsonl": [
+          {
+            "name": "checks applied migration order and real auth-login least privilege, rather than file presence",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005831035160665"
+          },
+          {
+            "name": "allows PBX row locks for issuer/worker while denying other lease-field updates and PBX identity reads",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005831035206313"
+          }
+        ],
+        "product-boundaries.progress.jsonl": [
+          {
+            "name": "boundary: reviews and exports a real proposal, imports independent signatures, then distinguishes submission, confirmation and activation",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005845570162485"
+          },
+          {
+            "name": "boundary: rejects replayed joint signatures and forged event/state/witness evidence without prematurely activating a directory-only change",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005845947406697"
+          },
+          {
+            "name": "boundary: shows durable worker failure instead of active configuration",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005853128042305"
+          },
+          {
+            "name": "boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005860295954415"
+          },
+          {
+            "name": "boundary: drops a held old-account response, clears management drafts on account switch and refuses revoked buttons",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005868329276570"
+          },
+          {
+            "name": "boundary: stops analysis transport and late model results after consent withdrawal, then isolates new revisions and provider failure",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005869927666723"
+          },
+          {
+            "name": "boundary: separates first-connect expiry from lease expiry and never reactivates terminal attempts",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005870203552186"
+          },
+          {
+            "name": "boundary: preserves a live synthetic lease for display changes but revokes it on confirmed policy generation changes",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005870563176616"
+          },
+          {
+            "name": "boundary: disables ungranted manager actions, rejects their HTTP bypass and clears work expiry on reload",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005877629743159"
+          },
+          {
+            "name": "boundary: recovers a committed creation after a lost response without duplicating the intent and cancels it safely",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005885643556615"
+          },
+          {
+            "name": "boundary: stops a pending model after lease-policy changes without publishing the late result",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005886405012586"
+          },
+          {
+            "name": "boundary: stops a pending model after connection-generation changes without publishing the late result",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005887181648283"
+          },
+          {
+            "name": "analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005888874544069"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects invented-evidence while retaining supported rules and product-controlled actions",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005889556423452"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects external-command while retaining supported rules and product-controlled actions",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005890209391491"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects epoch mismatch before forwarding a new frame",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005890851642117"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects key-generation mismatch before forwarding a new frame",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005891507816662"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects binding mismatch before forwarding a new frame",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005892163323079"
+          },
+          {
+            "name": "analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005893384292597"
+          },
+          {
+            "name": "analysis HTTP/WS: enforces the remote context identity cap and releases the stream",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005894658408464"
+          },
+          {
+            "name": "recall HTTP/SQL: keeps DELETE success, missing resources and unavailable observation distinct through real runtime writes",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005894947739154"
+          },
+          {
+            "name": "recall Chromium: renders real cancellation observations and clears a held response on visibility events and account switch",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005902890814090"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects an expired session row and cancels its pending provider result",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005904189761389"
+          },
+          {
+            "name": "analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005904827954562"
+          },
+          {
+            "name": "analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device",
+            "state": "failed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005911978586984"
+          },
+          {
+            "name": "analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005912633336516"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked consent transaction never starts STT and releases its SQL reservation",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005913070592516"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked session lookup leaves no provider or reservation",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005913188432047"
+          },
+          {
+            "name": "analysis HTTP/WS: cancellation while model reservation is blocked releases zero without invoking the provider",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005913749326094"
+          }
+        ],
+        "product-http.progress.jsonl": [
+          {
+            "name": "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005832747440061"
+          },
+          {
+            "name": "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005832747501879"
+          },
+          {
+            "name": "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005832975193678"
+          },
+          {
+            "name": "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005832975244094"
+          },
+          {
+            "name": "requires real recent auth_time and revokes active sessions through the account-management API",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005833076240274"
+          },
+          {
+            "name": "blocks new work after trust publication or recovery mismatch without creating partial state",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005833207808100"
+          },
+          {
+            "name": "renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005836455597648"
+          },
+          {
+            "name": "reads institution recall snapshots through actual sessions and rejects customer access",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2005836520370204"
+          }
+        ]
+      },
+      "minimumAvailableGiB": 48.72702407836914,
+      "hostObservedRssMiBMaximum": 1890.73828125,
+      "cleanup": {
+        "containerRemoved": true,
+        "privateRootRemoved": true,
+        "appsBeforeDatabase": true,
+        "resourceCause": "NORMAL_COMPLETION"
+      }
+    },
+    "browserRegression": {
+      "phase": {
+        "exitCode": 0,
+        "resourceStop": null,
+        "policy": "integration-pressure-v1",
+        "automaticRestart": false
+      },
+      "results": [
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.3038272559642792
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.40957896295003593
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 2,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 0.5043748130556196
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 1.0100364480167627
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": false,
+            "counts": {
+              "passed": 0,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            }
+          },
+          "durationSeconds": 0.2129504680633545
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 1,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 0.5036007959861308
+        },
+        {
+          "status": "PASS",
+          "reason": null,
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 8,
+              "failed": 0,
+              "skipped": 21,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 38.66283028991893
+        }
+      ],
+      "progress": {
+        "residue-audit.progress.jsonl": [
+          {
+            "name": "leaves no HTTP fixture authorities, sessions, outbox or unsettled quota after same-database reruns",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006096412209025"
+          }
+        ],
+        "readiness.progress.jsonl": [
+          {
+            "name": "checks applied migration order and real auth-login least privilege, rather than file presence",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006057164498547"
+          },
+          {
+            "name": "allows PBX row locks for issuer/worker while denying other lease-field updates and PBX identity reads",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006057164544034"
+          }
+        ],
+        "browser-regression.progress.jsonl": [
+          {
+            "name": "boundary: reviews and exports a real proposal, imports independent signatures, then distinguishes submission, confirmation and activation",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006067153009210"
+          },
+          {
+            "name": "boundary: rejects replayed joint signatures and forged event/state/witness evidence without prematurely activating a directory-only change",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006067153074655"
+          },
+          {
+            "name": "boundary: shows durable worker failure instead of active configuration",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006074363482661"
+          },
+          {
+            "name": "boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006077846678417"
+          },
+          {
+            "name": "boundary: drops a held old-account response, clears management drafts on account switch and refuses revoked buttons",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006082801256933"
+          },
+          {
+            "name": "boundary: stops analysis transport and late model results after consent withdrawal, then isolates new revisions and provider failure",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006082801356603"
+          },
+          {
+            "name": "boundary: separates first-connect expiry from lease expiry and never reactivates terminal attempts",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006082801379848"
+          },
+          {
+            "name": "boundary: preserves a live synthetic lease for display changes but revokes it on confirmed policy generation changes",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006082801391941"
+          },
+          {
+            "name": "boundary: disables ungranted manager actions, rejects their HTTP bypass and clears work expiry on reload",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006085659337056"
+          },
+          {
+            "name": "boundary: recovers a committed creation after a lost response without duplicating the intent and cancels it safely",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953132724"
+          },
+          {
+            "name": "boundary: stops a pending model after lease-policy changes without publishing the late result",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953183631"
+          },
+          {
+            "name": "boundary: stops a pending model after connection-generation changes without publishing the late result",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953256090"
+          },
+          {
+            "name": "analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953273553"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects invented-evidence while retaining supported rules and product-controlled actions",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953284945"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects external-command while retaining supported rules and product-controlled actions",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953297830"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects epoch mismatch before forwarding a new frame",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953308781"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects key-generation mismatch before forwarding a new frame",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953321946"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects binding mismatch before forwarding a new frame",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953332295"
+          },
+          {
+            "name": "analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953345491"
+          },
+          {
+            "name": "analysis HTTP/WS: enforces the remote context identity cap and releases the stream",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953358215"
+          },
+          {
+            "name": "recall HTTP/SQL: keeps DELETE success, missing resources and unavailable observation distinct through real runtime writes",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006087953378574"
+          },
+          {
+            "name": "recall Chromium: renders real cancellation observations and clears a held response on visibility events and account switch",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006092626609981"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects an expired session row and cancels its pending provider result",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006092626638655"
+          },
+          {
+            "name": "analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006092626657962"
+          },
+          {
+            "name": "analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device",
+            "state": "passed",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006095818361510"
+          },
+          {
+            "name": "analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006095818389503"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked consent transaction never starts STT and releases its SQL reservation",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006095818398380"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked session lookup leaves no provider or reservation",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006095818407337"
+          },
+          {
+            "name": "analysis HTTP/WS: cancellation while model reservation is blocked releases zero without invoking the provider",
+            "state": "skipped",
+            "clock": "vitest-process-hrtime",
+            "observerMonotonicNs": "2006095818414571"
+          }
+        ]
+      },
+      "minimumAvailableGiB": 47.888526916503906,
+      "hostObservedRssMiBMaximum": 2135.5546875,
+      "cleanup": {
+        "containerRemoved": true,
+        "privateRootRemoved": true,
+        "appsBeforeDatabase": true,
+        "resourceCause": "NORMAL_COMPLETION"
+      }
+    },
+    "uniqueFinalCases": {
+      "HTTP": 11,
+      "WebSocket": 17,
+      "Chromium": 9,
+      "total": 37,
+      "componentHostAnalysisCases": 1,
+      "method": "8 HTTP-suite cases plus29 boundary-suite cases;8 failed browser helpers were corrected and selectively rerun. Initial6 partial successes and repeated readiness are not added."
+    }
+  },
+  "media": {
+    "initialMetricFailure": {
+      "result": {
+        "status": "FAIL",
+        "reason": "STEP_FAILED:work-cancel",
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.60757637000643
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 1,
+            "seconds": 46.30194601602852
+          }
+        ],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 21,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [
+        {
+          "image": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        }
+      ],
+      "trials": {
+        "call-trial-work-cancel.json": {
+          "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+          "outcome": "failure",
+          "finishedMs": 19303.485643,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "authorization-request",
+              "atMs": 6319.172988999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "authorization-response",
+              "atMs": 6530.944996999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "connect-action",
+              "atMs": 9225.753902999997
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "verification-visible",
+              "atMs": 15543.624721
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "remote-decoded-both",
+              "atMs": 17558.539526
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "transcript",
+              "atMs": 18498.395511000002
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "analysis",
+              "atMs": 18803.353444
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-9c5e9ae1-3872-4aa7-8162-8c64e9bcfd42",
+              "phase": "warning-visible",
+              "atMs": 18805.459419
+            }
+          ]
+        }
+      },
+      "minimumAvailableGiB": 45.59479522705078,
+      "hostObservedMiBMaximum": 97.8125,
+      "containerObservedGiBMaximum": 4.5750274658203125,
+      "totalObservedGiBMaximum": 4.641849517822266,
+      "sampleCount": 29,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": []
+    },
+    "inputMetricRegression": {
+      "result": {
+        "status": "FAIL",
+        "reason": "STEP_FAILED:emergency-stop",
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.62053594109602
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 62.02910419902764
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.19701132690534
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 1,
+            "seconds": 46.53742925496772
+          }
+        ],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 21,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [
+        {
+          "image": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        },
+        {
+          "image": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        }
+      ],
+      "trials": {
+        "call-trial-emergency-stop.json": {
+          "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+          "outcome": "failure",
+          "finishedMs": 27700.733503000003,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "authorization-request",
+              "atMs": 6823.091329000003
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "authorization-response",
+              "atMs": 7192.198520000002
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "connect-action",
+              "atMs": 10017.995664000002
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "verification-visible",
+              "atMs": 16331.728249
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "remote-decoded-both",
+              "atMs": 18346.627244000003
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "ai-input",
+              "atMs": 19225.131563000003
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "transcript",
+              "atMs": 19237.662818999997
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "analysis",
+              "atMs": 19595.913082
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "warning-visible",
+              "atMs": 19617.188688000002
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "revocation-request",
+              "atMs": 20479.870931999998
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "ui-recalled",
+              "atMs": 20752.259351
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "audio-reclaimed",
+              "atMs": 24780.504977000004
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "pbx-absent",
+              "atMs": 24792.910763
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "server-applied",
+              "atMs": 27233.607670999998
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "chain-confirmed",
+              "atMs": 27238.426409
+            },
+            {
+              "id": "15",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "new-request-rejected",
+              "atMs": 27257.661545000003
+            },
+            {
+              "id": "16",
+              "observer": "runtime-media-29d53b06-06e2-42cc-93ed-c8a42988253c",
+              "phase": "resources-reclaimed",
+              "atMs": 27258.624585999998
+            }
+          ]
+        },
+        "phase-work-cancel/call-trial-work-cancel.json": {
+          "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+          "outcome": "success",
+          "finishedMs": 24414.996877999998,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "authorization-request",
+              "atMs": 6502.714163999997
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "authorization-response",
+              "atMs": 6662.212604
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "connect-action",
+              "atMs": 9334.594819999998
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "verification-visible",
+              "atMs": 15647.651537999998
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "remote-decoded-both",
+              "atMs": 17662.412537999997
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "ai-input",
+              "atMs": 18541.122337
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "transcript",
+              "atMs": 18552.948535999996
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "analysis",
+              "atMs": 18919.591173
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "warning-visible",
+              "atMs": 18947.838901999996
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "revocation-request",
+              "atMs": 19895.256326000002
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "ui-recalled",
+              "atMs": 20165.694934
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "audio-reclaimed",
+              "atMs": 24196.17138
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "pbx-absent",
+              "atMs": 24207.060478
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "new-request-rejected",
+              "atMs": 24224.439949
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-db929570-eb2a-4946-b59c-c00243a0b00d",
+              "phase": "resources-reclaimed",
+              "atMs": 24225.435281
+            }
+          ]
+        }
+      },
+      "minimumAvailableGiB": 45.769832611083984,
+      "hostObservedMiBMaximum": 98.01171875,
+      "containerObservedGiBMaximum": 4.6282196044921875,
+      "totalObservedGiBMaximum": 4.694572448730469,
+      "sampleCount": 42,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": []
+    },
+    "inactiveKeyRegression": {
+      "result": {
+        "status": "FAIL",
+        "reason": "STEP_FAILED:emergency-stop",
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.710101881064475
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 1,
+            "seconds": 51.67055489704944
+          }
+        ],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 21,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [
+        {
+          "image": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        }
+      ],
+      "trials": {
+        "call-trial-emergency-stop.json": {
+          "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+          "outcome": "failure",
+          "finishedMs": 25506.340304,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "authorization-request",
+              "atMs": 6693.793797000002
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "authorization-response",
+              "atMs": 6860.252617999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "connect-action",
+              "atMs": 9506.799509
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "verification-visible",
+              "atMs": 15819.992069000004
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "remote-decoded-both",
+              "atMs": 17835.404737
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "ai-input",
+              "atMs": 18746.259706
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "transcript",
+              "atMs": 18757.316604000003
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "analysis",
+              "atMs": 19118.283964
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "warning-visible",
+              "atMs": 19147.336668
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "revocation-request",
+              "atMs": 20053.651481999997
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "ui-recalled",
+              "atMs": 20326.117964
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "audio-reclaimed",
+              "atMs": 24357.120716
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-c7657f99-1c06-4ba1-93a9-7d7eb9e6f592",
+              "phase": "pbx-absent",
+              "atMs": 24367.265631
+            }
+          ]
+        }
+      },
+      "minimumAvailableGiB": 46.164886474609375,
+      "hostObservedMiBMaximum": 98.17578125,
+      "containerObservedGiBMaximum": 4.517177581787109,
+      "totalObservedGiBMaximum": 4.583736419677734,
+      "sampleCount": 31,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": []
+    },
+    "matchingEventRegression": {
+      "result": {
+        "status": "PASS",
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.72968116309494
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 0,
+            "seconds": 56.86490237317048
+          }
+        ],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 21,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [
+        {
+          "image": "sha256:03f79acc619e490dd521d8c3b35286f6c4f26d8594e98ec0167875d0e3ea2c04",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        }
+      ],
+      "trials": {
+        "call-trial-emergency-stop.json": {
+          "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+          "outcome": "success",
+          "finishedMs": 32216.836736999998,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "authorization-request",
+              "atMs": 6629.526110999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "authorization-response",
+              "atMs": 6822.869956999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "connect-action",
+              "atMs": 9925.399626999999
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "verification-visible",
+              "atMs": 16235.464165999998
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "remote-decoded-both",
+              "atMs": 18250.63385
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "ai-input",
+              "atMs": 18630.369316999997
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "transcript",
+              "atMs": 18639.891441
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "analysis",
+              "atMs": 19001.458913000002
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "warning-visible",
+              "atMs": 19025.038527999997
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "revocation-request",
+              "atMs": 19964.596617000003
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "ui-recalled",
+              "atMs": 20247.221618000003
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "audio-reclaimed",
+              "atMs": 24276.254718999997
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "pbx-absent",
+              "atMs": 24285.864139999998
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "server-applied",
+              "atMs": 24921.087064
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "chain-confirmed",
+              "atMs": 24925.860365
+            },
+            {
+              "id": "15",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "new-request-rejected",
+              "atMs": 24943.076671000003
+            },
+            {
+              "id": "16",
+              "observer": "runtime-media-e9e8b4b5-a41f-40f7-84f0-25bb2e9f2c70",
+              "phase": "resources-reclaimed",
+              "atMs": 24944.080860000002
+            }
+          ]
+        }
+      },
+      "minimumAvailableGiB": 46.15181350708008,
+      "hostObservedMiBMaximum": 98.1171875,
+      "containerObservedGiBMaximum": 4.538551330566406,
+      "totalObservedGiBMaximum": 4.604854583740234,
+      "sampleCount": 32,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "jointRecovery": {
+        "singleSignatureRejectedAt": "HTTP schema; EVM not reached",
+        "singleStatus": 400,
+        "jointStatus": 200,
+        "confirmedEpoch": "3",
+        "keyVersion": 2,
+        "oldCallTerminal": true,
+        "oldAuthorizationCancelled": true,
+        "oldCredentialRevoked": true,
+        "consumptionPreserved": true
+      },
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": []
+    },
+    "finalCandidate": {
+      "result": {
+        "status": "FAIL",
+        "reason": "[Errno 2] No such file or directory: '/proc/2745135/cgroup'",
+        "steps": [],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 15,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [],
+      "trials": {},
+      "minimumAvailableGiB": 48.08006286621094,
+      "hostObservedMiBMaximum": 82.53125,
+      "containerObservedGiBMaximum": 1.8280677795410156,
+      "totalObservedGiBMaximum": 1.9082908630371094,
+      "sampleCount": 20,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "normalizedStatus": "BLOCKED",
+      "normalizedCause": "MANDATORY_CONTAINER_OBSERVATION_UNAVAILABLE",
+      "limitation": "Raw launcher recorded FAIL with resourceStop null. /proc/PID/cgroup disappeared after a running-container snapshot; exact process role was not captured. Do not label this as product failure, memory exhaustion or a passing runtime/media test. No automatic restart.",
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": []
+    },
+    "approvedFinalCandidate": {
+      "result": {
+        "status": "PASS",
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.72367805195972
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 51.557363531086594
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.184899440035224
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 0,
+            "seconds": 46.37761624995619
+          }
+        ],
+        "resourceStop": null,
+        "cleanup": {
+          "removedContainers": 21,
+          "volumeCount": 2,
+          "errors": [],
+          "appsBeforeData": true
+        }
+      },
+      "normalEntrypointProbes": [
+        {
+          "image": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        },
+        {
+          "image": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+          "normalCommand": true,
+          "health": 200,
+          "unauthenticatedAuth": 401,
+          "fixtureMounted": false,
+          "scope": "startup/auth challenge, not full readiness or media"
+        }
+      ],
+      "trials": {
+        "call-trial-emergency-stop.json": {
+          "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+          "outcome": "success",
+          "finishedMs": 30613.744199999997,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "authorization-request",
+              "atMs": 6017.494354999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "authorization-response",
+              "atMs": 6227.773540999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "connect-action",
+              "atMs": 9027.786256
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "verification-visible",
+              "atMs": 15345.846140000001
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "remote-decoded-both",
+              "atMs": 17360.664132
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "ai-input",
+              "atMs": 18236.948822
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "transcript",
+              "atMs": 18251.21555
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "analysis",
+              "atMs": 18608.563924000002
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "warning-visible",
+              "atMs": 18631.872971
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "revocation-request",
+              "atMs": 19542.509871
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "ui-recalled",
+              "atMs": 20069.760379
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "audio-reclaimed",
+              "atMs": 24097.787783000003
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "pbx-absent",
+              "atMs": 24107.136598
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "server-applied",
+              "atMs": 26254.370732
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "chain-confirmed",
+              "atMs": 26259.10262
+            },
+            {
+              "id": "15",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "new-request-rejected",
+              "atMs": 26280.066077
+            },
+            {
+              "id": "16",
+              "observer": "runtime-media-2a3018c3-8844-456b-8ea8-5adaf9894efc",
+              "phase": "resources-reclaimed",
+              "atMs": 26281.145629000002
+            }
+          ]
+        },
+        "phase-work-cancel/call-trial-work-cancel.json": {
+          "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+          "outcome": "success",
+          "finishedMs": 28709.971079000003,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "authorization-request",
+              "atMs": 10926.479294
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "authorization-response",
+              "atMs": 11073.718137
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "connect-action",
+              "atMs": 13697.606347
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "verification-visible",
+              "atMs": 20005.729901
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "remote-decoded-both",
+              "atMs": 22021.35318
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "ai-input",
+              "atMs": 22896.578981
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "transcript",
+              "atMs": 22906.689010000002
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "analysis",
+              "atMs": 23262.110412
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "warning-visible",
+              "atMs": 23265.733642
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "revocation-request",
+              "atMs": 24168.893083000003
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "ui-recalled",
+              "atMs": 24440.045895000003
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "audio-reclaimed",
+              "atMs": 28469.67609
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "pbx-absent",
+              "atMs": 28482.275694000004
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "new-request-rejected",
+              "atMs": 28500.349893
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-c6a077dd-f4d1-4d37-b86e-50078bfd6b46",
+              "phase": "resources-reclaimed",
+              "atMs": 28501.422561
+            }
+          ]
+        }
+      },
+      "minimumAvailableGiB": 45.77191925048828,
+      "hostObservedMiBMaximum": 99.125,
+      "containerObservedGiBMaximum": 4.468505859375,
+      "totalObservedGiBMaximum": 4.535369873046875,
+      "sampleCount": 41,
+      "samplingSeconds": 5,
+      "notPeak": true,
+      "jointRecovery": {
+        "singleSignatureRejectedAt": "HTTP schema; EVM not reached",
+        "singleStatus": 400,
+        "jointStatus": 200,
+        "confirmedEpoch": "3",
+        "keyVersion": 2,
+        "oldCallTerminal": true,
+        "oldAuthorizationCancelled": true,
+        "oldCredentialRevoked": true,
+        "consumptionPreserved": true
+      },
+      "existingContainersMissingSinceStart": 0,
+      "dockerNetworkIdsUnchanged": true,
+      "remainingContainers": [],
+      "remainingVolumes": [],
+      "webImages": {
+        "web-image-id.txt": "sha256:f09eed981431aaf40bad6f1cfea7827ec80fe79c922446344268241847bed76a",
+        "phase-work-cancel/web-image-id.txt": "sha256:cddec49dfbd2ccae9ed797adb7d3f096a7e9214ebb8df4870d87597f6898a2be"
+      }
+    }
+  },
+  "notRun": [
+    "external IdP",
+    "external STT/LLM quality",
+    "AWS",
+    "new GHCR/Release publication"
+  ],
+  "remainingOwnedResources": [],
+  "scope": "Final source6e3cd23/imagec39cbb passed bootstrap, work-cancel and emergency-stop including joint recovery in one explicitly approved batch. Prior failed and blocked batches remain separate. Same-host relay only; local OIDC and synthetic STT/LLM, not external NAT, Korean AI quality or independent-host tolerance.",
+  "passedSource": "252fd59f7f33f213ae6d7e95479be268a1380304",
+  "finalSource": "6e3cd238e95457406134e8ef37730fd6d251209a",
+  "sourceHeadAtCollection": "6e3cd238e95457406134e8ef37730fd6d251209a",
+  "serverConfigurationMutationCommands": false,
+  "newDownloads": false,
+  "observerRaceRegression": {
+    "status": "PASS_OFFLINE_ONLY",
+    "cases": 6,
+    "servicesStarted": false,
+    "source": "task-private full runner memory helper",
+    "thresholdsChanged": false,
+    "originalProcessRoleNotCaptured": true,
+    "reexecutionRequiresApproval": true
+  },
+  "protectedInputCleanup": [
+    {
+      "runId": "media-delivery-20261104-209fa1",
+      "removedProtectedEntries": 49,
+      "remainingContainers": 0
+    },
+    {
+      "runId": "media-delivery-20261104-209fa1-r3",
+      "removedProtectedEntries": 50,
+      "remainingContainers": 0
+    },
+    {
+      "runId": "media-delivery-20261104-c460d1",
+      "removedProtectedEntries": 58,
+      "remainingContainers": 0
+    },
+    {
+      "runId": "media-delivery-20261104-209fa1-final",
+      "removedProtectedEntries": 39,
+      "remainingContainers": 0
+    },
+    {
+      "runId": "media-delivery-20261104-209fa1-r2",
+      "removedProtectedEntries": 50,
+      "remainingContainers": 0
+    },
+    {
+      "runId": "media-delivery-20261104-209fa1-r1",
+      "removedProtectedEntries": 57,
+      "remainingContainers": 0
+    }
+  ],
+  "offlineChecks": {
+    "source": "6e3cd238e95457406134e8ef37730fd6d251209a",
+    "light": {
+      "files": 63,
+      "tests": 316,
+      "status": "PASS"
+    },
+    "webBuild": "PASS; existing chunk/dynamic import warnings",
+    "apiRuntimeTypes": "PASS"
+  },
+  "finalSourceTree": "1224dbb41dcd5c1170deea99e3295fb265b8a1d7",
+  "fixtureBoundaries": {
+    "http": [
+      "local OIDC",
+      "ledger",
+      "ARI",
+      "anchor",
+      "binding",
+      "STT/LLM"
+    ],
+    "finalMedia": [
+      "local OIDC",
+      "STT/LLM",
+      "synthetic audio"
+    ],
+    "componentHostCases": 1
+  },
+  "publication": {
+    "newRuntimeGhcr": "NOT_PUBLISHED",
+    "newRelease": "NOT_PUBLISHED",
+    "aws": "NOT_RUN",
+    "finalAwsWeb": "NOT_GENERATED"
+  }
+}

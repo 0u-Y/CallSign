@@ -1840,3 +1840,13 @@ NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployme
 기본 제품 경로는 `/service`, 별도 인증 공식 확인은 `/official`이다. 기관·상담원·수신자는 독립 브라우저 프로필에서 실제 로그인한다. 기관은 고객/상담원/콜센터 선택→업무·위임 생성→원장 확정 확인, 상담원은 배정 업무→새 통화→개별 승인→마이크/PBX 등록→발신, 수신자는 자기 통화 선택→마이크/PBX 등록→수락/검증→선택적 분석 동의 순서다. 종료·취소·정지는 각 실제 권한/API로 수행하고 원장/서버/PBX/양 끝 음성 관측을 분리한다. 복구는 현재 proposal/nonce/epoch/만료에 맞는 서로 다른 관리 승인자2명 서명이 필요하며 과거 통화를 재사용하지 않는다. 별도 발표 화면·장면 버튼·기록 재생을 만들지 않는다.
 
 현재 `vercel.json`은 PUBLIC_PREVIEW build, self connect-src, microphone=()다. 실제 AWS API/WSS로 이어진 배포 연결이나 서비스 URL은 확인되지 않았다. 이를 풀어 쿠키/CSRF/origin 정책을 우회하지 않는다. 실제 서비스는 적절한 AWS 동일 origin과 OIDC callback/TLS/WSS/TURN 입력을 준비해 검증해야 하며 Vercel 공개 preview를 통화 성공으로 표시하지 않는다.
+
+### 최신 제품 후보의 사용·인계 상태 (2026-11-04)
+
+위 역할별 `/service` 사용 순서로 최신 후보의 work-cancel·emergency-stop을 실행했다. 일반 issuer 시작 확인은 실제 provider fixture 시험과 분리한다. 분석 결과 도착 표시와 이전 문맥 결과 폐기는6e3cd23에 포함된다. 정지 뒤 단독 복구400은 HTTP 검증,2명 공동 복구와 epoch/키 세대 반영은 실제 원장 검증이다. 과거 통화·승인을 다시 사용하지 않는다. [실행 기준·제한](FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [inventory/checksum](../artifacts/product-runtime-validation-20261104.json)을 먼저 확인한다.
+
+이번 실행에 한해 HTTP/WS/Chromium host RSS3GiB 재개를 승인받았고 전체 통화 host1GiB는 유지했다. cgroup 종료 경합 중단 뒤 사용자가 승인한 동일 후보 새 batch1회도 종료·정리했다. 이 승인을 다음 기동의 상시 권한으로 사용하지 않는다. 시작40GiB·실행 여유16GiB·총 관측24GiB와 관측 오류 중단 조건은 변경하지 않았다.
+
+로컬 전달 후보는 `.local/presentation-run-20261103T155054Z-209fa1/candidate-final-209fa1/delivery-final/`에 보존한다. 이름은 작업 디렉터리일 뿐 발표 UI가 아니며 AWS runtime 경로가 아니다. 공개 배포 tar·observer tar·images inventory·SHA256SUMS와6종 bootstrap archive가 있다. 보호 키/채운 env/원음/DB·chain 상태는 전달 archive에 넣지 않았고 일회성 시험 보호 입력은 정리했다. 이 후보는 신규 AWS NEW용 코드/이미지 전달물이며 종료한 시험 배포의 RESTORE 백업이 아니다.
+
+소스6e3cd23의 runtime config ID는 공개 증거를 따르며 registry manifest digest는 아직 없다.5종 인프라 이미지는 기존 검증 참조를 재사용한다. 실제 AWS trust·계약 metadata·PBX 인증서가 준비된 뒤 동일 전달 runtime/nginx로 최종 웹을 생성한다. 새 runtime 비공개 GHCR 게시→실제 registry digest 확보→새 고유 Release의 공개 파일/checksum 게시→별도 디렉터리 원격 수령 검증 전에는 기존 고정 Release가 최신이라고 설명하지 않는다. 이 작업에서는 새 원격 게시를 실행하지 않았다.

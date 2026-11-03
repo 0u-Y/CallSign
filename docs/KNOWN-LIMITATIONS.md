@@ -1,5 +1,11 @@
 # 현재 구현의 한계
 
+## 최신 제품 후보의 실행 범위 (2026-11-04)
+
+[최신 실행](FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)에서 실제 ServiceCall 양방향 합성 음성·분석 패널·동의 철회·업무 취소/긴급 정지·공동 복구를 확인했다. 과거의 해당 경로 NOT_RUN 기록은 당시 상태다. 최종 소스6e3cd23·runtime c39cbb의 선택2사례이며 모든 장애 조합·반복 성공률·외부 NAT·AWS 검증으로 확대하지 않는다. OIDC/STT/LLM은 fixture이며 한국어 품질·제공자 보관/청구·실제 IdP는 미검증이다. 단독 복구 거절은 HTTP schema에서 관측했고 계약 단독서명 실행 결과로 기록하지 않는다.
+
+로컬 후보·공개/observer 묶음은 생성했지만 새로운 GHCR/Release는 게시하지 않았다. 고정 Release와 최신 소스가 다르며 AWS 최종 웹도 아직 없다. Vercel 공개 preview는 실제 AWS 서비스 연결이 확인되지 않았다. 운영 도메인/TLS/OIDC·AWS reader 보호 참조·실제 배치 입력과 별도 AWS 실행 허가가 필요하다. 원본 실패와 자원 중단은 [증거](../artifacts/product-runtime-validation-20261104.json)에 별도로 남겼다.
+
 5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
 
 최신 로컬 후보는 실제 SQL/WS 종료 회귀5건과 readiness/잔류 감사까지 확인했다. 전체 NEW의40GiB 시작 조건을 충족하지 못해 ServiceCall·실제 음성/회수·반복과 후보 서비스 entrypoint는 미실행이다. 후보 image/source·묶음의 검사와 초기 자동 Node 수령/회수는 [후보 기록](FINALS-IMPLEMENTATION-PLAN.md#candidate-media-20261103)을 따른다. runtime build의 버전 probe나 layer hash가 실제 기동 성공을 대신하지 않는다.

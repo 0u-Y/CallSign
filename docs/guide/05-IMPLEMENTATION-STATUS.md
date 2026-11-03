@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+최신 실제 제품·통화 후보 검증은 [2026-11-04 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)을 따른다. 로컬 ServiceCall·양방향 합성 음원·분석/회수·공동 복구는 확인했으며 외부 IdP/AI 품질·AWS·새 원격 산출물 발행은 남아 있다.
+
 5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
 
 [서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)

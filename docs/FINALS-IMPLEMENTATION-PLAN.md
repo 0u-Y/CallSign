@@ -1,5 +1,21 @@
 # 개발 현황과 검증 기록
 
+<a id="product-runtime-20261104"></a>
+
+## 2026-11-04 최신 제품·후보 실제 연결 검증
+
+제품 경로는 `/service`·`/official`을 유지했다. 사용자가 철회한 발표 전용 화면·장면·기록 재생은 추가하지 않았다. 실행 소스 `6e3cd238e95457406134e8ef37730fd6d251209a`의 clean tree로 runtime 후보를 만들었다. 실제 제품 분석 결과가 도착해도 상단이 계속 “분석 중”으로 남던 결함을 수정하고, 이전 문맥 결과가 새 상태를 덮지 않는 회귀를 추가했다. 브라우저 역할 heading/접힌 계정 식별자 선택자, 분석 입력 관측, NEW의 비활성 복구키 준비, 원장 이벤트 대기 경합은 시험·준비 도구 결함으로 구분했다.
+
+최신 후보 `sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7`(linux/amd64, **로컬 config ID**)에서 bootstrap 후 work-cancel·emergency-stop 각1회 PASS. 실제 제품 로그인·업무·위임·승인·binding·소비·lease, 양쪽 합성 음원 수신/디코딩, remote track→인증 WS→분석→ServiceCall 패널, 동의 철회, 양측 음성 중단·ARI 부재·추가 lease 거절·quota 정리를 확인했다. 단독 복구는 HTTP schema에서400(EVM 미도달), 서로 다른2명 공동 복구는 실제 계약/원장 반영 후 epoch3·승인키 세대2를 확인했다. 기존 통화 종료·승인 취소·위임 철회·소비 이력 보존을 확인했다. 일반 issuer entrypoint도 fixture mount 없이 health200/auth401을 확인했으나 이것만으로 전체 readiness를 주장하지 않는다.
+
+HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분석 패널은 component host이며 전체 ServiceCall 증거와 분리한다. 최초 host1GiB 초과로6건 이후 중단한 실행, 승인된3GiB 재개 중 선택자8건 실패·교정 후 선택 재시험, 동일 DB 잔류 감사는 모두 보존했다. readiness·부분6건·재시험을37에 더하지 않는다. 이 HTTP 소스 이후 추가된 분석 상태 문구는 최종 후보의 실제 ServiceCall 시험과 단위 회귀로 확인했다.
+
+첫 최종 후보 batch는 종료 순간 `/proc/PID/cgroup` 조회 실패로 BLOCKED였다. 종료/제거된 소유 준비 도구를 재조회하는 관측 경합을 최소 수정·오프라인6사례 확인한 뒤 사용자가 승인한 새 batch1회에서 위2건을 완료했다. 최초 실패는 보존했고 자원 중단을 성공으로 바꾸지 않았다. 최종 batch5초 표본41개: 가용 RAM 최소45.77GiB, host RSS 최대99.13MiB, container current 최대4.47GiB, 총 관측 최대4.54GiB. 표본 최대이지 peak·최소 사양·SLA가 아니다. 시작40GiB·여유16GiB·전체24GiB·전체 통화 host1GiB, 웹 build2GiB/CPU1/90초와 pressure/OOM/deadline 조건을 유지했다.
+
+최종 `pnpm light`63파일316시험·웹 build·API runtime 타입 검사 PASS. 웹 chunk/dynamic import 경고는 남는다. [공개 증거](../artifacts/product-runtime-validation-20261104.json)에 원본 실패·소스/이미지·묶음 checksum·동일 DB 감사·정리 결과를 연결했다. 최종 batch 컨테이너21개·볼륨2개와 이번 실행의 보호 입력을 정리했다. 기존 자원·사용자 자료·과거 후보·고정 Release는 보존했다.
+
+실제 구성요소는 Besu4·Witness4·PostgreSQL·HTTPS Anchor·API/worker·Asterisk·TURN·제품 웹/Chromium이다. OIDC와 STT/LLM은 명시적 fixture, 음원은 합성이다. 같은 namespace의 TURN과 같은 호스트는 외부 NAT·독립 기관 장애 내성의 증거가 아니다. AWS·실제 IdP·한국어 STT/LLM 품질·새 GHCR/Release 게시는 미실행이다. 새 공개/observer 묶음과 runtime은 같은6e3cd23 소스이며5종 인프라는 재사용했다. 최종 AWS 웹은 실제 AWS metadata/trust/PBX 인증서 뒤에 생성해야 한다. 이전 고정 Release는 이번 소스를 포함하지 않는다.
+
 ## 2026-11-04 5차 후속 실행 경계 확인
 
 작업 branch `feat/mentoring-five-20261104`·시작 `496c576`은 원격과 일치하며 CI 성공이었다. 과거 일회성 기동/이미지 제작 허가를 승계하지 않았다. 현재 요청은 해당 실행을 유효한 허가가 있을 때로 한정하므로 서비스·브라우저·build/load/pull을 실행하지 않았다. 회수 오류 분류는 화면이 실제 호출하는 mapper로 분리해401/403/503/일반 오류와 내부 메시지 비노출을 직접 회귀했다. 기존 제품 동작은 유지했다.
