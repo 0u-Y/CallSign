@@ -28,6 +28,17 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 문서 정리에서는 진행표의 과거 본문을 보관본으로 분리하고 기존 앵커를 유지했다. 현재 구현 현황의 중복된 NOT_RUN 문장을 최신 소스/과거 증거 표로 정리했다. 요구사항 ID·실행 명령·원본 증거·Release·사용자 기획서는 삭제하지 않았다.
 
+## 최종 기획과 구현·검증 연결
+
+| 요구 ID·기획 흐름 | 실제 소비 경로 | 이번 근거·남은 범위 |
+|---|---|---|
+| BUSINESS-001~003·AUTH-001~002 | `ServicePage`→인증/업무 API→SQL | 역할/기관 격리·업무/위임·로그인·CSRF·회수 조회 HTTP/Chromium. 외부 IdP는 별도 |
+| CALL-001~006·IDENTITY-003 | `ServiceCall`→승인/binding/소비/lease→verifier | 최종 후보의 실제 업무 취소/정지 통화2사례. 모든 만료/장애 조합을 재실행한 것은 아님 |
+| CONTRACT-003~004·STATE-001~002·GOVERNANCE-001~002 | worker→ServiceRegistry→Witness→서버 projection | 실제 정지·공동 복구·키 세대 활성화. 관리2/3·Witness3/4·QBFT는 별개 |
+| MEDIA-001~003·PBX-001~003 | 양측 제품 웹→Asterisk/TURN→상대 receiver | 실제 합성 음원 양방향 디코딩·회수 후 음성 중단. AWS 외부 TLS/NAT는 별도 |
+| AI-001~004·UI-001~004 | remote recorder→인증 WS→orchestration→ServiceCall 패널 | 동의/경고/목적 이탈/장애 분리·철회·정산. 실제 LLM/STT 품질(AI-005)은 미검증 |
+| OPS-001~005·OPS-007·TEST-004 | runtime/공개·observer 전달→NEW/restart/RESTORE | 최신 로컬 후보 생성·일반 issuer 시작·소유 자원 정리. 과거 복원 증거는 당시 소스이며 최신 원격 게시/AWS는 남음 |
+
 ## 과거 기록 찾기
 
 이전 진행표의 본문은 [날짜별 보관본](archive/DEVELOPMENT-HISTORY-20261104.md)에 그대로 보존했다. 기존 링크가 끊기지 않도록 아래 앵커를 유지한다. 원본 artifacts와 Release는 이동하거나 덮어쓰지 않았다.
