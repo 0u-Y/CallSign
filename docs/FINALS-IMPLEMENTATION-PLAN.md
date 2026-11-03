@@ -16,7 +16,13 @@ AI-003/005·TEST-004: 기존 시험에 실제 SQL 잠금 중 consent transaction
 
 후보 생성의 최초 legacy build가 목표 stage 앞의 dependencies를 실행해 로컬에 없던 Node base227,146,390bytes를 자동 수령했다. 사용자에게 즉시 알렸으며 `--network=none`/`--pull=false`를 수령 차단으로 오해한 실행 결함이다. 추가 의존성 요청은 none 네트워크에서 실패했고 원본을 보존했다. prepared-runtime stage를 전용 Dockerfile로 분리해 설치 stage를 평가하지 않도록 수정하고 현재 호출/정적 회귀를 함께 갱신했다. 이 준비 결함을 제품 통합 실패나 성공으로 합산하지 않는다. 분리 후에는 기존 base의 root 소유 pnpm cache 디렉터리가 UID1000 검증을 막는 EACCES가 재현됐다. 새 후보 layer의 해당 디렉터리만 UID1000으로 맞추며 기존 host 파일/base image/lockfile/verify 설정은 변경하지 않는다.
 
-runtime·공개/observer 후보는 이 소스를 clean checkout으로 고정한 뒤 로컬에서만 생성·검사한다. 후보의 실제 image/config/hash·보호 자료 감사와 미실행 미디어 범위는 이번 후보 증거에 기록하며 기존 Release/GHCR는 변경하지 않는다.
+후보 제품 소스는 `e95b653` clean checkout이며 runtime local config ID는 `sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c`(linux/amd64)다. 버전 probe를 포함한 빌드는 종료5.42초로 기록했고 실제 서비스 entrypoint는 기동하지 않았다. 실제 image의 제품/도구7개와 migration11개 hash, fixture entrypoint 미포함, 새6종 archive의 config/layer closure를 확인했다. raw image 감사의 libgnutls1건은 기존에 검토한 공개 self-test PEM8개 hash와 일치했으며 원본 BLOCKED 출력을 보존하고 별도 검토로 분류했다.
+
+공개 묶음512000bytes·observer256000bytes·inventory3654bytes와6종 image archive2318664192bytes를 새 로컬 후보 디렉터리에 생성했다. producer의3파일 checksum은 별도 보존하고 NEW bootstrap이 요구하는 archive 포함4payload `SHA256SUMS`를 만들었다. 신규 AWS/local trial 웹·registry digest·게시 영수증을 만들어 쓰지 않았다. 전체 실제 ServiceCall/양방향 음성/목적 분석/회수·2회 반복은 **BLOCKED/NOT_RUN**이며 기존 실제 통합 수와 합산하지 않는다.
+
+SQL 관측70초/15표본에서 최소 RAM22.63GiB·앱/observer 관측 RSS549.41MiB·DB90.77MiB·PSI0·host oom 증가0이었다. swap-out 최대13.29MiB/s는3연속이 아니었고 자원 중단은 없었다. 최종 빌드 관측의 최소RAM32.97GiB·controller/client17.75MiB는 표본이며 builder peak는 미관측이다. 전체 실행은 시작하지 않았고 기존40GiB guard를 낮추지 않았다. Docker network/route/기존 실행 container ID hash는 일치했다. 인터페이스 raw JSON hash는 달랐으며1초 재관측에서 lifetime 두 필드만 변했지만 최초 자료가 hash뿐이라 전체 normalized interface 동일성은 입증하지 못했다. host 설정 변경 명령은 실행하지 않았고 추가 인프라 기동도 하지 않는다.
+
+소유 DB/보호 ROOT/CA·실패 socket·빌드 컨테이너는 회수했고 기존6종 image는 보존했다. 새 후보 image/archive·clean 소스와 비밀 없는 검증 기록은 `.local/candidate-media-20261103T124742Z-dfcfb3/`에 남긴다. 시험 chain/DB/Anchor identity는 생성하지 않았으며 이 묶음은 서비스 백업이 아니다. [이번 소스/후보/실패/정리 증거](../artifacts/candidate-media-20261103.json)를 따른다. 기존 Release/GHCR는 변경하지 않고 source만 일반 push한다.
 
 <a id="main-review-20261103"></a>
 

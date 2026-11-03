@@ -6,6 +6,8 @@
 
 종료 직전 분석 시작/호출 전 정산 경합을 오프라인 회귀로 수정했습니다. 기존 통합 증거와 새 미디어 분석 미실행 경로를 [리뷰 기록](../FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)에서 구별합니다. 실제 ServiceCall→상대 음성→분석 패널·동의 철회·권한 회수의 [다음 시험](../RUNBOOK.md#reviewed-servicecall-analysis)은 실행 허가와 새 후보 이미지가 필요합니다.
 
+새 로컬 후보의 선택 SQL·WS 종료 회귀5건은 실제 저장소·인증으로 확인했으며, 전체 미디어는 RAM 시작 조건으로 보류했습니다. [후보/자원/전달 기록](../FINALS-IMPLEMENTATION-PLAN.md#candidate-media-20261103)은 이미지 생성·파일 hash 검사와 실제 통화 미검증을 구분합니다.
+
 ## 실제 확인한 것과 남은 경계
 
 | 영역 | 구현·실행 근거 | 남아 있는 경계 |

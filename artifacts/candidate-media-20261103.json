@@ -1,0 +1,484 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-03T13:41:46.078980+00:00",
+  "startHead": "da98e2c12ebc37ad3e75a1f5810c9ecece16b702",
+  "executionScope": "local runtime candidate build, actual isolated SQL/auth/HTTP/WebSocket shutdown regressions, offline archive/content verification; no full media startup",
+  "assessment": {
+    "sqlWsSelectedRegressions": "PASS",
+    "fullServiceCallMediaAnalysisRecall": "BLOCKED",
+    "normalCandidateServiceEntrypoint": "NOT_RUN",
+    "twoLogicalCallTrials": "NOT_RUN",
+    "externalPublication": "NOT_RUN",
+    "aws": "NOT_RUN",
+    "runtimeImageBuildAndSelectedFileChecks": "PASS"
+  },
+  "sourceProvenance": {
+    "sqlWsExecutionHead": "da98e2c12ebc37ad3e75a1f5810c9ecece16b702",
+    "sqlWsWorktreeDirty": true,
+    "executedTestContentPreservedBy": "35189233efbb7af546b303b6d8c9f7a49aef74d7",
+    "candidateSourceCommit": "e95b653152bff5a79155810fbb60287c1c84fcea",
+    "candidateSourceWorktreeDirty": false,
+    "testedProductAndFixtureContentUnchangedInCandidate": [
+      "tests/integration/service-boundaries.test.ts",
+      "tests/integration/service-http-fixture.ts",
+      "services/api/src/service-audio.ts",
+      "services/api/src/quota.ts",
+      "services/api/src/finals-server.ts",
+      "services/api/src/auth.ts"
+    ],
+    "runtimeVerifiedFiles": {
+      "scripts/migrate-finals.ts": "93f6ef883f3bcc1588259fcc480c2fd046a6928e1d54b9326d7aab4643e2278d",
+      "scripts/release-manifest.ts": "12aac3afeb6952c195ba7fef33f83ed392287662049197ab982640025ca4bcd8",
+      "services/api/src/finals-server.ts": "9fc4dbb81f9a800f71174eff6369adbe16fc9abce052efc910565fd1a1d0c201",
+      "services/api/src/service-audio.ts": "608d2938aa6a20975146e0a512910faafe963f4cb8ab460629271786b3b527e3",
+      "services/api/src/service-analysis.ts": "51584db91ace75aed54d505d577645a7f22b3376ceb132a2738c4b1dafcf93d1",
+      "scripts/call-trials.ts": "0fa871cd127a1a29853e6c2e8ad51addc89b6f669d8f69c8efb0af93208eeb64",
+      "infra/deploy/prepared-runtime.Dockerfile": "0e01bc9523b5a6e798c96e8d0a160343911886ade704c86b85c827e590458f04",
+      "services/api/drizzle/0000_initial.sql": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+      "services/api/drizzle/0001_finals_authority.sql": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+      "services/api/drizzle/0002_session_scopes.sql": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+      "services/api/drizzle/0003_service_runtime.sql": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+      "services/api/drizzle/0004_worker_recovery.sql": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+      "services/api/drizzle/0005_account_management.sql": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+      "services/api/drizzle/0006_backup_drain.sql": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+      "services/api/drizzle/0007_pbx_lease_locks.sql": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+      "services/api/drizzle/0008_pjsip_contact_qualification.sql": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+      "services/api/drizzle/0009_pjsip_boolean_fields.sql": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+      "services/api/drizzle/0010_operation_lookup_indexes.sql": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+    },
+    "runtimeMigrationFiles": 11,
+    "runtimeMigrationRange": "0000..0010",
+    "hostControllerDependencies": "installed host Node packages; packaging Git metadata/archive selected clean detached source, not the user worktree; no host dependencies mounted into a service"
+  },
+  "candidate": {
+    "recordedAt": "2026-11-03T13:25:42.042844+00:00",
+    "sourceCommit": "e95b653152bff5a79155810fbb60287c1c84fcea",
+    "sourceWorktreeDirty": false,
+    "runtimeConfigId": "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c",
+    "runtimeRegistryDigest": null,
+    "architecture": "linux/amd64",
+    "files": [
+      {
+        "name": "deployment-files.tar",
+        "bytes": 512000,
+        "sha256": "16d63f6f97462d2c73d31a6efde1c952bddecbeaa5d989caeb820ca51da4199e"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 256000,
+        "sha256": "b71ed9e125b648323cdd0fcb1a69c3492ee8a48e81c281c0931d6100640117f0"
+      },
+      {
+        "name": "images.json",
+        "bytes": 3654,
+        "sha256": "381c4e31cd8cdde33b2dd6567d37e02ea8bfa8bfb2c85a2995b98e867724963e"
+      },
+      {
+        "name": "aws-bootstrap-images.tar",
+        "bytes": 2318664192,
+        "sha256": "d45d08b5a8ade1d8edc7d23712d75b6424739f871988c03d4de4508fa6a7093d"
+      },
+      {
+        "name": "SHA256SUMS",
+        "bytes": 341,
+        "sha256": "5163c19881695eaad2973335ff26993691f493d9470c77992dda5019386c58d0"
+      }
+    ],
+    "bootstrapMetadataEntries": 6,
+    "finalAwsWeb": "NOT_GENERATED",
+    "localTrialWeb": "NOT_GENERATED; full media prerequisites blocked",
+    "runtimeServiceEntrypoint": "NOT_RUN",
+    "mediaTrials": "BLOCKED; not PASS",
+    "externalPublication": "NOT_PUBLISHED",
+    "packagingControllerDependencies": "existing host installation only; no host dependencies mounted into a service",
+    "checksumScope": "Original three-file producer checksum preserved outside delivery; local archive checksum added to SHA256SUMS for the existing NEW bootstrap"
+  },
+  "infrastructureImagesReused": [
+    {
+      "role": "asterisk",
+      "configId": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 713957956,
+      "registryReference": "ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+      "imageWorkingDirectory": null,
+      "environmentNames": [
+        "PATH"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "role": "turn",
+      "configId": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 713957956,
+      "registryReference": "ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+      "imageWorkingDirectory": null,
+      "environmentNames": [
+        "PATH"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "role": "besu",
+      "configId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 552624305,
+      "registryReference": "ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+      "imageWorkingDirectory": "/opt/besu",
+      "environmentNames": [
+        "PATH",
+        "NO_PROXY_CACHE",
+        "PYROSCOPE_CONFIGURATION_FILE",
+        "BESU_RPC_HTTP_HOST",
+        "BESU_RPC_WS_HOST",
+        "BESU_GRAPHQL_HTTP_HOST",
+        "BESU_PID_PATH",
+        "OTEL_RESOURCE_ATTRIBUTES",
+        "JAVA_HOME",
+        "BESU_USER_NAME"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "role": "postgres",
+      "configId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 278212934,
+      "registryReference": "ghcr.io/0u-y/callsign-postgres@sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+      "imageWorkingDirectory": "/",
+      "environmentNames": [
+        "PATH",
+        "GOSU_VERSION",
+        "LANG",
+        "PG_MAJOR",
+        "PG_VERSION",
+        "PG_SHA256",
+        "DOCKER_PG_LLVM_DEPS",
+        "PGDATA"
+      ],
+      "sourceCommit": null
+    },
+    {
+      "role": "nginx",
+      "configId": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "architecture": "amd64",
+      "os": "linux",
+      "sizeBytes": 169475099,
+      "registryReference": "ghcr.io/0u-y/callsign-nginx@sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+      "imageWorkingDirectory": null,
+      "environmentNames": [
+        "PATH",
+        "NGINX_VERSION",
+        "NJS_VERSION",
+        "NJS_RELEASE",
+        "ACME_VERSION",
+        "PKG_RELEASE",
+        "DYNPKG_RELEASE"
+      ],
+      "sourceCommit": null
+    }
+  ],
+  "candidateImage": {
+    "configId": "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c",
+    "os": "linux",
+    "architecture": "amd64",
+    "sizeBytes": 634537325,
+    "sourceCommit": "e95b653152bff5a79155810fbb60287c1c84fcea",
+    "workingDirectoryInsideImage": "/home/ana/Desktop/yyw/CallSign",
+    "user": "1000:1000",
+    "entrypoint": null,
+    "cmd": [
+      "pnpm",
+      "--filter",
+      "@callsign/api",
+      "exec",
+      "tsx",
+      "src/finals-server.ts"
+    ],
+    "environmentNames": [
+      "PATH",
+      "NODE_ENV",
+      "COREPACK_HOME",
+      "COREPACK_ENABLE_NETWORK"
+    ],
+    "registryManifestDigest": null,
+    "servicesStartedFromThisImage": false
+  },
+  "imageSafety": {
+    "rawAudit": {
+      "version": 1,
+      "status": "BLOCKED",
+      "imageConfigIds": [
+        "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c"
+      ],
+      "uniqueLayers": 20,
+      "regularFilesScanned": 35951,
+      "regularFileBytesScanned": 634533719,
+      "knownProtectedValueCount": 0,
+      "findingCount": 1,
+      "findings": [
+        {
+          "kind": "private-key-material",
+          "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1",
+          "layer": "sha256:d81fb2a7c6ee3be05fdefaa7fd223be219c1ab172083ec1b994c3ecda33ac0a8"
+        }
+      ],
+      "findingsTruncated": false,
+      "scope": "Every saved layer, including deleted files, plus config/history; known inputs and recognizable private-key/token material. Not a general malware or exhaustive secret audit.",
+      "secretValuesPrinted": false,
+      "servicesStarted": false
+    },
+    "review": {
+      "rawStatus": "BLOCKED",
+      "reviewedStatus": "PASS_PUBLIC_SELFTEST_VECTORS_ONLY",
+      "observedPemSha256": [
+        "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+        "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+        "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+        "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138",
+        "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+        "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af"
+      ],
+      "allMatchPreviouslyReviewedPublicGnutlsSelftests": true,
+      "sourceEvidence": "artifacts/github-publication-20261102.json",
+      "unmatchedPrivateMaterial": 0,
+      "rawFindingsPreserved": true,
+      "privateValuesPrinted": false
+    },
+    "fixtureEntrypointExcluded": true,
+    "newDockerfile": "infra/deploy/prepared-runtime.Dockerfile",
+    "noDependencyInstallInFinalRecipe": true,
+    "fiveInfrastructureImages": "unchanged local config IDs and recipes; existing prior audits reused, not newly executed services",
+    "newArchiveClosure": {
+      "status": "PASS",
+      "configIds": [
+        "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "sha256:dfee37899cbfeb6fdb2916211ff447277e5dfae27478b670568950947ac2f03c",
+        "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b"
+      ],
+      "uniqueLayers": 46,
+      "allConfigAndLayerBytesRehashed": true,
+      "architecture": "linux/amd64",
+      "registryReceipt": false,
+      "servicesStarted": false
+    }
+  },
+  "actualPhases": {
+    "readiness": {
+      "status": "PASS",
+      "counts": {
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "durationSeconds": 0.9755136671010405,
+      "timeoutSeconds": 45,
+      "logSha256": "3b9bca1e936766f69480607cb37061f54484603ecbacdfa26630c7842ef482b1"
+    },
+    "audio-races": {
+      "status": "PASS",
+      "counts": {
+        "passed": 5,
+        "failed": 0,
+        "skipped": 24,
+        "pending": 0
+      },
+      "durationSeconds": 8.376442434964702,
+      "timeoutSeconds": 180,
+      "logSha256": "421910d8619350715b939373881cf27fbe66d3114c1bfd2e11884cc504bea13e"
+    },
+    "residue-audit": {
+      "status": "PASS",
+      "counts": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0,
+        "pending": 0
+      },
+      "durationSeconds": 0.8680167880374938,
+      "timeoutSeconds": 45,
+      "logSha256": "30ab0aad95113f073e18b5a3542350484cc999c57a3fe917a2f7081ed78c656b"
+    }
+  },
+  "scenarioNames": [
+    "boundary: stops analysis transport and late model results after consent withdrawal, then isolates new revisions and provider failure",
+    "analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort",
+    "analysis HTTP/WS: shutdown during a locked consent transaction never starts STT and releases its SQL reservation",
+    "analysis HTTP/WS: shutdown during a locked session lookup leaves no provider or reservation",
+    "analysis HTTP/WS: cancellation while model reservation is blocked releases zero without invoking the provider"
+  ],
+  "countsRule": "Five selected unique SQL/HTTP/WS cases only. Two readiness assertions and one residue audit are separate. Twenty-four filtered cases skipped, not passed. Historical DB17/HTTP11/WS14/Chromium9 are not re-executed or added.",
+  "actualComponents": [
+    "PostgreSQL17.6 with none networking, private Unix socket, real migrations0000..0010 and separate role LOGINs",
+    "loopback Platform/Issuer/Sender authentication, CSRF, session and actual SQL",
+    "local HTTPS OIDC authorization code/PKCE/JWT/JWKS fixture endpoints",
+    "real WebSocket and shipped service analysis orchestration/quota shutdown"
+  ],
+  "fixtureBoundaries": [
+    "ledger authority adapter",
+    "memory Anchor",
+    "synthetic call binding",
+    "controlled STT and LLM providers; real test crypto with disposable keys"
+  ],
+  "notRun": [
+    "Besu/Witness/actual registry/HTTPS persistent Anchor in this execution",
+    "Asterisk/TURN/Chromium and decoded remote media",
+    "full ServiceCall remote recorder to analysis panel",
+    "work-cancel and emergency-stop actual media recall",
+    "normal runtime image service startup/restart",
+    "two normal call-trials repetitions",
+    "actual external IdP/STT/LLM quality, retention/billing and AWS"
+  ],
+  "fullMediaCapacity": {
+    "initialAvailableGiB": 24.8,
+    "existingApprovedBudgetApproxGiB": 23,
+    "unchangedBootstrapStartGuardGiB": 40,
+    "lastCheck": {
+      "checkedAtMonotonicNs": 1997118683241302,
+      "availableGiB": 38.5440559387207,
+      "existingFullStackStartGiB": 40,
+      "fullStackEverStarted": false,
+      "unchangedGuardSatisfied": false
+    },
+    "quorumOrLimitsReduced": false,
+    "noTrialIdentityKeysOrChainCreated": true,
+    "noAutomaticRetryAfterResourceStop": true,
+    "existingCpuInitialLoadApprox": 138,
+    "cpuCount": 24
+  },
+  "resources": {
+    "sqlWs": {
+      "samples": 15,
+      "minimumAvailableGiB": 22.625808715820312,
+      "maxObservedAppAndObserverMiB": 549.4140625,
+      "maxContainerMemoryMiB": 90.7734375,
+      "maxSwapOutMiBps": 13.288885749846195,
+      "psiSomeMax": 0.0,
+      "psiFullMax": 0.0,
+      "hostOomKillDelta": 0,
+      "observedSeconds": 70.000658368,
+      "stopReasons": []
+    },
+    "build": {
+      "sampleCount": 14,
+      "minimumAvailableGiB": 32.97069549560547,
+      "maxControllerAndClientObservedMiB": 17.75390625,
+      "maxSwapOutMiBps": 9.8595812586542,
+      "hostOomKillDelta": 0,
+      "stopReasons": [],
+      "builderPeak": "NOT_OBSERVED; short RUN stages completed between samples; CLI hard limits recorded, no peak/minimum sizing claim"
+    },
+    "candidateFilesObservedGiB": 2.797688794322312,
+    "limits": "SQL DB hard512MiB/CPU1/data512MiB; apps observed3GiB; build requested hard2GiB/CPU1/90s, observed controller/client256MiB; no service test ran during build; task deadline includes cleanup",
+    "policy": "integration-pressure-v1; thresholds preserved, no kernel/swap changes",
+    "peaksAndSla": "not measured; point observations and bounded regressions are not SLA/minimum sizing"
+  },
+  "originalFailures": [
+    {
+      "kind": "test preparation",
+      "cause": "child policy argv omitted; EXPLICIT_RESOURCE_POLICY_MISMATCH before SQL readiness; assertion0",
+      "preserved": true
+    },
+    {
+      "kind": "local build preparation",
+      "cause": "uppercase repository name rejected before image build",
+      "preserved": true
+    },
+    {
+      "kind": "offline build isolation defect",
+      "cause": "legacy builder evaluated earlier dependencies stage, unexpectedly acquired absent Node base; npm request then failed inside none namespace",
+      "preserved": true
+    },
+    {
+      "kind": "runtime image preparation defect",
+      "cause": "base dependency cache directory not writable by UID1000; corrected only in new image layer",
+      "preserved": true
+    },
+    {
+      "kind": "packaging controller environment",
+      "cause": "clean source had no installed workspace packages; packaging controller reused installed host dependencies while binding Git to clean source",
+      "preserved": true
+    }
+  ],
+  "unexpectedDownload": {
+    "imageConfigId": "sha256:341b84210b3300ec9d6e0f0bcf477b1714b802209b5a4ca475e2077ffc07511d",
+    "localUncompressedImageSizeBytes": 227146390,
+    "networkTransferBytes": null,
+    "authorizationViolationAcknowledged": true,
+    "notUsedByCandidate": true,
+    "cleanup": {
+      "removed": [
+        {
+          "id": "sha256:d93a9f806ab85c9271b1cfa9e86e81be0d7d4dc2e690ccd8ee01cd1cf8592557",
+          "reason": "owned failed-build ENV child"
+        },
+        {
+          "id": "sha256:341b84210b3300ec9d6e0f0bcf477b1714b802209b5a4ca475e2077ffc07511d",
+          "reason": "newly fetched unused tag/config"
+        }
+      ],
+      "retained": [],
+      "forceOrPrune": false,
+      "sharedLayersManagedByDockerReferences": true
+    }
+  },
+  "cleanup": {
+    "sqlWs": {
+      "containerRemoved": true,
+      "privateRootRemoved": true,
+      "appsBeforeDatabase": true,
+      "resourceCause": "NORMAL_COMPLETION"
+    },
+    "remainingOwnedContainers": [],
+    "sixOriginalImagesPreserved": true,
+    "hostRouteDockerNetworkExistingContainerIdHashes": {
+      "routes": true,
+      "interfaces": false,
+      "dockerNetworks": true,
+      "existingContainerIds": true
+    },
+    "interfaceFollowup": {
+      "rawBeforeAfterHashEqual": false,
+      "oneSecondChangedFields": [
+        "/1/addr_info/0/valid_life_time",
+        "/1/addr_info/0/preferred_life_time"
+      ],
+      "currentRawHashEqual": false,
+      "interpretation": "Before snapshot stored hash only; current time-varying lifetime fields may explain mismatch but original normalized interface identity was not captured. Do not claim full interface equality."
+    },
+    "normalizedInterfaceEquality": "UNCONFIRMED; initial raw capture only hashed, one-second current observations show lifetime fields vary",
+    "hostMutationCommandsExecuted": false,
+    "sourceAndCandidateImagesArchivesRetained": true,
+    "privateSqlRootCaAndPasswordsRemoved": true,
+    "noGlobalPruneOrBroadKill": true
+  },
+  "localRetention": {
+    "directory": ".local/candidate-media-20261103T124742Z-dfcfb3",
+    "imagesAndTarsNotInGit": true,
+    "serviceBackup": false,
+    "deploymentIdentity": "no media chain/DB/Anchor identity; AWS requires NEW initialization",
+    "frozenReleaseUntouched": "aws-bootstrap-20261102t093531z",
+    "ghcrPushOrReleaseOrAwsCalls": false
+  },
+  "offlineChecks": {
+    "deploymentRecipeUnit": {
+      "files": 1,
+      "tests": 12,
+      "status": "PASS"
+    },
+    "lightTypes": {
+      "status": "PASS",
+      "runtimeExecution": false
+    },
+    "newRelativeLinksAndAnchors": "PASS; changed references only",
+    "diffCheck": "PASS"
+  }
+}
