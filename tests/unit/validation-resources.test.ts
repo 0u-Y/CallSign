@@ -179,3 +179,54 @@ try:SwapWatch('from-environment');raise AssertionError('implicit unknown policy 
 except ValueError:pass
 `],{stdio:'pipe'});
 });
+
+it('retains and reclaims owned descendants after their launcher exits',()=>{
+ execFileSync('python3',['-c',`
+import os,sys,time,tempfile,subprocess,json
+from pathlib import Path
+from scripts.validation_resources import RunState,process_start,owned_processes,cancel_owned,active_processes
+with tempfile.TemporaryDirectory() as directory:
+ state=RunState(directory,'unit-orphan');ready=Path(directory)/'ready';release=Path(directory)/'release'
+ code="import sys,time,subprocess;from pathlib import Path;c=subprocess.Popen([sys.executable,'-c','import time;time.sleep(20)']);Path(sys.argv[1]).write_text(str(c.pid));\\nwhile not Path(sys.argv[2]).exists():time.sleep(.01)"
+ parent=subprocess.Popen([sys.executable,'-c',code,str(ready),str(release)],start_new_session=True);start=process_start(parent.pid);orphan=None
+ try:
+  deadline=time.monotonic()+2
+  while not ready.exists() and time.monotonic()<deadline:time.sleep(.01)
+  assert ready.exists();orphan=int(ready.read_text());orphan_start=process_start(orphan)
+  state.write('active-test.json',{'pid':parent.pid,'processStart':start,'label':'orphan','ownedProcesses':owned_processes(parent.pid,start)})
+  release.touch();assert parent.wait(timeout=2)==0
+  assert any(p['pid']==orphan for p in active_processes(state.read('active-test.json')))
+  assert cancel_owned(state) is True
+  assert process_start(orphan)!=orphan_start
+  assert state.read('active-test.json')['ownedProcesses']==[]
+ finally:
+  if parent.poll() is None:parent.kill();parent.wait()
+  if orphan and process_start(orphan)==orphan_start:os.kill(orphan,9)
+`],{stdio:'pipe',timeout:8000});
+},10000);
+
+it('discovers helpers created during graceful cancellation before releasing ownership',()=>{
+ execFileSync('python3',['-c',`
+import os,sys,time,tempfile,subprocess
+from pathlib import Path
+from scripts.validation_resources import RunState,process_start,cancel_owned
+with tempfile.TemporaryDirectory() as directory:
+ state=RunState(directory,'unit-late-helper');ready=Path(directory)/'ready';helper=Path(directory)/'helper'
+ code="import sys,time,signal,subprocess;from pathlib import Path;\\ndef stop(*args):\\n c=subprocess.Popen([sys.executable,'-c','import time;time.sleep(20)']);Path(sys.argv[2]).write_text(str(c.pid));sys.exit(0)\\nsignal.signal(signal.SIGINT,stop);Path(sys.argv[1]).touch();time.sleep(20)"
+ parent=subprocess.Popen([sys.executable,'-c',code,str(ready),str(helper)],start_new_session=True);start=process_start(parent.pid)
+ try:
+  deadline=time.monotonic()+2
+  while not ready.exists() and time.monotonic()<deadline:time.sleep(.01)
+  assert ready.exists();state.write('active-test.json',{'pid':parent.pid,'processStart':start})
+  cancel_owned(state);parent.wait(timeout=2)
+  assert helper.exists() and process_start(int(helper.read_text())) is None
+  assert state.read('active-test.json')['ownedProcesses']==[]
+ finally:
+  if parent.poll() is None:parent.kill();parent.wait()
+  if helper.exists():
+   pid=int(helper.read_text())
+   if process_start(pid) and os.getsid(pid)==parent.pid:os.kill(pid,9)
+  for child in state.read('active-test.json').get('ownedProcesses',[]):
+   if process_start(child['pid'])==child['processStart']:os.kill(child['pid'],9)
+`],{stdio:'pipe',timeout:13000});
+},15000);

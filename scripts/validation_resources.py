@@ -143,53 +143,70 @@ def process_start(pid):
 
 
 def owned_processes(pid, start):
-    if process_start(pid) != start:
+    leader = process_start(pid)
+    if leader is not None and leader != start:
         return []
-    parents, starts = {}, {}
+    parents, starts, session_members = {}, {}, []
     for path in Path('/proc').glob('[0-9]*/stat'):
         try:
             fields=path.read_text().rsplit(')',1)[1].split();identity=int(path.parent.name)
             if fields[0]=='Z':continue
             parents.setdefault(int(fields[1]),[]).append(identity);starts[identity]=fields[19]
+            if int(fields[3])==pid:session_members.append(identity)
         except (OSError,ValueError,IndexError):continue
-    seen, stack = set(), [pid]
+    seen, stack = set(), ([pid] if leader is not None else [])+session_members
     while stack:
         current=stack.pop()
         if current not in seen:seen.add(current);stack.extend(parents.get(current,[]))
     return [dict(pid=current,processStart=starts[current]) for current in seen if current in starts]
 
 
-def owned_rss(pid, start):
+def active_processes(active):
+    known=active.get('ownedProcesses',[])+owned_processes(active['pid'],active['processStart'])
+    return list({(p['pid'],p['processStart']):p for p in known if p['pid']!=active.get('launcherPid') and process_start(p['pid'])==p['processStart']}.values())
+
+
+def process_rss(processes):
     total=0
-    for child in owned_processes(pid,start):
+    for child in processes:
+        if process_start(child['pid'])!=child['processStart']:continue
         try:
             status=Path(f"/proc/{child['pid']}/status").read_text()
             total+=int(next(line for line in status.splitlines() if line.startswith('VmRSS:')).split()[1])*1024
-        except (OSError,StopIteration):pass
+        except (FileNotFoundError,ProcessLookupError,StopIteration):pass
     return total
+
+def owned_rss(pid,start):
+    return process_rss(owned_processes(pid,start))
 
 
 def cancel_owned(state):
     active=state.read('active-test.json')
     if not active:return
-    children=owned_processes(active['pid'],active['processStart']) or active.get('ownedProcesses',[])
+    children=active_processes(active)
+    orphaned=process_start(active['pid'])!=active['processStart'] and bool(children)
     active['ownedProcesses']=children;state.write('active-test.json',active)
-    def alive(child):return process_start(child['pid'])==child['processStart']
+    def refresh():
+        active['ownedProcesses']=children
+        children[:]=active_processes(active)
+        state.write('active-test.json',active)
+        return children
     if process_start(active['pid'])==active['processStart']:
         if os.getpgid(active['pid'])!=active['pid']:raise RuntimeError('OWNED_PROCESS_GROUP_REQUIRED')
         try:os.kill(active['pid'],signal.SIGINT)
         except ProcessLookupError:pass
     # The runner closes apps/browser first; registered descendants are only forced after grace.
-    for sig, wait in [(None,8),(signal.SIGTERM,2),(signal.SIGKILL,1)]:
-        remaining=[child for child in children if alive(child)]
-        if not remaining:return
+    for sig, wait in ([(signal.SIGTERM,2),(signal.SIGKILL,1)] if orphaned else [(None,8),(signal.SIGTERM,2),(signal.SIGKILL,1)]):
+        remaining=refresh()
+        if not remaining:return orphaned
         if sig:
             for child in remaining:
                 try:os.kill(child['pid'],sig)
                 except ProcessLookupError:pass
         deadline=time.monotonic()+wait
-        while time.monotonic()<deadline and any(alive(child) for child in remaining):time.sleep(.05)
-    if any(alive(child) for child in children):raise RuntimeError('OWNED_PROCESS_CLEANUP_INCOMPLETE')
+        while time.monotonic()<deadline and refresh():time.sleep(.05)
+    if refresh():raise RuntimeError('OWNED_PROCESS_CLEANUP_INCOMPLETE')
+    return orphaned
 
 
 def stop_environment(state, reason, observation, cancel, preserve, close_apps, stop_db):

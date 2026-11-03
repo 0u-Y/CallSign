@@ -2,7 +2,7 @@
 """Existing local watchdog/step launcher, sharing a latched cause and owned process cleanup."""
 import sys,os,json,time,signal,subprocess,hashlib
 from pathlib import Path
-from validation_resources import RunState,SwapWatch,host_sample,owned_rss,owned_processes,process_start,cancel_owned,stop_environment,LEGACY_POLICY,PRESSURE_POLICY,budget_reason
+from validation_resources import RunState,SwapWatch,host_sample,owned_rss,owned_processes,process_start,cancel_owned,stop_environment,LEGACY_POLICY,PRESSURE_POLICY,budget_reason,active_processes,process_rss
 
 def identity(state):
     data=state.read('identity.json')
@@ -37,9 +37,11 @@ def stop(state,reason,observation,data=None):
 
 def sample(state,data=None):
     result=host_sample();active=state.read('active-test.json')
-    result['ownedProcessRssBytes']=owned_rss(active.get('launcherPid',active['pid']),active.get('launcherStart',active['processStart'])) if active else 0
+    processes=active_processes(active) if active else []
+    if active and active.get('launcherPid'):processes.append({'pid':active['launcherPid'],'processStart':active['launcherStart']})
+    result['ownedProcessRssBytes']=process_rss(processes)
     if active:
-        children=owned_processes(active['pid'],active['processStart'])
+        children=active_processes(active)
         if children:
             with state.locked():
                 current=state.read('active-test.json')
@@ -133,6 +135,7 @@ def run(state,label,seconds,command,policy=LEGACY_POLICY):
                 time.sleep(.1)
             if child.poll() is None:cancel_owned(state)
             code=child.wait(timeout=2)
+            orphaned=bool(cancel_owned(state))
             if not state.read('environment-stop.json'):
                 tail=log.read_bytes()[-65536:]
                 if b'heap out of memory' in tail or b'Reached heap limit' in tail:stop(state,'NODE_HEAP_OOM',sample(state,data),data)
@@ -140,7 +143,7 @@ def run(state,label,seconds,command,policy=LEGACY_POLICY):
             with state.locked():
                 cause=state.read('environment-stop.json');product=partial(state)
                 zero_tests=is_vitest and sum(product['counts'][k] for k in ['passed','failed'])==0
-                result=dict(policy=policy,status='BLOCKED' if cause or zero_tests and code==0 else 'PASS' if code==0 else 'FAIL',reason=cause['reason'] if cause else 'ZERO_EXECUTED_TESTS' if zero_tests and code==0 else None,exitCode=code,environmentCause=cause,partial=product,durationSeconds=time.monotonic()-start,timeoutSeconds=seconds)
+                result=dict(policy=policy,status='BLOCKED' if cause or zero_tests and code==0 else 'FAIL' if orphaned else 'PASS' if code==0 else 'FAIL',orphanedDescendantsReclaimed=orphaned,reason=cause['reason'] if cause else 'OWNED_DESCENDANTS_SURVIVED_ROOT' if orphaned else 'ZERO_EXECUTED_TESTS' if zero_tests and code==0 else None,exitCode=code,environmentCause=cause,partial=product,durationSeconds=time.monotonic()-start,timeoutSeconds=seconds)
                 state.write(label+'.result.json',result)
                 (state.directory/'active-test.json').unlink()
         finally:
