@@ -6,7 +6,7 @@
 
 <a id="main-review-20261103"></a>
 
-## 2026-11-03 검토 브랜치 리뷰와 main 반영 준비
+## 2026-11-03 검토 브랜치 리뷰와 main 반영
 
 시작은 `verify/mentoring-integration-20261103`의 `d59e75c`, 원격 main은 `f967e57`이었다. 기존 staging/추적 worktree는 깨끗했으며 사용자 요약/진행 포인터·과거 증거를 보존했다. 두 축의 소스 리뷰에서 consent transaction/세션 조회 도중 종료 후 provider/watch가 다시 시작되는 경합, 실제 LLM 호출 전 마지막 권한 검사 중 취소에도1을 정산하던 경로를 수정했다. 실제 ServiceAuthority를 사용한 제어된 await 단위 시험은 수정 전2실패·수정 후 통과를 확인했다. SQL/계약/권한 정책은 변경하지 않았다.
 
@@ -16,7 +16,7 @@ CALL-005/006·AI-001~005·TEST-003/004: 기존 제품/PBX 시험에 상대 track
 
 기존34고유 사례/동일DB3재실행/readiness/과거DB17을 합산하지 않았다. 원본 source hash를 시작 checkpoint 파일과 대조했다. 이번 audio 경합·선택적 제공자-only injection/observer 경로는 그 실제 통합의 새 PASS로 간주하지 않는다. 기존 유지보수의 만료 예약 전액 정산은 확인했지만 강제 종료의 실제 회수는 미실행이며 보존 대상 배포의 영향은 미확인이다. 범용 복구/임의 사용량 초기화 도구는 추가하지 않았다.
 
-현재 경량 검사는 [이번 리뷰 증거](../artifacts/main-review-20261103.json)에 구분한다. 최초 light의 기존 dry-run 시험 timeout과 helper 회귀의 최초 실패를 보존했고 assertion/중단 기준/timeout을 완화하지 않았다. main 반영은 필요한 검사와 원격 차이 확인 후 정상 병합/일반 push로 수행하며 공개 이력은 보존한다. 새 runtime/공개 묶음·실제 trust 웹은 향후 별도 발행이다. 이번에는 서비스/컨테이너·DB·키·이미지·Release·AWS를 생성하지 않았고 기존 서버 설정/자원을 변경하지 않았다.
+현재 경량 검사는 [이번 리뷰 증거](../artifacts/main-review-20261103.json)에 구분한다. 최초 light의 기존 dry-run 시험 timeout과 helper 회귀의 최초 실패를 보존했고 assertion/중단 기준/timeout을 완화하지 않았다. 리뷰 수정은 `5df9f69`·`ed0d5eb`·`303e8a9`, 증거/절차는 `d27ed54`에 보존했고 `7a987bf`에서 main에 정상 병합·일반 push했다. 해당 merge의 light CI는 성공했다. 최종 명령 대조에서 미디어 observer의 직접 HTTP 정리/늦은 lease 요청에 정확한 Origin을 추가했다. 늦은 lease는 CSRF 오류나 임의503이 아니라 실제 세션 만료/종료 권한 오류인지 검사하며 정리 POST 실패도 숨기지 않는다. 이 observer 보완은 타입/무기동 검사만 했고 실제 통화 재실행은 하지 않았다. 새 runtime/공개 묶음·실제 trust 웹은 향후 별도 발행이다. 이번에는 서비스/컨테이너·DB·키·이미지·Release·AWS를 생성하지 않았고 기존 서버 설정/자원을 변경하지 않았다.
 
 <a id="http-pressure-integration-20261103"></a>
 

@@ -145,7 +145,7 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
    const receipt=await client.getTransactionReceipt({hash:applied.ledgerObservation!.transactionHash as `0x${string}`});expect(receipt.status).toBe('success');expect(receipt.blockHash).toBe(applied.ledgerObservation!.blockHash);observation!.mark('chain-confirmed');
   }
   const terminal=(await f.state()).serviceV3!.attempts[attempt]!;expect(['ended','cancelled','failed','declined','no-answer']).toContain(terminal.status);
-  expect(lastLease).toBeDefined();const late=await receiver.request.post(f.origin+'/api/v3/lease',{headers:{'x-csrf-token':lastLease!.csrf,'idempotency-key':crypto.randomUUID()},data:lastLease!.body});expect([401,403,409,503]).toContain(late.status());observation!.mark('new-request-rejected');
+  expect(lastLease).toBeDefined();const late=await receiver.request.post(f.origin+'/api/v3/lease',{headers:{origin:f.origin,'x-csrf-token':lastLease!.csrf,'idempotency-key':crypto.randomUUID()},data:lastLease!.body});expect([401,409]).toContain(late.status());expect(late.status()===401?['AUTH_REQUIRED','SESSION_EXPIRED']:['CALL_NO_LONGER_AUTHORIZED']).toContain((await late.json()).error?.code);observation!.mark('new-request-rejected');
   await vi.waitFor(async()=>{const rows=await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`;expect(Number(rows[0]!.count)).toBe(0);},{timeout:5000,interval:100});
   observation!.mark('resources-reclaimed');
   expect(errors).toEqual([]);
