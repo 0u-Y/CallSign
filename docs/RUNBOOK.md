@@ -1810,3 +1810,19 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeou
 - 복원은 서비스 시작·anchor rollback·키 재발급·권한 generation 초기화를 하지 않는다. 최신 anchor 대조가 일치해야 gate를 열고, 새 로그인·새 통화 시도·공개 trust/키 검증을 적용한다. anchor가 앞서거나 이력이 손상됐으면 자동으로 맞추지 않는다. 현재 구현에는 이 불일치를 자동 해제하는 승인 복구 도구가 없으며 운영자의 원본 이력 복구/공동 재신뢰 결정이 필요하다.
 
 공유 증거는 코드/도구 hash·원본 판정·관측 요약·비밀 제거 로그만 남긴다. 백업/복호화 키·dump·SQL 평문·session·개인키·브라우저 storage는 게시하지 않는다. 자식 서버/worker가 종료됐음을 확인하고 container/volume의 identity label을 대조한 뒤 **그 두 컨테이너·그 두 volume과 보호 ROOT**만 정리한다. 전역 prune, 기존 프로세스 종료, 기존 anchor 초기화는 하지 않는다.
+
+<a id="mentoring-five-evaluation"></a>
+
+### 5차 평가·후보 인계
+
+`tests/fixtures/service-purpose-evaluation.json`은 합성30사례이며 모두 `humanReview: not-reviewed`다. 개발용/평가용을 사례군 `family`로 분리한다. 파서 상한50은 외부 호출 허가가 아니다. `evaluate-service-analysis.ts --provider`는 **평가용만 최대20회**, 각4초·직렬·재시도0으로 제한한다. 기존 source/image·보호 제공자 참조·비용/보관 승인 guard를 유지하며 이번에는 호출하지 않았다. 미실행 사례는 NOT_RUN으로 남고 판단 불가율은 관측 사례만 분모로 사용한다. 실제 제공자 text 평가는 STT·실제 한국어 음원 품질과 별개다. 별도 승인된 음원 평가에는 기존 provider-smoke/통화 분석 경로가 필요하며 합성 replay를 정확도로 집계하지 않는다.
+
+무호출 준비 확인은 `pnpm exec tsx scripts/evaluate-service-analysis.ts tests/fixtures/service-purpose-evaluation.json NEW_OUTPUT.json`이다. 이 명령은 결과 파일을 새로 만들며 언어 품질을 시험하지 않는다. 실제 호출에는 기존 [4차 실행 조건](#mentoring-fourth-validation)을 따른다.
+
+통화 집계에 `authorization-response`, `pbx-absent` 관측을 추가했다. 승인 응답은 실제 POST 응답 성공을 확인한 controller 시각이며, 승인 표시/검증 완료와 별도다. runtime-media의 PBX 부재는 ARI 채널2개·브리지의 실제404를 모두 확인한 뒤 기록한다. 실제 음성 중단은 양 끝점 decode 관측을 그대로 요구한다. 누락 구간은 `missing-endpoint`, 역순은 `reversed-order`로 남기며 타이머/0으로 채우지 않는다. smoke2회는 전체 성공률/SLA가 아니다.
+
+현재 후보 e95b653/runtime dfee3789와 고정 Release `aws-bootstrap-20261102t093531z`에는 이번 UI·측정·평가 변경이 없다. 다음 발행은 검증 소스 고정→새 runtime→공개/observer 묶음→layer/context 감사→비공개 GHCR→실제 registry digest→새 고유 Release→별도 수령 검증 순서다. 기존 release-manifest/게시 절차를 재사용하고 기존 digest/서명 inventory를 편집하지 않는다.5종 인프라 recipe는 변경하지 않았으므로 재사용 검토 대상이다. 최종 웹은 새 runtime과 AWS 계약 metadata/trust/PBX 인증서로 다시 생성한다. 개발 서버 경로/키·전역 Docker 로그인은 runtime 입력으로 전달하지 않는다.
+
+NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployment.sh restart`는 Compose restart만 실행하며 migration/seed/key/genesis를 호출하지 않는다. 강제 종료의 quota는 기존 만료 후 보수 정산이며 즉시 환불/청구 대조를 보장하지 않는다. 이번에 재시작·복원·외부 TLS/OIDC/TURN·AWS를 실행하지 않았다.40GiB 시작 guard와 동시 웹 build 예외의 미승인 상태도 변경하지 않았다.
+
+새 observer archive에는 합성 평가 fixture도 포함한다. runtime 안의 평가 도구만 전달하고 입력을 개발 서버 checkout에 남기는 누락을 보완했다. 새 phase를 쓰는 observer와 구 runtime의 observation-contract를 혼합하지 않는다.

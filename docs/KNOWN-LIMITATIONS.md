@@ -1,5 +1,7 @@
 # 현재 구현의 한계
 
+5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
+
 최신 로컬 후보는 실제 SQL/WS 종료 회귀5건과 readiness/잔류 감사까지 확인했다. 전체 NEW의40GiB 시작 조건을 충족하지 못해 ServiceCall·실제 음성/회수·반복과 후보 서비스 entrypoint는 미실행이다. 후보 image/source·묶음의 검사와 초기 자동 Node 수령/회수는 [후보 기록](FINALS-IMPLEMENTATION-PLAN.md#candidate-media-20261103)을 따른다. runtime build의 버전 probe나 layer hash가 실제 기동 성공을 대신하지 않는다.
 
 최신 branch 리뷰의 종료 경합/호출 전 quota 해제 수정과 다음 실제 ServiceCall 분석 경로는 [리뷰 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 이전34건은 당시 소스·fixture 범위이며 새 미디어 분석 경로의 PASS가 아니다. 강제 종료 뒤 예약은 기존 worker가 만료 후 전액 보수 정산하며, 제공자 청구 대조·즉시 환불·이번 실제 crash 검증을 뜻하지 않는다. 보존 대상 환경의 영향 여부는 미확인이다.

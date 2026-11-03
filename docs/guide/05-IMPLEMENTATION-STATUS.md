@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
+
 [서비스 가이드](README.md) · 이전: [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
 현재 기본 제품은 `/service` → `/v3`의 등록 URI·Asterisk 통화 경로입니다. 아래 결과는 각 원본에 기록된 소스·환경의 증거이며, 현재 코드 전체나 실제 기관 서비스를 검증했다는 뜻은 아닙니다. 새 변경은 [개발 기록](../FINALS-IMPLEMENTATION-PLAN.md)에 이어 기록합니다.

@@ -1,5 +1,19 @@
 # 개발 현황과 검증 기록
 
+<a id="mentoring-five-20261104"></a>
+
+## 2026-11-04 5차 제품·측정·평가 보완
+
+시작 main은 전달 기준보다 진행된 `2972a70`이며 `feat/mentoring-five-20261104`에서 사용자 미추적 요약3개와 기존 후보를 보존했다. 기관/상담원/수신자 업무 안내, 권한 제한 설명, 관리 JSON 상세 접기, 회수 조회의401/403/장애 구분과 내부 오류 코드 비노출을 반영했다. 기존 세대·동의·기관 권한 검사와 승인/현재 연결/위험 안내 분리는 유지한다.
+
+실제 결함은 평가 판단 불가율이 미실행 사례까지 분모에 넣던 점과, 최대20회라는 제공자 예산이 주석/기존 fixture 크기에만 의존하던 점이다. 관측 사례 분모로 수정하고 평가 split만 최대20회, 개발/평가 family 혼합은 호출 전 거절한다. 합성30사례 모두 사람 미검토이며 실제 모델/음원 정확도는 NOT_RUN이다. 공개 observer 목록에서 평가 fixture가 빠진 전달 누락도 보완했다. 통화 집계에 승인 응답/서버 적용/PBX 부재 구간과 누락·역순 사유를 추가하고 실제 observer 소스에 응답 성공·ARI404 이후 관측을 연결했다. 전체 통화를 실행한 것은 아니다.
+
+상태: 역할별 UI·집계·평가 보완은 **구현·오프라인 검증 완료**. 실제 ServiceCall·SQL/WS·브라우저 최신 경로는 **구현 완료·실행 미검증**. 실제 외부 제공자/IdP/AWS·새 runtime/Release는 **후속 범위**다. NEW/restart/RESTORE/worker 정산의 기존 경계는 검토 후 유지했으며 새 복구 체계를 만들지 않았다.
+
+최종 `pnpm light`63파일312시험·웹 build·SSR 상태 회귀·diff/링크 검사 통과. 웹 chunk/dynamic import 경고는 남아 있으며 실제 브라우저 렌더 확인은 하지 않았다. 초기 fixture category 오기와 observer 변수 충돌은 시험 소스 결함으로 수정했고 초기 light 로그는 로컬에 보존했다. 무호출 평가 결과는 providerCalls0·NOT_RUN이다. [증거](../artifacts/mentoring-five-20261104.json)는 당시 dirty 소스 hash를 기록한다. 서버/서비스·DB·키·네트워크·전역 인증 변경, 다운로드, 이미지/Release 발행은 없었다.
+
+새 runtime과 AWS trust에 맞춘 web, 공개/observer 묶음이 필요하다. 기존 e95b653 후보·고정 Release는 수정되지 않았고5종 인프라 recipe·ABI·서명 도메인도 변경하지 않았다. 다음 실제 실행의40GiB guard와 웹 build 동시 실행 예외/관측 예산 승인은 여전히 별도 조건이다. [멘토링 반영표](mentoring/README.md)·[실행 인계](RUNBOOK.md#mentoring-five-evaluation)를 따른다.
+
 기준일: **2026-11-02(KST)**. 최초 연결 작업의 `a9d67f0` 이후 worktree는 DB·계약 검증을 거쳐 커밋으로 보존했다. 첫 인증·HTTP·브라우저 작업 시작은 `7638501`, 당시 코드 checkpoint는 `5c2842d`이며 인증 후속 경계 작업 시작은 `a75398d`, 현재 영속 복구 검증 시작은 `c59edac`다. 시험 당시 HEAD와 미커밋 여부는 각 원본 증거를 따르며 나중의 커밋에서 시험한 것으로 바꾸지 않는다. 기존 작업 요약·미추적 진행 포인터·과거 증거를 보존했다.
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
