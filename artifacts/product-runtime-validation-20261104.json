@@ -2008,5 +2008,42 @@
     "newRelease": "NOT_PUBLISHED",
     "aws": "NOT_RUN",
     "finalAwsWeb": "NOT_GENERATED"
+  },
+  "mainHandoff": {
+    "runtimeSource": "6e3cd238e95457406134e8ef37730fd6d251209a",
+    "publicBundleSource": "2423e73d6a409aaa1c165cc4c7f1976ac4152b0f",
+    "observerPayloadsIdenticalToTestedCandidate": true,
+    "runtimeBuildInputsUnchanged": true,
+    "runtimeConfigId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+    "registryManifestDigest": null,
+    "publicBundleChanges": "RUNBOOK and KNOWN-LIMITATIONS documentation only",
+    "servicesStarted": false,
+    "imagesBuilt": false,
+    "remotePublication": "NOT_SENT",
+    "awsWeb": "NOT_GENERATED",
+    "controllerUsesInstalledRepositoryDependencies": true,
+    "runtimeRequiresControllerCheckout": false,
+    "localDirectory": ".local/delivery-handoff-2423e73/delivery",
+    "checksumVerification": "PASS",
+    "publicTarBoundaryCheck": "PASS; Python fixture URL constructors are source expressions, not filled credentials",
+    "remoteReceipt": "NOT_RUN",
+    "files": {
+      "deployment-files.tar": {
+        "bytes": 532480,
+        "sha256": "684535a3e0d433bdd3e2bfa62c5274a5bd4d962307612c26f506bef1ad3bb0d4"
+      },
+      "observer-tests.tar": {
+        "bytes": 276480,
+        "sha256": "15f8076996a72e5c0dcfc29ca08fa8164a88748f2372132a55f5d66bb0baff89"
+      },
+      "images.json": {
+        "bytes": 3654,
+        "sha256": "9a5e82a5377014f1b6af3a6e26c2d6ee83606a5294c63a10a584c14f5d0fe369"
+      },
+      "aws-bootstrap-images.tar": {
+        "bytes": 2318667264,
+        "sha256": "99997510c9815c4557d4b54291e9d720ba77b6209cd9b6ba9ca70ef61c4c5b40"
+      }
+    }
   }
 }

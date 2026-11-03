@@ -16,6 +16,8 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 실제 구성요소는 Besu4·Witness4·PostgreSQL·HTTPS Anchor·API/worker·Asterisk·TURN·제품 웹/Chromium이다. OIDC와 STT/LLM은 명시적 fixture, 음원은 합성이다. 같은 namespace의 TURN과 같은 호스트는 외부 NAT·독립 기관 장애 내성의 증거가 아니다. AWS·실제 IdP·한국어 STT/LLM 품질·새 GHCR/Release 게시는 미실행이다. 새 공개/observer 묶음과 runtime은 같은6e3cd23 소스이며5종 인프라는 재사용했다. 최종 AWS 웹은 실제 AWS metadata/trust/PBX 인증서 뒤에 생성해야 한다. 이전 고정 Release는 이번 소스를 포함하지 않는다.
 
+최신 main `2423e73`의 RUNBOOK/한계 문서를 포함한 추가 인계 묶음을 `.local/delivery-handoff-2423e73/delivery/`에 생성했다. 검증 runtime6e3cd23/c39cbb와 observer 내용은 그대로이며 main과의 차이는 문서·증거뿐이다.4개 파일 checksum·공개 tar 경계 검사를 통과했다. 이미지 재빌드/서비스 기동/원격 게시·수령은 하지 않았다. 기존 후보는 보존했으며 새 inventory는 로컬 config ID·최종 웹 미준비·NOT_SENT를 유지한다.
+
 ## 현재 상태와 다음 단계
 
 | 구분 | 상태·다음 작업 |
