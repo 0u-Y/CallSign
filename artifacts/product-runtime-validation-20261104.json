@@ -2045,5 +2045,43 @@
         "sha256": "99997510c9815c4557d4b54291e9d720ba77b6209cd9b6ba9ca70ef61c4c5b40"
       }
     }
-  }
+  },
+  "trialWebImageCleanup": [
+    {
+      "configId": "sha256:5d9bfdc1bd2f21104718bcee57a526fd703b428a1808a9bca4595f867fc8bc0c",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:b332623385de6c48aac8bb48ef4376c4125b9934337de279796f18bddf2c86df",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:f09eed981431aaf40bad6f1cfea7827ec80fe79c922446344268241847bed76a",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:cddec49dfbd2ccae9ed797adb7d3f096a7e9214ebb8df4870d87597f6898a2be",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:9531f8c4b87204de58dccd89f4daec7a18f9d42320f21a57c7878538a0b3294f",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:657eef80968490e6488794dff8215017b60f6a39d9b89cab40464dc8443b3fdd",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    },
+    {
+      "configId": "sha256:9567b32604954ad90049d8caf0cfacf41be222ea3624a37d2ae3f79be7c58eff",
+      "status": "REMOVED",
+      "remainingContainersUsingImage": 0
+    }
+  ],
+  "retainedImages": "tested runtime candidate, initial runtime and unchanged infrastructure; synthetic-trust trial web images removed explicitly without prune"
 }
