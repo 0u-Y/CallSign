@@ -44,7 +44,7 @@ it('keeps real chain integration outside light and database suites with an expli
 
 it('ships the historical report required by the web bundle and avoids dependency-directory config writes',()=>{
  const web=readFileSync('infra/deploy/web.Dockerfile','utf8');expect(web).toContain('vite build --configLoader runner');expect(web).toContain('COPY artifacts/test-results.json artifacts/test-results.json');
- expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'artifacts/test-results.json'");expect(readFileSync('.dockerignore','utf8')).toContain('!artifacts/test-results.json');
+ expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'artifacts/test-results.json'");expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'tests/fixtures/service-purpose-evaluation.json'");expect(readFileSync('.dockerignore','utf8')).toContain('!artifacts/test-results.json');
 });
 
 it('keeps NEW rehearsal preparation dry and denies unapproved execution before Docker or file creation',()=>{
