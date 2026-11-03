@@ -150,7 +150,7 @@ Docker pull는 digest에 고정된 manifest/config/layer를 검증하고 새 AWS
 
 AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구한다. 실제 trust/인증서 준비 후 AWS에서 생성하는 web만 검토한 local config ID를 사용할 수 있다. 웹은 Release의 공개 recipe와 GHCR runtime/nginx를 사용하고 pin/label·실제 기동을 확인한다. **bootstrap6종의 전달은 검증했으나, web 생성·실제 외부 설정·AWS 실행은 아직 완료하지 않았다.** [공식 인증/visibility 기준](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry), [package 권한](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility).
 
-**현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
+**현재 main과 고정 전달물의 차이:** 위 Release/6종 digest는 그 발행 소스의 검증 결과이며 이번 main 수정으로 바뀌지 않는다. 이번 AWS 전 점검은 과거 시험 화면의 오해 방지, 예약 예시 주소/초기 identity preflight, 계약 재개의 실제 profile/정책/승인자 대조를 수정했다. **실제 AWS 배포 전 새 runtime 이미지(웹 소스·준비 도구 포함)와 공개 배포 묶음의 새 고정 Release가 필요하다.** 기존5종 infrastructure 이미지는 이번 수정으로 재build할 이유가 없다. 검토 브랜치 반영분에는 migration CLI/0010·회수/목적 분석 제품 코드·audio 종료 정산/경합 수정이 포함되므로 새 runtime이 필요하다. observer 묶음은 기존 시험 외에 `tests/media/analysis-path.ts`·`tests/integration/runtime-analysis-fixture.ts`와 수정된 bootstrap/driver를 포함해야 한다. 통화 집계/자원 launcher는 새 runtime의 scripts로 전달된다. `.dockerignore`는 tests·보호 파일·로컬 증거를 제외하고 제품 소스/SQL·공개 예제를 유지한다. 인프라5종의 이미지 recipe/입력은 이번 반영으로 바뀌지 않아 기존 검증 digest를 재사용할 수 있지만 기동 설정·runtime과의 통합은 새 후보에서 다시 확인한다. 이번에는 image build/push/Release를 실행하지 않았으며 새 image ID/digest/tag를 만들어 쓰지 않는다. 새 runtime으로 실제 trust pin 웹을 만들고 검증하기 전까지 이전 inventory가 이 수정까지 포함한다고 설명하지 않는다.
 
 <a id="mentoring-fourth-validation"></a>
 
@@ -649,6 +649,32 @@ proof --delivery-files "$ROOT/public" --case session-expiry
 로컬 nginx는 UID1000·cap-drop과 읽기 전용 root를 위해 pid/cache를 소유 `/tmp`로 옮기는 controller 생성 global config를 사용한다. AWS nginx 기본 실행 설정과 이 차이도 기록한다. 전달된 AWS HTTPS server config를 수정하지 않은 별도 component 시험에서는 명시적 시험 `web` DNS 별칭·합성 인증서로308/HTTPS 제품 파일을 확인했다. 해당 별칭 파일은 그 소유 container에만 mount하며 host/기존 namespace의 hosts/DNS를 변경하지 않는다. 이 component 결과는 AWS override 전체나 외부 인증서 성공이 아니다.
 
 `ownership.json`에 기록한 ID와 현재 label을 대조한 후 이번 container만 stop/rm하고, volume도 같은 소유 label을 재확인한 뒤 제거한다. 증거부터 보존하며 다른 project나 전역 prune/down -v는 사용하지 않는다. 보호 env·signer key·브라우저 profile·합성 WAV·DB/체인 상태는 공개 전달물/Git에 넣지 않는다. 일회성 시험의 잔여 key/chain만으로 서비스 복원이 가능하다고 표시하지 않는다. 공개 전달물과 보호 자료를 분리해 승인된 외부 보관처에서 재수령·checksum 대조하기 전에는 외부 전달 완료로 보고하지 않는다.
+
+<a id="reviewed-servicecall-analysis"></a>
+
+### 검토 소스의 실제 ServiceCall·분석 통합 시험 (미실행)
+
+이 절차는 기존 통합34건의 component host1건이 우회했던 **실제 ServiceCall·상대 음성→분석 패널**을 확인하기 위한 다음 실행이다. 이번 검토에서는 서비스를 기동하지 않았다. 위 NEW 리허설로 준비한 소유 identity·실제 원장/DB/Anchor/PBX/TURN과 **새 runtime/observer 묶음**이 필요하다. 기존 고정 Release에는 아래 추가 observer 파일과 종료 경합 수정이 없다.
+
+```bash
+# Separate execution approval and resource preflight required; not executed during source review.
+# Use the proof() function and immutable APP from the NEW rehearsal above.
+proof --delivery-files "$ROOT/public" --analysis-fixture --case work-cancel
+# After preserving the first phase, select other existing revocation cases individually.
+proof --archive-phase analysis-work-cancel
+proof --delivery-files "$ROOT/public" --analysis-fixture --case emergency-stop
+proof --archive-phase analysis-emergency-stop
+```
+
+`work-cancel`은 인증한 기관 담당자의 업무 취소 API, `emergency-stop`은 기관 정지 API→outbox→원장/Witness 반영을 사용한다. `proof`·ROOT·APP의 정의와 소유 identity 준비는 바로 앞 NEW 절차를 따른다.
+
+`--analysis-fixture`는 별도 observer entrypoint와 작업 전용 보호 token을 명시적으로 mount한다. 서비스 제품 소스/의존성은 runtime 이미지에서 사용하고 인증·SQL·원장·Anchor·PBX는 실제 경로를 유지한다. 이 모드는 일반 issuer entrypoint 기동 검증과 구분한다. flag가 없으면 기존 일반 entrypoint를 사용하며 환경변수만으로 제공자 fixture를 선택하지 않는다. token·ownership·controller 소스는 보호 자료이며 공개 결과에 넣지 않는다.
+
+검증 순서는 제품 로그인/업무/승인·소비/lease→구별되는660/990Hz 상대 음성 디코딩→실제 제품의 분석 동의→**remote receiver track만 MediaRecorder에 전달**→인증 WS 프레임→합성 전사·모델 응답→실제 ServiceCall의 패널→동의 철회/abort/늦은 응답 폐기→재동의 후 권한 회수→양 끝 상대 음성 중단·ARI404·종료 상태·추가 lease 거절·quota 예약0이다. 합성 응답은 정확도를 시험하지 않으며 원음/전사는 결과에 저장하지 않는다. 세션은 종료와 로그아웃을 구별하고, 업무/소비/정산 이력은 삭제하지 않는다. outbox는 해당 위임 철회/정지 작업 완료를 대조하며 다른 기관의 작업을 지우지 않는다.
+
+`call-trial-CASE.json`은 기존 `CallObserver`의 동일 controller 단조 시계를 사용한다. 승인 요청·수락 동작·검증 표시·양방향 상대 음성·분석 입력/전사/결과/경고·회수 요청·화면 종료·실제 음성 회수·정리 관측을 연결한다. 원장 사례의 서버 적용은 `ledgerObservation`의 일치하는 event를 관측한 시점, chain-confirmed는 그 transaction receipt/block hash를 별도 조회해 확인한 시점이다. **조회 순서가 실제 발생 순서와 같지 않을 수 있어 역순 구간은 null이며 실제 확정→전파 지연이 아니다.** 누락 관측을0이나 과거 실측으로 채우지 않는다. 일반 반복 측정은 기존 `scripts/call-trials.ts`와 `infra/deploy/call-trials.example.json`을 사용하고 `analysis: "fixture"`, fixture 목록의 `analysis-adapter`, loopback control URL/보호 token 파일 참조를 명시한다. 이 경우 `ai-input`→`transcript`→`analysis`→`warning-visible` 관측이 순서대로 없으면 전체 성공으로 집계하지 않는다. 실패·timeout·시작 실패·미완료도 논리적 시도 분모에 남기며 재시도는 별도로 센다. 현재 이 새 경로의 성공률·지연은 **NOT_RUN**이다.
+
+실제 외부 STT/LLM은 별도 단계다. 위 fixture 옵션 없이 승인된 제공자 모델/보호 자격·소량 예산·보관 조건과 동의한 한국어 입력을 준비해 [제공자/평가 절차](#mentoring-fourth-validation)를 사용한다. 실제 사람/독립 평가 라벨로 품질을 판단하고, 제공자 취소·보관·청구를 합성 abort 관측으로 대체하지 않는다. 같은 namespace의 TURN은 AWS 외부 NAT 성공이 아니다. 종료 후 원본 실패/부분 관측을 보존하고 위 identity/label 기반 정리만 수행한다.
 
 ### 앞선 준비형 harness와 경로 계약
 
@@ -1485,7 +1511,9 @@ B/C 필터는 아래 절과 같으며 D에는 새 `analysis Chromium:`을 포함
 step chromium 300 node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts --testNamePattern '^(renders the actual service|recall Chromium:|analysis Chromium:|boundary: (reviews and exports|shows durable|synchronizes work logout|drops a held|disables ungranted|recovers a committed))'
 ```
 
-오디오 종료는 소켓/분석기 중단→진행 작업과 quota 정산 drain→quota pool 종료 순서다. 정산 실패나5초 drain timeout은 종료 성공으로 바꾸지 않는다. 제공자 호출 전 취소는 예약 해제0, 호출 뒤 취소는 기존 보수적 요청 사용량1을 정산하며 실제 제공자 청구/취소 성공을 뜻하지 않는다. fixture teardown은 미정산 예약을 삭제하기 전에 assert한다. 잔류 감사가 실패하면 데이터를 지워 통과시키지 않는다. 이번 최초DB의 balance17개는 수정하지 않고 실패 기록으로 보존했고, 같은 cluster의 추가 회귀DB에서 전체 수정 소스와 동일DB 재실행을 확인했다. 역할 LOGIN은 그대로 재사용하고 migration/table GRANT/readiness를 새 DB에서 확인했다. 기존 LOGIN provisioning SQL을 재적용해 비밀번호를 교체하지 않았다.
+오디오 종료는 소켓/분석기 중단→진행 작업과 quota 정산 drain→quota pool 종료 순서다. 종료가 consent transaction 또는 session 조회를 기다리는 동안 발생하면 이후 provider/watch를 새로 시작하지 않도록 수정하고 오프라인 경합 회귀로 확인했다. 이 수정 경로의 실제 서비스 재검증은 미실행이다. 최종 권한 검사 중 취소돼 제공자를 호출하지 않은 LLM 예약은0으로 해제한다. 정산 실패나5초 drain timeout은 종료 성공으로 바꾸지 않는다. 제공자 호출 전 취소는 예약 해제0, 호출 뒤 취소는 기존 보수적 요청 사용량1을 정산하며 실제 제공자 청구/취소 성공을 뜻하지 않는다. fixture teardown은 미정산 예약을 삭제하기 전에 assert한다. 잔류 감사가 실패하면 데이터를 지워 통과시키지 않는다. 이번 최초DB의 balance17개는 수정하지 않고 실패 기록으로 보존했고, 같은 cluster의 추가 회귀DB에서 전체 수정 소스와 동일DB 재실행을 확인했다. 역할 LOGIN은 그대로 재사용하고 migration/table GRANT/readiness를 새 DB에서 확인했다. 기존 LOGIN provisioning SQL을 재적용해 비밀번호를 교체하지 않았다.
+
+강제 종료는 graceful drain과 다르다. 기존 worker의 `serviceMaintenance.tick()`은 만료된 reserved 행을 잠그고 전액 사용으로 보수 정산한다. 분석 예약은 현재24시간 뒤 만료되며 정상 worker가 유지보수를 수행해야 한다. 제공자 결과를 모르므로 자동 환불/청구 대조가 아니다. 이번 검토에서 이 crash 경로는 실행하지 않았다. 시험DB의 이미 삭제된 예약17개를 되살리거나 balance를0으로 맞추지 않는다. 저장소에서 영향받은 보존 배포는 확인되지 않았고 기존 영속 환경 영향 여부는 미확인이다.
 
 [이번 실행 증거](../artifacts/http-pressure-integration-20261103.json)는 HTTP11/WS14/Chromium9, 동일DB3건 재실행과 전후 감사, 초기 실패·자원·정리를 구분한다. 원장/ARI/STT/LLM/Anchor/binding은 fixture이며 실제 음성 회수·한국어 품질·AWS를 검증한 것이 아니다. 새 runtime과 최종 trust/인증서에 맞춘 웹·공개 묶음은 별도 발행이 필요하며 기존 고정 Release/digest는 변경하지 않았다.
 

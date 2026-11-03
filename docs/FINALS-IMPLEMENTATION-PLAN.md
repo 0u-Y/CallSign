@@ -4,6 +4,20 @@
 
 요구·완료 기준은 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 사용자 설명은 [서비스 가이드](guide/README.md), 운영 명령은 [RUNBOOK](RUNBOOK.md)에 연결한다. 코드 작성·순수 단위 검증과 실제 서비스 성공을 구분한다.
 
+<a id="main-review-20261103"></a>
+
+## 2026-11-03 검토 브랜치 리뷰와 main 반영 준비
+
+시작은 `verify/mentoring-integration-20261103`의 `d59e75c`, 원격 main은 `f967e57`이었다. 기존 staging/추적 worktree는 깨끗했으며 사용자 요약/진행 포인터·과거 증거를 보존했다. 두 축의 소스 리뷰에서 consent transaction/세션 조회 도중 종료 후 provider/watch가 다시 시작되는 경합, 실제 LLM 호출 전 마지막 권한 검사 중 취소에도1을 정산하던 경로를 수정했다. 실제 ServiceAuthority를 사용한 제어된 await 단위 시험은 수정 전2실패·수정 후 통과를 확인했다. SQL/계약/권한 정책은 변경하지 않았다.
+
+AI-003/005·OPS-006·TEST-004: launcher의 root 종료 뒤 소유 자식을 놓치는 경로와 종료 handler가 새 helper를 만든 경합도 수정했다. PID/start/session으로 소유 자식을 재발견하고 정리 확인 전 active 기록을 지우지 않으며, root가 먼저 끝난 잔류는 회수해도 FAIL로 남긴다. resource 정책의 수치/명시 선택·원본 중단 기록은 유지했다. 감시 범위는 등록한 root/session·검증한 PID와 기존 기록에 한정되며 임의 daemon/전체 host 메모리를 포괄하지 않는다.
+
+CALL-005/006·AI-001~005·TEST-003/004: 기존 제품/PBX 시험에 상대 track·실제 WS·ServiceCall 패널·동의 철회·늦은 합성 결과·권한 회수·양측 음성/ARI·예약 정리 관측을 연결했다. observer-only 제공자 entrypoint는 명시 flag/소유 token·기존 integration/test DB guard를 요구하고 실제 Anchor/원장 경계를 대체하지 않는다. 통화 집계의 fixture 분석 성공에는 순서가 맞는 입력/전사/분석/경고 관측을 추가로 요구한다. **이 경로는 타입/오프라인 회귀만 했고 실제 PBX·브라우저·외부 모델은 NOT_RUN**이다. [다음 실행 절차](RUNBOOK.md#reviewed-servicecall-analysis)를 따른다.
+
+기존34고유 사례/동일DB3재실행/readiness/과거DB17을 합산하지 않았다. 원본 source hash를 시작 checkpoint 파일과 대조했다. 이번 audio 경합·선택적 제공자-only injection/observer 경로는 그 실제 통합의 새 PASS로 간주하지 않는다. 기존 유지보수의 만료 예약 전액 정산은 확인했지만 강제 종료의 실제 회수는 미실행이며 보존 대상 배포의 영향은 미확인이다. 범용 복구/임의 사용량 초기화 도구는 추가하지 않았다.
+
+현재 경량 검사는 [이번 리뷰 증거](../artifacts/main-review-20261103.json)에 구분한다. 최초 light의 기존 dry-run 시험 timeout과 helper 회귀의 최초 실패를 보존했고 assertion/중단 기준/timeout을 완화하지 않았다. main 반영은 필요한 검사와 원격 차이 확인 후 정상 병합/일반 push로 수행하며 공개 이력은 보존한다. 새 runtime/공개 묶음·실제 trust 웹은 향후 별도 발행이다. 이번에는 서비스/컨테이너·DB·키·이미지·Release·AWS를 생성하지 않았고 기존 서버 설정/자원을 변경하지 않았다.
+
 <a id="http-pressure-integration-20261103"></a>
 
 ## 2026-11-03 명시적 압박 정책으로 HTTP·WS·Chromium 통합 완료

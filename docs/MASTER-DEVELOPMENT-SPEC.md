@@ -2,6 +2,8 @@
 
 DB-001/003·TEST-001/004·AI-003/005·UI-006의 최신 실제 SQL/인증·HTTP/WS·Chromium 검증과 초기 quota 실패/수정은 [2026-11-03 통합 기록](FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)을 따른다. 고유 사례 HTTP11/WS14/Chromium9의 fixture/component host 경계와 실제 인프라 미검증을 구분하며 완료 기준은 유지한다.
 
+종료 경합 회귀와 실제 ServiceCall 분석/회수의 다음 실행 범위는 [검토 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 새 경로의 오프라인 확인을 실제 통화/모델 품질 완료로 확대하지 않는다.
+
 4차 반영의 추가 소스 범위는 GOVERNANCE-001/002·BUSINESS-003·CALL-005/006·AI-001~005·UI-001/006·OPS-003/006/007·TEST-003/004에 연결한다. 정책 결합/문맥·회수 운영 조회·통화별 집계는 [반영표](mentoring/README.md)와 [현재 검사 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-fourth-20261102)을 따른다. 후속 SQL/브라우저 검증은 위 최신 기록을 따르며 실제 ARI/제공자/AWS와 새 산출물 발행은 미검증이다. 기존 완료 조건은 유지한다.
 
 

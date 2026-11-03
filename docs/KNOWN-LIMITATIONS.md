@@ -1,5 +1,7 @@
 # 현재 구현의 한계
 
+최신 branch 리뷰의 종료 경합/호출 전 quota 해제 수정과 다음 실제 ServiceCall 분석 경로는 [리뷰 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 이전34건은 당시 소스·fixture 범위이며 새 미디어 분석 경로의 PASS가 아니다. 강제 종료 뒤 예약은 기존 worker가 만료 후 전액 보수 정산하며, 제공자 청구 대조·즉시 환불·이번 실제 crash 검증을 뜻하지 않는다. 보존 대상 환경의 영향 여부는 미확인이다.
+
 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)은 확인한 실행과 원본 증거를, 이 문서는 남은 보장·운영 한계를 설명한다. 코드 미구현과 외부 설정/실환경 미검증을 구별한다. [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)의 과거 SHA·날짜·결과는 해당 실행 범위로 보존한다.
 
 ## AWS 전달과 실행의 남은 경계
