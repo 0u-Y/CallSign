@@ -40,7 +40,7 @@ export function registerServiceAudio(app:FastifyInstance,options:{authority:Serv
         if((attempt.authorityStatus==='unavailable'||(attempt.authorityUntil??0)<=a.now())&&!(attempt.lease.payload.authority==='unavailable'&&attempt.unverifiedChoice==='continue'))throw new Error('AUDIO_AUTHORITY_PAUSED');
         await a.credential(record,attempt.lease.payload.vcDigest);return purposeAuthorityCurrent(attempt,a.now());
       };
-      await allowed();if(stopped)return;unwatch=connections.watch(await options.sessionId(request),async()=>{await allowed();},()=>{send({type:'unavailable',code:'AUDIO_SESSION_REVOKED'});stop();});
+      await allowed();if(stopped)return;const watchedSession=await options.sessionId(request);if(stopped)return;unwatch=connections.watch(watchedSession,async()=>{await allowed();},()=>{send({type:'unavailable',code:'AUDIO_SESSION_REVOKED'});stop();});
       const message=async(raw:import('ws').RawData,binary:boolean)=>{
         try{
           if(stopped)return;if(!binary){const command=z.object({type:z.enum(['consent','stop']),consent:z.boolean()}).strict().parse(JSON.parse(String(raw)));if(command.type==='stop'||!command.consent){stop();await a.consent(actor,`withdraw-${randomUUID()}`,attemptId,false);return;}}if(processing)throw new Error('AUDIO_BACKPRESSURE');processing=true;
@@ -49,17 +49,18 @@ export function registerServiceAudio(app:FastifyInstance,options:{authority:Serv
           if(!options.providers&&(!process.env.DEEPGRAM_API_KEY||!process.env.DEEPGRAM_MODEL)){send({type:'unavailable',code:'STT_NOT_CONFIGURED'});stop();return;}
           const streamId=randomUUID();reservation=`stt:${streamId}`;await options.quota.reserve(reservation,actor.institutionId,'stt-seconds',300,analysisScopes(actor.institutionId,actor.userId,attemptId,'stt-seconds',900,a.now()),a.now()+86400);reserved=true;if(stopped){await settle(reservation,0);return;}
           await a.options.store.transact(actor.institutionId,async record=>{const {attempt}=a.party(record,actor,attemptId);if(!attempt.consent?.granted||attempt.consent.generation!==generation||attempt.consent.streamId)throw new Error('CONSENT_STREAM_ALREADY_USED');attempt.consent.streamId=streamId;});
+          if(stopped)return;
           let requests=0;
           const llm=(options.providers?.analyze||(process.env.ANTHROPIC_API_KEY&&process.env.ANTHROPIC_MODEL))?(text:string,policy:typeof initial.policy,signal:AbortSignal)=>track((async()=>{
             if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');await a.idempotent(actor,`llm-${streamId}-${++requests}`,{streamId,requests},async record=>{const {attempt}=a.party(record,actor,attemptId);a.usage(record,actor,attempt,'llm-requests',1,20);a.usage(record,actor,attempt,'llm-input-bytes',Buffer.byteLength(text),100000);return {reserved:true};});
             if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
             const quotaId=`llm:${streamId}:${requests}`;await options.quota.reserve(quotaId,actor.institutionId,'llm-requests',1,analysisScopes(actor.institutionId,actor.userId,attemptId,'llm-requests',20,a.now()),a.now()+86400);
             if(signal.aborted||stopped){await settle(quotaId,0);throw new Error('ANALYSIS_CANCELLED');}
-            let cancel:(()=>void)|undefined;
+            let cancel:(()=>void)|undefined,invoked=false;
             try{if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
               const cancelled=new Promise<never>((_,reject)=>{cancel=()=>reject(new Error('ANALYSIS_CANCELLED'));signal.addEventListener('abort',cancel,{once:true});});
-              return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(text,policy,signal):analyzeServiceWithAnthropic({apiKey:process.env.ANTHROPIC_API_KEY!,model:process.env.ANTHROPIC_MODEL!,text,policy,signal}),cancelled]));
-            }finally{if(cancel)signal.removeEventListener('abort',cancel);await settle(quotaId,1);}
+              invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(text,policy,signal):analyzeServiceWithAnthropic({apiKey:process.env.ANTHROPIC_API_KEY!,model:process.env.ANTHROPIC_MODEL!,text,policy,signal}),cancelled]));
+            }finally{if(cancel)signal.removeEventListener('abort',cancel);await settle(quotaId,invoked?1:0);}
           })()):undefined;
           analyzer=new ServiceRevisionAnalyzer(initial.policy,event=>{if(stopped||!analyzer?.isCurrent(event))return;void allowed().then(current=>{if(!stopped&&analyzer?.isCurrent(event))send({type:'risk',event:current?event:{...event,status:'unavailable',engine:'authority-unavailable',purpose:{relation:'undetermined',evidenceSpan:'',reason:'현재 권한·정책의 최신성을 확인할 수 없습니다. 기존 규칙 근거만 참고하세요.'}}});}).catch(stop);},llm);analyzer.start(streamId);
           const streamOptions:ConstructorParameters<typeof DeepgramStream>[0]={apiKey:process.env.DEEPGRAM_API_KEY??'explicit-test-provider',model:process.env.DEEPGRAM_MODEL??'explicit-test-provider',streamId,
