@@ -22,6 +22,24 @@ app_image = os.environ['CALLSIGN_EXPECTED_RUNTIME_IMAGE']
 if not re.fullmatch(r'sha256:[0-9a-f]{64}', app_image):
     raise SystemExit('IMMUTABLE_RUNTIME_IMAGE_REQUIRED')
 
+def local_web_build_images(public, runtime, nginx):
+    recipe = (public / 'infra/deploy/web.Dockerfile').read_text()
+    if re.findall(r'^FROM .+$', recipe, re.M) != ['FROM ${PREPARED_RUNTIME_IMAGE} AS build', 'FROM ${NGINX_IMAGE} AS web'] or re.findall(r'^COPY\s+--from=(\S+)', recipe, re.M) != ['build'] or re.search(r'^\s*(?:#\s*syntax\s*=|ADD\s)', recipe, re.M | re.I):
+        raise RuntimeError('OFFLINE_WEB_BUILD_RECIPE_REVIEW_REQUIRED')
+    # --pull=false alone can still fetch a missing FROM; inspect both bases before any service starts.
+    for ref in [runtime, nginx]:
+        if not re.fullmatch(r'sha256:[0-9a-f]{64}', ref): raise RuntimeError('LOCAL_IMMUTABLE_BUILD_BASE_REQUIRED')
+        info = json.loads(subprocess.check_output(['docker', 'image', 'inspect', ref], timeout=10))[0]
+        if info['Id'] != ref or info['Os'] != 'linux' or info['Architecture'] != 'amd64':
+            raise RuntimeError('LOCAL_BUILD_BASE_IDENTITY_MISMATCH')
+
+if options.delivery_files and not options.archive_phase:
+    public = options.delivery_files.resolve()
+    if public != root / 'public' or not (root / 'images-loaded.json').is_file(): raise RuntimeError('OWNED_DELIVERY_FILES_REQUIRED')
+    images = json.loads((root / 'images-loaded.json').read_text())
+    if images['CALLSIGN_APP_IMAGE'] != app_image: raise RuntimeError('DELIVERED_RUNTIME_IMAGE_MISMATCH')
+    local_web_build_images(public, app_image, images['HTTPS_IMAGE'])
+
 def command(args, **kwargs):
     return subprocess.run(args, check=True, **kwargs)
 
@@ -178,12 +196,6 @@ try:
     start('worker', worker, [(root / 'data/deployment.json', '/ledger/deployment.json'), (root / 'private-keys/administrator.txt', '/keys/administrator.txt'), (root / 'private-keys/stopper.txt', '/keys/stopper.txt'), (root / 'tls/ca.pem', '/tls/ca.pem')], ['pnpm', 'exec', 'tsx', 'scripts/service-worker.ts'])
     if options.delivery_files:
         import hashlib
-        public = options.delivery_files.resolve()
-        if public != root / 'public' or not (root / 'images-loaded.json').is_file():
-            raise RuntimeError('OWNED_DELIVERY_FILES_REQUIRED')
-        images = json.loads((root / 'images-loaded.json').read_text())
-        if images['CALLSIGN_APP_IMAGE'] != app_image:
-            raise RuntimeError('DELIVERED_RUNTIME_IMAGE_MISMATCH')
         tags = {'PREPARED_RUNTIME_IMAGE': run_id + '-runtime:delivery', 'NGINX_IMAGE': run_id + '-nginx:delivery'}
         for key, ref in [('PREPARED_RUNTIME_IMAGE', app_image), ('NGINX_IMAGE', images['HTTPS_IMAGE'])]:
             existing = subprocess.run(['docker','image','inspect','--format','{{.Id}}',tags[key]],capture_output=True,text=True)
@@ -213,7 +225,7 @@ try:
         (inputs/'nginx.conf').write_text('pid /tmp/nginx.pid;\nerror_log /dev/stderr notice;\nevents { worker_connections 128; }\nhttp { include /etc/nginx/mime.types; access_log off; client_body_temp_path /tmp/client; proxy_temp_path /tmp/proxy; fastcgi_temp_path /tmp/fastcgi; uwsgi_temp_path /tmp/uwsgi; scgi_temp_path /tmp/scgi; include /etc/nginx/conf.d/*.conf; }\n')
         (inputs/'Dockerfile').write_text('ARG BASE\nFROM ${BASE}\nCOPY dist /usr/share/nginx/html\nCOPY default.conf /etc/nginx/conf.d/default.conf\nCOPY nginx.conf /etc/nginx/nginx.conf\nUSER 1000:1000\nCMD ["nginx","-g","daemon off;"]\n')
         nginx = json.loads(subprocess.check_output(['docker','image','inspect','nginx:stable']))[0]
-        nginx_ref = nginx['RepoDigests'][0] if nginx.get('RepoDigests') else nginx['Id']
+        nginx_ref = nginx['Id']
         command(['docker','build','--network=none','--pull=false','--build-arg','BASE='+nginx_ref,'--iidfile',str(root/'web-image-id.txt'),'-t',run_id+'-web:candidate',str(inputs)],stdout=log,stderr=subprocess.STDOUT,timeout=60)
         web_image = (root/'web-image-id.txt').read_text().strip()
         start('web', {}, [(root/'tls/cert.pem','/tls/cert.pem'),(root/'tls/key.pem','/tls/key.pem'),(root/'tls/ca.pem','/etc/nginx/pbx-ca.pem')], image=web_image)

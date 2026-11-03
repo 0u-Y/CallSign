@@ -115,3 +115,40 @@ it('keeps the offline runtime recipe independent of dependency-install stages an
  for(const path of ['packages','services','scripts','apps/web','infra/deploy'])expect(source).toContain(`COPY ${path} ${path}`);
  expect(readFileSync('infra/deploy/app.Dockerfile','utf8')).not.toContain('AS prepared-runtime');
 });
+
+it('checks every delivered web FROM locally before starting services and rejects an unreviewed frontend',()=>{
+ const check=`import ast,json,re,subprocess,tempfile
+from pathlib import Path
+from types import SimpleNamespace
+module=ast.parse(Path('tests/integration/runtime-media-driver.py').read_text())
+fn=next(n for n in module.body if isinstance(n,ast.FunctionDef) and n.name=='local_web_build_images')
+refs=['sha256:'+'a'*64,'sha256:'+'b'*64];calls=[];bad=None
+
+def capture(args,**kwargs):
+ calls.append(args)
+ if bad=='missing':raise subprocess.CalledProcessError(1,args)
+ return json.dumps([{'Id':args[-1] if bad!='id' else refs[0],'Os':'linux','Architecture':'amd64' if bad!='architecture' else 'arm64'}])
+scope={'re':re,'json':json,'subprocess':SimpleNamespace(check_output=capture)}
+exec(compile(ast.Module(body=[fn],type_ignores=[]),'actual-local-image-preflight','exec'),scope)
+with tempfile.TemporaryDirectory() as directory:
+ root=Path(directory);recipe=root/'infra/deploy/web.Dockerfile';recipe.parent.mkdir(parents=True)
+ source=Path('infra/deploy/web.Dockerfile').read_text();recipe.write_text(source)
+ scope['local_web_build_images'](root,*refs)
+ assert [c[-1] for c in calls]==refs
+ for bad in ['missing','id','architecture']:
+  try:scope['local_web_build_images'](root,*refs)
+  except (RuntimeError,subprocess.CalledProcessError):pass
+  else:raise AssertionError('unsafe local image accepted:'+bad)
+ bad=None
+ for source in ['FROM missing:remote AS dependency\\n'+source,'# syntax=docker/dockerfile:1\\n'+source,'COPY --from=remote:tag /x /x\\n'+source,'ADD https://example.invalid/file /x\\n'+source]:
+  recipe.write_text(source);calls.clear()
+  try:scope['local_web_build_images'](root,*refs)
+  except RuntimeError:pass
+  else:raise AssertionError('unreviewed Dockerfile accepted')
+  assert not calls
+`;
+ expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
+ const driver=readFileSync('tests/integration/runtime-media-driver.py','utf8');
+ expect(driver.indexOf('local_web_build_images(public, app_image')).toBeLessThan(driver.indexOf("keeper = inspect("));
+ expect(driver).toContain("nginx_ref = nginx['Id']");
+});
