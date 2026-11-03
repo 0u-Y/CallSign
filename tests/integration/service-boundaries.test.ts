@@ -30,7 +30,7 @@ async function browserLogin(p:Page,subject:string,official=false){
  try{await button.waitFor();}catch(error){await writeFile(`${f.runRoot}/navigation-failure.json`,JSON.stringify({path:new URL(p.url()).pathname,title:await p.title(),visibleText:(await p.locator('body').innerText()).slice(0,1000),pageErrors,pending:[...pending].map(u=>new URL(u).pathname),failures}),{mode:0o600});throw error;}
  const [done]=await Promise.all([p.waitForResponse(r=>r.url().endsWith('/api/v3/auth/callback')),button.click()]);expect(done.status()).toBe(200);
  if(official)await p.getByRole('heading',{name:'공식 업무 확인',exact:true}).waitFor();
- else await p.getByRole('heading',{name:`내 업무 · ${f.uid(subject)}`,exact:true}).waitFor();
+ else {await p.getByRole('heading',{name:subject==='agent'?'배정된 연락 업무':subject==='recipient'?'나에게 온 연락':'기관 연락 업무',exact:true}).waitFor();await p.getByText('내 계정 식별자',{exact:true}).click();await expect.poll(()=>p.getByText('내 계정 식별자',{exact:true}).locator('..').innerText()).toContain(f.uid(subject));await p.getByText('내 계정 식별자',{exact:true}).click();}
 }
 async function post(p:Page,path:string,body:unknown,key=randomUUID()){
  return p.evaluate(async({path,body,key})=>{const me=await fetch('/api/v3/auth/me?purpose=work').then(r=>r.json());const response=await fetch('/api'+path,{method:'POST',headers:{'content-type':'application/json','x-csrf-token':me.csrfToken,'idempotency-key':key},body:JSON.stringify(body)});return {status:response.status,body:await response.json()};},{path,body,key});
@@ -103,11 +103,11 @@ it('boundary: shows durable worker failure instead of active configuration',asyn
 
 it('boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks',async()=>{
  const prepared=await f.login('staff');expect((await prepared.c.request('/v3/intents',{id:'official-owned-task',recipientId:f.uid('recipient'),agentId:f.uid('agent'),serviceUri:'https://center.example',expiresAt:f.now()+3600})).status).toBe(200);
- const page=await browserPage('recipient'),other=await page.context().newPage();await other.goto(f.origin+'/service');await other.getByRole('heading',{name:`내 업무 · ${f.uid('recipient')}`,exact:true}).waitFor();
+ const page=await browserPage('recipient'),other=await page.context().newPage();await other.goto(f.origin+'/service');await other.getByRole('heading',{name:'나에게 온 연락',exact:true}).waitFor();
  // Official login in this same context creates a separate cookie and CSRF context.
  const official=await page.context().newPage();await browserLogin(official,'recipient',true);expect(await post(page,'/v3/official/confirm',{intentId:'missing',answer:'recognized'}).then(r=>r.status)).toBe(403);
  const response=page.waitForResponse(r=>r.url().endsWith('/api/v3/auth/logout'));await page.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();expect((await response).status()).toBe(200);
- await other.getByRole('heading',{name:`내 업무 · ${f.uid('recipient')}`,exact:true}).waitFor({state:'hidden'});expect(await other.evaluate(()=>fetch('/api/v3/workspace').then(r=>r.status))).toBe(401);
+ await other.getByRole('heading',{name:'나에게 온 연락',exact:true}).waitFor({state:'hidden'});expect(await other.evaluate(()=>fetch('/api/v3/workspace').then(r=>r.status))).toBe(401);
  expect(await official.evaluate(()=>fetch('/api/v3/official-tasks').then(r=>r.status))).toBe(200);
  await official.getByRole('button',{name:'본인 거래 확인',exact:true}).waitFor();expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(1);const cookie=(await official.context().cookies()).find(c=>c.name==='official_session')!;await f.sql`UPDATE public.sessions SET expires_at=now()-interval '1 second' WHERE token_hash=${tokenHash(cookie.value)}`;
  await official.getByRole('button',{name:'다시 확인',exact:true}).click();await official.getByRole('alert').filter({hasText:'다시 로그인'}).waitFor();expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(0);
@@ -121,11 +121,11 @@ it('boundary: drops a held old-account response, clears management drafts on acc
  await page.route('**/api/v3/workspace',async route=>{const response=await route.fetch();seen();await gate;await route.fulfill({response});fulfilled();});
  await page.getByRole('button',{name:'업무 새로고침',exact:true}).click();await waiting;
  const tab=await page.context().newPage();await browserLogin(tab,'second-manager'); // Cookie changes without logging out the first tab.
- await page.getByRole('heading',{name:`내 업무 · ${f.uid('staff')}`,exact:true}).waitFor({state:'hidden'});
+ await page.getByRole('heading',{name:'기관 연락 업무',exact:true}).waitFor({state:'hidden'});
  release();await handled;await page.unroute('**/api/v3/workspace');await expect.poll(()=>page.getByRole('button',{name:'업무 새로고침',exact:true}).isEnabled(),{timeout:6000}).toBe(true);await page.getByRole('button',{name:'업무 새로고침',exact:true}).click();
- await page.getByRole('heading',{name:`내 업무 · ${f.uid('second-manager')}`,exact:true}).waitFor();expect(await page.getByLabel('수신자 계정',{exact:true}).inputValue()).toBe('');expect(await page.evaluate(()=>[...document.querySelectorAll('input')].some(e=>e.value==='PRIVATE-OLD-ACCOUNT-DRAFT'))).toBe(false);
+ await page.getByRole('heading',{name:'기관 연락 업무',exact:true}).waitFor();await page.getByText('내 계정 식별자',{exact:true}).click();await expect.poll(()=>page.getByText('내 계정 식별자',{exact:true}).locator('..').innerText()).toContain(f.uid('second-manager'));expect(await page.getByText('내 계정 식별자',{exact:true}).locator('..').innerText()).not.toContain(f.uid('staff'));await page.getByText('내 계정 식별자',{exact:true}).click();expect(await page.getByLabel('수신자 계정',{exact:true}).inputValue()).toBe('');expect(await page.evaluate(()=>[...document.querySelectorAll('input')].some(e=>e.value==='PRIVATE-OLD-ACCOUNT-DRAFT'))).toBe(false);
  const manager=await f.login('staff');expect((await manager.c.request('/v3/management/accounts',{issuer:f.oidc,subject:'second-manager',displayName:'두 번째 합성 담당자',role:'institution',active:false,permissions:['contact.manage','institution.recover']})).status).toBe(200);
- expect(await page.evaluate(()=>fetch('/api/v3/workspace').then(r=>r.status))).toBe(401);await page.getByRole('button',{name:'업무 새로고침',exact:true}).click();await page.getByRole('heading',{name:`내 업무 · ${f.uid('second-manager')}`,exact:true}).waitFor({state:'hidden'});
+ expect(await page.evaluate(()=>fetch('/api/v3/workspace').then(r=>r.status))).toBe(401);await page.getByRole('button',{name:'업무 새로고침',exact:true}).click();await page.getByRole('heading',{name:'기관 연락 업무',exact:true}).waitFor({state:'hidden'});
  expect(await post(page,'/v3/intents',{id:'revoked-account-work',recipientId:f.uid('recipient'),agentId:f.uid('agent'),serviceUri:'https://center.example',expiresAt:f.now()+100}).then(r=>r.status)).toBe(401);
 });
 
