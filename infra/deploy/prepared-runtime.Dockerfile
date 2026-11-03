@@ -10,4 +10,8 @@ COPY scripts scripts
 COPY apps/web apps/web
 COPY infra/deploy infra/deploy
 COPY infra/besu/network-config.json infra/besu/network-config.json
+# Only the new image cache directory changes owner; host files and base images stay untouched.
+USER 0
+RUN chown 1000:1000 node_modules
+USER 1000:1000
 RUN node --version && pnpm --filter @callsign/api exec tsx --version

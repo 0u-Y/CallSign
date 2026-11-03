@@ -14,7 +14,7 @@ AI-003/005·TEST-004: 기존 시험에 실제 SQL 잠금 중 consent transaction
 
 초기 준비는 하위 CLI에 pressure policy 옵션이 누락돼 SQL readiness 전 `EXPLICIT_RESOURCE_POLICY_MISMATCH`로 차단됐다. 원본을 보존하고 정확한 argv를 수정했으며 자원 중단이나 제품 assertion 실패는 아니었다. 이 호출 주의와 정확한 하위 명령을 RUNBOOK에 반영했다. 초기화 중 남은 소유 socket 파일은 확인된 전용 mount에서만 회수했고 기존 파일의 권한/소유권은 변경하지 않았다. observer 묶음에는 선택 SQL/WS 시험·guard/setup/reporter와 readiness/감사를 포함하도록 보완했다.
 
-후보 생성의 최초 legacy build가 목표 stage 앞의 dependencies를 실행해 로컬에 없던 Node base227,146,390bytes를 자동 수령했다. 사용자에게 즉시 알렸으며 `--network=none`/`--pull=false`를 수령 차단으로 오해한 실행 결함이다. 추가 의존성 요청은 none 네트워크에서 실패했고 원본을 보존했다. prepared-runtime stage를 전용 Dockerfile로 분리해 설치 stage를 평가하지 않도록 수정하고 현재 호출/정적 회귀를 함께 갱신했다. 이 준비 결함을 제품 통합 실패나 성공으로 합산하지 않는다.
+후보 생성의 최초 legacy build가 목표 stage 앞의 dependencies를 실행해 로컬에 없던 Node base227,146,390bytes를 자동 수령했다. 사용자에게 즉시 알렸으며 `--network=none`/`--pull=false`를 수령 차단으로 오해한 실행 결함이다. 추가 의존성 요청은 none 네트워크에서 실패했고 원본을 보존했다. prepared-runtime stage를 전용 Dockerfile로 분리해 설치 stage를 평가하지 않도록 수정하고 현재 호출/정적 회귀를 함께 갱신했다. 이 준비 결함을 제품 통합 실패나 성공으로 합산하지 않는다. 분리 후에는 기존 base의 root 소유 pnpm cache 디렉터리가 UID1000 검증을 막는 EACCES가 재현됐다. 새 후보 layer의 해당 디렉터리만 UID1000으로 맞추며 기존 host 파일/base image/lockfile/verify 설정은 변경하지 않는다.
 
 runtime·공개/observer 후보는 이 소스를 clean checkout으로 고정한 뒤 로컬에서만 생성·검사한다. 후보의 실제 image/config/hash·보호 자료 감사와 미실행 미디어 범위는 이번 후보 증거에 기록하며 기존 Release/GHCR는 변경하지 않는다.
 
