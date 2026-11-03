@@ -4,6 +4,7 @@
 
 | 목적 | 시작 위치 |
 |---|---|
+| 실제 제품 역할별 사용 | [기관·상담원·수신자 순서](#2026-11-04-제품-경로-실행의-한정-승인) |
 | AWS에서 자료 수령 | [고정 Release·GHCR 참조와 인증](#github-delivery-20261102) |
 | 신규/기존 환경 구별 | [NEW 초기화](#new-초기-배포-순서), [재개·RESTORE](#재시작실패-재개기존-배포-restore) |
 | 서비스 기동 없는 개발 검사 | [실행 범주](#실행-범주), [단계별 판정](#단계별-검증과-판정) |
@@ -1810,3 +1811,43 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeou
 - 복원은 서비스 시작·anchor rollback·키 재발급·권한 generation 초기화를 하지 않는다. 최신 anchor 대조가 일치해야 gate를 열고, 새 로그인·새 통화 시도·공개 trust/키 검증을 적용한다. anchor가 앞서거나 이력이 손상됐으면 자동으로 맞추지 않는다. 현재 구현에는 이 불일치를 자동 해제하는 승인 복구 도구가 없으며 운영자의 원본 이력 복구/공동 재신뢰 결정이 필요하다.
 
 공유 증거는 코드/도구 hash·원본 판정·관측 요약·비밀 제거 로그만 남긴다. 백업/복호화 키·dump·SQL 평문·session·개인키·브라우저 storage는 게시하지 않는다. 자식 서버/worker가 종료됐음을 확인하고 container/volume의 identity label을 대조한 뒤 **그 두 컨테이너·그 두 volume과 보호 ROOT**만 정리한다. 전역 prune, 기존 프로세스 종료, 기존 anchor 초기화는 하지 않는다.
+
+<a id="mentoring-five-evaluation"></a>
+
+### 5차 평가·후보 인계
+
+`tests/fixtures/service-purpose-evaluation.json`은 합성30사례이며 모두 `humanReview: not-reviewed`다. 개발용/평가용을 사례군 `family`로 분리한다. 파서 상한50은 외부 호출 허가가 아니다. `evaluate-service-analysis.ts --provider`는 **평가용만 최대20회**, 각4초·직렬·재시도0으로 제한한다. 기존 source/image·보호 제공자 참조·비용/보관 승인 guard를 유지하며 이번에는 호출하지 않았다. 미실행 사례는 NOT_RUN으로 남고 판단 불가율은 관측 사례만 분모로 사용한다. 실제 제공자 text 평가는 STT·실제 한국어 음원 품질과 별개다. 별도 승인된 음원 평가에는 기존 provider-smoke/통화 분석 경로가 필요하며 합성 replay를 정확도로 집계하지 않는다.
+
+무호출 준비 확인은 `pnpm exec tsx scripts/evaluate-service-analysis.ts tests/fixtures/service-purpose-evaluation.json NEW_OUTPUT.json`이다. 이 명령은 결과 파일을 새로 만들며 언어 품질을 시험하지 않는다. 실제 호출에는 기존 [4차 실행 조건](#mentoring-fourth-validation)을 따른다.
+
+통화 집계에 `authorization-response`, `pbx-absent` 관측을 추가했다. 승인 응답은 실제 POST 응답 성공을 확인한 controller 시각이며, 승인 표시/검증 완료와 별도다. runtime-media의 PBX 부재는 ARI 채널2개·브리지의 실제404를 모두 확인한 뒤 기록한다. 실제 음성 중단은 양 끝점 decode 관측을 그대로 요구한다. 누락 구간은 `missing-endpoint`, 역순은 `reversed-order`로 남기며 타이머/0으로 채우지 않는다. smoke2회는 전체 성공률/SLA가 아니다.
+
+현재 후보 e95b653/runtime dfee3789와 고정 Release `aws-bootstrap-20261102t093531z`에는 이번 UI·측정·평가 변경이 없다. 다음 발행은 검증 소스 고정→새 runtime→공개/observer 묶음→layer/context 감사→비공개 GHCR→실제 registry digest→새 고유 Release→별도 수령 검증 순서다. 기존 release-manifest/게시 절차를 재사용하고 기존 digest/서명 inventory를 편집하지 않는다.5종 인프라 recipe는 변경하지 않았으므로 재사용 검토 대상이다. 최종 웹은 새 runtime과 AWS 계약 metadata/trust/PBX 인증서로 다시 생성한다. 개발 서버 경로/키·전역 Docker 로그인은 runtime 입력으로 전달하지 않는다.
+
+NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployment.sh restart`는 Compose restart만 실행하며 migration/seed/key/genesis를 호출하지 않는다. 강제 종료의 quota는 기존 만료 후 보수 정산이며 즉시 환불/청구 대조를 보장하지 않는다. 이번에 재시작·복원·외부 TLS/OIDC/TURN·AWS를 실행하지 않았다.40GiB 시작 guard와 동시 웹 build 예외의 미승인 상태도 변경하지 않았다.
+
+새 observer archive에는 합성 평가 fixture도 포함한다. runtime 안의 평가 도구만 전달하고 입력을 개발 서버 checkout에 남기는 누락을 보완했다. 새 phase를 쓰는 observer와 구 runtime의 observation-contract를 혼합하지 않는다.
+
+### 5차 후속의 직렬 웹 build 검토
+
+`runtime-media.test.ts`의 controller beforeAll은 로컬 OIDC fixture와 준비 문맥을 생성하고 `image-services-started.json`을 최대120초 기다린다. host driver는 그 문맥을 받아 API4개를 기동한 뒤 해당 trust pin으로 최대90초 웹을 build한다. controller를 정상 종료하면 OIDC/시험 실행 문맥도 종료되므로 같은 프로세스를 이어갈 수 없다. 기반 서비스만 종료해도 controller와 builder가 겹치며, 전체 종료 후 NEW를 반복하는 것은 허용된 재개가 아니다. 기존 phase 보관은 이전 시험 종료 후 앱/controller를 재시작하는 절차이지 이 beforeAll 중간을 직렬 checkpoint로 바꾸는 기능이 아니다.
+
+따라서 이번에는 복잡한 단계 분할 도구를 만들거나 실행 예외를 자동 적용하지 않았다. 변경 화면의 격리 HTTP/WS/Chromium, 새 runtime 제작, 전체 미디어 실행은 별도 명시적 허가가 필요하다. 웹 build2GiB/CPU1/90초만 동시 실행 예외·호스트1GiB 포함 전체 관측24GiB 제안은 승인 전까지 미적용이다.40GiB 시작·16GiB 여유·기존 pressure/OOM/timeout·소유 자원 정리 조건은 유지한다. 승인 후에도 최신 자원 관측과 실행 deadline을 고정한 뒤 시작하며, 부족한 로컬 이미지/도구는 다운로드하지 않는다.
+
+### 2026-11-04 제품 경로 실행의 한정 승인
+
+이번 로컬 실행에서는 앞선 동시 웹 build/예산 제안이 명시적으로 승인됐다. 시작40GiB·여유16GiB·전체 관측24GiB·호스트 시험 프로세스1GiB와 웹 build2GiB/CPU1/90초만의 동시 예외를 적용한다. 기존 중단 정책을 유지하고 정리 포함90분, 마지막10분은 신규 장기 단계를 시작하지 않는다. 다음 실행의 상시 허가가 아니다. 앞선 미승인 기록은 당시 상태로 보존한다.
+
+기본 제품 경로는 `/service`, 별도 인증 공식 확인은 `/official`이다. 기관·상담원·수신자는 독립 브라우저 프로필에서 실제 로그인한다. 기관은 고객/상담원/콜센터 선택→업무·위임 생성→원장 확정 확인, 상담원은 배정 업무→새 통화→개별 승인→마이크/PBX 등록→발신, 수신자는 자기 통화 선택→마이크/PBX 등록→수락/검증→선택적 분석 동의 순서다. 종료·취소·정지는 각 실제 권한/API로 수행하고 원장/서버/PBX/양 끝 음성 관측을 분리한다. 복구는 현재 proposal/nonce/epoch/만료에 맞는 서로 다른 관리 승인자2명 서명이 필요하며 과거 통화를 재사용하지 않는다. 별도 발표 화면·장면 버튼·기록 재생을 만들지 않는다.
+
+현재 `vercel.json`은 PUBLIC_PREVIEW build, self connect-src, microphone=()다. 실제 AWS API/WSS로 이어진 배포 연결이나 서비스 URL은 확인되지 않았다. 이를 풀어 쿠키/CSRF/origin 정책을 우회하지 않는다. 실제 서비스는 적절한 AWS 동일 origin과 OIDC callback/TLS/WSS/TURN 입력을 준비해 검증해야 하며 Vercel 공개 preview를 통화 성공으로 표시하지 않는다.
+
+### 최신 제품 후보의 사용·인계 상태 (2026-11-04)
+
+위 역할별 `/service` 사용 순서로 최신 후보의 work-cancel·emergency-stop을 실행했다. 일반 issuer 시작 확인은 실제 provider fixture 시험과 분리한다. 분석 결과 도착 표시와 이전 문맥 결과 폐기는6e3cd23에 포함된다. 정지 뒤 단독 복구400은 HTTP 검증,2명 공동 복구와 epoch/키 세대 반영은 실제 원장 검증이다. 과거 통화·승인을 다시 사용하지 않는다. [실행 기준·제한](FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [inventory/checksum](../artifacts/product-runtime-validation-20261104.json)을 먼저 확인한다.
+
+이번 실행에 한해 HTTP/WS/Chromium host RSS3GiB 재개를 승인받았고 전체 통화 host1GiB는 유지했다. cgroup 종료 경합 중단 뒤 사용자가 승인한 동일 후보 새 batch1회도 종료·정리했다. 이 승인을 다음 기동의 상시 권한으로 사용하지 않는다. 시작40GiB·실행 여유16GiB·총 관측24GiB와 관측 오류 중단 조건은 변경하지 않았다.
+
+로컬 전달 후보는 `.local/presentation-run-20261103T155054Z-209fa1/candidate-final-209fa1/delivery-final/`에 보존한다. 이름은 작업 디렉터리일 뿐 발표 UI가 아니며 AWS runtime 경로가 아니다. 공개 배포 tar·observer tar·images inventory·SHA256SUMS와6종 bootstrap archive가 있다. 보호 키/채운 env/원음/DB·chain 상태는 전달 archive에 넣지 않았고 일회성 시험 보호 입력은 정리했다. 이 후보는 신규 AWS NEW용 코드/이미지 전달물이며 종료한 시험 배포의 RESTORE 백업이 아니다.
+
+소스6e3cd23의 runtime config ID는 공개 증거를 따르며 registry manifest digest는 아직 없다.5종 인프라 이미지는 기존 검증 참조를 재사용한다. 실제 AWS trust·계약 metadata·PBX 인증서가 준비된 뒤 동일 전달 runtime/nginx로 최종 웹을 생성한다. 새 runtime 비공개 GHCR 게시→실제 registry digest 확보→새 고유 Release의 공개 파일/checksum 게시→별도 디렉터리 원격 수령 검증 전에는 기존 고정 Release가 최신이라고 설명하지 않는다. 이 작업에서는 새 원격 게시를 실행하지 않았다.

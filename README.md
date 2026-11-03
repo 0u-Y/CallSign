@@ -59,6 +59,8 @@ pnpm light
 
 대회 실행 환경은 **AWS**이며 개발 서버는 필요하지 않아야 합니다. Git에는 소스·설정 예제·도구를, 공개 Release에는 배포 파일·inventory·checksum을, **비공개 GHCR**에는 bootstrap 이미지를 보관합니다. 이미지 수령에는 별도의 package 읽기 권한과 보호 자격파일이 필요합니다. 게시용 token을 AWS에 복사하지 않습니다.
 
+최신 로컬 제품 후보는 실제 통화·분석·선택 회수/공동 복구를 확인했지만 아직 새 GHCR/Release로 게시하지 않았습니다. 아래 원격 전달 버전과 혼동하지 않습니다.
+
 **[배포 기준 Release·수령 명령](docs/RUNBOOK.md#github-delivery-20261102)**에서 고정 tag와 manifest digest를 확인하세요. GitHub의 `latest`를 배포 기준으로 사용하지 않습니다. 최종 웹은 실제 AWS trust·인증서가 준비된 뒤 생성합니다. [NEW 초기 배포와 기존 환경 재개·복구](docs/RUNBOOK.md#aws-competition)는 서로 다른 절차입니다.
 
 ## 문서 찾기

@@ -1,0 +1,58 @@
+{
+  "atUtc": "2026-11-03T15:16:04.550322+00:00",
+  "head": "2972a70127003bf5a7aa2136400a3bb1237135d0",
+  "dirty": true,
+  "scope": "offline source validation only",
+  "sourceFilesSha256": {
+    "apps/web/src/components/ServiceRecallStatus.tsx": "dd66ad79e43572b3e942c4794641fcfce1edd40244de4d2c3453b348cc56ded0",
+    "apps/web/src/pages/Service.tsx": "89b3ef7a6875a06b18c89abae0c987ee62bf5180dec3792bb30d7b24f0b0692e",
+    "scripts/evaluate-performance.ts": "ac544b9d4d7f4219e5c5f13695a1082e66267a3af52091a2d97ccf26e9caab01",
+    "scripts/evaluate-service-analysis.ts": "42d485685832a487df04390959b9c1189da3184420dc185619542d6ff24ee27e",
+    "scripts/release-manifest.ts": "acbcd460ed0ce6865eee037da3c3ea521f828455141fb5c68ecc806f4057e4db",
+    "services/api/src/observation-contract.ts": "6ba6726c51cedec295d05b185bb17a53ac661bf860443a7d09c7b83c030ef976",
+    "tests/fixtures/service-purpose-evaluation.json": "e8ac8006451e364dfc1dc7aadfaec518e4a0b0bfc9807ec150183899926d36fb",
+    "tests/integration/runtime-media.test.ts": "9b9c3d587dc22316ddb0f46a9b10ae2d10eec36103c0095415d5ce93b7f69e4f",
+    "tests/media/service-pbx.spec.ts": "f3ec6b5942b1aa653b3f4360772bb538ba0d5e2ce97bad8bc63522aaf0d95ff4",
+    "tests/unit/call-trials.test.ts": "f939fa03fccd7a54ffbacac877ffe1d1c0a981cc87f0d313d54e4837bd5f1eff",
+    "tests/unit/deployment-config.test.ts": "f3ff938f6f9a8eb3fa4b46aa2989bf12b8406791838cba610ef51d927bd35746",
+    "tests/unit/service-evaluation.test.ts": "56cc5e34e7241e394054225f578cace60bb6d28ad582d16ea53db2da6333e43d",
+    "apps/web/src/recall-view.test.ts": "ca5d8545d8088b004905ea127f533da44cc8699c287a5fe6ced779e5f9b9f236"
+  },
+  "checks": {
+    "light": {
+      "files": 63,
+      "tests": 312,
+      "status": "PASS"
+    },
+    "webBuild": "PASS_WITH_EXISTING_CHUNK_WARNINGS",
+    "componentRegression": "SSR only, no Chromium",
+    "uiDetector": [],
+    "evaluation": {
+      "cases": 30,
+      "status": "NOT_RUN",
+      "providerCalls": 0,
+      "humanReview": "not-reviewed"
+    },
+    "apiRuntimeTypes": "PASS",
+    "deliveryFixtureInObserver": "PASS_OFFLINE"
+  },
+  "correctedFailures": [
+    "Initial synthetic fixture used three non-schema category labels; corrected to protocol spellings.",
+    "Initial light found a duplicate authorization variable in the observer test; renamed response variable. Initial light log preserved locally."
+  ],
+  "notRun": [
+    "PostgreSQL",
+    "HTTP integration",
+    "WebSocket integration",
+    "Chromium",
+    "PBX/media",
+    "external STT/LLM quality",
+    "AWS",
+    "image build/publication",
+    "Release"
+  ],
+  "serverConfigurationChanges": false,
+  "servicesStarted": false,
+  "downloads": false,
+  "candidateImageUpdated": false
+}

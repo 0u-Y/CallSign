@@ -173,6 +173,18 @@ try:
     issuer_mounts=public_mounts+[(root/'data/issuer','/issuer'),(root/'data/pbx/evidence.json','/pbx/evidence.json'),(root/'tls/cert.pem','/tls/cert.pem')]
     issuer_command=None
     if options.analysis_fixture:
+        # Probe the image's normal command before mounting the observer-only provider entrypoint.
+        probe=start('issuer-entrypoint-probe',issuer,issuer_mounts)
+        try:
+            health_probe="const end=Date.now()+20000;for(;;){try{const h=await fetch('http://127.0.0.1:4101/health');const a=await fetch('http://127.0.0.1:4101/v3/auth/me?purpose=work');if(!h.ok||a.status!==401)throw Error();break;}catch{if(Date.now()>end)throw Error('NORMAL_ISSUER_ENTRYPOINT_TIMEOUT');await new Promise(r=>setTimeout(r,200));}}"
+            command(['docker','exec',controller,'node','--input-type=module','-e',health_probe],stdout=log,stderr=subprocess.STDOUT,timeout=25)
+            with open(root/('normal-entrypoint-'+str(time.time_ns())+'.json'),'x') as output:json.dump({'image':app_image,'normalCommand':True,'health':200,'unauthenticatedAuth':401,'fixtureMounted':False,'scope':'startup/auth challenge, not full readiness or media'},output)
+        finally:
+            info=inspect(probe)
+            if info['Image']!=app_image or info['Config']['Labels'].get('org.callsign.run-id')!=run_id or not any(c['id']==info['Id'] for c in owner['containers']):raise RuntimeError('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED')
+            command(['docker','stop','-t','3',info['Id']],stdout=log,stderr=subprocess.STDOUT,timeout=10)
+            command(['docker','rm',info['Id']],stdout=log,stderr=subprocess.STDOUT,timeout=10)
+            (root/'issuer-entrypoint-probe.env').unlink()
         entry=Path(__file__).resolve().parent/'runtime-analysis-fixture.ts'
         if not entry.is_file():raise RuntimeError('OBSERVER_ANALYSIS_ENTRY_MISSING')
         issuer.update(CALLSIGN_ALLOW_EXTERNAL_EXECUTION='integration',CALLSIGN_RUNTIME_IMAGE_CONFIRMATION='OWNED_FINAL_IMAGE',CALLSIGN_MEDIA_FIXTURE_RUN_ID=run_id,CALLSIGN_MEDIA_FIXTURE_TOKEN_FILE='/observer/token',CALLSIGN_MEDIA_FIXTURE_OWNERSHIP='/observer/ownership.json')

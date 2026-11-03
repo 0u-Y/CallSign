@@ -44,7 +44,7 @@ it('keeps real chain integration outside light and database suites with an expli
 
 it('ships the historical report required by the web bundle and avoids dependency-directory config writes',()=>{
  const web=readFileSync('infra/deploy/web.Dockerfile','utf8');expect(web).toContain('vite build --configLoader runner');expect(web).toContain('COPY artifacts/test-results.json artifacts/test-results.json');
- expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'artifacts/test-results.json'");expect(readFileSync('.dockerignore','utf8')).toContain('!artifacts/test-results.json');
+ expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'artifacts/test-results.json'");expect(readFileSync('scripts/release-manifest.ts','utf8')).toContain("'tests/fixtures/service-purpose-evaluation.json'");expect(readFileSync('.dockerignore','utf8')).toContain('!artifacts/test-results.json');
 });
 
 it('keeps NEW rehearsal preparation dry and denies unapproved execution before Docker or file creation',()=>{
@@ -151,4 +151,17 @@ with tempfile.TemporaryDirectory() as directory:
  const driver=readFileSync('tests/integration/runtime-media-driver.py','utf8');
  expect(driver.indexOf('local_web_build_images(public, app_image')).toBeLessThan(driver.indexOf("keeper = inspect("));
  expect(driver).toContain("nginx_ref = nginx['Id']");
+});
+
+
+it('probes the normal issuer command before explicitly selecting the media provider fixture',()=>{
+ const source=readFileSync('tests/integration/runtime-media-driver.py','utf8');
+ expect(source.indexOf("probe=start('issuer-entrypoint-probe',issuer,issuer_mounts)")).toBeLessThan(source.indexOf("issuer_command=['pnpm','exec','tsx','tests/integration/runtime-analysis-fixture.ts'"));
+ expect(source).toContain("'fixtureMounted':False");expect(source).toContain('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED');
+});
+
+it('prepares an inactive recovery key in NEW media fixtures without replacing the active manifest',()=>{
+ const source=readFileSync('tests/integration/runtime-delivery-bootstrap.py','utf8');
+ expect(source).toContain("'approval-key','/run/callsign/data','/run/callsign/data/public-manifest-v2.json'");expect(source).toContain("'APPROVAL_KEY_VERSION':'2'");
+ expect(source).toContain("if not (r/'foundation-complete.json').exists():");
 });

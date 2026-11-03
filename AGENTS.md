@@ -97,3 +97,8 @@
 ## 2026-11-03 후보 제작과 선택 SQL·WS 회귀
 
 이번 요청은 기존 서버/자원을 보존하는 소유 none namespace의 후보 runtime build·공개/observer 로컬 묶음, 합성 입력의 제한된 SQL/HTTP/WS·실제 미디어 시험과 관련 commit/일반 push/light CI를 조건부 허용한다. 기존 전체 NEW의40GiB 시작 guard는 유지하며 현재 부족한 자원에서 전체 스택을 시작하거나 예산을 임의 변경하지 않는다. 작은 SQL 시험은 기존512MiB DB/3GiB 앱·명시적 integration-pressure-v1을 적용한다. 기존 자원·host/global auth 변경, 다운로드·외부 제공자/AWS·GHCR push/Release는 금지다. 과거 증거를 현재 PASS로 복사하지 않으며 후속 기동의 상시 허가가 아니다.
+
+
+## 2026-11-04 실제 제품 통합·후보 제작의 한정 실행
+
+이번 사용자 요청은 소유 network=none/공유 namespace·Unix socket/loopback의 DB/API/OIDC/웹/설치 Chromium, 최신 runtime·공개/observer 로컬 후보, Besu4/Witness4/Anchor/PBX/TURN의 work-cancel·emergency-stop 각1회 및 단독/공동 복구 시험을 허용한다. 시작 available40GiB·실행 여유16GiB·전체 관측24GiB(호스트 시험 프로세스1GiB 포함), 최종 웹 build만2GiB/CPU1/90초 동시 실행 예외, 기존 pressure/OOM/관측 오류 기준과 정리 포함90분/마지막10분 신규 장기 단계 금지를 지킨다. 자원 중단 후 자동 재기동하지 않는다. 기존 host/network/global auth/service/volume·다운로드·외부 AI/AWS·별도 허가 없는 GHCR/Release는 변경/실행하지 않는다. 사용자의 후속 정정에 따라 발표 전용3분할/장면/재생 기능은 추가하지 않으며 실제 `/service` 역할별 흐름을 검증한다. 상시 실행 허가가 아니다.

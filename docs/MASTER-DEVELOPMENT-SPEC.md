@@ -1,5 +1,7 @@
 # CallSign 전체 개발 명세
 
+5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
+
 DB-001/003·TEST-001/004·AI-003/005·UI-006의 최신 실제 SQL/인증·HTTP/WS·Chromium 검증과 초기 quota 실패/수정은 [2026-11-03 통합 기록](FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)을 따른다. 고유 사례 HTTP11/WS14/Chromium9의 fixture/component host 경계와 실제 인프라 미검증을 구분하며 완료 기준은 유지한다.
 
 종료 경합 회귀와 실제 ServiceCall 분석/회수의 다음 실행 범위는 [검토 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 새 경로의 오프라인 확인을 실제 통화/모델 품질 완료로 확대하지 않는다.
