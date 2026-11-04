@@ -327,3 +327,13 @@ for role in ['besu1','witness1','postgres','anchor','asterisk','turn']:
 assert not m.expected_archive_exit('/test-run-issuer','test-run','archive-unknown')
 `],{stdio:'pipe'});
 });
+
+it('keeps owned exit diagnostics separate from credentials and arbitrary daemon error strings',()=>{
+ execFileSync('python3',['-c',`
+import runpy
+m=runpy.run_path('scripts/validation-runtime-media.py',run_name='unit_only')
+value=m['exit_observation']({'Status':'exited','Running':False,'ExitCode':139,'OOMKilled':False,'StartedAt':'start','FinishedAt':'finish','Error':'sensitive arbitrary message','Env':['SECRET=value']})
+assert value['ExitCode']==139 and value['OOMKilled'] is False
+assert 'Error' not in value and 'Env' not in value
+`],{stdio:'pipe'});
+});

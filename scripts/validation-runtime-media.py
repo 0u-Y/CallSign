@@ -33,6 +33,9 @@ def expected_archive_exit(name,run,stage):
     phases=['normal-smoke-1','normal-smoke-2','normal-repeat-1','normal-repeat-2','work-cancel']
     return stage in ['archive-'+phase for phase in phases] and name in ['/'+run+'-'+role for role in ['issuer','platform','sender','worker','web','https','controller']]
 
+def exit_observation(state):
+    return {key:state.get(key) for key in ['Status','Running','ExitCode','OOMKilled','StartedAt','FinishedAt']}
+
 def cleanup_priority(entry):
     name=entry['name']
     return 0 if any(x in name for x in ['controller','issuer','sender','platform','worker','web','https']) else 2 if name.endswith('-net') else 1
@@ -105,7 +108,7 @@ def main():
       used=memory(info) if info['State']['Running'] else 0
       if info['State'].get('OOMKilled'):stop=stop or 'OWNED_CONTAINER_OOM'
       if not info['State']['Running'] and info['State'].get('Status')!='created' and '-tool-' not in info['Name'] and 'issuer-entrypoint-probe' not in info['Name'] and not expected_archive_exit(info['Name'],run,stage):stop=stop or 'OWNED_SERVICE_EXIT'
-      total+=used;containers.append({'id':info['Id'],'bytes':used,'limit':info['HostConfig']['Memory'],'running':info['State']['Running'],'role':info.get('Name','').removeprefix('/'+run+'-'),'swapLimit':info['HostConfig']['MemorySwap'],'cgroup':info.get('_cgroup')})
+      total+=used;containers.append({'id':info['Id'],'bytes':used,'limit':info['HostConfig']['Memory'],'running':info['State']['Running'],'role':info.get('Name','').removeprefix('/'+run+'-'),'state':exit_observation(info['State']),'swapLimit':info['HostConfig']['MemorySwap'],'cgroup':info.get('_cgroup')})
      current=root/'runtime-media-test.log'
      if current.exists():
       for cid in re.findall(r'Running in ([0-9a-f]{12,64})',current.read_text(errors='replace')):
@@ -155,6 +158,12 @@ def main():
       if time.monotonic_ns()>plan['deadlineMonotonicNs']-30_000_000_000:errors.append('CLEANUP_DEADLINE_REMAINING_RESOURCES');break
       for info in inspect([entry['id']]):
        if info['Id']!=entry['id'] or (info['Config'].get('Labels') or {}).get('org.callsign.run-id')!=run:errors.append('OWNERSHIP_MISMATCH');continue
+       try:
+        state_file=evidence/('container-'+info['Id']+'-state.json');state_file.write_text(json.dumps(exit_observation(info['State']))+'\n');state_file.chmod(0o600)
+        logs=subprocess.run(['docker','logs','--tail','200',info['Id']],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=5)
+        if logs.returncode:errors.append('CONTAINER_LOG_CAPTURE_FAILED')
+        log_file=evidence/('container-'+info['Id']+'.log');log_file.write_bytes(logs.stdout);log_file.chmod(0o600)
+       except Exception as error:errors.append('CONTAINER_EVIDENCE_'+type(error).__name__)
        try:
         if info['State']['Running']:subprocess.run(['docker','stop','-t','3',info['Id']],check=True,stdout=subprocess.DEVNULL,timeout=12)
         subprocess.run(['docker','rm',info['Id']],check=True,stdout=subprocess.DEVNULL,timeout=10);removed.append(info['Id'])
