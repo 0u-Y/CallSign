@@ -46,6 +46,8 @@ GHCR의6e3cd23 이미지 후보6종은 비공개 게시·실제 원격 수령을
 
 A 정리 뒤 B 최초 표본은 available39.04GiB로40GiB 시작 조건을 통과하지 못했다. 체인/PBX/TURN/Anchor를 기동하거나 조건을 기다리며 반복 조회하지 않았다. 새 clean source65d85ac의 runtime은 기존 로컬 base·network-none·2GiB/CPU1/90초로 직렬 build하고 파일/사용자/아키텍처를 무기동 대조했다. 새 runtime 실제 기동·통화와 AWS 최종 trust 웹·후속 원격 게시를 완료로 표시하지 않는다. 기존 후보/Release·원본 실패·개인 요약은 보존했다.
 
+공개/observer·inventory·audit·checksum5개 로컬 후보를 [전달 영수증](../artifacts/service-ui-candidate-20261104.json)에 고정했다. runtime source와 문서/공개 묶음 source의 차이는 문서·증거뿐이다. checksum·공개 경로/패턴 검사를 통과했지만 새 runtime 기동/통화가 미검증이므로 원격 게시·수령·AWS 준비 완료로 쓰지 않는다.
+
 Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반 push하고 원격/CI를 확인한다. PR을 새로 만들거나 승인 대기하지 않으며 기존 Draft #1은 main 반영 뒤 중복으로 닫는다.
 
 ## 현재 상태와 다음 단계

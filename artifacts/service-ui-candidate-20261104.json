@@ -1,0 +1,60 @@
+{
+  "publicSourceCommit": "68c62fd1146b5a92c8ab06b6b8c6fde8f68b30c2",
+  "runtimeProductSourceCommit": "65d85ac28987f3b3dda0e7604f169be798c181ba",
+  "runtimeConfigId": "sha256:b5e25975c3ac52376beea64d807e30d8b31a9026dc3098cbda359f00e6a8fafb",
+  "runtimeRegistryManifestDigest": null,
+  "status": "LOCAL_PREPARATION_ONLY",
+  "fullMedia": "NOT_RUN",
+  "files": [
+    {
+      "name": "deployment-files.tar",
+      "bytes": 3010560,
+      "sha256": "bb172c62b426f4648d0725d2744e026f51c82716f303948d00047db3532d8b05"
+    },
+    {
+      "name": "observer-tests.tar",
+      "bytes": 286720,
+      "sha256": "fa0a5d43c657708b2baf2eb8a119a78159d95dfd826851229b961cfbd1150c22"
+    },
+    {
+      "name": "images.json",
+      "bytes": 5300,
+      "sha256": "69f3e58e33dc7fa753e554d610d9fda7c5a575b72db300d869d5ab639b911443"
+    },
+    {
+      "name": "publication-audit.json",
+      "bytes": 2826,
+      "sha256": "bdce58067a96acdccc83a949170c5f3820c1bd1aedd4e37cb2b6fbef8846e8a2"
+    },
+    {
+      "name": "SHA256SUMS",
+      "bytes": 339,
+      "sha256": "db7f80689520c9023b6b847618191e284b16c971669d8e0834c5c68b843d49d7"
+    }
+  ],
+  "archivePathAndPatternAudit": "PASS; not exhaustive independent secret absence proof",
+  "remotePublication": "NOT_PUBLISHED",
+  "runtimeStartup": "NOT_RUN",
+  "publicRuntimeDifference": [
+    "artifacts/service-ui-20261104/agent-mobile.png",
+    "artifacts/service-ui-20261104/analysis-component-risk-purpose.png",
+    "artifacts/service-ui-20261104/analysis-component-unavailable.png",
+    "artifacts/service-ui-20261104/approver-mobile.png",
+    "artifacts/service-ui-20261104/institution-desktop.png",
+    "artifacts/service-ui-20261104/loading-mobile.png",
+    "artifacts/service-ui-20261104/official-mobile.png",
+    "artifacts/service-ui-20261104/recipient-desktop.png",
+    "artifacts/service-ui-20261104/zoom-layout.png",
+    "artifacts/service-ui-validation-20261104.json",
+    "docs/FINALS-IMPLEMENTATION-PLAN.md",
+    "docs/KNOWN-LIMITATIONS.md",
+    "docs/LOCAL-VALIDATION.md",
+    "docs/guide/05-IMPLEMENTATION-STATUS.md"
+  ],
+  "localCandidateDirectory": ".local/ui-only-20261104T101446Z-699971/delivery-ui-candidate",
+  "architecture": "linux/amd64",
+  "imageAudit": "artifacts/service-ui-validation-20261104.json",
+  "unchangedInfrastructure": "five existing private manifests; config IDs verified during bundle inventory",
+  "transferReady": false,
+  "remaining": "new image runtime/media validation at full 40GiB profile, then private GHCR / unique prerelease / remote receipt; target AWS trust web separate"
+}
