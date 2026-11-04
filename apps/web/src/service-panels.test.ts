@@ -25,6 +25,7 @@ it('keeps selected task context distinct from call verification and handles unkn
  expect(render({intent:{...intent,status:'cancelled'}})).toContain('종료된 업무');
  const unknown=render({intent:{...intent,status:'INTERNAL_STATE'}});expect(unknown).toContain('새로 조회');expect(unknown).not.toContain('INTERNAL_STATE');expect(unknown).not.toContain('종료된 업무');
  expect(render({intent:undefined,attempt:undefined})).toContain('선택 전 · 연결되지 않음');
+ expect(render({active:true})).toContain('현재 통화의 권한과 연결 상태를 확인하세요');expect(render({active:false})).toContain('확인한 뒤 수락하세요');
 });
 
 

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./service.css";
 
 :root {
   --ground: #f6f8fa;
@@ -690,7 +691,6 @@ tbody th { color: var(--ink); font-weight: 700; }
   .brand strong { font-size: 16px; }
   .brand-mark { width: 29px; height: 29px; }
   .site-header nav a { padding: 0 7px; font-size: 12px; }
-  .app-shell:not(.public-preview) .site-header nav a:nth-child(2) { display: none; }
   .hero-copy h1 { font-size: 38px; }
   .hero-actions { flex-direction: column; }
   .hero-actions .button { width: 100%; }
@@ -765,37 +765,3 @@ tbody th { color: var(--ink); font-weight: 700; }
 
 .service-recalls, .service-analysis { min-width: 0; overflow-wrap: anywhere; }
 .service-recalls li { margin-block: 1rem; }
-
-/* Product workspace keeps the current contact and independent verification states together. */
-.service-workspace { max-width: 1120px; }
-.service-workspace h1 { font-size: 2rem; }
-.service-workspace h2 { font-size: 1.35rem; }
-.service-workspace > section { margin-block: 1.75rem; }
-.service-workspace .service-role { font-weight: 700; color: var(--teal-dark); }
-.service-contact { padding-block: 1.25rem; border-block: 1px solid var(--border); }
-.service-summary-list { margin: 0 0 1rem; }
-.service-summary-list > div { display: grid; grid-template-columns: minmax(8rem, 1fr) minmax(0, 3fr); gap: 1rem; padding-block: .65rem; border-bottom: 1px solid var(--border); }
-.service-summary-list dt { font-weight: 700; }
-.service-summary-list dd { margin: 0; overflow-wrap: anywhere; }
-.service-next-action { max-width: 70ch; padding: 1rem; background: var(--teal-soft); color: var(--teal-dark); }
-.service-workspace details { min-width: 0; margin-block: 1rem; }
-.service-workspace summary { min-height: 44px; padding-block: .65rem; cursor: pointer; font-weight: 600; }
-.service-verification { background: var(--surface); padding: 1.25rem; gap: 1.25rem; }
-.service-verification dd { font-size: 1.05rem; }
-.service-analysis { padding: 1.25rem; background: var(--surface); }
-.service-analysis.has-warning { background: var(--amber-soft); color: #573400; border: 1px solid #bd8b36; }
-.service-analysis.has-warning h2 { color: #573400; }
-.service-analysis q { font-weight: 600; }
-.service-safety-action { margin-bottom: 0; }
-.service-pending { padding: .75rem 1rem; background: var(--navy-soft); }
-.service-workspace .service-end { background: var(--red-dark); color: white; border-color: var(--red-dark); }
-.service-end.is-live { position: fixed; bottom: 1rem; right: max(1rem, env(safe-area-inset-right)); z-index: 40; min-width: 8rem; }
-.service-workspace:has(.service-end.is-live) { padding-bottom: 6rem; }
-.service-workspace .finals-list button[aria-pressed="true"] { border-color: var(--teal); color: var(--teal-dark); background: var(--teal-soft); }
-@media (max-width: 600px) {
-  .service-summary-list > div { grid-template-columns: 1fr; gap: .3rem; }
-  .service-workspace .service-call-controls { align-items: stretch; }
-  .service-workspace .service-call-controls > button { flex: 1 1 44%; }
-  .service-verification { padding: 1rem; }
-  .service-workspace .service-end.is-live { flex: none; }
-}
