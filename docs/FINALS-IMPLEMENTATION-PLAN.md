@@ -36,12 +36,24 @@ Git 추적 Markdown42개(MDX0)의 파일별 독자·현행/원본/이력·처리
 
 GHCR의6e3cd23 이미지 후보6종은 비공개 게시·실제 원격 수령을 완료했으나 추가 UI는 포함하지 않는다. 기존 Release는 그대로 두고 사전 Release/후속 runtime은 새 UI 검증 뒤에 확정한다. 봉인한 이전 묶음·실패 원본은 로컬에 보존했다. 새 Release가 있다고 설명하거나 기존 tag/inventory를 덮어쓰지 않는다.
 
+<a id="ui-only-20261104"></a>
+
+## 2026-11-04 UI 전용 실제 실행과 main 반영
+
+새 명시적 승인으로 `ui-only-v1`(시작24GiB/여유16GiB/host3GiB/DB 포함4GiB/45분, 정리10분)을 선택해 실제 PostgreSQL·API/세션/CSRF·HTTPS OIDC·제품 웹/Chromium을 실행했다. 전체 통화 profile의40GiB guard는 유지했다. 첫 표본은 판정 전에 보존했다. UI/업무 선택·공식 업무 오류·공동 승인·WS 분석 경계를 확인했고, 최초 숨겨진 ID 선택자 실패와 확대/보류 응답 시험 결함을 고쳐 원래 deadline 안에서 선택 재시험했다. 실패·재시험을 분모에서 없애거나 고유 사례 수에 더하지 않았다. [실행·자원·소스·캡처 원본 연결](../artifacts/service-ui-validation-20261104.json)을 기준으로 한다.
+
+직접 연 캡처에서 기관 고급 입력의 과밀과 공식 확인 버튼의 작은 조작 영역을 확인해 기존 details/버튼을 재사용했다. 위험·공동 변경 검토·긴급 정지는 접지 않았다. 계정 전환/조회 장애·빈 목록/로딩·정책/분석 오류와 동의 철회를 확인했다. 분석 화면1개는 실제 인증 WS를 받는 component host이며 ServiceCall/PBX/음성 경로가 아니다. 진행 통화에서 조회 장애 후 종료 조작은 B에서 확인할 항목으로 유지한다.
+
+A 정리 뒤 B 최초 표본은 available39.04GiB로40GiB 시작 조건을 통과하지 못했다. 체인/PBX/TURN/Anchor를 기동하거나 조건을 기다리며 반복 조회하지 않았다. 새 clean source65d85ac의 runtime은 기존 로컬 base·network-none·2GiB/CPU1/90초로 직렬 build하고 파일/사용자/아키텍처를 무기동 대조했다. 새 runtime 실제 기동·통화와 AWS 최종 trust 웹·후속 원격 게시를 완료로 표시하지 않는다. 기존 후보/Release·원본 실패·개인 요약은 보존했다.
+
+Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반 push하고 원격/CI를 확인한다. PR을 새로 만들거나 승인 대기하지 않으며 기존 Draft #1은 main 반영 뒤 중복으로 닫는다.
+
 ## 현재 상태와 다음 단계
 
 | 구분 | 상태·다음 작업 |
 |---|---|
-| 제품 소스 | 검증한6e3cd23과 이후 미통합 검증 UI branch를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
-| 로컬 후보 | 이전6e3cd23 runtime·공개/observer와2개 실제 통화/회수 증거를 보존. 새 UI runtime은 미제작이며 AWS 최종 웹도 아님 |
+| 제품 소스 | 이전 미디어 후보와 후속 UI 전용 실제 검증 소스를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
+| 로컬 후보 | 이전 미디어 후보/증거 보존. 후속 clean runtime은 로컬 build/무기동 감사 완료, 실제 기동·미디어는 미검증. AWS 최종 웹 아님 |
 | 원격 전달 | 검증한 이전 제품의6종 GHCR 게시/수령 완료. 후속 UI는 미반영이며 새 Release는 검증 뒤 발행 대기 |
 | 외부 환경 | AWS 공개 origin/TLS/OIDC/PBX/TURN·reader 보호 참조와 실행 허가 필요. AI 품질·사람 평가도 별도 |
 | 문서 기준 | 요구는 MASTER, 실행은 RUNBOOK, 한계는 KNOWN-LIMITATIONS. 과거 실행 성공을 현재 전체 PASS로 복사하지 않음 |

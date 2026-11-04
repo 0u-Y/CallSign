@@ -1,10 +1,10 @@
 # 05. 구현 및 검증 현황
 
-후속 실제 업무 UI는 `feat/service-workspace-20261104`에서 구현·오프라인 검사를 마쳤으며 실제 통합은 미검증이다. 새 승인 batch는40GiB 시작 guard에서 기동 전 차단됐으므로 아래의6e3cd23 통합 결과를 후속 UI·미생성 runtime에 복사하지 않는다. 변경 전 캡처/원격 이미지와 후속 소스는 [진행표](../FINALS-IMPLEMENTATION-PLAN.md)에서 구분한다.
+후속 실제 업무 UI는 [UI 전용 실제 실행](../../artifacts/service-ui-validation-20261104.json)으로 역할·오류·선택·공동 승인 화면을 확인했다. 소스와 기동한 구성요소·component fixture·실패 후 선택 회귀를 기록했다. 새 runtime은 로컬 제작/무기동 정합성 검사 대상이며, 전체 통화는40GiB 시작 guard 미달로 실행하지 않았다. 아래 이전 후보의 미디어 성공을 후속 UI/이미지에 복사하지 않는다.
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
-기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 최신 실행 소스는6e3cd23이며 이후 문서·증거 정리와 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
+기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 아래 실제 미디어 후보의 실행 소스는6e3cd23이며 이후 문서·증거 정리와 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
 
 ## 현재 확인한 범위
 
@@ -16,7 +16,7 @@
 | 위험·목적 분석 | 동의 후 remote track→인증 WS→분석→실제 ServiceCall 패널, 철회·정정·늦은 결과 차단. 분석 결과 수신 후 상단 “분석 중” 잔류를 수정 | STT/LLM은 명시적 fixture. 한국어 품질·보관/청구·실제 제공자 취소 미검증 |
 | 로컬 배포 후보 | 최신 runtime·공개/observer 묶음·checksum 생성, 일반 issuer entrypoint 확인,5종 인프라 재사용 | 새 GHCR/Release 미게시. AWS 최종 웹 미생성 |
 
-HTTP11·WS17·Chromium9는37개 고유 사례입니다. Chromium 중1개 component host 분석 패널은 실제 ServiceCall 통화 시험과 별개입니다. 초기 중단·선택자 실패·선택 재실행·readiness를 고유 사례에 중복 합산하지 않습니다. 최종 runtime의 통화2사례는 work-cancel·emergency-stop이며 정상 반복 성공률이나 SLA를 뜻하지 않습니다.
+아래 후보 당시 HTTP11·WS17·Chromium9는37개 고유 사례입니다. Chromium 중1개 component host 분석 패널은 실제 ServiceCall 통화 시험과 별개입니다. 초기 중단·선택자 실패·선택 재실행·readiness를 고유 사례에 중복 합산하지 않습니다. 최종 runtime의 통화2사례는 work-cancel·emergency-stop이며 정상 반복 성공률이나 SLA를 뜻하지 않습니다.
 
 ## 과거 증거를 사용하는 범위
 
