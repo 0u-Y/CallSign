@@ -1,0 +1,609 @@
+{
+  "version": 1,
+  "scope": "new private GHCR tags and real raw remote receipt; not AWS or new runtime execution",
+  "recordedAt": "2026-11-04T09:03:47.254146+00:00",
+  "runtimeProductSourceCommit": "6e3cd238e95457406134e8ef37730fd6d251209a",
+  "headAtPublicationStart": "55bb77cfb91564ee4910868f0f7d2022de76e172",
+  "releaseTag": "aws-candidate-20261104t085935z",
+  "releaseUrl": "https://github.com/0u-Y/CallSign/releases/tag/aws-candidate-20261104t085935z",
+  "images": [
+    {
+      "key": "CALLSIGN_APP_IMAGE",
+      "role": "runtime",
+      "configId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-runtime",
+      "repository": "0u-y/callsign-runtime",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-runtime:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "CALLSIGN_APP_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+        "configId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 634540041,
+        "repoDigests": [],
+        "sourceCommit": "6e3cd238e95457406134e8ef37730fd6d251209a"
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:3e0b397b2c2e4faa1428e87d5fbb85d039dedd82167a6c6b82e16a98a18bbc3f",
+      "registryManifestDigest": "sha256:3e0b397b2c2e4faa1428e87d5fbb85d039dedd82167a6c6b82e16a98a18bbc3f",
+      "platformManifestDigest": "sha256:3e0b397b2c2e4faa1428e87d5fbb85d039dedd82167a6c6b82e16a98a18bbc3f",
+      "manifestBytes": 4499,
+      "platformManifestBytes": 4499,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+        "bytes": 9203,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:478ceac1265ad247e710173259e0458249dd9460bd599b5a023c9f4429f19aba",
+          "bytes": 30629230,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:fe6490cfd903506e11e25766e26ad34058c57501ecfc03d5d87de3383e1ab17b",
+          "bytes": 174,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:d8a2fc3d8f07c65e579bae40539fba2990c429fe17b7deeb58ca4e920fc521e1",
+          "bytes": 62183666,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:0531d11cb4bd0f606e40f5962560e43b860f6785a16ec7ce1f8cf3c01335145a",
+          "bytes": 125592403,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:c369cec588f1ae4430d7cfa6cb6caa7cd02bb2b69e3dbb36fe47c1c82f5cc182",
+          "bytes": 1840935,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:7e7e4d384ced2219150366c6f26530ae02543505cf2ec971852a65d12737e44d",
+          "bytes": 13531,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:62fb2d6170452fd06920e1554542f95fc77730a2ec94f719ea0cb1dd7294f033",
+          "bytes": 112885,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:c315207dac536444588448dbbf5a0ebb972f2174a8f4f544747c19dd8d31ed7a",
+          "bytes": 77416,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:d0f6e8fc4f1d9f29102c6b8eec241812942ed1fc1000d71f707d9dddbd8164ad",
+          "bytes": 93081,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:9a6f6f1496a8b0ca10df925964adc3e4cad25ef0f628192dd33628456110b747",
+          "bytes": 13224,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5c9a204c4d16c4308dfc25e4248b57724014a7778b7037de7ad36e11ff74d79b",
+          "bytes": 613,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5c6a7ec694834e589afa6b8c0e7fb5900bb4beba96410acf215721fbb9a17df2",
+          "bytes": 125,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5c3ff675c16f6775a59c2c3fd193990d39d94bbe7e4c83c28039a4a2500ace49",
+          "bytes": 14186,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:08c2e9551078cdb2666f6333b1d95a8e35a96e7eb1d5ecfa566c22e8fd5cd024",
+          "bytes": 119627,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:7dd1e3ba70c9644734b49e796a6327a4dc6b47a73fc2fed5e6d54f6a499cdc90",
+          "bytes": 95870,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:f10245365dd498a031df90847729a8e5cb49231b4bbfac3617cc700bc0cffa78",
+          "bytes": 96502,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5d21a1c3b277a326ddee978bd41486ee13605f9d873041e167d9c337857127e2",
+          "bytes": 13733,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:b72df177cea463a666c26abbf6113e08361119776df7d57bdeb8ec07e0cfa05c",
+          "bytes": 616,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:6cd5899feb2ab6cf8631bae56d4747cd3601b8fdf19c1aaf834fd129b7966f78",
+          "bytes": 216,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:8507c3a96b153359d2d0cef1aa399468da0df14602078647a26ae320be136aaf",
+          "bytes": 838,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    },
+    {
+      "key": "ASTERISK_IMAGE",
+      "role": "asterisk",
+      "configId": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-asterisk",
+      "repository": "0u-y/callsign-asterisk",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-asterisk:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "ASTERISK_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "configId": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 713957956,
+        "repoDigests": [
+          "ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b"
+        ],
+        "sourceCommit": null
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+      "registryManifestDigest": "sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+      "platformManifestDigest": "sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b",
+      "manifestBytes": 742,
+      "platformManifestBytes": 742,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:0c2965f6f760f0416c602ab9f68a6cbf4b00961f6d3fca308074284ba68534c8",
+        "bytes": 1850,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:478ceac1265ad247e710173259e0458249dd9460bd599b5a023c9f4429f19aba",
+          "bytes": 30629230,
+          "networkDownloadedThisRequest": false,
+          "source": "verified remote content received earlier in this same new directory"
+        },
+        {
+          "digest": "sha256:ae908629c0411eac5e230c95df905d76a69dc975298f60a09ecf3e248c35acb4",
+          "bytes": 232329181,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    },
+    {
+      "key": "TURN_IMAGE",
+      "role": "turn",
+      "configId": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-turn",
+      "repository": "0u-y/callsign-turn",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-turn:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "TURN_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "configId": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 713957956,
+        "repoDigests": [
+          "ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0"
+        ],
+        "sourceCommit": null
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+      "registryManifestDigest": "sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+      "platformManifestDigest": "sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0",
+      "manifestBytes": 742,
+      "platformManifestBytes": 742,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:4dec18e876f5052f9d0949e1163699d66c6ba89707dca7ab772943e9e1a1abae",
+        "bytes": 1906,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:478ceac1265ad247e710173259e0458249dd9460bd599b5a023c9f4429f19aba",
+          "bytes": 30629230,
+          "networkDownloadedThisRequest": false,
+          "source": "verified remote content received earlier in this same new directory"
+        },
+        {
+          "digest": "sha256:ae908629c0411eac5e230c95df905d76a69dc975298f60a09ecf3e248c35acb4",
+          "bytes": 232329181,
+          "networkDownloadedThisRequest": false,
+          "source": "verified remote content received earlier in this same new directory"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    },
+    {
+      "key": "BESU_IMAGE",
+      "role": "besu",
+      "configId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-besu",
+      "repository": "0u-y/callsign-besu",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-besu:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "BESU_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "configId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 552624305,
+        "repoDigests": [
+          "hyperledger/besu@sha256:6f3f21ce533383fcc8db3bce02252b59d5a9e776b72b5a1c8ecd2db011600042",
+          "ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab"
+        ],
+        "sourceCommit": null
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+      "registryManifestDigest": "sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+      "platformManifestDigest": "sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab",
+      "manifestBytes": 1997,
+      "platformManifestBytes": 1997,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+        "bytes": 8138,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:39a120c374bd8c6387712ae60d413ed0e3cef76cd42f5622674708b0ef9a8872",
+          "bytes": 30612704,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:ddaaa4bbe11b7da47bbf968c145b412b79017de5e5114cbfa606116e965b070a",
+          "bytes": 1217144,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:80d603ab5e7c914c2aee17b381a1b84b75b82aae1622c70ca37a5bbfa64b076d",
+          "bytes": 92574622,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:4f4fb700ef54461cfa02571ae0db9a0dc1e0cdb5577484a6d75e68dc38e8acc1",
+          "bytes": 32,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:cd4848c5657bb953ea7a2a71c37a9c8aa4fe771c034bade31113fa6fe14dc21e",
+          "bytes": 191989908,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5db7ef0081af4d1b5a189ef305551d000bbf7a553ea0a50e3f0f853976792da4",
+          "bytes": 5370873,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5db4db51214c2ecae04f2da4eb8531016092194d2f1e7d568be8bb61a4ccd5b1",
+          "bytes": 388,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:9d38d17f1a0e28b4241fb53b3e1cb42a0cc3ab8f194cfe29ca56d38b49a91c3a",
+          "bytes": 1103,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    },
+    {
+      "key": "POSTGRES_IMAGE",
+      "role": "postgres",
+      "configId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-postgres",
+      "repository": "0u-y/callsign-postgres",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-postgres:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "POSTGRES_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "configId": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 278212934,
+        "repoDigests": [
+          "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+          "ghcr.io/0u-y/callsign-postgres@sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a"
+        ],
+        "sourceCommit": null
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-postgres@sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+      "registryManifestDigest": "sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+      "platformManifestDigest": "sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a",
+      "manifestBytes": 2402,
+      "platformManifestBytes": 2402,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:d741b376874687de90374fd34f55c6b2760e8f7bd7e4ae5cd47f50757fc08cf8",
+        "bytes": 8488,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:2d35ebdb57d9971fea0cac1582aa78935adf8058b2cc32db163c98822e5dfa1b",
+          "bytes": 3802452,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:82e3b18698cd7229a55eb5b7154c5d98bd2c4e3da32b6b2e4248b45659d108ae",
+          "bytes": 968,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:1d12e864e19a932e8093efe6464f933f09c47600a9771f14e0d1c5ac1b787f0b",
+          "bytes": 918287,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:10c02ef94427efa19ac1faab739dc93647b6b924c31c2129a195aae42cea643b",
+          "bytes": 116,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:ac28590ba4642d405c6162e2f777f1c802e29e1961fa8fa7ae1e598806d14098",
+          "bytes": 105873826,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:11e80b5eea539196bb1e3b6bcddaba0c4b8bdb9d0f5e1f59cf099bf5979c4b13",
+          "bytes": 9884,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:a5bd5a0b8636ac4b0b80a954ab0a8277d3162a5e230650b4f7788ba8e1e365f4",
+          "bytes": 128,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:aabce23918dc56935f94f7769d63258577fdb76659069677831ac14246ec242c",
+          "bytes": 171,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:3cecdd37f6f2cd8ed3ddd0e7ec4dfe12f8c506a1f8e6be8b7a0841c9eb3de34d",
+          "bytes": 6079,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:5b6f078adbb98a8561b472a9d5e16c5c6b784ebe3c792b33de80d635c8ee24d6",
+          "bytes": 185,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    },
+    {
+      "key": "HTTPS_IMAGE",
+      "role": "nginx",
+      "configId": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+      "os": "linux",
+      "architecture": "amd64",
+      "package": "callsign-nginx",
+      "repository": "0u-y/callsign-nginx",
+      "tag": "aws-candidate-20261104t085935z",
+      "taggedReference": "ghcr.io/0u-y/callsign-nginx:aws-candidate-20261104t085935z",
+      "packageExisted": true,
+      "localMetadata": {
+        "key": "HTTPS_IMAGE",
+        "status": "PASS",
+        "reference": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "configId": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "architecture": "amd64",
+        "os": "linux",
+        "sizeBytes": 169475099,
+        "repoDigests": [
+          "nginx@sha256:d5792f71a9496b833bc08ea834a758c46e2b6a6306c10f4be926f38a656cdc1c",
+          "ghcr.io/0u-y/callsign-nginx@sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee"
+        ],
+        "sourceCommit": null
+      },
+      "packageVisibilityBefore": "private",
+      "status": "PASS",
+      "registryReference": "ghcr.io/0u-y/callsign-nginx@sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+      "registryManifestDigest": "sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+      "platformManifestDigest": "sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee",
+      "manifestBytes": 1778,
+      "platformManifestBytes": 1778,
+      "manifestMediaType": "application/vnd.docker.distribution.manifest.v2+json",
+      "remoteConfig": {
+        "digest": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+        "bytes": 9092,
+        "networkDownloadedThisRequest": true,
+        "source": "GHCR HTTPS response, not Docker cache"
+      },
+      "remoteOs": "linux",
+      "remoteArchitecture": "amd64",
+      "layers": [
+        {
+          "digest": "sha256:2e19782d710937ff9b8920c403feb1489feb2d57b651b98d172bece8b46e9565",
+          "bytes": 30796644,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:0b08cd0de4e0a9283c032a69af2a84c50ed3574fa61ceb0661f08fc8bb1c7adf",
+          "bytes": 36286911,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:28c7fd8ab61cc502694cd06e6afb5495b8fa45ab4580ecf7e8277d73c5105e1e",
+          "bytes": 629,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:c04b8fd1dd8d3e862e3b1ba18aa55d40aba065dd3d540697dc8db870c130400d",
+          "bytes": 956,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:7803ef1d418e62e1baea4667703b25dbb1a64146367ce8866d080deee3f09ada",
+          "bytes": 404,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:0525b6a65f36034053765128e7192c2482a535e9f37b98303060f945c083fd9a",
+          "bytes": 1211,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        },
+        {
+          "digest": "sha256:887ef3017df6c532eb1f3f8f9745f9ba50dbd4753b5ea572637f79fac06970d4",
+          "bytes": 1400,
+          "networkDownloadedThisRequest": true,
+          "source": "GHCR HTTPS response, not Docker cache"
+        }
+      ],
+      "anonymousAccess": "DENIED",
+      "anonymousHttpStatus": 401
+    }
+  ],
+  "remoteReceipt": {
+    "status": "PASS",
+    "recordedAt": "2026-11-04T09:03:47.254146+00:00",
+    "uniqueRemoteObjects": 58,
+    "networkFetches": 58,
+    "networkBytesReceived": 952745914,
+    "durationSeconds": 130.98,
+    "newStorageDirectory": true,
+    "dockerCacheUsed": false,
+    "servicesStarted": false,
+    "redirectAuthorizationStrippedAcrossHosts": true
+  },
+  "packageVisibility": {
+    "runtime": "private",
+    "asterisk": "private",
+    "turn": "private",
+    "besu": "private",
+    "postgres": "private",
+    "nginx": "private"
+  },
+  "authentication": {
+    "temporaryDockerConfig": true,
+    "passwordStdin": true,
+    "sourceProtectedFileUnchanged": true,
+    "temporaryConfigRemoved": true,
+    "remoteValidationRegistryScope": "repository-specific pull only",
+    "credentialSource": "explicit publisher PAT; independent AWS reader PAT not provided",
+    "awsReaderCredentialVerified": false
+  },
+  "imageAudit": "artifacts/product-runtime-validation-20261104.json",
+  "noRebuild": true,
+  "finalAwsWebGenerated": false,
+  "awsRuntimeVerified": false
+}
