@@ -30,8 +30,11 @@ def compare_container_ids(before,after):
     return 'PRESERVED' if set(before)<=set(after) else 'MISSING_UNATTRIBUTED'
 
 def expected_archive_exit(name,run,stage):
-    phases=['normal-smoke-1','normal-smoke-2','normal-repeat-1','normal-repeat-2','work-cancel']
+    phases=['normal-smoke-1','normal-smoke-2',*[f'normal-repeat-{i}' for i in range(1,6)],'work-cancel','post-restore-normal','final-audit']
     return stage in ['archive-'+phase for phase in phases] and name in ['/'+run+'-'+role for role in ['issuer','platform','sender','worker','web','https','controller']]
+
+def expected_restore_exit(name,run,stage):
+    return stage=='full-restore' and name in ['/'+run+'-'+role for role in ['database','pbx','turn',*[f'besu{i}' for i in range(1,5)],*[f'witness{i}' for i in range(1,5)]]]
 
 def exit_observation(state):
     return {key:state.get(key) for key in ['Status','Running','ExitCode','OOMKilled','StartedAt','FinishedAt']}
@@ -47,11 +50,11 @@ def preserve_evidence(root, directory, reason, steps):
     for location in [root,*root.glob('phase-*')]:
         if location.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
         outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json']
-        outputs += [p.name for pattern in ['normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.png','*.log'] for p in location.glob(pattern)]
+        outputs += [p.name for pattern in ['analysis-observation-*.json','db-audit-*.json','restore-*.json','normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.png','*.log'] for p in location.glob(pattern)]
         for name in outputs:
             source=location/name
             if source.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
-            if source.is_file():
+            if source.is_file() and not name.endswith('.private.json'):
                 target=directory/source.relative_to(root)
                 target.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
                 if target.exists():raise RuntimeError('EVIDENCE_ALREADY_PRESERVED')
@@ -92,7 +95,7 @@ def main():
       # A completed preparation tool may be removed by bootstrap between the two snapshots.
       current=inspect([info['Id']])
       if not current:
-       if '-tool-' not in info.get('Name','') and info['Id'] not in builder_ids and not expected_archive_exit(info.get('Name',''),run,stage):raise RuntimeError('CONTAINER_IDENTITY_UNAVAILABLE')
+       if '-tool-' not in info.get('Name','') and info['Id'] not in builder_ids and not expected_archive_exit(info.get('Name',''),run,stage) and not expected_restore_exit(info.get('Name',''),run,stage):raise RuntimeError('CONTAINER_IDENTITY_UNAVAILABLE')
        info['State']={**info['State'],'Running':False,'Status':'removed-after-snapshot'};return 0
       latest=current[0]
       if latest['Id']!=info['Id'] or latest['Image']!=info['Image']:raise RuntimeError('CONTAINER_IDENTITY_CHANGED')
@@ -107,7 +110,7 @@ def main():
       if info['State']['OOMKilled']:stop=stop or 'OWNED_CONTAINER_OOM'
       used=memory(info) if info['State']['Running'] else 0
       if info['State'].get('OOMKilled'):stop=stop or 'OWNED_CONTAINER_OOM'
-      if not info['State']['Running'] and info['State'].get('Status')!='created' and '-tool-' not in info['Name'] and 'issuer-entrypoint-probe' not in info['Name'] and not expected_archive_exit(info['Name'],run,stage):stop=stop or 'OWNED_SERVICE_EXIT'
+      if not info['State']['Running'] and info['State'].get('Status')!='created' and '-tool-' not in info['Name'] and 'issuer-entrypoint-probe' not in info['Name'] and not expected_archive_exit(info['Name'],run,stage) and not expected_restore_exit(info['Name'],run,stage):stop=stop or 'OWNED_SERVICE_EXIT'
       total+=used;containers.append({'id':info['Id'],'bytes':used,'limit':info['HostConfig']['Memory'],'running':info['State']['Running'],'role':info.get('Name','').removeprefix('/'+run+'-'),'state':exit_observation(info['State']),'swapLimit':info['HostConfig']['MemorySwap'],'cgroup':info.get('_cgroup')})
      current=root/'runtime-media-test.log'
      if current.exists():
@@ -155,6 +158,15 @@ def main():
      except Exception as error:preservation={'status':'FAIL','errorType':type(error).__name__};errors.append('EVIDENCE_PRESERVATION_FAILED')
      items=sorted(owned['containers'],key=cleanup_priority)
      for entry in items:
+      if cleanup_priority(entry)>0 and plan.get('databaseAudit') and not (root/'db-audit-final.json').exists():
+       output=root/'db-audit-final.json'
+       if stop:output.write_text(json.dumps({'status':'BLOCKED','reason':'RESOURCE_STOP_CLEANUP_ONLY','firstCause':stop})+'\n')
+       else:
+        try:
+         audit=subprocess.run([sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(output),'--final'],cwd=observer,env=env,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=20)
+         if audit.returncode:errors.append('FINAL_DATABASE_AUDIT_NOT_PASS')
+        except Exception:errors.append('FINAL_DATABASE_AUDIT_OBSERVATION_FAILED')
+       if output.exists():shutil.copyfile(output,evidence/'db-audit-final.json')
       if time.monotonic_ns()>plan['deadlineMonotonicNs']-30_000_000_000:errors.append('CLEANUP_DEADLINE_REMAINING_RESOURCES');break
       for info in inspect([entry['id']]):
        if info['Id']!=entry['id'] or (info['Config'].get('Labels') or {}).get('org.callsign.run-id')!=run:errors.append('OWNERSHIP_MISMATCH');continue
@@ -191,13 +203,23 @@ def main():
       if time.monotonic()-began>=60:break
       time.sleep(5)
      action('bootstrap',[sys.executable,'tests/integration/runtime-delivery-bootstrap.py','--delivery',str(r/'delivery-final'),'--root',str(root),'--browser-cache',str(options.browser_cache.resolve()),'--apply'],600)
+     if plan.get('databaseAudit'):action('database-audit-start',[sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(root/'db-audit-start.json')],30)
      image=json.loads((root/'images-loaded.json').read_text())['CALLSIGN_APP_IMAGE'];extra={'CALLSIGN_RUNTIME_TEST_ROOT':str(root),'CALLSIGN_EXPECTED_RUNTIME_IMAGE':image}
-     if any(not isinstance(plan.get(k),int) or not 0<=plan[k]<=2 for k in ['normalSmokeAttempts','normalRepeatAttempts']):raise RuntimeError('BOUNDED_TRIAL_PLAN_REQUIRED')
+     if any(not isinstance(plan.get(k),int) or not 0<=plan[k]<=(5 if k=='normalRepeatAttempts' else 2) for k in ['normalSmokeAttempts','normalRepeatAttempts']):raise RuntimeError('BOUNDED_TRIAL_PLAN_REQUIRED')
      cases=[('normal-smoke-'+str(i+1),'normal-end') for i in range(plan['normalSmokeAttempts'])]+[('normal-repeat-'+str(i+1),'normal-end') for i in range(plan['normalRepeatAttempts'])]+[('work-cancel','work-cancel'),('emergency-stop','emergency-stop')]
      for label,case in cases:
-      phase_extra={**extra,'CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label=='normal-repeat-2' else 'no'}
+      if label=='emergency-stop' and plan.get('fullRestore'):
+       action('database-audit-source-quiesced',[sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(root/'db-audit-source-quiesced.json'),'--final'],30)
+       action('full-restore',[sys.executable,'tests/integration/runtime-restore-driver.py'],600,extra=extra)
+       action('post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case','normal-end'],600,extra=extra)
+       action('archive-post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase','post-restore-normal'],90,extra=extra)
+       action('stale-restore',[sys.executable,'tests/integration/runtime-restore-driver.py'],120,extra={**extra,'CALLSIGN_RESTORE_CHECK_PHASE':'stale'})
+      phase_extra={**extra,'CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label==plan.get('workspaceFailureCase','normal-repeat-2') else 'no'}
       action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case',case],600,extra=phase_extra)
       if label!='emergency-stop':action('archive-'+label,[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase',label],90,extra=extra)
+     if plan.get('databaseAudit'):
+      action('archive-final-audit',[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase','final-audit'],90,extra=extra)
+      action('database-audit-final',[sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(root/'db-audit-final.json'),'--final'],30)
      result={'status':'PASS','steps':steps,'resourceStop':None}
     except BaseException as error:
      result={'status':'BLOCKED' if stop else 'FAIL','reason':str(error),'steps':steps,'resourceStop':stop};print('Full phase stopped:',str(error))

@@ -337,3 +337,24 @@ assert value['ExitCode']==139 and value['OOMKilled'] is False
 assert 'Error' not in value and 'Env' not in value
 `],{stdio:'pipe'});
 });
+
+it('audits retained history without treating every SQL row as a leak',()=>{execFileSync('python3',['-c',`
+import runpy
+f=runpy.run_path('tests/integration/runtime-db-audit.py')['assess']
+v=dict(nonterminalAttempts=0,reservedReservations=0,expiredReservations=0,reservedBalance=0,overduePending=0,expiredClaims=0,outbox={'done':7},futureRetries=0,sessions={'validByExpiry':9},consumptionReceipts=5)
+assert f(v,True)['status']=='PASS'
+assert f(dict(v,reservedReservations=1),True)['status']=='FAIL'
+assert f(dict(v,futureRetries=1),True)['status']=='PARTIAL'
+assert f(dict(v,nonterminalAttempts=1),False)['status']=='PASS'
+`],{stdio:'pipe'});});
+
+it('permits only explicitly quiesced owned restore services in the restore stage',()=>{execFileSync('python3',['-c',`
+import runpy,subprocess,sys,os
+f=runpy.run_path('scripts/validation-runtime-media.py')['expected_restore_exit']
+assert f('/unit-besu1','unit','full-restore')
+assert not f('/unit-besu1','unit','normal-repeat-1')
+assert not f('/other-besu1','unit','full-restore')
+assert not f('/unit-anchor','unit','full-restore')
+p=subprocess.run([sys.executable,'tests/integration/runtime-restore-driver.py'],env={k:v for k,v in os.environ.items()if k!='CALLSIGN_ALLOW_EXTERNAL_EXECUTION'},capture_output=True,text=True,timeout=3)
+assert p.returncode!=0 and 'INTEGRATION_EXECUTION_BLOCKED'in p.stderr
+`],{stdio:'pipe'});});
