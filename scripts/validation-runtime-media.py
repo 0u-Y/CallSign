@@ -178,6 +178,9 @@ def main():
        except Exception as error:errors.append('CONTAINER_EVIDENCE_'+type(error).__name__)
        try:
         if info['State']['Running']:subprocess.run(['docker','stop','-t','3',info['Id']],check=True,stdout=subprocess.DEVNULL,timeout=12)
+        terminal=inspect([info['Id']]);assert len(terminal)==1 and terminal[0]['Id']==info['Id']
+        terminal_file=evidence/('container-'+info['Id']+'-state-after-stop.json');terminal_file.write_text(json.dumps(exit_observation(terminal[0]['State']))+'\n');terminal_file.chmod(0o600)
+        if info['Name'].endswith('-pbx') and terminal[0]['State'].get('ExitCode')!=0:errors.append('PBX_NONZERO_CLEANUP_EXIT')
         subprocess.run(['docker','rm',info['Id']],check=True,stdout=subprocess.DEVNULL,timeout=10);removed.append(info['Id'])
        except Exception as e:errors.append(type(e).__name__)
      for name in owned['volumes']:
