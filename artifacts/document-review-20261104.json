@@ -1,7 +1,7 @@
 {
   "version": 1,
   "recordedAt": "2026-11-04T09:54:10.733417+00:00",
-  "reviewedAgainstHead": "4ded32610528c753e999921ee43fc39c7e67204d",
+  "reviewedAgainstHead": "d0a2dbf47624c68f42e2a04a04e76116aba9e1af",
   "readFromWorktree": true,
   "inventoryCommand": "git ls-files -z; case-insensitive .md/.markdown/.mdown/.mdx classification",
   "trackedFileCount": 42,
@@ -112,7 +112,7 @@
     },
     {
       "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
-      "sha256": "da2391e449ee9dafa5121f99f8b2cba580399528f32aef7036cfa5bfa7c55396",
+      "sha256": "0ee2d4f7291803a16c5919ce4515f2f8e71207996ee16e2d2e388af579bce7c9",
       "lines": 206,
       "audience": "개발/인계 담당자",
       "purpose": "현재 진행·원본 증거 연결",

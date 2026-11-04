@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "source": "4ded32610528c753e999921ee43fc39c7e67204d",
+  "source": "d0a2dbf47624c68f42e2a04a04e76116aba9e1af",
   "branch": "feat/service-workspace-20261104",
   "sourceDirtyDuringOfflineChecks": true,
   "dirtyScope": "product changes subsequently committed as source; documentation and evidence also uncommitted",
@@ -10,7 +10,7 @@
     "pnpm light": {
       "status": "PASS",
       "files": 63,
-      "tests": 318
+      "tests": 319
     },
     "pnpm --filter @callsign/web build": {
       "status": "PASS",
@@ -21,6 +21,10 @@
     },
     "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit": {
       "status": "PASS"
+    },
+    "cleanup ownership regressions": {
+      "status": "PASS",
+      "tests": 11
     }
   },
   "newExecution": {
@@ -102,6 +106,16 @@
   "offlineLogHashes": {
     "service-workspace-complete-light.log": "c14ccac9fbf6470d97d59e656651f072fc6b7c155be7cbb2a4aa6b8fccb0c9cb",
     "service-workspace-complete-build.log": "fe06db5fe7e038964b1f8f202b8aced709ee1a1469cb155ca3eb5116563a8e1c",
-    "service-workspace-complete-runtime-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "service-workspace-complete-runtime-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "service-workspace-release-light.log": "92ce5457a28153b25db57c486b0b49337a78579011ca3853755e71ffcf7d2c24",
+    "service-workspace-cleanup-race.log": "fd54d7ab71440595c66b57800113707b63752514d25cc6eb49815ffed21a8c55"
+  },
+  "priorCiFailure": {
+    "url": "https://github.com/0u-Y/CallSign/actions/runs/41810851606",
+    "source": "83547595710b4d1f1e6ab10e7d85afff6d0f1b64",
+    "failure": "last helper fork missed by a single /proc snapshot during cancellation",
+    "correctionSource": "d0a2dbf47624c68f42e2a04a04e76116aba9e1af",
+    "assertionsPreserved": true,
+    "notHiddenBySuccessfulParallelRun": true
   }
 }
