@@ -372,5 +372,69 @@
       "originalAssetsPreserved": true,
       "supersedingReleasePlanned": "aws-recovery-tools-20261104t154909z"
     }
+  },
+  "finalRecoveryTools": {
+    "recordedAt": "2026-11-04T15:53:35.606726+00:00",
+    "sourceCommit": "b63c89381a87350b1f1eb572d61375702f705fdd",
+    "runtimeSourceUnchanged": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+    "runtimeRegistryReferenceUnchanged": "ghcr.io/0u-y/callsign-runtime@sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+    "release": {
+      "tag": "aws-recovery-tools-20261104t154909z",
+      "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z",
+      "prerelease": true,
+      "remoteFilesReceived": true,
+      "newStorageDirectory": true,
+      "files": [
+        {
+          "name": "SHA256SUMS",
+          "bytes": 339,
+          "sha256": "091019be7c4234ff35769b7a5d9dc35fc1f61fbd27ccb04fe843feff28165c08"
+        },
+        {
+          "name": "deployment-files.tar",
+          "bytes": 542720,
+          "sha256": "817fa4586481533df2b25ba897e5dc9709479627e63c4b07651b013b57da1d97"
+        },
+        {
+          "name": "images.json",
+          "bytes": 4954,
+          "sha256": "63c395db3c63f58b278e929b6d9af8ddb62b8414348e1795d93e9a5bf8837722"
+        },
+        {
+          "name": "observer-tests.tar",
+          "bytes": 378880,
+          "sha256": "b2da6df58b7274aa9937baeef9dc4693b39ab2ac6aa0439c22f0d52642113236"
+        },
+        {
+          "name": "publication-audit.json",
+          "bytes": 16666,
+          "sha256": "360d34ab259695a752fbdf0f91fc51a01e13af09614ecdea8bebde6dab2fdee7"
+        }
+      ],
+      "checksumStatus": "PASS"
+    },
+    "packagingChecks": {
+      "status": "PASS",
+      "packagedRunbookDefaultTagMatchesThisRelease": true,
+      "localValidationIncluded": true,
+      "evaluationAndMeasurementCliIncluded": true,
+      "auditAndRestoreObserversIncluded": true
+    },
+    "observerToolOverrides": [
+      {
+        "path": "scripts/evaluate-service-analysis.ts",
+        "runtimeSha256": "42d485685832a487df04390959b9c1189da3184420dc185619542d6ff24ee27e",
+        "observerSha256": "8d19dda8fa6be25c3def7edd3eef17c43459607ea10dfbe69ace73cc2efc71e7",
+        "scope": "Observer-side evaluation CLI cost guard only; production API has no import of this script. Use the new observer CLI, not the older copy in the unchanged runtime."
+      }
+    ],
+    "supersedesPackagingOnly": "aws-recovery-tools-20261104t153749z",
+    "oldReleaseUnchanged": true,
+    "imagesRebuilt": false,
+    "imagesRepushed": false,
+    "imagesRedownloaded": false,
+    "independentReaderVerified": false,
+    "integrationEvidence": "artifacts/restore-audit-20261105.json",
+    "fullRestore": "BLOCKED; not a restore-validated release"
   }
 }

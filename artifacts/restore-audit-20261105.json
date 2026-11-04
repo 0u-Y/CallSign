@@ -1195,7 +1195,8 @@
       "volumes": 0,
       "protectedTrialRootRemoved": true,
       "rawEvidenceOutsideRootRetained": true
-    }
+    },
+    "productAssertionsBeforeStop": "UNKNOWN: no completed Vitest JSON report was emitted before environment termination; no zero-failure assertion claim"
   },
   "recordedAt": "2026-11-04T15:30:33.183311+00:00",
   "normalMeasurements": {
@@ -1947,7 +1948,7 @@
     "productionServicesChanged": false,
     "runtimeRebuilt": false
   },
-  "deliveryRecord": "artifacts/product-candidate-20261104.json#recoveryTools",
+  "deliveryRecord": "artifacts/product-candidate-20261104.json#finalRecoveryTools",
   "vercelAccessCheck": {
     "pluginInstalled": false,
     "projectLocalLinkFilePresent": false,
@@ -1963,5 +1964,11 @@
     "contentType": "text/html; charset=utf-8",
     "validJson": false,
     "reason": "SPA HTML returned, deployed source SHA unverified"
+  },
+  "packagingDefectsFixed": {
+    "staleDefaultTag": true,
+    "missingLocalValidation": true,
+    "missingUpdatedEvaluationCli": true,
+    "verification": "Actual remote tar membership, source hashes and checksums; prior releases preserved"
   }
 }
