@@ -1970,5 +1970,1129 @@
     "missingLocalValidation": true,
     "missingUpdatedEvaluationCli": true,
     "verification": "Actual remote tar membership, source hashes and checksums; prior releases preserved"
+  },
+  "serviceHardeningFollowup": {
+    "recordedAt": "2026-11-04T18:06:16.340428+00:00",
+    "runtimeProductSource": "3e1908cefdf5858b3d6cd24e3e7a1fda4e76b47d",
+    "runtimeConfigId": "sha256:b66a173ed5f3fe4d3d8bfda565be60dcc5532ca1a22324251d1306aa139ae236",
+    "restore": {
+      "status": "PASS",
+      "runtimeProductSource": "3e1908cefdf5858b3d6cd24e3e7a1fda4e76b47d",
+      "observerSource": "6fed54011c46ca23fa803e5712dcb1b8552b894a",
+      "analysisFixture": false,
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 40.6734578399919
+        },
+        {
+          "label": "database-audit-start",
+          "exitCode": 0,
+          "seconds": 5.098645385820419
+        },
+        {
+          "label": "normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 46.392393251881
+        },
+        {
+          "label": "archive-normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 5.221741844899952
+        },
+        {
+          "label": "work-cancel",
+          "exitCode": 0,
+          "seconds": 36.08232572628185
+        },
+        {
+          "label": "archive-work-cancel",
+          "exitCode": 0,
+          "seconds": 5.186365489382297
+        },
+        {
+          "label": "database-audit-source-quiesced",
+          "exitCode": 0,
+          "seconds": 5.098113765008748
+        },
+        {
+          "label": "full-restore",
+          "exitCode": 0,
+          "seconds": 30.58115615323186
+        },
+        {
+          "label": "post-restore-normal",
+          "exitCode": 0,
+          "seconds": 36.11708099162206
+        },
+        {
+          "label": "archive-post-restore-normal",
+          "exitCode": 0,
+          "seconds": 5.19782600691542
+        },
+        {
+          "label": "stale-restore",
+          "exitCode": 0,
+          "seconds": 5.103152175899595
+        },
+        {
+          "label": "emergency-stop",
+          "exitCode": 0,
+          "seconds": 41.304497894831
+        },
+        {
+          "label": "archive-final-audit",
+          "exitCode": 0,
+          "seconds": 5.235860020853579
+        },
+        {
+          "label": "database-audit-final",
+          "exitCode": 0,
+          "seconds": 5.1004926366731524
+        }
+      ],
+      "logicalCalls": 4,
+      "trials": [
+        {
+          "phase": "phase-final-audit",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 216.28431499999715,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6335.013634000003,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8351.151598,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "audioReclaimed": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "pbxAbsent": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        },
+        {
+          "phase": "phase-normal-repeat-1",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 1061.3870349999997,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6383.924738999998,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8398.323196000001,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "audioReclaimed": {
+              "milliseconds": 4322.121322999999,
+              "reason": null
+            },
+            "pbxAbsent": {
+              "milliseconds": 4327.910048999998,
+              "reason": null
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        },
+        {
+          "phase": "phase-post-restore-normal",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 270.2454539999999,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6333.622411999999,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8348.261133000002,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "audioReclaimed": {
+              "milliseconds": 4321.345308999997,
+              "reason": null
+            },
+            "pbxAbsent": {
+              "milliseconds": 4327.598913000002,
+              "reason": null
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        },
+        {
+          "phase": "phase-work-cancel",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 189.51353900000322,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6334.295943000001,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8348.889194999998,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "audioReclaimed": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "pbxAbsent": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        }
+      ],
+      "automaticRetries": 0,
+      "checks": {
+        "db-audit-start.json": {
+          "status": "PASS",
+          "failures": [],
+          "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+          "final": false,
+          "observations": {
+            "migrations": {
+              "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+              "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+              "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+              "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+              "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+              "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+              "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+              "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+              "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+              "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+              "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+            },
+            "institutions": 1,
+            "attempts": 0,
+            "nonterminalAttempts": 0,
+            "cancelledWork": 0,
+            "sessions": {
+              "validByExpiry": 0,
+              "expired": 0
+            },
+            "outbox": {},
+            "overduePending": 0,
+            "expiredClaims": 0,
+            "futureRetries": 0,
+            "signerLeases": {
+              "current": 0,
+              "expired": 0
+            },
+            "reservedReservations": 0,
+            "expiredReservations": 0,
+            "reservationStates": {},
+            "reservedBalance": 0,
+            "consumptionReceipts": 0,
+            "consumptionJournal": 0,
+            "recoveryGates": {
+              "blocked": 1
+            }
+          },
+          "scope": "One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction."
+        },
+        "db-audit-source-quiesced.json": {
+          "status": "PASS",
+          "failures": [],
+          "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+          "final": true,
+          "observations": {
+            "migrations": {
+              "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+              "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+              "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+              "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+              "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+              "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+              "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+              "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+              "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+              "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+              "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+            },
+            "institutions": 1,
+            "attempts": 2,
+            "nonterminalAttempts": 0,
+            "cancelledWork": 1,
+            "sessions": {
+              "validByExpiry": 10,
+              "expired": 0
+            },
+            "outbox": {
+              "done": 21
+            },
+            "overduePending": 0,
+            "expiredClaims": 0,
+            "futureRetries": 0,
+            "signerLeases": {
+              "current": 0,
+              "expired": 0
+            },
+            "reservedReservations": 0,
+            "expiredReservations": 0,
+            "reservationStates": {},
+            "reservedBalance": 0,
+            "consumptionReceipts": 2,
+            "consumptionJournal": 4,
+            "recoveryGates": {
+              "ready": 1
+            }
+          },
+          "scope": "One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction."
+        },
+        "db-audit-final.json": {
+          "status": "PASS",
+          "failures": [],
+          "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+          "final": true,
+          "observations": {
+            "migrations": {
+              "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+              "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+              "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+              "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+              "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+              "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+              "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+              "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+              "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+              "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+              "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+            },
+            "institutions": 1,
+            "attempts": 4,
+            "nonterminalAttempts": 0,
+            "cancelledWork": 1,
+            "sessions": {
+              "validByExpiry": 10,
+              "expired": 0
+            },
+            "outbox": {
+              "done": 42
+            },
+            "overduePending": 0,
+            "expiredClaims": 0,
+            "futureRetries": 0,
+            "signerLeases": {
+              "current": 0,
+              "expired": 0
+            },
+            "reservedReservations": 0,
+            "expiredReservations": 0,
+            "reservationStates": {},
+            "reservedBalance": 0,
+            "consumptionReceipts": 4,
+            "consumptionJournal": 8,
+            "recoveryGates": {
+              "ready": 1
+            }
+          },
+          "scope": "One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction."
+        },
+        "restore-verification.json": {
+          "status": "PASS",
+          "scope": "Real full-bundle SQL/config restore and current independent Anchor; chain startup and post-restore product call are separate steps",
+          "sameAuthority": true,
+          "migrationsPreserved": true,
+          "receiptsPreserved": true,
+          "journalPreserved": true,
+          "sessionsInvalidated": true,
+          "closedBeforeAnchor": true,
+          "liveAnchorVerified": true,
+          "oldCallsTerminal": true
+        },
+        "restore-replay.json": {
+          "status": "PASS",
+          "scope": "Actual ServiceAuthority/SQL; authenticated post-restore browser workflow is a separate media case",
+          "sameBindingReturnsStoredReceipt": true,
+          "changedBindingRejected": true
+        },
+        "restore-stale-anchor.json": {
+          "status": "PASS",
+          "olderBackupRejectedAgainstCurrentAnchor": true,
+          "anchorReset": false
+        },
+        "restore-chain-verification.json": {
+          "status": "PASS",
+          "sameGenesis": true,
+          "previousCanonicalBlockPresent": true,
+          "independentFailureDomain": false
+        },
+        "restore-negative-metadata.json": {
+          "status": "PASS",
+          "missingManifestRejected": true,
+          "originalBackupPreserved": true
+        },
+        "restore-complete.json": {
+          "status": "PASS",
+          "scope": "Full encrypted bundle, new PostgreSQL volume and separately extracted stopped Besu state. Current independent Anchor was not restored. Actual post-restore login/call is a later media stage.",
+          "wrongKeyRejected": true,
+          "nativeClients": "existing PostgreSQL image; Node and CLI copied from exact runtime image; no installation/download",
+          "stoppedValidatorCount": 4,
+          "restoredValidatorCount": 4,
+          "sourceFencePreserved": true
+        }
+      },
+      "resource": {
+        "policy": "integration-pressure-v1",
+        "startGiB": 40,
+        "reserveGiB": 16,
+        "wholeObservedGiB": 24,
+        "hostObservedGiB": 1,
+        "deadlineIncludesCleanup": true,
+        "minAvailableGiB": 43.08454132080078,
+        "maxObservedHostGiB": 0.09251785278320312,
+        "maxObservedWholeGiB": 4.412487030029297,
+        "samplingSeconds": 5,
+        "resourceStop": null,
+        "scope": "Periodic samples, not instantaneous peak/minimum specification."
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 16,
+        "volumeCount": 3,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    "analysis": {
+      "status": "PASS",
+      "runtimeProductSource": "3e1908cefdf5858b3d6cd24e3e7a1fda4e76b47d",
+      "observerSource": "0b92f4fdbfc78934df2b415ca98b03d1aca8dfc8",
+      "analysisFixture": true,
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 35.566942788660526
+        },
+        {
+          "label": "database-audit-start",
+          "exitCode": 0,
+          "seconds": 5.088291089050472
+        },
+        {
+          "label": "normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 51.675959409214556
+        },
+        {
+          "label": "archive-normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 5.219990059733391
+        },
+        {
+          "label": "work-cancel",
+          "exitCode": 0,
+          "seconds": 41.220217280089855
+        },
+        {
+          "label": "archive-work-cancel",
+          "exitCode": 0,
+          "seconds": 5.22821786114946
+        },
+        {
+          "label": "emergency-stop",
+          "exitCode": 0,
+          "seconds": 51.61944747669622
+        },
+        {
+          "label": "archive-final-audit",
+          "exitCode": 0,
+          "seconds": 5.190613607876003
+        },
+        {
+          "label": "database-audit-final",
+          "exitCode": 0,
+          "seconds": 5.103237878996879
+        }
+      ],
+      "logicalCalls": 3,
+      "trials": [
+        {
+          "phase": "phase-final-audit",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 220.61121800000183,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6330.312850000002,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8346.325444000004,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": 399.33554699999513,
+              "reason": null
+            },
+            "audioReclaimed": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "pbxAbsent": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        },
+        {
+          "phase": "phase-normal-repeat-1",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 1037.1299699999981,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6323.471550999999,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8340.476076999996,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": 371.892022,
+              "reason": null
+            },
+            "audioReclaimed": {
+              "milliseconds": 4332.201800000003,
+              "reason": null
+            },
+            "pbxAbsent": {
+              "milliseconds": 4344.224300000002,
+              "reason": null
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        },
+        {
+          "phase": "phase-work-cancel",
+          "outcome": "success",
+          "timings": {
+            "authorizationResponse": {
+              "milliseconds": 204.69471599999815,
+              "reason": null
+            },
+            "verificationVisible": {
+              "milliseconds": 6330.191623000002,
+              "reason": null
+            },
+            "remoteAudioBoth": {
+              "milliseconds": 8344.864971000003,
+              "reason": null
+            },
+            "analysisVisible": {
+              "milliseconds": 401.63880000000427,
+              "reason": null
+            },
+            "audioReclaimed": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            },
+            "pbxAbsent": {
+              "milliseconds": null,
+              "reason": "missing or reversed observation"
+            }
+          },
+          "clock": "one observer monotonic clock; no cross-host subtraction",
+          "serverAppliedLatency": null
+        }
+      ],
+      "automaticRetries": 0,
+      "checks": {
+        "db-audit-start.json": {
+          "status": "PASS",
+          "failures": [],
+          "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+          "final": false,
+          "observations": {
+            "migrations": {
+              "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+              "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+              "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+              "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+              "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+              "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+              "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+              "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+              "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+              "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+              "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+            },
+            "institutions": 1,
+            "attempts": 0,
+            "nonterminalAttempts": 0,
+            "cancelledWork": 0,
+            "sessions": {
+              "validByExpiry": 0,
+              "expired": 0
+            },
+            "outbox": {},
+            "overduePending": 0,
+            "expiredClaims": 0,
+            "futureRetries": 0,
+            "signerLeases": {
+              "current": 0,
+              "expired": 0
+            },
+            "reservedReservations": 0,
+            "expiredReservations": 0,
+            "reservationStates": {},
+            "reservedBalance": 0,
+            "consumptionReceipts": 0,
+            "consumptionJournal": 0,
+            "recoveryGates": {
+              "blocked": 1
+            }
+          },
+          "scope": "One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction."
+        },
+        "db-audit-final.json": {
+          "status": "PASS",
+          "failures": [],
+          "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+          "final": true,
+          "observations": {
+            "migrations": {
+              "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+              "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+              "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+              "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+              "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+              "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+              "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+              "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+              "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+              "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+              "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53"
+            },
+            "institutions": 1,
+            "attempts": 3,
+            "nonterminalAttempts": 0,
+            "cancelledWork": 1,
+            "sessions": {
+              "validByExpiry": 15,
+              "expired": 0
+            },
+            "outbox": {
+              "done": 47
+            },
+            "overduePending": 0,
+            "expiredClaims": 0,
+            "futureRetries": 0,
+            "signerLeases": {
+              "current": 0,
+              "expired": 0
+            },
+            "reservedReservations": 0,
+            "expiredReservations": 0,
+            "reservationStates": {
+              "settled": 15
+            },
+            "reservedBalance": 0,
+            "consumptionReceipts": 3,
+            "consumptionJournal": 7,
+            "recoveryGates": {
+              "ready": 1
+            }
+          },
+          "scope": "One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction."
+        }
+      },
+      "resource": {
+        "policy": "integration-pressure-v1",
+        "startGiB": 40,
+        "reserveGiB": 16,
+        "wholeObservedGiB": 24,
+        "hostObservedGiB": 1,
+        "deadlineIncludesCleanup": true,
+        "minAvailableGiB": 43.2166748046875,
+        "maxObservedHostGiB": 0.097808837890625,
+        "maxObservedWholeGiB": 4.513118743896484,
+        "samplingSeconds": 5,
+        "resourceStop": null,
+        "scope": "Periodic samples, not instantaneous peak/minimum specification."
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 15,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    "earlierAttempts": [
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:normal-repeat-1",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.56425661803223
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.093009746167809
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 1,
+            "seconds": 51.61223542992957
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-analysis-final",
+        "status": "PASS",
+        "reason": null,
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.566942788660526
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.088291089050472
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 51.675959409214556
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.219990059733391
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 41.220217280089855
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.22821786114946
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 0,
+            "seconds": 51.61944747669622
+          },
+          {
+            "label": "archive-final-audit",
+            "exitCode": 0,
+            "seconds": 5.190613607876003
+          },
+          {
+            "label": "database-audit-final",
+            "exitCode": 0,
+            "seconds": 5.103237878996879
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-diagnostic",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:normal-repeat-1",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.56695099896751
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.085243014851585
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 1,
+            "seconds": 51.56498590996489
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-restore-fixed",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:full-restore",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.64837613282725
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.100717225112021
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 46.46551303099841
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.1973905940540135
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 36.10240172012709
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.222083115950227
+          },
+          {
+            "label": "database-audit-source-quiesced",
+            "exitCode": 0,
+            "seconds": 5.104273991193622
+          },
+          {
+            "label": "full-restore",
+            "exitCode": 1,
+            "seconds": 5.085643453057855
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-restore-only",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:full-restore",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.67056607292034
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.103917654138058
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 46.469034664100036
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.185727167874575
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 36.113850575871766
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.197121360804886
+          },
+          {
+            "label": "database-audit-source-quiesced",
+            "exitCode": 0,
+            "seconds": 5.086537622148171
+          },
+          {
+            "label": "full-restore",
+            "exitCode": 1,
+            "seconds": 5.10051020886749
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-restore-owner",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:full-restore",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.660528908949345
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.098714953754097
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 41.267509161960334
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.2234330317005515
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 36.10146732395515
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.2157755848020315
+          },
+          {
+            "label": "database-audit-source-quiesced",
+            "exitCode": 0,
+            "seconds": 5.096736492123455
+          },
+          {
+            "label": "full-restore",
+            "exitCode": 1,
+            "seconds": 20.374440342653543
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-restore-rpc",
+        "status": "FAIL",
+        "reason": "STEP_FAILED:full-restore",
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 35.56495958380401
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.0912009710446
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 46.4616739382036
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.216194507665932
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 36.08437396213412
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.213076253887266
+          },
+          {
+            "label": "database-audit-source-quiesced",
+            "exitCode": 0,
+            "seconds": 5.098080109339207
+          },
+          {
+            "label": "full-restore",
+            "exitCode": 1,
+            "seconds": 5.093752129003406
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      },
+      {
+        "identity": "submission-final-20261104T165620Z-c33d9a-restore-tar",
+        "status": "PASS",
+        "reason": null,
+        "resourceStop": null,
+        "steps": [
+          {
+            "label": "bootstrap",
+            "exitCode": 0,
+            "seconds": 40.6734578399919
+          },
+          {
+            "label": "database-audit-start",
+            "exitCode": 0,
+            "seconds": 5.098645385820419
+          },
+          {
+            "label": "normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 46.392393251881
+          },
+          {
+            "label": "archive-normal-repeat-1",
+            "exitCode": 0,
+            "seconds": 5.221741844899952
+          },
+          {
+            "label": "work-cancel",
+            "exitCode": 0,
+            "seconds": 36.08232572628185
+          },
+          {
+            "label": "archive-work-cancel",
+            "exitCode": 0,
+            "seconds": 5.186365489382297
+          },
+          {
+            "label": "database-audit-source-quiesced",
+            "exitCode": 0,
+            "seconds": 5.098113765008748
+          },
+          {
+            "label": "full-restore",
+            "exitCode": 0,
+            "seconds": 30.58115615323186
+          },
+          {
+            "label": "post-restore-normal",
+            "exitCode": 0,
+            "seconds": 36.11708099162206
+          },
+          {
+            "label": "archive-post-restore-normal",
+            "exitCode": 0,
+            "seconds": 5.19782600691542
+          },
+          {
+            "label": "stale-restore",
+            "exitCode": 0,
+            "seconds": 5.103152175899595
+          },
+          {
+            "label": "emergency-stop",
+            "exitCode": 0,
+            "seconds": 41.304497894831
+          },
+          {
+            "label": "archive-final-audit",
+            "exitCode": 0,
+            "seconds": 5.235860020853579
+          },
+          {
+            "label": "database-audit-final",
+            "exitCode": 0,
+            "seconds": 5.1004926366731524
+          }
+        ],
+        "scope": "All manual diagnostic/setup attempts retained; not merged into a reliability success denominator."
+      }
+    ],
+    "historicalFailureStatus": "Original JSON-success/process-exit mismatch and missing-purpose-badge failure remain unexplained. Later passes do not retrospectively resolve them; process exit and bounded WS/lifetime metadata are now retained.",
+    "limits": [
+      "Same host, synthetic identities and audio; no independent operator/failure-domain proof.",
+      "Single-approver recovery refused by HTTP schema (400); not a new EVM quorum-negative result.",
+      "No new normal-five reliability claim; earlier five normal calls remain their original separate denominator.",
+      "Missing historical interface baseline remains unknown; current equal configuration does not establish past state."
+    ],
+    "realComponents": [
+      "PostgreSQL/migrations/role LOGIN",
+      "Besu4/contracts",
+      "Witness4",
+      "independent Anchor store/TLS",
+      "Asterisk/TURN",
+      "product API/auth/CSRF",
+      "Chromium/ServiceCall",
+      "decoded distinct two-way tones"
+    ],
+    "fixtures": [
+      "local HTTPS OIDC",
+      "synthetic account/keys/tones",
+      "STT/LLM only in separate analysis plan"
+    ],
+    "publicBrowser": {
+      "status": "BLOCKED",
+      "reason": "HOST_1_GIB_BUDGET",
+      "automaticRestart": false,
+      "classification": "ENVIRONMENT_RESOURCE_STOP",
+      "policy": "full-media host RSS 1GiB applied to this remote-browser substep; separate UI profile is 3GiB and was not used here",
+      "completedMediaResultsPreserved": true
+    },
+    "externalInputs": {
+      "independentReader": "BLOCKED: no explicitly supplied separate read-only credential",
+      "realAI": "BLOCKED: provider/model/protected credential/cost/input approval not supplied",
+      "AWS": "NOT_RUN: no AWS resources created; environment inputs remain user decisions"
+    }
   }
 }

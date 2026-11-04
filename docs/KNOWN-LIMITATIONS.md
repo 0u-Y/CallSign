@@ -1,13 +1,16 @@
 # 현재 구현의 한계
 
-## 2026-11-05 감사·복원 범위 갱신
+## 2026-11-05 현재 검증 경계
 
-정상5회와 취소 사례의 원본 DB 최종 감사는 실제 수행했다. 유효 세션/영수증/정산 이력은 보존하고 진행 통화·기한 지난 작업·미정산 예약을 구분했다. 전체 RESTORE와 복원된 대상의 최종 감사는 아직 미실행이다. 최초 복원 도구 준비 결함을 수정했으나 재검증이 지속 swap-out으로 중단됐다. 과거 분석 중단/PBX 종료 원인 및 두 번째 환경의 interface/route 차이도 미확정이다. [현재 판정](../artifacts/restore-audit-20261105.json)을 따른다. 이후 정상 통과나 도구 보완으로 과거 누락 관측을 소급 입증하지 않는다.
+[최신 감사·복원](../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup은 일반 entrypoint에서 암호화 전체 백업, 별도 DB/정지 chain 상태 복원, live Anchor 대조, 복원 후 새 통화와 원본/대상 DB 감사를 통과했다. 다른 binding 재사용·오래된 백업/현재 Anchor·잘못된 키·누락 metadata 거절도 확인했다. 같은 호스트·한 기관의 선택 경로이며 독립 장애 영역이나 모든 복구 조합의 보장은 아니다.
 
+별도 합성 분석3통화는 실제 ServiceCall·음성·WS·동의 철회·업무 취소·기관 정지/공동 복구를 통과했다. 최초 JSON 성공/프로세스 비정상 종료와 목적 이탈 배지 미표시 실패는 보존하며 원인은 미확정이다. 이후 통과를 그 실패의 해결 증거로 바꾸지 않는다. 과거 누락 interface baseline도 미확인이다.
 
-## 최신 후보의 실제 실행 한계 (2026-11-04)
+[최신 UI 캡처](../artifacts/service-hardening-20261105/result.json)는 인증된 역할별 실제 화면과 별도 공개 frontend를 구분한다. 원격 브라우저 후속 확인은 host1GiB 적용 중1.20GiB에서 자원 중단했다. 최신 원격 모바일/확대 확인은 미완료이며 자동 재기동하지 않았다. Vercel API 미연결, 독립 reader·실제 AI·AWS 입력 부족은 남아 있다.
 
-현재 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 소표본 안정성/부하·최신 RESTORE·복원 대상 DB 감사·독립 AWS reader·외부 AI 품질은 미확인이다.
+## 이전 후보의 실제 실행 한계 (2026-11-04)
+
+현재 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 당시 미실행이던 RESTORE/DB 감사는 위 후속 기록을 따른다. 소표본 안정성/부하·독립 AWS reader·외부 AI 품질은 미확인이다.
 
 
 확인한 경로와 실행 소스는 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md), 실패와 당시 조건은 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)에서 관리한다. 이 문서는 현재 남은 제약만 설명한다. 과거 NOT_RUN·swap 중단·이전 후보 결과를 최신 상태로 해석하지 않는다.

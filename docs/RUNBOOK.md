@@ -10,6 +10,10 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 
 
+### RESTORE 도구의 native 실행 조건
+
+복원 CLI는 Node 외에 동일 배포의 `pg_dump`/`pg_restore`와 GNU tar를 요구한다. 이번 소유 리허설은 고정 PostgreSQL 이미지의 native client에 정확한 runtime의 Node·GNU loader/라이브러리·GNU tar를 연결하고 현재 UID/GID로 실행했다. Alpine의 musl·BusyBox tar로 조용히 대체하지 않는다. 도구 자체 확인은 drain 전에 수행하고, 보호 출력0600·원본 fence·독립 Anchor를 유지한다. host 패키지 설치나 전역 라이브러리 변경은 하지 않는다. 실제 chain RPC는 해당 validator의 검증된 loopback 설정을 사용하며8545로 가정하지 않는다.
+
 ## 문서 사용 순서
 
 | 목적 | 시작 위치 |
@@ -31,6 +35,9 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 <a id="github-delivery-20261102"></a>
 
 ### GitHub 보관·전달 경로
+
+현재 후보의 실제 판정·source/digest·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)의 serviceHardeningFollowup을 우선한다. [선택 전체 RESTORE/미디어](../artifacts/restore-audit-20261105.json)의 후속 결과와 이전 Release의 발행 당시 BLOCKED를 구분한다. 아래 이전 후보/태그는 원본 이력이며 덮어쓰지 않는다.
+
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 

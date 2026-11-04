@@ -32,7 +32,7 @@
 
 [현재 전달 버전과 AWS 수령 명령](RUNBOOK.md#github-delivery-20261102) → [NEW 초기 배포](RUNBOOK.md#new-초기-배포-순서) → [재시작·재개·RESTORE](RUNBOOK.md#재시작실패-재개기존-배포-restore) 순서로 확인합니다.
 
-Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니다. bootstrap 전달은 검증했지만 최종 AWS 웹·별도 GHCR 수령용 읽기 자격 검증·AWS 실행은 미완료입니다. 시험 chain/DB를 대회 identity로 간주하지 않으며, 기존 키·genesis·계약·소비 이력·Anchor를 초기화해 재개하지 않습니다. `infra/gcp`와 Vercel preview 설정은 과거 구성이며 AWS 대회 runtime이 아닙니다.
+Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니다. bootstrap 전달은 검증했지만 최종 AWS 웹·별도 GHCR 수령용 읽기 자격 검증·AWS 실행은 미완료입니다. 시험 chain/DB를 대회 identity로 간주하지 않으며, 기존 키·genesis·계약·소비 이력·Anchor를 초기화해 재개하지 않습니다. `infra/gcp`는 과거 보존물입니다. 현재 Vercel 공개 frontend는 API 미연결 제품 미리보기이며 AWS 대회 runtime이 아닙니다.
 
 ## 기록과 자료
 

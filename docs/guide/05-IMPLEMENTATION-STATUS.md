@@ -1,15 +1,24 @@
 # 05. 구현 및 검증 현황
 
-최근 [DB 감사·정상5회·복원 시도](../../artifacts/restore-audit-20261105.json)는 이전 통화4건과 별도다. 원본 DB의 실제 종료 전 감사는 PASS이며 전체 RESTORE/복원 대상 감사는 BLOCKED다. 수정한 복원 도구의 실제 재검증은 swap-out 중단 이후 수행하지 않았다. Vercel·별도 reader·실제 AI는 외부 접근/입력이 없으며 AWS 실행은 이번 범위에서 제외됐다.
+## 현재 작업표
 
+| 요구사항 | 현재 구현 | 실행 근거 | 남은 작업 | 완료 조건 | 차단 입력 |
+|---|---|---|---|---|---|
+| UI-001/006 역할별 업무·공식 확인 | 실제 업무/API·공식 조회 상태와 독립 통화 종료 | [HTTP·실제 역할별 캡처](../../artifacts/service-hardening-20261105/result.json) | 공개 frontend 후속 모바일/확대 확인 | 최신 원격 화면 상호작용 검토 | 원격 브라우저 RSS 중단 후 새 실행 범위 |
+| CALL-005/006·AI-001/005 | ServiceCall/remote track·동의·정책 결합 | [최신 일반/합성 분석 경로](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup | 이전 분석/프로세스 실패의 원인 미확정 | 재발 시 보존한 exit·WS·lease 관측으로 원인 확인 | 미재현 원인을 추정 확정하지 않음 |
+| OPS-004 복원·DB 감사 | 일관된 암호화 백업·별도 DB/chain 복원·독립 Anchor | 같은 기록의 restore: 전체 RESTORE·복원 후 통화·원본/대상 SQL 감사 PASS | 별도 장애 영역 운영 검증 | 실제 AWS 저장소/Anchor 배치와 복구 | AWS 환경 |
+| OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 새 후보 게시/원격 수령 결과 확인·별도 reader | digest·checksum·source 대응 및 reader 수령 | 독립 reader, AWS 환경 입력 |
+| AI-003 실제 제공자 평가 | 동의/취소·오류·quota·숫자 예산 선검사 | 합성 제어 흐름; 실제 제공자 호출0 | 사람 검토 한국어 입력·실제 평가 | 텍스트/음성·품질/제어 흐름 분리 | 제공자·모델·보호 참조·비용·입력 허가 |
 
-현재 전달물의 발행 당시 판정은 [후보 기록](../../artifacts/product-candidate-20261104.json), 이후 같은 이미지의 실제 실행은 [후속4개 고유 사례](../../artifacts/media-final-20261104.json)를 기준으로 본다. 정상 반복2회·실제 업무 조회 장애 중 종료·업무 취소·기관 정지·공동 복구를 통과했고 원장/Witness/Anchor/PBX/TURN과 ServiceCall/remote track/인증 WS를 실제 실행했다. OIDC·합성 음원·STT/LLM fixture와 실제 모델 품질은 구분한다. 과거 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다.
+일반 entrypoint/분석 미사용 복원 계획의4통화와 별도 합성 분석 계획의3통화는 각각 PASS다. 원본과 복원 대상 DB를 삭제 전에 read-only 감사했다. 과거5회 정상 반복·이전4개 사례·이번 진단 재실행을 합쳐 성공률을 만들지 않는다. 단독 복구400은 HTTP schema 거절이고 이번 EVM 정족수 거절 증거는 아니다.
 
-현재 화면은 [UI 전용 검증](../../artifacts/service-ui-validation-20261104.json)을 유지하며 연락 목적이 조회 장애 때 사라지던 수정을 [실제 장애 화면](../../artifacts/media-resume-20261104/workspace-outage-fixed.png)으로 확인했다. [390px 실제 경고](../../artifacts/media-resume-20261104/final-recipient-mobile.png)도 직접 검토했다. 최신 RESTORE·복원 대상 DB 감사·독립 reader·Vercel 최신 배포·외부 AI 품질은 미확인이다. 경량 검사나 선택 통화 성공이 이를 대신하지 않는다.
+실제 authenticated390px·데스크톱과 통화 화면을 열어 검토했다. Vercel 공개 frontend는 최신 main의 API 미연결 화면이며 실제 로그인/통화 backend는 없다. 후속 원격 브라우저는 전체 시험의 host1GiB를 적용하다1.20GiB에서 중단했다. UI3GiB로 소급 PASS하거나 자동 재시작하지 않았다. 부분 데스크톱 캡처와 HTTP 검증, 이전 UI 모바일 검증을 구분한다.
+
+이 표는 SLA나 모든 장애 조합의 보장이 아니다. 과거 분석 중단/PBX 종료·누락 baseline의 원인 미확정은 유지하며, 현재 equal baseline으로 과거 상태를 입증하지 않는다. 원본은 위 기록 및 [이전 미디어 결과](../../artifacts/media-final-20261104.json)를 따른다.
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
-기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 아래 실제 미디어 후보의 실행 소스는6e3cd23이며 이후 문서·증거 정리와 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
+기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 아래의 이전 초기 미디어 후보는6e3cd23이며 후속 후보·실행 기록과 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
 
 ## 이전 실제 미디어 후보에서 확인한 범위
 
@@ -37,7 +46,7 @@
 
 ## 다음 배포 단계
 
-[RUNBOOK의 고정 전달 기준](../RUNBOOK.md#github-delivery-20261102)은 이전 버전입니다. 최신 후보를 게시할 때 새 runtime registry digest와 새 고유 Release·원격 재수령이 필요합니다. 게시용 인증과 AWS reader 인증을 분리합니다.
+[RUNBOOK의 고정 전달 기준](../RUNBOOK.md#github-delivery-20261102)과 최신 후보 기록의 source/digest·원격 수령 판정을 함께 사용합니다. 게시용 인증과 AWS reader 인증을 분리합니다.
 
 AWS 위치/예산·도메인/TLS·OIDC·역할별 보호 참조·reader 권한은 [입력 계약](../RUNBOOK.md#aws-input-contract)을 따릅니다. AWS NEW가 만든 계약 metadata·공개 trust·PBX 인증서 뒤에 최종 웹을 생성합니다. 생성될 계약 주소·genesis hash·trust pin을 미리 요구하지 않습니다. 개발 서버는 runtime 의존성이 아닙니다.
 

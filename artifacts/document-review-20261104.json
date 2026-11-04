@@ -580,5 +580,89 @@
     "history": 8,
     "historical-original": 8,
     "current": 23
+  },
+  "serviceHardeningFollowup": {
+    "recordedAt": "2026-11-04T18:07:51.879866+00:00",
+    "trackedMarkdownFiles": 43,
+    "mdxFiles": 0,
+    "addedSinceOriginalAudit": [
+      "DESIGN.md"
+    ],
+    "changedSinceOriginalAudit": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "ac1a0277b34e270e4fb2d56d5df8cf1ad39371a2ab8b72c51f6ca12d80ba5138",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "AGENTS.md"
+      },
+      {
+        "path": "DESIGN.md",
+        "sha256": "a0aa365cb1c05b20f7e2b702e4d62acfead4387318f9bba2edafa1f5359512c0",
+        "action": "added-and-reviewed",
+        "canonicalLocation": "DESIGN.md"
+      },
+      {
+        "path": "PRODUCT.md",
+        "sha256": "14acaabc47d35a4406dfa96c9fc8b413bda07b34526131e3d6ba3ec2e5573a6b",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "PRODUCT.md"
+      },
+      {
+        "path": "README.md",
+        "sha256": "a77364469e663ac71ad21cf19b705743fb73dc8645f1b6c6a20b2bb915a2d1ab",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "README.md"
+      },
+      {
+        "path": "docs/DESIGN-REFERENCES.md",
+        "sha256": "c645ac0bce1737eb75ddf7f2e1a51c1864117a9f839dbc76143a0b0d7917ee02",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/DESIGN-REFERENCES.md"
+      },
+      {
+        "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
+        "sha256": "abb4bb4cbd85924bd09f31468f36b5707184a1704a77d2bc960c9b93a1ce8d2c",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/FINALS-IMPLEMENTATION-PLAN.md"
+      },
+      {
+        "path": "docs/KNOWN-LIMITATIONS.md",
+        "sha256": "f33a1a3385f6e80709e0ab9702970d3f2ef17b016123c0a0c02bd000b2a22a9d",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/KNOWN-LIMITATIONS.md"
+      },
+      {
+        "path": "docs/LOCAL-VALIDATION.md",
+        "sha256": "2b952eb2bd0d58e16af9e7e6311a5fce3b2d4ae0f60b6e02a9bc990a41adaa84",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/LOCAL-VALIDATION.md"
+      },
+      {
+        "path": "docs/README.md",
+        "sha256": "5fa456fc7a7f479a31699f0ff4446be28cf3c2cf55d42a3566f13fe09fac7d30",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/README.md"
+      },
+      {
+        "path": "docs/RUNBOOK.md",
+        "sha256": "8a4b7e41f7751e3c36e3d174e61772cbf875f5b3d5989e19066e7a7f9e1be699",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/RUNBOOK.md"
+      },
+      {
+        "path": "docs/guide/05-IMPLEMENTATION-STATUS.md",
+        "sha256": "59e9b72ab1401ecdce70b1357d691f595294cdb90203ba193bcae64c74c4b6fd",
+        "action": "reviewed-current-or-updated",
+        "canonicalLocation": "docs/guide/05-IMPLEMENTATION-STATUS.md"
+      }
+    ],
+    "unchangedOriginalFiles": 32,
+    "method": "Reused original 42-file review; read added DESIGN.md and changed current instructions/product/design/runbook/status documents. Current procedures corrected; historical failures and user original inputs retained.",
+    "localLinkAndAnchorCheck": {
+      "references": 661,
+      "errors": 0
+    },
+    "removedOrMoved": 0,
+    "untrackedPersonalNotesAndOriginalPdf": "Preserved outside commit/release."
   }
 }
