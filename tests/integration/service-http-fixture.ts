@@ -25,7 +25,8 @@ export async function httpBrowserOptions(){
  return {headless:true,args:['--disable-dev-shm-usage','--no-sandbox',`--ignore-certificate-errors-spki-list=${pin}`]};
 }
 
-export async function createHttpFixture(options:{web?:boolean;liveDirectory?:string;webOrigin?:string;resumeOidc?:string;preparedTrust?:string;startExternal?:(prepared:{environment:NodeJS.ProcessEnv;runRoot:string;origin:string;oidc:string;pin:string})=>Promise<string>}={}){
+export async function createHttpFixture(options:{web?:boolean;publicPreview?:boolean;liveDirectory?:string;webOrigin?:string;resumeOidc?:string;preparedTrust?:string;startExternal?:(prepared:{environment:NodeJS.ProcessEnv;runRoot:string;origin:string;oidc:string;pin:string})=>Promise<string>}={}){
+if(options.publicPreview&&(options.liveDirectory||options.startExternal))throw new Error('PUBLIC_PREVIEW_FIXTURE_MUST_BE_LOCAL');
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
 if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
@@ -102,7 +103,7 @@ const start=async()=>{
  oidc=await serverListen(provider);
  // Vite is already installed in the web workspace; no download or webServer hook.
  const createVite=options.web===false?undefined:(await import('../../apps/web/node_modules/vite/dist/node/index.js')).createServer;
- const vite=options.web===false?undefined:await createVite!({root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
+ const vite=options.web===false?undefined:await createVite!({define:options.publicPreview?{'import.meta.env.VITE_PUBLIC_PREVIEW':JSON.stringify('true')}:{},root:'apps/web',configFile:'apps/web/vite.config.ts',server:{host:'127.0.0.1',port:0,strictPort:false,https:tls,proxy:{'/api':{target:'http://127.0.0.1:1',rewrite:p=>p.replace(/^\/api/,'')}}}});
  if(vite){web=vite;await vite.listen();origin=vite.resolvedUrls!.local[0]!.replace(/\/$/,'');}else origin=options.webOrigin??'https://127.0.0.1:1';
  record={registrationState:'confirmed',directory:{hash:`0x${hashCanonical(initialDirectory)}`,version:1,entries:initialDirectory},id,did:institutionUri,institutionUri:institutionUri,authorityCheckpointVersion:1,epoch:'1',approvalKeyVersion,approvalKid:issuerKey.kid,approvalPublicKey:issuerKey.publicJwk,status:'active',policy:bankPolicy,serviceV3:newServiceState(),services:{[serviceUri]:{did:serviceUri,kid:serviceKey.kid,publicKey:serviceKey.publicJwk,keyVersion:1,active:true}},members:{},intents:{},attempts:{},credentials:{},authorizations:{},consumptions:{},recipientKeys:{},audit:[]};
  if(live){
