@@ -358,3 +358,20 @@ assert not f('/unit-anchor','unit','full-restore')
 p=subprocess.run([sys.executable,'tests/integration/runtime-restore-driver.py'],env={k:v for k,v in os.environ.items()if k!='CALLSIGN_ALLOW_EXTERNAL_EXECUTION'},capture_output=True,text=True,timeout=3)
 assert p.returncode!=0 and 'INTEGRATION_EXECUTION_BLOCKED'in p.stderr
 `],{stdio:'pipe'});});
+
+it('retains a nonzero controller exit alongside successful assertions before removing the owned root',()=>{
+ execFileSync('python3',['-c',`
+import runpy,tempfile,json
+from pathlib import Path
+m=runpy.run_path('scripts/validation-runtime-media.py',run_name='unit_only')
+with tempfile.TemporaryDirectory() as d:
+ root=Path(d)/'owned';root.mkdir();out=Path(d)/'evidence'
+ (root/'runtime-process-result.json').write_text(json.dumps({'exitCode':1}))
+ (root/'runtime-media-results.json').write_text(json.dumps({'success':True}))
+ (root/'secret.env').write_text('PRIVATE=value')
+ m['preserve_evidence'](root,out,'process failed',[])
+ assert json.loads((out/'runtime-process-result.json').read_text())['exitCode']==1
+ assert json.loads((out/'runtime-media-results.json').read_text())['success'] is True
+ assert not (out/'secret.env').exists()
+`],{stdio:'pipe'});
+});

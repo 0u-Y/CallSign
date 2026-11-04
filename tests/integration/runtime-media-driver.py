@@ -73,7 +73,7 @@ if options.archive_phase:
     if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
-    names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
+    names=['runtime-media-test.log','runtime-media-results.json','runtime-process-result.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
     names += [p.name for pattern in ['analysis-observation-*','media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','delivery-recipient-*','delivery-agent-*','delivery-workspace-*','pbx-control-*','call-trial-*'] for p in root.glob(pattern)]
     for name in names:
         if (root/name).exists(): (root/name).rename(phase/name)
@@ -109,7 +109,7 @@ def start(role, env, mounts, args=None, image=app_image, memory='512m'):
     (root / 'ownership.json').write_text(json.dumps(owner, indent=2) + '\n')
     return result
 
-for previous in ['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json']:
+for previous in ['runtime-media-test.log','runtime-media-results.json','runtime-process-result.json','image-services-request.json','image-services-started.json']:
     if (root / previous).exists():
         raise SystemExit('ARCHIVE_PREVIOUS_TEST_EVIDENCE_FIRST')
 log = open(root / 'runtime-media-test.log', 'x', opener=lambda p, f: os.open(p, f, 0o600))
@@ -133,7 +133,7 @@ if options.analysis_fixture:
 child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(test_environment), controller,
                           'timeout', '--signal=TERM', '--kill-after=5s', str(limit), 'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
                           '--configLoader', 'runner', '--fsModuleCachePath', '/tmp/callsign-runtime-image-modules',
-                          '--cache=false', '--reporter=json', '--outputFile=/run/callsign/runtime-media-results.json'] + selection,
+                          '--cache=false', '--reporter=default', '--reporter=json', '--outputFile=/run/callsign/runtime-media-results.json'] + selection,
                          stdout=log, stderr=subprocess.STDOUT)
 completed = False
 try:
@@ -263,8 +263,9 @@ try:
                 done.write_text(json.dumps({action+'d':True})+'\n')
         time.sleep(.2)
     code = child.returncode
+    (root/'runtime-process-result.json').write_text(json.dumps({'exitCode':code,'finishedMonotonicNs':time.monotonic_ns(),'scope':'Actual timeout/docker-exec process exit; JSON assertion success does not override a nonzero exit.'})+'\n')
     if code:
-        raise RuntimeError('RUNTIME_MEDIA_ASSERTIONS_FAILED')
+        raise RuntimeError('RUNTIME_MEDIA_PROCESS_FAILED:'+str(code))
     completed = True
     print('Owned final-image integration assertions completed.')
 finally:

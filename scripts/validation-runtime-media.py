@@ -49,7 +49,7 @@ def preserve_evidence(root, directory, reason, steps):
     copied=[]
     for location in [root,*root.glob('phase-*')]:
         if location.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
-        outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json']
+        outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json','runtime-process-result.json']
         outputs += [p.name for pattern in ['analysis-observation-*.json','db-audit-*.json','restore-*.json','normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.png','*.log'] for p in location.glob(pattern)]
         for name in outputs:
             source=location/name
