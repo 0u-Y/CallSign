@@ -18,6 +18,12 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 최신 main `2423e73`의 RUNBOOK/한계 문서를 포함한 추가 인계 묶음을 `.local/delivery-handoff-2423e73/delivery/`에 생성했다. 검증 runtime6e3cd23/c39cbb와 observer 내용은 그대로이며 main과의 차이는 문서·증거뿐이다.4개 파일 checksum·공개 tar 경계 검사를 통과했다. 이미지 재빌드/서비스 기동/원격 게시·수령은 하지 않았다. 기존 후보는 보존했으며 새 inventory는 로컬 config ID·최종 웹 미준비·NOT_SENT를 유지한다.
 
+## 2026-11-04 제출 후보의 원격 전달과 문서 정리
+
+새 지시의 명시적 발행 허가로 `aws-candidate-20261104t085935z`의6종 private GHCR 태그를 게시했다. runtime은 기존 검증 config ID, 인프라5종은 기존 이미지/manifest를 재사용했으며 실제 새 경로에 manifest/config/layer를 수령했다. [원본 증거](../artifacts/ghcr-candidate-20261104.json)는 writer 기반 pull-scope 수령과 미제공 AWS reader를 구별한다. 공개 사전 Release의 봉인·재수령은 후속 영수증으로 판정한다.
+
+RUNBOOK은 AWS 수령/NEW/재개/복구 중심으로 줄이고 로컬 통화·HTTP/DB/EVM 절차를 LOCAL-VALIDATION으로 분리했다. 기존 앵커는 이동 링크로 유지하고 공개 배포 tar에 새 문서를 포함한다. MASTER의 과거 실행 수치/미구현 이력은 원문 링크로 대체해 요구/완료 조건과 구분했다. KNOWN-LIMITATIONS의 오래된 현재형·결과 중복을 정리했고 요구 ID·서명/권한·원본 증거·사용자 기획서는 보존했다. 서비스/브라우저/체인 재기동·이미지 재build·AWS/유료 제공자 호출은 하지 않았다.
+
 ## 현재 상태와 다음 단계
 
 | 구분 | 상태·다음 작업 |

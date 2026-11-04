@@ -1,50 +1,17 @@
 # 현재 구현의 한계
 
-## 최신 제품 후보의 실행 범위 (2026-11-04)
+확인한 경로와 실행 소스는 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md), 실패와 당시 조건은 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)에서 관리한다. 이 문서는 현재 남은 제약만 설명한다. 과거 NOT_RUN·swap 중단·이전 후보 결과를 최신 상태로 해석하지 않는다.
 
-[최신 실행](FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)에서 실제 ServiceCall 양방향 합성 음성·분석 패널·동의 철회·업무 취소/긴급 정지·공동 복구를 확인했다. 과거의 해당 경로 NOT_RUN 기록은 당시 상태다. 최종 소스6e3cd23·runtime c39cbb의 선택2사례이며 모든 장애 조합·반복 성공률·외부 NAT·AWS 검증으로 확대하지 않는다. OIDC/STT/LLM은 fixture이며 한국어 품질·제공자 보관/청구·실제 IdP는 미검증이다. 단독 복구 거절은 HTTP schema에서 관측했고 계약 단독서명 실행 결과로 기록하지 않는다.
+## 제출 후보와 외부 환경
 
-로컬 후보·공개/observer 묶음은 생성했지만 새로운 GHCR/Release는 게시하지 않았다. 고정 Release와 최신 소스가 다르며 AWS 최종 웹도 아직 없다. Vercel 공개 preview는 실제 AWS 서비스 연결이 확인되지 않았다. 운영 도메인/TLS/OIDC·AWS reader 보호 참조·실제 배치 입력과 별도 AWS 실행 허가가 필요하다. 원본 실패와 자원 중단은 [증거](../artifacts/product-runtime-validation-20261104.json)에 별도로 남겼다.
-
-5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
-
-최신 로컬 후보는 실제 SQL/WS 종료 회귀5건과 readiness/잔류 감사까지 확인했다. 전체 NEW의40GiB 시작 조건을 충족하지 못해 ServiceCall·실제 음성/회수·반복과 후보 서비스 entrypoint는 미실행이다. 후보 image/source·묶음의 검사와 초기 자동 Node 수령/회수는 [후보 기록](FINALS-IMPLEMENTATION-PLAN.md#candidate-media-20261103)을 따른다. runtime build의 버전 probe나 layer hash가 실제 기동 성공을 대신하지 않는다.
-
-최신 branch 리뷰의 종료 경합/호출 전 quota 해제 수정과 다음 실제 ServiceCall 분석 경로는 [리뷰 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 이전34건은 당시 소스·fixture 범위이며 새 미디어 분석 경로의 PASS가 아니다. 강제 종료 뒤 예약은 기존 worker가 만료 후 전액 보수 정산하며, 제공자 청구 대조·즉시 환불·이번 실제 crash 검증을 뜻하지 않는다. 보존 대상 환경의 영향 여부는 미확인이다.
-
-[구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md)은 확인한 실행과 원본 증거를, 이 문서는 남은 보장·운영 한계를 설명한다. 코드 미구현과 외부 설정/실환경 미검증을 구별한다. [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)의 과거 SHA·날짜·결과는 해당 실행 범위로 보존한다.
-
-## 현재 후보의 전체 기동 조건
-
-현재 후보의 image/config·archive checksum·일반 entrypoint 파일/권한은 무기동으로 대조했다.90초 현재 호스트 관측은40GiB 시작 조건을 통과했지만, driver의 서비스/웹 build 동시 실행은 앞선 빌드 직렬 조건과 충돌한다. 전체 컨테이너 단계별 한도와 미지정 host 비용은 [단일 예산표](RUNBOOK.md#delivery-memory-budget)를 따른다.40GiB는 실측 최소 RAM이 아닌 운영 정책이며 그대로 유지한다. 웹 build만의 동시 실행 예외·전체24GiB 관측 예산 제안은 미승인이다. 이번에는 서비스/이미지 build/load를 실행하지 않았으며 일반 entrypoint·전체 통화·정상2회 반복은 여전히 NOT_RUN이다. 기존 후보는 보존했고 새 로컬 base 사전 검사는 observer 변경이므로 runtime 재빌드는 필요 없다. 기존 observer archive에 이 검사까지 반영됐다고 주장하지 않는다.
-
-## AWS 전달과 실행의 남은 경계
-
-bootstrap6종의 private GHCR 게시·실제 원격 manifest/config/layer 수령과 공개 파일 Release 재수령은 확인했다. [배포 기준·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 고정 버전을 찾는다. 별도 AWS reader 자격·리전/예산·실제 도메인/TLS·OIDC·최종 web pin·AWS 전체 기동은 아직 준비/검증 대기다. 현재 개발 서버 없이 자료를 받을 수 있다는 것과 AWS에서 서비스를 실행했다는 것은 다르다.
-
-AWS 전 점검의 화면·preflight·계약 재개 수정은 기존 고정 Release/runtime에 포함되지 않는다. 실제 배포 전 새 runtime과 공개 묶음을 검증·발행해야 한다. 이번에는 build/push/Release를 하지 않았다. 입력 분류와 전달물 차이는 [RUNBOOK](RUNBOOK.md#aws-input-contract)이 기준이다.
-
-같은 호스트의 새 chain/DB/별도 Anchor/PBX·제품 웹 리허설은 실제 구현과 합성 음원/로컬 OIDC를 사용했다. 독립 호스트 장애·실제 IdP·외부망 NAT/TURN·외부 AI·AWS override 전체 성공으로 확대하지 않는다. 기존 null inventory·package403·미전송 설명은 앞선 증거의 당시 상태다.
-
-## 최신 HTTP·WS·Chromium 통합의 확인 범위
-
-사용자가 승인한 시험 전용 압박 정책으로 실제 PostgreSQL/SQL·로그인/CSRF·Platform/Issuer/Sender·WS·Chromium을 연결했다. 최종 고유 사례는 HTTP11·WS14·Chromium9 PASS이고, 같은 회귀DB3건 재실행과 전후 잔류 감사도 통과했다. 초기 quota17개 잔류는 실패로 보존했으며 소켓/분석 drain보다 quota pool이 먼저 닫히던 결함을 수정했다. 실패DB를 초기화하지 않고 같은 소유 cluster의 추가 회귀DB에서 확인했다. [실행/실패/정리 증거](../artifacts/http-pressure-integration-20261103.json)와 [기록](FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)을 따른다.
-
-Chromium8개는 실제 제품 화면, 추가1개는 실제 로그인/WS/분석 결과를 출하 패널에 렌더링한 component host다. 후자는 ServiceCall·실제 상대 음성→분석→화면 전체 경로의 성공 증거가 아니다. 실제 마이크/체인/Witness/PBX/TURN/Anchor/외부 IdP/STT/LLM/AWS는 이번에 실행하지 않았다. 정책/hash/시대/동의·정정/늦은 결과의 fixture 검증과 한국어 모델 정확도·실제 음성 회수는 별개다. SPKI 예외의 동작은 해당 시험 인증서에만 확인했다.
-
-이전 PostgreSQL5파일17시험과 구 swap 정책의 assertion0/BLOCKED는 [당시 원본](../artifacts/mentoring-integration-20261103.json), 후속 기동 전 중단은 [별도 관측](../artifacts/http-resource-preflight-20261103.json)에 보존한다. 그 결과를 이번 시험 수에 합산하거나 실패 원본을 최신 값으로 고치지 않는다. 이번 정책의 수치는 보편적인 안전 기준이 아니며5초 sampling의 최대값은 순간 peak나 SLA가 아니다.
-
-## 4차 반영 소스와 아직 실행하지 않은 경계
-
-기관 회수 조회, 승인 정책에 결합한 제한 문맥 목적 분석, 통화별 반복/집계·합성 평가 도구를 구현했다. 최초 반영 때는 오프라인/SSR만 확인했으며 후속 실제 SQL/HTTP/WS/브라우저의 범위는 위 절을 따른다. ARI GET404는 명시적 응답 fixture이고 실제 PBX·음성 디코딩·외부 제공자·AWS 성공을 뜻하지 않는다. [최신 반영표](mentoring/README.md)와 [실행 조건](RUNBOOK.md#mentoring-fourth-validation)을 따른다.
-
-분석기는 최근 확정 remote 발화만 사용하므로 고객 앞선 발언·ASR 오인식·복잡한 인용/정정의 의미를 확정할 수 없다. 규칙/LLM의 근거·revision·정책 결합 검사와 실제 한국어 정확도는 다르다. development/evaluation을 나눈 합성14사례도 독립 사람 평가/실음성 gold가 아니다. 실제 통화 성공률/지연 기준선은 NOT_RUN이며 작은 표본의 p95/단일 회수는 SLA가 아니다.
-
-Registry 전역 고정 승인자 교체·기관별 집합·정족수 변경은 미구현이며 이번에 ABI/bytecode/도메인을 바꾸지 않았다. 후속 완료에는 필수 기관 동의 여부를 포함한 운영 정책, 새 계약/신뢰 전환, 대기 서명/구 VC·lease·웹 차단·nonce/키 세대 이행과 회귀가 필요하다. Witness를 직접 체인 proof로 대체하는 작업도 별도다. 실제 CTI는 선택 adapter의 인증·ID 매핑·취소/응답 유실·관측 계약을 검증해야 하며 현재 API 경계 문서만으로 상용 호환성을 선언하지 않는다.
+- 최신 제품 후보는 실제 ServiceCall·양방향 합성 음원·선택 회수/공동 복구를 확인했다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 확인하지 않았다. 단독 복구 요청은 HTTP schema에서 거절됐고 이번 EVM 정족수 거절 시험과 다르다.
+- 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.
+- AWS 리전/예산·공개 origin/TLS/OIDC·PBX/TURN 공개 주소·영속 저장소·독립 Anchor 배치·별도 GHCR reader가 필요하다. [입력 계약](RUNBOOK.md#aws-input-contract)을 따른다. 계약 주소·genesis hash·trust pin은 NEW 산출물이다.
+- AWS 최종 웹은 실제 metadata/trust/PBX 인증서 뒤에 생성한다. 로컬 시험 웹·bootstrap 전달을 AWS 배포 완료로 표시하지 않는다. Vercel은 현재 공개 preview 설정이며 실제 AWS 인증/통화 연결을 확인하지 않았다.
+- 같은 호스트/namespace의 Besu4·Witness4·TURN은 독립 기관 운영·호스트 장애·외부 NAT 통과의 증거가 아니다. 40GiB 시작/24GiB 관측 예산과5초 표본 최대는 이번 실행 정책·관측이며 최소 사양이나 peak가 아니다.
 
 ## 현재 서비스
 
-- **인증·원장·DB·미디어 선택 경로 검증, 전체 서비스 미검증.** 실제 실행 범위는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md)과 각 원본 증거를 따른다. OIDC만 fixture이고 원장/Witness·PostgreSQL·HTTPS Anchor·PBX/TURN·합성 원격 음원은 실제 구현이다. 과거 HTTP/복구 평가의 대체 경계는 그 실행 당시의 것이며 최신 미디어 결과나 운영 IdP·외부 AI/AWS·전체 복원 성공으로 합산하지 않는다.
 - **PBX 보장 경계.** Asterisk가 DTLS-SRTP 음성 종단이다. ARI는 채널·Call-ID·bridge를 조회한다. 인증서 지문은 배치한 공개 인증서에서 고정하고 브라우저의 실제 관측과 대조한다. 서버의 독립 DTLS handshake 수집이나 원 상담원의 개인 신원 증명은 아니다. 자체 SIP 모듈은 직접 Asterisk WSS/등록/수신 dialog로 제한하며 proxy route·PSTN·임의 transfer·재협상은 거절한다. 이번 Asterisk/PJSIP·ODBC·작업 CA·Chromium 경로는 확인했다. 운영 인증서·다른 단말·외부망 호환은 검증 전이다.
 - **통화 정책값.** 120초는 attempt 생성부터의 연결 시작 창이다. lease 30초·최대 4시간은 설정 가능한 초기값이며 합의된 SLA가 아니다. 업무·VC가 먼저 만료되면 더 일찍 종료한다. 기관 서비스 재시작 후 기존 PBX 통화는 정리하고 새 시도를 요구한다. 진행 통화의 무중단 복원은 보장하지 않는다.
 - **원장 외부 호출.** 같은 서명 raw tx/hash를 저장한 뒤 제출·조회·재전송한다. 외부 exactly-once는 아니다. 12회 실패는 운영자 확인 상태로 남고, 결과 불명의 signer nonce가 있으면 새 nonce 발급도 차단한다. 다른 도구가 같은 관리자 계정으로 동시에 tx를 제출하는 운영은 지원하지 않는다.
@@ -58,31 +25,14 @@ Registry 전역 고정 승인자 교체·기관별 집합·정족수 변경은 �
 - **신뢰 게시.** 정책/키 확정 뒤 공개 trust·웹 pin·runtimePolicy가 맞지 않으면 신규 발급/연결을 막는다. 선택한 정책 변경과 새 trust/web 전환은 신규 리허설에서 확인했지만 여러 replica·오래된 캐시·외부 배포의 전환과 부분 실패 복구는 미검증이다. 일반 재시작에 신뢰 전환이나 키 재생성을 숨기지 않는다.
 - **별도 확장.** 선택 DID의 추가 DNS/캐시 방어와 체인 헤더·commit seal·account/storage proof 직접 검증은 기본 PBX 서비스와 분리한다. Witness를 native proof로 설명하지 않는다.
 
-## 보존한 초기 시연의 한계와 정책 차이
+## 이번 범위 밖의 구현
 
-아래는 **2026-09-14 코드·시험**의 범위다. 현재 서비스가 통과한 결과나 운영 절차로 사용하지 않는다.
+Registry 전역 고정 승인자 교체·기관별 승인자 집합·정족수 변경, Witness의 직접 체인 proof 대체는 미구현이다. 관리2-of-3은 특정 기관의 필수 동의를 보장하지 않는다. 후속 변경에는 새 권한 모델·서명/nonce/키 세대·구 trust 전환과 회귀가 필요하며 기존 ABI/서명 도메인은 유지한다.
 
-- Chromium 153·같은 컴퓨터에서의 직접 통화·실제 원격 인증서 관측만 검증했다. Firefox/Safari·실제 모바일·TURN·여러 기기는 미검증이었다.
-- 네 노드·증언자는 키·프로세스·조회 서버가 나뉘었으나 같은 호스트·운영자여서 독립 기관 운영의 증거가 아니었다.
-- 시연은 승인마다 새 위임을 생성하고 철회 후 통화는 유지한 채 인증 표시만 철회했다. **현재 목표는 위임 재사용과 명시적 철회 시 통화 종료**다.
-- 당시 활성 화면은 3초 주기로 상태를 조회했고 마지막 기록의 취소 요청→표시 철회는 6.691초였다. 현재 체인 확정 후 5초 목표와 측정 시작점·코드가 다르다. 만료 뒤 화면 타이머 지연의 반복 측정도 하지 않았다.
-- 공동 복구에서 관리자·정지키를 바꿨지만 기관 승인용 Ed25519 키는 유지했다. 새 승인키 교체 성공의 증거로 사용할 수 없다.
-- 시연용 신뢰 설정을 다시 생성하는 `demo:up`은 초기화 도구다. 현재 배포의 일반 재시작·복원 명령이 아니다.
-- 합성 전사문·규칙과 선택 Ollama 연결 코드는 있었으나 실제 모델 추론은 하지 않았다.
-- 당시 Vercel 공개 화면은 고정 시험 데이터·브라우저 내 검증·저장된 로컬 증거를 보여주는 미리보기였다. 원격 PostgreSQL·Besu·분리 브라우저 전체 서비스는 아니었으며 현재 공개 주소·자동 배포 연결은 재확인하지 않았다.
+상용 CTI/PSTN·금융사 앱 SDK·기본 전화 화면·외부 알림 전송은 지원을 확인하지 않았다. 현재 Sender/Asterisk/API 계약을 임의 CTI 호환성으로 확대하지 않는다. [CTI 경계](PROTOCOL.md#cti-boundary)를 따른다.
 
-최신 실행 준비 후속에서는 전체 설정과 DB 소스 선행 조건을 분리했다. 검토한 수동 PASS도 사람의 관측/판정이며 독립기관 운영·침해 내성 인증이 아니다. sourceFiles/계약 파일 hash는 코드·선택 공개 산출물의 범위이고 개인키·DB/chain 상태·이미지의 실제 실행을 포함하지 않는다. [최신 기록](FINALS-IMPLEMENTATION-PLAN.md#readiness-refinement-20261029)을 따른다.
+## 과거 증거와 재시작
 
-## 로컬 EVM 검증의 보장 범위
+과거 DB/application 복원·별도 cluster·EVM·세션 자연 만료·PBX 재시도는 당시 원본으로 연결하며 최신 이미지 전체 재실행으로 복사하지 않는다. 초기 시연의 철회 후 통화 유지 정책과 현재 종료 정책은 다르다. [과거 기록](archive/DEVELOPMENT-HISTORY-20261104.md)·[실행 절차](LOCAL-VALIDATION.md)에서 시점을 확인한다.
 
-2026-10-30 계약21시험·실패/skip0, 제한 fuzz32회, 실제 앱 EIP-712와 계약의 digest/signer/calldata/event 호환을 확인했다. 이는 설치된 forge/Solc의 로컬 실행이며 Besu/QBFT 합의·P2P·Witness·실제 배포·오프체인 회수 전파의 검증이 아니다. 기존 InstitutionRegistry는 회귀용이며 기본 ServiceRegistry의 모든 추가 서명 검증·legacy 우회 차단과 구분한다.
-
-온체인은 정책/공식 경로의 hash와 version을 검증할 뿐 질문·표시 문자열의 의미를 해석하지 않는다. directory-only의 현재 제품 범위는 서버 schema가 제한한 `/official` 표시명 변경이며 임의 외부 경로의 안전성을 증명하지 않는다. 전역 nonce는 기관 간에도 재사용할 수 없다. fuzz는 assume 없는2단계 sequence32회이며 전체 상태 공간의 invariant 증명은 아니다. [현재 증거](../artifacts/contract-validation-20261030.json)를 따른다.
-
-첫 공개 push CI에서 source checker의 rg 의존성이 실패해 Git 기반 목록으로 수정했다. 현재 source hygiene는 Git checkout이 필요하며 rg 설치는 요구하지 않는다. 당시 로컬 light는43파일195시험 PASS이고 원격 CI 상태는 해당 실행 URL을 별도로 확인한다.
-
-## 인증·화면 시험의 대체 경계
-
-실제 로그인/세션/권한 middleware·issuer/platform/Sender Agent HTTP·역할별 PostgreSQL은 실행했다. 로컬 OIDC fixture는 production IdP/MFA 호환성이 아니며 앱은 discovery 대신 설정한 endpoint를 소비한다. Node는 시험 CA로 TLS 검증했고 Chromium context만 시험 인증서 오류를 허용했다. 운영 인증서 정책을 바꾸지 않았다. 실제 원격 오디오·PBX·Witness snapshot SDK 검증·체인 권한 전파·제공자 장애 중 분석 회수는 미실행이다.
-
-시험 중 heading timeout1회는 원인을 확정하지 못했고 후속 순차 실행에서는 재현되지 않았다. 개발 실패와 최종 PASS를 구분해 보존했다. 화면 캡처에는 합성 계정만 있으며 cookie·storage·trace·음성은 공유하지 않는다. API/DB가 시험 fixture에서 통과한 것은 전체 배포 readiness나 성능 목표 달성이 아니다.
+정상 분석 drain과 quota pool 종료 순서는 회귀했지만 프로세스 강제 종료의 즉시 환불을 보장하지 않는다. 기존 worker는 예약 만료 후 보수 정산하며 실제 제공자 청구 대조는 별도다. 보존 대상 환경의 영향 여부는 미확인이고 balance를 임의 초기화하는 복구 절차는 없다.

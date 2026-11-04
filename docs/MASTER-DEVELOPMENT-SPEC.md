@@ -237,128 +237,63 @@ sequenceDiagram
 
 ## 2. 영역별 상태와 이행 이력
 
-현재 상태는 §2.4다. 아래 §2.0~2.2는 이번 연결 전의 코드·검증 기준을 보존한 이력이며 현재 미구현 목록으로 재사용하지 않는다.
+현재 구현·실제 구성요소·fixture·미검증 경계는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), 소스/이미지 대응과 원본 증거는 [진행표](FINALS-IMPLEMENTATION-PLAN.md)를 따른다. 이 명세에는 요구사항과 완료 조건을 유지하고 매번 바뀌는 SHA·시험 수·실행 결과를 복제하지 않는다.
 
-| 영역 | 구현 | 검증 근거와 한계 |
-|---|---|---|
-| Besu 네트워크·계약 | 기존 구성·계약 코드, 허가 노드·계정 관리와 운영 안전 보완 필요 | 초기 시연 실행 기록만 존재. 현재 구성 실환경 미검증 |
-| 원장 변경·복구 | 등록·철회·정지·복구 요청 코드와 후속 작업 저장 구조 | 재처리 처리기·이벤트 읽기 위치 관리·트랜잭션 복구 미완성 |
-| 상태 증언·수신 검증 | 동일 블록·상태의 4개 중 3개 서명 확인, DB 기준 상태 저장 코드 추가 | 서명·메모리 상태 단위 검증. 실제 DB·재시작·복원·체인 자체 증명 미검증/미구현 |
-| 업무·정책·VC | 업무·할당 검사, 정책 해시, 직접 통화용 DID 및 등록 주소 기반 위임·승인 코드 | 역할 세분화·재할당·정책 변경·원장 등록 재처리 미완성 |
-| 인증·DB | 역할별 서버·별도 로그인 용도, 세션 회수·재사용 방지, 기관 행 잠금 | 단위 검증. 실제 DB 권한·경합·로그인 제공자 연결 미검증 |
-| 직접 통화 | 역할 화면·마이크·신호 교환·연결 관측·상대 음성 경로 연결 | 코드·단위·정적 검사. 현재 브라우저 실통화 미실행 |
-| PBX 교환기 통화 | Asterisk 채널·브리지 제어/서명, SIP 브라우저 모듈·별도 수신 검증 코드 | 화면·사건 구독·자동 회수·실제 설정/배포·전체 시험 미완성 |
-| STT·AI | Deepgram·Anthropic 호출 코드, 전사 수정·규칙·동의·예산 서버 경로 | 제공자 미호출. 새 화면 연결·비용 정산·삭제·한국어 품질 평가 미완성 |
-| 화면 | 역할별 직접 통화·공식 업무 조회 연결, 모의 업무 응답 서버 API 추가 | 통화 유지·PBX 전환과 공식 응답 UI·접근성·실사용 검증 남음 |
-| 운영·GCP | Compose·Dockerfile·Terraform·DB 백업/복원 코드 | 현재 서버 확장 배포 연결·일관된 전체 백업·운영 검증 남음 |
-| 외부 전달 산출물 | 원본 기획·초기 시연 증거·과거 검토 초안 보존 | 현재 릴리스의 실환경 증거와 최신 검토 원문은 별도 필요 |
+아래 번호는 기존 인용을 보존하는 이력 색인이다. 당시 “현재/최신” 표현은 그 실행 시점이며 현재 미구현 목록이 아니다. 원문은 [정리 전 명세](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#2-영역별-상태와-이행-이력)에 보존돼 있다. 요구 ID별 완료 조건은 이후 장을 따른다.
 
-2026-10-26의 [44개 시험 결과](../artifacts/finals-light-results.json)와 [당시 환경 기록](../artifacts/finals-validation.json)은 보존한다. 실행 당시 변경은 미커밋 상태였고, 시작 커밋만으로 전체 실행 소스를 재현할 수 없었다. 후속 인증 단계 66개, 서비스 확장 단계 82개는 각각 별도 결과이며 세 수치를 합산하지 않는다.
+<a id="21-후속-구현-인증조회연결-폐기-경계"></a>
 
 ### 2.1 후속 구현: 인증·조회·연결 폐기 경계
 
-2026-10-27 구현에서는 AUTH-002의 용도 분리/선택 로그아웃, BUSINESS-001의 workspace 반환 범위, CALL-006/MEDIA/AI의 로컬 세션 폐기와 현재 DB 권한 재검사, GOVERNANCE-002의 private/public key 대응 검사를 보완했다. `0002_session_scopes.sql`은 **작성만 했고 적용하지 않았다.** 기존44개 증거는 보존하며, 새 light 결과와 한계는 [후속 검증 기록](../artifacts/master-implementation-20261027-auth.json)과 [진행표](FINALS-IMPLEMENTATION-PLAN.md)에 남긴다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#21-후속-구현-인증조회연결-폐기-경계)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-후속 최종 `pnpm light`는 타입·소스 검사와 **15개 파일66개 테스트(기존 회귀 포함)**를 통과했다. 실제 PG 시험은 타입 검사만 포함했으며 실행하지 않았다. 실제 IdP/JWKS 검증은 fake로 대체한 경계 시험이고, 실제 JWT 제공자 연결 성공을 뜻하지 않는다.
-
-- 현재 세션에는 legacy/work/official purpose와 OIDC issuer/client/audience/authenticatedAt를 저장·검사한다. 이전 구현은 `authenticatedAt`에 iat를 대체 사용했다. 이번에는 auth_time이 없으면 재인증 근거를 주지 않으며 주요 작업에서 최근 인증을 요구한다.
-- logout은 해당 scope의 CSRF로 session row만 삭제하고 같은 scope cookie를 지운다. `oidc_login_uses`는 별도로 남아 logout 뒤 같은 ID token으로 다시 세션을 만들지 못한다. 만료된 login-use는 이후 로그인 transaction에서 정리한다.
-- 연결은 로컬 로그아웃에 즉시 폐기하고, 다른 프로세스의 폐기/만료·membership/업무/VC/key 변경은 1초 간격 DB 검사와 검사당 2초 timeout으로 검증할 수 없으면 허용하지 않는 처리 처리하는 코드를 추가했다. 이는 실측 철회 지연 SLO나 onchain 상태 최신성 검증의 대체물이 아니다.
-- UI는 실제 연결된 attempt에 분석/종료를 고정하고 logout 이후 늦은 workspace/official 응답을 폐기한다. 실제 브라우저 렌더·경합·통화 검증은 미실행이다. lease/native proof/PBX 전체 연결·영속 quota의 실제 보장·검증한 기준 상태 복원과 후속 작업 보관함 worker는 여전히 남는다.
-
+<a id="22-2026-10-27-서비스-결정-이행-현황"></a>
 
 ### 2.2 2026-10-27 서비스 결정 이행 현황
 
-이 단계 당시 검증은 `pnpm light` 18개 파일·82개 통과였다. URI VC·별도 시작 승인·통화 유지 허가·종료 확정 전이·PBX ARI 증거·SIP parser/digest의 순수 단위/타입 범위이며 실제 DB/체인/통화/AI 성공이 아니다. [진행표](FINALS-IMPLEMENTATION-PLAN.md#service-20261027)와 [당시 증거](../artifacts/master-implementation-20261027-service.json)를 따른다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#22-2026-10-27-서비스-결정-이행-현황)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-- IDENTITY-001/003, CALL-001~005: 통화 유지·PBX 서버 API·서명·메모리 대체 객체의 순차 전이 작성. DID 없는 기본 준비/화면·양측 현재 transport·갱신 연결은 부분 구현.
-- CALL-006/PBX-001~003: ARI 실채널 조회·별도 증언·consume 검사·새 verifier·브라우저 SIP 모듈 작성. UI 호출·ARI 사건·지속 회수·SDK 변조 시험·배포 구성 미완성.
-- DB-001~003/STATE-003: 공통 소비 식별 범위·후속 작업 보관함·사용 한도·검증한 기준 상태·recovery gate SQL/저장 경로 작성. 실제 PG·백그라운드 처리기·독립 복원 anchor/해제·보관·삭제 정책·전체 복구 보장 미완성.
-- AI-001~004: 통화 유지·PBX 경로 서버 오디오·동의 generation·영속 사용 한도 경로 추가. 새 UI·호출/삭제/제공자 계약·품질 실검증 미완성.
-- UI/OPS/GOVERNANCE의 기본 profile 전환·통화 강제 회수·재인증·권한 세분화·관리키 경계·백그라운드 처리기·전체 배포는 여전히 코드 미구현이 있다. 실행 대기만으로 표시하지 않는다.
-
-개별 요구의 근거에는 보존한 직접 통화 코드도 포함한다. 추가 서버의 구현·연결 범위는 이 절과 §7.2를 함께 적용한다. 자세한 완료 조건은 그대로 유지하며 helper/타입 통과를 전체 완료로 승계하지 않는다. 서비스 설명은 [가이드](guide/README.md)에 정리하며, 요구사항과 완료 기준은 이 명세를 따른다.
-
+<a id="23-이전-제품-연결-시점의-기록"></a>
 
 ### 2.3 이전 제품 연결 시점의 기록
 
-기본 `/service`→`/v3` 경로에 등록 URI·콜센터 요청 서명·개별 승인·수신 nonce·양측 binding PoP·일회 소비/영수증·양측 lease 갱신·PBX 검증/음성 허용·remote audio·공식 업무·회수를 연결했다. `/finals` 및 초기 시연 회귀는 보존한다. 신규 `0004_worker_recovery.sql`은 작성만 했고 적용하지 않았다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#23-이전-제품-연결-시점의-기록)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-| 요구 ID | 이번 구현·연결 | 검증 축과 한계 |
-|---|---|---|
-| IDENTITY-001/003, CALL-001~006 | [기본 화면](../apps/web/src/pages/Service.tsx), [통화 제어](../apps/web/src/lib/serviceCall.ts), [승인/유지](../services/api/src/service-authority.ts), [SDK](../packages/verifier/src/service.ts), URI 키/trust 준비 | 서명·chain/registry·nonce·세대·binding·PBX/양측 SDK·정족수·오래된/상충 상태 단위 검증. 실통화/DB 미실행 |
-| PBX-001~003, MEDIA-001~004 | [SIP](../apps/web/src/lib/pbxSip.ts), [ARI runtime](../services/api/src/pbx-runtime.ts), [PBX API](../services/api/src/pbx-routes.ts), Asterisk TLS/ODBC/RTP·배포 | dialog ACK/CANCEL/BYE·중복 사건·timeout·회수 재시도 단위 검증. 실제 이미지/드라이버·DTLS/음성/브라우저 미실행 |
-| LEDGER-001~003, DB-002 | [worker](../services/api/src/service-worker.ts), [원장 처리](../services/api/src/worker-ledger.ts), [사건 cursor](../services/api/src/ledger-events.ts) | 저장된 raw tx/hash 복구·재시도·claim 유실 단위 검증. 실제 nonce/GRANT/DB 경합/체인 미실행 |
-| DB-001/003/004, STATE-003, OPS-005 | [SQL](../services/api/drizzle/0004_worker_recovery.sql), [quota](../services/api/src/quota.ts), [독립 anchor](../services/api/src/consumption-anchor.ts), [retention](../services/api/src/retention.ts), 암호화 backup/restore | 예약/정산 실제 PG 시험은 작성·타입 검사만. anchor 충돌·변조 단위 검증. 외부 anchor 진행/DB 불명 commit은 자동 해제하지 않음 |
-| BUSINESS-001/002, AUTH-002, GOVERNANCE-001/002 | [관리](../services/api/src/service-management.ts), 명시적 permission·최근 auth_time·재할당/비활성 회수·2-of-3 등록/복구·기관/콜센터 키 교체 | 키 목록 공동 서명은 복구 서명과 별도다. 실제 계약/로그인/새 trust rollout 미실행 |
-| AI-001~004, UI-001~005/007 | remote stream·동의/전사 revision·provider/규칙·경고·철회/중단·공식 업무 호출 연결 | 단위/타입/웹 빌드. 실제 제공자·한국어 품질·보관/청구·접근성 미검증 |
-| OPS-001~007, TEST-001~004 | 기본 Compose/GCP/역할별 key mount/readiness, 작업/사용량 조회, 새 DB/PBX 시험 소스, guard 회귀 | YAML·셸·타입 검사. 실제 인프라·부하·복구 미실행. 가격/전체 알림·릴리스 자동화는 남음 |
-
-이전 연결 시점의 `pnpm light`는 **34개 파일·148개 테스트 통과**였다. [이번 원본 출력·소스 hash](../artifacts/product-connection-20261027.json), [ID별 진행/남은 코드](FINALS-IMPLEMENTATION-PLAN.md#service-20261027), [구체적 실행 절차](RUNBOOK.md)를 따른다. 이전 82/66/44개 시험을 합산하거나 현재 증거로 재사용하지 않는다. 당시 개발 fixture 9개도 독립 평가가 아니며 현재 확장은 §2.4를 따른다.
-
-중요한 정책: 120초는 attempt 생성부터의 최초 연결 창이다. 30초 lease·4시간 최대 통화는 `CALL_LEASE_SECONDS`/`CALL_MAX_SECONDS`의 초기값이며 확정 성능값이 아니다. 같은 binding·이전 lease hash·nonce·순번에 양측이 서명해야 갱신한다. 명시 철회와 freshness 만료를 구분하며 최초 bridge는 현재 권한/양측 검증 준비를 요구한다. 진행 중 조회 실패는 기본 음성·분석 정지와 명시적 미확인 계속 선택으로 표시한다.
-
-PBX의 ARI 채널/Call-ID/bridge 관측과 설정 인증서 pin을 브라우저 실제 DTLS 관측에 대조한다. 서버의 독립 DTLS handshake 수집이라고 표현하지 않는다. Asterisk가 RTP 종단이며 외부 미구현 Edge는 기본 의존성이 아니다. SIP는 직접 Asterisk WSS 수신 dialog로 한정하며 proxy/PSTN/자동 전환·새 연결의 무검증 재사용을 거절한다.
-
-독립 anchor는 VM 백업 밖의 HTTPS 권위 서비스다. 동일 백업으로 함께 복원하면 보장이 없다. 소비 SQL namespace/journal·권한 세대/외부 root가 다르면 gate를 닫는다. 신규 독립 anchor·기존 배포 이력 기준선·실제 일관 chain snapshot은 운영자가 검토해 준비해야 하며 파일 존재나 fake 일치만으로 신뢰하지 않는다.
+<a id="24-2026-10-27-실행-전-마무리-기록"></a>
 
 ### 2.4 2026-10-27 실행 전 마무리 기록
 
-이 절은10월27일 당시 기록이며 현재 기준은 §2.5다. 당시 HEAD는 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 재현에는 미커밋 파일도 필요하다. 요구 ID별 코드·시험·남은 경계는 [현재 진행표](FINALS-IMPLEMENTATION-PLAN.md#pre-execution-20261027), 실제 검사 출력·파일 hash는 [이번 증거](../artifacts/pre-execution-20261027.json)를 기준으로 한다. 당시 light는 38개 파일·171개 시험, 웹 빌드/runtime 타입 검사는 PASS다. 설정이 주입되지 않은 preflight는 38개 BLOCKED와 환경 확인 3개 SKIPPED를 보고했다. 계약 시험·서비스·migration·배포는 실행하지 않았다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#24-2026-10-27-실행-전-마무리-기록)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-| 요구 | 현재 구현·연결 | 검증과 완료 전 경계 |
-|---|---|---|
-| CONTRACT-001~005, GOVERNANCE-001/002, BUSINESS-003 | 새 `ServiceRegistry`의 공동 configuration 변경, EIP-712·독립 서명 수집·관리 UI/API·작업 제출·확정 event+state 대조·최신 Witness 확인 뒤 활성화 | 실제 서명 경계 단위 시험, 계약과 계약 시험 소스 오프라인 컴파일. 실제 계약 시험·새 배포·trust 전환 필요 |
-| STATE-001~003, CALL-006 | registry profile·policyHash를 동일 블록 증언/SDK에 결합. 정책 변경은 epoch 증가·구 권한/통화 무효화, 공식 경로 표시명만 변경하면 유지 | signed snapshot 변조/강등/정책 회수 단위 시험. 실제 체인·철회 전파 대기 |
-| AUTH-001/002, BUSINESS-001/002, UI-003/004 | 외부 issuer/subject 사전 연결·내부 계정/역할 관리 양식·최근 인증/CSRF·SQL 권한 경계·세션 세대·통화/분석 회수 | 일반 관리자는 공동 승인자 생성 불가. 실제 OIDC·SQL GRANT·경합 미검증 |
-| DB-001~004, LEDGER-001~003, OPS-005 | 기관별 worker·서명자 lease/fencing·복구 검사의 긴 행 잠금 제거·권한 metadata checkpoint·독립 anchor CAS·인증된 백업 manifest·복원 세션 폐기 | PG/독립 anchor 시험 소스 작성. 결과 불명 CAS/DB commit은 gate 차단; 자동 새 기준 채택 없음 |
-| CALL-002/005, MEDIA-002/003, PBX-001~003, UI-001/002/007 | 수락/숨김/기한과 비동기 track 경합 방어, 양방향 수신 차단, PBX 절대 timeout·DB 장애 채널 음소거, 업무 새로고침·동일 요청 재시도 | 실제 Asterisk/TURN/RTP·브라우저 미실행. transport 제어 지연을 뺀 짧은 기한이 적용될 수 있음 |
-| AI-001~005, OPS-006, TEST-001~004 | 영속 웹 알림·읽음/설정·만료, 고정 차원 지연/오류·worker/자원 계측, 36개 합성 개발 회귀, offline preflight/증거 수집 | 외부 알림 채널 미선택. provider·독립 사람 평가·실측 지연/비용·브라우저 캡처 미실행 |
+<a id="25-2026-10-29-실행-준비검증-체계--현재-기준"></a>
 
-**새 배포 경계:** 기존 계약은 upgrade 구조가 없다. 기본 서비스는 새 `ServiceRegistry` 주소·code hash·초기 policyHash·3승인자·배포 블록 및 새 trust를 명시적으로 채택한다. 구 계약/fixture는 보존한다. `0005_account_management.sql`은 작성만 했다. authority checkpoint가 없는 구 DB를 flag 수정만으로 채택하지 않으며, 검토한 새 배포 또는 독립 이력 대조를 포함한 별도 이행이 필요하다. 앱 정책 JSON 숫자만 변경해 활성화하지 않는다.
+### 2.5 2026-10-29 실행 준비·검증 체계 — 당시 기준
 
-코드가 남은 범위와 실환경 미검증을 구별한다. 당시에는 단계 runner가 없었다. 현재 자동/수동 범위는 §2.5와 RUNBOOK을 따른다. 외부 알림 공급자·실제 이미지 digest·IdP·DNS/인증서·독립 anchor 배치·제공자 보관/예산은 외부 결정/설정이다. native proof·일반 SIP/PSTN·자동 transfer·무중단 진행 통화 복원은 기본 범위 밖이다. §2.4 이후의 개별 항목에서 §2.3을 참조하는 검증 범위는 이 절의 최신 근거도 함께 적용한다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#25-2026-10-29-실행-준비검증-체계--현재-기준)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-### 2.5 2026-10-29 실행 준비·검증 체계 — 현재 기준
+<a id="26-실행-준비-후속-정합성--최신-기준"></a>
 
-HEAD는 여전히 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이고 미커밋 변경을 포함한다. §2.4의171개 시험/preflight38차단은 과거 결과다. [최신 진행표](FINALS-IMPLEMENTATION-PLAN.md#execution-readiness-20261029)와 [최종 오프라인 증거](../artifacts/execution-validation-rechecked-20261029.json)를 현재 기준으로 한다. 전체74개 요구 ID와 완료 조건은 유지하며 새 연구/외부 채널을 추가하지 않는다.
+### 2.6 실행 준비 후속 정합성 — 당시 기준
 
-| 요구 | 현재 추가한 연결·완료 조건 | 실제 확인/남은 것 |
-|---|---|---|
-| OPS-001~005/007, TEST-001/004 | 준비 도구는 기본 dry-run, 기존 대상 충돌·역할별 비밀 참조·부분 산출물 보존; 앱→키/DB→계약/PBX→trust→웹→독립 anchor→등록 순서. 실제 LOGIN 최소권한 SQL과 초기 blocked gate | 소스·단위·YAML/셸 검사. 실제 provisioning/등록/GRANT·인증서·이미지/driver·anchor는 대기 |
-| TEST-001~004, OPS-005/006 | 고정 argv runner 8단계, test 배포 identity·기존 guard·시간/출력 제한·실패 전파·resume 재검사·증거 redaction. 자동 assertion과 MANUAL 관측을 구분 | light42파일191시험, 웹 build/runtime 타입 PASS. 실제 환경 단계는 dry-run만 SKIPPED. MANUAL은 PASS로 바꾸지 않음 |
-| GOVERNANCE-001/002, BUSINESS-003, UI-003/004 | 현재/제안 정책·공식 경로 비교, 기관/chain/계약/action/nonce/기한/digest, 제안 내보내기/서명 가져오기·등록 signer/중복/만료 검증. 내용 변경은 구 서명 무효 | 로컬 실제 EIP-712 서명/변조 단위·타입/build. 실제 브라우저·공동 운영·체인 시험 미실행 |
-| CALL-001/004/006, STATE-003 | 게시 trust/pin/issuer/service키·정책이 현재 권한과 다르면 신규 발급/연결 차단, 확정→trust/웹 게시 중에는 관리·복구 유지; 최초 계정 등록은 복구 gate를 열지 않음 | 경계 단위 검증. 실제 새 zero anchor/정책·키 rollout·오래된 탭·부분 replica 실패 대기 |
-| DB-001/003, CALL-004, PBX-001/003, MEDIA-002 | 독립 SQL 연결 commit 후 응답 유실의 같은 영수증 복구, migration hash/GRANT 검사, 실제 test 배포 identity와 양방향 decoded audio/RTP 관측 | 통합/미디어 소스·타입 검사만. 실제 DB 원자성·미디어 성공 아님 |
-| TEST-003, OPS-006 | 실제 단일 monotonic 관측·100표본/실패수·nearest rank; 철회 확정 관측 지연 상한을 더해 목표 판정 | 계산·거절 단위 시험만. 한국어/음성/성능 실측·독립 정답은 미준비 |
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#26-실행-준비-후속-정합성--최신-기준)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-runtime preflight **BLOCKED62·PASS14·SKIPPED1**이다. [항목별 원인·주체·입력·절차](../artifacts/execution-preparation-rechecked-20261029.json)에 C43(사용자·외부 설정)와 D19(나중 생성값)를 기록한다. B의 기존 실제 ABI/hash·PBX 고정 IP를 이용해 과거38차단 중2개를 해소하고 누락 검사를 보완했다. E의 실제 네트워크/기동 확인은 SKIPPED이며 오프라인 PASS로 대체하지 않는다. DID/native proof 등 선택 확장은 준비의 필수 의존성이 아니다. STT/LLM은 필수 기능이며 bootstrap에서만 보류한다.
-
-이 단계의 ‘구현’은 설정/runner/선택 자동 시험과 수동 증거 계약의 코드 연결을 말한다. 실제 Besu 장애·TURN/철회/동의 전체 경로·실제 복원·실측 수집·GCP의 자동 시험은 MANUAL 절차로 남는다. 실환경 성공이 필요한 RULE-03을 충족했다고 선언하지 않는다. 다음 실행은 [RUNBOOK](RUNBOOK.md#단계별-검증과-판정)의 새 시험 환경/입력/guard 승인 후 수행한다.
-
-### 2.6 실행 준비 후속 정합성 — 최신 기준
-
-§2.5 이후 method/execution/verdict/review를 독립 기록하고 수동 실관측 검토의 PASS/FAIL을 지원했다. 과거 MANUAL을 통과로 추정하지 않는다. 첫 DB 단계는 전체 서비스 설정이 아닌 현재 소스 검사 통과와 DB 전용 설정/guard/격리를 요구한다. 신뢰 전환·anchor·정책 보장은 생략하지 않았다. 재현 identity에는 sourceFiles와 선택 계약 artifact를 포함하고 보호 env/키를 제외한다.
-
-요구 ID TEST-001/004·OPS-001~007·DB-001의 현재 변경/검증은 [최신 진행표](FINALS-IMPLEMENTATION-PLAN.md#readiness-refinement-20261029), 입력/이전/실행 조건은 [RUNBOOK](RUNBOOK.md#실행-전-정합성-보완--2026-10-29-후속)에 둔다. light42파일193시험·웹 build/runtime 타입은 통과했지만 전체 설정/실환경 완료는 아니다. 74개 요구와 기존 완료 조건을 낮추지 않는다.
+<a id="27-첫-격리-postgresql-검증"></a>
 
 ### 2.7 첫 격리 PostgreSQL 검증
 
-사용자 한정 허가 후 로컬 checkpoint와 자원 확인을 수행했다. DB-001/003·CALL-004·LEDGER-002·AUTH-002의 선택된 실제 SQL 경계15시험이 PostgreSQL17.6에서 통과했다. session fixture 문맥과 outbox 정리를 수정하고 auth 실제 금지 SQL을 확인했다. 전체 역할·disk 장애·독립 anchor·chain/통화는 미검증이다. 코드/시험 시점과 commit 관계 및 자원 제한은 [최신 기록](FINALS-IMPLEMENTATION-PLAN.md#postgres-validation-20261029)을 따른다. 이전 DB 미실행 표시는 당시 기록이다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#27-첫-격리-postgresql-검증)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
+
+<a id="28-로컬-evm-권한서명-검증--2026-10-30"></a>
 
 ### 2.8 로컬 EVM 권한·서명 검증 — 2026-10-30
 
-CONTRACT-001/003/004·GOVERNANCE-001/002·BUSINESS-003·TEST-002의 선택된 계약 상태 전이를 실제 프로세스 내부 EVM에서 실행했다.21시험 PASS(실패/skip0), fuzz32회×2성공 전이, 앱 typed-data/calldata·서명·event bytes 호환을 확인했다. 최초 light43파일194시험·웹 build/API runtime 타입은 통과했다. 이후 첫 push CI의 rg 미설치 실패를 수정하고 Git-only PATH 회귀를 추가해 최신 light43파일195시험을 통과했다. 계약 본체와 기존 ABI/bytecode는 변경하지 않았다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#28-로컬-evm-권한서명-검증--2026-10-30)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
-기존 미공개 checkpoint는 복구 ref를 만든 뒤 코드/설정·증거·문서로 재구성했으며 원본 tip과 tree가 같음을 확인했다. 과거 증거의 HEAD/결과는 보존했다. [최신 진행 기록](FINALS-IMPLEMENTATION-PLAN.md#contract-validation-20261030)이 실제 시험 HEAD·도구·원본 실패·커밋 대응의 기준이다. 온체인 회수 전이 확인과 실제 VC/브라우저/통화 회수 전파는 구분하며 Besu/QBFT/Witness는 여전히 미검증이다.
+<a id="29-실제-인증http브라우저-선택-경로--2026-10-30"></a>
 
 ### 2.9 실제 인증·HTTP·브라우저 선택 경로 — 2026-10-30
 
-AUTH-001/002, BUSINESS-001/002, CALL-004/005, DB-001/003, UI-001~003, TEST-001/004의 일부 경로를 실제 loopback API·PostgreSQL·HTTPS OIDC fixture·Chromium으로 실행했다. 1파일7시험과 기존 DB 회귀4파일15시험이 각각 PASS이며, light44파일197시험·웹 build/runtime/harness 타입도 PASS다. 과거 시험 수와 합산하지 않는다.
-
-정상 로그인은 실제 code/callback/JWKS 서명을 거치며 issuer/subject로 계정을 찾고 별도 LOGIN으로 세션/권한/업무를 저장한다. 계정 길이200자 계약, OIDC 인증 실패와 제공자 장애의 응답 구분, 화면 select 접근 이름을 수정했다. 생성/취소·객체 경계·재인증/CSRF·세션 세대 회수·동시 소비와 영수증 복구·서명 lease를 확인했다. browser API 응답 mock은 없다.
-
-서비스 proof도 실제 platform→Sender Agent→issuer HTTP 경로를 거친 [후속7시험](../artifacts/http-sender-validation-20261030.json)이 현재 HTTP 결과다. 다른 수신자 요청과 비공개 context 노출을 거절한다. 앞선7시험에 더하지 않는다. 체인 현재 상태와 독립 anchor는 명시적인 adapter fixture이며 PBX/TURN/실제 음성장치·외부 AI·GCP는 미실행이다. 합성 binding/lease 성공을 실제 연결 검증이나 진행 음성 회수 성공으로 확대하지 않는다. 기관/공동 관리 전체 UI·실제 IdP/MFA·전체 TLS 운영·다중 탭/장시간·네트워크 장애·독립 복구도 아직 전체 완료가 아니다. [이번 평가/파일 hash](../artifacts/http-validation-20261030.json), [진행표](FINALS-IMPLEMENTATION-PLAN.md#authenticated-http-validation-20261030), [재현 절차](RUNBOOK.md#authenticated-http-tests)가 근거다.
+[당시 기록과 실행 증거](https://github.com/0u-Y/CallSign/blob/55bb77cfb91564ee4910868f0f7d2022de76e172/docs/MASTER-DEVELOPMENT-SPEC.md#29-실제-인증http브라우저-선택-경로--2026-10-30)는 원본으로 보존한다. 현재 판정은 위 구현 현황을 따른다.
 
 ## 3. 우선 해결할 충돌·차단 요인
 

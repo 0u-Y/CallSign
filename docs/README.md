@@ -12,7 +12,8 @@
 | 구성요소·키·데이터·신뢰 경계 | [아키텍처](ARCHITECTURE.md) | 기본 PBX 경로와 보존한 호환 경로 |
 | 데이터·서명·세션 결합 | [프로토콜](PROTOCOL.md) | 등록 URI/VC/JWS·EIP-712·lease·Witness 형식 |
 | 공격자·신뢰 가정 | [위협 모델](THREAT-MODEL.md) | 방어 조건과 신뢰에 남는 위험 |
-| 설정·기동·검증·배포·복구 | [RUNBOOK](RUNBOOK.md) | 실행 순서·guard·중단 조건·NEW/재개/RESTORE |
+| AWS 수령·배포·복구 | [RUNBOOK](RUNBOOK.md) | 입력·NEW/재개/RESTORE·영속 경로 |
+| 로컬 통화·HTTP·DB·EVM 검증 | [검증 절차](LOCAL-VALIDATION.md) | 환경별 guard·예산·관측·정리. 새 실행 허가를 대신하지 않음 |
 | 현재 확인한 범위와 남은 경계 | [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), [알려진 한계](KNOWN-LIMITATIONS.md) | 실제 구성요소·fixture·미검증의 구분 |
 | 날짜별 변경·원래 SHA·결과 | [개발 진행 기록](FINALS-IMPLEMENTATION-PLAN.md) | 원본 증거로 연결하는 작업 이력 |
 

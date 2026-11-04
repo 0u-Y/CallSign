@@ -32,11 +32,13 @@
 
 | 피드백 | 결정·이유 | 변경 파일 | 검증·남은 조건 |
 |---|---|---|---|
-| 역할별 업무·오류 안내 | 수정 채택. 기존 permission/API/세대 검사 유지, JSON은 기술 상세로 이동 | Service.tsx·ServiceRecallStatus.tsx | SSR 상태/오래된 관측 회귀. 실제 브라우저는 미실행 |
-| 회수와 미디어 관측 분리 | 채택. 기존 receipt/서버/PBX/음성 구분 유지 | runtime-media.test.ts·service-pbx.spec.ts | 승인 응답·PBX 부재 관측 연결. 실제 전체 통화는 NOT_RUN |
+| 역할별 업무·오류 안내 | 수정 채택. 기존 permission/API/세대 검사 유지, JSON은 기술 상세로 이동 | Service.tsx·ServiceRecallStatus.tsx | SSR 상태/오래된 관측 회귀. 당시 SSR·오프라인. 후속 실제 범위는 아래 최신 실행 링크 |
+| 회수와 미디어 관측 분리 | 채택. 기존 receipt/서버/PBX/음성 구분 유지 | runtime-media.test.ts·service-pbx.spec.ts | 승인 응답·PBX 부재 관측 연결. 당시 NOT_RUN. 후속 실제 범위는 아래 최신 실행 링크 |
 | 시도별 측정 누락 구분 | 채택. 기존 분모/재시도/단조시계 계약 유지 | observation-contract·evaluate-performance·call-trials 회귀 | 승인 응답/서버 적용/PBX 부재 구간과 null 사유 오프라인 검증 |
 | AI 평가 보강 | 수정 채택. 합성30사례·모두 사람 미검토, 사례군 split 혼합 거절 | service-purpose-evaluation.json·evaluate-service-analysis·평가 회귀 | 미실행 제외한 판단 불가율, 평가용만 최대20회 강제. 모델/한국어 음원 품질 NOT_RUN |
 | 재시작·AWS·후보 정합성 | 기존 구현 유지. 명확한 새 초기화 결함을 확인하지 않음 | deployment.sh·release-manifest 및 RUNBOOK 검토 | restart는 init하지 않음. 실제 재시작/복원/AWS/발행 미실행 |
 | 승인자/CTI/계약 확장 | 후속. 요청 범위 밖이며 현재 신뢰 경계 유지 | 기존 한계 유지 | ABI·서명 도메인·정족수 변경 없음 |
 
 검사와 새 runtime/observer 영향은 [최신 진행 기록](../FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스 구현·오프라인 검증과 실제 통합·배포 완료를 구분한다.
+
+현재 실행·후보 발행 상태는 [제품 후보 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [구현 현황](../guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 위 표는 채택 당시 검증을 보존하며 최신 시험 수를 반복하지 않는다.
