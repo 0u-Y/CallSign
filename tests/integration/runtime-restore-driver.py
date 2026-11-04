@@ -9,6 +9,9 @@ def capture(args):return subprocess.check_output(args,text=True,stderr=log,timeo
 def info(name):
  d=json.loads(capture(['docker','inspect',name]))[0];assert d['Config']['Labels'].get('org.callsign.run-id')==run and any(x['id']==d['Id']for x in owner['containers']);return d
 net=info(run+'-net');assert net['State']['Running'];namespace='container:'+net['Id']
+rpc_args=info(run+'-besu1')['Config']['Cmd'];assert '--rpc-http-host=127.0.0.1' in rpc_args
+rpc_port=int(next(v.split('=',1)[1] for v in rpc_args if v.startswith('--rpc-http-port=')));assert 0<rpc_port<65536
+rpc_url='http://127.0.0.1:'+str(rpc_port)
 def envfile(name,values):
  p=root/(name+'.env');assert not p.exists();p.write_text(''.join(k+'='+str(v)+'\n'for k,v in values.items()));p.chmod(0o600);return str(p)
 def register(cid,name,role):owner['containers'].append({'id':cid,'name':name,'role':role});save()
@@ -24,7 +27,7 @@ def execute(script,values={},args=[],expected=True,rejection=()):
  if not expected and (not result.returncode or not rejection or any(code not in result.stderr.decode(errors='replace') for code in rejection)):raise RuntimeError('NEGATIVE_RESTORE_DID_NOT_REJECT_FOR_EXPECTED_REASON')
  return result
 url='postgres://callsign_migrator:'+db['ownerPassword']+'@127.0.0.1:5432/'+db['database'];common={'MIGRATOR_DATABASE_URL':url,'INSTITUTION_ID':ctx['institutionId'],'DEPLOYMENT_ID':'test:'+ctx['institutionId'],'CONSUMPTION_ANCHOR_URL':'https://127.0.0.1:4300','CONSUMPTION_ANCHOR_TOKEN':db['anchorToken']}
-def check(phase,url_value=url):return execute('tests/integration/runtime-restore-check.ts',{'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'integration','MIGRATOR_DATABASE_URL':url_value},[phase])
+def check(phase,url_value=url):return execute('tests/integration/runtime-restore-check.ts',{'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'integration','MIGRATOR_DATABASE_URL':url_value,'CALLSIGN_RESTORE_RPC_URL':rpc_url},[phase])
 if os.environ.get('CALLSIGN_RESTORE_CHECK_PHASE')=='stale':
  target=info(run+'-database');name=db['database']+'_stale';call(['docker','exec',target['Id'],'psql','-X','-v','ON_ERROR_STOP=1','-U','callsign_migrator','-d',db['database'],'-c','CREATE DATABASE '+name]);stale_url=url.rsplit('/',1)[0]+'/'+name
  values={'RESTORE_CONFIRMATION':'NEW-EMPTY-DATABASE-AND-DIRECTORY','RESTORE_BUNDLE':'/run/callsign/full-backup','RESTORE_DATABASE_URL':stale_url,'RESTORE_DATA_DIR':'/run/callsign/stale-restored','BACKUP_ENCRYPTION_KEY_PATH':'/run/callsign/backup-key.private'}
