@@ -313,3 +313,17 @@ with tempfile.TemporaryDirectory() as d:
  except FileNotFoundError:pass
 `],{stdio:'pipe'});
 });
+
+it('allows only the intentional owned application stop during an archive phase, retaining every other exit guard',()=>{
+ execFileSync('python3',['-c',`
+import importlib.util
+spec=importlib.util.spec_from_file_location('media','scripts/validation-runtime-media.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+assert m.expected_archive_exit('/test-run-issuer','test-run','archive-normal-smoke-2')
+assert m.expected_archive_exit('/test-run-controller','test-run','archive-work-cancel')
+assert not m.expected_archive_exit('/test-run-issuer','test-run','normal-smoke-2')
+assert not m.expected_archive_exit('/foreign-issuer','test-run','archive-normal-smoke-2')
+for role in ['besu1','witness1','postgres','anchor','asterisk','turn']:
+ assert not m.expected_archive_exit('/test-run-'+role,'test-run','archive-normal-smoke-2')
+assert not m.expected_archive_exit('/test-run-issuer','test-run','archive-unknown')
+`],{stdio:'pipe'});
+});

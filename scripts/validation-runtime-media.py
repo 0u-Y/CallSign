@@ -29,6 +29,10 @@ def compare_container_ids(before,after):
     if any(not re.fullmatch(r'[a-f0-9]{64}',x) for x in before+after):return 'UNKNOWN_ID_FORMAT'
     return 'PRESERVED' if set(before)<=set(after) else 'MISSING_UNATTRIBUTED'
 
+def expected_archive_exit(name,run,stage):
+    phases=['normal-smoke-1','normal-smoke-2','normal-repeat-1','normal-repeat-2','work-cancel']
+    return stage in ['archive-'+phase for phase in phases] and name in ['/'+run+'-'+role for role in ['issuer','platform','sender','worker','web','https','controller']]
+
 def cleanup_priority(entry):
     name=entry['name']
     return 0 if any(x in name for x in ['controller','issuer','sender','platform','worker','web','https']) else 2 if name.endswith('-net') else 1
@@ -40,7 +44,7 @@ def preserve_evidence(root, directory, reason, steps):
     for location in [root,*root.glob('phase-*')]:
         if location.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
         outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json']
-        outputs += [p.name for pattern in ['normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.log'] for p in location.glob(pattern)]
+        outputs += [p.name for pattern in ['normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.png','*.log'] for p in location.glob(pattern)]
         for name in outputs:
             source=location/name
             if source.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
@@ -85,7 +89,7 @@ def main():
       # A completed preparation tool may be removed by bootstrap between the two snapshots.
       current=inspect([info['Id']])
       if not current:
-       if '-tool-' not in info.get('Name','') and info['Id'] not in builder_ids:raise RuntimeError('CONTAINER_IDENTITY_UNAVAILABLE')
+       if '-tool-' not in info.get('Name','') and info['Id'] not in builder_ids and not expected_archive_exit(info.get('Name',''),run,stage):raise RuntimeError('CONTAINER_IDENTITY_UNAVAILABLE')
        info['State']={**info['State'],'Running':False,'Status':'removed-after-snapshot'};return 0
       latest=current[0]
       if latest['Id']!=info['Id'] or latest['Image']!=info['Image']:raise RuntimeError('CONTAINER_IDENTITY_CHANGED')
@@ -100,7 +104,7 @@ def main():
       if info['State']['OOMKilled']:stop=stop or 'OWNED_CONTAINER_OOM'
       used=memory(info) if info['State']['Running'] else 0
       if info['State'].get('OOMKilled'):stop=stop or 'OWNED_CONTAINER_OOM'
-      if not info['State']['Running'] and info['State'].get('Status')!='created' and '-tool-' not in info['Name'] and 'issuer-entrypoint-probe' not in info['Name']:stop=stop or 'OWNED_SERVICE_EXIT'
+      if not info['State']['Running'] and info['State'].get('Status')!='created' and '-tool-' not in info['Name'] and 'issuer-entrypoint-probe' not in info['Name'] and not expected_archive_exit(info['Name'],run,stage):stop=stop or 'OWNED_SERVICE_EXIT'
       total+=used;containers.append({'id':info['Id'],'bytes':used,'limit':info['HostConfig']['Memory'],'running':info['State']['Running'],'role':info.get('Name','').removeprefix('/'+run+'-'),'swapLimit':info['HostConfig']['MemorySwap'],'cgroup':info.get('_cgroup')})
      current=root/'runtime-media-test.log'
      if current.exists():
@@ -179,8 +183,11 @@ def main():
       time.sleep(5)
      action('bootstrap',[sys.executable,'tests/integration/runtime-delivery-bootstrap.py','--delivery',str(r/'delivery-final'),'--root',str(root),'--browser-cache',str(options.browser_cache.resolve()),'--apply'],600)
      image=json.loads((root/'images-loaded.json').read_text())['CALLSIGN_APP_IMAGE'];extra={'CALLSIGN_RUNTIME_TEST_ROOT':str(root),'CALLSIGN_EXPECTED_RUNTIME_IMAGE':image}
-     for label,case in [('normal-smoke-1','normal-end'),('normal-smoke-2','normal-end'),('normal-repeat-1','normal-end'),('normal-repeat-2','normal-end'),('work-cancel','work-cancel'),('emergency-stop','emergency-stop')]:
-      action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case',case],600,extra=extra)
+     if any(not isinstance(plan.get(k),int) or not 0<=plan[k]<=2 for k in ['normalSmokeAttempts','normalRepeatAttempts']):raise RuntimeError('BOUNDED_TRIAL_PLAN_REQUIRED')
+     cases=[('normal-smoke-'+str(i+1),'normal-end') for i in range(plan['normalSmokeAttempts'])]+[('normal-repeat-'+str(i+1),'normal-end') for i in range(plan['normalRepeatAttempts'])]+[('work-cancel','work-cancel'),('emergency-stop','emergency-stop')]
+     for label,case in cases:
+      phase_extra={**extra,'CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label=='normal-repeat-2' else 'no'}
+      action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case',case],600,extra=phase_extra)
       if label!='emergency-stop':action('archive-'+label,[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase',label],90,extra=extra)
      result={'status':'PASS','steps':steps,'resourceStop':None}
     except BaseException as error:
