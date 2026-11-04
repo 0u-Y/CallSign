@@ -34,7 +34,7 @@ it('boots final image roles with real SQL, CA, RPC and processes an actual deleg
  await writeFile(join(root,'media-contact.json'),JSON.stringify({intentId:workId,digest:vc.body.digest,institutionId:f.id,apiOrigin:f.apiOrigin,webOrigin:f.origin}),{flag:'wx',mode:0o600});
 });
 
-it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change'] as const)('proves decoded relay-only two-way audio and reclamation after %s',async outcome=>{
+it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change'] as const)('proves decoded relay-only two-way audio and reclamation after %s',async outcome=>{
  let observation:CallObserver|undefined,completed=false;let finishAnalysis:(()=>Promise<void>)|undefined;
  const {chromium}=await import('@playwright/test');
  const browsers=await Promise.all(['sender','recipient'].map(role=>chromium.launch({executablePath:'/opt/browser-cache/chromium-1243/chrome-linux64/chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--allow-loopback-in-peer-connection','--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture=/run/callsign/'+role+'.wav','--autoplay-policy=no-user-gesture-required'],env:{...process.env,LD_LIBRARY_PATH:'/host-libs',HOME:process.env.CALLSIGN_BROWSER_HOME??'/tmp/callsign-media-home'}})));
@@ -95,7 +95,8 @@ it.each(['logout','work-cancel','lease-expiry','delegation-revoke','emergency-st
   const saved=(await f.state()).serviceV3!.attempts[attempt]!;expect(saved.status).toBe('accepted');expect(saved.profile).toBe('asterisk-webrtc-v3');expect(saved.lease?.payload.authority).toBe('current');expect(saved.pbx?.state).toBe('bridged');
   const selectedRelay=await Promise.all([sender,receiver].map(page=>page.evaluate(async()=>{const observations=[];for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers){const stats=await pc.getStats();for(const t of stats.values())if(t.type==='transport'&&t.dtlsState==='connected'){const pair=stats.get(t.selectedCandidatePairId);observations.push({local:stats.get(pair?.localCandidateId)?.candidateType,remote:stats.get(pair?.remoteCandidateId)?.candidateType,dtls:t.dtlsState});}}return observations;})));
   for(const side of selectedRelay){expect(side.length).toBeGreaterThan(0);for(const selected of side){expect(selected.local).toBe('relay');expect(selected.remote).toBe('relay');}}
-  const stop=performance.now();observation!.mark('revocation-request');let blockedRenewals=0;
+  const stop=performance.now();observation!.mark(outcome==='normal-end'?'termination-request':'revocation-request');
+  if(outcome==='normal-end')await receiver.getByRole('button',{name:'통화 종료',exact:true}).click();let blockedRenewals=0;
   const ledgerRevocation=['policy-change','key-change','delegation-revoke','emergency-stop'].includes(outcome);
   if(outcome==='logout')await sender.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();
   if(outcome==='work-cancel')expect((await staff.c.request('/v3/cancel',{intentId:contact.intentId})).status).toBe(200);

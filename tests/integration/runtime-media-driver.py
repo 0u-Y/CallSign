@@ -3,7 +3,7 @@ import argparse, json, os, re, shutil, subprocess, time
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--case', nargs='+', choices=['logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change','device-denied','device-absent'])
+parser.add_argument('--case', nargs='+', choices=['normal-end','logout','work-cancel','lease-expiry','delegation-revoke','emergency-stop','session-expiry','pbx-outage','policy-change','key-change','device-denied','device-absent'])
 parser.add_argument('--analysis-fixture',action='store_true',help='Explicit observer-only provider adapter entrypoint; never a production fallback')
 parser.add_argument('--archive-phase', help='Preserve prior private evidence and stop only owned application/controller processes before an explicit new phase')
 parser.add_argument('--delivery-files', type=Path, help='Extracted, checksum-verified public delivery directory; build web only from delivered runtime/nginx')
