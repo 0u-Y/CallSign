@@ -31,17 +31,17 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 현재 실제 수령 가능한 [고정 bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)는 이전 소스다. 최신 UI나 제출 후보로 간주하지 않는다.
-- `aws-candidate-20261104t085935z`는 검증한 이전 제품 source의 **GHCR 이미지 후보만 게시**했다. 후속 UI 검증을 먼저 반영하기 위해 새 사전 Release 발행은 보류했다. 존재하지 않는 Release를 수령 대상으로 사용하지 않는다.
-- 이전 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 산출물로 보존한다.
+- 최신 UI 사전 후보: `aws-ui-candidate-20261104t121056z` ([Release](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)). 이미지 원격 수령은 확인했고 공개 첨부물은 봉인·발행 단계다. 상태와 영수증은 [후보 근거](../artifacts/submission-candidate-20261104.json)를 확인한다. **이 후보 runtime의 실제 기동·통화는 시작 RAM40GiB 조건 미달로 BLOCKED다. 검증 완료 배포판이 아니다.**
+- runtime source는 `9d6f9dde0cdfe6dd90626666943a525c48755e0c`이며 UI 검증 소스 이후 제품 변경은 없다. 공개 묶음의 문서 source는 inventory의 `sourceCommit`, 이미지 source는 `runtimeProductSourceCommit`으로 구분한다.
+- 이전 `aws-candidate-20261104t085935z`는 이미지 후보만 게시했고 대응 Release는 없다. 기존 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 상태로 보존한다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.
-- 6종 모두 **private·linux/amd64**다. 검증한 runtime은 재build하지 않았고 인프라5종은 동일 manifest를 재사용했다. 새 고유 태그만 추가했으며 기존 태그/visibility/권한 상속은 바꾸지 않았다.
+- 6종 모두 private·linux/amd64다. 새 runtime만 게시하고 변경 없는 인프라5종은 기존 불변 manifest를 재사용했다. 실제 manifest/config/layer를 새 저장 경로로 수령했으며 Docker cache를 증거로 쓰지 않았다. AWS 별도 reader 권한은 아직 확인하지 않았다.
 
-아래 표의 후보 digest는 이미지 게시 근거이며, 아래 기존 Release 수령 결과와 혼합하지 않는다. 실제 기동 참조는 해당 inventory의 소스/검증 범위를 확인한다.
+아래 표는 최신 사전 후보의 이미지 게시 근거이며, 과거 Release 수령 결과와 혼합하지 않는다. 실제 기동 참조는 해당 inventory의 소스/검증 범위를 확인한다.
 
 | 이미지 | 실제 registry manifest 참조 |
 |---|---|
-| runtime | `ghcr.io/0u-y/callsign-runtime@sha256:3e0b397b2c2e4faa1428e87d5fbb85d039dedd82167a6c6b82e16a98a18bbc3f` |
+| runtime | `ghcr.io/0u-y/callsign-runtime@sha256:4129b44217c7bccf5d3b46a36af4fc5c7590c0aefb47acd20b414a617834d173` |
 | asterisk | `ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b` |
 | turn | `ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0` |
 | besu | `ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab` |
@@ -61,7 +61,7 @@ runtime 제품 source는 `6e3cd238e95457406134e8ef37730fd6d251209a`다. 이후 �
 ```bash
 set +x
 umask 077
-TAG=aws-bootstrap-20261102t093531z
+TAG=aws-ui-candidate-20261104t121056z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
@@ -263,7 +263,7 @@ docker --config "$PUBLISH_DOCKER_CONFIG" push "ghcr.io/0u-y/callsign-runtime:$NE
 # Acquire actual manifest digest, then a fresh remote receiver verifies config/layers/amd64/access.
 # Seal the NEW six-image inventory and audit only from those receipts. Never copy PASS flags.
 # After checksum/public asset review and remote receipt, create a NEW Release (no --clobber):
-gh release create "$NEW_TAG" --repo 0u-Y/CallSign --target "$SOURCE_COMMIT" \
+gh release create "$NEW_TAG" --prerelease --repo 0u-Y/CallSign --target "$SOURCE_COMMIT" \
   --title "$NEW_TAG" --notes-file "$REVIEWED_RELEASE_NOTES" \
   "$NEW_PUBLIC_BUNDLE/deployment-files.tar" "$NEW_PUBLIC_BUNDLE/observer-tests.tar" \
   "$NEW_PUBLIC_BUNDLE/images.json" "$NEW_PUBLIC_BUNDLE/publication-audit.json" \

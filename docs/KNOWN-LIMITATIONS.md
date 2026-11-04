@@ -4,6 +4,8 @@
 
 ## 제출 후보와 외부 환경
 
+- 최신 [제출 사전 후보](../artifacts/submission-candidate-20261104.json)는 새 UI source의 runtime·공개/observer 전달 대상이다. 비공개 GHCR 실제 수령과 제품 UI 통합 검증을 구분하며 새 이미지의 일반 entrypoint·전체 통화·반복·복원은 아직 NOT_RUN/BLOCKED다. 이전 이미지 증거를 옮기지 않는다.
+
 - [현재 재설계 UI](../artifacts/service-redesign-20261104.json)는 실제 API/SQL·Chromium에서 확인했지만 기존65d85ac runtime과 게시 이미지에는 포함되지 않는다. 새 runtime/웹/observer 및 실제 통화 회귀가 필요하다. 확인된 Vercel 공개 화면은 과거 발표 UI이며 새 Preview URL/배포 SHA·원격 build 설정은 인증 참조 부재로 미확인이다.
 
 - 실제 ServiceCall·양방향 합성 음원·선택 회수/공동 복구 증거는 이전6e3cd23 후보에 해당한다. 후속 UI는 실제 HTTP/SQL/WS·Chromium으로 확인했으나 새 runtime의 실제 기동·통화는40GiB 시작 조건 미달로 미검증이다. [현재 UI 실행 근거](../artifacts/service-ui-validation-20261104.json)를 구분한다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 확인하지 않았다. 단독 복구 요청은 HTTP schema에서 거절됐고 이번 EVM 정족수 거절 시험과 다르다.

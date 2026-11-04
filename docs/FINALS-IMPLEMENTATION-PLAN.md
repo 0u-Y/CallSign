@@ -1,5 +1,19 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 AWS 이전 전 후보 정합성
+
+| 최종 기획의 행동/조건 | 현재 판정 | 근거와 남은 조건 |
+|---|---|---|
+| 기관 업무·할당·위임·취소·회수 조회 | 구현·범위 검증 완료 | 최신 제품 UI/실제 SQL·HTTP의 [검증 근거](../artifacts/service-redesign-20261104.json). 원장/PBX는 해당 UI 시험에서 fixture |
+| 상담원·수신자의 승인·소비·lease·동의·오류 처리 | 구현·UI/WS 검증 완료, 최신 이미지 통화 미실행 | 제품 소스49a2cb9 이후 문서만 변경. 실제 음성 증거는 이전6e3cd23이며 새 이미지로 확대하지 않음 |
+| 공동 변경·긴급 정지·복구 | 구현·선택 범위 검증 완료 | 최신 HTTP/화면과 이전 실제 원장 증거를 구분. 단독 복구 HTTP400은 EVM 거절 증거가 아님 |
+| 최신 runtime·공개/observer·원격 전달 | 후보 제작·이미지 수령 완료, 공개 첨부물 봉인 진행 | [후보 기록](../artifacts/submission-candidate-20261104.json). 통화40GiB guard 미달, 정상 smoke2회는 NOT_RUN |
+| 최신 Vercel frontend | 배포 준비·BLOCKED | 프로젝트 ID/URL 확인, token 보호 참조 없음. API403·과거 SPA 반환. main push를 배포로 간주하지 않음 |
+| AWS·외부 IdP·AI·독립 reader | 외부 입력 필요 | RUNBOOK 입력 계약. 계약 주소/genesis/trust pin은 NEW 산출물이며 사용자 선입력 아님 |
+
+prepared runtime의 dependency lock과 인프라5종 recipe/config가 기존 검토본과 같음을 확인했다. 새 runtime에는 최신 화면·정산·migration26개 선택 파일의 일치 감사를 기록했다(전체 migration 개수가26이라는 뜻이 아니다). 라이브러리 공개 self-test 키 형태6개 hash 일치만 허용했고 원본 탐지를 보존했다. 새 사용자 데이터·보호 파일은 build context에 넣지 않았다. runtime/observer의 실제 기동·복구·호환성 성공을 정적 감사로 주장하지 않는다. 이번에는 필수 제품 결함이 새로 확인되지 않아 제품 로직을 추가하지 않았다.
+
+
 ## 2026-11-04 실제 업무 공간 재설계와 UI 확인
 
 [화면 구성 결정](../DESIGN.md)에 따라 기관은 목록/선택 상세, 수신자는 통화/위험 안내, 공동 승인자는 변경 전후 검토를 중심으로 재구성했다. 인증·권한·서명·동의·미디어 생명주기는 유지했다. 공개 `/demo`는 `/service`로 연결하고 과거 발표 화면은 `/legacy/demo`에만 남긴다. API 미연결 공개 빌드는 로그인·통화를 비활성화하고 그 이유를 표시한다.

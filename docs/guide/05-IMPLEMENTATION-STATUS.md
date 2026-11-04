@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+AWS 이전 전 최신 산출물과 차단 조건은 [제출 사전 후보](../../artifacts/submission-candidate-20261104.json)로 관리한다. 소스/UI 검증과 이미지 원격 수령은 완료 범위가 다르며, 새 이미지의 실제 통화·Vercel 최신 배포·독립 AWS reader는 아직 확인하지 않았다.
+
 현재 화면은 [업무 공간 재설계 검증](../../artifacts/service-redesign-20261104.json)을 따른다. 실제 인증/API/SQL 기반 역할별 화면과 명시적 component 시각 상태를 구분했다. 현재 공개 Vercel은 과거 화면이며 재설계 Preview의 원격 배포는 확인되지 않았다. 기존 runtime·실제 통화 증거를 새 레이아웃의 배포/음성 성공으로 해석하지 않는다.
 
 후속 실제 업무 UI는 [UI 전용 실제 실행](../../artifacts/service-ui-validation-20261104.json)으로 역할·오류·선택·공동 승인 화면을 확인했다. 소스와 기동한 구성요소·component fixture·실패 후 선택 회귀를 기록했다. 새 runtime은 로컬 제작/무기동 정합성 검사 대상이며, 전체 통화는40GiB 시작 guard 미달로 실행하지 않았다. 아래 이전 후보의 미디어 성공을 후속 UI/이미지에 복사하지 않는다.
