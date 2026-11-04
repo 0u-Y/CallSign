@@ -1,5 +1,12 @@
 # 개발·배포·복구 운영 절차
 
+### 공개 프런트엔드와 실제 통화 배포 구분
+
+현재 제품 진입은 `/service`, 별도 공식 인증은 `/official`이다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. `/demo`는 제품 경로로 이동하며 과거 발표 화면은 `/legacy/demo`다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+
+Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 현재 확인과 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json)에 연결한다.
+
+
 ## 문서 사용 순서
 
 | 목적 | 시작 위치 |

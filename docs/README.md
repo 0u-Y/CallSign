@@ -7,7 +7,7 @@
 | 찾는 내용 | 기준 문서 | 다루는 범위 |
 |---|---|---|
 | 서비스 목적·사용자 흐름 | [서비스 가이드](guide/README.md) | 기관·상담원·수신자의 동작, 승인과 내용 위험의 구분 |
-| 제품 표현·화면 원칙 | [제품 기준](../PRODUCT.md) | Team Signal·CallSign 명칭, UX·접근성 원칙 |
+| 제품 표현·화면 원칙 | [제품 기준](../PRODUCT.md) · [화면 구성 결정](../DESIGN.md) | Team Signal·CallSign 명칭, UX·접근성 원칙 |
 | 요구사항·완료 조건 | [MASTER](MASTER-DEVELOPMENT-SPEC.md) | 요구 ID와 목표. 검증 성공을 선언하는 보고서가 아님 |
 | 구성요소·키·데이터·신뢰 경계 | [아키텍처](ARCHITECTURE.md) | 기본 PBX 경로와 보존한 호환 경로 |
 | 데이터·서명·세션 결합 | [프로토콜](PROTOCOL.md) | 등록 URI/VC/JWS·EIP-712·lease·Witness 형식 |

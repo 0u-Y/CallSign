@@ -1,5 +1,16 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 실제 업무 공간 재설계와 UI 확인
+
+[화면 구성 결정](../DESIGN.md)에 따라 기관은 목록/선택 상세, 수신자는 통화/위험 안내, 공동 승인자는 변경 전후 검토를 중심으로 재구성했다. 인증·권한·서명·동의·미디어 생명주기는 유지했다. 공개 `/demo`는 `/service`로 연결하고 과거 발표 화면은 `/legacy/demo`에만 남긴다. API 미연결 공개 빌드는 로그인·통화를 비활성화하고 그 이유를 표시한다.
+
+[이번 원본 결과와 역할별 캡처](../artifacts/service-redesign-20261104.json)가 기준이다. 고유 HTTP11·WS17·Chromium12는 재실행/viewport를 중복 합산하지 않은 결과이며 Chromium 중2개는 component host다. 실제 통화 상태의 합성 시각 검토를 ServiceCall·음성 검증으로 확대하지 않는다. 최종 선택 회귀 소스는49a2cb9이며 초기 실행 이후 UI 변경과 선택 재시험을 기록했다. 공식 세션 시험의 원인 미확정 네트워크 중단과 공개 preview 시험 설정 결함의 실패 원본은 보존했고 보안 조건·timeout은 완화하지 않았다. 소유 DB/보호 경로5세트는 모두 정리했으며 이번에는 같은 DB 간 재실행을 주장하지 않는다.
+
+64파일321시험 light·웹 build를 확인했다. 이전42개 Markdown 감사는 보존하고 새 DESIGN.md만 추가 검토했다. 기존65d85ac runtime은 이 재설계를 포함하지 않는다. 새 runtime/웹/observer 제작과 실제 통화 회귀가 필요하며 이번에 이미지·Release를 만들지 않았다.
+
+확인된 공개 주소는 `https://callsign-rouge.vercel.app`이나 실제 라우트는 과거 발표 화면이며 배포 SHA는 미확인이다. 기존 프로젝트 ID는 사용자가 제공했다. Preview 브랜치는 정상 push했지만 Vercel check가 queued이고 새 URL은 미확인이다. 프로젝트 ID만으로 인증할 수 없으며 Vercel token 보호 파일 참조가 없어 원격 프로젝트 설정 확인/게시가 막혀 있다. Git push·로컬 build를 Vercel 배포 성공으로 기록하지 않는다.
+
+
 <a id="product-runtime-20261104"></a>
 
 ## 2026-11-04 최신 제품·후보 실제 연결 검증
