@@ -41,9 +41,10 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
+- 새 서비스/복원 후보: [aws-restore-candidate-20261104t180638z](https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z). runtime은 새 제품 종료 수정과 UI를 포함하고, 전체 RESTORE·별도 합성 분석 경로의 실제 검증은 위 후속 기록을 따른다. 현재 게시 준비/수령 상태는 단일 후보 기록의 serviceHardeningFollowup에서 확인한다.
+- 이전 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
 - 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
-- 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 소표본/SLA·최신 RESTORE·최종 DB 전체 잔류 감사·Vercel·독립 reader·AWS는 미확인이므로 **AWS 이전 전 전체 완료가 아니다.**
+- 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 이 이전 후보 발행 시점의 미확인 항목은 후속 기록과 구분하며 독립 reader·실제 AI·AWS는 남아 있으므로 **AWS 이전 전 전체 완료가 아니다.**
 - runtime source와 공개/observer source는 inventory에서 구분하며 제품 입력 hash 일치를 확인한다. 일반 issuer 명령과 명시적 시험 분석 fixture entrypoint를 분리한다. 실제 AWS web은 여기에 포함하지 않는다.
 - runtime은 앞선 부분 후보에서 비공개 GHCR에 게시·새 저장 경로로 원격 수령한 같은 불변 digest다. 후속 검증 때문에 이미지를 재build/재게시/재다운로드하지 않았으며 공개/observer5파일만 새 Release로 원격 재수령했다. 인프라5종도 기존 불변 digest/수령 영수증을 재사용했다. 게시용 PAT의 수령 성공은 독립 AWS reader 검증이 아니며 writer를 AWS에 복사하지 않는다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다. checksum PASS와 실제 네트워크 수령은 별도 기록한다.
@@ -58,7 +59,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 ```bash
 set +x
 umask 077
-TAG=aws-recovery-tools-20261104t154909z
+TAG=aws-restore-candidate-20261104t180638z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
@@ -184,7 +185,7 @@ docker run --rm --pull=never --network none --memory 512m --memory-swap 512m --c
 
 실제 `--provider`는 별도 승인된 outbound 실행 문맥·보호 env 파일·모델/가격/예산·동의한 입력이 준비된 뒤에만 선택한다. 위 dry-run의 `NOT_RUN`을 실제 제공자 평가로 바꾸지 않는다.
 
-실제 텍스트 평가 `--provider`는 자격·동의 확인 외에 `CALLSIGN_EVALUATION_MAX_COST_USD`와 `CALLSIGN_EVALUATION_REQUEST_BOUND_USD`를 요구한다. 선택 사례 수×운영자가 검증한 요청당 최대 비용 가정이 예산을 넘으면 첫 호출 전에 차단한다. 이는 모델 가격을 자동 검증하거나 실제 청구를 제한하는 기능이 아니므로 현재 모델/가격·제공자 지출 제한을 별도로 확인한다. 실패/timeout도 예약 최대 비용에 남기며 실제 청구액은 확인 전 `NOT_MEASURED`다. 최신 비용 검사는 observer의 평가 도구를 사용한다. 기존 runtime 안의 이전 평가 CLI를 최신 도구로 간주하지 않는다.
+실제 텍스트 평가 `--provider`는 자격·동의 확인 외에 `CALLSIGN_EVALUATION_MAX_COST_USD`와 `CALLSIGN_EVALUATION_REQUEST_BOUND_USD`를 요구한다. 선택 사례 수×운영자가 검증한 요청당 최대 비용 가정이 예산을 넘으면 첫 호출 전에 차단한다. 이는 모델 가격을 자동 검증하거나 실제 청구를 제한하는 기능이 아니므로 현재 모델/가격·제공자 지출 제한을 별도로 확인한다. 실패/timeout도 예약 최대 비용에 남기며 실제 청구액은 확인 전 `NOT_MEASURED`다. 새 서비스/복원 후보의 runtime과 observer에는 숫자 비용 선검사가 모두 포함된다. 이전 runtime의 더 오래된 CLI를 이 후보의 도구로 간주하지 않는다.
 
 서버는 분석 시작 시 기관/업무/서명된 승인/VC/lease의 정책 hash를 대조하고 통화 session·connection generation·consent generation을 고정한다. 현재 정책/세대가 바뀌면 전송과 결과 표시를 중단한다. 분석기 `purpose-context-1`은 기관 정책 version/hash와 별개이며 프롬프트 변경만으로 epoch를 올리지 않는다.
 
