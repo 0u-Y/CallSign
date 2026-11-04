@@ -100,6 +100,7 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
   for(const side of selectedRelay){expect(side.length).toBeGreaterThan(0);for(const selected of side){expect(selected.local).toBe('relay');expect(selected.remote).toBe('relay');}}
   if(outcome==='normal-end'&&process.env.CALLSIGN_WORKSPACE_FAILURE_TEST==='yes'){
     expect(await receiver.getByRole('list',{name:'연락 업무 목록',exact:true}).count()).toBe(1);await receiver.route('**/api/v3/workspace',route=>route.abort('failed'));await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();await vi.waitFor(async()=>expect(await receiver.getByRole('list',{name:'연락 업무 목록',exact:true}).count()).toBe(0));await vi.waitFor(async()=>expect(await receiver.getByRole('button',{name:'통화 종료',exact:true}).isEnabled()).toBe(true));
+    expect(await receiver.getByRole('heading',{name:'이상거래 본인 확인',exact:true}).isVisible()).toBe(true);expect(await receiver.locator('.service-contact').innerText()).toContain('최신 업무 조회 미확인');expect(await receiver.locator('[role=alert]').innerText()).not.toContain('Failed to fetch');
     const stillAudible=await audio(receiver,660,990);expect(stillAudible.target).toBeGreaterThan(.003);await receiver.screenshot({path:join(root,'delivery-workspace-failure-live.png'),fullPage:true});
    }
   const stop=performance.now();observation!.mark(outcome==='normal-end'?'termination-request':'revocation-request');
