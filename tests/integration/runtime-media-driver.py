@@ -79,6 +79,7 @@ if options.archive_phase:
         if (root/name).exists(): (root/name).rename(phase/name)
     if (root/'controller-code').exists(): shutil.copytree(root/'controller-code',phase/'controller-code')
     if (root/'runtime-test.env').exists(): shutil.copyfile(root/'runtime-test.env',phase/'runtime-test.env')
+    if (root/'runtime-analysis-test.env').exists(): (root/'runtime-analysis-test.env').rename(phase/'runtime-analysis-test.env')
     print('Prior private evidence preserved; owned app/controller processes stopped/restarted. DB, chain, Anchor and keys were not initialized.')
     raise SystemExit(0)
 
