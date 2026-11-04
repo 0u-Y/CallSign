@@ -24,10 +24,13 @@
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 제출 후보 사전 Release: [`aws-candidate-20261104t085935z`](https://github.com/0u-Y/CallSign/releases/tag/aws-candidate-20261104t085935z). 이미지/공개 파일의 게시·재수령 판정은 해당 Release의 `publication-audit.json`과 저장소의 후속 수령 영수증을 따른다. `latest`로 선택하지 않는다.
+- 현재 실제 수령 가능한 [고정 bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)는 이전 소스다. 최신 UI나 제출 후보로 간주하지 않는다.
+- `aws-candidate-20261104t085935z`는 검증한 이전 제품 source의 **GHCR 이미지 후보만 게시**했다. 후속 UI 검증을 먼저 반영하기 위해 새 사전 Release 발행은 보류했다. 존재하지 않는 Release를 수령 대상으로 사용하지 않는다.
 - 이전 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 산출물로 보존한다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.
 - 6종 모두 **private·linux/amd64**다. 검증한 runtime은 재build하지 않았고 인프라5종은 동일 manifest를 재사용했다. 새 고유 태그만 추가했으며 기존 태그/visibility/권한 상속은 바꾸지 않았다.
+
+아래 표의 후보 digest는 이미지 게시 근거이며, 아래 기존 Release 수령 결과와 혼합하지 않는다. 실제 기동 참조는 해당 inventory의 소스/검증 범위를 확인한다.
 
 | 이미지 | 실제 registry manifest 참조 |
 |---|---|
@@ -51,7 +54,7 @@ runtime 제품 source는 `6e3cd238e95457406134e8ef37730fd6d251209a`다. 이후 �
 ```bash
 set +x
 umask 077
-TAG=aws-candidate-20261104t085935z
+TAG=aws-bootstrap-20261102t093531z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
