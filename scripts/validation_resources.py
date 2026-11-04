@@ -198,7 +198,10 @@ def cancel_owned(state):
     # The runner closes apps/browser first; registered descendants are only forced after grace.
     for sig, wait in ([(signal.SIGTERM,2),(signal.SIGKILL,1)] if orphaned else [(None,8),(signal.SIGTERM,2),(signal.SIGKILL,1)]):
         remaining=refresh()
-        if not remaining:return orphaned
+        if not remaining:
+            # A /proc snapshot may predate the last helper fork but observe its parent already exited.
+            remaining=refresh()
+            if not remaining:return orphaned
         if sig:
             for child in remaining:
                 try:os.kill(child['pid'],sig)
