@@ -38,7 +38,7 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
  let observation:CallObserver|undefined,completed=false;let finishAnalysis:(()=>Promise<void>)|undefined;
  const {chromium}=await import('@playwright/test');
  const browsers=await Promise.all(['sender','recipient'].map(role=>chromium.launch({executablePath:'/opt/browser-cache/chromium-1243/chrome-linux64/chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--allow-loopback-in-peer-connection','--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture=/run/callsign/'+role+'.wav','--autoplay-policy=no-user-gesture-required'],env:{...process.env,LD_LIBRARY_PATH:'/host-libs',HOME:process.env.CALLSIGN_BROWSER_HOME??'/tmp/callsign-media-home'}})));
- const contexts=await Promise.all(browsers.map(b=>b.newContext({permissions:['microphone']})));
+ const contexts=await Promise.all(browsers.map(b=>b.newContext({permissions:['microphone'],viewport:{width:1366,height:768}})));
  let lastLease:{body:unknown;csrf:string}|undefined;
  const responses:{path:string;status:number}[]=[];const sipFrames:unknown[]=[];const errors:string[]=[];const failures:{path:string;status:number;code?:string}[]=[];
  try{
@@ -91,12 +91,21 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
   const during={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};
   for(const result of [during.sender,during.recipient]){expect(result.receiverTracks).toBeGreaterThan(0);expect(result.target).toBeGreaterThan(.003);expect(result.target).toBeGreaterThan(result.self*3);expect(result.rms).toBeGreaterThan(.003);}
   observation!.mark('remote-decoded-both');
-  if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation!);
+  if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation!,async()=>{
+   await receiver.screenshot({path:join(root,'delivery-recipient-analysis-'+outcome+'-1366.png'),fullPage:true});await sender.screenshot({path:join(root,'delivery-agent-call-'+outcome+'-1366.png'),fullPage:true});
+   await receiver.setViewportSize({width:390,height:844});expect(await receiver.evaluate(()=>document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);await receiver.getByRole('button',{name:'통화 종료',exact:true}).waitFor({state:'visible'});await receiver.screenshot({path:join(root,'delivery-recipient-analysis-'+outcome+'-390.png'),fullPage:true});await receiver.setViewportSize({width:1366,height:768});
+  });
   const saved=(await f.state()).serviceV3!.attempts[attempt]!;expect(saved.status).toBe('accepted');expect(saved.profile).toBe('asterisk-webrtc-v3');expect(saved.lease?.payload.authority).toBe('current');expect(saved.pbx?.state).toBe('bridged');
   const selectedRelay=await Promise.all([sender,receiver].map(page=>page.evaluate(async()=>{const observations=[];for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers){const stats=await pc.getStats();for(const t of stats.values())if(t.type==='transport'&&t.dtlsState==='connected'){const pair=stats.get(t.selectedCandidatePairId);observations.push({local:stats.get(pair?.localCandidateId)?.candidateType,remote:stats.get(pair?.remoteCandidateId)?.candidateType,dtls:t.dtlsState});}}return observations;})));
   for(const side of selectedRelay){expect(side.length).toBeGreaterThan(0);for(const selected of side){expect(selected.local).toBe('relay');expect(selected.remote).toBe('relay');}}
+  if(outcome==='normal-end'&&process.env.CALLSIGN_WORKSPACE_FAILURE_TEST==='yes'){
+    expect(await receiver.getByRole('list',{name:'연락 업무 목록',exact:true}).count()).toBe(1);await receiver.route('**/api/v3/workspace',route=>route.abort('failed'));await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();await vi.waitFor(async()=>expect(await receiver.getByRole('list',{name:'연락 업무 목록',exact:true}).count()).toBe(0));await vi.waitFor(async()=>expect(await receiver.getByRole('button',{name:'통화 종료',exact:true}).isEnabled()).toBe(true));
+    const stillAudible=await audio(receiver,660,990);expect(stillAudible.target).toBeGreaterThan(.003);await receiver.screenshot({path:join(root,'delivery-workspace-failure-live.png'),fullPage:true});
+   }
   const stop=performance.now();observation!.mark(outcome==='normal-end'?'termination-request':'revocation-request');
-  if(outcome==='normal-end')await receiver.getByRole('button',{name:'통화 종료',exact:true}).click();let blockedRenewals=0;
+  if(outcome==='normal-end'){
+   await receiver.getByRole('button',{name:'통화 종료',exact:true}).click();await receiver.unroute('**/api/v3/workspace');
+  }let blockedRenewals=0;
   const ledgerRevocation=['policy-change','key-change','delegation-revoke','emergency-stop'].includes(outcome);
   if(outcome==='logout')await sender.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();
   if(outcome==='work-cancel')expect((await staff.c.request('/v3/cancel',{intentId:contact.intentId})).status).toBe(200);

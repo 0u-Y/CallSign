@@ -74,7 +74,7 @@ if options.archive_phase:
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     names=['runtime-media-test.log','runtime-media-results.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
-    names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','pbx-control-*','call-trial-*'] for p in root.glob(pattern)]
+    names += [p.name for pattern in ['media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','delivery-recipient-*','delivery-agent-*','delivery-workspace-*','pbx-control-*','call-trial-*'] for p in root.glob(pattern)]
     for name in names:
         if (root/name).exists(): (root/name).rename(phase/name)
     if (root/'controller-code').exists(): shutil.copytree(root/'controller-code',phase/'controller-code')
@@ -127,7 +127,7 @@ if options.analysis_fixture:
     if not token_path.exists():
         with open(token_path,'x',opener=lambda p,f:os.open(p,f,0o600)) as output:output.write(secrets.token_urlsafe(32))
     values=dict(line.split('=',1) for line in test_environment.read_text().splitlines() if '=' in line)
-    values.update(CALLSIGN_MEDIA_ANALYSIS_MODE='fixture',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL='http://127.0.0.1:4101/__fixture/analysis',CALLSIGN_MEDIA_ANALYSIS_TOKEN_FILE='/run/callsign/analysis-fixture.token')
+    values.update(CALLSIGN_WORKSPACE_FAILURE_TEST='yes' if os.environ.get('CALLSIGN_WORKSPACE_FAILURE_TEST')=='yes' else 'no',CALLSIGN_MEDIA_ANALYSIS_MODE='fixture',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL='http://127.0.0.1:4101/__fixture/analysis',CALLSIGN_MEDIA_ANALYSIS_TOKEN_FILE='/run/callsign/analysis-fixture.token')
     test_environment=write_env('runtime-analysis-test',values)
 child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(test_environment), controller,
                           'timeout', '--signal=TERM', '--kill-after=5s', str(limit), 'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
