@@ -1,8 +1,13 @@
 # 현재 구현의 한계
 
+## 2026-11-05 감사·복원 범위 갱신
+
+정상5회와 취소 사례의 원본 DB 최종 감사는 실제 수행했다. 유효 세션/영수증/정산 이력은 보존하고 진행 통화·기한 지난 작업·미정산 예약을 구분했다. 전체 RESTORE와 복원된 대상의 최종 감사는 아직 미실행이다. 최초 복원 도구 준비 결함을 수정했으나 재검증이 지속 swap-out으로 중단됐다. 과거 분석 중단/PBX 종료 원인 및 두 번째 환경의 interface/route 차이도 미확정이다. [현재 판정](../artifacts/restore-audit-20261105.json)을 따른다. 이후 정상 통과나 도구 보완으로 과거 누락 관측을 소급 입증하지 않는다.
+
+
 ## 최신 후보의 실제 실행 한계 (2026-11-04)
 
-현재 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 소표본 안정성/부하·최신 RESTORE·최종 전체 DB 잔류 감사·독립 AWS reader·Vercel 최신 배포·외부 AI 품질은 미확인이다.
+현재 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 소표본 안정성/부하·최신 RESTORE·복원 대상 DB 감사·독립 AWS reader·Vercel 최신 배포·외부 AI 품질은 미확인이다.
 
 
 확인한 경로와 실행 소스는 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md), 실패와 당시 조건은 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)에서 관리한다. 이 문서는 현재 남은 제약만 설명한다. 과거 NOT_RUN·swap 중단·이전 후보 결과를 최신 상태로 해석하지 않는다.

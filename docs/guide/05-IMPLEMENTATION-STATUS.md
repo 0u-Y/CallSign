@@ -1,8 +1,11 @@
 # 05. 구현 및 검증 현황
 
+최근 [DB 감사·정상5회·복원 시도](../../artifacts/restore-audit-20261105.json)는 이전 통화4건과 별도다. 원본 DB의 실제 종료 전 감사는 PASS이며 전체 RESTORE/복원 대상 감사는 BLOCKED다. 수정한 복원 도구의 실제 재검증은 swap-out 중단 이후 수행하지 않았다. Vercel·별도 reader·실제 AI는 외부 접근/입력이 없으며 AWS 실행은 이번 범위에서 제외됐다.
+
+
 현재 전달물의 발행 당시 판정은 [후보 기록](../../artifacts/product-candidate-20261104.json), 이후 같은 이미지의 실제 실행은 [후속4개 고유 사례](../../artifacts/media-final-20261104.json)를 기준으로 본다. 정상 반복2회·실제 업무 조회 장애 중 종료·업무 취소·기관 정지·공동 복구를 통과했고 원장/Witness/Anchor/PBX/TURN과 ServiceCall/remote track/인증 WS를 실제 실행했다. OIDC·합성 음원·STT/LLM fixture와 실제 모델 품질은 구분한다. 과거 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다.
 
-현재 화면은 [UI 전용 검증](../../artifacts/service-ui-validation-20261104.json)을 유지하며 연락 목적이 조회 장애 때 사라지던 수정을 [실제 장애 화면](../../artifacts/media-resume-20261104/workspace-outage-fixed.png)으로 확인했다. [390px 실제 경고](../../artifacts/media-resume-20261104/final-recipient-mobile.png)도 직접 검토했다. 최신 RESTORE·최종 전체 DB 잔류 감사·독립 reader·Vercel 최신 배포·외부 AI 품질은 미확인이다. 경량 검사나 선택 통화 성공이 이를 대신하지 않는다.
+현재 화면은 [UI 전용 검증](../../artifacts/service-ui-validation-20261104.json)을 유지하며 연락 목적이 조회 장애 때 사라지던 수정을 [실제 장애 화면](../../artifacts/media-resume-20261104/workspace-outage-fixed.png)으로 확인했다. [390px 실제 경고](../../artifacts/media-resume-20261104/final-recipient-mobile.png)도 직접 검토했다. 최신 RESTORE·복원 대상 DB 감사·독립 reader·Vercel 최신 배포·외부 AI 품질은 미확인이다. 경량 검사나 선택 통화 성공이 이를 대신하지 않는다.
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 

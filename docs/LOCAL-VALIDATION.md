@@ -1,5 +1,8 @@
 # 로컬 검증 절차와 과거 준비 환경
 
+현재 DB 감사/복원 시험은 `scripts/validation-runtime-media.py`의 명시적 plan `databaseAudit`/`fullRestore`에서 선택한다. 시작 snapshot→정해진 통화→앱/worker 정리→DB가 살아 있는 최종 감사→기반 자원 정리 순서를 유지한다. 정상 반복은 최대5회·자동 재시도0으로 제한한다. `fullRestore`는 기존 암호화 bundle CLI와 현재 이미지에서 복사한 Node/코드, 기존 PostgreSQL 이미지의 native client를 사용하며 원본 fence·새 DB volume·정지한4개 Besu snapshot·독립 Anchor 보존을 요구한다. **현재 실제 전체 복원 PASS는 없고 수정 후 재검증은 자원 중단으로 BLOCKED다.** [실행 근거](../artifacts/restore-audit-20261105.json)를 확인한다. 별도 사용자의 실행 승인과 기존40GiB/24GiB/16GiB·압박/OOM/deadline 조건 없이 기동하지 않는다.
+
+
 현재 후보의 실제 준비·일반 entrypoint·자원 중단은 [후속 실행 기록](../artifacts/candidate-media-followup-20261104.json)을 따른다. 통화 완료 전 중단됐고 기존 실행 정책을 바꾸지 않았다. 새로운 허가 없이 자동 재기동하지 않는다.
 
 정리 전에 원본 로그와 최초 자원 중단 표본, 소유 ID, host baseline/after snapshot을 **보호된 로컬 경로에 먼저 보존**한다. env·키·세션·DB/chain 데이터는 공개 증거에서 제외한다. Docker ID를 비교할 때 전후 모두 `--no-trunc`를 쓰거나 명시적으로 prefix를 정규화한다. 전체 interface snapshot의 차이는 수명/외부 작업 등의 원인을 확인하기 전 설정 변경으로 단정하지 않는다. baseline을 잃었거나 비교 형식이 잘못됐으면 보존 PASS 대신 미확인으로 기록한다. 원본 보존을 확인한 뒤 소유 label/ID를 대조해 앱/브라우저→기반 서비스→보호 trial root 순서로 정리한다.
