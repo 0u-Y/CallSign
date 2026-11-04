@@ -210,8 +210,48 @@
     "tag": "aws-ui-candidate-20261104t121056z",
     "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z",
     "prerelease": true,
-    "publication": "PENDING_PUBLIC_ASSET_SEAL",
-    "remoteFilesReceived": false
+    "publication": "PUBLISHED_PRERELEASE",
+    "remoteFilesReceived": true,
+    "receipt": {
+      "status": "PASS",
+      "releaseTag": "aws-ui-candidate-20261104t121056z",
+      "releaseUrl": "https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z",
+      "prerelease": true,
+      "newDownloadDirectory": true,
+      "files": 5,
+      "allByteEqualToSealedAssets": true,
+      "checksumVerifier": "PASS",
+      "allSixImageReferencesMatchRemoteReceipt": true,
+      "servicesStarted": false,
+      "runtimeMediaValidated": false
+    },
+    "files": [
+      {
+        "name": "deployment-files.tar",
+        "bytes": 542720,
+        "sha256": "1376233ef5e08a3eb5875d3b5de3a160725d69796457f8ad3fc880fc6513de98"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 286720,
+        "sha256": "1b8fc2714729116ac5e9f4967a836f3dc9da4974640f00a542f86666c75cacd3"
+      },
+      {
+        "name": "images.json",
+        "bytes": 4126,
+        "sha256": "25fa5839dfb3eb2d6b7d03c2fac203d5988db45723c812e5b7687779af700555"
+      },
+      {
+        "name": "publication-audit.json",
+        "bytes": 9004,
+        "sha256": "c418770451edcf84afc8e749cefb086ffbe6def8c0811bbfd69a0cf7e2c93181"
+      },
+      {
+        "name": "SHA256SUMS",
+        "bytes": 339,
+        "sha256": "197ea5623d0a032bad87dd190de4d553bb3aaced1b385284e42f352461a52668"
+      }
+    ]
   },
   "external": {
     "vercel": "BLOCKED: no token protected-file reference; project API403, public build-meta returns old SPA HTML",
@@ -230,7 +270,16 @@
     "hostSettingsChanged": false,
     "oldReleasesAndTagsPreserved": true,
     "privateImageVisibilityUnchanged": true,
-    "imageArchiveCommittedOrPublished": false
+    "imageArchiveCommittedOrPublished": false,
+    "temporaryPublisherDockerConfigRemoved": true,
+    "originalProtectedReferenceUnchanged": true
   },
-  "localCandidateDirectory": ".local/submission-candidate-20261104T120812Z-691a7b"
+  "localCandidateDirectory": ".local/submission-candidate-20261104T120812Z-691a7b",
+  "publicSourceCommit": "76e5590b4686b7d91dd26ced130158d87f6b17a5",
+  "buildResourceObservation": {
+    "samples": 14,
+    "resourceStops": [],
+    "notPeakOrMinimumSpecification": true
+  },
+  "retainedLocalBytes": 1747367582
 }

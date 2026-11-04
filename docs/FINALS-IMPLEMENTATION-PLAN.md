@@ -2,12 +2,14 @@
 
 ## 2026-11-04 AWS 이전 전 후보 정합성
 
+새 사전 Release의 공개5개 파일을 별도 디렉터리에 다시 내려받아 checksum과 GHCR6종 실제 digest를 대조했다. 이미지 원격 수신은952,751,386bytes이며 기존 Docker cache를 사용하지 않았다. runtime source9d6f9dd·공개/observer source76e5590의 제품 입력26파일 hash가 같고 차이는 문서/증거다. 최종 기동·통화는 BLOCKED 상태로 게시했으며 기존 후보·Release는 변경하지 않았다. 게시 인증 임시 디렉터리는 제거하고 원본 보호 파일은 보존했다.
+
 | 최종 기획의 행동/조건 | 현재 판정 | 근거와 남은 조건 |
 |---|---|---|
 | 기관 업무·할당·위임·취소·회수 조회 | 구현·범위 검증 완료 | 최신 제품 UI/실제 SQL·HTTP의 [검증 근거](../artifacts/service-redesign-20261104.json). 원장/PBX는 해당 UI 시험에서 fixture |
 | 상담원·수신자의 승인·소비·lease·동의·오류 처리 | 구현·UI/WS 검증 완료, 최신 이미지 통화 미실행 | 제품 소스49a2cb9 이후 문서만 변경. 실제 음성 증거는 이전6e3cd23이며 새 이미지로 확대하지 않음 |
 | 공동 변경·긴급 정지·복구 | 구현·선택 범위 검증 완료 | 최신 HTTP/화면과 이전 실제 원장 증거를 구분. 단독 복구 HTTP400은 EVM 거절 증거가 아님 |
-| 최신 runtime·공개/observer·원격 전달 | 후보 제작·이미지 수령 완료, 공개 첨부물 봉인 진행 | [후보 기록](../artifacts/submission-candidate-20261104.json). 통화40GiB guard 미달, 정상 smoke2회는 NOT_RUN |
+| 최신 runtime·공개/observer·원격 전달 | 후보 제작·비공개 이미지 게시·공개 사전 Release/원격 수령 완료 | [후보 기록](../artifacts/submission-candidate-20261104.json). 통화40GiB guard 미달, 정상 smoke2회는 NOT_RUN |
 | 최신 Vercel frontend | 배포 준비·BLOCKED | 프로젝트 ID/URL 확인, token 보호 참조 없음. API403·과거 SPA 반환. main push를 배포로 간주하지 않음 |
 | AWS·외부 IdP·AI·독립 reader | 외부 입력 필요 | RUNBOOK 입력 계약. 계약 주소/genesis/trust pin은 NEW 산출물이며 사용자 선입력 아님 |
 

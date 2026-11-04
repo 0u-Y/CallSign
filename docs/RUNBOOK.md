@@ -31,7 +31,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 UI 사전 후보: `aws-ui-candidate-20261104t121056z` ([Release](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)). 이미지 원격 수령은 확인했고 공개 첨부물은 봉인·발행 단계다. 상태와 영수증은 [후보 근거](../artifacts/submission-candidate-20261104.json)를 확인한다. **이 후보 runtime의 실제 기동·통화는 시작 RAM40GiB 조건 미달로 BLOCKED다. 검증 완료 배포판이 아니다.**
+- 최신 UI 사전 후보: `aws-ui-candidate-20261104t121056z` ([Release](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)). 이미지와 공개 첨부물을 새 저장 경로로 실제 수령하고 checksum·6종 digest 참조를 대조했다. 상태와 영수증은 [후보 근거](../artifacts/submission-candidate-20261104.json)를 확인한다. **이 후보 runtime의 실제 기동·통화는 시작 RAM40GiB 조건 미달로 BLOCKED다. 검증 완료 배포판이 아니다.**
 - runtime source는 `9d6f9dde0cdfe6dd90626666943a525c48755e0c`이며 UI 검증 소스 이후 제품 변경은 없다. 공개 묶음의 문서 source는 inventory의 `sourceCommit`, 이미지 source는 `runtimeProductSourceCommit`으로 구분한다.
 - 이전 `aws-candidate-20261104t085935z`는 이미지 후보만 게시했고 대응 Release는 없다. 기존 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 상태로 보존한다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.
