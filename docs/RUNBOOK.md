@@ -6,6 +6,9 @@
 
 Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 현재 확인과 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json)에 연결한다.
 
+인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
+
+
 
 ## 문서 사용 순서
 
@@ -32,6 +35,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
 - 최신 UI 사전 후보: `aws-ui-candidate-20261104t121056z` ([Release](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)). 이미지와 공개 첨부물을 새 저장 경로로 실제 수령하고 checksum·6종 digest 참조를 대조했다. 상태와 영수증은 [후보 근거](../artifacts/submission-candidate-20261104.json)를 확인한다. **이 후보 runtime의 실제 기동·통화는 시작 RAM40GiB 조건 미달로 BLOCKED다. 검증 완료 배포판이 아니다.**
+- [후속 실제 기동](../artifacts/candidate-media-followup-20261104.json)에서 같은 runtime의 일반 issuer startup/auth challenge를 확인했다. 이후 지속 swap-out 중단으로 통화 사례 완료0이다. 발행 시점의 NOT_RUN 기록은 수정하지 않으며 새 기동 결과를 전체 통화 검증으로 확대하지 않는다.
 - runtime source는 `9d6f9dde0cdfe6dd90626666943a525c48755e0c`이며 UI 검증 소스 이후 제품 변경은 없다. 공개 묶음의 문서 source는 inventory의 `sourceCommit`, 이미지 source는 `runtimeProductSourceCommit`으로 구분한다.
 - 이전 `aws-candidate-20261104t085935z`는 이미지 후보만 게시했고 대응 Release는 없다. 기존 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 상태로 보존한다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.

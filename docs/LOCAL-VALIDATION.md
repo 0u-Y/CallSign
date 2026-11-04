@@ -1,5 +1,9 @@
 # 로컬 검증 절차와 과거 준비 환경
 
+현재 후보의 실제 준비·일반 entrypoint·자원 중단은 [후속 실행 기록](../artifacts/candidate-media-followup-20261104.json)을 따른다. 통화 완료 전 중단됐고 기존 실행 정책을 바꾸지 않았다. 새로운 허가 없이 자동 재기동하지 않는다.
+
+정리 전에 원본 로그와 최초 자원 중단 표본, 소유 ID, host baseline/after snapshot을 **보호된 로컬 경로에 먼저 보존**한다. env·키·세션·DB/chain 데이터는 공개 증거에서 제외한다. Docker ID를 비교할 때 전후 모두 `--no-trunc`를 쓰거나 명시적으로 prefix를 정규화한다. 전체 interface snapshot의 차이는 수명/외부 작업 등의 원인을 확인하기 전 설정 변경으로 단정하지 않는다. baseline을 잃었거나 비교 형식이 잘못됐으면 보존 PASS 대신 미확인으로 기록한다. 원본 보존을 확인한 뒤 소유 label/ID를 대조해 앱/브라우저→기반 서비스→보호 trial root 순서로 정리한다.
+
 [운영 진입점](RUNBOOK.md) · [현재 구현/검증](guide/05-IMPLEMENTATION-STATUS.md)
 
 아래는 환경별 실행 절차다. 날짜별 “이번”·미승인·NOT_RUN 문구는 당시 작업 범위이며 현재 완료 판정은 진행 기록을 따른다. 과거 서버 경로/자원 표본을 AWS 설정으로 복사하지 않는다. 실행 guard와 새 사용자 허가가 필요하고 이미 소모한 일회성 batch를 재사용하지 않는다.

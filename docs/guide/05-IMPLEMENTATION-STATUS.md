@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+최신 후보의 [후속 실제 준비/기동](../../artifacts/candidate-media-followup-20261104.json)에서 일반 issuer의 health200/auth401과 실제 기반 구성 준비를 확인했다. 통화 사례 시작 전 지속 swap-out 기준으로 중단했으므로 실제 ServiceCall·회수·정상 반복·복원은 이번 소스의 PASS가 아니다. 기존 UI/이전 미디어 증거와 구분한다.
+
 AWS 이전 전 최신 산출물과 차단 조건은 [제출 사전 후보](../../artifacts/submission-candidate-20261104.json)로 관리한다. 소스/UI 검증과 이미지 원격 수령은 완료 범위가 다르며, 새 이미지의 실제 통화·Vercel 최신 배포·독립 AWS reader는 아직 확인하지 않았다.
 
 현재 화면은 [업무 공간 재설계 검증](../../artifacts/service-redesign-20261104.json)을 따른다. 실제 인증/API/SQL 기반 역할별 화면과 명시적 component 시각 상태를 구분했다. 현재 공개 Vercel은 과거 화면이며 재설계 Preview의 원격 배포는 확인되지 않았다. 기존 runtime·실제 통화 증거를 새 레이아웃의 배포/음성 성공으로 해석하지 않는다.

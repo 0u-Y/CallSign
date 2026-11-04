@@ -1,5 +1,22 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 최신 이미지 실제 준비·일반 기동 후 자원 중단
+
+[후속 실행 원본](../artifacts/candidate-media-followup-20261104.json)은 기존 후보와 같은 runtime/observer이며 제품 변경·재build·새 Release는 없다. 시작 가용40.20GiB를 확인하고 실제 Besu4·계약 배포·Witness4·migration0000~0010·역할 LOGIN·별도 TLS Anchor·PBX/TURN과 제품 API 준비를 수행했다. **일반 issuer 명령은 fixture mount 없이 health200/auth401**을 확인했다. 이는 전체 readiness/통화 PASS가 아니다. 전달 runtime/nginx만으로 새 합성 identity의 웹을 build했으나 실제 화면을 여는 통화 사례 완료 전에 중단됐다.
+
+swap-out이5초 구간11.11→66.99→18.93MiB/s로3회 연속 기준을 넘어 `SUSTAINED_SWAP_OUT`으로 중단했다.25개 표본의 가용 최소37.58GiB·host 최대0.096GiB·전체 최대3.90GiB는 관측 극값이며 peak/최소 사양이 아니다. host-wide swap의 원인은 미확정이고 OOM 증가는 없었다. bootstrap 준비 완료와 통화 성공을 합산하지 않는다. work-cancel은 준비 중 BLOCKED, emergency-stop·정상 smoke2회·재시작/복원은 NOT_RUN이며 새 제품 사례 완료0이다. 자원 중단 후 자동 재기동하지 않았다.
+
+소유 컨테이너21개·volume2개는 앱/브라우저 우선 순서로 정리했고 보호 trial root도 제거했다. 원본 로그는 보호 로컬 경로, 공개 판정·최초3구간은 위 artifact에 보존했다. 정리 중 원래 호스트 baseline을 복사하지 못한 증거 한계가 있다. 기존 Docker ID의 short/full 비교 오류는 보존 PASS로 쓰지 않았고, interface 전체 snapshot 차이의 원인도 단정하지 않았다. route·Docker network ID 비교는 같았으며 host 설정 변경 명령은 실행하지 않았다. 후속 정리 절차에 baseline 선보존·ID 정규화를 명시했다.
+
+| 남은 항목 | 현재 상태/근거 | 다음 행동·차단 조건 |
+|---|---|---|
+| 제품 UI·HTTP/WS | 기존 최신 UI 검증 재사용, 이후 제품 코드 차이 없음 | 새 실제 ServiceCall 화면은 아래 통화 범위에서 확인 |
+| 일반 runtime 진입점 | startup/auth challenge 확인 | readiness·실제 통화로 확대하지 않음 |
+| 통화·분석·회수·정상 반복·실패/복원 | 이번 자원 중단으로 BLOCKED/NOT_RUN | 안정된 별도 환경 또는 새 실행 승인 뒤 동일 정책. guard 완화/자동 재개 없음 |
+| Vercel | token 보호 참조 없음, 원격 설정/새 버전 미확인 | 기존 프로젝트 인증 참조 또는 대시보드의 정확한 Git SHA 배포 |
+| GitHub 전달·AWS 입력 | 기존 사전 Release/비공개 digest 수령 근거 유지 | AWS reader·실제 배포 입력 필요. 원격 전달을 전체 통화 PASS로 확대하지 않음 |
+
+
 ## 2026-11-04 AWS 이전 전 후보 정합성
 
 새 사전 Release의 공개5개 파일을 별도 디렉터리에 다시 내려받아 checksum과 GHCR6종 실제 digest를 대조했다. 이미지 원격 수신은952,751,386bytes이며 기존 Docker cache를 사용하지 않았다. runtime source9d6f9dd·공개/observer source76e5590의 제품 입력26파일 hash가 같고 차이는 문서/증거다. 최종 기동·통화는 BLOCKED 상태로 게시했으며 기존 후보·Release는 변경하지 않았다. 게시 인증 임시 디렉터리는 제거하고 원본 보호 파일은 보존했다.
