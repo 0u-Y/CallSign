@@ -41,3 +41,11 @@ with tempfile.TemporaryDirectory() as directory:
 `;
  expect(()=>execFileSync('python3',['-c',program],{stdio:'pipe'})).not.toThrow();
 });
+
+it('keeps packaged links local and pins omitted source references without changing executable examples',async()=>{
+ const {pinReleaseDocumentation}=await import('../../scripts/release-documentation.js'),sha='a'.repeat(40),included=new Set(['docs/RUNBOOK.md']),tracked=new Set(['docs/RUNBOOK.md','docs/guide/README.md','artifacts/proof.json']);
+ const input='[local](RUNBOOK.md#prepare) [guide](guide/README.md) [proof](../artifacts/proof.json)\n```bash\n[example](../not-a-link)\n```\n`[literal](../not-a-link)`';
+ const result=pinReleaseDocumentation(input,'docs/LOCAL-VALIDATION.md',sha,included,tracked);
+ expect(result).toContain('[local](RUNBOOK.md#prepare)');expect(result).toContain('https://github.com/0u-Y/CallSign/blob/'+sha+'/docs/guide/README.md');expect(result).toContain('https://github.com/0u-Y/CallSign/blob/'+sha+'/artifacts/proof.json');expect(result).toContain('```bash\n[example](../not-a-link)\n```');expect(result).toContain('`[literal](../not-a-link)`');
+ expect(()=>pinReleaseDocumentation('[outside](../../secret)','docs/RUNBOOK.md',sha,included,tracked)).toThrow('OUTSIDE_REPOSITORY');expect(()=>pinReleaseDocumentation('[missing](missing.md)','docs/RUNBOOK.md',sha,included,tracked)).toThrow('TARGET_MISSING');
+});

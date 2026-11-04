@@ -1,6 +1,7 @@
+import {pinReleaseDocumentation} from './release-documentation.js';
 import {immutableImageReference,reviewDeploymentImage} from './image-reference.mjs';
 // Offline release metadata: reads files and Git; never queries an image registry or starts a service.
-import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,mkdtemp,rm} from 'node:fs/promises';
 import {resolve} from 'node:path';
 import {inspectionEnvironment} from './execution-input.js';
 import {deploymentImages} from './preflight-aws.js';
@@ -19,6 +20,9 @@ if(['--inventory','--bundle'].includes(process.argv[2]??'')){
   await mkdir(output,{mode:0o700});const files=resolve(output,'deployment-files.tar');
   const paths=['.dockerignore','infra/deploy','infra/besu/network-config.json','scripts/deployment.sh','scripts/generate-besu.sh','scripts/image-reference.mjs','scripts/preflight-aws.ts','scripts/restricted.mjs','scripts/verify-release-files.mjs','scripts/audit-image-archive.py','docs/RUNBOOK.md','docs/LOCAL-VALIDATION.md','docs/KNOWN-LIMITATIONS.md','artifacts/service-registry-build-20261027.json','artifacts/test-results.json','tests/fixtures/service-purpose-evaluation.json'];
   execFileSync('git',['archive','--format=tar','--output',files,head,...paths],{timeout:30000});
+  const entries=execFileSync('tar',['-tf',files],{encoding:'utf8'}).trim().split('\n'),included=new Set(entries.map(p=>p.replace(/\/$/,''))),tracked=new Set(execFileSync('git',['ls-files'],{encoding:'utf8'}).trim().split('\n'));
+  const stage=await mkdtemp(resolve(output,'public-docs-'));
+  try{execFileSync('tar',['-xf',files,'-C',stage]);for(const path of entries.filter(p=>/\.md$/i.test(p)))await writeFile(resolve(stage,path),pinReleaseDocumentation(await readFile(resolve(stage,path),'utf8'),path,head,included,tracked));execFileSync('tar',['-C',stage,'--owner=0','--group=0','--numeric-owner','--sort=name','--mtime=@'+execFileSync('git',['show','-s','--format=%ct',head],{encoding:'utf8'}).trim(),'-cf',files,...paths]);}finally{await rm(stage,{recursive:true,force:true});}
   const observer=resolve(output,'observer-tests.tar');execFileSync('git',['archive','--format=tar','--output',observer,head,'scripts/evaluate-service-analysis.ts','scripts/evaluate-performance.ts','scripts/validation-runtime-media.py','scripts/validation_resources.py','tests/fixtures/service-purpose-evaluation.json','tests/integration/runtime-delivery-bootstrap.py','tests/integration/runtime-media-driver.py','tests/integration/runtime-db-audit.py','tests/integration/runtime-restore-driver.py','tests/integration/runtime-restore-check.ts','tests/integration/runtime-media.test.ts','tests/integration/service-http-fixture.ts','tests/integration/service-http.test.ts','tests/integration/service-boundaries.test.ts','tests/integration/http-cleanup.test.ts','tests/integration/database-readiness.test.ts','tests/integration/postgres-unix.mjs','tests/integration/postgres-unix-setup.mjs','tests/integration/progress-reporter.mjs','tests/media/service-pbx.spec.ts','tests/media/analysis-path.ts','tests/integration/runtime-analysis-fixture.ts','playwright.finals.config.ts','vitest.http.config.ts','vitest.integration.config.ts'],{timeout:30000});
   await writeFile(resolve(output,'images.json'),JSON.stringify(inventory,null,2)+'\n',{flag:'wx',mode:0o600});
   const hashes=[];for(const name of ['deployment-files.tar','observer-tests.tar','images.json'])hashes.push(createHash('sha256').update(await readFile(resolve(output,name))).digest('hex')+'  '+name);
