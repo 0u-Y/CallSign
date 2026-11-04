@@ -248,3 +248,17 @@ with tempfile.TemporaryDirectory() as directory:
  assert state.read('active-test.json')['ownedProcesses']==[]
 `],{stdio:'pipe',timeout:3000});
 });
+
+it('keeps UI-only memory and cleanup reserves distinct from the full media guard',()=>{
+ execFileSync('python3',['-c',`
+from scripts.validation_resources import ui_budget_reason
+b=dict(memAvailableBytes=24*1024**3,ownedProcessRssBytes=2*1024**3,observerRssBytes=0,containerMemoryBytes=512*1024**2,temporaryTotalUpperBoundBytes=0,monotonicNs=0)
+assert ui_budget_reason(b) is None
+assert ui_budget_reason(dict(b,memAvailableBytes=24*1024**3-1),startup=True)=='UI_START_MEMORY'
+assert ui_budget_reason(dict(b,memAvailableBytes=24*1024**3-1)) is None
+assert ui_budget_reason(dict(b,memAvailableBytes=16*1024**3-1))=='UI_HOST_MEMORY_RESERVE'
+assert ui_budget_reason(dict(b,ownedProcessRssBytes=3*1024**3+1))=='APP_MEMORY_BUDGET'
+assert ui_budget_reason(dict(b,containerMemoryBytes=3*1024**3))=='UI_TOTAL_MEMORY_BUDGET'
+assert ui_budget_reason(b,600_000_000_000)=='UI_DEADLINE_CLEANUP_RESERVE'
+`],{stdio:'pipe'});
+});

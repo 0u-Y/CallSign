@@ -2,11 +2,14 @@
 """Existing local watchdog/step launcher, sharing a latched cause and owned process cleanup."""
 import sys,os,json,time,signal,subprocess,hashlib
 from pathlib import Path
-from validation_resources import RunState,SwapWatch,host_sample,owned_rss,owned_processes,process_start,cancel_owned,stop_environment,LEGACY_POLICY,PRESSURE_POLICY,budget_reason,active_processes,process_rss
+from validation_resources import RunState,SwapWatch,host_sample,owned_rss,owned_processes,process_start,cancel_owned,stop_environment,LEGACY_POLICY,PRESSURE_POLICY,budget_reason,active_processes,process_rss,UI_PROFILE,ui_budget_reason
+
+PROFILE=None
 
 def identity(state):
     data=state.read('identity.json')
     if not data or data['runId']!=state.run_id:raise RuntimeError('OWNED_RUN_IDENTITY_REQUIRED')
+    if data.get('executionProfile')!=PROFILE:raise RuntimeError('EXPLICIT_EXECUTION_PROFILE_MISMATCH')
     root=Path(data['root']).resolve();info=root.stat()
     if data.get('bootIdHash')!=hashlib.sha256(Path('/proc/sys/kernel/random/boot_id').read_bytes()).hexdigest():raise RuntimeError('HOST_BOOT_IDENTITY_CHANGED')
     if root.name!=data['runId'] or info.st_uid!=os.getuid() or info.st_mode&0o077:raise RuntimeError('OWNED_TEST_ROOT_REQUIRED')
@@ -91,11 +94,11 @@ def observe(state,preflight,data=None,policy=LEGACY_POLICY):
                             if path.is_file():raw['temporaryFilesObservedBytes']+=path.stat().st_size
                         except FileNotFoundError:pass
                 raw['temporaryTotalUpperBoundBytes']=raw['temporaryFilesObservedBytes']+raw['databaseDataBudgetBytes']
-                reason=next((v['stop']['reason'] for v in records if v['stop']),None) or budget_reason(raw,data['deadlineMonotonicNs'] if data else None)
+                reason=next((v['stop']['reason'] for v in records if v['stop']),None) or (ui_budget_reason(raw,data['deadlineMonotonicNs'] if data else None,preflight) if PROFILE==UI_PROFILE else budget_reason(raw,data['deadlineMonotonicNs'] if data else None))
             except Exception as error:
                 stop(state,'RESOURCE_OBSERVATION_UNAVAILABLE',{'monotonicNs':time.monotonic_ns(),'errorType':type(error).__name__,'policy':policy},data);return 2
             for record in records:
-                record.update({k:v for k,v in raw.items() if k.startswith('temporary') or k=='databaseDataBudgetBytes'});record['runId']=state.run_id
+                record.update({k:v for k,v in raw.items() if k.startswith('temporary') or k=='databaseDataBudgetBytes'});record['runId']=state.run_id;record['executionProfile']=PROFILE
                 output.write(json.dumps(record)+'\n')
             output.flush()
             def saved_watch(watch):return {key:getattr(watch,key) for key in ['previous','consecutive','pressure_consecutive','out_consecutive']}
@@ -121,7 +124,7 @@ def run(state,label,seconds,command,policy=LEGACY_POLICY):
         with state.locked():
             state.require_ready();watch=state.read('resource-watches.json')
             if not watch or process_start(watch['observerPid'])!=watch['observerStart'] or watch.get('policy',LEGACY_POLICY)!=policy or not 0<=time.monotonic_ns()-watch['fast']['previous']['monotonicNs']<=(7 if policy==PRESSURE_POLICY else 2)*1_000_000_000:raise RuntimeError('LIVE_RESOURCE_OBSERVER_REQUIRED')
-            if time.monotonic_ns()>=data['deadlineMonotonicNs']-40_000_000_000:raise RuntimeError('RUN_DEADLINE_CLEANUP_RESERVE')
+            if time.monotonic_ns()>=data['deadlineMonotonicNs']-(600_000_000_000 if PROFILE==UI_PROFILE else 40_000_000_000):raise RuntimeError('RUN_DEADLINE_CLEANUP_RESERVE')
             if state.read('active-test.json'):raise RuntimeError('ONE_TEST_WORKER_ONLY')
             try:child=subprocess.Popen(command,env=env,stdout=output,stderr=subprocess.STDOUT,start_new_session=True)
             except OSError as error:
@@ -180,6 +183,9 @@ if __name__=='__main__':
     if '--policy' in arguments:
         index=arguments.index('--policy');policy=arguments[index+1];del arguments[index:index+2]
     if policy not in [LEGACY_POLICY,PRESSURE_POLICY]:raise RuntimeError('UNKNOWN_RESOURCE_POLICY')
+    if '--profile' in arguments:
+        index=arguments.index('--profile');PROFILE=arguments[index+1];del arguments[index:index+2]
+        if PROFILE!=UI_PROFILE:raise RuntimeError('UNKNOWN_EXECUTION_PROFILE')
     action,directory,*args=arguments;path=Path(directory)
     if action=='observe':
         if not path.exists():path.mkdir(mode=0o700,parents=False,exist_ok=False)
