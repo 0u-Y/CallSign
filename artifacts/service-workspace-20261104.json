@@ -69,5 +69,39 @@
     "previous 37 integration cases and two media cases remain prior-source evidence",
     "no external AI/IdP/AWS calls",
     "no new image config ID or registry digest created"
-  ]
+  ],
+  "executionPolicy": {
+    "startupMemAvailableGiB": 40,
+    "runningReserveGiB": 16,
+    "observedTotalGiB": 24,
+    "httpWsChromiumHostGiB": 3,
+    "mediaHostGiB": 1,
+    "finalWebBuild": {
+      "memoryGiB": 2,
+      "cpu": 1,
+      "seconds": 90
+    },
+    "deadlineIncludingCleanupMinutes": 90,
+    "noNewLongStageInLastMinutes": 10,
+    "pressurePolicy": "integration-pressure-v1",
+    "resourceAbortRequiresNewApproval": true
+  },
+  "approvedBatchScope": [
+    "isolated UI HTTP/WS/Chromium regression",
+    "follow-up local runtime/public/observer candidate",
+    "work-cancel and emergency-stop once each",
+    "normal two-attempt smoke if remaining deadline and budget permit"
+  ],
+  "handoff": {
+    "executionProcedure": "docs/LOCAL-VALIDATION.md#reviewed-servicecall-analysis",
+    "currentProgress": "docs/FINALS-IMPLEMENTATION-PLAN.md",
+    "markdownInventory": "artifacts/document-review-20261104.json",
+    "awsReader": "separate protected classic PAT reference with read:packages and access to all six private packages; not provided or replaced by writer",
+    "finalAwsWeb": "generated after target contract metadata, public trust and PBX certificate; not this development identity"
+  },
+  "offlineLogHashes": {
+    "service-workspace-complete-light.log": "c14ccac9fbf6470d97d59e656651f072fc6b7c155be7cbb2a4aa6b8fccb0c9cb",
+    "service-workspace-complete-build.log": "fe06db5fe7e038964b1f8f202b8aced709ee1a1469cb155ca3eb5116563a8e1c",
+    "service-workspace-complete-runtime-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
 }
