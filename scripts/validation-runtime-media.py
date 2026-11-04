@@ -80,7 +80,7 @@ def main():
     if not r.is_relative_to(Path.cwd().resolve()/'.local') or r.stat().st_uid!=os.getuid() or r.stat().st_mode&0o077:raise SystemExit('OWNED_PRIVATE_WORK_DIRECTORY_REQUIRED')
     root=Path((r/'full-root-path').read_text().strip());
     if not root.is_relative_to(r/'observer/.local') or not root.name.startswith('media-delivery-'):raise SystemExit('OWNED_MEDIA_ROOT_REQUIRED')
-    observer=root.parent.parent;run=root.name;plan=json.loads((r/'plan.json').read_text());watch=SwapWatch(PRESSURE_POLICY);child=None;start=None;stop=None;stage='preflight';steps=[];builder_ids=set();env={**os.environ,'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'integration','DOCKER_CONFIG':str(r/'docker-auth-empty'),'COREPACK_ENABLE_NETWORK':'0'}
+    observer=root.parent.parent;run=root.name;plan=json.loads((r/'plan.json').read_text());analysis_args=['--analysis-fixture'] if plan.get('analysisFixture',True) else [];watch=SwapWatch(PRESSURE_POLICY);child=None;start=None;stop=None;stage='preflight';steps=[];builder_ids=set();env={**os.environ,'CALLSIGN_ALLOW_EXTERNAL_EXECUTION':'integration','DOCKER_CONFIG':str(r/'docker-auth-empty'),'COREPACK_ENABLE_NETWORK':'0'}
     if not time.monotonic_ns()<plan['deadlineMonotonicNs']<=time.monotonic_ns()+90*60*10**9:raise SystemExit('BOUNDED_DEADLINE_REQUIRED')
     evidence=r/'evidence-private';evidence.mkdir(mode=0o700)
     log=(r/'full-resources.jsonl').open('x')
@@ -214,11 +214,11 @@ def main():
       if label=='emergency-stop' and plan.get('fullRestore'):
        action('database-audit-source-quiesced',[sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(root/'db-audit-source-quiesced.json'),'--final'],30)
        action('full-restore',[sys.executable,'tests/integration/runtime-restore-driver.py'],600,extra=extra)
-       action('post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case','normal-end'],600,extra=extra)
+       action('post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),*analysis_args,'--case','normal-end'],600,extra=extra)
        action('archive-post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase','post-restore-normal'],90,extra=extra)
        action('stale-restore',[sys.executable,'tests/integration/runtime-restore-driver.py'],120,extra={**extra,'CALLSIGN_RESTORE_CHECK_PHASE':'stale'})
       phase_extra={**extra,'CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label==plan.get('workspaceFailureCase','normal-repeat-2') else 'no'}
-      action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case',case],600,extra=phase_extra)
+      action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),*analysis_args,'--case',case],600,extra=phase_extra)
       if label!='emergency-stop':action('archive-'+label,[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase',label],90,extra=extra)
      if plan.get('databaseAudit'):
       action('archive-final-audit',[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase','final-audit'],90,extra=extra)
