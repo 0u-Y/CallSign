@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import {readFile} from 'node:fs/promises';
-import {evaluateServiceAnalysis,assertProviderEvaluation,runServiceEvaluation} from '../../scripts/evaluate-service-analysis.js';
+import {evaluateServiceAnalysis,assertProviderEvaluation,assertEvaluationCostBudget,runServiceEvaluation} from '../../scripts/evaluate-service-analysis.js';
 it('separates false warnings, omissions, abstentions and unexecuted cases across tuning/evaluation data',async()=>{
  const f=JSON.parse(await readFile('tests/fixtures/service-purpose-evaluation.json','utf8'));
  const report=evaluateServiceAnalysis(f,[{id:'loan-and-otp',result:{signals:[],recommendedAction:'fixed action',limitations:'fixture',purpose:{relation:'not-detected',evidenceSpan:'',reason:'fixture'}}},{id:'missing-customer',unavailable:true,result:{signals:[],recommendedAction:'fixed action',limitations:'fixture',purpose:{relation:'undetermined',evidenceSpan:'',reason:'fixture'}}}],'synthetic-replay');
@@ -23,4 +23,11 @@ it('rejects more than twenty provider evaluation cases before any network reques
  const f=JSON.parse(await readFile('tests/fixtures/service-purpose-evaluation.json','utf8'));f.cases=Array.from({length:21},(_,n)=>({...f.cases[0],id:'budget-'+n,family:'budget-'+n,split:'evaluation'}));
  try{Object.assign(process.env,{CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'media',CALLSIGN_PROVIDER_CONFIRMATION:'CONSENTED-SAMPLE-WITH-BUDGET',CALLSIGN_PURPOSE_EVALUATION_CONFIRMATION:'MAX20-SYNTHETIC-TEXT-REQUESTS',CALLSIGN_EVALUATION_SOURCE_SHA256:'a'.repeat(64),CALLSIGN_EVALUATION_IMAGE:'sha256:'+'b'.repeat(64),ANTHROPIC_API_KEY:'synthetic-unit-only',ANTHROPIC_MODEL:'synthetic-unit-model'});const input=join(directory,'fixture.json');await writeFile(input,JSON.stringify(f));await expect(runServiceEvaluation(input,join(directory,'output.json'),true)).rejects.toThrow('PROVIDER_CASE_BUDGET_EXCEEDED');}
  finally{for(const key of Object.keys(process.env))if(!(key in previous))delete process.env[key];Object.assign(process.env,previous);await rm(directory,{recursive:true,force:true});}
+});
+
+it('requires a numeric declared cost bound and rejects over-budget plans before calls',()=>{
+ expect(()=>assertEvaluationCostBudget({},2)).toThrow('NUMERIC_EVALUATION_COST_BUDGET_REQUIRED');
+ expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.6'},2)).toThrow('PLANNED_COST_EXCEEDS_BUDGET');
+ const budget=assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1'},5);expect(budget.plannedMaximumUsd).toBe(.5);expect(budget.scope).toContain('not independently verified');
+ expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'Infinity',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1'},1)).toThrow();
 });

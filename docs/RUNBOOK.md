@@ -161,6 +161,8 @@ AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구�
 
 ### 승인 정책 기반 분석과 평가
 
+실제 텍스트 평가 `--provider`는 자격·동의 확인 외에 `CALLSIGN_EVALUATION_MAX_COST_USD`와 `CALLSIGN_EVALUATION_REQUEST_BOUND_USD`를 요구한다. 선택 사례 수×운영자가 검증한 요청당 최대 비용 가정이 예산을 넘으면 첫 호출 전에 차단한다. 이는 모델 가격을 자동 검증하거나 실제 청구를 제한하는 기능이 아니므로 현재 모델/가격·제공자 지출 제한을 별도로 확인한다. 실패/timeout도 예약 최대 비용에 남기며 실제 청구액은 확인 전 `NOT_MEASURED`다. 최신 비용 검사는 observer의 평가 도구를 사용한다. 기존 runtime 안의 이전 평가 CLI를 최신 도구로 간주하지 않는다.
+
 서버는 분석 시작 시 기관/업무/서명된 승인/VC/lease의 정책 hash를 대조하고 통화 session·connection generation·consent generation을 고정한다. 현재 정책/세대가 바뀌면 전송과 결과 표시를 중단한다. 분석기 `purpose-context-1`은 기관 정책 version/hash와 별개이며 프롬프트 변경만으로 epoch를 올리지 않는다.
 
 최근 확정 상대 발화 최대6개·4000자·60초, 요청 최대20회,250ms coalescing·동시1요청을 사용한다. 한 stream의 서로 다른 segment ID는256개로 제한하며 초과하면 분석 중단을 알리고 새 동의/통화 상태 확인을 요구한다. 기존 통화/사용자/기관/global quota와 제공자4초 timeout도 유지한다. 정책과 문맥 전체 revision/id·event sequence가 맞는 결과만 표시한다. 정정은 이전 근거를 철회하며 제공자 실패 때 규칙 근거와 목적 판단 불가를 함께 표시한다. 목적 이탈 의심은 자동 종료·정지·철회·온체인 변경을 하지 않는다. 원음/문맥은 비영구이며 고객 발화를 추가 수집하지 않는다.
