@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+후속 실제 업무 UI는 `feat/service-workspace-20261104`에서 구현·오프라인 검사를 마쳤으며 실제 통합은 미검증이다. 새 승인 batch는40GiB 시작 guard에서 기동 전 차단됐으므로 아래의6e3cd23 통합 결과를 후속 UI·미생성 runtime에 복사하지 않는다. 변경 전 캡처/원격 이미지와 후속 소스는 [진행표](../FINALS-IMPLEMENTATION-PLAN.md)에서 구분한다.
+
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
 기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 최신 실행 소스는6e3cd23이며 이후 문서·증거 정리와 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.

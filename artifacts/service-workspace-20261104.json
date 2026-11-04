@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "source": "4ded32610528c753e999921ee43fc39c7e67204d",
+  "branch": "feat/service-workspace-20261104",
+  "sourceDirtyDuringOfflineChecks": true,
+  "dirtyScope": "product changes subsequently committed as source; documentation and evidence also uncommitted",
+  "previousValidatedSource": "6e3cd238e95457406134e8ef37730fd6d251209a",
+  "previousImageConfigId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+  "checks": {
+    "pnpm light": {
+      "status": "PASS",
+      "files": 63,
+      "tests": 318
+    },
+    "pnpm --filter @callsign/web build": {
+      "status": "PASS",
+      "warnings": [
+        "existing chunk size",
+        "ineffective dynamic imports"
+      ]
+    },
+    "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit": {
+      "status": "PASS"
+    }
+  },
+  "newExecution": {
+    "status": "BLOCKED",
+    "firstFailure": "START_40_GIB_REQUIRED",
+    "sourceAtPreflight": "a5dd028e62c9ea7be41a251627fc4cd9ac237fe9",
+    "exactFirstSampleNotRetained": true,
+    "subsequentReadOnlySample": {
+      "time": "2026-11-04T09:32:33.642016+00:00",
+      "memAvailableBytes": 41668624384,
+      "notTheFirstFailingSample": true
+    },
+    "guardGiB": 40,
+    "createdBatchPlan": false,
+    "createdServices": false,
+    "createdContainers": false,
+    "createdTestKeys": false,
+    "autoRestart": false
+  },
+  "notRun": [
+    "new UI HTTP/WS/Chromium",
+    "new UI screenshots and visual review",
+    "new runtime build",
+    "work-cancel and emergency-stop on new UI",
+    "normal call smoke 2 attempts / 0 retries",
+    "new Release publication"
+  ],
+  "visualReview": {
+    "before": "two actual prior-source institution and receiver captures viewed; prior source only",
+    "after": "NOT_RUN"
+  },
+  "candidateImpact": {
+    "runtime": "new runtime required for changed web payload; prior image preserved",
+    "web": "rebuild with target metadata/trust/PBX certificate",
+    "observer": "new source includes updated UI selectors and normal-end case; needs actual execution",
+    "infrastructure": "no recipe/input changes; prior five infrastructure images reusable after identity verification",
+    "release": "old published images do not contain this UI; unique follow-up required"
+  },
+  "serverProtection": {
+    "settingsChanged": false,
+    "existingResourcesChanged": false,
+    "ownedExecutionResourcesCreated": false
+  },
+  "boundaries": [
+    "unit/SSR and build are not browser integration",
+    "previous 37 integration cases and two media cases remain prior-source evidence",
+    "no external AI/IdP/AWS calls",
+    "no new image config ID or registry digest created"
+  ]
+}

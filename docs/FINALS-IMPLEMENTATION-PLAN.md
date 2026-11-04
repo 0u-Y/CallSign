@@ -24,13 +24,25 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 RUNBOOK은 AWS 수령/NEW/재개/복구 중심으로 줄이고 로컬 통화·HTTP/DB/EVM 절차를 LOCAL-VALIDATION으로 분리했다. 기존 앵커는 이동 링크로 유지하고 공개 배포 tar에 새 문서를 포함한다. MASTER의 과거 실행 수치/미구현 이력은 원문 링크로 대체해 요구/완료 조건과 구분했다. KNOWN-LIMITATIONS의 오래된 현재형·결과 중복을 정리했고 요구 ID·서명/권한·원본 증거·사용자 기획서는 보존했다. 서비스/브라우저/체인 재기동·이미지 재build·AWS/유료 제공자 호출은 하지 않았다.
 
+## 2026-11-04 실제 업무 UI 후속과 시작 조건 차단
+
+`feat/service-workspace-20261104`의 제품 UI는 현재 연락 요약·역할/다음 행동·독립 검증 상태·경고 우선·통화 중 종료 위치·업무 선택/기술 상세를 개선했다. 계정 관리만 접고 공동 승인 문맥·경고·승인/현재 연결은 유지했다. 승인 전 마이크/PBX 준비를 비활성화하며 기존 API 권한/세대/동의 검사는 그대로다. 기존 실제 캡처2개를 직접 열어 문제를 확인했으며 새 UI 캡처나 이해도 평가를 했다는 주장은 하지 않는다.
+
+사용자가 같은 예산의 새 UI batch1회를 승인했으나 `START_40_GIB_REQUIRED`에서 계획·키·DB·컨테이너 생성 전에 차단됐다. 첫 표본의 수치는 보존하지 못했으며 **후속 읽기 전용 표본**은 available38.81GiB였다. guard/예산을 낮추거나 자동 재시도하지 않았다. 새 HTTP/WS/Chromium·통화·runtime 제작은 NOT_RUN이고 이전6e3cd23/c39cbb 결과를 복사하지 않는다. 정상 통화2회/재시도0의 기존 observer 경로를 준비했지만 실행한 결과는 없다.
+
+추가 리뷰에서 업무 조회 실패 시 이전 목록/관리 동작 유지와 다른 업무 선택 시 이전 통화 요약 유지, 공식 업무 조회 실패 시 과거 목록/내부 오류 표시를 수정했다. 기존 진행 통화 종료는 조회 실패에도 사용할 수 있다. 최종 오프라인 `pnpm light`63파일318시험·웹 build·API runtime 타입 검사 PASS이며 새 UI 실제 HTTP/브라우저 결과가 아니다. [소스/검증 경계](../artifacts/service-workspace-20261104.json)에 기록한다.
+
+Git 추적 Markdown42개(MDX0)의 파일별 독자·현행/원본/이력·처리를 [전수 검토 기록](../artifacts/document-review-20261104.json)에 보존한다. root 개인 요약4개·기존 ignored 전달 요약25개는 별도 분류해 로컬 보존하고 게시/삭제하지 않았다. RUNBOOK/MASTER/한계/현황 역할을 나누고 코드·문서/anchor·배포 포함 경로를 대조했다. UI/reference 변경은 [제품 기준](../PRODUCT.md)과 [공식 패턴](DESIGN-REFERENCES.md)을 따른다.
+
+GHCR의6e3cd23 이미지 후보6종은 비공개 게시·실제 원격 수령을 완료했으나 추가 UI는 포함하지 않는다. 기존 Release는 그대로 두고 사전 Release/후속 runtime은 새 UI 검증 뒤에 확정한다. 봉인한 이전 묶음·실패 원본은 로컬에 보존했다. 새 Release가 있다고 설명하거나 기존 tag/inventory를 덮어쓰지 않는다.
+
 ## 현재 상태와 다음 단계
 
 | 구분 | 상태·다음 작업 |
 |---|---|
-| 제품 소스 | 검증한6e3cd23과 이후 문서/증거 정리를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
-| 로컬 후보 | runtime·공개/observer 묶음과2개 실제 통화/회수 사례 확인. 원격 게시 전 후보이며 AWS 최종 웹 아님 |
-| 원격 전달 | 고정 Release는 이전 소스. 최신 runtime 게시·새 inventory/Release·별도 수령 검증이 남음 |
+| 제품 소스 | 검증한6e3cd23과 이후 미통합 검증 UI branch를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
+| 로컬 후보 | 이전6e3cd23 runtime·공개/observer와2개 실제 통화/회수 증거를 보존. 새 UI runtime은 미제작이며 AWS 최종 웹도 아님 |
+| 원격 전달 | 검증한 이전 제품의6종 GHCR 게시/수령 완료. 후속 UI는 미반영이며 새 Release는 검증 뒤 발행 대기 |
 | 외부 환경 | AWS 공개 origin/TLS/OIDC/PBX/TURN·reader 보호 참조와 실행 허가 필요. AI 품질·사람 평가도 별도 |
 | 문서 기준 | 요구는 MASTER, 실행은 RUNBOOK, 한계는 KNOWN-LIMITATIONS. 과거 실행 성공을 현재 전체 PASS로 복사하지 않음 |
 
