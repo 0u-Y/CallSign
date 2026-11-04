@@ -41,5 +41,12 @@
   "framework": "vite",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "VITE_PUBLIC_PREVIEW=true pnpm --filter @callsign/web build",
-  "outputDirectory": "apps/web/dist"
+  "outputDirectory": "apps/web/dist",
+  "redirects": [
+    {
+      "source": "/legacy/demo",
+      "destination": "/service",
+      "permanent": false
+    }
+  ]
 }
