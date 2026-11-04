@@ -1,7 +1,7 @@
 import {beforeEach,afterEach,it,expect} from 'vitest';
 import {readFile,writeFile} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
-import {chromium,type Page,type Browser} from '@playwright/test';
+import {chromium,type Page,type Browser,type BrowserContextOptions} from '@playwright/test';
 import {privateKeyToAccount} from 'viem/accounts';
 import {encodeEventTopics,encodeAbiParameters,keccak256,stringToHex,type Hex} from 'viem';
 import {configurationTypedData,hashCanonical,policyHash,signPayload,generateEd25519KeyPair,type ServiceBinding} from '../../packages/protocol/src/index.js';
@@ -20,8 +20,8 @@ const accounts=[1,2,3,4].map(n=>privateKeyToAccount(`0x${String(n).padStart(64,'
 let f:HttpFixture,browsers:Browser[]=[],pageErrors:string[]=[],browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;
 beforeEach(async()=>{expectedTransportFailure=false;closing=false;pageErrors=[];browserObservations={consoleErrors:0,failedRequests:0},expectedTransportFailure=false,closing=false;f=await createHttpFixture({web:process.env.CALLSIGN_HTTP_API_ONLY!=='true'});await f.start();},30000);
 afterEach(async()=>{closing=true;for(const b of browsers)await b.close();browsers=[];try{await writeFile(`${f.runRoot}/browser-observations.json`,JSON.stringify({...browserObservations,uncaughtPageErrors:pageErrors.length}),{mode:0o600});expect(pageErrors).toEqual([]);}finally{await f?.close();}});
-async function browserPage(subject='staff'){
- let b=browsers[0];if(!b){b=await chromium.launch(await httpBrowserOptions());browsers.push(b);}const c=await b.newContext();
+async function browserPage(subject='staff',contextOptions:BrowserContextOptions={}){
+ let b=browsers[0];if(!b){b=await chromium.launch(await httpBrowserOptions());browsers.push(b);}const c=await b.newContext(contextOptions);
  await c.route('**/*',r=>new URL(r.request().url()).hostname==='127.0.0.1'?r.continue():r.abort());c.on('page',p=>{p.on('pageerror',e=>pageErrors.push(e.name));p.on('console',m=>{if(m.type()==='error'){browserObservations.consoleErrors++;if(!/^Failed to load resource: the server responded with a status of (401|403|409|503) \([^)]*\)$/.test(m.text())&&!(expectedTransportFailure&&m.text()==='Failed to load resource: net::ERR_FAILED'))pageErrors.push(`Unexpected browser console error: ${m.text().slice(0,200)}`);}});p.on('requestfailed',r=>{browserObservations.failedRequests++;if(!closing&&!(expectedTransportFailure&&new URL(r.url()).pathname==='/api/v3/intents'))pageErrors.push('Unexpected failed network request');});});const p=await c.newPage();p.setDefaultTimeout(6000);await browserLogin(p,subject);return p;
 }
 async function browserLogin(p:Page,subject:string,official=false){
@@ -30,7 +30,10 @@ async function browserLogin(p:Page,subject:string,official=false){
  try{await button.waitFor();}catch(error){await writeFile(`${f.runRoot}/navigation-failure.json`,JSON.stringify({path:new URL(p.url()).pathname,title:await p.title(),visibleText:(await p.locator('body').innerText()).slice(0,1000),pageErrors,pending:[...pending].map(u=>new URL(u).pathname),failures}),{mode:0o600});throw error;}
  const [done]=await Promise.all([p.waitForResponse(r=>r.url().endsWith('/api/v3/auth/callback')),button.click()]);expect(done.status()).toBe(200);
  if(official)await p.getByRole('heading',{name:'공식 업무 확인',exact:true}).waitFor();
- else {await p.getByRole('heading',{name:subject==='agent'?'배정된 연락 업무':subject==='recipient'?'나에게 온 연락':'기관 연락 업무',exact:true}).waitFor();await p.getByText('내 계정 식별자',{exact:true}).click();await expect.poll(()=>p.getByText('내 계정 식별자',{exact:true}).locator('..').innerText()).toContain(f.uid(subject));await p.getByText('내 계정 식별자',{exact:true}).click();}
+ else {await p.getByRole('heading',{name:subject==='agent'?'배정된 연락 업무':['recipient','other'].includes(subject)?'나에게 온 연락':'기관 연락 업무',exact:true}).waitFor();await p.getByText('내 계정 식별자',{exact:true}).click();await expect.poll(()=>p.getByText('내 계정 식별자',{exact:true}).locator('..').innerText()).toContain(f.uid(subject));await p.getByText('내 계정 식별자',{exact:true}).click();}
+}
+async function captureUi(page:Page,label:string){
+ const previous=page.viewportSize();for(const width of [1366,390]){await page.setViewportSize({width,height:768});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${f.runRoot}/${label}-${width}.png`,fullPage:true});}if(previous)await page.setViewportSize(previous);
 }
 async function post(p:Page,path:string,body:unknown,key=randomUUID()){
  return p.evaluate(async({path,body,key})=>{const me=await fetch('/api/v3/auth/me?purpose=work').then(r=>r.json());const response=await fetch('/api'+path,{method:'POST',headers:{'content-type':'application/json','x-csrf-token':me.csrfToken,'idempotency-key':key},body:JSON.stringify(body)});return {status:response.status,body:await response.json()};},{path,body,key});
@@ -67,7 +70,7 @@ it('boundary: reviews and exports a real proposal, imports independent signature
   await expect.poll(()=>page.getByLabel('서명 파일 가져오기',{exact:true}).isEnabled(),{timeout:6000}).toBe(true);
   if(n===0){await page.getByLabel('서명 파일 가져오기',{exact:true}).setInputFiles({name:'broken.json',mimeType:'application/json',buffer:Buffer.from('{')});await page.getByRole('alert').waitFor();await expect.poll(()=>page.getByLabel('서명 파일 가져오기',{exact:true}).isEnabled(),{timeout:6000}).toBe(true);}
   await page.getByLabel('서명 파일 가져오기',{exact:true}).setInputFiles({name:'signature.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(sigFile))});
-  await page.getByRole('status').filter({hasText:'서명을 직접 확인했습니다'}).waitFor();const [approved]=await Promise.all([page.waitForResponse(r=>r.url().endsWith('/api/v3/management/configuration/approve')),page.getByRole('button',{name:'확인한 승인 서명 등록',exact:true}).click()]);expect(approved.status()).toBe(200);
+  await page.getByRole('status').filter({hasText:'서명을 직접 확인했습니다'}).waitFor();const [approved]=await Promise.all([page.waitForResponse(r=>r.url().endsWith('/api/v3/management/configuration/approve')),page.getByRole('button',{name:'확인한 승인 서명 등록',exact:true}).click()]);expect(approved.status()).toBe(200);await captureUi(page,'approver-'+n);
  }
  await article.getByRole('button',{name:'유효 공동 승인으로 제출',exact:true}).waitFor();await expect.poll(()=>article.getByRole('button',{name:'유효 공동 승인으로 제출',exact:true}).isEnabled(),{timeout:6000}).toBe(true);
  const submitted=manager.waitForResponse(r=>r.url().endsWith('/api/v3/management/configuration/submit'));await article.getByRole('button',{name:'유효 공동 승인으로 제출',exact:true}).click();expect((await submitted).status()).toBe(200);await article.getByText(/제출됨 · 원장 확정 대기/).waitFor();expect((await f.state()).configurationProposals![operation]!.activatedAt).toBeUndefined();
@@ -109,8 +112,10 @@ it('boundary: synchronizes work logout across tabs while keeping official sessio
  const response=page.waitForResponse(r=>r.url().endsWith('/api/v3/auth/logout'));await page.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();expect((await response).status()).toBe(200);
  await other.getByRole('heading',{name:'나에게 온 연락',exact:true}).waitFor({state:'hidden'});expect(await other.evaluate(()=>fetch('/api/v3/workspace').then(r=>r.status))).toBe(401);
  expect(await official.evaluate(()=>fetch('/api/v3/official-tasks').then(r=>r.status))).toBe(200);
- await official.getByRole('button',{name:'본인 거래 확인',exact:true}).waitFor();expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(1);const cookie=(await official.context().cookies()).find(c=>c.name==='official_session')!;await f.sql`UPDATE public.sessions SET expires_at=now()-interval '1 second' WHERE token_hash=${tokenHash(cookie.value)}`;
- await official.getByRole('button',{name:'다시 확인',exact:true}).click();await official.getByRole('alert').filter({hasText:'다시 로그인'}).waitFor();expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(0);
+ await official.getByRole('button',{name:'본인 거래 확인',exact:true}).waitFor();await captureUi(official,'official-normal');
+ for(const status of [503,403]){await official.route('**/api/v3/official-tasks',route=>route.fulfill({status,contentType:'application/json',body:JSON.stringify({error:{code:'PRIVATE_INTERNAL_CODE',message:'PRIVATE_INTERNAL_MESSAGE'}})}));await official.getByRole('button',{name:'다시 확인',exact:true}).click();await official.getByRole('alert').filter({hasText:status===403?'권한이 없습니다':'확인하지 못했습니다'}).waitFor();expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(0);expect(await official.locator('body').innerText()).not.toContain('PRIVATE_INTERNAL');await captureUi(official,'official-error-'+status);await official.unroute('**/api/v3/official-tasks');await official.getByRole('button',{name:'다시 확인',exact:true}).click();await official.getByRole('button',{name:'본인 거래 확인',exact:true}).waitFor();}
+ expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(1);const cookie=(await official.context().cookies()).find(c=>c.name==='official_session')!;await f.sql`UPDATE public.sessions SET expires_at=now()-interval '1 second' WHERE token_hash=${tokenHash(cookie.value)}`;
+ await official.getByRole('button',{name:'다시 확인',exact:true}).click();await official.getByRole('alert').filter({hasText:'다시 로그인'}).waitFor();await captureUi(official,'official-expired');expect(await official.getByRole('button',{name:'본인 거래 확인',exact:true}).count()).toBe(0);
  await other.reload();expect(await other.getByRole('heading',{name:'기관 업무',exact:true}).count()).toBe(0);await browserLogin(official,'recipient',true);await official.getByRole('button',{name:'본인 거래 확인',exact:true}).waitFor();await official.getByRole('button',{name:'공식 업무 로그아웃',exact:true}).click();await expect.poll(()=>official.getByRole('button',{name:'다시 확인',exact:true}).isEnabled()).toBe(true);expect(await official.evaluate(()=>fetch('/api/v3/official-tasks').then(r=>r.status))).toBe(401);
 });
 
@@ -200,7 +205,7 @@ it('boundary: recovers a committed creation after a lost response without duplic
  await page.route('**/api/v3/intents',async route=>{requests.push({key:route.request().headers()['idempotency-key']!,body:route.request().postDataJSON()});const response=await route.fetch();expect(response.status()).toBe(200);if(requests.length===1){committed();await gate;await route.abort('failed');}else await route.fulfill({response});});
  const button=page.getByRole('button',{name:'연락 업무 생성',exact:true});await button.click();await stored;expect(await button.isEnabled()).toBe(false);expect(requests).toHaveLength(1);release();await page.getByRole('alert').waitFor();await expect.poll(()=>button.isEnabled()).toBe(true);await button.click();await expect.poll(()=>requests.length).toBe(2);await expect.poll(()=>button.isEnabled()).toBe(true);
  expect(requests[1]).toEqual(requests[0]);const record=await f.state(),created=requests[0]!.body.id;expect(Object.values(record.intents).filter(i=>i.id===created)).toHaveLength(1);
- const row=page.getByRole('listitem').filter({has:page.getByText(created,{exact:true})});await row.getByRole('button',{name:'연락 취소',exact:true}).click();await expect.poll(async()=>(await f.state()).intents[created]?.status).toBe('cancelled');await expect.poll(()=>row.getByRole('button',{name:'연락 취소',exact:true}).isEnabled()).toBe(false);
+ const row=page.getByRole('list',{name:'연락 업무 목록',exact:true}).getByRole('listitem').filter({hasText:created});await row.getByRole('button',{name:'연락 취소',exact:true}).click();await expect.poll(async()=>(await f.state()).intents[created]?.status).toBe('cancelled');await expect.poll(()=>row.getByRole('button',{name:'연락 취소',exact:true}).isEnabled()).toBe(false);
 });
 
 it.each(['lease-policy','connection-generation'] as const)('boundary: stops a pending model after %s changes without publishing the late result',async change=>{
@@ -329,15 +334,15 @@ it('analysis Chromium: renders authenticated WebSocket results in the shipped pa
  },c.attempt.id);
  await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.ready)).toBe(true);await expect.poll(()=>f.audio.streams.length).toBe(1);
  const stream=f.audio.streams[0]!,revision=(n:number)=>stream.options.onRevision({streamId:stream.options.streamId,segmentId:'browser-analysis',revision:n,final:true,text:'OTP를 알려주세요. 대출 상품을 안내하겠습니다.',source:'remote'}),panel=page.getByTestId('live-analysis-component');
- revision(1);await expect.poll(()=>f.audio.calls.length).toBe(1);f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.','suspected','대출 상품을 안내하겠습니다.'));
+ await panel.screenshot({path:`${f.runRoot}/analysis-component-off.png`});revision(1);await expect.poll(()=>f.audio.calls.length).toBe(1);await panel.getByText('분석 중',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-pending.png`});f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.','suspected','대출 상품을 안내하겠습니다.'));
  await panel.getByText('승인 목적 이탈 의심',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
  for(const width of [1440,390]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`${f.runRoot}/analysis-component-${width}.png`,fullPage:true});}
  revision(2);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));await panel.getByText('분석 범위에서 목적 이탈 근거 미탐지 · 안전 판정 아님',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
- revision(3);await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FIXTURE_PROVIDER_UNAVAILABLE'));await panel.getByText('목적 분석 불가 · 규칙 근거는 별도 표시',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ revision(3);await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FIXTURE_PROVIDER_UNAVAILABLE'));await panel.getByText('목적 분석 불가 · 규칙 근거는 별도 표시',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-unavailable.png`});expect(await panel.locator('strong').count()).toBeGreaterThan(0);
  revision(4);await expect.poll(()=>f.audio.calls.length).toBe(4);
  expect(await page.evaluate(async attemptId=>(await fetch('/api/v3/consent',{method:'POST',headers:{'content-type':'application/json','x-csrf-token':sessionStorage.getItem('ip_csrf')??'','idempotency-key':crypto.randomUUID()},body:JSON.stringify({attemptId,granted:false})})).status,c.attempt.id)).toBe(200);
  await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.closed)).toBe(true);expect(stream.stopped).toBe(true);expect(f.audio.calls[3]!.signal.aborted).toBe(true);f.audio.calls[3]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));
- await panel.getByText('아직 표시할 분석 결과가 없습니다. 실행 상태는 음성 분석 항목을 확인하세요.',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBe(0);
+ await panel.getByText('아직 표시할 분석 결과가 없습니다. 실행 상태는 음성 분석 항목을 확인하세요.',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-consent-cleared.png`});expect(await panel.locator('strong').count()).toBe(0);
  expect(await page.evaluate(async()=>(await navigator.permissions.query({name:'microphone'})).state)).not.toBe('granted');
 },20000);
 
@@ -385,4 +390,14 @@ it('analysis HTTP/WS: cancellation while model reservation is blocked releases z
   const closing=f.stopIssuer();await expect.poll(()=>c.ws.readyState,{timeout:1500,interval:20}).toBe(WebSocket.CLOSED);await release();await closing;
   expect(f.audio.calls).toHaveLength(0);const rows=await f.sql`SELECT state,actual FROM issuer_v2.usage_reservations WHERE id=${quotaId}`;expect(rows).toHaveLength(1);expect(rows[0]!.state).toBe('released');expect(Number(rows[0]!.actual)).toBe(0);expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBe(0);
  }finally{await release();c.ws.terminate();}
+});
+
+
+it('UI only: keeps empty and loading work states usable with 200 percent viewport emulation and keyboard focus',async()=>{
+ const page=await browserPage('other');await page.getByText('현재 접근 가능한 업무가 없습니다.',{exact:true}).waitFor();await captureUi(page,'empty-work');
+ let release!:()=>void,seen!:()=>void,finished!:()=>void;const gate=new Promise<void>(r=>release=r),waiting=new Promise<void>(r=>seen=r),handled=new Promise<void>(r=>finished=r);
+ await page.route('**/api/v3/workspace',async route=>{const response=await route.fetch();seen();await gate;await route.fulfill({response});finished();});
+ try{await page.getByRole('button',{name:'업무 새로고침',exact:true}).click();await waiting;expect(await page.getByRole('button',{name:'업무 새로고침',exact:true}).isEnabled()).toBe(false);await captureUi(page,'loading-work');}finally{release();await handled;await page.unroute('**/api/v3/workspace');}
+ await expect.poll(()=>page.getByRole('button',{name:'업무 새로고침',exact:true}).isEnabled()).toBe(true);const zoom=await browserPage('other',{viewport:{width:683,height:384},deviceScaleFactor:2});try{expect(await zoom.evaluate(()=>({width:innerWidth,scale:devicePixelRatio,overflow:document.documentElement.scrollWidth>innerWidth}))).toEqual({width:683,scale:2,overflow:false});await zoom.getByRole('button',{name:'업무 새로고침',exact:true}).focus();await zoom.keyboard.press('Tab');expect(await zoom.evaluate(()=>document.activeElement?.tagName)).not.toBe('BODY');await zoom.evaluate(()=>scrollTo(0,0));await zoom.screenshot({path:`${f.runRoot}/empty-work-zoom-layout-emulation-200.png`,fullPage:true});}finally{await zoom.context().close();}
+ const manager=await f.login('staff');expect((await manager.c.request('/v3/intents',{id:'official-target-'+randomUUID(),recipientId:f.uid('other'),agentId:f.uid('agent'),serviceUri:'https://center.example',expiresAt:f.now()+600})).status).toBe(200);await browserLogin(page,'other',true);const confirm=page.getByRole('button',{name:'본인 거래 확인',exact:true});await confirm.waitFor();expect((await confirm.boundingBox())!.height).toBeGreaterThanOrEqual(44);await captureUi(page,'official-targets');
 });
