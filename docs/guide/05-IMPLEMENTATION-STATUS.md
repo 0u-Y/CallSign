@@ -1,10 +1,8 @@
 # 05. 구현 및 검증 현황
 
-현재 소스·runtime·공개/observer·Release의 대응과 원격 수령은 [부분 검증 사전 후보](../../artifacts/product-candidate-20261104.json)를 기준으로 본다. 새 runtime은 일반 issuer 기동과 실제 정상 통화2회·양방향 음성·분석 패널·동의 철회·정상 종료를 확인했다. 앞선 분석 중단과 후속 PBX 종료는 원인 미확정이며, 새 이미지의 조회 장애 상호작용·취소/정지·반복은 완료하지 못했다. 이전 이미지의 실제 회수/공동 복구 PASS는 [실행별 기록](../../artifacts/media-resume-20261104.json)에서 별도로 확인한다.
+현재 전달물의 발행 당시 판정은 [후보 기록](../../artifacts/product-candidate-20261104.json), 이후 같은 이미지의 실제 실행은 [후속4개 고유 사례](../../artifacts/media-final-20261104.json)를 기준으로 본다. 정상 반복2회·실제 업무 조회 장애 중 종료·업무 취소·기관 정지·공동 복구를 통과했고 원장/Witness/Anchor/PBX/TURN과 ServiceCall/remote track/인증 WS를 실제 실행했다. OIDC·합성 음원·STT/LLM fixture와 실제 모델 품질은 구분한다. 과거 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다.
 
-현재 화면은 [업무 공간 재설계](../../artifacts/service-redesign-20261104.json)와 [UI 전용 실제 실행](../../artifacts/service-ui-validation-20261104.json)의 역할/권한/오류 경계를 유지한다. 추가로 실제 ServiceCall에서 업무 조회 장애 시 연락 목적이 사라지는 문제를 수정했다. 이 장애 상호작용의 새 이미지 재검증은 아직 미실행이며 SSR 회귀만 통과했다. 새 이미지의 합성 계정 [데스크톱](../../artifacts/media-resume-20261104/recipient-desktop.png)·[390px](../../artifacts/media-resume-20261104/recipient-mobile.png) 통화 화면은 직접 열어 검토했다.
-
-Vercel은 연결 인증이 없어 최신 배포를 수행하지 못했고 공개 build metadata는 HTML을 반환한다. 별도 GHCR reader·AWS 최종 웹/실배포·외부 AI 품질·최신 RESTORE·최종 전체 DB 잔류 감사도 미확인이다. 경량 검사는 이 범위를 대신하지 않는다.
+현재 화면은 [UI 전용 검증](../../artifacts/service-ui-validation-20261104.json)을 유지하며 연락 목적이 조회 장애 때 사라지던 수정을 [실제 장애 화면](../../artifacts/media-resume-20261104/workspace-outage-fixed.png)으로 확인했다. [390px 실제 경고](../../artifacts/media-resume-20261104/final-recipient-mobile.png)도 직접 검토했다. 최신 RESTORE·최종 전체 DB 잔류 감사·독립 reader·Vercel 최신 배포·외부 AI 품질은 미확인이다. 경량 검사나 선택 통화 성공이 이를 대신하지 않는다.
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 

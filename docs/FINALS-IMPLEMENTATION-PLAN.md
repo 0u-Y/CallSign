@@ -1,5 +1,13 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 후속 승인 batch: 최신 이미지 선택 경로 통과
+
+새 사용자 승인에 따른 별도 batch에서 같은59b4379 runtime/37edf8e observer의 정상 반복2회(그중1회는 실제 업무 조회 장애 중 종료)·work-cancel·emergency-stop 각1회가 통과했다. [이번4개 고유 사례·단일 시계 측정·정리](../artifacts/media-final-20261104.json)를 기준으로 보고 이전 정상 smoke2회나 실패를 이번 분모에 합산하지 않는다. 새 이미지 재제작·GHCR 재게시·이미지 재다운로드 없이 기존 불변 manifest를 재사용했다.
+
+[조회 장애 수정 화면](../artifacts/media-resume-20261104/workspace-outage-fixed.png)을 직접 열어 연락 당시 기관/목적·최신 조회 미확인·한국어 장애 안내·진행 통화 종료가 유지됨을 확인했다. [실제390px 경고](../artifacts/media-resume-20261104/final-recipient-mobile.png)도 검토했다. 정상 반복의 계획 분모2/실행2/성공2/재시도0이며 소표본/SLA 미평가다. 실제 원장·Witness·Anchor·PBX/TURN·remote track/인증 WS를 사용했고 OIDC·음원·STT/LLM fixture 범위를 유지했다. 동의 철회·늦은 결과·양측 음성 중단·ARI 부재·추가 lease 거절·통화별 SQL 예약0·공동 복구와 과거 승인/위임/통화 비활성 유지를 확인했다. 단독 복구400은 여전히 HTTP schema 경계다.
+
+이전 분석 중단/PBX 종료의 원인은 미확정이며 이번 미재현을 수정 증거로 쓰지 않는다. DB/체인/Anchor를 보존한 앱/controller 단계 재시작은 수행했으나 전체 RESTORE는 미실행이다. 통화별 SQL 검사는 통과했지만 별도 최종 전체 DB 감사는 정리 완료 후 연결을 시도해 관측하지 못했다. 이를 PASS로 처리하지 않는다. baseline/full ID·소유 cgroup 관측과 앱 우선 정리·잔류0/보호 trial 경로 제거를 확인했다. Vercel 인증·독립 reader·실제 AWS/외부 AI 입력은 남는다.
+
 ## 2026-11-04 동일 deadline의 통화 검증과 실제 화면 결함 수정
 
 새 부분 검증 사전 Release의 비공개 runtime·공개5파일 원격 수령을 완료했다. [최종 전달 근거](../artifacts/product-candidate-20261104.json)에 소스/manifest/observer/checksum을 연결했다. 이 전달 성공은 아래 미해결 통화·Vercel·복구 범위를 완료로 바꾸지 않는다.

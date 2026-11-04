@@ -2,16 +2,16 @@
 
 ## 최신 후보의 실제 실행 한계 (2026-11-04)
 
-현재 runtime59b4379/c7455c2는 일반 issuer 기동과 정상 통화2회를 확인했지만, 앞선 분석 중단1건의 원인이 미확정이다. 이후 반복 준비 중 PBX가 예기치 않게 종료돼 해당 batch를 중단·정리했으며 새 이미지의 조회 장애/취소/정지·반복은 완료하지 못했다. 당시 exit code/컨테이너 로그 누락은 이후 코드 보완으로 소급 해소하지 않는다. [실행별 근거](../artifacts/media-resume-20261104.json)의 이전 runtime 성공과 새 이미지 부분 결과를 구분한다. 최신 RESTORE·전체 DB 세션/outbox 잔류 감사·독립 AWS reader·Vercel 최신 배포·외부 AI 품질은 미확인이다.
+현재 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 소표본 안정성/부하·최신 RESTORE·최종 전체 DB 잔류 감사·독립 AWS reader·Vercel 최신 배포·외부 AI 품질은 미확인이다.
 
 
 확인한 경로와 실행 소스는 [구현·검증 현황](guide/05-IMPLEMENTATION-STATUS.md), 실패와 당시 조건은 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)에서 관리한다. 이 문서는 현재 남은 제약만 설명한다. 과거 NOT_RUN·swap 중단·이전 후보 결과를 최신 상태로 해석하지 않는다.
 
 ## 제출 후보와 외부 환경
 
-- 현재 [부분 검증 사전 후보](../artifacts/product-candidate-20261104.json)는 비공개 GHCR·공개 Release 수령을 확인했지만 전체 통화 검증 완료판이 아니다. 현재 미실행과 원인 미확정 실패는 위 절과 [실행별 기록](../artifacts/media-resume-20261104.json)을 따른다.
+- 현재 [부분 검증 사전 후보](../artifacts/product-candidate-20261104.json)는 비공개 GHCR·공개 Release 수령을 확인했지만 전체 통화 검증 완료판이 아니다. 발행 당시 부분 판정과 이후 [선택 경로 통과](../artifacts/media-final-20261104.json)를 구분한다. 원인 미확정 과거 실패는 그대로 남긴다.
 - [재설계 UI](../artifacts/service-redesign-20261104.json)·[역할별 실제 UI 실행](../artifacts/service-ui-validation-20261104.json)과 새 runtime의 정상 통화 화면을 구분한다. Vercel 공개 Preview는 최신 배포 SHA를 확인하지 못했고 `/build-meta.json`이 HTML을 반환한다. 연결 인증 없이는 기존 프로젝트를 배포/승격할 수 없다.
-- 이전 runtime9d6f9dd의 실제 조회 장애 중 통화 종료·work-cancel·emergency-stop·공동 복구는 확인했으나 새59b4379 이미지로 그 결과를 옮기지 않는다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 미검증이다. 단독 복구400은 HTTP schema 거절이며 이번 EVM 정족수 거절 증거가 아니다.
+- 새59b4379 이미지의 실제 조회 장애 중 종료·work-cancel·emergency-stop·공동 복구는 후속 batch에서 별도로 확인했다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 미검증이다. 단독 복구400은 HTTP schema 거절이며 이번 EVM 정족수 거절 증거가 아니다.
 - 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.
 - AWS 리전/예산·공개 origin/TLS/OIDC·PBX/TURN 공개 주소·영속 저장소·독립 Anchor 배치·별도 GHCR reader가 필요하다. [입력 계약](RUNBOOK.md#aws-input-contract)을 따른다. 계약 주소·genesis hash·trust pin은 NEW 산출물이다.
 - AWS 최종 웹은 실제 metadata/trust/PBX 인증서 뒤에 생성한다. 로컬 시험 웹·bootstrap 전달을 AWS 배포 완료로 표시하지 않는다. Vercel은 현재 공개 preview 설정이며 실제 AWS 인증/통화 연결을 확인하지 않았다.

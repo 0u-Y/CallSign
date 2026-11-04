@@ -1,0 +1,881 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-04T14:27:24.041921+00:00",
+  "runtimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+  "observerSource": "37edf8e9dc5c3bd0ba0fbdfc2293f62b3b560905",
+  "currentHeadAtStart": "6af660ef961703a80ca201c6e17c4de26127a3b1",
+  "runtimeRegistryReference": "ghcr.io/0u-y/callsign-runtime@sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+  "runtimeConfigId": "sha256:c7455c22b627447d571469aa88b02eadb5b74bfa84d6a38850fa4e813aab55dd",
+  "sourceCompatibility": {
+    "runtimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+    "observerSource": "37edf8e9dc5c3bd0ba0fbdfc2293f62b3b560905",
+    "currentHead": "6af660ef961703a80ca201c6e17c4de26127a3b1",
+    "executionPathsChanged": [],
+    "newRuntimeBuilt": false,
+    "existingReleaseReused": "aws-product-candidate-20261104t135448z"
+  },
+  "policy": {
+    "source": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+    "controllerSource": "37edf8e9dc5c3bd0ba0fbdfc2293f62b3b560905",
+    "requestedAtHead": "6af660ef961703a80ca201c6e17c4de26127a3b1",
+    "authorization": "User current request grants one new bounded batch after current-state review; no automatic retry after a stop",
+    "normalSmokeAttempts": 0,
+    "normalRepeatAttempts": 2,
+    "normalSmokeReusedEvidence": "artifacts/media-resume-20261104.json: same image two normal smoke successes; no count copied into this run",
+    "maxRetries": 0,
+    "scenarios": [
+      "work-cancel",
+      "emergency-stop"
+    ],
+    "totalObservedGiB": 24,
+    "hostObservedGiB": 1,
+    "startGiB": 40,
+    "reserveGiB": 16,
+    "deadlineIncludesCleanup": true
+  },
+  "result": {
+    "status": "PASS",
+    "steps": [
+      {
+        "label": "bootstrap",
+        "exitCode": 0,
+        "seconds": 40.745986292138696
+      },
+      {
+        "label": "normal-repeat-1",
+        "exitCode": 0,
+        "seconds": 51.65134266600944
+      },
+      {
+        "label": "archive-normal-repeat-1",
+        "exitCode": 0,
+        "seconds": 5.186037220060825
+      },
+      {
+        "label": "normal-repeat-2",
+        "exitCode": 0,
+        "seconds": 46.39788209483959
+      },
+      {
+        "label": "archive-normal-repeat-2",
+        "exitCode": 0,
+        "seconds": 5.188386108027771
+      },
+      {
+        "label": "work-cancel",
+        "exitCode": 0,
+        "seconds": 46.43901376798749
+      },
+      {
+        "label": "archive-work-cancel",
+        "exitCode": 0,
+        "seconds": 5.1740439659915864
+      },
+      {
+        "label": "emergency-stop",
+        "exitCode": 0,
+        "seconds": 51.62791187991388
+      }
+    ],
+    "resourceStop": null
+  },
+  "uniqueProductCases": 4,
+  "readinessCountedAsProductCase": false,
+  "plannedNormalRepeats": 2,
+  "normalSmokeReusedAsPriorEvidenceOnly": 2,
+  "maxRetries": 0,
+  "trials": [
+    {
+      "path": "call-trial-emergency-stop.json",
+      "sha256": "d526017449b35a7b11a4b879c72a4b61ffd02ef8d71b8ee3fc365d8b242ac619",
+      "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+      "outcome": "success",
+      "finishedMs": 37322.710444,
+      "events": [
+        {
+          "id": "0",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "authorization-request",
+          "atMs": 5930.384336000001
+        },
+        {
+          "id": "1",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "authorization-response",
+          "atMs": 6953.837176999999
+        },
+        {
+          "id": "2",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "connect-action",
+          "atMs": 9939.363724
+        },
+        {
+          "id": "3",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "verification-visible",
+          "atMs": 16777.915149
+        },
+        {
+          "id": "4",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "remote-decoded-both",
+          "atMs": 18793.228204
+        },
+        {
+          "id": "5",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "ai-input",
+          "atMs": 19682.197988
+        },
+        {
+          "id": "6",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "transcript",
+          "atMs": 19702.199486999998
+        },
+        {
+          "id": "7",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "analysis",
+          "atMs": 20057.008283999996
+        },
+        {
+          "id": "8",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "warning-visible",
+          "atMs": 20078.810684999997
+        },
+        {
+          "id": "9",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "revocation-request",
+          "atMs": 22403.765693
+        },
+        {
+          "id": "10",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "ui-recalled",
+          "atMs": 22684.796333
+        },
+        {
+          "id": "11",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "audio-reclaimed",
+          "atMs": 26711.18541
+        },
+        {
+          "id": "12",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "pbx-absent",
+          "atMs": 26722.25653
+        },
+        {
+          "id": "13",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "server-applied",
+          "atMs": 30978.781297999994
+        },
+        {
+          "id": "14",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "chain-confirmed",
+          "atMs": 30982.317476999997
+        },
+        {
+          "id": "15",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "new-request-rejected",
+          "atMs": 31010.413798
+        },
+        {
+          "id": "16",
+          "observer": "runtime-media-b7686ed2-772e-41e0-bfec-09d939df881b",
+          "phase": "resources-reclaimed",
+          "atMs": 31011.394021
+        }
+      ]
+    },
+    {
+      "path": "phase-normal-repeat-1/call-trial-normal-end.json",
+      "sha256": "0d1df9aa35623866f3c205083f85a286a23ad379e9cfa8b8d9085f08cac98c40",
+      "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+      "outcome": "success",
+      "finishedMs": 26303.410869,
+      "events": [
+        {
+          "id": "0",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "authorization-request",
+          "atMs": 6429.148325000002
+        },
+        {
+          "id": "1",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "authorization-response",
+          "atMs": 7460.048701
+        },
+        {
+          "id": "2",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "connect-action",
+          "atMs": 10341.122627
+        },
+        {
+          "id": "3",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "verification-visible",
+          "atMs": 16674.045204000002
+        },
+        {
+          "id": "4",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "remote-decoded-both",
+          "atMs": 18689.192493000002
+        },
+        {
+          "id": "5",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "ai-input",
+          "atMs": 19096.434882
+        },
+        {
+          "id": "6",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "transcript",
+          "atMs": 19105.835262
+        },
+        {
+          "id": "7",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "analysis",
+          "atMs": 19469.635264999997
+        },
+        {
+          "id": "8",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "warning-visible",
+          "atMs": 19491.529529
+        },
+        {
+          "id": "9",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "termination-request",
+          "atMs": 21739.713589
+        },
+        {
+          "id": "10",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "ui-recalled",
+          "atMs": 22031.679076
+        },
+        {
+          "id": "11",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "audio-reclaimed",
+          "atMs": 26059.394707
+        },
+        {
+          "id": "12",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "pbx-absent",
+          "atMs": 26070.771556
+        },
+        {
+          "id": "13",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "new-request-rejected",
+          "atMs": 26090.868945000002
+        },
+        {
+          "id": "14",
+          "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561",
+          "phase": "resources-reclaimed",
+          "atMs": 26091.925645000003
+        }
+      ]
+    },
+    {
+      "path": "phase-normal-repeat-2/call-trial-normal-end.json",
+      "sha256": "b2777909375252e0294a45375f21d34e09f389a1ac416ac33abb5499607ba84f",
+      "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+      "outcome": "success",
+      "finishedMs": 26897.614099000002,
+      "events": [
+        {
+          "id": "0",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "authorization-request",
+          "atMs": 6210.867791000001
+        },
+        {
+          "id": "1",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "authorization-response",
+          "atMs": 6404.744451000002
+        },
+        {
+          "id": "2",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "connect-action",
+          "atMs": 9271.317056
+        },
+        {
+          "id": "3",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "verification-visible",
+          "atMs": 15605.688968999999
+        },
+        {
+          "id": "4",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "remote-decoded-both",
+          "atMs": 17620.944620000002
+        },
+        {
+          "id": "5",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "ai-input",
+          "atMs": 18515.385586
+        },
+        {
+          "id": "6",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "transcript",
+          "atMs": 18528.331302000002
+        },
+        {
+          "id": "7",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "analysis",
+          "atMs": 18886.749925
+        },
+        {
+          "id": "8",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "warning-visible",
+          "atMs": 18913.767441
+        },
+        {
+          "id": "9",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "termination-request",
+          "atMs": 22344.326855000003
+        },
+        {
+          "id": "10",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "ui-recalled",
+          "atMs": 22629.535051000003
+        },
+        {
+          "id": "11",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "audio-reclaimed",
+          "atMs": 26656.483560999997
+        },
+        {
+          "id": "12",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "pbx-absent",
+          "atMs": 26666.860567
+        },
+        {
+          "id": "13",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "new-request-rejected",
+          "atMs": 26687.192201
+        },
+        {
+          "id": "14",
+          "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1",
+          "phase": "resources-reclaimed",
+          "atMs": 26688.140003000004
+        }
+      ]
+    },
+    {
+      "path": "phase-work-cancel/call-trial-work-cancel.json",
+      "sha256": "b38994cfc27cb4f4821b4c6ee7682691f448341cb6d607bbbba2cb3248e479ac",
+      "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+      "outcome": "success",
+      "finishedMs": 27015.639017,
+      "events": [
+        {
+          "id": "0",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "authorization-request",
+          "atMs": 6720.543034
+        },
+        {
+          "id": "1",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "authorization-response",
+          "atMs": 7024.822201000001
+        },
+        {
+          "id": "2",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "connect-action",
+          "atMs": 9932.462959000002
+        },
+        {
+          "id": "3",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "verification-visible",
+          "atMs": 16265.392835
+        },
+        {
+          "id": "4",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "remote-decoded-both",
+          "atMs": 18280.386653
+        },
+        {
+          "id": "5",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "ai-input",
+          "atMs": 19172.65354
+        },
+        {
+          "id": "6",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "transcript",
+          "atMs": 19193.775874000006
+        },
+        {
+          "id": "7",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "analysis",
+          "atMs": 19548.303769000006
+        },
+        {
+          "id": "8",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "warning-visible",
+          "atMs": 19595.291884000006
+        },
+        {
+          "id": "9",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "revocation-request",
+          "atMs": 21945.165155000002
+        },
+        {
+          "id": "10",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "ui-recalled",
+          "atMs": 22724.016931000006
+        },
+        {
+          "id": "11",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "audio-reclaimed",
+          "atMs": 26751.421017
+        },
+        {
+          "id": "12",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "pbx-absent",
+          "atMs": 26764.202478
+        },
+        {
+          "id": "13",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "new-request-rejected",
+          "atMs": 26789.297404000004
+        },
+        {
+          "id": "14",
+          "observer": "runtime-media-1a0a7dd9-ff2d-4430-af5f-f486825e797a",
+          "phase": "resources-reclaimed",
+          "atMs": 26790.442874
+        }
+      ]
+    }
+  ],
+  "jointRecovery": {
+    "singleSignatureRejectedAt": "HTTP schema; EVM not reached",
+    "singleStatus": 400,
+    "jointStatus": 200,
+    "confirmedEpoch": "3",
+    "keyVersion": 2,
+    "oldCallTerminal": true,
+    "oldAuthorizationCancelled": true,
+    "oldCredentialRevoked": true,
+    "consumptionPreserved": true
+  },
+  "resources": {
+    "samples": 62,
+    "startAvailableGiB": 43.98295593261719,
+    "minAvailableGiB": 39.84920120239258,
+    "maxSampledHostGiB": 0.09714126586914062,
+    "maxSampledOwnedGiB": 4.5067596435546875,
+    "limits": "sampled observer/launcher descendants and owned cgroup current; not peak, minimum spec or unrelated workload attribution",
+    "ownedCgroupSwapMaxZero": true,
+    "ownedCgroupOomObserved": false
+  },
+  "cleanup": {
+    "baselineComparison": {
+      "interfaces": "EQUAL_CONFIGURATION",
+      "routes": "EQUAL",
+      "container-ids": "PRESERVED",
+      "network-ids": "EQUAL"
+    },
+    "removedContainers": 21,
+    "volumeCount": 2,
+    "errors": [],
+    "appsBeforeData": true
+  },
+  "fixtures": [
+    "local HTTPS OIDC",
+    "distinct synthetic 660/990Hz audio",
+    "explicit STT/LLM provider; no accuracy claim"
+  ],
+  "realComponents": [
+    "PostgreSQL migrations/LOGIN",
+    "Besu4/contracts",
+    "Witness4",
+    "separate TLS Anchor",
+    "Asterisk",
+    "TURN",
+    "product ServiceCall/authenticated WS/remote receiver track",
+    "installed Chromium"
+  ],
+  "verifiedBoundaries": [
+    "workspace lookup failure removes stale workspace/admin actions while retaining bound purpose with stale label and hangup",
+    "actual decoded bidirectional audio",
+    "risk and purpose warning visible in actual ServiceCall",
+    "consent withdrawal stops frames and late results",
+    "work-cancel and emergency-stop revoke audio at both endpoints, actual ARI resources absent and further lease rejected",
+    "per-case SQL unsettled reservation count zero",
+    "same DB retained across four cases and app/controller restarts; old call/approval/delegation not resurrected by joint recovery"
+  ],
+  "notProven": [
+    "Earlier first analysis stop and PBX exit were not reproduced; their causes remain unknown and original failures are retained.",
+    "Small bounded repeat is not reliability, load, SLA or an independent operational-domain test.",
+    "Post-cleanup aggregate SQL audit could not connect because owned DB was already removed; not counted as PASS. Per-case SQL assertions are narrower.",
+    "Latest full backup/RESTORE, actual AWS, independent reader and external AI quality not executed.",
+    "Vercel latest deployment requires a connected credential; frontend URL alone is not deployment authorization."
+  ],
+  "normalMeasurements": {
+    "version": 1,
+    "status": "MEASURED",
+    "plan": {
+      "environmentId": "test:media-final-20261104",
+      "environment": "local",
+      "transport": "turn",
+      "analysis": "fixture",
+      "sourceSha256": "97f2adc66c775c0b52c153e03f63d3c7a79546d3a8599e1a85020af970048848",
+      "images": [
+        "sha256:c7455c22b627447d571469aa88b02eadb5b74bfa84d6a38850fa4e813aab55dd"
+      ],
+      "fixtures": [
+        "local-oidc",
+        "synthetic-audio",
+        "analysis-adapter"
+      ],
+      "normalAttempts": 2,
+      "maxRetries": 0,
+      "perTryTimeoutMs": 120000,
+      "totalTimeoutMs": 600000
+    },
+    "criteria": "Normal logical attempts are the denominator; normal completion requires authorization verification, decoded distinct remote audio AND observed cleanup within the per-try deadline; fixture analysis mode additionally requires input/transcript/analysis/visible warning observations; joint authorization/audio rate is counted independently of cleanup outcome. Failures/timeouts/not-started/incomplete remain in denominator. Explicit retry budget only.",
+    "clock": "Each try uses one test-controller monotonic clock. Missing or reversed phase pairs are unmeasured, never zero. Browser/UI reports are untrusted observations.",
+    "attempts": [
+      {
+        "id": "phase-normal-repeat-1/call-trial-normal-end.json",
+        "outcome": "first-success",
+        "tryCount": 1,
+        "authorityVerified": true,
+        "tries": [
+          {
+            "outcome": "success",
+            "authorityVerified": true,
+            "cleanupObserved": true,
+            "analysisObserved": true,
+            "authorityAndRemoteAudio": true,
+            "unavailable": [],
+            "latencyMs": {
+              "authorizationResponse": 1030.9003759999978,
+              "revocationToServer": null,
+              "revocationToPbx": null,
+              "authorizationToVerification": 10244.896879,
+              "connectToVerification": 6332.922577000001,
+              "connectToRemoteAudio": 8348.069866000002,
+              "revocationToConfirmation": null,
+              "confirmationToServer": null,
+              "serverToRejection": null,
+              "serverToUi": null,
+              "revocationToAudio": null,
+              "terminationToAudio": 4319.681118,
+              "aiToTranscript": 9.400379999999132,
+              "transcriptToAnalysis": 363.80000299999665,
+              "analysisToWarning": 21.894264000002295
+            },
+            "unmeasured": {
+              "revocation-request:server-applied": "missing-endpoint",
+              "revocation-request:pbx-absent": "missing-endpoint",
+              "revocation-request:chain-confirmed": "missing-endpoint",
+              "chain-confirmed:server-applied": "missing-endpoint",
+              "server-applied:new-request-rejected": "missing-endpoint",
+              "server-applied:ui-recalled": "missing-endpoint",
+              "revocation-request:audio-reclaimed": "missing-endpoint"
+            },
+            "events": [
+              {
+                "id": "0",
+                "phase": "authorization-request",
+                "atMs": 6429.148325000002,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "1",
+                "phase": "authorization-response",
+                "atMs": 7460.048701,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "2",
+                "phase": "connect-action",
+                "atMs": 10341.122627,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "3",
+                "phase": "verification-visible",
+                "atMs": 16674.045204000002,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "4",
+                "phase": "remote-decoded-both",
+                "atMs": 18689.192493000002,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "5",
+                "phase": "ai-input",
+                "atMs": 19096.434882,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "6",
+                "phase": "transcript",
+                "atMs": 19105.835262,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "7",
+                "phase": "analysis",
+                "atMs": 19469.635264999997,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "8",
+                "phase": "warning-visible",
+                "atMs": 19491.529529,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "9",
+                "phase": "termination-request",
+                "atMs": 21739.713589,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "10",
+                "phase": "ui-recalled",
+                "atMs": 22031.679076,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "11",
+                "phase": "audio-reclaimed",
+                "atMs": 26059.394707,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "12",
+                "phase": "pbx-absent",
+                "atMs": 26070.771556,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "13",
+                "phase": "new-request-rejected",
+                "atMs": 26090.868945000002,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              },
+              {
+                "id": "14",
+                "phase": "resources-reclaimed",
+                "atMs": 26091.925645000003,
+                "observer": "runtime-media-97503992-d657-4255-8cc6-534b61c66561"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "phase-normal-repeat-2/call-trial-normal-end.json",
+        "outcome": "first-success",
+        "tryCount": 1,
+        "authorityVerified": true,
+        "tries": [
+          {
+            "outcome": "success",
+            "authorityVerified": true,
+            "cleanupObserved": true,
+            "analysisObserved": true,
+            "authorityAndRemoteAudio": true,
+            "unavailable": [],
+            "latencyMs": {
+              "authorizationResponse": 193.87666000000172,
+              "revocationToServer": null,
+              "revocationToPbx": null,
+              "authorizationToVerification": 9394.821177999998,
+              "connectToVerification": 6334.371912999999,
+              "connectToRemoteAudio": 8349.627564000002,
+              "revocationToConfirmation": null,
+              "confirmationToServer": null,
+              "serverToRejection": null,
+              "serverToUi": null,
+              "revocationToAudio": null,
+              "terminationToAudio": 4312.156705999994,
+              "aiToTranscript": 12.945716000001994,
+              "transcriptToAnalysis": 358.41862299999775,
+              "analysisToWarning": 27.017515999999887
+            },
+            "unmeasured": {
+              "revocation-request:server-applied": "missing-endpoint",
+              "revocation-request:pbx-absent": "missing-endpoint",
+              "revocation-request:chain-confirmed": "missing-endpoint",
+              "chain-confirmed:server-applied": "missing-endpoint",
+              "server-applied:new-request-rejected": "missing-endpoint",
+              "server-applied:ui-recalled": "missing-endpoint",
+              "revocation-request:audio-reclaimed": "missing-endpoint"
+            },
+            "events": [
+              {
+                "id": "0",
+                "phase": "authorization-request",
+                "atMs": 6210.867791000001,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "1",
+                "phase": "authorization-response",
+                "atMs": 6404.744451000002,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "2",
+                "phase": "connect-action",
+                "atMs": 9271.317056,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "3",
+                "phase": "verification-visible",
+                "atMs": 15605.688968999999,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "4",
+                "phase": "remote-decoded-both",
+                "atMs": 17620.944620000002,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "5",
+                "phase": "ai-input",
+                "atMs": 18515.385586,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "6",
+                "phase": "transcript",
+                "atMs": 18528.331302000002,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "7",
+                "phase": "analysis",
+                "atMs": 18886.749925,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "8",
+                "phase": "warning-visible",
+                "atMs": 18913.767441,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "9",
+                "phase": "termination-request",
+                "atMs": 22344.326855000003,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "10",
+                "phase": "ui-recalled",
+                "atMs": 22629.535051000003,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "11",
+                "phase": "audio-reclaimed",
+                "atMs": 26656.483560999997,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "12",
+                "phase": "pbx-absent",
+                "atMs": 26666.860567,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "13",
+                "phase": "new-request-rejected",
+                "atMs": 26687.192201,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              },
+              {
+                "id": "14",
+                "phase": "resources-reclaimed",
+                "atMs": 26688.140003000004,
+                "observer": "runtime-media-35c0bd9f-aca6-4789-8af9-22a79e13c3b1"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "denominator": 2,
+      "totalTries": 2,
+      "firstSuccess": 2,
+      "retrySuccess": 0,
+      "failure": 0,
+      "timeout": 0,
+      "incomplete": 0,
+      "unavailableAttempts": 0,
+      "authorityVerified": 2,
+      "authorityVerifiedRate": 1,
+      "authorityAndRemoteAudio": 2,
+      "authorityAndRemoteAudioRate": 1
+    },
+    "sla": "NOT_EVALUATED: bounded observational sample, no SLA or new performance baseline"
+  },
+  "finalOwnedCleanup": {
+    "status": "PASS",
+    "runId": "media-delivery-media-final-20261104t141958z-ded824",
+    "containersRemaining": 0,
+    "volumesRemaining": 0,
+    "privateTrialRootRemoved": true,
+    "evidenceOutsideRootPreserved": true,
+    "existingResourcesChanged": false,
+    "recordedAt": "2026-11-04T14:28:13.758725+00:00"
+  }
+}
