@@ -36,17 +36,19 @@ def cleanup_priority(entry):
 def preserve_evidence(root, directory, reason, steps):
     # Whitelist outputs; never copy env, keys, sessions, account files or DB/chain data.
     directory.mkdir(exist_ok=True,mode=0o700)
-    outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json']
-    outputs += [p.name for p in root.glob('normal-entrypoint-*.json')]
-    outputs += [p.name for p in root.glob('*.log')]
     copied=[]
-    for name in outputs:
-        source=root/name
-        if source.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
-        if source.is_file():
-            target=directory/name
-            if target.exists():raise RuntimeError('EVIDENCE_ALREADY_PRESERVED')
-            shutil.copyfile(source,target);target.chmod(0o600);copied.append(name)
+    for location in [root,*root.glob('phase-*')]:
+        if location.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
+        outputs=['ownership.json','interfaces-before.json','routes-before.json','docker-containers-before.json','docker-networks-before.json','chain-observation.json','foundation-complete.json','database-stage-complete.json','delivery-web-build.json','runtime-media-results.json']
+        outputs += [p.name for pattern in ['normal-entrypoint-*.json','call-trial-*.json','decoded-audio-*.json','*.log'] for p in location.glob(pattern)]
+        for name in outputs:
+            source=location/name
+            if source.is_symlink():raise RuntimeError('EVIDENCE_SYMLINK_FORBIDDEN')
+            if source.is_file():
+                target=directory/source.relative_to(root)
+                target.parent.mkdir(parents=True,exist_ok=True,mode=0o700)
+                if target.exists():raise RuntimeError('EVIDENCE_ALREADY_PRESERVED')
+                shutil.copyfile(source,target);target.chmod(0o600);copied.append(str(source.relative_to(root)))
     (directory/'partial-stop.json').write_text(json.dumps({'reason':reason,'steps':steps})+'\n')
     (directory/'partial-stop.json').chmod(0o600)
     return {'copied':copied,'firstCause':reason,'scope':'private evidence only; no public secret-absence claim'}
@@ -177,7 +179,7 @@ def main():
       time.sleep(5)
      action('bootstrap',[sys.executable,'tests/integration/runtime-delivery-bootstrap.py','--delivery',str(r/'delivery-final'),'--root',str(root),'--browser-cache',str(options.browser_cache.resolve()),'--apply'],600)
      image=json.loads((root/'images-loaded.json').read_text())['CALLSIGN_APP_IMAGE'];extra={'CALLSIGN_RUNTIME_TEST_ROOT':str(root),'CALLSIGN_EXPECTED_RUNTIME_IMAGE':image}
-     for label,case in [('normal-smoke-1','normal-end'),('normal-smoke-2','normal-end'),('work-cancel','work-cancel'),('emergency-stop','emergency-stop')]:
+     for label,case in [('normal-smoke-1','normal-end'),('normal-smoke-2','normal-end'),('normal-repeat-1','normal-end'),('normal-repeat-2','normal-end'),('work-cancel','work-cancel'),('emergency-stop','emergency-stop')]:
       action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),'--analysis-fixture','--case',case],600,extra=extra)
       if label!='emergency-stop':action('archive-'+label,[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase',label],90,extra=extra)
      result={'status':'PASS','steps':steps,'resourceStop':None}

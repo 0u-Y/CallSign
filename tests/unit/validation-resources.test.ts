@@ -271,11 +271,13 @@ spec=importlib.util.spec_from_file_location('media','scripts/validation-runtime-
 with tempfile.TemporaryDirectory() as d:
  root=Path(d)/'trial';root.mkdir();evidence=Path(d)/'private-evidence'
  for name,content in [('interfaces-before.json','[]'),('ownership.json','{}'),('runtime-media-results.json','{"numFailedTests":1}'),('bootstrap.log','original setup failure'),('private-app.json','SECRET'),('trial.env','SECRET'),('key.pem','SECRET')]: (root/name).write_text(content)
+ phase=root/'phase-normal-smoke-1';phase.mkdir();(phase/'call-trial-normal-end.json').write_text('{"outcome":"failure"}');(phase/'runtime-test.env').write_text('SECRET')
  steps=[{'label':'product','exitCode':1}];m.preserve_evidence(root,evidence,'SUSTAINED_SWAP_OUT',steps)
  shutil.rmtree(root)
  assert json.loads((evidence/'partial-stop.json').read_text())=={'reason':'SUSTAINED_SWAP_OUT','steps':steps}
  assert json.loads((evidence/'runtime-media-results.json').read_text())['numFailedTests']==1
  assert (evidence/'interfaces-before.json').exists() and (evidence/'bootstrap.log').exists()
+ assert json.loads((evidence/'phase-normal-smoke-1/call-trial-normal-end.json').read_text())['outcome']=='failure' and not (evidence/'phase-normal-smoke-1/runtime-test.env').exists()
  assert not any((evidence/n).exists() for n in ['trial.env','key.pem','private-app.json'])
  assert (evidence/'bootstrap.log').stat().st_mode&0o077==0
  root.mkdir();(root/'bootstrap.log').symlink_to(evidence/'bootstrap.log')
