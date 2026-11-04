@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-04T14:16:38.704246+00:00",
+  "runtimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+  "publicObserverSource": "37edf8e9dc5c3bd0ba0fbdfc2293f62b3b560905",
+  "runtime": {
+    "key": "CALLSIGN_APP_IMAGE",
+    "role": "runtime",
+    "configId": "sha256:c7455c22b627447d571469aa88b02eadb5b74bfa84d6a38850fa4e813aab55dd",
+    "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+    "registryManifestDigest": "sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+    "os": "linux",
+    "architecture": "amd64",
+    "status": "PASS",
+    "remoteVerified": true,
+    "packageVisibility": "private",
+    "receiptScope": "new runtime remote byte verification"
+  },
+  "verificationState": "PARTIAL_MEDIA_PBX_EXIT_AND_UNRESOLVED_ANALYSIS_STOP",
+  "runtimeStartup": "PASS: normal issuer health200/auth401, not whole-readiness proof",
+  "fullMedia": "PARTIAL: normal2 PASS; earlier analysis failure and later owned PBX exit unresolved; new-image cancel/stop NOT_RUN",
+  "integrationEvidence": "artifacts/media-resume-20261104.json",
+  "registry": {
+    "status": "PASS",
+    "architecture": "linux/amd64",
+    "runtimeNetworkBytesReceived": 220918172,
+    "newStorageDirectory": true,
+    "dockerCacheUsed": false,
+    "privatePackage": true,
+    "anonymousAccess": "DENIED",
+    "credentialRole": "explicit publisher protected reference; independent AWS reader NOT verified",
+    "unchangedInfrastructure": {
+      "count": 5,
+      "receiptSource": "artifacts/submission-candidate-20261104.json",
+      "repeatedDownload": false
+    }
+  },
+  "release": {
+    "tag": "aws-product-candidate-20261104t135448z",
+    "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-product-candidate-20261104t135448z",
+    "prerelease": true,
+    "publication": "PASS",
+    "remoteFilesReceived": true,
+    "newDirectory": true,
+    "files": [
+      {
+        "name": "SHA256SUMS",
+        "bytes": 339,
+        "sha256": "a444fe261b6ca9683b84957b9cb7e23f807b6872f5d5e136d956bc546c76a59a"
+      },
+      {
+        "name": "deployment-files.tar",
+        "bytes": 348160,
+        "sha256": "e8ba973be3d68fe07bb75a7932b144980ae5dff2cf8f81f7dd27e2559670927f"
+      },
+      {
+        "name": "images.json",
+        "bytes": 4887,
+        "sha256": "8624ac36f81c66a9e6547f4637b3db54398c4f624147bb41a5ff8794296981bf"
+      },
+      {
+        "name": "observer-tests.tar",
+        "bytes": 327680,
+        "sha256": "9f09b3a1b823595017a35908223cc604e8f14ebd2619e21fc4f7e75807764a9c"
+      },
+      {
+        "name": "publication-audit.json",
+        "bytes": 15978,
+        "sha256": "83e072da6b293850c4d37adfad41e94410d5d42ce3e1625a744811fcc496b9cf"
+      }
+    ],
+    "checksumVerification": "PASS"
+  },
+  "imageAudit": {
+    "source": "image-content-review before runtime execution",
+    "runtimeSourceFiles": {
+      "apps/web/src/App.tsx": "b1e4158bea99663dba13099021c33dacd54ddba9e8c65ab3b31d60545caca50a",
+      "apps/web/src/components/ConfigurationReviewPanel.tsx": "8ab2edec90398081a1ee2d2655c495ab704cc735f1fb59a27df18bc8743dd969",
+      "apps/web/src/lib/serviceCall.ts": "28cb7acc6548a76b5a3a24345a32ccffcc5a011f8c9a26223653e3e12914773a",
+      "apps/web/src/pages/Service.tsx": "bf2cd8b70732ea0aa11f75f89a0d70926fa6ae0e474891a8f862bdf573193784",
+      "apps/web/vite.config.ts": "85793d7c1900a04720ebcd9483b296f8fea1a2e60954445c76a0dc618ed38a9e",
+      "scripts/evaluate-performance.ts": "ac544b9d4d7f4219e5c5f13695a1082e66267a3af52091a2d97ccf26e9caab01",
+      "scripts/service-worker.ts": "8dff0cdea1487b49e4d49940b12c5c4dbc36cd9387b82ed982b35e28bb67021c",
+      "services/api/drizzle/0000_initial.sql": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+      "services/api/drizzle/0001_finals_authority.sql": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+      "services/api/drizzle/0002_session_scopes.sql": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+      "services/api/drizzle/0003_service_runtime.sql": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+      "services/api/drizzle/0004_worker_recovery.sql": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+      "services/api/drizzle/0005_account_management.sql": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+      "services/api/drizzle/0006_backup_drain.sql": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+      "services/api/drizzle/0007_pbx_lease_locks.sql": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+      "services/api/drizzle/0008_pjsip_contact_qualification.sql": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+      "services/api/drizzle/0009_pjsip_boolean_fields.sql": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+      "services/api/src/finals-server.ts": "9fc4dbb81f9a800f71174eff6369adbe16fc9abce052efc910565fd1a1d0c201",
+      "services/api/src/service-audio.ts": "608d2938aa6a20975146e0a512910faafe963f4cb8ab460629271786b3b527e3",
+      "services/api/drizzle/0010_operation_lookup_indexes.sql": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53",
+      "services/api/src/observation-contract.ts": "6ba6726c51cedec295d05b185bb17a53ac661bf860443a7d09c7b83c030ef976",
+      "scripts/evaluate-service-analysis.ts": "42d485685832a487df04390959b9c1189da3184420dc185619542d6ff24ee27e",
+      "apps/web/src/components/ServiceContactSummary.tsx": "ac7c3480817f35183d18c466ccae639022213ab79d8980076b2bf7d1bf5a1561",
+      "apps/web/src/components/ServiceRecallStatus.tsx": "c282e5187225620fe143825fe96cbcd0328b30462bd5afc1d2e7f780a304996a",
+      "apps/web/src/components/ServiceWorkspace.tsx": "e54272834887e5a9c7541fa2e4d0c832f14460944e96945cd63e48e933dcd33c",
+      "apps/web/src/service.css": "eb6d285e05aded4210058dca2309eca67d7ab22ffa62157d1e02ef8ea742b35b"
+    },
+    "rawFinding": "known public GnuTLS self-test PEM vectors; original raw audit retained",
+    "runtimeConfig": {
+      "imageId": "sha256:c7455c22b627447d571469aa88b02eadb5b74bfa84d6a38850fa4e813aab55dd",
+      "os": "linux",
+      "architecture": "amd64",
+      "user": "1000:1000",
+      "entrypoint": null,
+      "cmd": [
+        "pnpm",
+        "--filter",
+        "@callsign/api",
+        "exec",
+        "tsx",
+        "src/finals-server.ts"
+      ],
+      "source": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e"
+    },
+    "publicAssets": "known publisher value + token/PEM/path checks PASS; not exhaustive absence guarantee"
+  },
+  "cleanup": {
+    "recordedAt": "2026-11-04T14:11:23.658028+00:00",
+    "status": "PASS",
+    "roots": [
+      {
+        "runId": "media-delivery-media-resume-20261104t130918z-9b96de",
+        "containerResidual": 0,
+        "volumeResidual": 0,
+        "privateTrialRootRemoved": true,
+        "failureOriginalPreservedPrivately": true,
+        "evidenceOutsideRootRetained": true
+      },
+      {
+        "runId": "media-delivery-observer-fix-9b96de",
+        "containerResidual": 0,
+        "volumeResidual": 0,
+        "privateTrialRootRemoved": true,
+        "failureOriginalPreservedPrivately": true,
+        "evidenceOutsideRootRetained": true
+      },
+      {
+        "runId": "media-delivery-env-phase-fix-9b96de",
+        "containerResidual": 0,
+        "volumeResidual": 0,
+        "privateTrialRootRemoved": true,
+        "failureOriginalPreservedPrivately": true,
+        "evidenceOutsideRootRetained": true
+      },
+      {
+        "runId": "media-delivery-product-verified-9b96de",
+        "containerResidual": 0,
+        "volumeResidual": 0,
+        "privateTrialRootRemoved": true,
+        "failureOriginalPreservedPrivately": true,
+        "evidenceOutsideRootRetained": true
+      },
+      {
+        "runId": "media-delivery-analysis-diagnostic-9b96de",
+        "containerResidual": 0,
+        "volumeResidual": 0,
+        "privateTrialRootRemoved": true,
+        "failureOriginalPreservedPrivately": true,
+        "evidenceOutsideRootRetained": true
+      }
+    ],
+    "existingResourcesTouched": false
+  },
+  "authenticationCleanup": {
+    "temporaryDockerConfigRemoved": true,
+    "originalProtectedFileUnchanged": true,
+    "globalDockerConfigExists": false,
+    "credentialPrinted": false,
+    "tokenScope": "write:packages (includes package download/read; remote verification follows)"
+  },
+  "vercel": {
+    "checkedAt": "2026-11-04T14:15:07.622258+00:00",
+    "projectId": "prj_WbvNuAzgintDOJlqsgyHMiBlv22O",
+    "status": "BLOCKED_AUTHENTICATION_NOT_CONNECTED",
+    "deploymentPerformed": false,
+    "rows": [
+      {
+        "path": "/service",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1493,
+        "finalUrl": "https://callsign-rouge.vercel.app/service"
+      },
+      {
+        "path": "/official",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1493,
+        "finalUrl": "https://callsign-rouge.vercel.app/official"
+      },
+      {
+        "path": "/demo",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1493,
+        "finalUrl": "https://callsign-rouge.vercel.app/demo"
+      },
+      {
+        "path": "/build-meta.json",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 1493,
+        "finalUrl": "https://callsign-rouge.vercel.app/build-meta.json",
+        "validJson": false,
+        "reason": "HTML SPA response; deployment SHA not established"
+      }
+    ]
+  },
+  "external": {
+    "AWS": "NOT_RUN: region/budget/domain/OIDC/TLS/TURN/persistent placement decisions and protected inputs required",
+    "AWSReader": "BLOCKED: separate read-only protected credential reference absent",
+    "externalAI": "NOT_RUN: provider/model/protected reference, input consent/human-reviewed labels and cost limit absent",
+    "AWSFinalWeb": "NOT_BUILT: generated only with target metadata/trust/PBX certificate"
+  },
+  "oldReleasesPreserved": true,
+  "fullyValidatedRelease": false
+}

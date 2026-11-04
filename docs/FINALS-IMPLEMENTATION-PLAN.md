@@ -2,6 +2,8 @@
 
 ## 2026-11-04 동일 deadline의 통화 검증과 실제 화면 결함 수정
 
+새 부분 검증 사전 Release의 비공개 runtime·공개5파일 원격 수령을 완료했다. [최종 전달 근거](../artifacts/product-candidate-20261104.json)에 소스/manifest/observer/checksum을 연결했다. 이 전달 성공은 아래 미해결 통화·Vercel·복구 범위를 완료로 바꾸지 않는다.
+
 [실행별 근거와 현재 미확인 범위](../artifacts/media-resume-20261104.json)를 기준으로 본다. 이전 swap-out 중단은 host-wide 관측이며 원인을 이번 작업으로 귀속하지 않는다. 이번 launcher는 baseline을 trial root 밖에 선보존하고 full Docker ID·소유 cgroup swap/pressure/events를 기록한다. 의도된 앱 archive 종료와 실제 기반 서비스 종료를 구분하며, 후속 수정은 종료 상태·소유 로그를 정리 전에 보존한다. 이 마지막 로그 보완은 오프라인 검증만 수행했고 과거에 없던 로그를 복원하지 않는다.
 
 | 항목 | 실제 결과 | 남은 조건 |

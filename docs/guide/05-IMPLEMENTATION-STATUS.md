@@ -1,12 +1,10 @@
 # 05. 구현 및 검증 현황
 
-최신 후보의 [후속 실제 준비/기동](../../artifacts/candidate-media-followup-20261104.json)에서 일반 issuer의 health200/auth401과 실제 기반 구성 준비를 확인했다. 통화 사례 시작 전 지속 swap-out 기준으로 중단했으므로 실제 ServiceCall·회수·정상 반복·복원은 이번 소스의 PASS가 아니다. 기존 UI/이전 미디어 증거와 구분한다.
+현재 소스·runtime·공개/observer·Release의 대응과 원격 수령은 [부분 검증 사전 후보](../../artifacts/product-candidate-20261104.json)를 기준으로 본다. 새 runtime은 일반 issuer 기동과 실제 정상 통화2회·양방향 음성·분석 패널·동의 철회·정상 종료를 확인했다. 앞선 분석 중단과 후속 PBX 종료는 원인 미확정이며, 새 이미지의 조회 장애 상호작용·취소/정지·반복은 완료하지 못했다. 이전 이미지의 실제 회수/공동 복구 PASS는 [실행별 기록](../../artifacts/media-resume-20261104.json)에서 별도로 확인한다.
 
-AWS 이전 전 최신 산출물과 차단 조건은 [제출 사전 후보](../../artifacts/submission-candidate-20261104.json)로 관리한다. 소스/UI 검증과 이미지 원격 수령은 완료 범위가 다르며, 새 이미지의 실제 통화·Vercel 최신 배포·독립 AWS reader는 아직 확인하지 않았다.
+현재 화면은 [업무 공간 재설계](../../artifacts/service-redesign-20261104.json)와 [UI 전용 실제 실행](../../artifacts/service-ui-validation-20261104.json)의 역할/권한/오류 경계를 유지한다. 추가로 실제 ServiceCall에서 업무 조회 장애 시 연락 목적이 사라지는 문제를 수정했다. 이 장애 상호작용의 새 이미지 재검증은 아직 미실행이며 SSR 회귀만 통과했다. 새 이미지의 합성 계정 [데스크톱](../../artifacts/media-resume-20261104/recipient-desktop.png)·[390px](../../artifacts/media-resume-20261104/recipient-mobile.png) 통화 화면은 직접 열어 검토했다.
 
-현재 화면은 [업무 공간 재설계 검증](../../artifacts/service-redesign-20261104.json)을 따른다. 실제 인증/API/SQL 기반 역할별 화면과 명시적 component 시각 상태를 구분했다. 현재 공개 Vercel은 과거 화면이며 재설계 Preview의 원격 배포는 확인되지 않았다. 기존 runtime·실제 통화 증거를 새 레이아웃의 배포/음성 성공으로 해석하지 않는다.
-
-후속 실제 업무 UI는 [UI 전용 실제 실행](../../artifacts/service-ui-validation-20261104.json)으로 역할·오류·선택·공동 승인 화면을 확인했다. 소스와 기동한 구성요소·component fixture·실패 후 선택 회귀를 기록했다. 새 runtime은 로컬 제작/무기동 정합성 검사 대상이며, 전체 통화는40GiB 시작 guard 미달로 실행하지 않았다. 아래 이전 후보의 미디어 성공을 후속 UI/이미지에 복사하지 않는다.
+Vercel은 연결 인증이 없어 최신 배포를 수행하지 못했고 공개 build metadata는 HTML을 반환한다. 별도 GHCR reader·AWS 최종 웹/실배포·외부 AI 품질·최신 RESTORE·최종 전체 DB 잔류 감사도 미확인이다. 경량 검사는 이 범위를 대신하지 않는다.
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 

@@ -34,27 +34,12 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 UI 사전 후보: `aws-ui-candidate-20261104t121056z` ([Release](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)). 이미지와 공개 첨부물을 새 저장 경로로 실제 수령하고 checksum·6종 digest 참조를 대조했다. 상태와 영수증은 [후보 근거](../artifacts/submission-candidate-20261104.json)를 확인한다. **이 후보 runtime의 실제 기동·통화는 시작 RAM40GiB 조건 미달로 BLOCKED다. 검증 완료 배포판이 아니다.**
-- [후속 실제 기동](../artifacts/candidate-media-followup-20261104.json)에서 같은 runtime의 일반 issuer startup/auth challenge를 확인했다. 이후 지속 swap-out 중단으로 통화 사례 완료0이다. 발행 시점의 NOT_RUN 기록은 수정하지 않으며 새 기동 결과를 전체 통화 검증으로 확대하지 않는다.
-- runtime source는 `9d6f9dde0cdfe6dd90626666943a525c48755e0c`이며 UI 검증 소스 이후 제품 변경은 없다. 공개 묶음의 문서 source는 inventory의 `sourceCommit`, 이미지 source는 `runtimeProductSourceCommit`으로 구분한다.
-- 이전 `aws-candidate-20261104t085935z`는 이미지 후보만 게시했고 대응 Release는 없다. 기존 [bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)와 [null inventory Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t082954z)는 당시 상태로 보존한다.
-- 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다.
-- 6종 모두 private·linux/amd64다. 새 runtime만 게시하고 변경 없는 인프라5종은 기존 불변 manifest를 재사용했다. 실제 manifest/config/layer를 새 저장 경로로 수령했으며 Docker cache를 증거로 쓰지 않았다. AWS 별도 reader 권한은 아직 확인하지 않았다.
-
-아래 표는 최신 사전 후보의 이미지 게시 근거이며, 과거 Release 수령 결과와 혼합하지 않는다. 실제 기동 참조는 해당 inventory의 소스/검증 범위를 확인한다.
-
-| 이미지 | 실제 registry manifest 참조 |
-|---|---|
-| runtime | `ghcr.io/0u-y/callsign-runtime@sha256:4129b44217c7bccf5d3b46a36af4fc5c7590c0aefb47acd20b414a617834d173` |
-| asterisk | `ghcr.io/0u-y/callsign-asterisk@sha256:2dc2844a4543a18689346f4db860a6aa65b1ffc7131b1d8a406c020574cc657b` |
-| turn | `ghcr.io/0u-y/callsign-turn@sha256:fe27cb685181c1d07e5bfb0d561bde698c10e01f1f1c1c05eacae0e7ce0f76e0` |
-| besu | `ghcr.io/0u-y/callsign-besu@sha256:5a58478e7835de6082d539e0baa940c1e5a0b3a738e9d656bc0ee6b76a3d87ab` |
-| postgres | `ghcr.io/0u-y/callsign-postgres@sha256:1517ffbd8fdf7c4946535604bfa8df5299456b7749e5396c0edcbb345fe76d6a` |
-| nginx | `ghcr.io/0u-y/callsign-nginx@sha256:51d36c4e1d8aaaa63e40a16d69274460cc806ec0ee433cd53076bafd97c9b8ee` |
-
-[이미지 게시·원격 수령 증거](../artifacts/ghcr-candidate-20261104.json)에서 실제 manifest/config/layer hash·크기·아키텍처·익명 거절을 확인한다. 새 빈 저장 경로로 HTTPS bytes를 수령했고 Docker cache를 수령 증거로 사용하지 않았다. 게시 PAT와 별도의 임시 인증 문맥에서 repository별 pull scope bearer를 사용했지만, **독립 AWS reader 자격 검증은 아직 아니다**. writer PAT를 AWS에 복사하지 않는다.
-
-runtime 제품 source는 `6e3cd238e95457406134e8ef37730fd6d251209a`다. 이후 후보의 차이는 문서·증거뿐이며 observer 파일 내용과 runtime COPY 입력을 대조한다. 로컬 config ID·registry manifest digest·archive hash는 다르다. build/layer audit의 원본 GnuTLS PEM 경고와 공개 self-test hash 판정은 [후보 감사](../artifacts/product-runtime-validation-20261104.json)에 보존한다.
+- 현재 부분 검증 사전 후보: [aws-product-candidate-20261104t135448z](https://github.com/0u-Y/CallSign/releases/tag/aws-product-candidate-20261104t135448z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
+- 새 runtime은 일반 issuer 기동과 정상 통화2회를 확인했지만, 앞선 분석 중단과 후속 PBX 종료 원인이 미확정이다. 새 이미지의 조회 장애·취소·정지·반복은 미완료다. **검증 완료 배포판이 아니며 AWS 이전 전 전체 완료도 아니다.** [실행별 근거](../artifacts/media-resume-20261104.json)를 확인한다.
+- runtime source와 공개/observer source는 inventory에서 구분하며 제품 입력 hash 일치를 확인한다. 일반 issuer 명령과 명시적 시험 분석 fixture entrypoint를 분리한다. 실제 AWS web은 여기에 포함하지 않는다.
+- 새 runtime만 비공개 GHCR에 게시·새 저장 경로로 원격 수령했다. 변경 없는 인프라5종은 기존 불변 digest/수령 영수증을 재사용했다. 게시용 PAT의 수령 성공은 독립 AWS reader 검증이 아니며 writer를 AWS에 복사하지 않는다.
+- 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다. checksum PASS와 실제 네트워크 수령은 별도 기록한다.
+- 기존 [UI 후보](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)·[bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)·원본 실패는 변경하지 않았다. 당시 이미지 게시/기동/미실행 판정은 해당 기록에 남긴다.
 
 **bootstrap 전달과 AWS 배포 완료는 다르다.** 최종 web은 실제 AWS 계약/trust/PBX 인증서 뒤에 runtime+nginx로 생성한다. 실제 AWS·외부 IdP/TLS/NAT/TURN·AI는 미검증이다.
 
@@ -65,7 +50,7 @@ runtime 제품 source는 `6e3cd238e95457406134e8ef37730fd6d251209a`다. 이후 �
 ```bash
 set +x
 umask 077
-TAG=aws-ui-candidate-20261104t121056z
+TAG=aws-product-candidate-20261104t135448z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
