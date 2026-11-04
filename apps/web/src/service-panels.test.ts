@@ -26,3 +26,12 @@ it('keeps selected task context distinct from call verification and handles unkn
  const unknown=render({intent:{...intent,status:'INTERNAL_STATE'}});expect(unknown).toContain('새로 조회');expect(unknown).not.toContain('INTERNAL_STATE');expect(unknown).not.toContain('종료된 업무');
  expect(render({intent:undefined,attempt:undefined})).toContain('선택 전 · 연결되지 않음');
 });
+
+
+it('separates official authentication, permission and lookup failures without exposing internal errors',async()=>{
+ const {officialLookupError}=await import('./lib/officialError.js');const {ApiError}=await import('./lib/api.js');
+ for(const [status,text] of [[401,'다시 로그인'],[403,'권한이 없습니다'],[409,'상태가 변경'],[429,'요청 한도'],[503,'이전 목록은 최신 결과가 아닙니다']] as const){
+  const message=officialLookupError(new ApiError(status,'PRIVATE_INTERNAL_CODE','private diagnostic'));expect(message).toContain(text);expect(message).not.toContain('PRIVATE_INTERNAL_CODE');
+ }
+ expect(officialLookupError(new Error('private diagnostic'))).not.toContain('private diagnostic');
+});
