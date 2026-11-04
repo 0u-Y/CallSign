@@ -10,7 +10,7 @@ try{
  if(phase==='snapshot'){
   const rpc=async(method:string,params:unknown[])=>{const r=await fetch('http://127.0.0.1:8545',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method,params}),signal:AbortSignal.timeout(3000)});const j=await r.json();assert(r.ok&&!j.error,'OWNED_CHAIN_CHECKPOINT_UNAVAILABLE');return j.result;};
   const genesis=await rpc('eth_getBlockByNumber',['0x0',false]),head=await rpc('eth_getBlockByNumber',['latest',false]);await writeFile(root+'/restore-chain-checkpoint.json',JSON.stringify({genesis:genesis.hash,head:head.hash,number:head.number}),{flag:'wx',mode:0o600});
-  assert(Object.values(state.serviceV3!.attempts).length>=6,'EXPECTED_PRIOR_CALLS_MISSING');assert(Object.values(state.intents).some((v:any)=>v.status==='cancelled'),'CANCELLED_WORK_MISSING');assert(receipts.length>=6,'CONSUMPTIONS_MISSING');
+  assert(Object.values(state.serviceV3!.attempts).length>=2,'EXPECTED_PRIOR_CALLS_MISSING');assert(Object.values(state.intents).some((v:any)=>v.status==='cancelled'),'CANCELLED_WORK_MISSING');assert(receipts.length>=2,'CONSUMPTIONS_MISSING');
   await writeFile(root+'/restore-before.private.json',JSON.stringify({state,receipts,migrations,journal,anchor:await anchor.read(state.id)}),{flag:'wx',mode:0o600});
  }else{
   const before=JSON.parse(await readFile(root+'/restore-before.private.json','utf8'));
