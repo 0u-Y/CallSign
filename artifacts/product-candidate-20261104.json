@@ -436,5 +436,77 @@
     "independentReaderVerified": false,
     "integrationEvidence": "artifacts/restore-audit-20261105.json",
     "fullRestore": "BLOCKED; not a restore-validated release"
+  },
+  "vercelRedeployment": {
+    "checkedAt": "2026-11-04T16:31:48.640492+00:00",
+    "rows": [
+      {
+        "path": "/",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 645
+      },
+      {
+        "path": "/service",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 645
+      },
+      {
+        "path": "/official",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 645
+      },
+      {
+        "path": "/demo",
+        "status": 200,
+        "contentType": "text/html; charset=utf-8",
+        "bytes": 645
+      },
+      {
+        "path": "/build-meta.json",
+        "status": 200,
+        "contentType": "application/json; charset=utf-8",
+        "bytes": 96,
+        "metadata": {
+          "commit": "77b559e6ec1a255acd52a6e4e7927e9757d50668",
+          "target": "production",
+          "publicPreview": true
+        }
+      },
+      {
+        "path": "/assets/index-CvdjPleV.css",
+        "status": 200,
+        "contentType": "text/css; charset=utf-8",
+        "bytes": 416986
+      },
+      {
+        "path": "/assets/index-DkM9Ym_I.js",
+        "status": 200,
+        "contentType": "application/javascript; charset=utf-8",
+        "bytes": 662188
+      }
+    ],
+    "projectId": "prj_WbvNuAzgintDOJlqsgyHMiBlv22O",
+    "deploymentId": "dpl_B6drACoamrk5TgSUYZFMbgM8P56o",
+    "source": "77b559e6ec1a255acd52a6e4e7927e9757d50668",
+    "url": "https://callsign-rouge.vercel.app",
+    "status": "READY_PUBLIC_HTTP_VERIFIED",
+    "previewDeploymentId": "dpl_D6z5q9GSsvPvq2QAABmp438vPsKs",
+    "previewLimit": "Build READY; direct HTTP inspection redirected to Vercel authentication, including a temporary automation bypass attempt. Temporary bypasses were revoked; production public routes were verified separately.",
+    "configurationCorrection": {
+      "oldRepositoryId": 1369518385,
+      "currentRepositoryId": 1435074983,
+      "productionBranch": "main",
+      "framework": "vite",
+      "nodeVersion": "22.x",
+      "rootDirectory": null,
+      "outputDirectory": "apps/web/dist"
+    },
+    "browserInteraction": "NOT_RUN in this redeployment; HTTP routes, build metadata and referenced entry assets checked.",
+    "backend": "API-disconnected public frontend; not authenticated calling service or AWS deployment.",
+    "runtimeChanged": false,
+    "branches": "Four remote work branches are ancestors of main with zero unique commits; preserved."
   }
 }

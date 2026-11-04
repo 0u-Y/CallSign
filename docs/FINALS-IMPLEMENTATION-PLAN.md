@@ -1,5 +1,11 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 Vercel 공개 frontend 재배포
+
+보호 인증 참조로 기존 프로젝트의 오래된 Git repository ID를 현재 저장소 ID로 다시 연결하고 Production branch `main`을 유지했다. Vite/Node22·저장소 루트 build·`apps/web/dist` 설정으로 정확한 소스의 Preview와 Production build가 READY다. 공개 `/service`·`/official`·`/demo`·정적 자원과 JSON build metadata의 소스 일치를 HTTP로 확인했다. [배포 근거](../artifacts/product-candidate-20261104.json)의 `vercelRedeployment`를 기준으로 보며 이전 인증 차단 기록은 당시 결과로 보존한다. 이번에는 브라우저 상호작용·실제 API/통화를 재실행하지 않았다. 공개 frontend의 API 미연결 제한과 기존 runtime은 유지한다.
+
+남은 원격 작업 브랜치4개는 모두 main의 조상이며 고유 커밋0개다. 기능/검증/Preview 이력으로 보존했고 삭제하지 않았다. 신규 작업은 기존 지침대로 main commit/push를 사용한다.
+
 ## 2026-11-05 DB 감사·반복·전체 복원 시도
 
 전달 archive 재검토에서 RUNBOOK의 이전 TAG, LOCAL-VALIDATION 및 새 평가 CLI의 포함 누락을 발견했다. allowlist/명령을 수정하고 후속 `aws-recovery-tools-20261104t154909z`의 source를 고정해 새 파일로 봉인한다. 이전 Release/원본 영수증은 변경하지 않는다. 새 source의 발행 전 상태와 발행 후 원격 영수증을 구분한다.
@@ -12,7 +18,7 @@
 
 두 환경 모두 소유 컨테이너21개·volume2개와 보호 trial 경로를 정리했다. 두 번째 baseline의 기존 container/network ID는 보존됐지만 interface/route 차이는 원인 미확정이다. 원본 비교와 최초 중단 신호를 보존했고 host 설정 변경 명령은 실행하지 않았다. 이를 전체 설정 일치 PASS로 바꾸지 않는다.
 
-Vercel 연결·별도 reader·실제 AI 자격/입력/비용은 아직 없다. AI 평가 도구의 숫자 예산 선검사와 dry-run을 보완했고 실제 호출0이다. 이는 제공자 청구 상한 보장이 아니며 실제 모델 가격/지출 제한 확인이 필요하다. AWS 실행은 사용자 후속 지시에 따라 제외했다. 제품 서비스 입력은 바뀌지 않아 runtime을 재제작하지 않으며 새 observer/운영 도구와 기존 이미지의 차이를 전달 기록에 명시한다.
+별도 reader·실제 AI 자격/입력/비용은 아직 없다. Vercel은 위 후속 재배포 결과로 갱신됐다. AI 평가 도구의 숫자 예산 선검사와 dry-run을 보완했고 실제 호출0이다. 이는 제공자 청구 상한 보장이 아니며 실제 모델 가격/지출 제한 확인이 필요하다. AWS 실행은 사용자 후속 지시에 따라 제외했다. 제품 서비스 입력은 바뀌지 않아 runtime을 재제작하지 않으며 새 observer/운영 도구와 기존 이미지의 차이를 전달 기록에 명시한다.
 
 
 ## 2026-11-04 후속 승인 batch: 최신 이미지 선택 경로 통과
