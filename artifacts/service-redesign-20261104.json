@@ -1028,5 +1028,12 @@
     "priorAudit": "artifacts/document-review-20261104.json",
     "newManagedMarkdown": "DESIGN.md",
     "action": "new decision record reviewed; historical42-file audit unchanged"
+  },
+  "mediaFollowup": {
+    "status": "BLOCKED_START_CONDITION",
+    "requiredAvailableGiB": 40,
+    "observedAvailableGiB": 39.326,
+    "observationRecordedAt": "2026-11-04T11:52:35.257188+00:00",
+    "action": "No media services started; no guard change or repeated polling"
   }
 }
