@@ -171,5 +171,93 @@
     "independent AWS GHCR reader",
     "real AWS/IdP/AI inputs and permission"
   ],
-  "evidencePreservationLimitation": "Original before-interface/route/container snapshots were not copied before owned private-root removal. Published comparison booleans are observations, not a normalized host configuration audit."
+  "evidencePreservationLimitation": "Original before-interface/route/container snapshots were not copied before owned private-root removal. Published comparison booleans are observations, not a normalized host configuration audit.",
+  "laterAnalysis": {
+    "recordedAt": "2026-11-04T13:10:17.640339+00:00",
+    "source": "original preserved full-resources.jsonl, ownership and observer source; no retrospective cgroup readings",
+    "stageAtStop": "work-cancel preparation; web build completed, no product case completion",
+    "observedRoleMemoryLimitsGiB": {
+      "preparation-tool": [
+        0.5,
+        1.0
+      ],
+      "net": [
+        0.03125
+      ],
+      "anchor-database": [
+        0.5
+      ],
+      "database": [
+        0.5
+      ],
+      "besu4": [
+        3.0
+      ],
+      "besu3": [
+        3.0
+      ],
+      "besu2": [
+        3.0
+      ],
+      "besu1": [
+        3.0
+      ],
+      "anchor": [
+        0.25
+      ],
+      "controller": [
+        2.0
+      ],
+      "pbx": [
+        0.5
+      ],
+      "turn": [
+        0.5
+      ],
+      "witness4": [
+        0.5
+      ],
+      "witness3": [
+        0.5
+      ],
+      "witness2": [
+        0.5
+      ],
+      "witness1": [
+        0.5
+      ],
+      "final-image-issuer": [
+        0.5
+      ],
+      "final-image-worker": [
+        0.5
+      ],
+      "final-image-platform": [
+        0.5
+      ],
+      "final-image-sender": [
+        0.5
+      ],
+      "web-builder": [
+        2.0
+      ],
+      "final-image-https": [
+        0.5
+      ],
+      "final-image-web": [
+        0.5
+      ]
+    },
+    "maximumSimultaneousRecordedRunningLimitGiB": 21.28125,
+    "duplicateContainerIdsInAnySample": false,
+    "configuredBesu": {
+      "JVMHeap": "2GiB",
+      "containerMemoryLimit": "3GiB per node",
+      "memorySwap": "launch source sets equal to memory; old per-container swap accounting not observed"
+    },
+    "oldCgroupSwapAndPressure": "UNKNOWN; only memory.current was preserved then",
+    "overlap": "controller/API/Besu/Witness/DB/Anchor/PBX/TURN plus the explicitly allowed 2GiB web builder; no runtime build",
+    "accounting": "host controller/client RSS plus owned cgroup memory.current, web builder included once. Container cache/tmpfs is inside memory.current; daemon overhead and global host page cache not separately attributed. Sampled extrema are not peaks.",
+    "conclusion": "No attribution of host swap-out to CallSign or other jobs is established. No evidence justifies changing the40GiB/pressure policy; fresh owned cgroup observations will be separate evidence."
+  }
 }

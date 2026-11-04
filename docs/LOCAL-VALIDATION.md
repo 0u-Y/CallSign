@@ -104,7 +104,7 @@ Asterisk/PJSIP/WSS/ARI/SRTP/ODBC와 PostgreSQL Unicode driver를 실제 image에
 
 한도 합은 실제 사용량/메모리 예약/최소 사양이 아니다. 각 `/tmp` tmpfs 한도(bootstrap256MiB, 앱64MiB)는 사용한 만큼 컨테이너 메모리에 반영되므로 별도 전량을 한도 합에 더하지 않는다. PostgreSQL shmem·page cache 역시 실제 cgroup 사용을 관측해야 한다. Docker daemon과 호스트 측 추가 비용이 모두 위 수치 안에서 제한된다고 주장하지 않는다. 과거 전달 리허설의 최소 available37.53GiB, Besu의 약433~445MiB 종료 시점 표본은 다른 소스/이미지의 역사 관측이며 현재 peak·필수 RAM 근거가 아니다. [원본](../artifacts/delivery-only-rehearsal-20261102.json)은 보존한다.
 
-**현재 실행 보류 사유:** 이전 승인에서 빌드와 서비스의 동시 실행을 금지했지만, 이 driver는 trust 준비와 API 기동 후 웹을 build한다.40GiB 충족만으로 그 실행 순서를 승인된 것으로 간주하지 않는다. 기존 후보를 바꾸지 않는 최소 변경안은 이2GiB/90초 웹 생성만 동시 실행 예외로 승인하고, 컨테이너 최대22.28125GiB + 호스트 시험 프로세스 관측 예산1GiB를 올린 **전체 관측 예산24GiB**, 기존 작업용16GiB 여유·40GiB 시작 guard를 함께 유지하는 것이다. **이 제안은 미승인·미적용**이며 Docker daemon 등의 공유 비용은 호스트 available/PSI/OOM 관측으로 별도 감시해야 한다. 승인 전에는 아래 apply/proof를 실행하지 않는다. 예산이나 guard를 자동으로 높이거나 낮추지 않는다.
+**현재 실행 정책:** 사용자는 이번 소유 batch에 한해 trust 준비/API 기동 후 최종 웹 생성만 서비스와 동시 실행하도록 승인했다. 웹 builder는2GiB·CPU1·90초, 전체 관측24GiB(호스트 시험 프로세스1GiB 포함), 시작 available40GiB·실행 여유16GiB, 정리 포함90분/마지막10분 신규 장기 단계 금지를 유지한다. 이는 다음 실행의 상시 허가나 검증된 최소 사양이 아니다. Docker daemon 등 공유 비용은 host available/PSI/OOM으로 별도 관측하며 소유 작업 사용량으로 직접 귀속하지 않는다. 압박·swap-out·OOM·관측 오류 중단 후 자동 재기동하지 않는다.
 
 동일 구성을 별도 장비에서 시험한다면 linux/amd64, Docker/Python3.12+/UID1000, 위 설치 Chromium/라이브러리, 시작 available40GiB와 충분한 CPU 여유가 필요하다. 관측한 호스트는24논리 CPU이며 전용 장비에24 vCPU·64GiB RAM·빈 디스크30GiB 이상을 **준비 제안**으로 삼을 수 있으나 실측 최소 사양은 아니다. 전달 archive2.32GB와 unpacked image·새 chain/DB·로그/웹 build 공간을 확보하고 증가량을 제한한다. 새 identity/키를 만들고 기존 체인·DB·Anchor를 섞지 않는다. 내부 none namespace·loopback와 설치 controller만 사용하므로 개발 서버 IP/인증/키는 필요 없다. 실제 AWS 외부 TLS/NAT 검증은 별도다.
 

@@ -1,0 +1,1304 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-04T14:10:22.749463+00:00",
+  "policy": {
+    "name": "integration-pressure-v1",
+    "startGiB": 40,
+    "reserveGiB": 16,
+    "hostGiB": 1,
+    "totalGiB": 24,
+    "webBuildGiB": 2,
+    "webBuildCpu": 1,
+    "webBuildSeconds": 90,
+    "deadlineSeconds": 5400,
+    "cleanupReserveSeconds": 600,
+    "noAutomaticResourceRetry": true,
+    "allCorrectionsSharedOriginalDeadline": true
+  },
+  "runs": [
+    {
+      "id": "media-resume-20261104T130918Z-9b96de",
+      "runtimeSource": "9d6f9dde0cdfe6dd90626666943a525c48755e0c",
+      "observerSource": "d5fdcd4c925edaa851df38fb528e8bb0ace0c8d0",
+      "status": "BLOCKED",
+      "reason": "OWNED_SERVICE_EXIT",
+      "resourceStop": "OWNED_SERVICE_EXIT",
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 40.7076148360502
+        },
+        {
+          "label": "normal-smoke-1",
+          "exitCode": 0,
+          "seconds": 56.920681874034926
+        },
+        {
+          "label": "archive-normal-smoke-1",
+          "exitCode": 0,
+          "seconds": 5.178166127996519
+        },
+        {
+          "label": "normal-smoke-2",
+          "exitCode": 0,
+          "seconds": 46.547025262145326
+        }
+      ],
+      "trialObservations": [
+        {
+          "path": "call-trial-normal-end.json",
+          "sha256": "e10f40bd134ebaa27bfedd3574cbe09b5003b37dba5ab483d1bb36776949a10c",
+          "outcome": "success",
+          "finishedMs": 25014.381459999997,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "authorization-request",
+              "atMs": 6019.003749999998
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "authorization-response",
+              "atMs": 7053.813015999998
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "connect-action",
+              "atMs": 9928.885745999998
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "verification-visible",
+              "atMs": 16263.672008
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "remote-decoded-both",
+              "atMs": 18277.028457
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "ai-input",
+              "atMs": 19171.669425
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "transcript",
+              "atMs": 19184.11718
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "analysis",
+              "atMs": 19543.880463999994
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "warning-visible",
+              "atMs": 19567.639417
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "termination-request",
+              "atMs": 20526.375915999997
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "ui-recalled",
+              "atMs": 20801.344571
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "audio-reclaimed",
+              "atMs": 24829.303694999995
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "pbx-absent",
+              "atMs": 24840.550671999998
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "new-request-rejected",
+              "atMs": 24861.973089
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f",
+              "phase": "resources-reclaimed",
+              "atMs": 24863.041368
+            }
+          ],
+          "observer": "runtime-media-29ffd516-1285-4a4a-8067-22bcdf92862f"
+        },
+        {
+          "path": "phase-normal-smoke-1/call-trial-normal-end.json",
+          "sha256": "46307a278738afafcb99332b2a907338f0f0dd5a3d1b7206e28cec40b1c64ccc",
+          "outcome": "success",
+          "finishedMs": 26419.621176,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "authorization-request",
+              "atMs": 7516.946211000002
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "authorization-response",
+              "atMs": 8541.420241
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "connect-action",
+              "atMs": 11275.355040000002
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "verification-visible",
+              "atMs": 17611.441432
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "remote-decoded-both",
+              "atMs": 19626.381390000002
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "ai-input",
+              "atMs": 20538.438414000004
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "transcript",
+              "atMs": 20554.552267
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "analysis",
+              "atMs": 20907.453736000003
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "warning-visible",
+              "atMs": 21002.353678
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "termination-request",
+              "atMs": 21908.288276
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "ui-recalled",
+              "atMs": 22185.013555999998
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "audio-reclaimed",
+              "atMs": 26213.455358
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "pbx-absent",
+              "atMs": 26225.244093
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "new-request-rejected",
+              "atMs": 26245.079881999998
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5",
+              "phase": "resources-reclaimed",
+              "atMs": 26246.362436000003
+            }
+          ],
+          "observer": "runtime-media-9e9db0bc-e566-436b-87c5-a9b2484d05e5"
+        }
+      ],
+      "resources": {
+        "samples": 43,
+        "startAvailableGiB": 44.114986419677734,
+        "minAvailableGiB": 39.7457275390625,
+        "maxSampledHostGiB": 0.09656143188476562,
+        "maxSampledOwnedGiB": 4.715721130371094,
+        "scope": "sampled maxima, not peak/minimum specifications; host is observer and launcher descendants, containers are cgroup current including cache/tmpfs; unrelated host work not attributed"
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 20,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    {
+      "id": "observer-fix-9b96de",
+      "runtimeSource": "9d6f9dde0cdfe6dd90626666943a525c48755e0c",
+      "observerSource": "ae9cb57afeb342725581a1e9d989f4e4e56c1172",
+      "status": "FAIL",
+      "reason": "STEP_FAILED:normal-repeat-2",
+      "resourceStop": null,
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 40.704037287971005
+        },
+        {
+          "label": "normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 57.085861168801785
+        },
+        {
+          "label": "archive-normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 5.221021851990372
+        },
+        {
+          "label": "normal-repeat-2",
+          "exitCode": 1,
+          "seconds": 5.105401003034785
+        }
+      ],
+      "trialObservations": [
+        {
+          "path": "phase-normal-repeat-1/call-trial-normal-end.json",
+          "sha256": "e4ae76dcbd3bcd78410c73886989a9a64e1afbdac7076b488934686f430b840e",
+          "outcome": "success",
+          "finishedMs": 25106.485526,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "authorization-request",
+              "atMs": 5813.5121649999965
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "authorization-response",
+              "atMs": 6843.200186999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "connect-action",
+              "atMs": 9616.453274999996
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "verification-visible",
+              "atMs": 15941.026352999997
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "remote-decoded-both",
+              "atMs": 17955.196329000002
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "ai-input",
+              "atMs": 18852.646174999998
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "transcript",
+              "atMs": 18868.798023
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "analysis",
+              "atMs": 19223.776992999996
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "warning-visible",
+              "atMs": 19250.679856
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "termination-request",
+              "atMs": 20557.98787
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "ui-recalled",
+              "atMs": 20830.057805
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "audio-reclaimed",
+              "atMs": 24858.663561999998
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "pbx-absent",
+              "atMs": 24869.766979999997
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "new-request-rejected",
+              "atMs": 24887.560375999998
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1",
+              "phase": "resources-reclaimed",
+              "atMs": 24888.535985
+            }
+          ],
+          "observer": "runtime-media-81b479dc-6ac6-4e74-aaf1-3fd272a76fe1"
+        }
+      ],
+      "resources": {
+        "samples": 34,
+        "startAvailableGiB": 44.15614700317383,
+        "minAvailableGiB": 39.71942901611328,
+        "maxSampledHostGiB": 0.09669113159179688,
+        "maxSampledOwnedGiB": 4.584033966064453,
+        "scope": "sampled maxima, not peak/minimum specifications; host is observer and launcher descendants, containers are cgroup current including cache/tmpfs; unrelated host work not attributed"
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 15,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    {
+      "id": "env-phase-fix-9b96de",
+      "runtimeSource": "9d6f9dde0cdfe6dd90626666943a525c48755e0c",
+      "observerSource": "438239f23877cedb1887b2fd8acfe0f28aae71fa",
+      "status": "PASS",
+      "reason": null,
+      "resourceStop": null,
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 35.6149607419502
+        },
+        {
+          "label": "normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 56.943231501150876
+        },
+        {
+          "label": "archive-normal-repeat-1",
+          "exitCode": 0,
+          "seconds": 5.185934584122151
+        },
+        {
+          "label": "normal-repeat-2",
+          "exitCode": 0,
+          "seconds": 46.61802895599976
+        },
+        {
+          "label": "archive-normal-repeat-2",
+          "exitCode": 0,
+          "seconds": 5.19008295214735
+        },
+        {
+          "label": "work-cancel",
+          "exitCode": 0,
+          "seconds": 46.616972429910675
+        },
+        {
+          "label": "archive-work-cancel",
+          "exitCode": 0,
+          "seconds": 5.19054836104624
+        },
+        {
+          "label": "emergency-stop",
+          "exitCode": 0,
+          "seconds": 51.78050755895674
+        }
+      ],
+      "trialObservations": [
+        {
+          "path": "call-trial-emergency-stop.json",
+          "sha256": "3facb0649a40f6a57de41a6b240bfc7eef6ba3d44db48524023fc16ee5a357de",
+          "outcome": "success",
+          "finishedMs": 36097.510451,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "authorization-request",
+              "atMs": 6501.829080000001
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "authorization-response",
+              "atMs": 6809.635254999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "connect-action",
+              "atMs": 9629.514025000002
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "verification-visible",
+              "atMs": 16465.048412000004
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "remote-decoded-both",
+              "atMs": 18479.150663
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "ai-input",
+              "atMs": 19371.071083999996
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "transcript",
+              "atMs": 19386.299308
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "analysis",
+              "atMs": 19741.584950999997
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "warning-visible",
+              "atMs": 19764.737383
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "revocation-request",
+              "atMs": 22144.537765
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "ui-recalled",
+              "atMs": 22428.804363999996
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "audio-reclaimed",
+              "atMs": 26455.001172999997
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "pbx-absent",
+              "atMs": 26465.132099000002
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "server-applied",
+              "atMs": 30726.443318999998
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "chain-confirmed",
+              "atMs": 30732.521206999998
+            },
+            {
+              "id": "15",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "new-request-rejected",
+              "atMs": 30761.656235000002
+            },
+            {
+              "id": "16",
+              "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138",
+              "phase": "resources-reclaimed",
+              "atMs": 30762.776331
+            }
+          ],
+          "observer": "runtime-media-d7a06c65-9e2b-4a66-a566-9220ea748138"
+        },
+        {
+          "path": "phase-normal-repeat-1/call-trial-normal-end.json",
+          "sha256": "38fcd724a968e87c6940a8cd8b6b15e3afc07039c576ece3fb354ce4e7c55859",
+          "outcome": "success",
+          "finishedMs": 28408.180393,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "authorization-request",
+              "atMs": 7817.396649999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "authorization-response",
+              "atMs": 8882.847290000002
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "connect-action",
+              "atMs": 12325.209210000005
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "verification-visible",
+              "atMs": 18659.276517000002
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "remote-decoded-both",
+              "atMs": 20676.379265
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "ai-input",
+              "atMs": 21067.490875
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "transcript",
+              "atMs": 21082.230245000002
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "analysis",
+              "atMs": 21438.812326000003
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "warning-visible",
+              "atMs": 21444.598197000003
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "termination-request",
+              "atMs": 23854.792777
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "ui-recalled",
+              "atMs": 24149.509638
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "audio-reclaimed",
+              "atMs": 28177.245918000004
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "pbx-absent",
+              "atMs": 28189.000839000004
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "new-request-rejected",
+              "atMs": 28209.67885
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387",
+              "phase": "resources-reclaimed",
+              "atMs": 28210.768247000004
+            }
+          ],
+          "observer": "runtime-media-c152452b-54db-4501-9aaa-ec11cea0d387"
+        },
+        {
+          "path": "phase-normal-repeat-2/call-trial-normal-end.json",
+          "sha256": "cdfeae1dc41a4504a4673015e58706285e72a661549857d8676a843998fd31c2",
+          "outcome": "success",
+          "finishedMs": 27013.488671000003,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "authorization-request",
+              "atMs": 6332.782573
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "authorization-response",
+              "atMs": 6520.252650999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "connect-action",
+              "atMs": 9419.694344
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "verification-visible",
+              "atMs": 15742.773809999999
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "remote-decoded-both",
+              "atMs": 17759.326443
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "ai-input",
+              "atMs": 18654.276726
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "transcript",
+              "atMs": 18670.900208000003
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "analysis",
+              "atMs": 19025.07033
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "warning-visible",
+              "atMs": 19048.659963000002
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "termination-request",
+              "atMs": 22458.455940999997
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "ui-recalled",
+              "atMs": 22751.328279999998
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "audio-reclaimed",
+              "atMs": 26777.892688000004
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "pbx-absent",
+              "atMs": 26789.026844999997
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "new-request-rejected",
+              "atMs": 26811.599219
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15",
+              "phase": "resources-reclaimed",
+              "atMs": 26812.523470999997
+            }
+          ],
+          "observer": "runtime-media-c7b98c22-df09-4d64-93dd-3cd0655c3b15"
+        },
+        {
+          "path": "phase-work-cancel/call-trial-work-cancel.json",
+          "sha256": "0738000353041db63d02d2b370427ca883a7caa62cd0f57fbcbd24f95d09b94b",
+          "outcome": "success",
+          "finishedMs": 27113.096535000004,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "authorization-request",
+              "atMs": 6714.531315999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "authorization-response",
+              "atMs": 6921.7331920000015
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "connect-action",
+              "atMs": 9818.117402000002
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "verification-visible",
+              "atMs": 16642.197005
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "remote-decoded-both",
+              "atMs": 18656.986176
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "ai-input",
+              "atMs": 19550.143194000004
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "transcript",
+              "atMs": 19565.183769000003
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "analysis",
+              "atMs": 19923.133134000003
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "warning-visible",
+              "atMs": 19945.124201
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "revocation-request",
+              "atMs": 22556.17258
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "ui-recalled",
+              "atMs": 22846.043421000002
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "audio-reclaimed",
+              "atMs": 26872.923965
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "pbx-absent",
+              "atMs": 26884.983257
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "new-request-rejected",
+              "atMs": 26909.988591
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d",
+              "phase": "resources-reclaimed",
+              "atMs": 26911.092646000005
+            }
+          ],
+          "observer": "runtime-media-0a76d565-1b55-45fe-b9bb-fd4cc499526d"
+        }
+      ],
+      "resources": {
+        "samples": 62,
+        "startAvailableGiB": 44.118896484375,
+        "minAvailableGiB": 39.497257232666016,
+        "maxSampledHostGiB": 0.09743881225585938,
+        "maxSampledOwnedGiB": 4.582588195800781,
+        "scope": "sampled maxima, not peak/minimum specifications; host is observer and launcher descendants, containers are cgroup current including cache/tmpfs; unrelated host work not attributed"
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 21,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    {
+      "id": "product-verified-9b96de",
+      "runtimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+      "observerSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+      "status": "FAIL",
+      "reason": "STEP_FAILED:normal-smoke-1",
+      "resourceStop": null,
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 35.63128006597981
+        },
+        {
+          "label": "normal-smoke-1",
+          "exitCode": 1,
+          "seconds": 56.962675461079925
+        }
+      ],
+      "trialObservations": [
+        {
+          "path": "call-trial-normal-end.json",
+          "sha256": "11639dfed4136c9600edb68dbec049051698141d4409f3a31cccdcd9ca35789a",
+          "outcome": "failure",
+          "finishedMs": 23899.048937999996,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "authorization-request",
+              "atMs": 5803.071567999996
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "authorization-response",
+              "atMs": 5960.320201999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "connect-action",
+              "atMs": 8819.513492999995
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "verification-visible",
+              "atMs": 15152.450051999997
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "remote-decoded-both",
+              "atMs": 17167.024187
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "ai-input",
+              "atMs": 18065.750109999997
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "transcript",
+              "atMs": 18077.487801
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2",
+              "phase": "analysis",
+              "atMs": 18433.727733999996
+            }
+          ],
+          "observer": "runtime-media-87fa8ff3-c47c-4d9e-86eb-b7a9294667b2"
+        }
+      ],
+      "resources": {
+        "samples": 31,
+        "startAvailableGiB": 43.34516525268555,
+        "minAvailableGiB": 39.89031982421875,
+        "maxSampledHostGiB": 0.0972137451171875,
+        "maxSampledOwnedGiB": 4.4933013916015625,
+        "scope": "sampled maxima, not peak/minimum specifications; host is observer and launcher descendants, containers are cgroup current including cache/tmpfs; unrelated host work not attributed"
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 21,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    },
+    {
+      "id": "analysis-diagnostic-9b96de",
+      "runtimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+      "observerSource": "d9f24d9fef80013b43f8ab9975f5576d8f27571b",
+      "status": "BLOCKED",
+      "reason": "OWNED_SERVICE_EXIT",
+      "resourceStop": "OWNED_SERVICE_EXIT",
+      "steps": [
+        {
+          "label": "bootstrap",
+          "exitCode": 0,
+          "seconds": 40.75961353396997
+        },
+        {
+          "label": "normal-smoke-1",
+          "exitCode": 0,
+          "seconds": 56.89428013097495
+        },
+        {
+          "label": "archive-normal-smoke-1",
+          "exitCode": 0,
+          "seconds": 5.192665888927877
+        },
+        {
+          "label": "normal-smoke-2",
+          "exitCode": 0,
+          "seconds": 46.5314221389126
+        },
+        {
+          "label": "archive-normal-smoke-2",
+          "exitCode": 0,
+          "seconds": 5.166212257929146
+        }
+      ],
+      "trialObservations": [
+        {
+          "path": "phase-normal-smoke-1/call-trial-normal-end.json",
+          "sha256": "e70541a41343dde810c5f69e84a471a70acf7158d735bcc026d529d88a52d78d",
+          "outcome": "success",
+          "finishedMs": 27604.624948000004,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "authorization-request",
+              "atMs": 7275.405676000002
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "authorization-response",
+              "atMs": 8310.989090000003
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "connect-action",
+              "atMs": 11002.398468
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "verification-visible",
+              "atMs": 17334.426844
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "remote-decoded-both",
+              "atMs": 19352.062526
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "ai-input",
+              "atMs": 20261.446942000002
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "transcript",
+              "atMs": 20271.191156
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "analysis",
+              "atMs": 20630.341815
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "warning-visible",
+              "atMs": 20655.034640000005
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "termination-request",
+              "atMs": 23032.759966000005
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "ui-recalled",
+              "atMs": 23308.418656
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "audio-reclaimed",
+              "atMs": 27337.303966
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "pbx-absent",
+              "atMs": 27346.771241000002
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "new-request-rejected",
+              "atMs": 27364.891223
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f",
+              "phase": "resources-reclaimed",
+              "atMs": 27366.194173000004
+            }
+          ],
+          "observer": "runtime-media-e0e6bd56-dda9-46f7-9886-6cea4b52ef7f"
+        },
+        {
+          "path": "phase-normal-smoke-2/call-trial-normal-end.json",
+          "sha256": "8f817abdc364fde6ea763261fa7f45de8225b5cf7b9251a754405a295a28a5df",
+          "outcome": "success",
+          "finishedMs": 26596.891192,
+          "events": [
+            {
+              "id": "0",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "authorization-request",
+              "atMs": 6326.259409999999
+            },
+            {
+              "id": "1",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "authorization-response",
+              "atMs": 7373.571232999999
+            },
+            {
+              "id": "2",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "connect-action",
+              "atMs": 10215.875046000001
+            },
+            {
+              "id": "3",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "verification-visible",
+              "atMs": 16553.107471
+            },
+            {
+              "id": "4",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "remote-decoded-both",
+              "atMs": 18568.511988000002
+            },
+            {
+              "id": "5",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "ai-input",
+              "atMs": 19464.770712
+            },
+            {
+              "id": "6",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "transcript",
+              "atMs": 19485.122087
+            },
+            {
+              "id": "7",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "analysis",
+              "atMs": 19838.636134999997
+            },
+            {
+              "id": "8",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "warning-visible",
+              "atMs": 19861.374721999997
+            },
+            {
+              "id": "9",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "termination-request",
+              "atMs": 22052.554946
+            },
+            {
+              "id": "10",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "ui-recalled",
+              "atMs": 22326.745942999998
+            },
+            {
+              "id": "11",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "audio-reclaimed",
+              "atMs": 26354.264100000004
+            },
+            {
+              "id": "12",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "pbx-absent",
+              "atMs": 26365.919425000004
+            },
+            {
+              "id": "13",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "new-request-rejected",
+              "atMs": 26385.813725000004
+            },
+            {
+              "id": "14",
+              "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65",
+              "phase": "resources-reclaimed",
+              "atMs": 26386.847470999997
+            }
+          ],
+          "observer": "runtime-media-9cc0d151-01fd-4c5d-b4c9-5508a3211c65"
+        }
+      ],
+      "resources": {
+        "samples": 52,
+        "startAvailableGiB": 44.03373718261719,
+        "minAvailableGiB": 39.53025817871094,
+        "maxSampledHostGiB": 0.09718704223632812,
+        "maxSampledOwnedGiB": 4.511554718017578,
+        "scope": "sampled maxima, not peak/minimum specifications; host is observer and launcher descendants, containers are cgroup current including cache/tmpfs; unrelated host work not attributed"
+      },
+      "cleanup": {
+        "baselineComparison": {
+          "interfaces": "EQUAL_CONFIGURATION",
+          "routes": "EQUAL",
+          "container-ids": "PRESERVED",
+          "network-ids": "EQUAL"
+        },
+        "removedContainers": 21,
+        "volumeCount": 2,
+        "errors": [],
+        "appsBeforeData": true
+      }
+    }
+  ],
+  "oldRuntimeConfigId": "sha256:c5828a84efaa8752eed183f7f469797474dfbe1473ee502b29f6f96fcbc001e4",
+  "newRuntimeSource": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+  "newRuntimeConfigId": "sha256:c7455c22b627447d571469aa88b02eadb5b74bfa84d6a38850fa4e813aab55dd",
+  "newRuntimeResults": {
+    "initialNormalAttempt": "FAIL: analysis stopped before visible warning; unavailable code not collected in this original run; cause unknown",
+    "diagnosticBatch": "normal-smoke-1 and normal-smoke-2 PASS; PBX unexpectedly exited before normal-repeat-1 completed; no automatic restart",
+    "normalRepeat2WithWorkspaceFailure": "NOT_RUN",
+    "workCancel": "NOT_RUN",
+    "emergencyStop": "NOT_RUN",
+    "fullCandidateValidated": false
+  },
+  "oldRuntimeRecovery": {
+    "source": "9d6f9dde0cdfe6dd90626666943a525c48755e0c",
+    "workCancel": "PASS",
+    "emergencyStop": "PASS",
+    "singleSignatureRejectedAt": "HTTP schema 400; EVM not reached",
+    "twoSignatures": "actual contract/ledger recovery PASS",
+    "oldCallTerminal": true,
+    "consumptionPreserved": true,
+    "doesNotValidateNewRuntime": true
+  },
+  "unknowns": [
+    "First new-image analysis stop cause: original WS stop code/server logs were not preserved. A later two-normal run passed; this does not explain the failure.",
+    "Unexpected owned PBX exit: no OOM was sampled; exit code/container logs were not collected before deletion. No cause attribution.",
+    "Current product outage-context fix has SSR/offline regression only; current-image live outage interaction did not run.",
+    "Current backup/RESTORE and final whole-DB outbox/session residual audit NOT_RUN.",
+    "Independent GHCR reader, Vercel authentication, external AI cost/input authorization, AWS settings absent."
+  ],
+  "fixtures": [
+    "local HTTPS OIDC",
+    "synthetic distinct 660/990Hz audio",
+    "explicit STT/LLM provider; no model quality claim"
+  ],
+  "realComponents": [
+    "PostgreSQL migrations/LOGIN",
+    "Besu4/contracts",
+    "Witness4",
+    "separate TLS Anchor",
+    "Asterisk",
+    "TURN",
+    "product API/ServiceCall/authenticated WS/remote-track recorder",
+    "installed Chromium"
+  ],
+  "preservation": {
+    "hostSettingsChanged": false,
+    "rawFailuresOverwritten": false,
+    "historicalRuntimeResultsReassigned": false,
+    "existingResources": "full container IDs preserved; routes and Docker networks equal; interface comparison excludes lifetime countdown only; raw before/after retained"
+  }
+}

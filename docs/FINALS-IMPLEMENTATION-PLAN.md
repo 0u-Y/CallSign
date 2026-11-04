@@ -1,5 +1,20 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-04 동일 deadline의 통화 검증과 실제 화면 결함 수정
+
+[실행별 근거와 현재 미확인 범위](../artifacts/media-resume-20261104.json)를 기준으로 본다. 이전 swap-out 중단은 host-wide 관측이며 원인을 이번 작업으로 귀속하지 않는다. 이번 launcher는 baseline을 trial root 밖에 선보존하고 full Docker ID·소유 cgroup swap/pressure/events를 기록한다. 의도된 앱 archive 종료와 실제 기반 서비스 종료를 구분하며, 후속 수정은 종료 상태·소유 로그를 정리 전에 보존한다. 이 마지막 로그 보완은 오프라인 검증만 수행했고 과거에 없던 로그를 복원하지 않는다.
+
+| 항목 | 실제 결과 | 남은 조건 |
+|---|---|---|
+| 기존9d6f9dd runtime | 정상 smoke2회, 선택 반복·조회 실패 중 실제 종료, work-cancel/emergency-stop·양측 음성 회수·ARI 부재·lease 거절·예약 정리 및 실제 공동 복구 확인 | 반복 제어 도구의 두 실패도 원본 보존. 단독 복구400은 HTTP schema 거절이며 이번 EVM 단독 거절 증거 아님 |
+| 실제 화면 수정59b4379 | 업무 조회 장애에도 연결 당시 기관·목적을 ‘최신 조회 미확인’으로 유지. 관리/신규 발신은 비활성 유지, 원문 네트워크 오류 대신 한국어 안내. SSR·타입 회귀 통과 | 새 이미지에서 조회 장애 상호작용은 미실행 |
+| 새 runtime c7455c2 | 일반 issuer health/auth challenge·실제 정상 통화2회·양방향 음성·remote track/WS·위험/목적 패널·동의 철회·정상 종료 통과 | 앞선 분석 중단1건 원인 미확정. 이후 PBX 예기치 않은 종료로 반복·취소·정지 단계 BLOCKED, 자동 재기동 없음 |
+| 정리·보존 | 각 실행 소유 컨테이너/volume 정리, baseline 비교 확인. 실제1366px/390px 캡처를 열어 검토 | 전체 DB 세션/outbox 잔류 감사·최신 RESTORE 미실행. 소표본은 SLA 아님 |
+| 외부 단계 | 기존 Release 보존, 새 후보를 부분 검증 사전 후보로 구분 | Vercel 연결 인증·독립 GHCR reader·외부 AI 비용/입력·AWS 결정 필요 |
+
+[데스크톱](../artifacts/media-resume-20261104/recipient-desktop.png)과 [390px](../artifacts/media-resume-20261104/recipient-mobile.png)는 새 runtime의 실제 ServiceCall이며 합성 계정·음원·분석 제공자를 사용했다. 기관 승인/현재 연결/위험·목적 안내와 통화 종료를 각각 확인했다. 합성 제공자 결과는 실제 모델 정확도가 아니다. 이전 또는 수정 전 이미지의 취소/정지 PASS를 새 이미지의 PASS로 옮기지 않는다.
+
+
 ## 2026-11-04 최신 이미지 실제 준비·일반 기동 후 자원 중단
 
 [후속 실행 원본](../artifacts/candidate-media-followup-20261104.json)은 기존 후보와 같은 runtime/observer이며 제품 변경·재build·새 Release는 없다. 시작 가용40.20GiB를 확인하고 실제 Besu4·계약 배포·Witness4·migration0000~0010·역할 LOGIN·별도 TLS Anchor·PBX/TURN과 제품 API 준비를 수행했다. **일반 issuer 명령은 fixture mount 없이 health200/auth401**을 확인했다. 이는 전체 readiness/통화 PASS가 아니다. 전달 runtime/nginx만으로 새 합성 identity의 웹을 build했으나 실제 화면을 여는 통화 사례 완료 전에 중단됐다.
