@@ -361,6 +361,16 @@
     ],
     "integrationEvidence": "artifacts/restore-audit-20261105.json",
     "fullRestore": "BLOCKED; corrected fixture and final exit-state observer have offline checks only",
-    "fullyValidatedRelease": false
+    "fullyValidatedRelease": false,
+    "laterPackagingReview": {
+      "status": "ISSUES_FOUND",
+      "issues": [
+        "packaged RUNBOOK default TAG referenced the preceding media candidate",
+        "LOCAL-VALIDATION.md was not packaged",
+        "updated evaluation CLI was described as observer-side but not actually in observer tar"
+      ],
+      "originalAssetsPreserved": true,
+      "supersedingReleasePlanned": "aws-recovery-tools-20261104t154909z"
+    }
   }
 }

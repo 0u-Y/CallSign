@@ -34,7 +34,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t153749z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t153749z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
+- 최신 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
 - 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
 - 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 소표본/SLA·최신 RESTORE·최종 DB 전체 잔류 감사·Vercel·독립 reader·AWS는 미확인이므로 **AWS 이전 전 전체 완료가 아니다.**
 - runtime source와 공개/observer source는 inventory에서 구분하며 제품 입력 hash 일치를 확인한다. 일반 issuer 명령과 명시적 시험 분석 fixture entrypoint를 분리한다. 실제 AWS web은 여기에 포함하지 않는다.
@@ -51,7 +51,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 ```bash
 set +x
 umask 077
-TAG=aws-recovery-tools-20261104t153749z
+TAG=aws-recovery-tools-20261104t154909z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
@@ -161,6 +161,21 @@ AWS runtime preflight는6개 bootstrap 참조에 GHCR manifest digest를 요구�
 회수 화면의 요청·원장 작업 pending/failed/확정 receipt·서버 종료·PBX 요청/retry/부재 관측은 서로 다른 상태다. 원장 receipt만으로 Witness 반영이나 새 정책 활성화를 뜻하지 않는다. PBX 완료는 ARI DELETE와 GET404 확인이며 **실제 상대 음성 중단은 별도 관측**이다. 조회 실패·화면 숨김·오래된 snapshot은 현재 성공값으로 유지하지 않는다. 응답의 checkedAt은 DB 관측, mediaObservation.observedAt은 마지막 교환기 관측이며 현재 음성의 신뢰 증명이 아니다.
 
 ### 승인 정책 기반 분석과 평가
+
+새 observer의 평가 CLI를 runtime 이미지의 설치 의존성과 함께 사용할 수 있다. 아래는 서비스/외부 제공자를 실행하지 않는 **무네트워크 dry-run 예시**이며 현재 자원 중단 후 실행한 명령이 아니다. 소유 컨테이너 실행 승인과 자원 정책을 먼저 확인한다. `OBSERVER`는 검증한 observer tar를 추출한 새 경로, `EVAL_OUTPUT`은 UID1000이 쓸 수 있는 새 보호 경로다.
+
+```bash
+APP_WORK="$(docker image inspect --format '{{.Config.WorkingDir}}' "$CALLSIGN_APP_IMAGE")"
+docker run --rm --pull=never --network none --memory 512m --memory-swap 512m --cpus 1 \
+  --user 1000:1000 --entrypoint node \
+  --mount "type=bind,src=$OBSERVER/scripts/evaluate-service-analysis.ts,dst=$APP_WORK/scripts/evaluate-service-analysis.ts,readonly" \
+  --mount "type=bind,src=$OBSERVER/tests/fixtures/service-purpose-evaluation.json,dst=/run/fixture.json,readonly" \
+  --mount "type=bind,src=$EVAL_OUTPUT,dst=/run/results" \
+  "$CALLSIGN_APP_IMAGE" --import tsx scripts/evaluate-service-analysis.ts \
+  /run/fixture.json /run/results/NEW-EVALUATION.json
+```
+
+실제 `--provider`는 별도 승인된 outbound 실행 문맥·보호 env 파일·모델/가격/예산·동의한 입력이 준비된 뒤에만 선택한다. 위 dry-run의 `NOT_RUN`을 실제 제공자 평가로 바꾸지 않는다.
 
 실제 텍스트 평가 `--provider`는 자격·동의 확인 외에 `CALLSIGN_EVALUATION_MAX_COST_USD`와 `CALLSIGN_EVALUATION_REQUEST_BOUND_USD`를 요구한다. 선택 사례 수×운영자가 검증한 요청당 최대 비용 가정이 예산을 넘으면 첫 호출 전에 차단한다. 이는 모델 가격을 자동 검증하거나 실제 청구를 제한하는 기능이 아니므로 현재 모델/가격·제공자 지출 제한을 별도로 확인한다. 실패/timeout도 예약 최대 비용에 남기며 실제 청구액은 확인 전 `NOT_MEASURED`다. 최신 비용 검사는 observer의 평가 도구를 사용한다. 기존 runtime 안의 이전 평가 CLI를 최신 도구로 간주하지 않는다.
 

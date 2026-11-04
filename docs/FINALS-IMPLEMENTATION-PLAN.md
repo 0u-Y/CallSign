@@ -2,6 +2,8 @@
 
 ## 2026-11-05 DB 감사·반복·전체 복원 시도
 
+전달 archive 재검토에서 RUNBOOK의 이전 TAG, LOCAL-VALIDATION 및 새 평가 CLI의 포함 누락을 발견했다. allowlist/명령을 수정하고 후속 `aws-recovery-tools-20261104t154909z`의 source를 고정해 새 파일로 봉인한다. 이전 Release/원본 영수증은 변경하지 않는다. 새 source의 발행 전 상태와 발행 후 원격 영수증을 구분한다.
+
 최신 운영 observer는 `aws-recovery-tools-20261104t153749z`로 새 공개5파일을 원격 수령했다. 같은 비공개 runtime/인프라 manifest를 유지했고 이미지 재build/재게시/재수령은 하지 않았다. [전달 대응](../artifacts/product-candidate-20261104.json)의 `recoveryTools`와 실제 실행 소스/단계를 구분한다. 전체 RESTORE 검증 완료판이 아니다.
 
 [이번 실행과 여섯 항목 판정](../artifacts/restore-audit-20261105.json)을 기준으로 본다. 정상 반복은 사전 계획5/실행5/성공5/재시도0이고, 별도 취소 사례를 같은 DB에서 실행했다. 원본 DB의 시작·quiesced·앱/worker 종료 후 삭제 전 최종 감사가 PASS다. 세션30개·소비 영수증6개 등 정상 보존 데이터를 지우지 않았으며 pending/processing outbox·미정산 예약/잔액은0이었다. 규칙/합성 제공자의 실제 WS 시작·종료 관측은 모델 품질과 구분한다.
