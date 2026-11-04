@@ -2,6 +2,8 @@
 
 ## 2026-11-04 후속 승인 batch: 최신 이미지 선택 경로 통과
 
+후속 `aws-media-candidate-20261104t142900z`의 공개5파일을 새 저장 경로로 원격 수령하고 checksum을 대조했다. [전달 기록의 followup](../artifacts/product-candidate-20261104.json)은 runtime 불변 digest 재사용과 새 공개/observer source를 연결한다. 기존 Release는 변경하지 않았다.
+
 새 사용자 승인에 따른 별도 batch에서 같은59b4379 runtime/37edf8e observer의 정상 반복2회(그중1회는 실제 업무 조회 장애 중 종료)·work-cancel·emergency-stop 각1회가 통과했다. [이번4개 고유 사례·단일 시계 측정·정리](../artifacts/media-final-20261104.json)를 기준으로 보고 이전 정상 smoke2회나 실패를 이번 분모에 합산하지 않는다. 새 이미지 재제작·GHCR 재게시·이미지 재다운로드 없이 기존 불변 manifest를 재사용했다.
 
 [조회 장애 수정 화면](../artifacts/media-resume-20261104/workspace-outage-fixed.png)을 직접 열어 연락 당시 기관/목적·최신 조회 미확인·한국어 장애 안내·진행 통화 종료가 유지됨을 확인했다. [실제390px 경고](../artifacts/media-resume-20261104/final-recipient-mobile.png)도 검토했다. 정상 반복의 계획 분모2/실행2/성공2/재시도0이며 소표본/SLA 미평가다. 실제 원장·Witness·Anchor·PBX/TURN·remote track/인증 WS를 사용했고 OIDC·음원·STT/LLM fixture 범위를 유지했다. 동의 철회·늦은 결과·양측 음성 중단·ARI 부재·추가 lease 거절·통화별 SQL 예약0·공동 복구와 과거 승인/위임/통화 비활성 유지를 확인했다. 단독 복구400은 여전히 HTTP schema 경계다.

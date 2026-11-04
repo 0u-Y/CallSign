@@ -34,12 +34,12 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 현재 부분 검증 사전 후보: [aws-product-candidate-20261104t135448z](https://github.com/0u-Y/CallSign/releases/tag/aws-product-candidate-20261104t135448z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
-- 새 runtime은 일반 issuer 기동과 정상 통화2회를 확인했지만, 앞선 분석 중단과 후속 PBX 종료 원인이 미확정이다. 새 이미지의 조회 장애·취소·정지·반복은 미완료다. **검증 완료 배포판이 아니며 AWS 이전 전 전체 완료도 아니다.** [실행별 근거](../artifacts/media-resume-20261104.json)를 확인한다.
+- 현재 후속 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
+- 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 소표본/SLA·최신 RESTORE·최종 DB 전체 잔류 감사·Vercel·독립 reader·AWS는 미확인이므로 **AWS 이전 전 전체 완료가 아니다.**
 - runtime source와 공개/observer source는 inventory에서 구분하며 제품 입력 hash 일치를 확인한다. 일반 issuer 명령과 명시적 시험 분석 fixture entrypoint를 분리한다. 실제 AWS web은 여기에 포함하지 않는다.
-- 새 runtime만 비공개 GHCR에 게시·새 저장 경로로 원격 수령했다. 변경 없는 인프라5종은 기존 불변 digest/수령 영수증을 재사용했다. 게시용 PAT의 수령 성공은 독립 AWS reader 검증이 아니며 writer를 AWS에 복사하지 않는다.
+- runtime은 앞선 부분 후보에서 비공개 GHCR에 게시·새 저장 경로로 원격 수령한 같은 불변 digest다. 후속 검증 때문에 이미지를 재build/재게시/재다운로드하지 않았으며 공개/observer5파일만 새 Release로 원격 재수령했다. 인프라5종도 기존 불변 digest/수령 영수증을 재사용했다. 게시용 PAT의 수령 성공은 독립 AWS reader 검증이 아니며 writer를 AWS에 복사하지 않는다.
 - 공개 첨부물은 `deployment-files.tar`, `observer-tests.tar`, `images.json`, `publication-audit.json`, `SHA256SUMS`다. image tar·보호 입력·합성 trust web은 첨부하지 않는다. checksum PASS와 실제 네트워크 수령은 별도 기록한다.
-- 기존 [UI 후보](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)·[bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)·원본 실패는 변경하지 않았다. 당시 이미지 게시/기동/미실행 판정은 해당 기록에 남긴다.
+- 기존 [부분 검증 후보](https://github.com/0u-Y/CallSign/releases/tag/aws-product-candidate-20261104t135448z)·[UI 후보](https://github.com/0u-Y/CallSign/releases/tag/aws-ui-candidate-20261104t121056z)·[bootstrap Release](https://github.com/0u-Y/CallSign/releases/tag/aws-bootstrap-20261102t093531z)·원본 실패는 변경하지 않았다. 당시 이미지 게시/기동/미실행 판정은 해당 기록에 남긴다.
 
 **bootstrap 전달과 AWS 배포 완료는 다르다.** 최종 web은 실제 AWS 계약/trust/PBX 인증서 뒤에 runtime+nginx로 생성한다. 실제 AWS·외부 IdP/TLS/NAT/TURN·AI는 미검증이다.
 
@@ -50,7 +50,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 ```bash
 set +x
 umask 077
-TAG=aws-product-candidate-20261104t135448z
+TAG=aws-media-candidate-20261104t142900z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \

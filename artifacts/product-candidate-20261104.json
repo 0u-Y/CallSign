@@ -219,5 +219,58 @@
     "AWSFinalWeb": "NOT_BUILT: generated only with target metadata/trust/PBX certificate"
   },
   "oldReleasesPreserved": true,
-  "fullyValidatedRelease": false
+  "fullyValidatedRelease": false,
+  "followup": {
+    "recordedAt": "2026-11-04T14:30:24.417797+00:00",
+    "release": {
+      "tag": "aws-media-candidate-20261104t142900z",
+      "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z",
+      "prerelease": true,
+      "sourceCommit": "76c50ee42e06f7cfe4ce5ebdcc850f5cff0e8a10",
+      "publication": "PASS",
+      "remoteFilesReceived": true,
+      "newStorageDirectory": true,
+      "files": [
+        {
+          "name": "SHA256SUMS",
+          "bytes": 339,
+          "sha256": "1e383f6b46271fb66be3b406cf0dc83ef031ef264e3237a2c2c68032101ecd8a"
+        },
+        {
+          "name": "deployment-files.tar",
+          "bytes": 348160,
+          "sha256": "663ed87c101e08b9e6d2f28126d6d20bbbca6c7fa474c21c60084277100f0256"
+        },
+        {
+          "name": "images.json",
+          "bytes": 4985,
+          "sha256": "084d0559b45950825e6a0e08f0185d273ae8169e0fae1bd61b0b4adbd78141d3"
+        },
+        {
+          "name": "observer-tests.tar",
+          "bytes": 327680,
+          "sha256": "e454b4ecfc7a8d53ca1011b7144da5460b9f7d2959ab2719e4c9b2fc9f3279da"
+        },
+        {
+          "name": "publication-audit.json",
+          "bytes": 15976,
+          "sha256": "8cafa6a39d823261c0ff8981806f170c0e99f5f6968a44d8a3924f708026310f"
+        }
+      ],
+      "checksumStatus": "PASS"
+    },
+    "runtimeSourceUnchanged": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+    "runtimeRegistryReferenceUnchanged": "ghcr.io/0u-y/callsign-runtime@sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+    "imageRebuilt": false,
+    "imageRepushed": false,
+    "imageRedownloaded": false,
+    "imageReceiptSource": "Original registry receipt in this record; same immutable manifest/config/layers, no claimed new image transfer",
+    "observerSource": "76c50ee42e06f7cfe4ce5ebdcc850f5cff0e8a10",
+    "verificationState": "SELECTED_MEDIA_PASS_WITH_UNRESOLVED_PRIOR_FAILURES",
+    "integrationEvidence": "artifacts/media-final-20261104.json",
+    "newUniqueProductCases": 4,
+    "previousAttemptsPreserved": true,
+    "AWSReady": false,
+    "remaining": "Unexplained prior analysis/PBX failures, latest RESTORE/final whole-DB residual audit, Vercel authentication/deployment, separate reader, target AWS inputs and external AI evaluation remain separate."
+  }
 }
