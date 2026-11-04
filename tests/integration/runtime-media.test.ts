@@ -103,9 +103,15 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
     expect(await receiver.getByRole('heading',{name:'이상거래 본인 확인',exact:true}).isVisible()).toBe(true);expect(await receiver.locator('.service-contact').innerText()).toContain('최신 업무 조회 미확인');expect(await receiver.locator('[role=alert]').innerText()).not.toContain('Failed to fetch');
     const stillAudible=await audio(receiver,660,990);expect(stillAudible.target).toBeGreaterThan(.003);await receiver.screenshot({path:join(root,'delivery-workspace-failure-live.png'),fullPage:true});
    }
+  let releaseWorkspace:(()=>void)|undefined;
+  if(outcome==='normal-end'&&process.env.CALLSIGN_WORKSPACE_FAILURE_TEST==='yes'){
+   await receiver.unroute('**/api/v3/workspace');let entered!:()=>void;const pendingRequest=new Promise<void>(r=>entered=r),gate=new Promise<void>(r=>releaseWorkspace=r);
+   await receiver.route('**/api/v3/workspace',async route=>{entered();await gate;await route.abort('failed');});
+   await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();await pendingRequest;
+  }
   const stop=performance.now();observation!.mark(outcome==='normal-end'?'termination-request':'revocation-request');
   if(outcome==='normal-end'){
-   await receiver.getByRole('button',{name:'통화 종료',exact:true}).click();await receiver.unroute('**/api/v3/workspace');
+   try{expect(await receiver.getByRole('button',{name:'통화 종료',exact:true}).isEnabled()).toBe(true);await receiver.getByRole('button',{name:'통화 종료',exact:true}).click();}finally{releaseWorkspace?.();await receiver.unroute('**/api/v3/workspace');}
   }let blockedRenewals=0;
   const ledgerRevocation=['policy-change','key-change','delegation-revoke','emergency-stop'].includes(outcome);
   if(outcome==='logout')await sender.getByRole('button',{name:'로그아웃 및 연결 회수',exact:true}).click();

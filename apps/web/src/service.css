@@ -36,3 +36,7 @@
 .service-call-controls .call-continuation{flex-basis:100%;font-size:13px}.call-continuation .button{margin:6px 8px 6px 0}
 .configuration-review article{flex-basis:100%;padding-top:24px;margin-top:24px;border-top:1px solid var(--border)}.service-app .configuration-review article>table{margin:20px 0 28px}.configuration-review caption{text-align:left;font-weight:700;font-size:15px;margin-bottom:16px}.configuration-review th,.configuration-review td{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);font-size:14px}.service-app .configuration-review article>dl{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 20px;font-size:13px}.configuration-review dt{font-weight:600;color:var(--muted)}.configuration-review dd{margin:0}.configuration-review .button{margin:8px 8px 8px 0}
 @media(max-width:700px){.service-app .configuration-review article>dl{grid-template-columns:1fr;gap:4px}.configuration-review dd{margin-bottom:12px}.configuration-review th,.configuration-review td{padding:8px 4px;font-size:13px}}
+
+.official-workspace { max-width: 48rem; margin-block: 1.5rem; padding: 1.5rem; background: var(--surface, #fff); border: 1px solid #d4dfe5; border-radius: 14px; }
+.official-workspace h2 { font-size: 1.5rem; line-height: 1.5; margin-block: 0 1rem; }
+.official-workspace p { line-height: 1.8; }
