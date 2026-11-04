@@ -22,3 +22,6 @@ tests
 **/*.env
 **/*.env.*
 !infra/deploy/*.env.example
+
+# Host-only owned validation launcher; never a product entrypoint.
+scripts/validation-runtime-media.py

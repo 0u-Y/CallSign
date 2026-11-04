@@ -113,7 +113,7 @@ def wait_pg(name,db,port=5432):
 
 if not options.resume:
  for name,args in [('interfaces-before.json',['ip','-j','addr']),('routes-before.json',['ip','-j','route','show','table','all'])]:write(name,json.loads(capture(args)))
- write('docker-networks-before.json',capture(['docker','network','ls','-q']).splitlines());write('docker-containers-before.json',capture(['docker','ps','-aq']).splitlines())
+ write('docker-networks-before.json',capture(['docker','network','ls','-q']).splitlines());write('docker-containers-before.json',capture(['docker','ps','-aq','--no-trunc']).splitlines())
 if not (r/'foundation-complete.json').exists():
  public=r/'public';public.mkdir(mode=0o700)
  with tarfile.open(delivery/'deployment-files.tar') as t:

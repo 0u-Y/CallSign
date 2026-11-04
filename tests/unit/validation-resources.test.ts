@@ -262,3 +262,52 @@ assert ui_budget_reason(dict(b,containerMemoryBytes=3*1024**3))=='UI_TOTAL_MEMOR
 assert ui_budget_reason(b,600_000_000_000)=='UI_DEADLINE_CLEANUP_RESERVE'
 `],{stdio:'pipe'});
 });
+
+it('preserves only private evidence before trial-root cleanup, including the original stop and partial failure',()=>{
+ execFileSync('python3',['-c',`
+import importlib.util,tempfile,json,shutil,os
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('media','scripts/validation-runtime-media.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+with tempfile.TemporaryDirectory() as d:
+ root=Path(d)/'trial';root.mkdir();evidence=Path(d)/'private-evidence'
+ for name,content in [('interfaces-before.json','[]'),('ownership.json','{}'),('runtime-media-results.json','{"numFailedTests":1}'),('bootstrap.log','original setup failure'),('private-app.json','SECRET'),('trial.env','SECRET'),('key.pem','SECRET')]: (root/name).write_text(content)
+ steps=[{'label':'product','exitCode':1}];m.preserve_evidence(root,evidence,'SUSTAINED_SWAP_OUT',steps)
+ shutil.rmtree(root)
+ assert json.loads((evidence/'partial-stop.json').read_text())=={'reason':'SUSTAINED_SWAP_OUT','steps':steps}
+ assert json.loads((evidence/'runtime-media-results.json').read_text())['numFailedTests']==1
+ assert (evidence/'interfaces-before.json').exists() and (evidence/'bootstrap.log').exists()
+ assert not any((evidence/n).exists() for n in ['trial.env','key.pem','private-app.json'])
+ assert (evidence/'bootstrap.log').stat().st_mode&0o077==0
+ root.mkdir();(root/'bootstrap.log').symlink_to(evidence/'bootstrap.log')
+ try:m.preserve_evidence(root,Path(d)/'other',None,[]);raise AssertionError('symlink accepted')
+ except RuntimeError:pass
+`],{stdio:'pipe'});
+});
+it('compares full Docker identities without converting missing or malformed observations into preservation PASS',()=>{
+ execFileSync('python3',['-c',`
+import importlib.util,tempfile,json
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('media','scripts/validation-runtime-media.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+full='a'*64;other='b'*64
+assert m.compare_container_ids([full],[full,other])=='PRESERVED'
+assert m.compare_container_ids([full],[other])=='MISSING_UNATTRIBUTED'
+assert m.compare_container_ids([full[:12]],[full])=='UNKNOWN_ID_FORMAT'
+import subprocess,sys,os
+child=subprocess.run([sys.executable,'scripts/validation-runtime-media.py','--work-dir','/nonexistent','--policy','integration-pressure-v1','--browser-cache','/nonexistent'],env={k:v for k,v in os.environ.items() if k!='CALLSIGN_ALLOW_EXTERNAL_EXECUTION'},capture_output=True,text=True)
+assert child.returncode!=0 and 'EXPLICIT_INTEGRATION_EXECUTION_REQUIRED' in child.stderr
+with tempfile.TemporaryDirectory() as d:
+ result=m.compare_baselines(Path(d));assert all(v=='UNKNOWN_MISSING_SNAPSHOT' for v in result.values())
+ p=Path(d);(p/'before-interfaces.raw').write_text(json.dumps([{'addr_info':[{'local':'192.0.2.1','valid_life_time':300}]}]));(p/'after-interfaces.raw').write_text(json.dumps([{'addr_info':[{'local':'192.0.2.1','valid_life_time':280}]}]))
+ assert m.compare_baselines(p)['interfaces']=='EQUAL_CONFIGURATION'
+ (p/'after-interfaces.raw').write_text(json.dumps([{'addr_info':[{'local':'192.0.2.2','valid_life_time':280}]}]));assert m.compare_baselines(p)['interfaces']=='DIFFERENT_UNATTRIBUTED'
+order=sorted([{'name':'run-pg'},{'name':'run-net'},{'name':'run-controller'},{'name':'run-issuer'}],key=m.cleanup_priority)
+assert order[0]['name']=='run-controller' and order[-1]['name']=='run-net'
+with tempfile.TemporaryDirectory() as d:
+ p=Path(d)
+ for n,v in [('memory.current','12'),('memory.swap.current','0'),('memory.swap.max','0'),('memory.events','oom 0\\noom_kill 0'),('memory.pressure','some avg10=0 avg60=0 avg300=0 total=0\\nfull avg10=0 avg60=0 avg300=0 total=0')]: (p/n).write_text(v)
+ assert m.read_cgroup(p)['swapCurrentBytes']==0 and m.read_cgroup(p)['memoryEvents']['oom_kill']==0
+ (p/'memory.events').unlink()
+ try:m.read_cgroup(p);raise AssertionError('missing mandatory observation accepted')
+ except FileNotFoundError:pass
+`],{stdio:'pipe'});
+});
