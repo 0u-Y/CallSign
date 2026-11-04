@@ -1,0 +1,175 @@
+{
+  "version": 1,
+  "recordedAt": "2026-11-04T12:39:33.027782+00:00",
+  "headAtExecution": "15e7fe4f967fc92bc2a36fc8282c95c81d98ac2d",
+  "productRuntimeSource": "9d6f9dde0cdfe6dd90626666943a525c48755e0c",
+  "publicObserverSource": "76e5590b4686b7d91dd26ced130158d87f6b17a5",
+  "runtimeConfigId": "sha256:c5828a84efaa8752eed183f7f469797474dfbe1473ee502b29f6f96fcbc001e4",
+  "runtimeRegistryReference": "ghcr.io/0u-y/callsign-runtime@sha256:4129b44217c7bccf5d3b46a36af4fc5c7590c0aefb47acd20b414a617834d173",
+  "runId": "media-delivery-20261104t123124z-27b6de",
+  "executionProfile": "full-media; integration-pressure-v1",
+  "status": "BLOCKED_RESOURCE",
+  "actualPrepared": {
+    "foundation": {
+      "status": "PREPARED_NOT_RUNTIME_VERIFIED",
+      "preparedAtUnixSeconds": 1793795621.7303028,
+      "imagesLoadedFromArchive": true,
+      "freshValidatorCount": 4,
+      "newIdentity": "callsign_test_delivery_27b6de",
+      "noSourceMounts": true
+    },
+    "database": {
+      "status": "PREPARED_NOT_PRODUCT_PASS",
+      "migrations": "0000..0010",
+      "roles": "distinct issuer/auth/worker/PBX logins",
+      "anchor": "separate PostgreSQL storage/login/TLS",
+      "sessionsInserted": false,
+      "provisioning": "delivered scripts and SQL; existing data never overwritten"
+    },
+    "chainNodeCount": 4,
+    "sameChainId": true,
+    "sameGenesisHash": true,
+    "registry": "deployer completed before bootstrap success",
+    "witness": "four processes started; product quorum/freshness assertions not completed",
+    "PBXTurn": "process startup only; no media claim"
+  },
+  "normalEntrypoint": {
+    "image": "sha256:c5828a84efaa8752eed183f7f469797474dfbe1473ee502b29f6f96fcbc001e4",
+    "normalCommand": true,
+    "health": 200,
+    "unauthenticatedAuth": 401,
+    "fixtureMounted": false,
+    "scope": "startup/auth challenge, not full readiness or media"
+  },
+  "testWebBuild": {
+    "runtime": "sha256:c5828a84efaa8752eed183f7f469797474dfbe1473ee502b29f6f96fcbc001e4",
+    "nginx": "sha256:3c175c1aa411ed8265ccc495ebd34815c53bb937bc90a54ce24708a48ee5e0b7",
+    "web": "sha256:2eb4d166708693a1110ebdb7a89bf158a2fcb008a04ef3c3d9996f655f8a6810",
+    "pin": "2b173aee3be50ed8d19ae8a94a5f5ad6c7df298b05cc196ce4a29dfe53e0a452",
+    "dockerfileSha256": "60454bd16633a8151a30319ddc3e2aa2c74e1f549d8ee25f4489a9b4834e0611",
+    "source": "delivered runtime layers only; public delivery build context",
+    "hostSourceOrNodeModules": false,
+    "awsOverrideExecuted": false
+  },
+  "productCases": {
+    "completed": 0,
+    "workCancel": "BLOCKED_DURING_SETUP",
+    "emergencyStop": "NOT_RUN",
+    "normalSmoke": {
+      "planned": 2,
+      "retries": 0,
+      "status": "NOT_RUN"
+    },
+    "newProductAssertionFailures": "none observed; interrupted before product-case completion; no complete test report"
+  },
+  "firstStop": {
+    "reason": "SUSTAINED_SWAP_OUT",
+    "firstSatisfiedMonotonicNs": 2079678391344151,
+    "samples": [
+      {
+        "monotonicNs": 2079667980022934,
+        "intervalSeconds": 5.094180027,
+        "swapInMiBPerSecond": 0.43477924577870436,
+        "swapOutMiBPerSecond": 11.109491557040334,
+        "consecutive": 1,
+        "memoryPSI": {
+          "some": {
+            "avg10": 0.0,
+            "avg60": 0.02,
+            "avg300": 0.0,
+            "total": 295483798.0
+          },
+          "full": {
+            "avg10": 0.0,
+            "avg60": 0.02,
+            "avg300": 0.0,
+            "total": 287473800.0
+          }
+        },
+        "oomKillDelta": 0
+      },
+      {
+        "monotonicNs": 2079673178764713,
+        "intervalSeconds": 5.198741779,
+        "swapInMiBPerSecond": 0.21489574737349157,
+        "swapOutMiBPerSecond": 66.99337355181996,
+        "consecutive": 2,
+        "memoryPSI": {
+          "some": {
+            "avg10": 1.59,
+            "avg60": 0.36,
+            "avg300": 0.07,
+            "total": 295654145.0
+          },
+          "full": {
+            "avg10": 1.59,
+            "avg60": 0.36,
+            "avg300": 0.07,
+            "total": 287642396.0
+          }
+        },
+        "oomKillDelta": 0
+      },
+      {
+        "monotonicNs": 2079678391344151,
+        "intervalSeconds": 5.212579438,
+        "swapInMiBPerSecond": 0.20383382404770942,
+        "swapOutMiBPerSecond": 18.934063964667008,
+        "consecutive": 3,
+        "memoryPSI": {
+          "some": {
+            "avg10": 1.36,
+            "avg60": 0.4,
+            "avg300": 0.08,
+            "total": 295685588.0
+          },
+          "full": {
+            "avg10": 1.36,
+            "avg60": 0.4,
+            "avg300": 0.08,
+            "total": 287673448.0
+          }
+        },
+        "oomKillDelta": 0
+      }
+    ],
+    "attribution": "host-wide swap activity; causal attribution to this run not established",
+    "automaticRestart": false
+  },
+  "observations": {
+    "sampleCount": 25,
+    "minimumAvailableGiB": 37.577,
+    "maximumHostObservedGiB": 0.096,
+    "maximumTotalObservedGiB": 3.899,
+    "scope": "5-second sample extrema, not peaks/minimum AWS specifications",
+    "startAvailableGiB": 40.196258544921875
+  },
+  "cleanup": {
+    "removedContainers": 21,
+    "volumeCount": 2,
+    "errors": [],
+    "appsBeforeData": true,
+    "privateTrialRootRemoved": true,
+    "remainingOwnedContainers": 0,
+    "remainingOwnedVolumes": 0
+  },
+  "hostReadOnlyComparison": {
+    "interfacesSnapshotEqual": false,
+    "routesSnapshotEqual": true,
+    "dockerNetworkIdsEqual": true,
+    "existingContainerIdsPreserved": null,
+    "containerComparisonLimitation": "Before capture used short Docker IDs; after capture used full IDs, so the initial equality result was invalid. Original baseline was removed with the trial root before correction. Cleanup itself checked exact owned IDs and labels; no existing-container preservation PASS inferred.",
+    "interfaceComparisonLimitation": "Full interface snapshots differed. Baseline not retained after trial-root cleanup; differences and causal attribution unresolved. No host configuration mutation commands were issued; no new Docker bridge or published port was used."
+  },
+  "sourceCompatibility": "API/Witness/contracts/protocol/worker unchanged between previous6e3cd23 media source and candidate9d6f9dd; new UI full-media assertions remain unverified",
+  "publication": "existing prerelease/assets/digests untouched; follow-up evidence only, no rebuild",
+  "privateOriginalLogs": "retained in owned local protected directory; not Git or Release",
+  "localEvidenceDirectory": ".local/candidate-final-check-20261104T123124Z-27b6de",
+  "remaining": [
+    "actual ServiceCall/audio/analysis/cancellation/recovery and repetitions",
+    "latest Vercel deployment credential",
+    "independent AWS GHCR reader",
+    "real AWS/IdP/AI inputs and permission"
+  ],
+  "evidencePreservationLimitation": "Original before-interface/route/container snapshots were not copied before owned private-root removal. Published comparison booleans are observations, not a normalized host configuration audit."
+}

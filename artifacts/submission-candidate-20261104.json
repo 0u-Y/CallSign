@@ -281,5 +281,7 @@
     "resourceStops": [],
     "notPeakOrMinimumSpecification": true
   },
-  "retainedLocalBytes": 1747367582
+  "retainedLocalBytes": 1747367582,
+  "followupEvidence": "artifacts/candidate-media-followup-20261104.json",
+  "followupScope": "normal entrypoint startup/auth challenge and real foundation preparation; media interrupted by sustained swap-out; original publication state retained"
 }
