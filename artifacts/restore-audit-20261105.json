@@ -1946,5 +1946,22 @@
     "restoreNodeCopyFix": "docker cp -L and regular-file check; full corrected RESTORE execution remains BLOCKED",
     "productionServicesChanged": false,
     "runtimeRebuilt": false
+  },
+  "deliveryRecord": "artifacts/product-candidate-20261104.json#recoveryTools",
+  "vercelAccessCheck": {
+    "pluginInstalled": false,
+    "projectLocalLinkFilePresent": false,
+    "installedCliPresent": false,
+    "projectActionSecretNames": [],
+    "protectedFileReferenceEnvironmentPresent": false,
+    "credentialStoreSearchPerformed": false,
+    "deploymentAttempted": false
+  },
+  "vercelPublicMetadata": {
+    "checkedAt": "2026-11-04T15:44:18.049301+00:00",
+    "httpStatus": 200,
+    "contentType": "text/html; charset=utf-8",
+    "validJson": false,
+    "reason": "SPA HTML returned, deployed source SHA unverified"
   }
 }

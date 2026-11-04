@@ -34,7 +34,8 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 현재 후속 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
+- 최신 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t153749z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t153749z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
+- 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
 - 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 소표본/SLA·최신 RESTORE·최종 DB 전체 잔류 감사·Vercel·독립 reader·AWS는 미확인이므로 **AWS 이전 전 전체 완료가 아니다.**
 - runtime source와 공개/observer source는 inventory에서 구분하며 제품 입력 hash 일치를 확인한다. 일반 issuer 명령과 명시적 시험 분석 fixture entrypoint를 분리한다. 실제 AWS web은 여기에 포함하지 않는다.
 - runtime은 앞선 부분 후보에서 비공개 GHCR에 게시·새 저장 경로로 원격 수령한 같은 불변 digest다. 후속 검증 때문에 이미지를 재build/재게시/재다운로드하지 않았으며 공개/observer5파일만 새 Release로 원격 재수령했다. 인프라5종도 기존 불변 digest/수령 영수증을 재사용했다. 게시용 PAT의 수령 성공은 독립 AWS reader 검증이 아니며 writer를 AWS에 복사하지 않는다.
@@ -50,7 +51,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 ```bash
 set +x
 umask 077
-TAG=aws-media-candidate-20261104t142900z
+TAG=aws-recovery-tools-20261104t153749z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \

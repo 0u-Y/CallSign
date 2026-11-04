@@ -272,5 +272,95 @@
     "previousAttemptsPreserved": true,
     "AWSReady": false,
     "remaining": "Unexplained prior analysis/PBX failures, latest RESTORE/final whole-DB residual audit, Vercel authentication/deployment, separate reader, target AWS inputs and external AI evaluation remain separate."
+  },
+  "recoveryTools": {
+    "recordedAt": "2026-11-04T15:44:17.962172+00:00",
+    "sourceCommit": "41c7218ef0419a6542cd2c3c0de38c037d5a8200",
+    "runtimeProductSourceUnchanged": "59b4379e37eec22bbd25a473fb5bfce1f0ad890e",
+    "runtimeRegistryReferenceUnchanged": "ghcr.io/0u-y/callsign-runtime@sha256:45afa39b1eb8ef350c1268f5b2f5f45098378a2aa8fcc6d40fa65898001521f0",
+    "release": {
+      "tag": "aws-recovery-tools-20261104t153749z",
+      "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t153749z",
+      "prerelease": true,
+      "publication": "PASS",
+      "remoteFilesReceived": true,
+      "newStorageDirectory": true,
+      "checksumStatus": "PASS",
+      "files": [
+        {
+          "name": "SHA256SUMS",
+          "bytes": 339,
+          "sha256": "31428bcc3c28c8f8d685087900ee13ed399f29abf219c7e819e68b9555624bc7"
+        },
+        {
+          "name": "deployment-files.tar",
+          "bytes": 348160,
+          "sha256": "4c9ff15e88ca4a997d8858d6cb96a8de3408dd846ff63f9cc07909c6aa983d9f"
+        },
+        {
+          "name": "images.json",
+          "bytes": 4954,
+          "sha256": "78b31b966de0f1e415fbf51b704eb4542bf6ce6ef37d05773808c88774631505"
+        },
+        {
+          "name": "observer-tests.tar",
+          "bytes": 358400,
+          "sha256": "67fb433733fd3aa87357f4906eb8e7c7886dedc510d3755bffae9c57709a2e4e"
+        },
+        {
+          "name": "publication-audit.json",
+          "bytes": 16428,
+          "sha256": "8a1e08bacd731f5c92f7514a88d529ab9e1b8b98477c0620cbe675981d79cdd1"
+        }
+      ]
+    },
+    "verificationState": "DB_AUDIT_PASS_RESTORE_BLOCKED_RESOURCE",
+    "runtimeRebuilt": false,
+    "imageRepushed": false,
+    "imageRedownloaded": false,
+    "priorByteReceiptReused": true,
+    "visibilityMetadata": {
+      "checkedAt": "2026-11-04T15:41:17.490003+00:00",
+      "credentialRole": "provided publisher; package visibility metadata only, not independent reader verification",
+      "images": [
+        {
+          "role": "runtime",
+          "visibility": "private"
+        },
+        {
+          "role": "asterisk",
+          "visibility": "private"
+        },
+        {
+          "role": "turn",
+          "visibility": "private"
+        },
+        {
+          "role": "besu",
+          "visibility": "private"
+        },
+        {
+          "role": "postgres",
+          "visibility": "private"
+        },
+        {
+          "role": "nginx",
+          "visibility": "private"
+        }
+      ],
+      "imageBytesReceived": 0
+    },
+    "separateReaderVerified": false,
+    "observerToolOverrides": [
+      {
+        "path": "scripts/evaluate-service-analysis.ts",
+        "runtimeSha256": "42d485685832a487df04390959b9c1189da3184420dc185619542d6ff24ee27e",
+        "observerSha256": "8d19dda8fa6be25c3def7edd3eef17c43459607ea10dfbe69ace73cc2efc71e7",
+        "scope": "Observer-side evaluation CLI cost guard only; production API has no import of this script. Use the new observer CLI, not the older copy in the unchanged runtime."
+      }
+    ],
+    "integrationEvidence": "artifacts/restore-audit-20261105.json",
+    "fullRestore": "BLOCKED; corrected fixture and final exit-state observer have offline checks only",
+    "fullyValidatedRelease": false
   }
 }
