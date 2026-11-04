@@ -17,7 +17,7 @@
 
 ## 제출 후보와 외부 환경
 
-- 현재 [부분 검증 사전 후보](../artifacts/product-candidate-20261104.json)는 비공개 GHCR·공개 Release 수령을 확인했지만 전체 통화 검증 완료판이 아니다. 발행 당시 부분 판정과 이후 [선택 경로 통과](../artifacts/media-final-20261104.json)를 구분한다. 원인 미확정 과거 실패는 그대로 남긴다.
+- [현재 후보](../artifacts/product-candidate-20261104.json)의 serviceHardeningFollowup은 새 runtime/공개 묶음의 게시·원격 수령과 선택 RESTORE/미디어를 연결한다. AWS·독립 reader·실제 모델 품질·일반 신뢰도 완료판은 아니다. 이전 발행/실행 판정과 원인 미확정 실패는 보존한다.
 - [재설계 UI](../artifacts/service-redesign-20261104.json)·[역할별 실제 UI 실행](../artifacts/service-ui-validation-20261104.json)과 새 runtime의 정상 통화 화면을 구분한다. Vercel 공개 frontend는 후속 재배포에서 최신 소스의 경로·정적 자원·JSON metadata를 HTTP로 확인했다([배포 근거](../artifacts/product-candidate-20261104.json)의 `vercelRedeployment`). 이번 재배포의 브라우저 상호작용은 미실행이며 공개 frontend는 API 미연결 상태다.
 - 새59b4379 이미지의 실제 조회 장애 중 종료·work-cancel·emergency-stop·공동 복구는 후속 batch에서 별도로 확인했다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 미검증이다. 단독 복구400은 HTTP schema 거절이며 이번 EVM 정족수 거절 증거가 아니다.
 - 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.

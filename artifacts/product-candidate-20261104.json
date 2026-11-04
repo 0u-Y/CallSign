@@ -517,8 +517,8 @@
     "architecture": "linux/amd64",
     "packageVisibility": "private",
     "releaseTag": "aws-restore-candidate-20261104t180638z",
-    "releasePublication": "PENDING",
-    "publicSource": "TO_BE_SEALED_FROM_NEXT_CLEAN_MAIN",
+    "releasePublication": "PASS: new unique prerelease and actual network re-download; checksums match sealed files",
+    "publicSource": "37bf6eca4aca6fb12fad6bf774ef683bde940819",
     "runtimeRemoteReceive": {
       "status": "PASS",
       "recordedAt": "2026-11-04T18:08:31.968937+00:00",
@@ -745,6 +745,73 @@
     "infrastructure": "Five unchanged pinned images and earlier remote receipts reused, not rebuilt/redownloaded.",
     "independentReaderVerified": false,
     "finalAwsWebGenerated": false,
-    "claim": "Selected same-host local full RESTORE/media verified; historical failures unresolved; prerelease, not AWS deployment complete."
+    "claim": "Selected same-host local full RESTORE/media verified; historical failures unresolved; prerelease, not AWS deployment complete.",
+    "releaseUrl": "https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z",
+    "observerSource": "37bf6eca4aca6fb12fad6bf774ef683bde940819",
+    "releaseTarget": "37bf6eca4aca6fb12fad6bf774ef683bde940819",
+    "remotePublicReceive": {
+      "status": "PASS",
+      "freshStorageDirectory": true,
+      "actualGhReleaseDownload": true,
+      "files": [
+        {
+          "name": "deployment-files.tar",
+          "sha256": "f1a35625fd21a3a16aba52c82562b5d2750b5ae5fd7e59f1cf808a9a5006fca5",
+          "bytes": 552960
+        },
+        {
+          "name": "observer-tests.tar",
+          "sha256": "d73feea84c010489892a4d23f22dc1e7a4ecd5ee693185a59717581496284fa4",
+          "bytes": 378880
+        },
+        {
+          "name": "images.json",
+          "sha256": "e83523f4d9fa38583ccac69f2e6d4ed96253f5e5b1506b2cbb561d28d38cdf9a",
+          "bytes": 5661
+        },
+        {
+          "name": "publication-audit.json",
+          "sha256": "6f1e8bca2159fbdc8ae3fe9f54f2f097e4e3dd7475cb2a321ef80b6a7688c177",
+          "bytes": 27666
+        },
+        {
+          "name": "SHA256SUMS",
+          "sha256": "e8a1f3cbb44e77f2a41eb4e027816aa0c06e1c12d8279d6a7be5aefed4f48bbb",
+          "bytes": 339
+        }
+      ]
+    },
+    "integrationObservers": {
+      "generalEntrypointFullRestore": "6fed54011c46ca23fa803e5712dcb1b8552b894a",
+      "explicitSyntheticAnalysis": "0b92f4fdbfc78934df2b415ca98b03d1aca8dfc8"
+    },
+    "ciForPublicSource": {
+      "status": "PASS",
+      "url": "https://github.com/0u-Y/CallSign/actions/runs/41884247012"
+    },
+    "vercel": {
+      "projectId": "prj_WbvNuAzgintDOJlqsgyHMiBlv22O",
+      "publicOrigin": "https://callsign-rouge.vercel.app",
+      "observedProductionSource": "37bf6eca4aca6fb12fad6bf774ef683bde940819",
+      "observedDeploymentId": "dpl_GnYTnc4hzz2dnVLJS7hkVnm7dmTJ",
+      "state": "READY",
+      "buildMetadataMatches": true,
+      "mode": "publicPreview=true, API disconnected; no backend login or calls",
+      "preview": {
+        "source": "3e1908cefdf5858b3d6cd24e3e7a1fda4e76b47d",
+        "deploymentId": "dpl_5HiTQKU9FANJshNrdb3pJsisHmUZ",
+        "state": "READY",
+        "verification": "BLOCKED: direct URL remains behind Vercel SSO; temporary bypasses revoked, no protection disabled"
+      },
+      "publicRoutes": "HTTP /service,/official,/demo and JSON/static assets checked; /legacy/demo now redirects /service",
+      "browser": "Partial current desktop captures reviewed; public browser stopped at applied host1GiB; latest remote mobile/zoom not completed. Authenticated local mobile/desktop is separate PASS."
+    },
+    "downloadCleanup": {
+      "remoteOciBytesRemovedAfterVerifiedReceipt": true,
+      "receivedPublicReleaseFilesRetained": true,
+      "temporaryDockerAuthRemoved": true,
+      "globalDockerAuthUnchanged": true,
+      "separateReaderVerified": false
+    }
   }
 }

@@ -4,7 +4,7 @@
 
 조회 요청 처리 중에도 통화 종료를 독립 실행하고 공식 조회 전/만료를 빈 목록과 구분했다. [실제 역할별 HTTP/Chromium·캡처](../artifacts/service-hardening-20261105/result.json)와 [후속 전체 복원·미디어 결과](../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup을 기준으로 본다. 일반 entrypoint의 암호화 전체 RESTORE·복원 후 통화·원본/대상 감사와 별도 명시적 합성 STT/LLM3통화는 PASS다. 도구의 GNU loader/라이브러리·사용자 권한·GNU tar·실제 validator RPC 결함을 수정하고 실패 원본을 보존했다.
 
-첫 분석의 JSON/프로세스 불일치와 목적 이탈 배지 실패는 원인 미확정이다. 프로세스 exit·bounded WS/lease·실패 후 통화 정리를 보완했으며 이후 성공으로 소급 해결 처리하지 않는다. 후속 공개 브라우저는 잘못 선택한 host1GiB 범위에서 자원 중단했고 새 기동 없이 정리했다. latest 공개 main HTTP/desktop 부분 확인과 기존 실제390px 확인을 구분한다. 새 후보와 과거 이미지/Release는 별도 기록하며, 독립 reader·실제 AI·AWS 조건은 미확인이다.
+첫 분석의 JSON/프로세스 불일치와 목적 이탈 배지 실패는 원인 미확정이다. 프로세스 exit·bounded WS/lease·실패 후 통화 정리를 보완했으며 이후 성공으로 소급 해결 처리하지 않는다. 후속 공개 브라우저는 잘못 선택한 host1GiB 범위에서 자원 중단했고 새 기동 없이 정리했다. latest 공개 main HTTP/desktop 부분 확인과 기존 실제390px 확인을 구분한다. 새 후보를 비공개 GHCR·고유 사전 Release로 게시하고 실제 원격 이미지/공개5파일을 새 저장 경로로 수령했다([후보 대응](../artifacts/product-candidate-20261104.json)의 serviceHardeningFollowup). 새 후보와 과거 이미지/Release는 별도 기록하며, 독립 reader·실제 AI·AWS 조건은 미확인이다.
 
 아래 날짜별 실패·미실행은 당시 기록이며 위 후속 결과로 덮어쓰지 않는다.
 

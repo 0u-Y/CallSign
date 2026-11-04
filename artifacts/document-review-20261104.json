@@ -582,7 +582,7 @@
     "current": 23
   },
   "serviceHardeningFollowup": {
-    "recordedAt": "2026-11-04T18:07:51.879866+00:00",
+    "recordedAt": "2026-11-04T18:13:15.090662+00:00",
     "trackedMarkdownFiles": 43,
     "mdxFiles": 0,
     "addedSinceOriginalAudit": [
@@ -621,13 +621,13 @@
       },
       {
         "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
-        "sha256": "abb4bb4cbd85924bd09f31468f36b5707184a1704a77d2bc960c9b93a1ce8d2c",
+        "sha256": "4ea6cfea107bf6b84e20338f5b7ca67ee45e4715800ae6c9fc719108a1a63b6e",
         "action": "reviewed-current-or-updated",
         "canonicalLocation": "docs/FINALS-IMPLEMENTATION-PLAN.md"
       },
       {
         "path": "docs/KNOWN-LIMITATIONS.md",
-        "sha256": "f33a1a3385f6e80709e0ab9702970d3f2ef17b016123c0a0c02bd000b2a22a9d",
+        "sha256": "c980d571fd15cff70beadf17a2514f1facb701e1ca24d8dc4ec31c5cfd88c811",
         "action": "reviewed-current-or-updated",
         "canonicalLocation": "docs/KNOWN-LIMITATIONS.md"
       },
@@ -645,13 +645,13 @@
       },
       {
         "path": "docs/RUNBOOK.md",
-        "sha256": "8a4b7e41f7751e3c36e3d174e61772cbf875f5b3d5989e19066e7a7f9e1be699",
+        "sha256": "050b024ac53052aa452c7981861c0ae5e307fc314b333e4a386a41cb12a1b3b5",
         "action": "reviewed-current-or-updated",
         "canonicalLocation": "docs/RUNBOOK.md"
       },
       {
         "path": "docs/guide/05-IMPLEMENTATION-STATUS.md",
-        "sha256": "59e9b72ab1401ecdce70b1357d691f595294cdb90203ba193bcae64c74c4b6fd",
+        "sha256": "b4749b5e953bf8d1ed892d9eb1121939221822305f1994379bd19cdcbea9c333",
         "action": "reviewed-current-or-updated",
         "canonicalLocation": "docs/guide/05-IMPLEMENTATION-STATUS.md"
       }

@@ -452,5 +452,52 @@
       ],
       "scope": "Exact detected PEMs match published GnuTLS self-test vectors; raw findings preserved; no blanket path exemption."
     }
+  },
+  "publicPartialCaptures": {
+    "source": "e6113457733e31e4b9282d1ebbaa02c671528c8e",
+    "files": [
+      "public-service-desktop.png",
+      "public-official-desktop.png"
+    ],
+    "scope": "Actual public API-disconnected frontend desktop; opened for visual review before resource stop. Latest public mobile/zoom remains incomplete."
+  },
+  "finalOwnedResourceCheck": {
+    "status": "PASS",
+    "ownedContainerIdsRecorded": 377,
+    "ownedRemaining": [],
+    "ownedVolumeNamesRecorded": 18,
+    "ownedVolumesRemaining": [],
+    "missingExistingBaselineContainerCount": 0,
+    "scope": "Full-ID owned containers and named owned volumes only; no existing service mutation. Current equality does not retroactively explain earlier historical interface drift."
+  },
+  "awsExamplePreflight": {
+    "scope": "Offline unfilled public example; placeholders intentionally block deployment, no AWS calls or startup.",
+    "counts": {
+      "PASS": 17,
+      "BLOCKED": 19,
+      "SKIPPED": 1
+    },
+    "blockedInputs": [
+      "ISSUER_URI",
+      "SERVICE_URI",
+      "WEB_ORIGIN",
+      "OIDC_ISSUER",
+      "OIDC_JWKS_URL",
+      "OIDC_AUTHORIZATION_URL",
+      "OIDC_TOKEN_URL",
+      "CONSUMPTION_ANCHOR_URL",
+      "OIDC_CLIENT_ID",
+      "OFFICIAL_OIDC_CLIENT_ID",
+      "OIDC_AUDIENCE",
+      "OFFICIAL_OIDC_AUDIENCE",
+      "INSTITUTION_ID",
+      "DEPLOYMENT_ID",
+      "CALLSIGN_PROJECT",
+      "NETWORK_ID",
+      "aws-chain-id",
+      "aws-oidc-separation",
+      "SIP_WSS_URL"
+    ],
+    "runtime": "NOT_RUN"
   }
 }

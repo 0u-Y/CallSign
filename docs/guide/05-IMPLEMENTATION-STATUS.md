@@ -7,7 +7,7 @@
 | UI-001/006 역할별 업무·공식 확인 | 실제 업무/API·공식 조회 상태와 독립 통화 종료 | [HTTP·실제 역할별 캡처](../../artifacts/service-hardening-20261105/result.json) | 공개 frontend 후속 모바일/확대 확인 | 최신 원격 화면 상호작용 검토 | 원격 브라우저 RSS 중단 후 새 실행 범위 |
 | CALL-005/006·AI-001/005 | ServiceCall/remote track·동의·정책 결합 | [최신 일반/합성 분석 경로](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup | 이전 분석/프로세스 실패의 원인 미확정 | 재발 시 보존한 exit·WS·lease 관측으로 원인 확인 | 미재현 원인을 추정 확정하지 않음 |
 | OPS-004 복원·DB 감사 | 일관된 암호화 백업·별도 DB/chain 복원·독립 Anchor | 같은 기록의 restore: 전체 RESTORE·복원 후 통화·원본/대상 SQL 감사 PASS | 별도 장애 영역 운영 검증 | 실제 AWS 저장소/Anchor 배치와 복구 | AWS 환경 |
-| OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 공개 묶음 원격 수령·별도 reader | digest·checksum·source 대응 및 reader 수령 | 독립 reader, AWS 환경 입력 |
+| OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 별도 reader·AWS 실행 | 새 후보 게시·공개/이미지 원격 수령 PASS; reader는 별도 | 독립 reader, AWS 환경 입력 |
 | AI-003 실제 제공자 평가 | 동의/취소·오류·quota·숫자 예산 선검사 | 합성 제어 흐름; 실제 제공자 호출0 | 사람 검토 한국어 입력·실제 평가 | 텍스트/음성·품질/제어 흐름 분리 | 제공자·모델·보호 참조·비용·입력 허가 |
 
 일반 entrypoint/분석 미사용 복원 계획의4통화와 별도 합성 분석 계획의3통화는 각각 PASS다. 원본과 복원 대상 DB를 삭제 전에 read-only 감사했다. 과거5회 정상 반복·이전4개 사례·이번 진단 재실행을 합쳐 성공률을 만들지 않는다. 단독 복구400은 HTTP schema 거절이고 이번 EVM 정족수 거절 증거는 아니다.
