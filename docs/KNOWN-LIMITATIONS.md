@@ -9,10 +9,9 @@
 
 ## 제출 후보와 외부 환경
 
-- 최신 [제출 사전 후보](../artifacts/submission-candidate-20261104.json)는 새 UI source의 runtime·공개/observer 전달 대상이다. 비공개 GHCR 실제 수령과 제품 UI 통합 검증을 구분하며 새 이미지의 일반 issuer startup/auth challenge는 후속 실행에서 확인했다. 전체 readiness·통화·반복·복원은 지속 swap-out 중단으로 NOT_RUN/BLOCKED다. 이전 이미지 증거를 옮기지 않는다.
-
-- [현재 재설계 UI](../artifacts/service-redesign-20261104.json)는 실제 API/SQL·Chromium에서 확인했다. 후속 runtime·공개/observer 사전 후보는 게시·원격 수령했지만 실제 통화는 미검증이다. 확인된 Vercel 공개 화면은 과거 발표 UI이며 새 Preview URL/배포 SHA·원격 build 설정은 인증 참조 부재로 미확인이다.
-- 실제 ServiceCall·양방향 합성 음원·선택 회수/공동 복구 증거는 이전6e3cd23 후보에 해당한다. 후속 UI는 실제 HTTP/SQL/WS·Chromium으로 확인했으나 새 runtime의 실제 기동·통화는40GiB 시작 조건 미달로 미검증이다. [현재 UI 실행 근거](../artifacts/service-ui-validation-20261104.json)를 구분한다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 확인하지 않았다. 단독 복구 요청은 HTTP schema에서 거절됐고 이번 EVM 정족수 거절 시험과 다르다.
+- 현재 [부분 검증 사전 후보](../artifacts/product-candidate-20261104.json)는 비공개 GHCR·공개 Release 수령을 확인했지만 전체 통화 검증 완료판이 아니다. 현재 미실행과 원인 미확정 실패는 위 절과 [실행별 기록](../artifacts/media-resume-20261104.json)을 따른다.
+- [재설계 UI](../artifacts/service-redesign-20261104.json)·[역할별 실제 UI 실행](../artifacts/service-ui-validation-20261104.json)과 새 runtime의 정상 통화 화면을 구분한다. Vercel 공개 Preview는 최신 배포 SHA를 확인하지 못했고 `/build-meta.json`이 HTML을 반환한다. 연결 인증 없이는 기존 프로젝트를 배포/승격할 수 없다.
+- 이전 runtime9d6f9dd의 실제 조회 장애 중 통화 종료·work-cancel·emergency-stop·공동 복구는 확인했으나 새59b4379 이미지로 그 결과를 옮기지 않는다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 미검증이다. 단독 복구400은 HTTP schema 거절이며 이번 EVM 정족수 거절 증거가 아니다.
 - 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.
 - AWS 리전/예산·공개 origin/TLS/OIDC·PBX/TURN 공개 주소·영속 저장소·독립 Anchor 배치·별도 GHCR reader가 필요하다. [입력 계약](RUNBOOK.md#aws-input-contract)을 따른다. 계약 주소·genesis hash·trust pin은 NEW 산출물이다.
 - AWS 최종 웹은 실제 metadata/trust/PBX 인증서 뒤에 생성한다. 로컬 시험 웹·bootstrap 전달을 AWS 배포 완료로 표시하지 않는다. Vercel은 현재 공개 preview 설정이며 실제 AWS 인증/통화 연결을 확인하지 않았다.
