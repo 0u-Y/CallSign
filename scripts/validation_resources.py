@@ -87,6 +87,15 @@ def budget_reason(sample, deadline_ns=None):
     if deadline_ns is not None and sample['monotonicNs']>=deadline_ns-40_000_000_000:return 'RUN_DEADLINE_CLEANUP_RESERVE'
     return None
 
+UI_PROFILE = 'ui-only-v1'
+
+def ui_budget_reason(sample, deadline_ns=None, startup=False):
+    return ('UI_START_MEMORY' if startup and sample['memAvailableBytes']<24*1024**3 else
+            'UI_HOST_MEMORY_RESERVE' if sample['memAvailableBytes']<16*1024**3 else
+            'UI_TOTAL_MEMORY_BUDGET' if sample['ownedProcessRssBytes']+sample['observerRssBytes']+(sample.get('containerMemoryBytes') or 0)>4*1024**3 else
+            'UI_DEADLINE_CLEANUP_RESERVE' if deadline_ns is not None and sample['monotonicNs']>=deadline_ns-600_000_000_000 else
+            budget_reason(sample,deadline_ns))
+
 # This latch belongs to one owned test directory, not the host or a production service.
 import json
 import signal
@@ -198,7 +207,10 @@ def cancel_owned(state):
     # The runner closes apps/browser first; registered descendants are only forced after grace.
     for sig, wait in ([(signal.SIGTERM,2),(signal.SIGKILL,1)] if orphaned else [(None,8),(signal.SIGTERM,2),(signal.SIGKILL,1)]):
         remaining=refresh()
-        if not remaining:return orphaned
+        if not remaining:
+            # A /proc snapshot may predate the last helper fork but observe its parent already exited.
+            remaining=refresh()
+            if not remaining:return orphaned
         if sig:
             for child in remaining:
                 try:os.kill(child['pid'],sig)

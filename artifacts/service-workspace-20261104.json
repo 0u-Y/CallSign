@@ -1,0 +1,121 @@
+{
+  "version": 1,
+  "source": "d0a2dbf47624c68f42e2a04a04e76116aba9e1af",
+  "branch": "feat/service-workspace-20261104",
+  "sourceDirtyDuringOfflineChecks": true,
+  "dirtyScope": "product changes subsequently committed as source; documentation and evidence also uncommitted",
+  "previousValidatedSource": "6e3cd238e95457406134e8ef37730fd6d251209a",
+  "previousImageConfigId": "sha256:c39cbb13a1f0efde6a9ead66a4624f78cb998e7f8a6f7fb366df6b2c866a8dc7",
+  "checks": {
+    "pnpm light": {
+      "status": "PASS",
+      "files": 63,
+      "tests": 319
+    },
+    "pnpm --filter @callsign/web build": {
+      "status": "PASS",
+      "warnings": [
+        "existing chunk size",
+        "ineffective dynamic imports"
+      ]
+    },
+    "pnpm exec tsc -p services/api/tsconfig.runtime.json --noEmit": {
+      "status": "PASS"
+    },
+    "cleanup ownership regressions": {
+      "status": "PASS",
+      "tests": 11
+    }
+  },
+  "newExecution": {
+    "status": "BLOCKED",
+    "firstFailure": "START_40_GIB_REQUIRED",
+    "sourceAtPreflight": "a5dd028e62c9ea7be41a251627fc4cd9ac237fe9",
+    "exactFirstSampleNotRetained": true,
+    "subsequentReadOnlySample": {
+      "time": "2026-11-04T09:32:33.642016+00:00",
+      "memAvailableBytes": 41668624384,
+      "notTheFirstFailingSample": true
+    },
+    "guardGiB": 40,
+    "createdBatchPlan": false,
+    "createdServices": false,
+    "createdContainers": false,
+    "createdTestKeys": false,
+    "autoRestart": false
+  },
+  "notRun": [
+    "new UI HTTP/WS/Chromium",
+    "new UI screenshots and visual review",
+    "new runtime build",
+    "work-cancel and emergency-stop on new UI",
+    "normal call smoke 2 attempts / 0 retries",
+    "new Release publication"
+  ],
+  "visualReview": {
+    "before": "two actual prior-source institution and receiver captures viewed; prior source only",
+    "after": "NOT_RUN"
+  },
+  "candidateImpact": {
+    "runtime": "new runtime required for changed web payload; prior image preserved",
+    "web": "rebuild with target metadata/trust/PBX certificate",
+    "observer": "new source includes updated UI selectors and normal-end case; needs actual execution",
+    "infrastructure": "no recipe/input changes; prior five infrastructure images reusable after identity verification",
+    "release": "old published images do not contain this UI; unique follow-up required"
+  },
+  "serverProtection": {
+    "settingsChanged": false,
+    "existingResourcesChanged": false,
+    "ownedExecutionResourcesCreated": false
+  },
+  "boundaries": [
+    "unit/SSR and build are not browser integration",
+    "previous 37 integration cases and two media cases remain prior-source evidence",
+    "no external AI/IdP/AWS calls",
+    "no new image config ID or registry digest created"
+  ],
+  "executionPolicy": {
+    "startupMemAvailableGiB": 40,
+    "runningReserveGiB": 16,
+    "observedTotalGiB": 24,
+    "httpWsChromiumHostGiB": 3,
+    "mediaHostGiB": 1,
+    "finalWebBuild": {
+      "memoryGiB": 2,
+      "cpu": 1,
+      "seconds": 90
+    },
+    "deadlineIncludingCleanupMinutes": 90,
+    "noNewLongStageInLastMinutes": 10,
+    "pressurePolicy": "integration-pressure-v1",
+    "resourceAbortRequiresNewApproval": true
+  },
+  "approvedBatchScope": [
+    "isolated UI HTTP/WS/Chromium regression",
+    "follow-up local runtime/public/observer candidate",
+    "work-cancel and emergency-stop once each",
+    "normal two-attempt smoke if remaining deadline and budget permit"
+  ],
+  "handoff": {
+    "executionProcedure": "docs/LOCAL-VALIDATION.md#reviewed-servicecall-analysis",
+    "currentProgress": "docs/FINALS-IMPLEMENTATION-PLAN.md",
+    "markdownInventory": "artifacts/document-review-20261104.json",
+    "awsReader": "separate protected classic PAT reference with read:packages and access to all six private packages; not provided or replaced by writer",
+    "finalAwsWeb": "generated after target contract metadata, public trust and PBX certificate; not this development identity"
+  },
+  "offlineLogHashes": {
+    "service-workspace-complete-light.log": "c14ccac9fbf6470d97d59e656651f072fc6b7c155be7cbb2a4aa6b8fccb0c9cb",
+    "service-workspace-complete-build.log": "fe06db5fe7e038964b1f8f202b8aced709ee1a1469cb155ca3eb5116563a8e1c",
+    "service-workspace-complete-runtime-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "service-workspace-release-light.log": "92ce5457a28153b25db57c486b0b49337a78579011ca3853755e71ffcf7d2c24",
+    "service-workspace-cleanup-race.log": "fd54d7ab71440595c66b57800113707b63752514d25cc6eb49815ffed21a8c55"
+  },
+  "priorCiFailure": {
+    "url": "https://github.com/0u-Y/CallSign/actions/runs/41810851606",
+    "source": "83547595710b4d1f1e6ab10e7d85afff6d0f1b64",
+    "failure": "last helper fork missed by a single /proc snapshot during cancellation",
+    "correctionSource": "d0a2dbf47624c68f42e2a04a04e76116aba9e1af",
+    "assertionsPreserved": true,
+    "notHiddenBySuccessfulParallelRun": true
+  }
+}

@@ -102,3 +102,7 @@
 ## 2026-11-04 실제 제품 통합·후보 제작의 한정 실행
 
 이번 사용자 요청은 소유 network=none/공유 namespace·Unix socket/loopback의 DB/API/OIDC/웹/설치 Chromium, 최신 runtime·공개/observer 로컬 후보, Besu4/Witness4/Anchor/PBX/TURN의 work-cancel·emergency-stop 각1회 및 단독/공동 복구 시험을 허용한다. 시작 available40GiB·실행 여유16GiB·전체 관측24GiB(호스트 시험 프로세스1GiB 포함), 최종 웹 build만2GiB/CPU1/90초 동시 실행 예외, 기존 pressure/OOM/관측 오류 기준과 정리 포함90분/마지막10분 신규 장기 단계 금지를 지킨다. 자원 중단 후 자동 재기동하지 않는다. 기존 host/network/global auth/service/volume·다운로드·외부 AI/AWS·별도 허가 없는 GHCR/Release는 변경/실행하지 않는다. 사용자의 후속 정정에 따라 발표 전용3분할/장면/재생 기능은 추가하지 않으며 실제 `/service` 역할별 흐름을 검증한다. 상시 실행 허가가 아니다.
+
+## Git 작업 방식 (2026-11-04 이후)
+
+PR 생성·리뷰/승인 대기 없이 검증한 변경을 책임별 영어 한 줄 커밋으로 보존하고 main에 정상 반영·일반 push한다. 원격 SHA와 기존 light CI를 확인한다. 공개 이력 재작성·force push·hook 우회는 금지한다. 기존 Draft PR #1의 커밋은 보존하고 검증·main 반영 뒤 중복 PR을 닫는다.

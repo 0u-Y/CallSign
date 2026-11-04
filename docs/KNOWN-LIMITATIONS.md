@@ -4,7 +4,7 @@
 
 ## 제출 후보와 외부 환경
 
-- 최신 제품 후보는 실제 ServiceCall·양방향 합성 음원·선택 회수/공동 복구를 확인했다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 확인하지 않았다. 단독 복구 요청은 HTTP schema에서 거절됐고 이번 EVM 정족수 거절 시험과 다르다.
+- 실제 ServiceCall·양방향 합성 음원·선택 회수/공동 복구 증거는 이전6e3cd23 후보에 해당한다. 후속 UI는 실제 HTTP/SQL/WS·Chromium으로 확인했으나 새 runtime의 실제 기동·통화는40GiB 시작 조건 미달로 미검증이다. [현재 UI 실행 근거](../artifacts/service-ui-validation-20261104.json)를 구분한다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 확인하지 않았다. 단독 복구 요청은 HTTP schema에서 거절됐고 이번 EVM 정족수 거절 시험과 다르다.
 - 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.
 - AWS 리전/예산·공개 origin/TLS/OIDC·PBX/TURN 공개 주소·영속 저장소·독립 Anchor 배치·별도 GHCR reader가 필요하다. [입력 계약](RUNBOOK.md#aws-input-contract)을 따른다. 계약 주소·genesis hash·trust pin은 NEW 산출물이다.
 - AWS 최종 웹은 실제 metadata/trust/PBX 인증서 뒤에 생성한다. 로컬 시험 웹·bootstrap 전달을 AWS 배포 완료로 표시하지 않는다. Vercel은 현재 공개 preview 설정이며 실제 AWS 인증/통화 연결을 확인하지 않았다.

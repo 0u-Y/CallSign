@@ -24,13 +24,37 @@ HTTP11·WS17·Chromium9의37개 고유 사례를 확인했다. Chromium1개 분�
 
 RUNBOOK은 AWS 수령/NEW/재개/복구 중심으로 줄이고 로컬 통화·HTTP/DB/EVM 절차를 LOCAL-VALIDATION으로 분리했다. 기존 앵커는 이동 링크로 유지하고 공개 배포 tar에 새 문서를 포함한다. MASTER의 과거 실행 수치/미구현 이력은 원문 링크로 대체해 요구/완료 조건과 구분했다. KNOWN-LIMITATIONS의 오래된 현재형·결과 중복을 정리했고 요구 ID·서명/권한·원본 증거·사용자 기획서는 보존했다. 서비스/브라우저/체인 재기동·이미지 재build·AWS/유료 제공자 호출은 하지 않았다.
 
+## 2026-11-04 실제 업무 UI 후속과 시작 조건 차단
+
+`feat/service-workspace-20261104`의 제품 UI는 현재 연락 요약·역할/다음 행동·독립 검증 상태·경고 우선·통화 중 종료 위치·업무 선택/기술 상세를 개선했다. 계정 관리만 접고 공동 승인 문맥·경고·승인/현재 연결은 유지했다. 승인 전 마이크/PBX 준비를 비활성화하며 기존 API 권한/세대/동의 검사는 그대로다. 기존 실제 캡처2개를 직접 열어 문제를 확인했으며 새 UI 캡처나 이해도 평가를 했다는 주장은 하지 않는다.
+
+사용자가 같은 예산의 새 UI batch1회를 승인했으나 `START_40_GIB_REQUIRED`에서 계획·키·DB·컨테이너 생성 전에 차단됐다. 첫 표본의 수치는 보존하지 못했으며 **후속 읽기 전용 표본**은 available38.81GiB였다. guard/예산을 낮추거나 자동 재시도하지 않았다. 새 HTTP/WS/Chromium·통화·runtime 제작은 NOT_RUN이고 이전6e3cd23/c39cbb 결과를 복사하지 않는다. 정상 통화2회/재시도0의 기존 observer 경로를 준비했지만 실행한 결과는 없다.
+
+추가 리뷰에서 업무 조회 실패 시 이전 목록/관리 동작 유지와 다른 업무 선택 시 이전 통화 요약 유지, 공식 업무 조회 실패 시 과거 목록/내부 오류 표시를 수정했다. 기존 진행 통화 종료는 조회 실패에도 사용할 수 있다. CI에서 종료 중 마지막 helper가 `/proc` 첫 표본에 누락되는 정리 경합1건을 발견해 빈 소유 목록을 재확인하도록 수정했다. 실패 CI 원본은 보존했고 결정적 경합 회귀와 기존11개 정리/자원 시험을 통과했다. 최종 오프라인 `pnpm light`63파일319시험·웹 build·API runtime 타입 검사 PASS이며 새 UI 실제 HTTP/브라우저 결과가 아니다. [소스/검증 경계](../artifacts/service-workspace-20261104.json)에 기록한다.
+
+Git 추적 Markdown42개(MDX0)의 파일별 독자·현행/원본/이력·처리를 [전수 검토 기록](../artifacts/document-review-20261104.json)에 보존한다. root 개인 요약4개·기존 ignored 전달 요약25개는 별도 분류해 로컬 보존하고 게시/삭제하지 않았다. RUNBOOK/MASTER/한계/현황 역할을 나누고 코드·문서/anchor·배포 포함 경로를 대조했다. UI/reference 변경은 [제품 기준](../PRODUCT.md)과 [공식 패턴](DESIGN-REFERENCES.md)을 따른다.
+
+GHCR의6e3cd23 이미지 후보6종은 비공개 게시·실제 원격 수령을 완료했으나 추가 UI는 포함하지 않는다. 기존 Release는 그대로 두고 사전 Release/후속 runtime은 새 UI 검증 뒤에 확정한다. 봉인한 이전 묶음·실패 원본은 로컬에 보존했다. 새 Release가 있다고 설명하거나 기존 tag/inventory를 덮어쓰지 않는다.
+
+<a id="ui-only-20261104"></a>
+
+## 2026-11-04 UI 전용 실제 실행과 main 반영
+
+새 명시적 승인으로 `ui-only-v1`(시작24GiB/여유16GiB/host3GiB/DB 포함4GiB/45분, 정리10분)을 선택해 실제 PostgreSQL·API/세션/CSRF·HTTPS OIDC·제품 웹/Chromium을 실행했다. 전체 통화 profile의40GiB guard는 유지했다. 첫 표본은 판정 전에 보존했다. UI/업무 선택·공식 업무 오류·공동 승인·WS 분석 경계를 확인했고, 최초 숨겨진 ID 선택자 실패와 확대/보류 응답 시험 결함을 고쳐 원래 deadline 안에서 선택 재시험했다. 실패·재시험을 분모에서 없애거나 고유 사례 수에 더하지 않았다. [실행·자원·소스·캡처 원본 연결](../artifacts/service-ui-validation-20261104.json)을 기준으로 한다.
+
+직접 연 캡처에서 기관 고급 입력의 과밀과 공식 확인 버튼의 작은 조작 영역을 확인해 기존 details/버튼을 재사용했다. 위험·공동 변경 검토·긴급 정지는 접지 않았다. 계정 전환/조회 장애·빈 목록/로딩·정책/분석 오류와 동의 철회를 확인했다. 분석 화면1개는 실제 인증 WS를 받는 component host이며 ServiceCall/PBX/음성 경로가 아니다. 진행 통화에서 조회 장애 후 종료 조작은 B에서 확인할 항목으로 유지한다.
+
+A 정리 뒤 B 최초 표본은 available39.04GiB로40GiB 시작 조건을 통과하지 못했다. 체인/PBX/TURN/Anchor를 기동하거나 조건을 기다리며 반복 조회하지 않았다. 새 clean source65d85ac의 runtime은 기존 로컬 base·network-none·2GiB/CPU1/90초로 직렬 build하고 파일/사용자/아키텍처를 무기동 대조했다. 새 runtime 실제 기동·통화와 AWS 최종 trust 웹·후속 원격 게시를 완료로 표시하지 않는다. 기존 후보/Release·원본 실패·개인 요약은 보존했다.
+
+Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반 push하고 원격/CI를 확인한다. PR을 새로 만들거나 승인 대기하지 않으며 기존 Draft #1은 main 반영 뒤 중복으로 닫는다.
+
 ## 현재 상태와 다음 단계
 
 | 구분 | 상태·다음 작업 |
 |---|---|
-| 제품 소스 | 검증한6e3cd23과 이후 문서/증거 정리를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
-| 로컬 후보 | runtime·공개/observer 묶음과2개 실제 통화/회수 사례 확인. 원격 게시 전 후보이며 AWS 최종 웹 아님 |
-| 원격 전달 | 고정 Release는 이전 소스. 최신 runtime 게시·새 inventory/Release·별도 수령 검증이 남음 |
+| 제품 소스 | 이전 미디어 후보와 후속 UI 전용 실제 검증 소스를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
+| 로컬 후보 | 이전 미디어 후보/증거 보존. 후속 clean runtime은 로컬 build/무기동 감사 완료, 실제 기동·미디어는 미검증. AWS 최종 웹 아님 |
+| 원격 전달 | 검증한 이전 제품의6종 GHCR 게시/수령 완료. 후속 UI는 미반영이며 새 Release는 검증 뒤 발행 대기 |
 | 외부 환경 | AWS 공개 origin/TLS/OIDC/PBX/TURN·reader 보호 참조와 실행 허가 필요. AI 품질·사람 평가도 별도 |
 | 문서 기준 | 요구는 MASTER, 실행은 RUNBOOK, 한계는 KNOWN-LIMITATIONS. 과거 실행 성공을 현재 전체 PASS로 복사하지 않음 |
 

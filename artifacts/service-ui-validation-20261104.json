@@ -1,0 +1,663 @@
+{
+  "version": 1,
+  "source": "65d85ac28987f3b3dda0e7604f169be798c181ba",
+  "integrationStartedAtHead": "7b47206449ee9eff7361bd1eccb54bb8afd5bf51",
+  "integrationSourceDirty": true,
+  "initialDiffSha256": "7c83c81d8d32da994dcddbda073c3c819eb785cf0a6be10b5179af690c30b014",
+  "sourceScope": "Initial full suite plus bounded selected UI repairs; API/SQL/WS product sources unchanged across repairs. Final product markup is committed in source; no claim that each case was rerun after every visual edit.",
+  "A": {
+    "profile": "ui-only-v1",
+    "uniqueCases": {
+      "Chromium": 10,
+      "HTTP": 11,
+      "WS": 17
+    },
+    "uniqueCaseCount": 38,
+    "finalFailures": 0,
+    "initialFailuresRetained": true,
+    "phases": [
+      {
+        "phase": "ui-only-20261104T101446Z-699971",
+        "result": {
+          "exitCode": 2,
+          "resourceStop": null,
+          "policy": "integration-pressure-v1",
+          "automaticRestart": false
+        },
+        "tests": [
+          {
+            "name": "boundary: reviews and exports a real proposal, imports independent signatures, then distinguishes submission, confirmation and activation",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: rejects replayed joint signatures and forged event/state/witness evidence without prematurely activating a directory-only change",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "boundary: shows durable worker failure instead of active configuration",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: drops a held old-account response, clears management drafts on account switch and refuses revoked buttons",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: stops analysis transport and late model results after consent withdrawal, then isolates new revisions and provider failure",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "boundary: separates first-connect expiry from lease expiry and never reactivates terminal attempts",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "boundary: preserves a live synthetic lease for display changes but revokes it on confirmed policy generation changes",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "boundary: disables ungranted manager actions, rejects their HTTP bypass and clears work expiry on reload",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: recovers a committed creation after a lost response without duplicating the intent and cancels it safely",
+            "state": "failed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: stops a pending model after lease-policy changes without publishing the late result",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "boundary: stops a pending model after connection-generation changes without publishing the late result",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects invented-evidence while retaining supported rules and product-controlled actions",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects external-command while retaining supported rules and product-controlled actions",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects epoch mismatch before forwarding a new frame",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects key-generation mismatch before forwarding a new frame",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects binding mismatch before forwarding a new frame",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: enforces the remote context identity cap and releases the stream",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "recall HTTP/SQL: keeps DELETE success, missing resources and unavailable observation distinct through real runtime writes",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "recall Chromium: renders real cancellation observations and clears a held response on visibility events and account switch",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "analysis HTTP/WS: rejects an expired session row and cancels its pending provider result",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "analysis HTTP/WS: drains real quota before issuer shutdown even when a provider ignores abort",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked consent transaction never starts STT and releases its SQL reservation",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: shutdown during a locked session lookup leaves no provider or reservation",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "analysis HTTP/WS: cancellation while model reservation is blocked releases zero without invoking the provider",
+            "state": "passed",
+            "kind": "WS"
+          },
+          {
+            "name": "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "requires real recent auth_time and revokes active sessions through the account-management API",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "blocks new work after trust publication or recovery mismatch without creating partial state",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "reads institution recall snapshots through actual sessions and rejects customer access",
+            "state": "passed",
+            "kind": "HTTP"
+          }
+        ],
+        "cleanup": {
+          "containerRemoved": true,
+          "privateRootRemoved": true,
+          "appsBeforeDatabase": true,
+          "resourceCause": "NORMAL_COMPLETION"
+        },
+        "audit": "NOT_RUN",
+        "progressHashes": {
+          "readiness.progress.jsonl": "a8ecf364655bc244c3aeee829d6c0455bbfc26e0bdf8c82c7b09b894aa84cbef",
+          "product-boundaries.progress.jsonl": "382e987f22b96cd9cd3909463ab06089df6ce66adc4f742e0f9609bdcc712748",
+          "product-http.progress.jsonl": "c81531037d43bb5e07936de9da9e5695edaef366795501bd1ad20145a5f2e01e"
+        }
+      },
+      {
+        "phase": "repair-1",
+        "result": {
+          "exitCode": 0,
+          "resourceStop": null,
+          "policy": "integration-pressure-v1",
+          "automaticRestart": false
+        },
+        "tests": [
+          {
+            "name": "boundary: reviews and exports a real proposal, imports independent signatures, then distinguishes submission, confirmation and activation",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: synchronizes work logout across tabs while keeping official session separate, and clears expired official tasks",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "boundary: recovers a committed creation after a lost response without duplicating the intent and cancels it safely",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "uses real authorization-code/PKCE login and keeps Secure cookies, purpose and replay boundaries",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "rejects issuer/audience/client/nonce/signature/expiry mismatches and unregistered/inactive/cross-tenant subjects",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "enforces CSRF, tenant assignment, strict schemas, durable idempotency and pending delegation status over HTTP",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "issues and consumes real signed authorizations once across concurrent HTTP requests, rejecting tampering and unavailable authority",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "requires real recent auth_time and revokes active sessions through the account-management API",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "blocks new work after trust publication or recovery mismatch without creating partial state",
+            "state": "passed",
+            "kind": "HTTP"
+          },
+          {
+            "name": "renders the actual service in Chromium, completes OIDC login, creates/cancels work and isolates recipient menus",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "reads institution recall snapshots through actual sessions and rejects customer access",
+            "state": "passed",
+            "kind": "HTTP"
+          }
+        ],
+        "cleanup": {
+          "containerRemoved": true,
+          "privateRootRemoved": true,
+          "appsBeforeDatabase": true,
+          "resourceCause": "NORMAL_COMPLETION"
+        },
+        "audit": "PASS",
+        "progressHashes": {
+          "residue-audit.progress.jsonl": "9c0b8870b32f60e72f69872315238ce470de96cd4054b58d1e0203b63d7ee1f0",
+          "readiness.progress.jsonl": "ab999450a920af46070f075b8678f55d007e3d8538c75fe4395f55ed6e14d7dd",
+          "product-boundaries.progress.jsonl": "4077aedfd45911574e666d5829245076457cdadcc10eb73b93748d6242418f0d",
+          "product-http.progress.jsonl": "744e383874e11a0a84a2ce4afbf8d2fbf3f2b16e3bb2b8bf3d9c74bb88e76a8e"
+        }
+      },
+      {
+        "phase": "state-captures",
+        "result": {
+          "exitCode": 2,
+          "resourceStop": null,
+          "policy": "integration-pressure-v1",
+          "automaticRestart": false
+        },
+        "tests": [
+          {
+            "name": "analysis Chromium: renders authenticated WebSocket results in the shipped panel with synthetic binding and no media device",
+            "state": "passed",
+            "kind": "Chromium"
+          },
+          {
+            "name": "UI only: keeps empty and loading work states usable with enlarged text and keyboard focus",
+            "state": "failed",
+            "kind": "Chromium"
+          }
+        ],
+        "cleanup": {
+          "containerRemoved": true,
+          "privateRootRemoved": true,
+          "appsBeforeDatabase": true,
+          "resourceCause": "NORMAL_COMPLETION"
+        },
+        "audit": "NOT_RUN",
+        "progressHashes": {
+          "readiness.progress.jsonl": "4aaeb8fb262c983e4b62ea327b73f211db0124ffdffc83e1922cc1508678bd00",
+          "product-boundaries.progress.jsonl": "7c129bec5cb489e68f75d711efc3805b941301259e7b4c41b6304d4b65e6c870"
+        }
+      },
+      {
+        "phase": "capture-repair",
+        "result": {
+          "exitCode": 0,
+          "resourceStop": null,
+          "policy": "integration-pressure-v1",
+          "automaticRestart": false
+        },
+        "tests": [
+          {
+            "name": "UI only: keeps empty and loading work states usable with 200 percent viewport emulation and keyboard focus",
+            "state": "passed",
+            "kind": "Chromium"
+          }
+        ],
+        "cleanup": {
+          "containerRemoved": true,
+          "privateRootRemoved": true,
+          "appsBeforeDatabase": true,
+          "resourceCause": "NORMAL_COMPLETION"
+        },
+        "audit": "PASS",
+        "progressHashes": {
+          "residue-audit.progress.jsonl": "95db34e5bbcad5520030783b20d5f77e5bc4d6e3bec3081f6abcd29c38e5a3b4",
+          "readiness.progress.jsonl": "02bcc2225f469eb68c53872722c19da135ccb3ab04374313b8c2cfd6cc485729",
+          "product-boundaries.progress.jsonl": "73885bd688091faf3cb79b937452b4f82c12d8ddfdb8c4972e3644c081c0d8e0"
+        }
+      },
+      {
+        "phase": "zoom-confirmation",
+        "result": {
+          "exitCode": 0,
+          "resourceStop": null,
+          "policy": "integration-pressure-v1",
+          "automaticRestart": false
+        },
+        "tests": [
+          {
+            "name": "UI only: keeps empty and loading work states usable with 200 percent viewport emulation and keyboard focus",
+            "state": "passed",
+            "kind": "Chromium"
+          }
+        ],
+        "cleanup": {
+          "containerRemoved": true,
+          "privateRootRemoved": true,
+          "appsBeforeDatabase": true,
+          "resourceCause": "NORMAL_COMPLETION"
+        },
+        "audit": "PASS",
+        "progressHashes": {
+          "residue-audit.progress.jsonl": "e9e48b2f390dd9f36c1147e720febc2a5174a6278a04b8bc7ceb4d2a37ece310",
+          "readiness.progress.jsonl": "e57bdb0544c76bb5186faa7125ed5b3a1682ddaa44123aad94462f4e2bfa8d0c",
+          "product-boundaries.progress.jsonl": "3d6c8b2003d08a60fd07489b0dc98d2f816eddd451d5d04a51d1739887fe3139"
+        }
+      }
+    ],
+    "initialSample": {
+      "sample": {
+        "bootIdHash": "d36d25288dd1f9e169655cd792da1f5e8411266902ee3f75e194818fc0448ab1",
+        "clock": "linux-CLOCK_MONOTONIC",
+        "observerPid": 3866765,
+        "observerRssBytes": 18477056,
+        "monotonicNs": 2071299401473363,
+        "pageBytes": 4096,
+        "oomKillTotal": 3,
+        "swapInPagesTotal": 17468852,
+        "swapOutPagesTotal": 33072291,
+        "memAvailableBytes": 41829433344,
+        "memoryPSI": {
+          "some": {
+            "avg10": 0.0,
+            "avg60": 0.0,
+            "avg300": 0.0,
+            "total": 292513458.0
+          },
+          "full": {
+            "avg10": 0.0,
+            "avg60": 0.0,
+            "avg300": 0.0,
+            "total": 284524623.0
+          }
+        }
+      },
+      "failure": null,
+      "profile": "ui-only-v1"
+    },
+    "limits": {
+      "startGiB": 24,
+      "reserveGiB": 16,
+      "hostObservedGiB": 3,
+      "totalObservedGiB": 4,
+      "postgresHardMemoryMiB": 512,
+      "postgresHardCpu": 1,
+      "temporaryGiB": 5,
+      "deadlineMinutes": 45,
+      "cleanupReserveMinutes": 10
+    },
+    "sampled": {
+      "hostSampleCount": 87,
+      "minMemAvailableBytes": 40183562240,
+      "maxHostOwnedRssBytes": 2283266048,
+      "maxTotalObservedBytes": 2391773184,
+      "maxContainerMemoryBytes": 133251072,
+      "maxTemporaryUpperBoundBytes": 543908712
+    },
+    "noResourceStop": true,
+    "cleanup": "all five owned sequential PostgreSQL subresources and protected roots removed; application/browser cleanup preceded DB",
+    "sameDatabaseAudit": "Each successful repair phase audited its own DB. The first failed suite was cleaned before repair; no claim of a rerun in that removed DB."
+  },
+  "B": {
+    "observedAt": "2026-11-04T10:21:12.620203+00:00",
+    "stage": "B-full-media",
+    "sample": {
+      "bootIdHash": "d36d25288dd1f9e169655cd792da1f5e8411266902ee3f75e194818fc0448ab1",
+      "clock": "linux-CLOCK_MONOTONIC",
+      "observerPid": 3903690,
+      "observerRssBytes": 18219008,
+      "monotonicNs": 2071685912192447,
+      "pageBytes": 4096,
+      "oomKillTotal": 3,
+      "swapInPagesTotal": 17469296,
+      "swapOutPagesTotal": 33072293,
+      "memAvailableBytes": 41919037440,
+      "memoryPSI": {
+        "some": {
+          "avg10": 0.0,
+          "avg60": 0.01,
+          "avg300": 0.0,
+          "total": 292801040.0
+        },
+        "full": {
+          "avg10": 0.0,
+          "avg60": 0.01,
+          "avg300": 0.0,
+          "total": 284811585.0
+        }
+      }
+    },
+    "guardGiB": 40,
+    "decision": "BLOCKED_START_40_GIB",
+    "automaticRetry": false
+  },
+  "components": {
+    "actual": [
+      "PostgreSQL migrations and role LOGIN",
+      "Platform/Issuer/Sender HTTP and SQL",
+      "HTTPS OIDC authorization code/PKCE/JWT/JWKS fixture transport",
+      "product web and installed Chromium",
+      "authenticated analysis WebSocket orchestration"
+    ],
+    "fixture": [
+      "OIDC identity/provider",
+      "ledger and Witness responses/events",
+      "Anchor adapter",
+      "ARI",
+      "STT/LLM"
+    ],
+    "notStarted": [
+      "Besu",
+      "Witness services",
+      "actual Anchor",
+      "Asterisk",
+      "TURN",
+      "actual media",
+      "external IdP/AI",
+      "AWS"
+    ]
+  },
+  "screenshots": [
+    {
+      "path": "artifacts/service-ui-20261104/institution-desktop.png",
+      "sha256": "90c047a54eea5687cece4208185ac02acea333e842e287a50f8c3c81f0556619",
+      "bytes": 463580,
+      "scope": "actual product; selected cancelled work and expanded technical detail",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/agent-mobile.png",
+      "sha256": "8f2983dfa580fe66956f8106e96c1acfe8bd28a77305a480166a7ed0c1b513ab",
+      "bytes": 268065,
+      "scope": "actual product; second work selection, no live call",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/recipient-desktop.png",
+      "sha256": "e6ae27bd9eaec8696660d4dab8050c38cf7b19e8829af5c6755479b7c5cae53a",
+      "bytes": 244722,
+      "scope": "actual product; approval/connection/analysis remain separate, no live call",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/approver-mobile.png",
+      "sha256": "cea3c306f59f3c6936a5ae757e0a0f89cf50e66132124dd1665b17ba54bec689",
+      "bytes": 365116,
+      "scope": "actual product authenticated approver, chain/witness fixtures",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/official-mobile.png",
+      "sha256": "c6bacbf781fc02b8a7d8f8919053fdc101d51e3c391f1c1c62aebb52f90e9233",
+      "bytes": 47809,
+      "scope": "actual official session/API, 44px or larger confirmation targets",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/loading-mobile.png",
+      "sha256": "87be69c9f235ce7b406ef841bea34aac6321d3fcd8a9ce748d9ecdf91673b3fb",
+      "bytes": 232735,
+      "scope": "actual workspace response delayed; no success replacement",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/zoom-layout.png",
+      "sha256": "7cb235ae0354ffbc4fc7f6334fecfa35200a6ed0180a05d538f01a8eb7d281d4",
+      "bytes": 460345,
+      "scope": "683 CSS px at DPR2, 200% layout equivalent; not native browser menu zoom",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/analysis-component-unavailable.png",
+      "sha256": "67da8d9ea253c3183f881826303ffa9bb568801605ce72f94fb5249000317db7",
+      "bytes": 58377,
+      "scope": "actual authenticated WS with synthetic binding/provider; component host bypasses ServiceCall/PBX/media",
+      "visuallyOpened": true
+    },
+    {
+      "path": "artifacts/service-ui-20261104/analysis-component-risk-purpose.png",
+      "sha256": "04062013a16cd804f5993ad34f31883ac82e684a1b64ac2bf176b9c152098376",
+      "bytes": 290538,
+      "scope": "component host with real authenticated WS; simultaneous risk/purpose results, no media",
+      "visuallyOpened": true
+    }
+  ],
+  "offlineChecks": {
+    "lightEquivalent": "pnpm lint; pnpm typecheck; pnpm exec vitest run --maxWorkers=1: 63 files / 320 tests PASS",
+    "webBuild": "PASS with existing chunk/dynamic import warnings"
+  },
+  "documentReviewDelta": {
+    "trackedMarkdownCount": 42,
+    "addedTrackedMarkdown": [],
+    "baseline": "artifacts/document-review-20261104.json",
+    "personalUntrackedMarkdown": "preserved, not published; includes user-requested local summary",
+    "modifiedMarkdownAfterAudit": [
+      "AGENTS.md",
+      "docs/LOCAL-VALIDATION.md",
+      "docs/KNOWN-LIMITATIONS.md",
+      "docs/guide/05-IMPLEMENTATION-STATUS.md",
+      "docs/FINALS-IMPLEMENTATION-PLAN.md"
+    ],
+    "gitWorkflow": "verified responsibility commits, normal main push, then close duplicate PR #1; no new PR or approval wait"
+  },
+  "serverSettingsChanged": false,
+  "existingResourcesChanged": false,
+  "runtimeCandidate": {
+    "configId": "sha256:b5e25975c3ac52376beea64d807e30d8b31a9026dc3098cbda359f00e6a8fafb",
+    "architecture": "linux/amd64",
+    "source": "65d85ac28987f3b3dda0e7604f169be798c181ba",
+    "user": "1000:1000",
+    "workingDirectory": "/home/ana/Desktop/yyw/CallSign",
+    "entrypoint": null,
+    "cmd": [
+      "pnpm",
+      "--filter",
+      "@callsign/api",
+      "exec",
+      "tsx",
+      "src/finals-server.ts"
+    ],
+    "copiedSourceHashes": {
+      "apps/web/src/pages/Service.tsx": "36322621e4d32b488b040116cfd3213d80fab4b08819a21bbe5249ca13b8ac02",
+      "apps/web/src/components/ServiceContactSummary.tsx": "8088bfc832e57d51142a48291f05be84b10efcd976e2b4e12af881ba38b21e59",
+      "apps/web/src/lib/officialError.ts": "a38b09970a9c9e318b24cd70dc5f1b7647c1b6d2b836c1b3886398409aa457ac",
+      "scripts/validation_resources.py": "b0e8885471cdb49ed2b4a902db5fc0054a6de375db3e1be248474c45739d707a"
+    },
+    "imageLayerCount": 20,
+    "historySha256": "8fff60b99ebc861288f35b87b0f03318cf98492893ae420de9110cc758f9ea37",
+    "buildInputs": "clean public Git worktree; existing prepared base; new COPY paths use unchanged .dockerignore excluding .local/node_modules/dist/protected env/key files",
+    "baseAudit": "existing prepared base audit retained; no new secret material passed to build",
+    "auditContainerStarted": false,
+    "auditContainerRemoved": true,
+    "runtimeStartup": "NOT_RUN",
+    "registryManifestDigest": null,
+    "build": {
+      "status": "BUILT_NOT_RUNTIME_VERIFIED",
+      "worktreeDirty": false,
+      "baseConfigId": "sha256:ed282c7e35db95359ac1d227a833baae1856d8646808b606194afaee3798266f",
+      "memoryHardLimitGiB": 2,
+      "cpuHardLimit": 1,
+      "controllerObservedLimitMiB": 256,
+      "timeoutSeconds": 90,
+      "durationSeconds": 5.172322676982731,
+      "policy": "integration-pressure-v1",
+      "servicesRunningDuringBuild": false,
+      "executionProfile": "ui-only-v1 offline serial candidate",
+      "totalObservedLimitGiB": 4,
+      "dockerfileSha256": "0e01bc9523b5a6e798c96e8d0a160343911886ade704c86b85c827e590458f04",
+      "dockerignoreSha256": "9f9c5752852d6034dc934dc69bb06568c1d35ea765967987d93a0e1b2414bb0c"
+    },
+    "imagePublication": "NOT_PUBLISHED",
+    "reusedInfrastructure": "five unchanged recipes and lockfiles; existing config IDs / private registry digests preserved"
+  },
+  "sourceFileHashes": {
+    "apps/web/src/pages/Service.tsx": "36322621e4d32b488b040116cfd3213d80fab4b08819a21bbe5249ca13b8ac02",
+    "apps/web/src/components/ServiceContactSummary.tsx": "8088bfc832e57d51142a48291f05be84b10efcd976e2b4e12af881ba38b21e59",
+    "apps/web/src/components/ServiceAnalysisPanel.tsx": "05067109cb55e288d7080675df7c65fe0f9ee0059c833064716961d975a97485",
+    "apps/web/src/lib/officialError.ts": "a38b09970a9c9e318b24cd70dc5f1b7647c1b6d2b836c1b3886398409aa457ac",
+    "apps/web/src/styles.css": "bce530854683abaae2048cda892c459938f7d95cca5730f546a5a92ac78bab75",
+    "tests/integration/service-http.test.ts": "abad09f0855c0c1932073ef16e97306a321798c41b45e549b3c0610d7ef23002",
+    "tests/integration/service-boundaries.test.ts": "ba62586232debf55e868cc056cd73443956b6f9e6221d1b97bebdb34ba5e9e78"
+  },
+  "remainingMediaAssertions": [
+    "live call end remains usable during workspace query failure",
+    "actual ServiceCall remote receiver track and panel after UI change",
+    "work-cancel and emergency-stop with both decoded remote audio streams stopping",
+    "new runtime ordinary service entrypoints and fixture separation at actual startup"
+  ],
+  "visualFindings": [
+    "Advanced membership/registration/recovery inputs crowded primary work; folded while emergency stop and joint configuration review remain visible",
+    "Official task actions lacked button targets; reused existing primary/secondary styles, actual height >=44px",
+    "A hidden technical ID selector was stale; scope the row lookup to the named work list",
+    "CSS zoom does not emulate native layout zoom; replaced with 683 CSS px / DPR2 independent browser context",
+    "Native browser menu zoom and screen reader use remain unverified"
+  ],
+  "allScreenshotsExamined": "selected nine published captures directly opened; prior first-pass captures and failures retained locally"
+}

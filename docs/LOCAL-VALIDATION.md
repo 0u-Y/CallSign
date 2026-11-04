@@ -14,6 +14,22 @@
 | 무기동 검사·DB·EVM | [실행 범주](#실행-범주), [DB](#자원-제한-postgresql-검증-실측-절차), [EVM](#로컬-evm-계약-검증-2026-10-30) |
 | 실제 AWS·백업/복원 | [운영 RUNBOOK](RUNBOOK.md) |
 
+<a id="ui-only-validation"></a>
+
+## UI 전용 검증과 실제 통화 검증의 분리
+
+실제 `/service`·`/official` 화면 검토는 기존 HTTP fixture·격리 PostgreSQL·loopback API/OIDC/웹·설치 Chromium을 사용한다. 원장/ARI/Anchor/분석 제공자는 명시적 adapter이며 전체 통화 성공으로 세지 않는다. 별도 사용자 승인이 있는 새 batch에서만 `--profile ui-only-v1 --policy integration-pressure-v1`을 선택한다. 환경변수만으로 선택하지 않으며 identity의 `executionProfile`도 일치해야 한다.
+
+이 UI profile의 승인 조건은 시작24GiB·실행 여유16GiB, host 관측3GiB·DB 포함4GiB·임시5GiB, DB 강제512MiB/CPU1, worker1·브라우저1, 정리 포함45분/마지막10분 확보다. 조건·최초 표본을 판정 전에 보존한다. 기존 압박/swap-out/OOM/관측 오류 중단은 유지한다. 강제 DB 제한과 관측 예산은 다르며 AWS 최소 사양이 아니다. 전체 통화의40GiB/24GiB/host1GiB 조건은 바꾸지 않는다.
+
+기존 [Unix socket 준비](#mentoring-integration-unix)로 새 소유 DB·최소권한 LOGIN·migration을 준비하고, 같은 identity의 controller에 profile을 명시한다. 보호 env·CA는 소유 경로만 사용한다. 예를 들어 다음 명령은 이미 준비한 controller/실시간 watchdog 아래의 한 단계이며 독립적인 전체 준비 명령이 아니다.
+
+```bash
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration python3 scripts/validation-resource-control.py   --profile ui-only-v1 --policy integration-pressure-v1 run "$CONTROL" product-ui 300   node node_modules/vitest/vitest.mjs run --config vitest.http.config.ts tests/integration/service-http.test.ts
+```
+
+실제 API 성공은 대체하지 않는다. 장애 응답/보류 응답·component host를 쓴 사례는 결과에 표시하고, 캡처는 직접 열어 판단한다. 683 CSS px·DPR2 확대 동등 viewport 검토는 네이티브 브라우저 메뉴 확대·스크린리더 검증과 구분한다. 실패 원본과 선택 재시험을 보존하고 고유 사례를 중복 집계하지 않는다. 자원 중단 시 새 batch를 자동 생성하지 않는다. [현재 실행 결과](../artifacts/service-ui-validation-20261104.json)를 따른다.
+
 <a id="isolated-media-20261102"></a>
 
 ## 2026-11-02 교환기 통합 시험과 이미지 전달

@@ -230,3 +230,35 @@ with tempfile.TemporaryDirectory() as directory:
    if process_start(child['pid'])==child['processStart']:os.kill(child['pid'],9)
 `],{stdio:'pipe',timeout:13000});
 },15000);
+
+
+it('rescans an empty ownership snapshot before releasing helpers forked during cancellation',()=>{
+ execFileSync('python3',['-c',`
+import tempfile,signal
+from unittest.mock import patch
+import scripts.validation_resources as resources
+with tempfile.TemporaryDirectory() as directory:
+ state=resources.RunState(directory,'unit-empty-snapshot')
+ state.write('active-test.json',dict(pid=900000,processStart='parent'))
+ helper=dict(pid=900001,processStart='helper')
+ snapshots=iter([[helper],[],[helper],[],[],[]]);sent=[]
+ with patch.object(resources,'active_processes',side_effect=lambda active:next(snapshots,[])),patch.object(resources,'process_start',return_value=None),patch.object(resources.os,'kill',side_effect=lambda pid,sig:sent.append((pid,sig))):
+  assert resources.cancel_owned(state) is True
+ assert sent==[(helper['pid'],signal.SIGTERM)]
+ assert state.read('active-test.json')['ownedProcesses']==[]
+`],{stdio:'pipe',timeout:3000});
+});
+
+it('keeps UI-only memory and cleanup reserves distinct from the full media guard',()=>{
+ execFileSync('python3',['-c',`
+from scripts.validation_resources import ui_budget_reason
+b=dict(memAvailableBytes=24*1024**3,ownedProcessRssBytes=2*1024**3,observerRssBytes=0,containerMemoryBytes=512*1024**2,temporaryTotalUpperBoundBytes=0,monotonicNs=0)
+assert ui_budget_reason(b) is None
+assert ui_budget_reason(dict(b,memAvailableBytes=24*1024**3-1),startup=True)=='UI_START_MEMORY'
+assert ui_budget_reason(dict(b,memAvailableBytes=24*1024**3-1)) is None
+assert ui_budget_reason(dict(b,memAvailableBytes=16*1024**3-1))=='UI_HOST_MEMORY_RESERVE'
+assert ui_budget_reason(dict(b,ownedProcessRssBytes=3*1024**3+1))=='APP_MEMORY_BUDGET'
+assert ui_budget_reason(dict(b,containerMemoryBytes=3*1024**3))=='UI_TOTAL_MEMORY_BUDGET'
+assert ui_budget_reason(b,600_000_000_000)=='UI_DEADLINE_CLEANUP_RESERVE'
+`],{stdio:'pipe'});
+});
