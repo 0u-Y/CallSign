@@ -1,32 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "web": {
-      "root": ".",
-      "framework": "vite",
-      "installCommand": "pnpm install --frozen-lockfile",
-      "buildCommand": "VITE_PUBLIC_PREVIEW=true pnpm --filter @callsign/web build",
-      "outputDirectory": "apps/web/dist",
-      "rewrites": [
-        {
-          "source": "/(.*)",
-          "destination": "/index.html"
-        }
-      ]
-    }
-  },
   "rewrites": [
     {
-      "source": "/assets/(.*)",
-      "destination": {
-        "service": "web"
-      }
-    },
-    {
       "source": "/(.*)",
-      "destination": {
-        "service": "web"
-      }
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -60,5 +37,9 @@
         }
       ]
     }
-  ]
+  ],
+  "framework": "vite",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "VITE_PUBLIC_PREVIEW=true pnpm --filter @callsign/web build",
+  "outputDirectory": "apps/web/dist"
 }

@@ -48,31 +48,7 @@ interface JourneyStep {
 }
 
 export function LandingPage() {
-  return (
-    <div className="landing-page">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <span className="mode-tag preview"><CircleDot size={14} /> UI PREVIEW · 모의 데이터</span>
-          <h1>이 연락, 정말 기관이 승인했을까요?</h1>
-          <p>기관이 승인한 연락인지 전화를 받는 순간 확인하고, 통화 중 위험한 요구는 별도로 안내합니다.</p>
-          <div className="hero-actions">
-            <Link className="button primary" to="/demo"><Play size={18} />3분 데모 시작</Link>
-            <Link className="button quiet" to="/evidence">기술 구조 보기<ArrowRight size={18} /></Link>
-          </div>
-          <p className="scope-note">실제 기관 연동이 아닌, 모의 기관·합성 데이터 기반 작동형 개념검증입니다.</p>
-        </div>
-        <EvidenceSwitchboard state="CONNECTED_VERIFIED" compact />
-      </section>
-      <section className="steps-section" aria-labelledby="steps-heading">
-        <h2 id="steps-heading">믿으라는 이름 대신, 확인할 수 있는 경로</h2>
-        <div className="steps-line">
-          <article><Landmark aria-hidden="true" /><h3>기관이 연락을 승인합니다</h3><p>위임만으로는 부족합니다. 수신자와 목적을 정한 개별 승인서가 필요합니다.</p></article>
-          <article><Link2 aria-hidden="true" /><h3>실제 연결과 묶습니다</h3><p>승인서·수신 세션·게이트웨이 키·WebRTC 전송 문맥을 대조합니다.</p></article>
-          <article><FileCheck2 aria-hidden="true" /><h3>공식 업무로 이어집니다</h3><p>민감한 서류는 전화 증명만으로 열지 않고, 별도 로그인과 객체 권한을 확인합니다.</p></article>
-        </div>
-      </section>
-    </div>
-  );
+ return <div className="service-home"><section className="home-intro"><div><h1>연락의 목적은 분명하게.<br/>통화의 권한은 끝까지.</h1><p>CallSign은 기관이 승인한 고객과 목적으로 연락하도록 관리하고, 수신자가 이번 연락과 현재 연결을 확인하도록 돕습니다.</p><div className="button-row"><Link className="button primary" to="/service">연락 업무 열기<ArrowRight size={18}/></Link><Link className="button secondary" to="/official">공식 업무 확인</Link></div><p className="home-scope">기관의 연락 승인과 통화 내용의 안전은 다릅니다.</p></div><aside className="home-mechanism"><h2>이름을 믿기보다,<br/>연락의 근거를 확인합니다.</h2><dl><div><dt>기관이 승인한 목적</dt><dd>특정 고객·업무·연결에 결합한 개별 연락 승인</dd></div><div><dt>지금 유효한 권한</dt><dd>진행 통화에서도 확인하는 연결과 유지 허가</dd></div><div><dt>내용 위험은 별도 안내</dt><dd>동의한 상대 음성의 위험 요구·목적 이탈 분석</dd></div></dl><p>기능 설명이며 현재 통화의 검증 결과가 아닙니다.</p></aside></section><section className="home-workflow"><h2>각자의 역할로, 하나의 연락을 확인합니다.</h2><p>기관은 업무와 위임을 관리하고, 상담원은 배정 업무로 연락합니다. 수신자는 목적을 확인하고 통화를 수락하며 분석 동의를 직접 선택합니다.</p><Link to="/evidence">구현과 검증 범위 확인<ArrowRight size={16}/></Link><p>모의 금융기관 사례로 개발 중입니다. 실제 금융기관·통신사 연동과 AWS 외부 환경은 별도 검증 대상입니다.</p></section></div>;
 }
 
 export function DemoPage() {
