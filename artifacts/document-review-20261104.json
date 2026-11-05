@@ -720,12 +720,12 @@
   "followupReviews": [
     {
       "recordedAt": "2026-11-05T13:54:58.655350+00:00",
-      "sourceHead": "798a8f44e2ed8cb05c3248c0608cfd509890cf58",
+      "sourceHead": "bf2e9771c1d613be99f5a3925799115d26762714",
       "status": "IN_PROGRESS",
       "trackedMarkdownCount": 43,
       "trackedMdxCount": 0,
-      "reviewedThisPass": 39,
-      "note": "39 of 43 tracked Markdown files reread in the current pass; four long documents remain. Historical assessments and user-owned untracked sources are preserved. No complete-review claim.",
+      "reviewedThisPass": 40,
+      "note": "40 of 43 tracked Markdown files reread in the current pass; LOCAL-VALIDATION, MASTER-DEVELOPMENT-SPEC and DEVELOPMENT-HISTORY remain. Historical evidence and user-owned untracked sources are preserved. No complete-review claim.",
       "inventory": [
         {
           "path": "AGENTS.md",
@@ -916,10 +916,10 @@
         },
         {
           "path": "docs/RUNBOOK.md",
-          "sha256": "54a319967a2e9514c12a2fc11ad229ee200f3239db141a8edd9dbe4e1a55288d",
-          "reviewStatus": "pending-current-pass",
-          "action": null,
-          "reason": null,
+          "sha256": "41f6174891b5c93370f8d4fa4eeffd8b0a27c908233f8d42cc0858e894f59953",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Entire runbook read. Correct completed ingress enrollment, 24h monitoring, current OpenAI file inputs and duplicate tar append instruction; label AWS procedures as outside the present goal and retain historical results/anchors.",
           "audience": "AWS 배포/운영자",
           "purpose": "수령·NEW·재개·복구",
           "classification": "current",
@@ -1201,7 +1201,7 @@
           "canonicalLocation": "submission/slides.md"
         }
       ],
-      "updatedAt": "2026-11-05T14:27:39.277882+00:00",
+      "updatedAt": "2026-11-05T14:34:15.530645+00:00",
       "readFromWorktree": true,
       "localLinkCheck": {
         "trackedDocuments": 43,

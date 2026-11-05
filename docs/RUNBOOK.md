@@ -101,6 +101,8 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 ## AWS 대회 배포: 개발 서버와 완전히 분리
 
+이 절은 보존 중인 AWS 이전 절차다. 현재 목표는 서버컴의 지속 데모이며 AWS 생성·이전은 실행하지 않는다. 아래2026-11-02 결정과 발행 당시 상태를 현재 서버 운영 지시로 해석하지 않는다.
+
 **2026-11-02 변경 결정:** 개발 서버는 코드·빌드·검증용이다. 대회 때는 종료되거나 접근 불가여도 되어야 한다. 최종 대상은 AWS이며 GCP 구성은 과거 보존물이다. 이전 절차가 모든 시험 데이터를 이전하라는 뜻은 아니다. 현재 보존하기로 정한 대회 identity는 없으며, 폐기한 시험 chain/DB/Anchor를 대회 환경에 이어 붙이지 않는다.
 
 <a id="github-delivery-20261102"></a>
@@ -164,7 +166,7 @@ print('PASS: relative regular files/directories only; nothing extracted')
 CHECK_PUBLIC_TARS
 ```
 
-원격 검증된 ref/digest는 새 inventory로 고정했다. source tag는 `b0a5183802dd2c94e86faf9978111b88928d14e3`이며, 이전 null inventory는 덮어쓰지 않았다. 실제 재수령 파일만으로 checksum 검사·새 디렉터리 추출과 기존 경로 거절을 확인했다. [공개 파일의 게시/재수령 영수증](../artifacts/ghcr-delivery-20261102.json)은 source bundle보다 나중에 기록됐으며, bundle 안의 발행 직전 문서를 후속 문서로 덮지 않는다.
+2026-11-02 bootstrap의 원격 검증 ref/digest는 당시 inventory로 고정했다. 당시 source는 `b0a5183802dd2c94e86faf9978111b88928d14e3`이며, 이전 null inventory는 덮어쓰지 않았다. 실제 재수령 파일만으로 checksum 검사·새 디렉터리 추출과 기존 경로 거절을 확인했다. [공개 파일의 게시/재수령 영수증](../artifacts/ghcr-delivery-20261102.json)은 source bundle보다 나중에 기록됐으며, bundle 안의 발행 직전 문서를 후속 문서로 덮지 않는다.
 
 #### AWS의 최소권한 인증
 
@@ -272,7 +274,7 @@ node --import tsx scripts/evaluate-service-analysis.ts \
 
 위 명령은 설치된 검증 controller용이다. AWS에서 host node_modules 없이 실행하려면 새 runtime의 내장 scripts/의존성을 쓰고 Release에서 받은 공개 fixture 한 파일과 새 결과 디렉터리만 별도로 mount한다. API 서비스에 host checkout을 mount하지 않는다. 보호 env와 경로는 container 내부 기준이며 network는 승인받은 AWS 평가 egress만 선택한다. 이번에는 container도 실행하지 않았다.
 
-실제 제공자 평가를 승인받은 뒤에만 같은 명령에 `--provider`를 붙인다. 필요한 보호 환경은 기존 `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL`, `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media`, `CALLSIGN_PROVIDER_CONFIRMATION=CONSENTED-SAMPLE-WITH-BUDGET`와 별도의 `CALLSIGN_PURPOSE_EVALUATION_CONFIRMATION=MAX20-SYNTHETIC-TEXT-REQUESTS`다. 실제 source hash `CALLSIGN_EVALUATION_SOURCE_SHA256`와 image 참조 `CALLSIGN_EVALUATION_IMAGE`도 지정한다. 모델은 운영자가 선택하며20회 이하 순차·입력4000자·각4초·재시도 없음이다. 실제 가격/청구·보관 조건은 별도 검토한다. 기존 output은 호출 전에 거절한다.
+실제 제공자 평가를 승인받은 뒤에만 같은 명령에 `--provider`를 붙인다. 필요한 보호 환경은 선택한 제공자의 `CALLSIGN_ANALYSIS_PROVIDER=openai`·`OPENAI_API_KEY_FILE`·`OPENAI_MODEL` 또는 기존 Anthropic 설정과, `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=media`, `CALLSIGN_PROVIDER_CONFIRMATION=CONSENTED-SAMPLE-WITH-BUDGET`와 별도의 `CALLSIGN_PURPOSE_EVALUATION_CONFIRMATION=MAX20-SYNTHETIC-TEXT-REQUESTS`다. 실제 source hash `CALLSIGN_EVALUATION_SOURCE_SHA256`와 image 참조 `CALLSIGN_EVALUATION_IMAGE`도 지정한다. 모델은 운영자가 선택하며20회 이하 순차·입력4000자·각4초·재시도 없음이다. 실제 가격/청구·보관 조건은 별도 검토한다. 기존 output은 호출 전에 거절한다.
 
 출력은 위험 요구 오경고/누락, 목적 이탈 오경고/누락, 판단 불가·제공자 불가·미실행을 분리한다. 문맥 부족 정답에 근거 없는 확답은 unsupportedPurposeJudgments로 별도 계산한다. 제공자 응답을 fixture로 대체한 결과는 SYNTHETIC이고 실제 LLM 정확도 PASS가 아니다. 출력에는 원음/전사/키/토큰을 넣지 않으며 실제 source/image identity는 별도 릴리스 영수증과 대조한다.
 
@@ -317,11 +319,11 @@ trial별 events/단계 지연/확인 불가 원인·구간, 정상 확인률과 
 
 ### 새 runtime·공개 묶음 발행 시 확인할 차이
 
-이번 제품·schema·도구·migration0010·웹 소스는 기존 고정 Release에 없다. 새 runtime과 공개 묶음/observer-tests가 필요하며5종 infrastructure Dockerfile은 이번에 바꾸지 않았다. 실제 연동 회귀는 별도다. 새 웹은 여전히 실제 계약/trust/PBX 인증서가 준비된 뒤 runtime/nginx로 생성한다.
+고정 후보와 현재 제품·schema·도구·migration·웹 입력을 비교해 변경한 산출물만 갱신한다. 문서 변경만으로 runtime을 반복 제작하지 않는다. 새 웹은 실제 계약/trust/PBX 인증서가 준비된 뒤 runtime/nginx로 생성하며, 실제 연동 회귀와 소스 대응은 별도 증거로 남긴다.
 
 기존 legacy builder는 `--target` 앞 stage도 실행할 수 있고 `--pull=false`는 없는 FROM 이미지의 수령을 막지 못한다. 오프라인 갱신에는 설치 stage가 없는 `infra/deploy/prepared-runtime.Dockerfile`만 사용하고 base의 실제 로컬 ID를 먼저 확인한다. `--network=none`은 RUN의 네트워크 경계이며 daemon의 image 수령 차단을 대신하지 않는다. 이번 최초 잘못된 경로에서 Node base의 로컬 비압축 image Size227,146,390bytes가 추가됐고(전송 bytes는 미측정) 원본 실패를 보존했다. 이후 후보에는 이 이미지를 사용하지 않으며 확인한 실패 ENV child와 새 Node tag/config는 비강제·no-prune으로 회수했다. [Docker multi-stage 동작](https://docs.docker.com/build/building/multi-stage/#differences-between-legacy-builder-and-buildkit)과 [build 옵션 범위](https://docs.docker.com/reference/cli/docker/image/build/)를 구분한다.
 
-발행 허가 뒤에는 clean source commit→새 runtime build/회귀→layer/history/build context 감사→새 비공개 GHCR tag 게시→실제 manifest/config/layer 재수령→검증한 digest inventory→공개 묶음/checksum·새 고유 Release→새 경로 수령/hash 대조 순서다. 기존 inventory/Release는 편집하지 않는다. 공개 파일 생성은 `pnpm exec tsx scripts/release-manifest.ts --bundle NEW-DIRECTORY --env-file PROTECTED-ENV`이며 실제 image metadata와 clean Git source를 확인한다. 이 도구의 기본 archive 뒤에 같은 source의 `docs/LOCAL-VALIDATION.md`를 추가한 뒤 최종 checksum/audit를 봉인한다. 검증한 runtime의 도구 자체는 바꾸지 않는다. `CLEAN_SOURCE`가 해당 commit의 clean checkout임을 확인한 뒤 `tar --append --file "$NEW_PUBLIC_BUNDLE/deployment-files.tar" --directory "$CLEAN_SOURCE" docs/LOCAL-VALIDATION.md`로 파일 하나만 추가한다. archive 전체 연결은 중복 directory entry를 만들 수 있으므로 사용하지 않는다. 이 출력은 local metadata용 inventory다. 최종 웹이 없으면 exit2/BLOCKED일 수 있으며 이를 최종 GHCR bootstrap inventory로 게시하지 않는다.6종의 실제 원격 수령·visibility·manifest/config/layer 대조 후 별도의 새 inventory에 고정하고 최종 웹은 deferred로 표시한다. 이어 기존 publication audit/원격 검증 절차를 사용한다. 미준비 이미지/pin으로 inventory의 BLOCKED를 PASS로 바꾸지 않는다. **이번에는 build/push/Release를 실행하지 않았다.**
+발행 허가 뒤에는 clean source commit→새 runtime build/회귀→layer/history/build context 감사→새 비공개 GHCR tag 게시→실제 manifest/config/layer 재수령→검증한 digest inventory→공개 묶음/checksum·새 고유 Release→새 경로 수령/hash 대조 순서다. 기존 inventory/Release는 편집하지 않는다. 공개 파일 생성은 `pnpm exec tsx scripts/release-manifest.ts --bundle NEW-DIRECTORY --env-file PROTECTED-ENV`이며 실제 image metadata와 clean Git source를 확인한다. 현재 도구는 `docs/LOCAL-VALIDATION.md`를 기본 archive에 포함한다. 수동 tar append로 같은 경로를 중복 추가하지 않는다. 실제 entry 목록·source·checksum/audit를 확인한 뒤 봉인한다. 이 출력은 local metadata용 inventory다. 최종 웹이 없으면 exit2/BLOCKED일 수 있으며 이를 최종 GHCR bootstrap inventory로 게시하지 않는다.6종의 실제 원격 수령·visibility·manifest/config/layer 대조 후 별도의 새 inventory에 고정하고 최종 웹은 deferred로 표시한다. 이어 기존 publication audit/원격 검증 절차를 사용한다. 미준비 이미지/pin으로 inventory의 BLOCKED를 PASS로 바꾸지 않는다. **이번에는 build/push/Release를 실행하지 않았다.**
 
 아래는 **새 발행을 별도 승인받은 작업자만 실행할 명령**이다. NEW_TAG·검토한 기존 runtime 참조·새 output 경로·게시용 보호 파일은 그 작업에서 준비한다. 기존 private package의 visibility를 게시 전후 확인하고 공개 상태이거나 권한이 없으면 중단한다. writer 인증은 AWS reader와 분리하며 이 명령을 이번 작업에서는 실행하지 않았다.
 
@@ -390,7 +392,7 @@ gh release create "$NEW_TAG" --prerelease --repo 0u-Y/CallSign --target "$SOURCE
 | B/C | `CONSUMPTION_ANCHOR_URL`, `CONSUMPTION_ANCHOR_TOKEN` | Issuer/worker, 최초 checkpoint | 별도 수명 HTTPS Anchor. 아래 Anchor 환경과 deployment/institution/token을 대조. 과거 DB와 함께 Anchor를 되돌리지 않음 |
 | B/C | `CALLSIGN_ANCHOR_PROJECT`, `ANCHOR_VOLUME_ROOT`, `ANCHOR_TLS_DIR`, `ANCHOR_OWNER_PASSWORD`, `ANCHOR_APP_PASSWORD`, `ANCHOR_DATABASE_URL`, `ANCHOR_TOKEN`, `DEPLOYMENT_ID`, `INSTITUTION_ID` | anchor.env·별도 Compose·provision-anchor | 별도 AWS 저장소/운영 책임·최소권한 LOGIN. 신규 zero record만 생성; 기존 역할/이력을 재초기화하지 않음 |
 | B | `CALLSIGN_GHCR_READ_TOKEN_FILE`, `GHCR_USER` | 이미지 수령만 | 별도 읽기 계정의 classic `read:packages`와6개 private package read 권한. 현재 명시적 경로가 없어 인증만 BLOCKED. writer PAT로 대체하지 않음 |
-| E | `DEEPGRAM_API_KEY`, `DEEPGRAM_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | 동의 기반 분석/provider 검증 | 미제공이면 분석 불가. 기본 통화/기관 승인을 막거나 안전 판정으로 바꾸지 않음. 실호출은 비용·보관 허가 후 |
+| E | `DEEPGRAM_API_KEY_FILE`, `DEEPGRAM_MODEL`, `CALLSIGN_ANALYSIS_PROVIDER`, `OPENAI_API_KEY_FILE`, `OPENAI_MODEL` 또는 기존 Anthropic 설정 | 동의 기반 분석/provider 검증 | 실제 선택 제공자의 서버 측 보호 참조. 미설정은 분석 불가이며 기본 통화/기관 승인을 막거나 안전 판정으로 바꾸지 않음. 실호출은 비용·보관 허가 후 |
 | E | `BACKUP_ENCRYPTION_KEY_PATH`, `BACKUP_SCOPE`, `CHAIN_SNAPSHOT_ARCHIVE`, `BACKUP_DEPLOYMENT_ENV_PATH`, `RESTORE_DATABASE_URL`, `RESTORE_DATA_DIR`, `RESTORE_BUNDLE` | 승인된 백업/RESTORE만 | NEW와 별개. 보호 key/manifest·파일/이력 검사, 빈 target·현재 독립 Anchor·source fence 필요. 부분 자료로 gate 해제 금지 |
 
 `CALLSIGN_AWS_MOUNT`는 env 파일에서 자동으로 읽지 않으므로 아래 `deployment.sh` 호출처럼 명시적인 실행 환경으로 전달한다.
