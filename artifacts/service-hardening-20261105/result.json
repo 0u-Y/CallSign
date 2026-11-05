@@ -623,5 +623,33 @@
       "service-hardening-20261105/persistent-public-official-css-zoom-2.png"
     ],
     "visualReview": "Opened actual mobile service and CSS2x official focus captures; no clipping/overflow observed. Public API-disconnected frontend only. CSS zoom is not native browser zoom or WCAG certification."
+  },
+  "publicDemoRecapture": {
+    "status": "PASS_DISCONNECTED_FRONTEND_ONLY",
+    "production": "https://callsign-rouge.vercel.app",
+    "deployment": "dpl_3pBAJsBTyqQVotDD8mBKiyzxyDvf",
+    "desktop": [
+      1366,
+      768
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "cssEnlargement": 2,
+    "nativeBrowserZoom": "NOT_RUN",
+    "actualAuthenticatedBackend": "NOT_CONNECTED",
+    "screenshots": [
+      "artifacts/service-hardening-20261105/public-live-demo-call-1366.png",
+      "artifacts/service-hardening-20261105/public-live-demo-governance-1366.png",
+      "artifacts/service-hardening-20261105/public-live-demo-call-390.png",
+      "artifacts/service-hardening-20261105/public-live-demo-governance-390.png",
+      "artifacts/service-hardening-20261105/public-live-demo-call-css-zoom-2.png"
+    ],
+    "review": "Opened actual captures; independent reviewer ships disconnected readability fixes only. No authenticated controls, analysis or WebRTC validation.",
+    "consoleErrors": 0,
+    "unexpectedNetworkFailures": 0,
+    "peakHostGiB": 1.170265,
+    "minimumAvailableGiB": 35.670673
   }
 }

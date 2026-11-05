@@ -1,6 +1,6 @@
 # 로컬 검증 절차와 과거 준비 환경
 
-현재 DB 감사/복원 시험은 `scripts/validation-runtime-media.py`의 명시적 plan `databaseAudit`/`fullRestore`에서 선택한다. 시작 snapshot→정해진 통화→앱/worker 정리→DB가 살아 있는 최종 감사→기반 자원 정리 순서를 유지한다. 정상 반복은 최대5회·자동 재시도0으로 제한한다. `fullRestore`는 기존 암호화 bundle CLI와 현재 이미지에서 복사한 Node/코드, 기존 PostgreSQL 이미지의 native client를 사용하며 원본 fence·새 DB volume·정지한4개 Besu snapshot·독립 Anchor 보존을 요구한다. **현재 실제 전체 복원 PASS는 없고 수정 후 재검증은 자원 중단으로 BLOCKED다.** [실행 근거](../artifacts/restore-audit-20261105.json)를 확인한다. 별도 사용자의 실행 승인과 기존40GiB/24GiB/16GiB·압박/OOM/deadline 조건 없이 기동하지 않는다.
+현재 DB 감사/복원 시험은 `scripts/validation-runtime-media.py`의 명시적 plan `databaseAudit`/`fullRestore`에서 선택한다. 시작 snapshot→정해진 통화→앱/worker 정리→DB가 살아 있는 최종 감사→기반 자원 정리 순서를 유지한다. 정상 반복은 최대5회·자동 재시도0으로 제한한다. `fullRestore`는 기존 암호화 bundle CLI와 현재 이미지에서 복사한 Node/코드, 기존 PostgreSQL 이미지의 native client를 사용하며 원본 fence·새 DB volume·정지한4개 Besu snapshot·독립 Anchor 보존을 요구한다. **이전 service-hardening 소스의 전체 RESTORE·복원 후 통화·양쪽 DB 감사는 PASS다. 새 지속 데모/provider 후보의 전체 RESTORE는 NOT_RUN이며 이전 PASS를 전용하지 않는다.** [실행 근거](../artifacts/restore-audit-20261105.json)를 확인한다. 별도 사용자의 실행 승인과 기존40GiB/24GiB/16GiB·압박/OOM/deadline 조건 없이 기동하지 않는다.
 
 
 현재 후보의 실제 준비·일반 entrypoint·자원 중단은 [후속 실행 기록](../artifacts/candidate-media-followup-20261104.json)을 따른다. 통화 완료 전 중단됐고 기존 실행 정책을 바꾸지 않았다. 새로운 허가 없이 자동 재기동하지 않는다.

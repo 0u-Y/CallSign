@@ -15,7 +15,11 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 ## 지속 서비스와 시험 환경의 분리
 
-현재 공개 Vercel은 API 미연결 제품 미리보기다. 최신 상태와 [지속 환경 준비 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 확인한다. 지속 backend는 아직 생성하지 않았다. 현재 443은 다른 프로젝트 소유이고, CallSign 전용 외부 TLS/WSS·UDP 경로·실제 OIDC·지속 자원 관측·중단 범위이 미정이다. 전체 구성은 기존40GiB 시작 조건에 미달하여 기동하지 않는다. localhost 시험 성공을 외부 접속으로 확대하지 않는다.
+현재 공개 Vercel은 API 미연결 제품 미리보기다. 최신 상태와 [지속 환경 준비 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 확인한다. 지속 backend는 아직 생성하지 않았다. 현재 443은 다른 프로젝트 소유이고, CallSign 전용 외부 TLS/WSS·UDP 경로·실제 OIDC·지속 자원 관측·중단 범위이 미정이다. 전체 구성은 기동 직전 기존40GiB 시작 조건과 압박 사전 관측을 모두 통과해야 한다. 과거 미달과 현재 단일 표본을 구분하며 자동 기동하지 않는다. localhost 시험 성공을 외부 접속으로 확대하지 않는다.
+
+전용 공개 경로 준비는 승인됐지만 등록 대기 중인 별도 userspace 노드는 정상 종료한 상태다. `scripts/prepare-demo-ingress.py`는 명시적 guard 아래 등록만 준비하며 공개 backend를 만들지 않는다. 같은 identity는 `--resume-identity PRIVATE_OWNED_ROOT`로만 이어가고 resource-stop latch를 자동 지우지 않는다. 등록 URL·state는 보호 경로에서만 취급한다. Tailscale Funnel은 TLS/TCP 경로이며 실제 TURN relay·외부 브라우저 시험을 대신하지 않는다. tailnet 정책을 자동 수정하는 Funnel 활성화는 실행하지 않았다.
+
+실제 OIDC 선택지는 `CALLSIGN_OIDC_PROVIDER=keycloak`과 `compose.oidc.yml`이다. 기본은 external로 유지한다. 정확한 HTTPS `KEYCLOAK_PUBLIC_ORIGIN`·신뢰하는 proxy 주소·불변 image와 보호 env/DB password 파일이 필요하다. `prepare-demo-oidc.ts --apply PRIVATE_NEW_PATH`는 실제 공개 origin에서 보호 realm/계정·무작위 password 입력만 생성하며 사용자를 생성하지 않는다. NEW의 별도 `oidc-init` profile만 `import --override false`를 실행하고 정상 `oidc` 시작은 `start`만 실행한다. 실제 서명된 issuer/sub를 검증한 뒤 기존 계정 등록 절차로 연결한다. realm JSON은 세션/폐기 상태를 포함한 완전한 IdP 백업이 아니므로 별도 영속 IdP DB를 함께 일관되게 백업한다. 이 overlay는 bridge 기반이며 현재 보호된 개발 서버에서 기동하지 않는다. 실제 import/login/RESTORE는 아직 NOT_RUN이다.
 
 ### 브라우저부터 실제 서비스까지
 
@@ -55,7 +59,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 선택 overlay `infra/deploy/compose.providers.yml`은 두 보호 파일만 issuer에 read-only mount한다. CALLSIGN_PROVIDER_CONFIG=deepgram-openai를 보호 CFG에서 명시해야 deployment.sh가 연결한다. 기본 none은 mount하지 않는다. 모델은 OPENAI_MODEL·DEEPGRAM_MODEL로 별도 지정하며 API 키의 존재를 운영 비용 승인으로 간주하지 않는다. 기존 Anthropic 경로는 명시/기존 설정에서만 유지하고 OpenAI 오류의 자동 fallback으로 사용하지 않는다.
 
-첫 제안 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개인 서비스 분석 설정이며 한국어 품질은 미측정이다. 최대6 LLM 요청·STT2연결×30초·재시도0, 요청당 입력8,000토큰 가정의 예상 비용은 약$0.063이다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 첫 smoke $0.10 계획만 승인됐고 입력은 별도 제공 예정이다. 실제 호출은 아직0이며 지속 서비스의 무제한 비용 승인이 아니다.
+첫 제안 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개인 서비스 분석 설정이며 한국어 품질은 미측정이다. 최대6 LLM 요청·STT2연결×30초·재시도0, 요청당 입력8,000토큰 가정의 예상 비용은 약$0.063이다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 첫 smoke $0.10 계획만 승인됐고 입력은 별도 제공 예정이다. 후속 실제 텍스트 smoke는3요청·재시도0이며 계약 통과와 품질 제한을 분리했다. 음성은 아직0초다. 최신 사용량·원본 상태는 [후보 기록](../artifacts/product-candidate-20261104.json)의 persistentDemoConnection을 따른다. 지속 서비스의 무제한 비용 승인이 아니다.
 
 평가 CLI는 기존 비용 guard에 CALLSIGN_EVALUATION_MAX_REQUESTS를 추가해6 이하 계획을 선언할 수 있다. provider-smoke는 기존 결과 파일을 호출 전에 거절하고 STT 입력은 설치 ffprobe로30초 이하 단일 오디오인지 검사한다. 도구/동의 입력이 없으면 중단한다. 숫자 선언은 실제 invoice 강제 상한이 아니며 실제 가격·보관/학습 정책·계정 지출 제한은 실행 전 대조한다. OpenAI store:false도 제공자의 모든 보관을 없앤다는 보장이 아니다.
 

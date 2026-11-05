@@ -1654,5 +1654,128 @@
       ],
       "existingReleasePreserved": true
     }
+  },
+  "persistentDemoConnection": {
+    "recordedAt": "2026-11-05T09:09:18.725566+00:00",
+    "productSource": "27b4043e6c5ce5460ae4c8fb947048c98d387f9e",
+    "publicFrontend": {
+      "status": "PASS_DISCONNECTED_FRONTEND_ONLY",
+      "production": "https://callsign-rouge.vercel.app",
+      "deployment": "dpl_3pBAJsBTyqQVotDD8mBKiyzxyDvf",
+      "desktop": [
+        1366,
+        768
+      ],
+      "mobile": [
+        390,
+        844
+      ],
+      "cssEnlargement": 2,
+      "nativeBrowserZoom": "NOT_RUN",
+      "actualAuthenticatedBackend": "NOT_CONNECTED",
+      "screenshots": [
+        "artifacts/service-hardening-20261105/public-live-demo-call-1366.png",
+        "artifacts/service-hardening-20261105/public-live-demo-governance-1366.png",
+        "artifacts/service-hardening-20261105/public-live-demo-call-390.png",
+        "artifacts/service-hardening-20261105/public-live-demo-governance-390.png",
+        "artifacts/service-hardening-20261105/public-live-demo-call-css-zoom-2.png"
+      ],
+      "review": "Opened actual captures; independent reviewer ships disconnected readability fixes only. No authenticated controls, analysis or WebRTC validation.",
+      "consoleErrors": 0,
+      "unexpectedNetworkFailures": 0,
+      "peakHostGiB": 1.170265,
+      "minimumAvailableGiB": 35.670673
+    },
+    "openaiTextSmoke": {
+      "status": "PASS_CONTRACT_QUALITY_LIMITS",
+      "model": "gpt-5.4-mini-2026-03-17",
+      "logicalAttempts": 3,
+      "requests": 3,
+      "retries": 0,
+      "inputTokens": 1403,
+      "outputTokens": 370,
+      "usagePriceEstimateUsd": 0.00271725,
+      "actualInvoice": "NOT_OBSERVED",
+      "results": [
+        {
+          "id": "normal",
+          "httpStatus": 200,
+          "result": {
+            "riskCategories": [
+              "인증번호 요구"
+            ],
+            "purposeRelation": "undetermined",
+            "validatedEvidence": true
+          }
+        },
+        {
+          "id": "risk",
+          "httpStatus": 200,
+          "result": {
+            "riskCategories": [
+              "인증번호 요구"
+            ],
+            "purposeRelation": "undetermined",
+            "validatedEvidence": true
+          }
+        },
+        {
+          "id": "purpose",
+          "httpStatus": 200,
+          "result": {
+            "riskCategories": [],
+            "purposeRelation": "undetermined",
+            "validatedEvidence": true
+          }
+        }
+      ],
+      "limitations": "Three user-supplied synthetic text cases only. Normal case returned an OTP warning; purpose case was undetermined. These are unexpected observed results, not quality PASS or accuracy estimates. No audio, remote track or browser tested."
+    },
+    "deepgram": {
+      "keyAuthenticationHttpStatus": 200,
+      "audioSeconds": 0,
+      "transcriptionRequests": 0,
+      "status": "BLOCKED_AWAITING_CONSENTED_AUDIO_REFERENCE"
+    },
+    "ingress": {
+      "status": "USER_NODE_APPROVAL_REQUIRED",
+      "publicEndpointCreated": false,
+      "ownedDaemonStopped": true,
+      "statePreserved": true,
+      "scope": "Separate userspace node; no default daemon or host route/firewall changes. Protected enrollment reference delivered separately. Funnel not enabled; tailnet policy modification not authorized.",
+      "correction": "Short private socket and explicit owned TS_LOGS_DIR; only proven newly created owned default log config removed. Earlier complete filesystem preservation cannot be inferred from later baseline."
+    },
+    "keycloak": {
+      "status": "RESOURCE_STOPPED_DOWNLOAD_PENDING_ONE_RESUME_APPROVAL",
+      "officialImage": "quay.io/keycloak/keycloak:26.8.1",
+      "downloadCapBytes": 524288000,
+      "transferredBytes": 252108848,
+      "stopReason": "DOWNLOAD_RSS_BUDGET",
+      "newStreamingReceiver": "32MiB offline hash/size regression passed; no automatic network retry",
+      "loadedOrStarted": false
+    },
+    "persistentBackend": {
+      "status": "NOT_STARTED",
+      "fullStackStartGiB": 40,
+      "publicOidcLogin": "NOT_RUN",
+      "publicWebrtc": "NOT_RUN",
+      "turnRelay": "NOT_RUN",
+      "latestReadOnlyMemorySample": {
+        "observedAt": "2026-11-05T09:10:34.632355+00:00",
+        "memAvailableGiB": 42.45836639404297,
+        "fullStackStartGiB": 40,
+        "fullStackStartSatisfied": true,
+        "scope": "Read-only current sample, not historical attribution or service minimum specification"
+      }
+    },
+    "operatorPreparation": {
+      "status": "PASS_OFFLINE_CONFIG_ONLY",
+      "optionalOidcOverlay": "infra/deploy/compose.oidc.yml",
+      "normalRestartImportsRealm": false,
+      "profile": "oidc-init imports once; oidc starts without import",
+      "hostPreservingLauncher": false,
+      "limitations": "Bridge-based optional deployment overlay must not be started on this protected development host. Actual Keycloak import, login and restart remain NOT_RUN.",
+      "offlineChecks": "pnpm light: 69 files / 350 tests PASS; offline Compose interpolation PASS. No service start."
+    }
   }
 }

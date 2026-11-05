@@ -2,13 +2,13 @@
 
 ## 새 데모 화면 검증 경계
 
-`/demo/call`·`/demo/governance`를 실제 서비스 controller/API에 연결했다. 브라우저 합성 API 응답으로 역할별 배치·탐색·조회 실패 경계를 확인했지만 실제 세션·WebRTC 통화·원장 검증은 아니다. 이후 상단 높이/고급 폼을 축약한 최신 표시의 재캡처는 sustained memory PSI로 차단됐다. 이전 캡처를 최신 화면 승인으로 사용하지 않으며 독립 시각 검토 판정은 recapture다. 두 자원 중단과 fixture 실패를 보존한다. 상세는 [현재 후보](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation.demoUi를 따른다.
+`/demo/call`·`/demo/governance`를 실제 서비스 controller/API에 연결했다. 브라우저 합성 API 응답으로 역할별 배치·탐색·조회 실패 경계를 확인했지만 실제 세션·WebRTC 통화·원장 검증은 아니다. 이후 축약한 최신 표시를 실제 Production의 desktop/390px/CSS2배에서 다시 캡처하고 직접 검토했다. 독립 검토도 API 미연결 화면의 가독성에 한해 ship 판정이다. 인증된 조작·실제 통화 검증은 아니다. 두 자원 중단과 fixture 실패를 보존한다. 상세는 [현재 후보](../artifacts/product-candidate-20261104.json)의 persistentDemoConnection과 persistentServicePreparation.demoUi를 따른다.
 
 ## 지속 공개 서비스 준비
 
-현재 Vercel 제품 frontend는 실제 API 미연결이며 지속 backend/사용자 계정을 공개하지 않았다. 기존443은 다른 프로젝트 소유이고 승인된 CallSign 공개 TLS/WSS·UDP 경로·OIDC가 없으며, 지속 감시·중단 범위과 전체40GiB 시작 조건도 충족하지 못했다. 기존 네트워크를 바꾸지 않는 지속 launcher/외부 미디어는 아직 실행 검증하지 않았다. [현재 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
+현재 Vercel 제품 frontend는 실제 API 미연결이며 지속 backend/사용자 계정을 공개하지 않았다. 기존443은 다른 프로젝트 소유이고 새 전용 공개 경로 준비는 승인됐으나 사용 가능한 TLS/WSS·미디어·OIDC 연결은 아직 없으며, 지속 감시 연결과 기동 직전 전체40GiB·압박 조건 확인이 남았다. 기존 네트워크를 바꾸지 않는 지속 launcher/외부 미디어는 아직 실행 검증하지 않았다. [현재 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
 
-OpenAI·Deepgram 키는 명시적 보호 파일로 제공돼 서버 로딩을 확인했다. OpenAI adapter/공통 취소·근거·quota 처리를 구현하고 첫 smoke $0.10 계획은 승인됐다. 동의한 음성/전사 입력은 별도 제공 예정으로 실제 호출0이다. 실제 모델 품질·계정 사용 가능성·보관/청구·지속 운영 비용 조건을 확인했다고 쓰지 않는다. 새 제품의 이전 이미지 통합 PASS 전용은 금지한다.
+OpenAI·Deepgram 키는 명시적 보호 파일로 제공돼 서버 로딩을 확인했다. OpenAI adapter/공통 취소·근거·quota 처리를 구현하고 첫 smoke $0.10 계획은 승인됐다. 사용자가 제공한 합성 한국어 텍스트3건을 실제 OpenAI에 전송했다(재시도0, 입력1403/출력370토큰, 가격 기준 추정$0.00271725, 실제 청구 미확인). 출력 계약은 통과했지만 정상 문장의 인증번호 경고와 목적 이탈 판단 불가가 나와 품질 PASS가 아니다. Deepgram은 키 인증 HTTP200만 확인했으며 음성 전송0초다. 동의한 음원 경로는 대기 중이다. 실제 모델 품질·계정 사용 가능성·보관/청구·지속 운영 비용 조건을 확인했다고 쓰지 않는다. 새 제품의 이전 이미지 통합 PASS 전용은 금지한다.
 
 새 UI-only 원격 브라우저에서 공개 데스크톱/390px·CSS2배 확대와 focus를 확인하고 캡처를 열어 검토했다. 이는 공개 로그인·통화 검증이 아니다. 과거1GiB 자원 중단과 새 승인 실행은 별도 기록이다.
 
