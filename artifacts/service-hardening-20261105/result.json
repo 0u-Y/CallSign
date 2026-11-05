@@ -499,5 +499,129 @@
       "SIP_WSS_URL"
     ],
     "runtime": "NOT_RUN"
+  },
+  "persistentPublicUiFollowup": {
+    "status": "PASS",
+    "source": "928b78a54f2053faf57d6a0c12e4f36cc0910b6f",
+    "profile": "ui-only-v1",
+    "records": [
+      {
+        "path": "/",
+        "width": 1366,
+        "finalPath": "/",
+        "overflow": 0,
+        "headings": [
+          "연락의 목적은 분명하게.통화의 권한은 끝까지."
+        ],
+        "errors": []
+      },
+      {
+        "path": "/service",
+        "width": 1366,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/official",
+        "width": 1366,
+        "finalPath": "/official",
+        "overflow": 0,
+        "headings": [
+          "공식 업무 확인"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/demo",
+        "width": 1366,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/legacy/demo",
+        "width": 1366,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/official",
+        "width": 1366,
+        "cssZoom": 2,
+        "focusTag": "A",
+        "overflow": 0,
+        "errors": []
+      },
+      {
+        "path": "/",
+        "width": 390,
+        "finalPath": "/",
+        "overflow": 0,
+        "headings": [
+          "연락의 목적은 분명하게.통화의 권한은 끝까지."
+        ],
+        "errors": []
+      },
+      {
+        "path": "/service",
+        "width": 390,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/official",
+        "width": 390,
+        "finalPath": "/official",
+        "overflow": 0,
+        "headings": [
+          "공식 업무 확인"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/demo",
+        "width": 390,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      },
+      {
+        "path": "/legacy/demo",
+        "width": 390,
+        "finalPath": "/service",
+        "overflow": 0,
+        "headings": [
+          "기관 승인 연락"
+        ],
+        "errors": []
+      }
+    ],
+    "maxObservedHostGiB": 1.0387611389160156,
+    "minAvailableGiB": 33.30813217163086,
+    "resourceStop": null,
+    "remainingOwnedBrowserProcesses": [],
+    "captures": [
+      "service-hardening-20261105/persistent-public-service-390.png",
+      "service-hardening-20261105/persistent-public-official-css-zoom-2.png"
+    ],
+    "visualReview": "Opened actual mobile service and CSS2x official focus captures; no clipping/overflow observed. Public API-disconnected frontend only. CSS zoom is not native browser zoom or WCAG certification."
   }
 }

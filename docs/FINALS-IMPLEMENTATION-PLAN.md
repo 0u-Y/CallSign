@@ -1,5 +1,14 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 지속 서비스 요청과 제공자 연결
+
+일회성 통합과 별개인 지속 서비스 요청을 인계했다. 기존 Vercel main 배포/공개 metadata는 정상이나 API 미연결이다. 기존443의 다른 프로젝트 소유·공개 HTTPS/WSS/UDP 경로·OIDC·지속 감시 범위 미확정과40GiB 시작 guard 미달로 지속 backend는 생성하지 않았다. host 설정/기존 자원은 변경하지 않았다. 실제 연결표·운영 명령·NEW/상태 이전 구분은 RUNBOOK의 지속 서비스 절차를 따른다.
+
+persistent label/검사한 full ID 중지·status·resource-stop latch를 기존 도구에 추가하고 시험 cleanup은 해당 자원을 거절하도록 회귀했다. 새 공개 UI-only는 데스크톱/390px·CSS2배·focus/오류/overflow를 실제 검토했다. API/계정/통화는 연결하지 않았다. [현재 후보 기록](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 기준으로 본다.
+
+명시된 OpenAI·Deepgram 보호 파일은0600/상위0700과 서버 로딩을 확인했다. 기존 `/service` orchestration에 OpenAI Responses JSON/근거 검사와 Deepgram/ko 파일 설정을 연결했다. 첫6요청/60초/$0.10 계획은 승인됐으나 동의한 입력은 별도 제공 예정으로 외부 호출은 보류했다. 자격 미제공과 실제 미실행을 구분하고, 이전 이미지의 미디어 PASS를 새 provider 코드에 전용하지 않는다.
+
+
 ## 2026-11-05 서비스 종료·실제 복원 후속 검증
 
 조회 요청 처리 중에도 통화 종료를 독립 실행하고 공식 조회 전/만료를 빈 목록과 구분했다. [실제 역할별 HTTP/Chromium·캡처](../artifacts/service-hardening-20261105/result.json)와 [후속 전체 복원·미디어 결과](../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup을 기준으로 본다. 일반 entrypoint의 암호화 전체 RESTORE·복원 후 통화·원본/대상 감사와 별도 명시적 합성 STT/LLM3통화는 PASS다. 도구의 GNU loader/라이브러리·사용자 권한·GNU tar·실제 validator RPC 결함을 수정하고 실패 원본을 보존했다.

@@ -813,5 +813,640 @@
       "globalDockerAuthUnchanged": true,
       "separateReaderVerified": false
     }
+  },
+  "persistentServicePreparation": {
+    "recordedAt": "2026-11-05T06:43:38.941832+00:00",
+    "productSource": "93c97ad10f075ebe87db7c59966fcf7a44d46f89",
+    "liveBackend": {
+      "status": "BLOCKED",
+      "created": false,
+      "runningResources": [],
+      "accountsCreated": false,
+      "reasons": [
+        "No approved CallSign public HTTPS/WSS and PBX/TURN media ingress. Existing443 belongs to unrelated service and was not changed.",
+        "Real public OIDC settings/subjects and protected account delivery have not been supplied.",
+        "Persistent deployment is authorized until user stop, but a live fail-closed resource observer and safe no-network-change launch scope remain unvalidated. Trial90-minute deadline applies to C, not the intended lifetime of A.",
+        "Full stack40GiB start condition not met. UI/offline stages have separate narrower budgets."
+      ],
+      "memorySampleGiB": 33.47937774658203
+    },
+    "vercel": {
+      "projectId": "prj_WbvNuAzgintDOJlqsgyHMiBlv22O",
+      "gitRepository": {
+        "type": "github",
+        "repo": "CallSign",
+        "productionBranch": "main"
+      },
+      "rootDirectory": null,
+      "buildCommand": "VITE_PUBLIC_PREVIEW=true pnpm --filter @callsign/web build",
+      "outputDirectory": "apps/web/dist",
+      "environmentNames": [],
+      "deployments": [
+        {
+          "id": "dpl_CP85TECPixnRiVH13m89TJV9GPkJ",
+          "state": "READY",
+          "target": "production",
+          "source": "928b78a54f2053faf57d6a0c12e4f36cc0910b6f"
+        },
+        {
+          "id": "dpl_GnYTnc4hzz2dnVLJS7hkVnm7dmTJ",
+          "state": "READY",
+          "target": "production",
+          "source": "37bf6eca4aca6fb12fad6bf774ef683bde940819"
+        }
+      ],
+      "publicMetadata": {
+        "commit": "928b78a54f2053faf57d6a0c12e4f36cc0910b6f",
+        "target": "production",
+        "publicPreview": true
+      }
+    },
+    "connectionContract": {
+      "api": "Same-origin /api/v3/*; credentials include; exact Origin/CSRF and strict session cookies retained.",
+      "analysis": "Same-origin /api/v3/audio WSS, authenticated Upgrade required.",
+      "oidc": "Separate work/official client/audience; PKCE; both callback at WEB_ORIGIN/service.",
+      "pbx": "SIP WSS /pbx/ws; private ARI not exposed.",
+      "media": "PBX UDP10000-10099, TURN3478/TCP+UDP,5349/TCP,relay49160-49200/UDP; independent external reachability not established.",
+      "internal": "DB5432, Besu8545, Witness4201-4204, Anchor4300/TLS remain private.",
+      "vercelBackendProxyConfigured": false,
+      "publicModeChanged": false
+    },
+    "publicUi": {
+      "status": "PASS",
+      "source": "928b78a54f2053faf57d6a0c12e4f36cc0910b6f",
+      "profile": "ui-only-v1",
+      "records": [
+        {
+          "path": "/",
+          "width": 1366,
+          "finalPath": "/",
+          "overflow": 0,
+          "headings": [
+            "연락의 목적은 분명하게.통화의 권한은 끝까지."
+          ],
+          "errors": []
+        },
+        {
+          "path": "/service",
+          "width": 1366,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/official",
+          "width": 1366,
+          "finalPath": "/official",
+          "overflow": 0,
+          "headings": [
+            "공식 업무 확인"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/demo",
+          "width": 1366,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/legacy/demo",
+          "width": 1366,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/official",
+          "width": 1366,
+          "cssZoom": 2,
+          "focusTag": "A",
+          "overflow": 0,
+          "errors": []
+        },
+        {
+          "path": "/",
+          "width": 390,
+          "finalPath": "/",
+          "overflow": 0,
+          "headings": [
+            "연락의 목적은 분명하게.통화의 권한은 끝까지."
+          ],
+          "errors": []
+        },
+        {
+          "path": "/service",
+          "width": 390,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/official",
+          "width": 390,
+          "finalPath": "/official",
+          "overflow": 0,
+          "headings": [
+            "공식 업무 확인"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/demo",
+          "width": 390,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        },
+        {
+          "path": "/legacy/demo",
+          "width": 390,
+          "finalPath": "/service",
+          "overflow": 0,
+          "headings": [
+            "기관 승인 연락"
+          ],
+          "errors": []
+        }
+      ],
+      "maxObservedHostGiB": 1.0387611389160156,
+      "minAvailableGiB": 33.30813217163086,
+      "resourceStop": null,
+      "remainingOwnedBrowserProcesses": [],
+      "captures": [
+        "service-hardening-20261105/persistent-public-service-390.png",
+        "service-hardening-20261105/persistent-public-official-css-zoom-2.png"
+      ],
+      "visualReview": "Opened actual mobile service and CSS2x official focus captures; no clipping/overflow observed. Public API-disconnected frontend only. CSS zoom is not native browser zoom or WCAG certification."
+    },
+    "selectedSqlWs": {
+      "status": "PARTIAL_RESOURCE_STOP",
+      "source": "93c97ad10f075ebe87db7c59966fcf7a44d46f89",
+      "identity": "ui-only-20261105T062403Z-b62256",
+      "readiness": "PASS",
+      "selectedCases": {
+        "policy": "integration-pressure-v1",
+        "status": "PASS",
+        "orphanedDescendantsReclaimed": false,
+        "reason": null,
+        "exitCode": 0,
+        "environmentCause": null,
+        "partial": {
+          "available": true,
+          "counts": {
+            "passed": 14,
+            "failed": 0,
+            "skipped": 18,
+            "pending": 0
+          },
+          "complete": false
+        },
+        "durationSeconds": 13.778594932053238,
+        "timeoutSeconds": 300,
+        "runId": "callsign-candidate-ws-fb49c281"
+      },
+      "unintendedFollowingBoundaryStep": {
+        "result": {
+          "policy": "integration-pressure-v1",
+          "status": "BLOCKED",
+          "orphanedDescendantsReclaimed": true,
+          "reason": "SUSTAINED_SWAP_OUT",
+          "exitCode": 130,
+          "environmentCause": {
+            "reason": "SUSTAINED_SWAP_OUT",
+            "firstSatisfiedMonotonicNs": 2143958415402195,
+            "observation": {
+              "bootIdHash": "d36d25288dd1f9e169655cd792da1f5e8411266902ee3f75e194818fc0448ab1",
+              "clock": "linux-CLOCK_MONOTONIC",
+              "observerPid": 1916037,
+              "observerRssBytes": 18788352,
+              "monotonicNs": 2143958415402195,
+              "pageBytes": 4096,
+              "oomKillTotal": 3,
+              "swapInPagesTotal": 19871020,
+              "swapOutPagesTotal": 38417201,
+              "memAvailableBytes": 28937838592,
+              "memoryPSI": {
+                "some": {
+                  "avg10": 0.24,
+                  "avg60": 0.27,
+                  "avg300": 0.19,
+                  "total": 315793693.0
+                },
+                "full": {
+                  "avg10": 0.24,
+                  "avg60": 0.27,
+                  "avg300": 0.17,
+                  "total": 307442181.0
+                }
+              }
+            },
+            "runId": "callsign-candidate-ws-fb49c281"
+          },
+          "partial": {
+            "available": true,
+            "counts": {
+              "passed": 3,
+              "failed": 0,
+              "skipped": 0,
+              "pending": 0
+            },
+            "complete": false
+          },
+          "durationSeconds": 24.966064173262566,
+          "timeoutSeconds": 300,
+          "runId": "callsign-candidate-ws-fb49c281"
+        },
+        "explanation": "Existing runner retained a full boundary step after selected WS. This was not removed when narrowing the plan. Original step/source/results retained; no restart or success-rate pooling."
+      },
+      "finalResidueAudit": "NOT_RUN: resource stop before audit",
+      "resource": {
+        "profile": "ui-only-v1",
+        "startGiB": 26.673858642578125,
+        "minAvailableGiB": 26.101837158203125,
+        "maxObservedHostGiB": 2.076427459716797,
+        "maxObservedWholeGiB": 2.193450927734375,
+        "swapOutMiBPerSecondLastSamples": [
+          0.0,
+          0.0,
+          14.582575288164303,
+          10.672096006301775
+        ],
+        "firstCause": {
+          "reason": "SUSTAINED_SWAP_OUT",
+          "atMonotonicNs": 2143958415402195,
+          "attribution": "Host pressure; cannot attribute to CallSign or another workload from these observations."
+        }
+      },
+      "cleanup": {
+        "containerRemoved": true,
+        "privateRootRemoved": true,
+        "appsBeforeDatabase": true,
+        "resourceCause": "SUSTAINED_SWAP_OUT"
+      },
+      "privateFixtures": "Real SQL/authenticated WS; ledger/ARI/STT/LLM adapters are explicit fixtures. Not public service or current image startup."
+    },
+    "providers": {
+      "protectedCredentialFiles": "PROVIDED; current-user regular0600 files, parent0700; service loader passed. No values or local protected file paths published.",
+      "loader": {
+        "status": "PASS",
+        "keyFileLoading": "Exact service-side loader; explicit protected references only; key contents not printed or placed in environment.",
+        "stt": {
+          "loaded": true,
+          "model": "nova-3",
+          "language": "ko"
+        },
+        "analysis": {
+          "loaded": true,
+          "provider": "openai",
+          "model": "gpt-5.4-mini-2026-03-17"
+        },
+        "networkCalls": 0,
+        "costApproval": "USD0.10 first bounded smoke only; input to be supplied separately; not persistent-service spending approval"
+      },
+      "modelProposal": {
+        "llm": "gpt-5.4-mini-2026-03-17",
+        "stt": "nova-3",
+        "language": "ko",
+        "maxLlmRequests": 6,
+        "maxOutputTokensPerRequest": 700,
+        "maxTranscriptCharacters": 4000,
+        "maxSttConnections": 2,
+        "maxSecondsPerSttConnection": 30,
+        "automaticRetries": 0,
+        "inputTokenEstimatePerRequest": 8000,
+        "inputUsdPerMillion": 0.75,
+        "outputUsdPerMillion": 4.5,
+        "sttUsdPerMinute": 0.0077,
+        "estimatedTotalUsd": 0.0626,
+        "approvedFirstSmokeUsd": 0.1,
+        "costScope": "First bounded smoke only; declared estimate, not a provider billing cap or persistent service spending authorization.",
+        "priceSources": [
+          "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+          "https://deepgram.com/pricing"
+        ]
+      },
+      "paidProviderCalls": 0,
+      "inputStatus": "WAITING: user approved USD0.10 plan; consented Korean voice/transcript input will be supplied separately.",
+      "actualModelQuality": "NOT_RUN",
+      "accountModelAccess": "NOT_CHECKED",
+      "retentionAndInvoice": "NOT_VERIFIED"
+    },
+    "candidate": {
+      "status": "BUILT_NOT_RUNTIME_VERIFIED",
+      "runtimeProductSource": "93c97ad10f075ebe87db7c59966fcf7a44d46f89",
+      "configId": "sha256:5d41f50da75775bd3560a88b2f3dac0674e3d6fbd90f8ddc1490ad1085a741a0",
+      "architecture": "linux/amd64",
+      "user": "1000:1000",
+      "matchedRuntimeInputFiles": 215,
+      "layerAudit": {
+        "status": "PASS_WITH_REVIEW",
+        "source": "93c97ad10f075ebe87db7c59966fcf7a44d46f89",
+        "runtimeConfigId": "sha256:5d41f50da75775bd3560a88b2f3dac0674e3d6fbd90f8ddc1490ad1085a741a0",
+        "architecture": "linux/amd64",
+        "user": "1000:1000",
+        "matchedInputFiles": 215,
+        "rawLayerAudit": {
+          "version": 1,
+          "status": "BLOCKED",
+          "imageConfigIds": [
+            "sha256:5d41f50da75775bd3560a88b2f3dac0674e3d6fbd90f8ddc1490ad1085a741a0"
+          ],
+          "uniqueLayers": 36,
+          "regularFilesScanned": 36381,
+          "regularFileBytesScanned": 637023954,
+          "knownProtectedValueCount": 4,
+          "findingCount": 1,
+          "findings": [
+            {
+              "kind": "private-key-material",
+              "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1",
+              "layer": "sha256:d81fb2a7c6ee3be05fdefaa7fd223be219c1ab172083ec1b994c3ecda33ac0a8"
+            }
+          ],
+          "findingsTruncated": false,
+          "scope": "Every saved layer, including deleted files, plus config/history; known inputs and recognizable private-key/token material. Not a general malware or exhaustive secret audit.",
+          "secretValuesPrinted": false,
+          "servicesStarted": false
+        },
+        "knownProtectedValueCount": 4,
+        "reviewedPublicLibraryVectors": [
+          {
+            "path": "usr/lib/x86_64-linux-gnu/libgnutls.so.30.37.1",
+            "fileSha256": "ddbae2995750875c07bc218d12a062d73f8250678f54dedda7e9be5068781c98",
+            "publicPemSha256": [
+              "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+              "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af",
+              "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+              "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+              "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+              "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138"
+            ]
+          }
+        ],
+        "upstreamEvidence": [
+          {
+            "tag": "3.7.9",
+            "symbol": "rsa_2048_privkey",
+            "pemSha256": "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "dsa_2048_privkey",
+            "pemSha256": "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "ecdsa_secp256r1_privkey",
+            "pemSha256": "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "ecdsa_secp192r1_privkey",
+            "pemSha256": "934b3e9bfd9936c5e30c7f0ed7d36a05e2044f755c0aa433e1d6bef6a68d1391",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "ecdsa_secp224r1_privkey",
+            "pemSha256": "a0b9679665e29ac220dfb0b366317e1b9dd5fe31e9def8b2e511669a041389ae",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "ecdsa_secp384r1_privkey",
+            "pemSha256": "293216817f0d585f0b54f225582f59e7b2e2a795b5f8002e2d71c5e3d49ce9b0",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "ecdsa_secp521r1_privkey",
+            "pemSha256": "f8766749b0c6f9b5661364568226af0ba7ae8d87c0073df24e440de4417521cd",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "gost01_privkey",
+            "pemSha256": "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "gost12_256_privkey",
+            "pemSha256": "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.7.9",
+            "symbol": "gost12_512_privkey",
+            "pemSha256": "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+            "sourceSha256": "c3d79122e072177f55dc30a98f68b949c0f36f6159a363aae9512a22a9280ed0",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.7.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "rsa_2048_privkey",
+            "pemSha256": "d039c8119a029ab9f9c83c04d67002d887b6bc6026c4264402ab27cdf24cf138",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "dsa_2048_privkey",
+            "pemSha256": "7c4c63ee462e0e700cd9e29c8e0f730b3f1b484c4abdd83f1e69fcd477c061fa",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "ecdsa_secp256r1_privkey",
+            "pemSha256": "91ea1699ff6b1a34b4a1d500a9c75a808441e47b9ea68da6fb0195e01ce1dc61",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "ecdsa_secp192r1_privkey",
+            "pemSha256": "934b3e9bfd9936c5e30c7f0ed7d36a05e2044f755c0aa433e1d6bef6a68d1391",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "ecdsa_secp224r1_privkey",
+            "pemSha256": "a0b9679665e29ac220dfb0b366317e1b9dd5fe31e9def8b2e511669a041389ae",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "ecdsa_secp384r1_privkey",
+            "pemSha256": "293216817f0d585f0b54f225582f59e7b2e2a795b5f8002e2d71c5e3d49ce9b0",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "ecdsa_secp521r1_privkey",
+            "pemSha256": "f8766749b0c6f9b5661364568226af0ba7ae8d87c0073df24e440de4417521cd",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "gost01_privkey",
+            "pemSha256": "ef237ea8db4f2ae9ee100e8ced96d29b5dceb0e6a948443e6b8a00b1791f9ec9",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "gost12_256_privkey",
+            "pemSha256": "fa0b06a72461ec0a963dcfccb8d5b61bd88a6074fc7271573bff68ab86b8c1af",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "gost12_512_privkey",
+            "pemSha256": "a4d138d7ef9748464117b44fb9c0a4b5b85a1599a127d02690abaa96d03c16e6",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "eddsa_ed25519_privkey",
+            "pemSha256": "5a09eb5df3674472eda0077d83cbccef72692c3d052ab393368ac57295439c58",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          },
+          {
+            "tag": "3.8.9",
+            "symbol": "eddsa_ed448_privkey",
+            "pemSha256": "fed7079dd4491609e4c996e232f366ac434fa4cc9df19df363391d079d470964",
+            "sourceSha256": "fce9355507865b53ba0b5c5587932b9d8519be2cd195650b0d9ff69ac2c335c7",
+            "sourceUrl": "https://github.com/gnutls/gnutls/blob/3.8.9/lib/crypto-selftests-pk.c"
+          }
+        ],
+        "maxObservedRssMiB": 41.7734375,
+        "scope": "All saved layers/config/history and selected prepared-runtime inputs; inherited excluded test files are not claimed current. Not exhaustive secret absence.",
+        "runtimeStartup": "NOT_RUN",
+        "privateValuesPrinted": false
+      },
+      "build": {
+        "status": "BUILT_NOT_RUNTIME_VERIFIED",
+        "head": "93c97ad10f075ebe87db7c59966fcf7a44d46f89",
+        "worktreeDirty": false,
+        "memoryHardLimitGiB": 2,
+        "cpuHardLimit": 1,
+        "timeoutSeconds": 90,
+        "durationSeconds": 5.216955572832376,
+        "policy": "integration-pressure-v1",
+        "servicesRunningDuringBuild": false,
+        "totalObservedLimitGiB": 4
+      },
+      "publicSource": "PENDING_SEAL",
+      "runtimeGeneralEntrypoint": "NOT_RUN for this new image",
+      "fullMedia": "NOT_RUN for this new image; prior source remains its own evidence",
+      "release": "PENDING_SEAL_AND_REMOTE_RECEIPT",
+      "awsDeployment": "NOT_RUN",
+      "releaseTag": "aws-provider-preparation-20261105t063602z",
+      "registryPush": "PASS: existing private runtime package; original credential and global Docker auth unchanged"
+    },
+    "lifecycleTools": {
+      "status": "OFFLINE_REGRESSION_PASS",
+      "persistentLabels": "Application/Anchor services and persistent volumes",
+      "trialCleanup": "Rejects persistent resources even with colliding run labels/full IDs. HTTP controls also reject persistent DB.",
+      "operators": "status,stop,restart,start,resource-stop; no init/seed/reset/prune. Resource latch blocks start/restart, stop/status remain possible.",
+      "stopOwnership": "All scoped records validated before mutation; exact full IDs, applications before data.",
+      "developmentStart": "BLOCKED before Docker invocation: shipped Compose creates bridges/published ports and cannot preserve this development host unchanged.",
+      "persistentSupervisor": "NOT_DEPLOYED; operating period and safe topology still required.",
+      "offlineComposeRender": {
+        "status": "PASS",
+        "scope": "Offline Compose render with synthetic placeholders only. No network/container/volume created, no readiness/deployment proof.",
+        "persistentServices": [
+          "asterisk",
+          "besu1",
+          "besu2",
+          "besu3",
+          "besu4",
+          "https",
+          "issuer",
+          "platform",
+          "postgres",
+          "sender",
+          "turn",
+          "web",
+          "witness1",
+          "witness2",
+          "witness3",
+          "witness4",
+          "worker"
+        ],
+        "labeledVolumes": [
+          "besu1-data",
+          "besu2-data",
+          "besu3-data",
+          "besu4-data",
+          "postgres-data"
+        ]
+      },
+      "providerOverlay": {
+        "status": "PASS",
+        "scope": "Offline synthetic Compose rendering only, no key loading/service/network/volume created.",
+        "providerSelection": "openai",
+        "protectedReadOnlyFileMounts": 2,
+        "secretValuesInEnvironment": false,
+        "ordinaryComposeWithoutOverlayUnchanged": true
+      }
+    },
+    "awsTransfer": "Same product, environment-specific inputs. NEW or consistent source fence/backup/target RESTORE; never simultaneous writers with the same identity. No AWS resources created.",
+    "independentReader": "BLOCKED: no separate protected reader reference supplied.",
+    "checks": {
+      "light": {
+        "status": "PASS",
+        "files": 66,
+        "tests": 340
+      },
+      "sourceLintAndTypes": "PASS",
+      "markdownReferences": 666,
+      "markdownErrors": 0
+    },
+    "cleanup": {
+      "interfaces": "EQUAL_CONFIGURATION",
+      "mainRoutes": "EQUAL",
+      "trialContainerRemoved": true,
+      "trialProtectedRootRemoved": true,
+      "persistentServicesCreated": 0,
+      "scope": "Compared current task read-only snapshots; no global settings or existing service changes executed."
+    }
   }
 }

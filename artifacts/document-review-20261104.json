@@ -664,5 +664,41 @@
     },
     "removedOrMoved": 0,
     "untrackedPersonalNotesAndOriginalPdf": "Preserved outside commit/release."
+  },
+  "persistentServiceFollowup": {
+    "recordedAt": "2026-11-05T06:43:38.948689+00:00",
+    "trackedMarkdownFiles": 43,
+    "addedMarkdownFiles": [],
+    "reviewedChangedFiles": [
+      {
+        "path": "README.md",
+        "sha256": "15ba1432581c579f34cfc48fb5d952f8b2d9e7faa75b455b097f6a2625982dd9",
+        "action": "updated-current-operation-and-validation-boundary"
+      },
+      {
+        "path": "docs/RUNBOOK.md",
+        "sha256": "ee8e07b3bc06db0bb983f5065986ed21fb8052932084fdea3b7f255fecfdbea3",
+        "action": "updated-current-operation-and-validation-boundary"
+      },
+      {
+        "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
+        "sha256": "9c871264e64423aaef6af5a136cfd5c4a7a03ad3717589d04304b45dc360cdcd",
+        "action": "updated-current-operation-and-validation-boundary"
+      },
+      {
+        "path": "docs/KNOWN-LIMITATIONS.md",
+        "sha256": "216781abfc0c851566cde6f7824fe9449751240ebae04774675509672ec3cd5f",
+        "action": "updated-current-operation-and-validation-boundary"
+      },
+      {
+        "path": "docs/guide/05-IMPLEMENTATION-STATUS.md",
+        "sha256": "217989a476f9be0253ddba68465798a6d7f3fd6a9bce012ce204f222b832d71f",
+        "action": "updated-current-operation-and-validation-boundary"
+      }
+    ],
+    "unchangedDocuments": "Previous full review retained; no repeated rewrite.",
+    "references": 666,
+    "linkAnchorErrors": 0,
+    "removedOriginalEvidence": false
   }
 }

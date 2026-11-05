@@ -2,13 +2,65 @@
 
 ### 공개 프런트엔드와 실제 통화 배포 구분
 
-현재 제품 진입은 `/service`, 별도 공식 인증은 `/official`이다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. `/demo`는 제품 경로로 이동하며 과거 발표 화면은 `/legacy/demo`다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+현재 제품 진입은 `/service`, 별도 공식 인증은 `/official`이다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. `/demo`와 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
 
 Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 현재 확인과 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json)에 연결한다.
 
 인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
 
 
+
+## 지속 서비스와 시험 환경의 분리
+
+현재 공개 Vercel은 API 미연결 제품 미리보기다. 최신 상태와 [지속 환경 준비 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 확인한다. 지속 backend는 아직 생성하지 않았다. 현재 443은 다른 프로젝트 소유이고, CallSign 전용 외부 TLS/WSS·UDP 경로·실제 OIDC·지속 자원 관측·중단 범위이 미정이다. 전체 구성은 기존40GiB 시작 조건에 미달하여 기동하지 않는다. localhost 시험 성공을 외부 접속으로 확대하지 않는다.
+
+### 브라우저부터 실제 서비스까지
+
+| 연결 | 현재 소비 코드/계약 | 지속 환경에서 필요한 확인 |
+|---|---|---|
+| frontend → API | api.ts의 상대 `/api/v3/*`, credentials include | 같은 공개 origin의 인증된 HTTPS 경로. 현재 Vercel rewrite는 SPA fallback뿐이며 API proxy가 아님 |
+| frontend → 분석 | liveMedia.ts의 같은 origin `/api/v3/audio` WSS | 실제 Upgrade101·인증 cookie·Origin·동의. HTTP200만으로 WSS 성공 처리 금지 |
+| 로그인 → callback | 업무/공식 별도 client·audience, PKCE, 둘 다 `WEB_ORIGIN/service` | 실제 issuer/JWKS/token URL과 합성 역할 계정. 공개 시험 OIDC fixture 금지 |
+| 브라우저 → PBX signaling | `/pbx/ws` WSS→Asterisk, SIP subprotocol | 실제 TLS·인증과 signaling 도달성. ARI는 공개하지 않음 |
+| 브라우저 ↔ 음성 | PBX RTP UDP10000–10099, TURN3478 TCP/UDP·5349 TCP·relay49160–49200 UDP | 승인한 공개 주소·NAT/UDP 경로·외부 두 단말. Vercel HTTP proxy가 UDP를 전달한다고 가정하지 않음 |
+| 내부 서비스 | PostgreSQL5432·Besu8545·Witness4201–4204·Anchor4300 TLS | 사설 연결/권한 유지. DB/RPC/Witness 관리/ARI 외부 공개 금지 |
+
+세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 이 정적 프로젝트에서 backend·분석·SIP까지 전달됐다는 증거는 별도로 필요하다. 공개 경로가 준비되기 전 Production의 preview 제한/CSP/마이크 차단을 해제하지 않는다.
+
+일반 Compose는 bridge·published port로 host route/firewall/NAT를 바꿀 수 있다([Docker 설명](https://docs.docker.com/engine/network/packet-filtering-firewalls/)). 현재 개발 서버에는 실행하지 않는다. 기존 proxy 변경·새 tunnel·port publish는 별도 결정 없이 우회 수단으로 사용하지 않는다. 기존 none namespace 시험 helper는 지속 서비스 launcher나 공개 인증 제공자가 아니다.
+
+### 소유 자원과 운영 명령
+
+배포 Compose의 서비스/volume에는 `org.callsign.lifecycle=persistent`와 고유 `org.callsign.deployment-id`를 붙인다. 시험은 별도 run ID/DB/키이며 full runner의 ephemeral label 또는 HTTP의 callsign.test marker를 사용한다. 시험 도구는 persistent label을 거절한다. 실제 운영 중인 환경을 ownership.json에 넣어 시험 cleanup을 적용하지 않는다.
+
+기존 deployment.sh는 다음 명령을 제공한다. **이 명령으로 현재 서버에 지속 서비스가 이미 생긴 것은 아니다.** start/restart는 현재 서버의 네트워크 보존과 호환되지 않는 일반 Compose 경로를 차단하며, AWS 경로는 기존 별도 승인/mount/preflight를 유지한다.
+
+```bash
+CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh status
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh stop
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh resource-stop
+# 승인·입력·자원 조건을 충족한 실제 배포 환경에서만 기존 start/restart 사용
+```
+
+status는 역할·deployment label이 맞는 서비스 ID/state/health만 출력한다. health와 전체 readiness는 다르며 monitor 생존을 증명하지 않는다. stop은 검사한 full container ID로 앱/worker/미디어를 먼저, DB/chain을 뒤에 중지하고 volume·키·genesis를 삭제하지 않는다. resource-stop은 보호 설정 디렉터리의 resource-stop.json을 먼저 보존하고 동일하게 중지한다. start/restart는 이 latch가 있으면 거절한다. stop/status는 latch 뒤에도 가능하다. 도구에 자동 latch 삭제·seed·NEW·prune는 없다. restart는 검토한 같은 이미지/영속 상태를 사용하고 초기화하지 않는다.
+
+Compose 로그는 AWS 제한 overlay의 json-file 크기/개수 제한을 유지한다. 현재 개발 서버용 무인 supervisor·지속 감시/누적 디스크 정책은 아직 실행 검증하지 않았다. 사용자의 지속 실행 허가는 사용자 중지까지의 환경 유지로 이해하며 시험90분 deadline은 C에만 적용한다. 이것이 압박·상한·중단 기준을 없애는 허가는 아니다. 시험90분을 무기한 운영 허가로 해석하거나 unless-stopped로 자원 중단을 무력화하지 않는다.
+
+### Deepgram 한국어 + OpenAI 분석의 보호 입력
+
+STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 분석은 CALLSIGN_ANALYSIS_PROVIDER=openai와 OPENAI_MODEL을 명시한다. OPENAI_API_KEY_FILE·DEEPGRAM_API_KEY_FILE은 서버만 읽는 현재 UID 소유 일반 파일0600이어야 하고 심볼릭 링크·공개 권한·값과 파일 동시 지정은 거절한다. 키를 process.env에 다시 복사하거나 브라우저로 보내지 않는다.
+
+선택 overlay `infra/deploy/compose.providers.yml`은 두 보호 파일만 issuer에 read-only mount한다. CALLSIGN_PROVIDER_CONFIG=deepgram-openai를 보호 CFG에서 명시해야 deployment.sh가 연결한다. 기본 none은 mount하지 않는다. 모델은 OPENAI_MODEL·DEEPGRAM_MODEL로 별도 지정하며 API 키의 존재를 운영 비용 승인으로 간주하지 않는다. 기존 Anthropic 경로는 명시/기존 설정에서만 유지하고 OpenAI 오류의 자동 fallback으로 사용하지 않는다.
+
+첫 제안 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개인 서비스 분석 설정이며 한국어 품질은 미측정이다. 최대6 LLM 요청·STT2연결×30초·재시도0, 요청당 입력8,000토큰 가정의 예상 비용은 약$0.063이다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 첫 smoke $0.10 계획만 승인됐고 입력은 별도 제공 예정이다. 실제 호출은 아직0이며 지속 서비스의 무제한 비용 승인이 아니다.
+
+평가 CLI는 기존 비용 guard에 CALLSIGN_EVALUATION_MAX_REQUESTS를 추가해6 이하 계획을 선언할 수 있다. provider-smoke는 기존 결과 파일을 호출 전에 거절하고 STT 입력은 설치 ffprobe로30초 이하 단일 오디오인지 검사한다. 도구/동의 입력이 없으면 중단한다. 숫자 선언은 실제 invoice 강제 상한이 아니며 실제 가격·보관/학습 정책·계정 지출 제한은 실행 전 대조한다. OpenAI store:false도 제공자의 모든 보관을 없앤다는 보장이 아니다.
+
+정책 결합·정정된 근거·동의/epoch/binding·timeout·취소·quota는 공통 orchestration을 유지한다. 거절/불완전 출력/제공자 실패는 분석 불가이며 기존 규칙 경고를 지우거나 안전 판정으로 바꾸지 않는다. 정상 서비스가 합성 제공자를 자동 선택하지 않는다.
+
+### AWS로 전환할 때
+
+같은 제품 이미지에 공개 주소·OIDC·TLS·영속 mount·보호 provider 파일만 환경별로 공급한다. 새 identity NEW는 새 키/genesis/기관/trust/웹을 생성한다. 기존 상태 이전은 source drain/fence → 일관된 암호화 백업 → source writer 중지 확인 → 별도 target RESTORE/현재 독립 Anchor 대조 → 새 외부 endpoint/trust 검증 → 사용자 전환 순서다. 같은 identity의 source와 target을 동시에 쓰기 상태로 열지 않는다. 되돌리기도 최신 journal/Anchor 일치와 단일 writer를 확인한 뒤 수행하며 과거 백업으로 gate를 초기화하지 않는다.
 
 ### RESTORE 도구의 native 실행 조건
 

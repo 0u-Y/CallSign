@@ -1,12 +1,20 @@
 # 현재 구현의 한계
 
+## 지속 공개 서비스 준비
+
+현재 Vercel 제품 frontend는 실제 API 미연결이며 지속 backend/사용자 계정을 공개하지 않았다. 기존443은 다른 프로젝트 소유이고 승인된 CallSign 공개 TLS/WSS·UDP 경로·OIDC가 없으며, 지속 감시·중단 범위과 전체40GiB 시작 조건도 충족하지 못했다. 기존 네트워크를 바꾸지 않는 지속 launcher/외부 미디어는 아직 실행 검증하지 않았다. [현재 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
+
+OpenAI·Deepgram 키는 명시적 보호 파일로 제공돼 서버 로딩을 확인했다. OpenAI adapter/공통 취소·근거·quota 처리를 구현하고 첫 smoke $0.10 계획은 승인됐다. 동의한 음성/전사 입력은 별도 제공 예정으로 실제 호출0이다. 실제 모델 품질·계정 사용 가능성·보관/청구·지속 운영 비용 조건을 확인했다고 쓰지 않는다. 새 제품의 이전 이미지 통합 PASS 전용은 금지한다.
+
+새 UI-only 원격 브라우저에서 공개 데스크톱/390px·CSS2배 확대와 focus를 확인하고 캡처를 열어 검토했다. 이는 공개 로그인·통화 검증이 아니다. 과거1GiB 자원 중단과 새 승인 실행은 별도 기록이다.
+
 ## 2026-11-05 현재 검증 경계
 
 [최신 감사·복원](../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup은 일반 entrypoint에서 암호화 전체 백업, 별도 DB/정지 chain 상태 복원, live Anchor 대조, 복원 후 새 통화와 원본/대상 DB 감사를 통과했다. 다른 binding 재사용·오래된 백업/현재 Anchor·잘못된 키·누락 metadata 거절도 확인했다. 같은 호스트·한 기관의 선택 경로이며 독립 장애 영역이나 모든 복구 조합의 보장은 아니다.
 
 별도 합성 분석3통화는 실제 ServiceCall·음성·WS·동의 철회·업무 취소·기관 정지/공동 복구를 통과했다. 최초 JSON 성공/프로세스 비정상 종료와 목적 이탈 배지 미표시 실패는 보존하며 원인은 미확정이다. 이후 통과를 그 실패의 해결 증거로 바꾸지 않는다. 과거 누락 interface baseline도 미확인이다.
 
-[최신 UI 캡처](../artifacts/service-hardening-20261105/result.json)는 인증된 역할별 실제 화면과 별도 공개 frontend를 구분한다. 원격 브라우저 후속 확인은 host1GiB 적용 중1.20GiB에서 자원 중단했다. 최신 원격 모바일/확대 확인은 미완료이며 자동 재기동하지 않았다. Vercel API 미연결, 독립 reader·실제 AI·AWS 입력 부족은 남아 있다.
+[최신 UI 캡처](../artifacts/service-hardening-20261105/result.json)는 인증된 역할별 실제 화면과 별도 공개 frontend를 구분한다. 원격 브라우저 후속 확인은 host1GiB 적용 중1.20GiB에서 자원 중단했다. 당시 최신 원격 모바일/확대는 미완료였고 자동 재기동하지 않았다. 이후 새 승인 UI-only 결과는 위 후속 기록을 따른다. Vercel API 미연결, 독립 reader·실제 AI·AWS 입력 부족은 남아 있다.
 
 ## 이전 후보의 실제 실행 한계 (2026-11-04)
 

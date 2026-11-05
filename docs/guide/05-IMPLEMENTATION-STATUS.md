@@ -4,15 +4,17 @@
 
 | 요구사항 | 현재 구현 | 실행 근거 | 남은 작업 | 완료 조건 | 차단 입력 |
 |---|---|---|---|---|---|
-| UI-001/006 역할별 업무·공식 확인 | 실제 업무/API·공식 조회 상태와 독립 통화 종료 | [HTTP·실제 역할별 캡처](../../artifacts/service-hardening-20261105/result.json) | 공개 frontend 후속 모바일/확대 확인 | 최신 원격 화면 상호작용 검토 | 원격 브라우저 RSS 중단 후 새 실행 범위 |
+| UI-001/006 역할별 업무·공식 확인 | 실제 업무/API·공식 조회 상태와 독립 통화 종료 | [HTTP·실제 역할별 캡처](../../artifacts/service-hardening-20261105/result.json) | 공개 실제 backend 연결 | 새 UI-only 원격 모바일/확대 PASS; 로그인/통화는 미연결 | 공개 TLS/WSS/UDP·OIDC·지속 감시 범위 |
 | CALL-005/006·AI-001/005 | ServiceCall/remote track·동의·정책 결합 | [최신 일반/합성 분석 경로](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup | 이전 분석/프로세스 실패의 원인 미확정 | 재발 시 보존한 exit·WS·lease 관측으로 원인 확인 | 미재현 원인을 추정 확정하지 않음 |
 | OPS-004 복원·DB 감사 | 일관된 암호화 백업·별도 DB/chain 복원·독립 Anchor | 같은 기록의 restore: 전체 RESTORE·복원 후 통화·원본/대상 SQL 감사 PASS | 별도 장애 영역 운영 검증 | 실제 AWS 저장소/Anchor 배치와 복구 | AWS 환경 |
 | OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 별도 reader·AWS 실행 | 새 후보 게시·공개/이미지 원격 수령 PASS; reader는 별도 | 독립 reader, AWS 환경 입력 |
-| AI-003 실제 제공자 평가 | 동의/취소·오류·quota·숫자 예산 선검사 | 합성 제어 흐름; 실제 제공자 호출0 | 사람 검토 한국어 입력·실제 평가 | 텍스트/음성·품질/제어 흐름 분리 | 제공자·모델·보호 참조·비용·입력 허가 |
+| AI-003 실제 제공자 평가 | OpenAI adapter·Deepgram/ko·동의/취소·quota·비용 선검사 | 합성 제어 흐름; 실제 제공자 호출0 | 동의한 한국어 입력·실제 평가 | OpenAI/Deepgram 보호 파일 로딩·오프라인 회귀; 첫 $0.10 계획 승인 | 입력 미제공, 지속 비용/보관 조건 별도 |
+
+지속 환경 A는 미기동이다. 현재 공개 ingress·실제 OIDC·지속 자원 관측·중단 범위이 미정이며 전체 RAM 시작 guard에 미달한다. 새 provider 코드의 전체 원장/미디어 검증은 미실행이다. 아래 일반 entrypoint/복원/합성 분석 PASS는 이전 제품 소스의 선택 경로이며 새 OpenAI 실제 품질 증거가 아니다. [현재 준비 상태](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
 
 일반 entrypoint/분석 미사용 복원 계획의4통화와 별도 합성 분석 계획의3통화는 각각 PASS다. 원본과 복원 대상 DB를 삭제 전에 read-only 감사했다. 과거5회 정상 반복·이전4개 사례·이번 진단 재실행을 합쳐 성공률을 만들지 않는다. 단독 복구400은 HTTP schema 거절이고 이번 EVM 정족수 거절 증거는 아니다.
 
-실제 authenticated390px·데스크톱과 통화 화면을 열어 검토했다. Vercel 공개 frontend는 최신 main의 API 미연결 화면이며 실제 로그인/통화 backend는 없다. 후속 원격 브라우저는 전체 시험의 host1GiB를 적용하다1.20GiB에서 중단했다. UI3GiB로 소급 PASS하거나 자동 재시작하지 않았다. 부분 데스크톱 캡처와 HTTP 검증, 이전 UI 모바일 검증을 구분한다.
+실제 authenticated390px·데스크톱과 통화 화면을 열어 검토했다. Vercel 공개 frontend는 최신 main의 API 미연결 화면이며 실제 로그인/통화 backend는 없다. 후속 원격 브라우저는 전체 시험의 host1GiB를 적용하다1.20GiB에서 중단했다. UI3GiB로 소급 PASS하거나 자동 재시작하지 않았다. 해당 실패를 보존하고 새 승인 UI-only의 공개 데스크톱/390px·CSS 확대를 후속 검증했다. 인증된 로컬 화면과 API 미연결 공개 화면은 구분한다.
 
 이 표는 SLA나 모든 장애 조합의 보장이 아니다. 과거 분석 중단/PBX 종료·누락 baseline의 원인 미확정은 유지하며, 현재 equal baseline으로 과거 상태를 입증하지 않는다. 원본은 위 기록 및 [이전 미디어 결과](../../artifacts/media-final-20261104.json)를 따른다.
 
