@@ -700,5 +700,21 @@
     "references": 666,
     "linkAnchorErrors": 0,
     "removedOriginalEvidence": false
+  },
+  "demoUiFollowup": {
+    "scope": "Only changed current guidance after original full Markdown audit; original per-file decisions retained",
+    "paths": [
+      "DESIGN.md",
+      "PRODUCT.md",
+      "README.md",
+      "docs/RUNBOOK.md",
+      "docs/FINALS-IMPLEMENTATION-PLAN.md",
+      "docs/KNOWN-LIMITATIONS.md",
+      "docs/guide/05-IMPLEMENTATION-STATUS.md"
+    ],
+    "trackedMarkdownFiles": 43,
+    "linkCheck": "668 references, 0 errors before final edits; rerun on final source",
+    "deletionOrMove": false,
+    "newLongReports": false
   }
 }

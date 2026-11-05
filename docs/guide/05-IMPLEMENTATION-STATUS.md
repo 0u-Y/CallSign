@@ -1,5 +1,8 @@
 # 05. 구현 및 검증 현황
 
+최신 데모 변경은 `/demo/call`·`/demo/governance`의 실제 서비스 controller/API 재사용이다. 네 역할의 합성 API-response 브라우저 검사를 수행했지만 실제 인증·통화 검증은 아니다. 축약한 최신 레이아웃의 재캡처는 memory PSI 중단으로 미실행이며 독립 시각 검토는 recapture다. 공개 Vercel은 정확한 제품 소스의 API 미연결 frontend다. 새 준비 이미지의 일반 entrypoint/미디어/복원은 미검증으로 이전 후보 PASS와 분리한다. [단일 후보 기록](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation.demoUi·demoPreparationCandidate를 따른다.
+
+
 ## 현재 작업표
 
 | 요구사항 | 현재 구현 | 실행 근거 | 남은 작업 | 완료 조건 | 차단 입력 |

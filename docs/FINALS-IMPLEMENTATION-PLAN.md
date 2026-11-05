@@ -328,3 +328,18 @@ Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반
 
 <a id="문서-관리와-다음-개발"></a>
 - [문서 관리와 다음 개발](archive/DEVELOPMENT-HISTORY-20261104.md#문서-관리와-다음-개발)
+
+## 2026-11-05 두 데모 작업면 후속
+
+사용자 확정에 따라 `/demo/call`·`/demo/governance`를 기존 ServicePage parent route/controller·실제 역할 API에 연결했다. 공통 오디오·종료 제어와 근거 drawer, 현재 역할의 조작/수신 상태 배치, 권한 제한된 네 노드 관측을 추가했다. 같은 높이의 fresh hash만 비교하며 validator 소속·개별 투표·Witness 정족수는 조회만으로 성공 표시하지 않는다. 기존 callback·공식 인증은 유지한다.
+
+브라우저 API-response fixture에서 네 역할/1366·390, 탐색·뒤로가기의 같은 오디오 DOM, drawer Esc, 빈 목록·조회 실패 후 목록 제거를 확인했다. 회수/알림 fixture의 형식 오류 두 건을 보존하고 응답만 수정했다. 실제 인증/미디어 시험은 아니다. 캡처를 열어 상단 밀도를 확인하고 준비 도구·비통화 종료 바·재할당 폼을 축약했지만 확인 재빌드의 사전 관측에서 sustained memory PSI로 중단했다. 최신 재캡처는 NOT_RUN이며 독립 시각 검토 판정도 **recapture**다. 최초 UI batch 중단과 후속 승인 batch의 기록을 별도로 보존했고 자동 재기동하지 않았다. [현재 대응](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation.demoUi를 따른다.
+
+| 항목 | 현재 근거 / 상태 | 다음 완료 조건 |
+|---|---|---|
+| 두 작업면·공통 통화 수명 | 소스 구현·light PASS; fixture에서 같은 audio DOM 유지 | 실제 통화 중 탐색·동의 철회·종료 검증 |
+| 최신 표시 확인 | 이전 dirty UI fixture 캡처; 축약 후 recapture BLOCKED | 자원 정책을 지키는 새 승인 화면 검증 |
+| 공개 frontend | 정확한 제품 SHA Preview/Production Ready·원격 HTTP/JSON/assets 확인 | 최신 원격 DOM/모바일 재캡처; backend 연결과 구분 |
+| 지속 backend | 기존 공개 ingress/OIDC 없음·전체40GiB 미달 | 승인된 TLS/WSS/UDP·IdP·지속 감시 구성 |
+| AI | 보호 자격 로딩·오프라인 adapter 검증, $0.10 첫 smoke 승인 | 별도 동의 음성/전사 입력; 실제 호출0 |
+| 전달 후보 | 새 소스 오프라인 image build; 실제 runtime/media NOT_RUN | 후보별 상태를 보존한 게시·수령; 실제 통합 후 검증 완료 판정 |

@@ -69,4 +69,4 @@ pnpm light
 
 [전체 문서 안내](docs/README.md) · [서비스 가이드](docs/guide/README.md) · [개발 명세](docs/MASTER-DEVELOPMENT-SPEC.md) · [아키텍처](docs/ARCHITECTURE.md) · [알려진 한계](docs/KNOWN-LIMITATIONS.md)
 
-멘토링·기획서·과거 시연과 검증 증거는 [문서 안내의 기록 보관](docs/README.md#기록과-자료)에서 찾을 수 있습니다. `/finals`는 이전 직접 통화 호환 경로이며 `/demo`는 고정 시험 데이터·과거 증거를 사용하는 시연 화면입니다.
+멘토링·기획서·과거 시연과 검증 증거는 [문서 안내의 기록 보관](docs/README.md#기록과-자료)에서 찾을 수 있습니다. `/finals`는 이전 직접 통화 호환 경로이며 `/demo/call`과 `/demo/governance`는 실제 업무·통화·관리 API를 재사용하는 데모 작업면입니다. API 미연결 공개 배포는 실행 성공을 표시하지 않습니다.

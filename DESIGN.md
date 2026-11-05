@@ -23,3 +23,25 @@
 역할은 서버 세션으로 결정한다. 합성 상태는 시험에만 사용한다. 공개 프런트엔드에서 API가 없으면 로그인·통화 불가를 표시하며 성공 화면으로 대체하지 않는다. AWS는 실제 인증·통화 runtime이고 Vercel 공개 배포는 연결이 확인되기 전까지 프런트엔드 미리보기다.
 
 참고 패턴은 [기존 조사](docs/DESIGN-REFERENCES.md)의 task/list-detail, summary/details, persistent warning, status message를 사용한다. 외형이나 라이브러리를 복제하지 않는다.
+
+## 2026-11-05 실제 데모 작업면
+
+사용자 확정에 따라 `/demo`의 redirect 방침을 대체한다. 기존 업무 화면을 복제한 발표 앱 대신 같은 ServicePage/controller를 공유하는 `/demo/call`, `/demo/governance`를 제공한다. `/service` callback과 `/official`의 별도 인증 문맥은 보존한다.
+
+- 채택: 연락은 기관 조작 / 수신 상태의 비대칭 배치와 하단 근거, 관리는 변경 검토 / 네 노드 관측과 하단 세 계층. 실제 조작과 관측을 같은 맥락에서 읽을 수 있다.
+- 미채택: 단계별 전체 화면 전환. 현재 연락·종료 제어가 사라지고 화면 탐색을 실행 상태로 오해할 위험이 있다.
+- Operate 방식. 기존 로고·Noto Sans KR·밝은 작업 면·남색 본문·청록 행동을 사용한다. 큰 목적 제목, 대비 있는 고정 위치 통화 종료, 기술 상세 접기를 적용한다. 모바일은 수신 상태→기관 조작, 공동 관리는 변경→노드 순이다.
+
+| 화면 요소 | 실제 데이터 출처 | 실행 권한 | 갱신 방식 | 미확인 시 표시 |
+|---|---|---|---|---|
+| 업무·기관·목적 | `/v3/workspace` | 현재 기관/상담원/수신자 scope | 기존 5초 polling, 수동 재조회 | 이전 목록 숨김·현재성 미확인 |
+| 승인·연결·분석 | 기존 ServiceCall callback, 서명/lease/WS 검증 | 해당 통화 actor 세션 | 실제 controller 이벤트 | 미확인·분석 불가를 성공과 구분 |
+| 취소·회수 | 기존 cancel/recalls API | contact.manage | 실제 요청·기존 회수 조회 | 요청·서버 적용·PBX 관측 분리 |
+| 공동 변경·승인자 | `/v3/management`·기존 configuration review | 기관 관리/독립 승인 permission | 기존 3초 polling·서명 검증·제출 | 승인 대기·조회 실패 |
+| 공동 복구 | 기존 recover API·별도 서명 도구 | institution.recover와 유효 독립 서명 | 명시적 제출·관리 상태 조회 | API 입력 거절을 EVM 거절로 표현하지 않음 |
+| 노드 4개·블록 hash | 기존 `/v3/management/health`·서버 RPC 검사 | institution.recover, read-only | 화면 활성 시 5초 polling·취소/늦은 응답 폐기 | 미관측·stale·조회 실패; validator 소속 미확인 |
+| Witness·명령 전파 | 기존 서버 검증/관리 작업 결과만 | 기존 actor 범위 | 기존 처리 결과 | 노드 health로 3-of-4를 대체하지 않음 |
+
+네 노드의 같은 높이 hash만 비교한다. URL·자격·peer 토폴로지는 보내지 않고 개별 합의 투표를 만들지 않는다. 현재 actor의 세션만 조작하며 다른 actor 쿠키를 수집하지 않는다. 관람자는 공개 frontend의 API 미연결 상태를 본다. 새 read-only 집계 권한을 임의로 추가하지 않았다.
+
+통화 작업면과 관리 작업면은 하나의 parent route 아래 유지한다. 숨긴 작업면을 unmount하지 않고 audio를 공통 위치에 두어 탐색만으로 controller를 닫지 않는다. 새로고침은 기존 WebRTC를 복원한 것처럼 표시하지 않는다. 실제 브라우저/미디어 검증 범위는 최신 실행 기록을 따른다.

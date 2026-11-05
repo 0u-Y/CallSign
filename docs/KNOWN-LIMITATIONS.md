@@ -1,5 +1,9 @@
 # 현재 구현의 한계
 
+## 새 데모 화면 검증 경계
+
+`/demo/call`·`/demo/governance`를 실제 서비스 controller/API에 연결했다. 브라우저 합성 API 응답으로 역할별 배치·탐색·조회 실패 경계를 확인했지만 실제 세션·WebRTC 통화·원장 검증은 아니다. 이후 상단 높이/고급 폼을 축약한 최신 표시의 재캡처는 sustained memory PSI로 차단됐다. 이전 캡처를 최신 화면 승인으로 사용하지 않으며 독립 시각 검토 판정은 recapture다. 두 자원 중단과 fixture 실패를 보존한다. 상세는 [현재 후보](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation.demoUi를 따른다.
+
 ## 지속 공개 서비스 준비
 
 현재 Vercel 제품 frontend는 실제 API 미연결이며 지속 backend/사용자 계정을 공개하지 않았다. 기존443은 다른 프로젝트 소유이고 승인된 CallSign 공개 TLS/WSS·UDP 경로·OIDC가 없으며, 지속 감시·중단 범위과 전체40GiB 시작 조건도 충족하지 못했다. 기존 네트워크를 바꾸지 않는 지속 launcher/외부 미디어는 아직 실행 검증하지 않았다. [현재 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.

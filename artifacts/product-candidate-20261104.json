@@ -1376,10 +1376,13 @@
       "publicSource": "PENDING_SEAL",
       "runtimeGeneralEntrypoint": "NOT_RUN for this new image",
       "fullMedia": "NOT_RUN for this new image; prior source remains its own evidence",
-      "release": "PENDING_SEAL_AND_REMOTE_RECEIPT",
+      "release": "NOT_CREATED_SUPERSEDED_BEFORE_DEMO_UI",
       "awsDeployment": "NOT_RUN",
       "releaseTag": "aws-provider-preparation-20261105t063602z",
-      "registryPush": "PASS: existing private runtime package; original credential and global Docker auth unchanged"
+      "registryPush": "PASS_PRIVATE_PACKAGE",
+      "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:9479ba75897dffb8310bfa4d1ce4f9cb614c84b4de3596f32bb821df8e90848b",
+      "remoteReceipt": "PASS_FRESH_HTTPS_MANIFEST_CONFIG_LAYERS_PUBLISHER_AUTH_NOT_INDEPENDENT_READER",
+      "demoUiIncluded": false
     },
     "lifecycleTools": {
       "status": "OFFLINE_REGRESSION_PASS",
@@ -1447,6 +1450,167 @@
       "trialProtectedRootRemoved": true,
       "persistentServicesCreated": 0,
       "scope": "Compared current task read-only snapshots; no global settings or existing service changes executed."
+    },
+    "demoUi": {
+      "status": "IMPLEMENTED_FIXTURE_VISUAL_PARTIAL_LATEST_RECAPTURE_BLOCKED",
+      "routes": [
+        "/demo/call",
+        "/demo/governance"
+      ],
+      "runtimeLifetime": "same parent route; hidden panels and shared audio; real media navigation not executed",
+      "resourceStop": "SUSTAINED_MEMORY_PSI",
+      "browserStarted": true,
+      "build": "PASS_1.22_SECONDS",
+      "scope": "UI-only 24/16GiB host3/whole4; all owned processes cleaned; no persistent services started",
+      "next": "latest visual recapture and real authenticated media navigation require a policy-compliant newly authorized execution; no automatic restart",
+      "productSource": "935f44a66c31f50e0c0013faad741000f3aeaead",
+      "browserFixture": {
+        "status": "PASS",
+        "scope": "4 synthetic roles, 1366/390, same audio DOM across demo navigation/back, drawer Escape, empty and failed lookup clears old tasks; intercepted API only",
+        "sourceBase": "6cba52b1e63a78625d79b37329335fb64bc600e9",
+        "worktreeDirty": true,
+        "sourceSnapshot": "uncommitted first demo layout; exact clean source not captured; built asset hashes preserved privately",
+        "captures": [
+          "artifacts/service-hardening-20261105/demo-fixture-before-compact-recipient-call-1366.png",
+          "artifacts/service-hardening-20261105/demo-fixture-before-compact-recipient-call-390.png",
+          "artifacts/service-hardening-20261105/demo-fixture-before-compact-institution-governance-1366.png",
+          "artifacts/service-hardening-20261105/demo-fixture-before-compact-institution-governance-390.png"
+        ],
+        "initialFixtureFailures": 2,
+        "originalFailuresRetained": true
+      },
+      "latestPresentation": {
+        "changes": [
+          "compact tools",
+          "hide global end bar without live call",
+          "fold agent reassignment"
+        ],
+        "browser": "NOT_RUN_SUSTAINED_MEMORY_PSI",
+        "reviewerDisposition": "recapture",
+        "screenshotsAreNotLatest": true
+      },
+      "resourceStops": [
+        "initial UI batch sustained memory PSI",
+        "same-batch visual confirmation preflight sustained memory PSI"
+      ],
+      "integration": "NOT_RUN_REAL_AUTH_WS_MEDIA_NODE_GOVERNANCE_ON_NEW_UI",
+      "persistentBackend": "BLOCKED_NO_APPROVED_INGRESS_OIDC_AND_FULL_RESOURCE_START",
+      "vercel": {
+        "status": "PASS_PRODUCTION_HTTP_NOT_BROWSER",
+        "recordedAt": "2026-11-05T07:10:23.860996+00:00",
+        "source": "935f44a66c31f50e0c0013faad741000f3aeaead",
+        "production": "https://callsign-rouge.vercel.app",
+        "preview": {
+          "status": 200,
+          "contentType": "text/html",
+          "finalHost": "vercel.com",
+          "remoteAccess": "PROTECTED_SSO"
+        },
+        "buildMeta": {
+          "commit": "935f44a66c31f50e0c0013faad741000f3aeaead",
+          "target": "production",
+          "publicPreview": true
+        },
+        "paths": [
+          {
+            "path": "/",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/demo",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/demo",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/demo/call",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/demo/call",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/demo/governance",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/demo/governance",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/service",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/service",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/official",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/official",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/build-meta.json",
+            "status": 200,
+            "contentType": "application/json",
+            "finalPath": "/build-meta.json",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          },
+          {
+            "path": "/legacy/demo",
+            "status": 200,
+            "contentType": "text/html",
+            "finalPath": "/service",
+            "boundary": "HTTP SPA document only; not DOM, refresh interaction, login or media"
+          }
+        ],
+        "assets": [
+          {
+            "path": "/assets/index-vNzXMpCg.js",
+            "bytes": 675175,
+            "status": 200,
+            "knownProtectedValuesAbsent": true
+          },
+          {
+            "path": "/assets/index-ykutvCMO.css",
+            "bytes": 422860,
+            "status": 200,
+            "knownProtectedValuesAbsent": true
+          }
+        ],
+        "secretScanScope": "four explicitly supplied protected values; not a full dependency/security audit",
+        "browser": "Latest compacted layout NOT_RUN: resource stop; previous fixture captures retained separately",
+        "backend": "API disconnected; no public login/call claims"
+      },
+      "cleanup": {
+        "allTemporaryAppsAndBrowserStopped": true,
+        "persistentServicesCreated": 0,
+        "existingResourcesUnchangedByCommands": true
+      },
+      "firstBatchBrowserStarted": false
+    },
+    "demoPreparationCandidate": {
+      "status": "PRIVATE_IMAGE_RECEIVED_RELEASE_PENDING",
+      "runtimeProductSource": "935f44a66c31f50e0c0013faad741000f3aeaead",
+      "configId": "sha256:16886ae4f69b6e9144d52b0044cdb22a0d31d022ac17f64a9fd259e291791f41",
+      "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:07bea15bcbd62840b7d44bd1fd50a17ecd2bee1cbbe03e255910b281c6c1d48a",
+      "registryManifestDigest": "sha256:07bea15bcbd62840b7d44bd1fd50a17ecd2bee1cbbe03e255910b281c6c1d48a",
+      "architecture": "linux/amd64",
+      "packageVisibility": "private",
+      "audit": "218 selected runtime inputs matched; all saved layers/config/history known-value and pattern scan; inherited public GnuTLS test vectors reviewed separately",
+      "runtimeGeneralEntrypoint": "NOT_RUN",
+      "fullMediaRestore": "NOT_RUN_NEW_IMAGE",
+      "latestUiVisual": "RECAPTURE_BLOCKED_MEMORY_PSI",
+      "releaseTag": "aws-demo-preparation-20261105t071306z",
+      "publicObserverSource": "PENDING_DOCS_COMMIT",
+      "remoteImageReceipt": "PASS_FRESH_HTTPS_PUBLISHER_CONTEXT_NOT_INDEPENDENT_READER",
+      "finalAwsWeb": "DEFERRED_REAL_METADATA_TRUST_CERTIFICATE",
+      "sourceRuntimeDiff": "UI and operational head-hash observation; previous provider code included; previous runtime PASS not transferred"
     }
   }
 }

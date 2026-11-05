@@ -2,11 +2,14 @@
 
 ### 공개 프런트엔드와 실제 통화 배포 구분
 
-현재 제품 진입은 `/service`, 별도 공식 인증은 `/official`이다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. `/demo`와 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+현재 시연 진입은 `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+
+시연 준비/조작: 독립 브라우저 프로필로 기관·상담원·수신자·공동 승인자를 로그인한다. `/demo/call`의 준비 패널에서 현재 역할을 확인하고 기관 업무 생성/선택 → 상담원 새 시도·개별 승인 → 양측 마이크/PBX 등록 → 발신·수락 → 수신자 분석 동의 순서로 진행한다. 조회 장애에도 공통 진행 통화 종료를 사용할 수 있다. `/demo/governance`에서 권한자가 기관을 정지하고 실제 관리 상태/회수를 확인한다. 복구는 현재 epoch/nonce/만료의 요청을 각 독립 승인자가 별도 도구로 서명하고 공동 복구 상세에서 제출한다. API 거절은 계약 거절로 설명하지 않는다. 새 키/trust 활성화와 새 업무 가능 여부를 확인하며 과거 소비·종료 기록은 지우지 않는다. 공개 API 미연결 배포에서는 이 조작을 실행할 수 없다. 실제 실행·fixture·미검증 경계는 현황/후보 기록을 따른다.
+
 
 Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 현재 확인과 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json)에 연결한다.
 
-인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
+인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo/call`·`/demo/governance`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
 
 
 
@@ -93,7 +96,8 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 새 서비스/복원 후보: [aws-restore-candidate-20261104t180638z](https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z). runtime은 새 제품 종료 수정과 UI를 포함하고, 전체 RESTORE·별도 합성 분석 경로의 실제 검증은 위 후속 기록을 따른다. 비공개 GHCR와 공개5파일 게시·실제 원격 재수령을 완료했다. 정확한 source/digest·checksum은 단일 후보 기록의 serviceHardeningFollowup에서 확인한다.
+- 최신 데모/제공자 **준비 후보**: `aws-demo-preparation-20261105t071306z`. 새 runtime은 게시/수령했지만 일반 entrypoint·실제 통화·RESTORE는 NOT_RUN이며 최신 화면 재캡처도 압박 중단이다. 아래 수령 예시는 이 준비 후보를 선택한다. 기존 실제 통합 결과를 새 이미지에 전용하지 않는다.
+- 이전 실제 서비스/복원 검증 후보: [aws-restore-candidate-20261104t180638z](https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z). runtime은 새 제품 종료 수정과 UI를 포함하고, 전체 RESTORE·별도 합성 분석 경로의 실제 검증은 위 후속 기록을 따른다. 비공개 GHCR와 공개5파일 게시·실제 원격 재수령을 완료했다. 정확한 source/digest·checksum은 단일 후보 기록의 serviceHardeningFollowup에서 확인한다.
 - 이전 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
 - 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
 - 같은 runtime으로 [후속4개 고유 사례](../artifacts/media-final-20261104.json)의 정상 반복·실제 조회 장애 중 종료·업무 취소·기관 정지와 공동 복구를 확인했다. 이전 분석 중단/PBX 종료는 미재현이며 원인 미확정 기록을 유지한다. 이 이전 후보 발행 시점의 미확인 항목은 후속 기록과 구분하며 독립 reader·실제 AI·AWS는 남아 있으므로 **AWS 이전 전 전체 완료가 아니다.**
@@ -111,7 +115,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 ```bash
 set +x
 umask 077
-TAG=aws-restore-candidate-20261104t180638z
+TAG=aws-demo-preparation-20261105t071306z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \
