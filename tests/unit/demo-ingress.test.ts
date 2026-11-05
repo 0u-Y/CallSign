@@ -35,3 +35,33 @@ root=pathlib.Path(sys.argv[-1]);result=json.loads((root/'result.json').read_text
   expect(()=>execFileSync('python3',['-c',check,output],{env:{PATH:process.env.PATH,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'infrastructure',CALLSIGN_INGRESS_CONFIRMATION:'ISOLATED-USERSPACE-ONLY'},stdio:'pipe'})).not.toThrow();
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+it('bounds native socket paths and keeps daemon logs and inherited credentials out of user state',()=>{
+ const check=`import ast,pathlib,os
+source=ast.parse(pathlib.Path('scripts/prepare-demo-ingress.py').read_text());functions=[n for n in source.body if isinstance(n,ast.FunctionDef) and n.name in ['private_socket','isolated_process_environment']];scope={'os':os};exec(compile(ast.Module(body=functions,type_ignores=[]),'<isolated-process>','exec'),scope)
+assert str(scope['private_socket'](pathlib.Path('/tmp/owned')))=="/tmp/owned/daemon.sock"
+try:scope['private_socket'](pathlib.Path('/owned/'+('x'*100)))
+except ValueError:pass
+else:raise AssertionError('oversized socket accepted')
+os.environ['OPENAI_API_KEY']='unit-only-never-forward';os.environ['STATE_DIRECTORY']='/other/service';env=scope['isolated_process_environment'](pathlib.Path('/owned/private/logs'));assert env['TS_LOGS_DIR']=='/owned/private/logs' and 'STATE_DIRECTORY'not in env and 'OPENAI_API_KEY'not in env
+`;
+ expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
+});
+
+it('refuses resuming a resource-stopped identity before creating a new output or daemon',()=>{
+ const root=mkdtempSync(join(tmpdir(),'callsign-ingress-latch-'));
+ try{
+  const check=`import pathlib,json,os,sys,runpy,types,subprocess
+root=pathlib.Path(sys.argv[1]);identity=root/'identity';identity.mkdir(mode=0o700);marker=identity/'identity.json';marker.write_text(json.dumps({'format':'callsign-isolated-ingress-v1','root':str(identity),'hostname':'callsign-unit'}));marker.chmod(0o600);(identity/'resource-stop.json').write_text('{}')
+stub=types.ModuleType('validation_resources');stub.host_sample=lambda:None;stub.SwapWatch=lambda *args:None;stub.PRESSURE_POLICY='unit';stub.owned_rss=lambda *args:0;stub.process_start=lambda *args:0;sys.modules['validation_resources']=stub
+original=pathlib.Path.is_file;pathlib.Path.is_file=lambda self:True if str(self) in ['/usr/bin/tailscale','/usr/sbin/tailscaled'] else original(self)
+def forbidden(*args,**kwargs):raise AssertionError('DAEMON_MUST_NOT_START')
+subprocess.Popen=forbidden;sys.argv=['prepare-demo-ingress.py','--apply','--output',str(root/'new-output'),'--resume-identity',str(identity)]
+try:runpy.run_path('scripts/prepare-demo-ingress.py',run_name='__main__')
+except SystemExit as error:assert str(error)=='INGRESS_RESOURCE_STOP_LATCHED_REVIEW_REQUIRED'
+else:raise AssertionError('resource stop was bypassed')
+assert not(root/'new-output').exists()and(identity/'resource-stop.json').exists()
+`;
+  expect(()=>execFileSync('python3',['-c',check,root],{env:{PATH:process.env.PATH,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'infrastructure',CALLSIGN_INGRESS_CONFIRMATION:'ISOLATED-USERSPACE-ONLY'},stdio:'pipe'})).not.toThrow();
+ }finally{rmSync(root,{recursive:true,force:true});}
+});
