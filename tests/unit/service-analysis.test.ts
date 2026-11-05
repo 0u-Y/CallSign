@@ -56,3 +56,10 @@ it('keeps punctuation and correction words inside quotes from creating or retrac
  const quoted=fixture();await quoted.a.accept(rev('“OTP를 알려주세요.”라는 요청에는 응하지 마세요.'));await quoted.a.flush();expect(quoted.events.at(-1)?.signals).toEqual([]);
  const actual=fixture();await actual.a.accept(rev('OTP를 알려주세요. “정정합니다.”라는 단어를 읽습니다.'));await actual.a.flush();expect(actual.events.at(-1)?.signals.map(s=>s.category)).toEqual(['인증번호 요구']);
 });
+
+it('does not display an unsupported no-deviation label while retaining independent risk findings',async()=>{
+ const {a,events}=fixture(async()=>({...response(),purpose:{relation:'not-detected',evidenceSpan:'',reason:'The unsolicited offer is unrelated to the approved purpose.'}}));
+ await a.accept(rev('인증번호를 알려주세요. 대출 상품도 안내합니다.'));await a.flush();
+ expect(events.at(-1)).toMatchObject({status:'unavailable',purpose:{relation:'undetermined'},signals:[{category:'인증번호 요구'}]});
+ expect(events.at(-1)?.purpose.reason).not.toContain('unrelated');
+});
