@@ -1,5 +1,20 @@
 # 개발 현황과 검증 기록
 
+## 현재 상태와 다음 단계
+
+아래 날짜별 기록과 시험 수치는 당시 소스·환경의 결과다. 현재 공개 사용 가능 여부는 이 표를 기준으로 보고, 원본 실패·후속 결과는 각 증거에서 확인한다. AWS 이전은 현재 목표에서 제외한다.
+
+| 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
+|---|---|---|---|
+| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 현재 공개 `publicPreview:true` |
+| 공개 API·분석 WSS | 직접 Funnel HTTPS/WSS 진단 성공. [Vercel rewrite](../artifacts/vercel-ingress-transport-20261105.json)는 HTTPS200/WSS404 | 실제 backend 인증·cookie·CSRF·WS 연결 | Vercel 주소 유지 또는 서비스 도메인 이동의 배치 결정 |
+| 실제 로그인 | 영속 IdP DB 준비·NEW import exit0, [감시 오류 후 소유 컨테이너 중지](../artifacts/persistent-idp-start-20261105.json) | 기존 DB의 정상 Keycloak 기동·공개 callback·역할 로그인 | 원본 latch를 보존한 중단 후 재개 승인 대기 |
+| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 지속 backend·미디어 경로 미검증 |
+| 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
+| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
+| DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
+| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | 현재 서비스 종료 상태, 자동 재기동 금지 |
+
 ## 2026-11-05 초기화 종료와 감시 관측 경계
 
 초기화 프로세스 종료와 `/proc`/cgroup 조회가 겹칠 때 같은 full container ID의 종료를 Docker에서 재확인하도록 보완했다. 실행 중 관측 누락·OOM·identity/강제 한도 변경·권한 오류는 계속 중단한다. 관련 단위4건과 이미 종료된 소유 IdP 컨테이너2개의 읽기 전용 조회를 통과했다. 새 서비스 기동·중단 latch 해제·제공자 호출은 하지 않았다.
@@ -225,18 +240,6 @@ A 정리 뒤 B 최초 표본은 available39.04GiB로40GiB 시작 조건을 통�
 
 Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반 push하고 원격/CI를 확인한다. PR을 새로 만들거나 승인 대기하지 않으며 기존 Draft #1은 main 반영 뒤 중복으로 닫는다.
 
-## 현재 상태와 다음 단계
-
-| 구분 | 상태·다음 작업 |
-|---|---|
-| 제품 소스 | 이전 미디어 후보와 후속 UI 전용 실제 검증 소스를 구분. `/service`·`/official`, 역할·정족수·서명/통화 구조 유지 |
-| 로컬 후보 | 이전 미디어 후보/증거 보존. 후속 clean runtime은 로컬 build/무기동 감사 완료, 실제 기동·미디어는 미검증. AWS 최종 웹 아님 |
-| 원격 전달 | 검증한 이전 제품의6종 GHCR 게시/수령 완료. 후속 UI는 미반영이며 새 Release는 검증 뒤 발행 대기 |
-| 외부 환경 | AWS 공개 origin/TLS/OIDC/PBX/TURN·reader 보호 참조와 실행 허가 필요. AI 품질·사람 평가도 별도 |
-| 문서 기준 | 요구는 MASTER, 실행은 RUNBOOK, 한계는 KNOWN-LIMITATIONS. 과거 실행 성공을 현재 전체 PASS로 복사하지 않음 |
-
-문서 정리에서는 진행표의 과거 본문을 보관본으로 분리하고 기존 앵커를 유지했다. 현재 구현 현황의 중복된 NOT_RUN 문장을 최신 소스/과거 증거 표로 정리했다. 요구사항 ID·실행 명령·원본 증거·Release·사용자 기획서는 삭제하지 않았다.
-
 ## 최종 기획과 구현·검증 연결
 
 | 요구 ID·기획 흐름 | 실제 소비 경로 | 이번 근거·남은 범위 |
@@ -395,6 +398,8 @@ Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반
 - [문서 관리와 다음 개발](archive/DEVELOPMENT-HISTORY-20261104.md#문서-관리와-다음-개발)
 
 ## 2026-11-05 두 데모 작업면 후속
+
+이 절은 초기 두 작업면 구현 당시 기록이다. 아래 recapture·등록 대기·호출0은 당시 판정이며, 후속 진행은 상단 현재 표와 날짜별 증거를 따른다.
 
 사용자 확정에 따라 `/demo/call`·`/demo/governance`를 기존 ServicePage parent route/controller·실제 역할 API에 연결했다. 공통 오디오·종료 제어와 근거 drawer, 현재 역할의 조작/수신 상태 배치, 권한 제한된 네 노드 관측을 추가했다. 같은 높이의 fresh hash만 비교하며 validator 소속·개별 투표·Witness 정족수는 조회만으로 성공 표시하지 않는다. 기존 callback·공식 인증은 유지한다.
 

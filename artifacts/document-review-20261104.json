@@ -720,12 +720,12 @@
   "followupReviews": [
     {
       "recordedAt": "2026-11-05T13:54:58.655350+00:00",
-      "sourceHead": "4a2540174e1cbe844ae03d3582afb7974c4e582b",
+      "sourceHead": "798a8f44e2ed8cb05c3248c0608cfd509890cf58",
       "status": "IN_PROGRESS",
       "trackedMarkdownCount": 43,
       "trackedMdxCount": 0,
-      "reviewedThisPass": 37,
-      "note": "37 of 43 tracked Markdown files reread in the current pass; six long documents remain. Original historical assessment retained. No complete-review claim. User source HTML/PDF and personal untracked summaries remain excluded.",
+      "reviewedThisPass": 39,
+      "note": "39 of 43 tracked Markdown files reread in the current pass; four long documents remain. Historical assessments and user-owned untracked sources are preserved. No complete-review claim.",
       "inventory": [
         {
           "path": "AGENTS.md",
@@ -828,10 +828,10 @@
         },
         {
           "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
-          "sha256": "7126ef4fed9a5327b52aca38c202cfc897753e5dd3ac54e419c3dfbab5f2ff7c",
-          "reviewStatus": "pending-current-pass",
-          "action": null,
-          "reason": null,
+          "sha256": "36ffe1f949362f06b86626af6273b780bccaa40f597f4ffc9801cbed046f3226",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Read current and historical sections; move the corrected current status table to the top, distinguish same-day historical snapshots, retain original evidence and anchors.",
           "audience": "개발/인계 담당자",
           "purpose": "현재 진행·원본 증거 연결",
           "classification": "current",
@@ -994,9 +994,9 @@
         {
           "path": "docs/archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md",
           "sha256": "c9c2dfda20981bad47a3dc6bea6ce8f7bfc782d31b39b79d27b13931d2baf04a",
-          "reviewStatus": "pending-current-pass",
-          "action": null,
-          "reason": null,
+          "reviewStatus": "read-and-kept",
+          "action": "kept",
+          "reason": "Entire dated snapshot read. Historical commands, paths, test counts and code-completion claims remain historical; current entry links resolve. Original report preserved.",
           "audience": "이력 검토자",
           "purpose": "당시 개발·설계·검증 이력",
           "classification": "history",
@@ -1201,11 +1201,11 @@
           "canonicalLocation": "submission/slides.md"
         }
       ],
-      "updatedAt": "2026-11-05T14:04:06.154799+00:00",
+      "updatedAt": "2026-11-05T14:27:39.277882+00:00",
       "readFromWorktree": true,
       "localLinkCheck": {
         "trackedDocuments": 43,
-        "localLinks": 687,
+        "localLinks": 690,
         "broken": [],
         "scope": "Local Markdown links and GitHub-style headings; external URL availability and prose command references not checked here."
       }
