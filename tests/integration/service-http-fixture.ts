@@ -29,7 +29,7 @@ export async function createHttpFixture(options:{web?:boolean;publicPreview?:boo
 if(options.publicPreview&&(options.liveDirectory||options.startExternal))throw new Error('PUBLIC_PREVIEW_FIXTURE_MUST_BE_LOCAL');
 const root=process.env.CALLSIGN_HTTP_TEST_ROOT;
 if(!root||!process.env.TEST_DATABASE_URL||!/^\/callsign_test_/.test(new URL(process.env.TEST_DATABASE_URL).pathname))throw new Error('DISPOSABLE_HTTP_TEST_CONFIGURATION_REQUIRED');
-if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
+if(!['127.0.0.1','localhost','[::1]'].includes(new URL(process.env.TEST_DATABASE_URL).hostname)||['ARI_URL','TURN_URLS','DEEPGRAM_API_KEY','ANTHROPIC_API_KEY','OPENAI_API_KEY','DEEPGRAM_API_KEY_FILE','ANTHROPIC_API_KEY_FILE','OPENAI_API_KEY_FILE','BESU_NODE_URLS','CONSUMPTION_ANCHOR_URL'].some(k=>process.env[k]))throw new Error('LOCAL_FIXTURE_ONLY_NO_EXTERNAL_ADAPTER_CONFIG');
 // Explicit integration-only live option; production never imports this fixture.
 const readLive=async(name:string)=>JSON.parse(await readFile(join(options.liveDirectory!,name),'utf8'));
 const live=options.liveDirectory?{context:await readLive('live-http-context.json'),deployment:await readLive('data/deployment.json'),manifest:await readLive('data/public-manifest.json'),ownership:await readLive('ownership.json')}:undefined;

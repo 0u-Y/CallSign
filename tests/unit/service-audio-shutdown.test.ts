@@ -12,7 +12,7 @@ async function fixture(){
  class Socket extends EventEmitter{readyState=1;bufferedAmount=0;sent:any[]=[];send(raw:string){this.sent.push(JSON.parse(raw));}close(){if(this.readyState===3)return;this.readyState=3;this.emit('close');}}
  const socket=new Socket(),connections=new SessionConnections(),settle=vi.fn<QuotaStore['settle']>(async()=>{}),reserve=vi.fn<QuotaStore['reserve']>(async()=>{}),stream=vi.fn<AudioProviders['stream']>(()=>({connect(){},push(){},stop(){}})),analyze=vi.fn<NonNullable<AudioProviders['analyze']>>();
  const quota:QuotaStore={reserve,settle,close:async()=>{}};
- registerServiceAudio(app,{authority:f.authority,actorFor:async()=>f.receiver,sessionId:async()=> 'session',connections,origin:'https://test.example',quota,providers:{stream,analyze} as AudioProviders});
+ await registerServiceAudio(app,{authority:f.authority,actorFor:async()=>f.receiver,sessionId:async()=> 'session',connections,origin:'https://test.example',quota,providers:{stream,analyze} as AudioProviders});
  await open(socket,{query:{attemptId:f.attempt.id},headers:{origin:'https://test.example'}});expect(socket.sent.some(x=>x.type==='ready')).toBe(true);
  return {...f,socket,connections,settle,reserve,stream,analyze,close:async()=>{await hooks[0]!();connections.close();}};
 }

@@ -1,0 +1,14 @@
+# Opt-in only after provider/model/input/cost approval; no keys in environment or images.
+services:
+  issuer:
+    environment:
+      CALLSIGN_ANALYSIS_PROVIDER: openai
+      OPENAI_MODEL: ${OPENAI_MODEL:?reviewed service analysis model, separate from Codex}
+      OPENAI_API_KEY: ''
+      OPENAI_API_KEY_FILE: /run/providers/openai.key
+      DEEPGRAM_MODEL: ${DEEPGRAM_MODEL:?reviewed Korean streaming model}
+      DEEPGRAM_API_KEY: ''
+      DEEPGRAM_API_KEY_FILE: /run/providers/deepgram.key
+    volumes:
+      - {type: bind, source: '${OPENAI_API_KEY_FILE:?protected OpenAI key file}', target: /run/providers/openai.key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${DEEPGRAM_API_KEY_FILE:?protected Deepgram key file}', target: /run/providers/deepgram.key, read_only: true, bind: {create_host_path: false}}

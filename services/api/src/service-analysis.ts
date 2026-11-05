@@ -1,5 +1,6 @@
 import {hashCanonical,policyHash,serviceAnalysisSchema,serviceAnalysisEventSchema,type PurposePolicy,type ServiceAnalysis,type ServiceAnalysisEvent} from '@callsign/protocol';
 import {analyzeWithRules,correctedSentences} from './risk.js';
+import {requestOpenAI} from './openai-analysis.js';
 import {requestAnthropic,transcriptRevisionSchema,type TranscriptRevision} from './transcription.js';
 
 const categoryCode={ '인증번호 요구':'OTP','송금 유도':'TRANSFER','원격제어 설치':'REMOTE_CONTROL','비밀 유지 강요':'SECRECY'} as const;
@@ -10,10 +11,13 @@ export function mergePolicySignals(policy:PurposePolicy,text:string,...lists:Ser
  for(const signal of lists.flat())if(policy.forbiddenRequests.includes(categoryCode[signal.category])&&text.includes(signal.evidenceSpan))found.set(signal.category+':'+signal.evidenceSpan.trim(),signal);
  return [...found.values()].slice(0,8);
 }
-export async function analyzeServiceWithAnthropic(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{
- const content=await requestAnthropic(input,'Return JSON only: {"signals":[{"category":"송금 유도|원격제어 설치|인증번호 요구|비밀 유지 강요","evidenceSpan":"exact quote","explanation":"reason"}],"purpose":{"relation":"suspected|not-detected|undetermined","evidenceSpan":"exact quote, empty if no evidence","reason":"relation to approved purpose; not overall safety"},"recommendedAction":"verify via official channel","limitations":"remote-only bounded context"}. No probability or safety verdict. Normal greetings, repetition, clarifications and closing are compatible with the purpose.');
+const serviceAnalysisFormat='Return JSON only: {"signals":[{"category":"송금 유도|원격제어 설치|인증번호 요구|비밀 유지 강요","evidenceSpan":"exact quote","explanation":"reason"}],"purpose":{"relation":"suspected|not-detected|undetermined","evidenceSpan":"exact quote, empty if no evidence","reason":"relation to approved purpose; not overall safety"},"recommendedAction":"verify via official channel","limitations":"remote-only bounded context"}. No probability or safety verdict. Normal greetings, repetition, clarifications and closing are compatible with the purpose.';
+export async function analyzeServiceWithAnthropic(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{return checkedServiceAnalysis(await requestAnthropic(input,serviceAnalysisFormat),input.text);}
+export async function analyzeServiceWithOpenAI(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{return checkedServiceAnalysis(await requestOpenAI(input,serviceAnalysisFormat),input.text);}
+export function analyzeServiceWithProvider(config:{provider:'openai'|'anthropic';apiKey:string;model:string},input:Omit<Parameters<typeof requestAnthropic>[0],'apiKey'|'model'>){return (config.provider==='openai'?analyzeServiceWithOpenAI:analyzeServiceWithAnthropic)({...input,apiKey:config.apiKey,model:config.model});}
+function checkedServiceAnalysis(content:string,text:string):ServiceAnalysis{
  const result=serviceAnalysisSchema.parse(JSON.parse(content));
- if(result.signals.some(s=>/https?:\/\/|www\./i.test(s.explanation))||/https?:\/\/|www\./i.test(result.purpose?.reason??'')||result.signals.some(s=>!input.text.includes(s.evidenceSpan)||!correctedSentences(input.text).join(' ').includes(s.evidenceSpan))||(result.purpose?.evidenceSpan&&(!input.text.includes(result.purpose.evidenceSpan)||!correctedSentences(input.text).join(' ').includes(result.purpose.evidenceSpan))))throw new Error('LLM_EVIDENCE_INVALID');
+ if(result.signals.some(s=>/https?:\/\/|www\./i.test(s.explanation))||/https?:\/\/|www\./i.test(result.purpose?.reason??'')||result.signals.some(s=>!text.includes(s.evidenceSpan)||!correctedSentences(text).join(' ').includes(s.evidenceSpan))||(result.purpose?.evidenceSpan&&(!text.includes(result.purpose.evidenceSpan)||!correctedSentences(text).join(' ').includes(result.purpose.evidenceSpan))))throw new Error('LLM_EVIDENCE_INVALID');
  // LLM advice is never a URL or product command.
  return {...result,recommendedAction:'별도 인증한 공식 업무 화면에서 확인하세요.',limitations:'최근 상대방 발화만 분석한 보조 안내이며 통화 전체의 안전 판정이 아닙니다.'};
 }

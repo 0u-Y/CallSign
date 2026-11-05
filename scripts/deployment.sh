@@ -20,6 +20,13 @@ if [[ "$deployment_target" == aws ]]; then
 fi
 # The shipped Compose creates bridges/published ports. It is not the no-network-change development-host launcher.
 if [[ "$deployment_target" != aws && ( "$command" == start || "$command" == restart ) ]]; then echo 'BLOCKED: development host network preservation requires a separately reviewed ingress/topology; this Compose creates bridges and publishes ports' >&2; exit 78; fi
+provider_config="$(node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
+import {readFileSync} from 'node:fs';import {parseEnv} from 'node:util';
+const env={...parseEnv(readFileSync(process.argv[2],'utf8')),...process.env};const value=env.CALLSIGN_PROVIDER_CONFIG||'none';
+if(!['none','deepgram-openai'].includes(value))throw new Error('PROVIDER_CONFIGURATION_INVALID');process.stdout.write(value);
+JS
+)"
+if [[ "$provider_config" == deepgram-openai ]]; then compose+=(-f infra/deploy/compose.providers.yml); fi
 if [[ "$command" == status ]]; then exec node scripts/deployment-control.mjs status "$CALLSIGN_ENV_FILE" "${compose[@]}"; fi
 control=owned
 if [[ "$command" == start || "$command" == restart ]]; then control=check; fi

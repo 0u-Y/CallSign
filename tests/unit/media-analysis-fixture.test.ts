@@ -5,7 +5,7 @@ import {bankPolicy} from '../../packages/protocol/src/index.js';
 it('keeps the media provider fixture opt-in and refuses unsafe controller targets before credentials',async()=>{
  expect(()=>assertAnalysisFixtureEntry({},[])).toThrow('OWNED_ANALYSIS_FIXTURE_REQUIRED');
  const env={CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'integration',CALLSIGN_RUNTIME_IMAGE_CONFIRMATION:'OWNED_FINAL_IMAGE',CALLSIGN_MEDIA_FIXTURE_RUN_ID:'media-unit',DEPLOYMENT_ID:'test:unit',SERVICE_ROLE:'issuer'};
- expect(()=>assertAnalysisFixtureEntry(env,['--owned-analysis-fixture'])).not.toThrow();expect(()=>assertAnalysisFixtureEntry({...env,DEEPGRAM_API_KEY:'synthetic'},['--owned-analysis-fixture'])).toThrow();
+ expect(()=>assertAnalysisFixtureEntry(env,['--owned-analysis-fixture'])).not.toThrow();expect(()=>assertAnalysisFixtureEntry({...env,DEEPGRAM_API_KEY:'synthetic'},['--owned-analysis-fixture'])).toThrow();for(const key of ['OPENAI_API_KEY','OPENAI_API_KEY_FILE','DEEPGRAM_API_KEY_FILE','ANTHROPIC_API_KEY_FILE'])expect(()=>assertAnalysisFixtureEntry({...env,[key]:'unit-only-protected-reference'},['--owned-analysis-fixture'])).toThrow();
  await expect(analysisControl({CALLSIGN_MEDIA_ANALYSIS_MODE:'fixture',CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'media',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL:'https://external.invalid/__fixture/analysis'})).rejects.toThrow('LOOPBACK_FIXTURE_CONTROL_REQUIRED');
 });
 it('observes frames and aborts without retaining audio or treating synthetic responses as model quality',async()=>{

@@ -21,7 +21,7 @@ export function analysisFixture(){
  return {providers,control};
 }
 export function assertAnalysisFixtureEntry(env:NodeJS.ProcessEnv,args:string[]){
- if(!args.includes('--owned-analysis-fixture')||env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration'||env.CALLSIGN_RUNTIME_IMAGE_CONFIRMATION!=='OWNED_FINAL_IMAGE'||!env.DEPLOYMENT_ID?.startsWith('test:')||!env.CALLSIGN_MEDIA_FIXTURE_RUN_ID?.startsWith('media-')||env.SERVICE_ROLE!=='issuer'||env.DEEPGRAM_API_KEY||env.ANTHROPIC_API_KEY)throw new Error('OWNED_ANALYSIS_FIXTURE_REQUIRED');
+ if(!args.includes('--owned-analysis-fixture')||env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration'||env.CALLSIGN_RUNTIME_IMAGE_CONFIRMATION!=='OWNED_FINAL_IMAGE'||!env.DEPLOYMENT_ID?.startsWith('test:')||!env.CALLSIGN_MEDIA_FIXTURE_RUN_ID?.startsWith('media-')||env.SERVICE_ROLE!=='issuer'||env.DEEPGRAM_API_KEY||env.ANTHROPIC_API_KEY||env.OPENAI_API_KEY||env.DEEPGRAM_API_KEY_FILE||env.ANTHROPIC_API_KEY_FILE||env.OPENAI_API_KEY_FILE)throw new Error('OWNED_ANALYSIS_FIXTURE_REQUIRED');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  assertAnalysisFixtureEntry(process.env,process.argv.slice(2));

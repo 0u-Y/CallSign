@@ -219,7 +219,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
   app.addHook('onReady',()=>serviceAuthority.stopInterruptedCalls(env.INSTITUTION_ID).then(()=>{}));
   registerServiceRoutes(app, { authority: serviceAuthority, store, actorFor, sessionId:async r=>(await scopedSession(r)).sessionId });
   const quota=postgresQuotaStore(required("ISSUER_DATABASE_URL"));app.addHook("onClose",()=>quota.close());
-  registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId,...(adapters?.audioProviders?{providers:adapters.audioProviders}:{})});
+  await registerServiceAudio(app,{quota,authority:serviceAuthority,actorFor,connections,origin:env.WEB_ORIGIN,sessionId:async r=>(await scopedSession(r)).sessionId,...(adapters?.audioProviders?{providers:adapters.audioProviders}:{})});
   if (process.env.ARI_URL) {
     const certificate=new X509Certificate(await readFile(required("PBX_DTLS_CERT_PATH")));
     const bridge = new AsteriskBridge(new AriClient({base:new URL(required("ARI_URL")),authorization:required("ARI_AUTHORIZATION"),application:"callsign"}), pbxSigningKey!, {networkId:env.NETWORK_ID,registryAddress:env.REGISTRY_ADDRESS,pbxFingerprint:certificate.fingerprint256});

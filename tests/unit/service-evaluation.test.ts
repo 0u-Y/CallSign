@@ -30,4 +30,6 @@ it('requires a numeric declared cost bound and rejects over-budget plans before 
  expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.6'},2)).toThrow('PLANNED_COST_EXCEEDS_BUDGET');
  const budget=assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1'},5);expect(budget.plannedMaximumUsd).toBe(.5);expect(budget.scope).toContain('not independently verified');
  expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'Infinity',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1'},1)).toThrow();
+ for(const count of ['NaN','21','0'])expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1',CALLSIGN_EVALUATION_MAX_REQUESTS:count},1)).toThrow();
+ expect(()=>assertEvaluationCostBudget({CALLSIGN_EVALUATION_MAX_COST_USD:'1',CALLSIGN_EVALUATION_REQUEST_BOUND_USD:'0.1',CALLSIGN_EVALUATION_MAX_REQUESTS:'6'},7)).toThrow();
 });
