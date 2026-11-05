@@ -11,6 +11,7 @@ import { stateSnapshotSchema, type StateSnapshot } from "@callsign/verifier";
 const witnessId = process.env.WITNESS_ID ?? "witness-1";
 const rpcUrl = process.env.BESU_RPC_URL ?? "http://127.0.0.1:18545";
 const port = Number(process.env.WITNESS_PORT ?? 4201);
+const host = z.enum(['0.0.0.0', '127.0.0.1']).parse(process.env.LISTEN_HOST ?? '0.0.0.0');
 const root = resolve(import.meta.dirname, "../../..");
 const deploymentPath = process.env.DEPLOYMENT_PATH ?? resolve(root, ".local/deployment.json");
 const keyPath = process.env.WITNESS_KEY_PATH ?? resolve(root, `.local/witness-keys/${witnessId}.json`);
@@ -101,4 +102,4 @@ app.post("/snapshot", async (request) => {
   return { witnessId, snapshot, jws: await signPayload(snapshot, { privateKey: key.privateKey, kid: key.kid }) };
 });
 
-await app.listen({ host: "0.0.0.0", port });
+await app.listen({ host, port });

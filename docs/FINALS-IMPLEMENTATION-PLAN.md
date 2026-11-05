@@ -1,5 +1,9 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 서버 전용 loopback 준비
+
+API/Witness의 명시적 `LISTEN_HOST=127.0.0.1`과 Besu peer 준비의 `--host-loopback`을 추가했다. 기존 container 기본 listen·private-prefix 검사는 유지하며 노드별30311~30314를 구분한다. 관련 무기동 단위28건과 API/Witness/light 타입 검사를 통과했다. 실제 bind·기동·공개 연결 검증은 아니며, 기존4201~4204 listener를 변경하지 않았다. IdP 관측 중단의 원본 latch/DB를 보존한 재개 승인과 공개 frontend/WS 배치 결정은 대기 중이다.
+
 ## 2026-11-05 지속 IdP 첫 기동과 관측 결함
 
 loopback 전용 host-mode overlay와 기존 소유권 제어를 사용해 별도 영속 IdP DB를 기동했다. DB healthy, NEW import exit0이며 공개 로그인은 미실행이다. healthcheck 없는 컨테이너의 Docker template 조회가 실패하면서 monitor와 자동 중지도 실패했다. 조회식을 수정해 실제 health=null/소유권/중지 동작을 확인했고 두 소유 컨테이너는 exited다. 원본 최초 오류·영속 DB·latch는 보존했으며 자동 재기동하지 않았다. [결과](../artifacts/persistent-idp-start-20261105.json). 수정한 감시/소유권/IdP 단위5건 통과. 이미지 config가 보고하는 실제 Keycloak 버전은26.8.1이며 보호 실행 설정은 config ID에 고정한다.

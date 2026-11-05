@@ -44,6 +44,8 @@ Vercel은 [현재 공식 문서](https://vercel.com/docs/functions/websockets)�
 
 세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 이 정적 프로젝트에서 backend·분석·SIP까지 전달됐다는 증거는 별도로 필요하다. 공개 경로가 준비되기 전 Production의 preview 제한/CSP/마이크 차단을 해제하지 않는다.
 
+현재 서버의 API/Witness는 `LISTEN_HOST=127.0.0.1`을 명시해야 한다. 이 값의 기본은 기존 container 배포를 위해 `0.0.0.0`이며 host-mode에서 기본값으로 시작하지 않는다. 실제 listener/port 충돌을 먼저 확인한다. Besu의 고정 peer 준비는 `prepare-besu-peers.ts --apply --host-loopback`을 명시할 때만127.0.0.1의 서로 다른30311~30314를 생성한다. 기존 private-network prefix 검사는 유지한다. 이 준비는 노드 기동이 아니며 P2P의 실제 bind interface와 RPC listen도 별도로 loopback에 고정해야 한다.
+
 일반 Compose는 bridge·published port로 host route/firewall/NAT를 바꿀 수 있다([Docker 설명](https://docs.docker.com/engine/network/packet-filtering-firewalls/)). 현재 개발 서버에는 실행하지 않는다. 기존 proxy 변경·새 tunnel·port publish는 별도 결정 없이 우회 수단으로 사용하지 않는다. 기존 none namespace 시험 helper는 지속 서비스 launcher나 공개 인증 제공자가 아니다.
 
 ### 소유 자원과 운영 명령

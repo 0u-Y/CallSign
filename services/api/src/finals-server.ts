@@ -489,5 +489,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   if (process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION !== "infrastructure") throw new Error("INFRASTRUCTURE_EXECUTION_BLOCKED");
   const env = finalsEnvironment(process.env); const app = await buildFinalsServer(env);
   for (const signal of ["SIGINT", "SIGTERM"] as const) process.once(signal, () => { void app.close(); });
-  await app.listen({ host: "0.0.0.0", port: env.PORT });
+  await app.listen({ host: env.LISTEN_HOST, port: env.PORT });
 }

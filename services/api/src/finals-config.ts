@@ -7,6 +7,7 @@ export const finalsEnvironmentSchema = z.object({
   ISSUER_URL: z.string().url(), SENDER_URL: z.string().url(),
   INSTITUTION_ID: z.string().min(16), NETWORK_ID: z.string().regex(/^\d+$/), REGISTRY_ADDRESS: z.string().regex(/^0x[0-9a-fA-F]{40}$/),
   PORT: z.coerce.number().int().min(1024).max(65535).default(4100),
+  LISTEN_HOST: z.enum(['0.0.0.0', '127.0.0.1']).default('0.0.0.0'),
   DEMO_MODE: z.enum(["true", "false"]).default("false"),
   TRUST_BUNDLE_PATH: z.string().min(1),
 }).passthrough().superRefine((e, ctx) => {

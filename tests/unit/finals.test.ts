@@ -88,6 +88,10 @@ describe("DID and public configuration", () => {
     expect(finalsEnvironmentSchema.safeParse(env).success).toBe(false);
     expect(finalsEnvironmentSchema.safeParse({ ...env, WEB_ORIGIN: "https://bank.example", DEMO_MODE: "true" }).success).toBe(false);
     expect(finalsEnvironmentSchema.safeParse({ ...env, WEB_ORIGIN: "https://bank.example", PUBLIC_DEPLOYMENT: "false" }).success).toBe(false);
+    const valid = { ...env, WEB_ORIGIN: 'https://bank.example' };
+    expect(finalsEnvironmentSchema.parse(valid).LISTEN_HOST).toBe('0.0.0.0');
+    expect(finalsEnvironmentSchema.parse({ ...valid, LISTEN_HOST: '127.0.0.1' }).LISTEN_HOST).toBe('127.0.0.1');
+    expect(finalsEnvironmentSchema.safeParse({ ...valid, LISTEN_HOST: 'other-service.internal' }).success).toBe(false);
   });
 });
 

@@ -7,3 +7,10 @@ it('derives all four peers from the same reviewed private /24 prefix',()=>{
  expect(JSON.parse(c.staticNodes).map((p:string)=>p.split('@')[1])).toEqual([11,12,13,14].map(n=>`10.206.0.${n}:30303`));
  expect(c.permissions).toContain('10.206.0.14');expect(c.staticNodes).not.toContain('10.203.0.');
 });
+
+it('requires explicit host-loopback mode and gives each node a distinct local port',()=>{
+ const keys=['11','22','33','44'].map(k=>'0x'+k.repeat(64));
+ const config=besuPeerConfiguration(keys,undefined,'host-loopback');
+ expect(JSON.parse(config.staticNodes).map((p:string)=>p.split('@')[1])).toEqual([30311,30312,30313,30314].map(port=>`127.0.0.1:${port}`));
+ expect(()=>besuPeerConfiguration(keys,'127.0.0')).toThrow('PRIVATE_IPV4');
+});
