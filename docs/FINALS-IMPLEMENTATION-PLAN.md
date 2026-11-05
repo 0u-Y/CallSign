@@ -1,5 +1,13 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 녹음 송신 경계 재확인
+
+기존 파일 전환 실패는 측정기 FFT 평활화가 이전 마이크 peak를 남긴 시험 결함이었다. 파일 stream RMS와 sender track 일치를 확인한 뒤 평활화만 끄자 실제 두 RTCPeerConnection 사이에서 마이크445.31Hz→파일878.91Hz→음소거RMS0→마이크445.31Hz가 확인됐다. [결과](../artifacts/recording-switch-20261105.json). 공개 PBX/TURN·인증·실제 제공자 경로로 확대하지 않는다. 파일 자연 종료 시 재생/context/track을 정리하도록 보완했고 단위 회귀를 통과했다.
+
+## 2026-11-05 지속 운영 조건 승인
+
+사용자가 최초 기동 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB 상한, 기존 구성요소 강제 한도와 PSI/swap-out/OOM 중단 유지, 자원 중단 후 자동 재시작 금지, 정상 기동 확인부터24시간 유지를 승인했다. 기존 전체 시험40GiB guard는 그대로 둔다. 이는 운영 조건 승인이고 지속 서비스가 이미 기동됐다는 뜻은 아니다.
+
 ## 2026-11-05 공개 ingress 활성화 확인
 
 사용자 계정에서 전용 노드 등록, 해당 노드의 Funnel 권한, HTTPS 인증서 발급을 승인했다. 보존 identity `callsign-demo-l-fixed.tail37b235.ts.net`으로 실제 공개 HTTPS와 WSS 왕복을 확인했다. 증거는 작업 보호 경로 `ingress-public-cert-20261105T2155/result.json`이며 제품 인증·API·PBX/TURN 검증은 아니다. 확인용 서버와 소유 ingress 프로세스는 정상 종료했고 등록 state는 보존했다. 기존 daemon·443 서비스·호스트 네트워크 설정은 변경하지 않았다. 인증서 최초 발급 대기 없이 요청했던 TLS timeout은 별도 실패로 보존했다.

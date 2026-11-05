@@ -3,6 +3,37 @@ export class LiveMedia {
   private microphone: MediaStream | undefined;
   private sender: RTCRtpSender | undefined;
   private accepted = false;
+  private muted = true;
+  private switching = false;
+  private recording: {stream: MediaStream; stop:()=>void} | undefined;
+  private pendingSourceStop: (()=>void) | undefined;
+  private clearRecording() {this.recording?.stop();this.recording=undefined;}
+  async playRecording(file: File,onEnded:()=>void=()=>{}) {
+    if(this.closed||!this.accepted||!this.sender||this.switching)throw new Error('AUDIO_SOURCE_NOT_READY');
+    if(!file.size||file.size>20*1024*1024)throw new Error('AUDIO_FILE_SIZE_INVALID');
+    this.switching=true;
+    let stop:()=>void=()=>{};
+    try {
+      const context=new AudioContext(),audio=new Audio(),url=URL.createObjectURL(file);let stream:MediaStream|undefined,released=false;
+      stop=()=>{if(released)return;released=true;audio.onended=null;audio.pause();audio.removeAttribute('src');audio.load();stream?.getTracks().forEach(t=>{t.enabled=false;t.stop();});void context.close();URL.revokeObjectURL(url);};
+      this.pendingSourceStop=stop;audio.src=url;audio.onended=()=>{if(!this.closed&&this.recording?.stop===stop){stop();onEnded();}};
+      const destination=context.createMediaStreamDestination();stream=destination.stream;context.createMediaElementSource(audio).connect(destination);
+      const track=stream.getAudioTracks()[0]!;track.enabled=false;
+      await context.resume();if(this.closed)throw new Error('MEDIA_CLOSED');await audio.play();
+      if(this.closed)throw new Error('MEDIA_CLOSED');
+      await this.sender.replaceTrack(track);
+      if(this.closed)throw new Error('MEDIA_CLOSED');
+      this.clearRecording();this.recording={stream,stop};this.pendingSourceStop=undefined;this.mute(this.muted);
+    } catch(error) {stop();this.pendingSourceStop=undefined;throw error;}
+    finally {this.switching=false;}
+  }
+  async useMicrophone() {
+    if(this.closed||!this.accepted||!this.sender||this.switching)throw new Error('AUDIO_SOURCE_NOT_READY');
+    const track=this.microphone?.getAudioTracks()[0];if(!track||track.readyState!=='live')throw new Error('MICROPHONE_UNAVAILABLE');
+    this.switching=true;
+    try {await this.sender.replaceTrack(track);if(this.closed)throw new Error('MEDIA_CLOSED');this.clearRecording();this.mute(this.muted);}
+    finally {this.switching=false;}
+  }
   private remoteAccepted = false;
   private closed = false;
   readonly remote = new MediaStream();
@@ -28,13 +59,17 @@ export class LiveMedia {
     if (this.closed || !this.microphone || !this.sender) throw new Error("MICROPHONE_NOT_READY");
     const track = this.microphone.getAudioTracks()[0]; if (!track || track.readyState === "ended") throw new Error("MICROPHONE_UNAVAILABLE");
     if(this.accepted)return;
-    await this.sender.replaceTrack(track); if (this.closed || this.microphone.getAudioTracks()[0]?.readyState !== "live") throw new Error("MEDIA_CLOSED"); this.accepted = true;track.enabled=!startMuted;if(!startMuted){this.remoteAccepted=true;for(const incoming of this.remote.getTracks())incoming.enabled=true;}
+    await this.sender.replaceTrack(track); if (this.closed || this.microphone.getAudioTracks()[0]?.readyState !== "live") throw new Error("MEDIA_CLOSED"); this.accepted = true;this.muted=startMuted;track.enabled=!startMuted;if(!startMuted){this.remoteAccepted=true;for(const incoming of this.remote.getTracks())incoming.enabled=true;}
   }
-  mute(value: boolean) { for (const track of this.microphone?.getAudioTracks() ?? []) track.enabled = this.accepted && !value && !this.closed; }
+  mute(value: boolean) {
+    this.muted=value;const enabled=this.accepted&&!value&&!this.closed;
+    for(const track of this.microphone?.getAudioTracks()??[])track.enabled=enabled&&!this.recording;
+    for(const track of this.recording?.stream.getAudioTracks()??[])track.enabled=enabled;
+  }
   pause(){this.mute(true);this.remoteAccepted=false;for(const track of this.remote.getTracks())track.enabled=false;}
   resume(muted:boolean){if(!this.accepted||this.closed)throw new Error("MEDIA_NOT_ACCEPTED");this.remoteAccepted=true;for(const track of this.remote.getTracks())track.enabled=true;this.mute(muted);}
   close() {
-    if (this.closed) return; this.closed = true; this.accepted = false;
+    if (this.closed) return; this.closed = true; this.accepted = false;this.pendingSourceStop?.();this.pendingSourceStop=undefined;this.clearRecording();
     for (const track of this.microphone?.getTracks() ?? []) { track.enabled = false; track.onended = null; track.stop(); }
     for (const track of this.remote.getTracks()) track.stop(); this.peer.close();
   }

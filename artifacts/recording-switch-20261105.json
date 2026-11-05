@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "microphoneHz": 445.3125,
+  "fileHz": 878.90625,
+  "pausedRms": 0,
+  "resumedHz": 445.3125,
+  "scope": "Two local real RTCPeerConnections using synthetic tones; no PBX, external NAT, authenticated product or provider claim",
+  "baseline": "FILE_TONE_NOT_RECEIVED: old 445.3125Hz peak retained while file stream RMS=0.259 and sender track matched the recording",
+  "cause": "FFT smoothing retained the previous microphone peak. Setting smoothingTimeConstant=0 observed the switched signal.",
+  "resourceProfile": "ui-only-v1",
+  "automaticRetries": 0,
+  "paidProviderCalls": 0,
+  "publicPbxTurnVerified": false
+}
