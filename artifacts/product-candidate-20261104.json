@@ -1997,7 +1997,7 @@
       "buildCpu": 1,
       "runtimeStartup": "NOT_RUN_NEW_IMAGE",
       "publication": {
-        "status": "PUSHED_PRIVATE_AND_FRESH_REMOTE_RECEIPT_PASS",
+        "status": "PASS_PRIVATE_PUSH_AND_FRESH_REMOTE_IMAGE_AND_RELEASE_RECEIPTS",
         "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:39b637df7a9e392f5aaab4e04784db01f1fafcf78228d78d6d2c03341f71f8f7",
         "registryManifestDigest": "sha256:39b637df7a9e392f5aaab4e04784db01f1fafcf78228d78d6d2c03341f71f8f7",
         "configId": "sha256:e8e47edcd7ff05b217cc716a3339159148bae8b576dd526fc1d8b8801051d5c7",
@@ -2005,8 +2005,13 @@
         "dockerCacheUsed": false,
         "networkBytes": 221643419,
         "tag": "aws-demo-design-preparation-20261105t111610z",
-        "release": "PREPARING_NOT_CREATED",
-        "separateAwsReaderVerified": false
+        "release": "https://github.com/0u-Y/CallSign/releases/tag/aws-demo-design-preparation-20261105t111610z",
+        "separateAwsReaderVerified": false,
+        "releaseTag": "aws-demo-design-preparation-20261105t111610z",
+        "publicSource": "60ca6d5933a3a9c877f607ce7e0a94e5f8fe6e87",
+        "packagedObserverSource": "60ca6d5933a3a9c877f607ce7e0a94e5f8fe6e87",
+        "releaseFileCount": 5,
+        "releaseReceiptScope": "Actual GitHub Release network download into new directory, no local cache substitution"
       }
     },
     "fullMedia": {
@@ -2036,6 +2041,24 @@
       "files": 69,
       "tests": 352,
       "status": "PASS"
+    },
+    "sourceDifferences": {
+      "runtimeProduct": "ce9f5011260272d12cf07efc9a0c9d88b3bee21d",
+      "plannedAttemptObserver": "537ec9c19b353626abbf883a8628bed43c11a52b",
+      "releasePublicObserver": "60ca6d5933a3a9c877f607ce7e0a94e5f8fe6e87",
+      "explanation": "After runtime source, only observer/controller and documentation/evidence changed. Selected221 runtime input hashes match final public source. Full batch guard prevented actual observer/service execution."
+    },
+    "cleanup": {
+      "persistentBackendRunning": false,
+      "ownedIngressProcessesStopped": true,
+      "ingressRegistrationStateRetained": true,
+      "uiBrowserAndLoopbackServerStopped": true,
+      "fullStackResourcesCreated": 0,
+      "temporaryPublisherDockerAuthenticationRemoved": true,
+      "originalProtectedCredentialUnchanged": true,
+      "verifiedImageArchivesAndReceiptsRetained": true,
+      "globalDockerAuthenticationChanged": false,
+      "existingHostBaselineComparison": "UNKNOWN: full startup guard stopped before baseline capture; no bootstrap resource creation commands ran."
     }
   }
 }
