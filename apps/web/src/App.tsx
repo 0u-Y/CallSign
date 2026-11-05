@@ -14,9 +14,13 @@ export function App() {
     <Routes>
       <Route element={<Shell />}>
         <Route index element={<LandingPage />} />
-        <Route path="service" element={<ServicePage />} />
+        <Route element={<ServicePage />} >
+          <Route path="service" />
+          <Route path="demo" />
+          <Route path="demo/call" />
+          <Route path="demo/governance" />
+        </Route>
         <Route path="finals" element={localOnly(<FinalsPage />)} />
-        <Route path="demo" element={<Navigate to="/service" replace />} />
         <Route path="legacy/demo" element={<DemoPage />} />
         <Route path="receiver" element={localOnly(serviceProfile ? <Navigate to="/service" replace /> : finalsProfile ? <Navigate to="/finals" replace /> : <ReceiverPage />)} />
         <Route path="institution" element={localOnly(serviceProfile ? <Navigate to="/service" replace /> : finalsProfile ? <Navigate to="/finals" replace /> : <InstitutionPage />)} />
