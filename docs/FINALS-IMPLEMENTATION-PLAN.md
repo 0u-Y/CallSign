@@ -1,5 +1,9 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 초기화 종료와 감시 관측 경계
+
+초기화 프로세스 종료와 `/proc`/cgroup 조회가 겹칠 때 같은 full container ID의 종료를 Docker에서 재확인하도록 보완했다. 실행 중 관측 누락·OOM·identity/강제 한도 변경·권한 오류는 계속 중단한다. 관련 단위4건과 이미 종료된 소유 IdP 컨테이너2개의 읽기 전용 조회를 통과했다. 새 서비스 기동·중단 latch 해제·제공자 호출은 하지 않았다.
+
 ## 2026-11-05 서버 전용 loopback 준비
 
 API/Witness의 명시적 `LISTEN_HOST=127.0.0.1`과 Besu peer 준비의 `--host-loopback`을 추가했다. 기존 container 기본 listen·private-prefix 검사는 유지하며 노드별30311~30314를 구분한다. 관련 무기동 단위28건과 API/Witness/light 타입 검사를 통과했다. 실제 bind·기동·공개 연결 검증은 아니며, 기존4201~4204 listener를 변경하지 않았다. IdP 관측 중단의 원본 latch/DB를 보존한 재개 승인과 공개 frontend/WS 배치 결정은 대기 중이다.

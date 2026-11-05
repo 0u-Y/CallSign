@@ -23,6 +23,44 @@ def resource_reason(sample, owned_bytes, expires_ns):
     return None
 
 
+def container_memory(cid, env):
+    def inspect():
+        details = json.loads(subprocess.check_output(['docker', 'inspect', '--format',
+            '{"id":{{json .Id}},"pid":{{.State.Pid}},"state":{{json .State.Status}},"oom":{{.State.OOMKilled}},"memory":{{.HostConfig.Memory}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}}}',
+            cid], env=env, timeout=10, stderr=subprocess.PIPE, text=True))
+        if details['id'] != cid or details['oom']:
+            raise RuntimeError('OWNED_CONTAINER_IDENTITY_OR_OOM')
+        if not details['memory'] or details['swap'] != details['memory'] or details['restart'] != 'no':
+            raise RuntimeError('OWNED_CONTAINER_LIMITS_REQUIRED')
+        return details
+
+    details = inspect()
+    if not details['pid']:
+        if details['state'] in ['created', 'exited', 'dead']:
+            return 0
+        raise RuntimeError('OWNED_PROCESS_STATE_UNOBSERVED')
+    pid = details['pid']
+    try:
+        start = process_start(pid)
+        if start is None:
+            raise ProcessLookupError()
+        group = next(s.split(':', 2)[2] for s in Path(f'/proc/{pid}/cgroup').read_text().splitlines() if s.startswith('0::'))
+        cg = Path('/sys/fs/cgroup') / group.lstrip('/')
+        used = int((cg / 'memory.current').read_text())
+        events = dict(line.split() for line in (cg / 'memory.events').read_text().splitlines())
+        if int(events.get('oom', 0)) or int(events.get('oom_kill', 0)):
+            raise RuntimeError('OWNED_CGROUP_OOM')
+        if process_start(pid) != start:
+            raise ProcessLookupError()
+        return used
+    except (FileNotFoundError, ProcessLookupError):
+        # A completed one-shot can lose its cgroup between inspect and reading /proc.
+        current = inspect()
+        if current['pid'] == 0 and current['state'] in ['exited', 'dead']:
+            return 0
+        raise RuntimeError('OWNED_PROCESS_CHANGED_DURING_OBSERVATION')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file', required=True)
@@ -69,25 +107,7 @@ def main():
             for service in status['services']:
                 phase = 'owned-container-memory'
                 cid = service['id']
-                details = json.loads(subprocess.check_output(['docker', 'inspect', '--format',
-                    '{"id":{{json .Id}},"pid":{{.State.Pid}},"oom":{{.State.OOMKilled}},"memory":{{.HostConfig.Memory}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}}}',
-                    cid], env=safe_env, timeout=10, stderr=subprocess.PIPE, text=True))
-                if details['id'] != cid or details['oom']:
-                    raise RuntimeError('OWNED_CONTAINER_IDENTITY_OR_OOM')
-                if not details['memory'] or details['swap'] != details['memory'] or details['restart'] != 'no':
-                    raise RuntimeError('OWNED_CONTAINER_LIMITS_REQUIRED')
-                used = 0
-                if details['pid']:
-                    pid = details['pid']
-                    start = process_start(pid)
-                    group = next(s.split(':', 2)[2] for s in Path(f'/proc/{pid}/cgroup').read_text().splitlines() if s.startswith('0::'))
-                    cg = Path('/sys/fs/cgroup') / group.lstrip('/')
-                    used = int((cg / 'memory.current').read_text())
-                    events = dict(line.split() for line in (cg / 'memory.events').read_text().splitlines())
-                    if int(events.get('oom', 0)) or int(events.get('oom_kill', 0)):
-                        raise RuntimeError('OWNED_CGROUP_OOM')
-                    if process_start(pid) != start:
-                        raise RuntimeError('OWNED_PROCESS_CHANGED_DURING_OBSERVATION')
+                used = container_memory(cid, safe_env)
                 owned_bytes += used
                 containers.append({'id': cid, 'service': service['service'], 'memoryBytes': used})
             row.update(ownedBytes=owned_bytes, containers=containers)

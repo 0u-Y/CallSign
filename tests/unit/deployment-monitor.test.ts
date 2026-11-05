@@ -12,3 +12,39 @@ assert check(sample,1,10)=='APPROVED_PERIOD_ENDED'
 `;
  expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
 });
+
+it('rechecks an exiting container instead of treating missing live cgroup data as zero',()=>{
+ const check=`import ast,json,pathlib
+from types import SimpleNamespace
+source=ast.parse(pathlib.Path('scripts/monitor-deployment.py').read_text());function=next(n for n in source.body if isinstance(n,ast.FunctionDef)and n.name=='container_memory')
+running={'id':'owned','pid':123,'state':'running','oom':False,'memory':512,'swap':512,'restart':'no'}
+terminal=dict(running,pid=0,state='exited')
+class File:
+ def __init__(self,path):self.path=path
+ def __truediv__(self,part):return File(self.path+'/'+part)
+ def read_text(self):
+  if mode=='missing':raise FileNotFoundError()
+  if mode=='permission':raise PermissionError()
+  return {'/proc/123/cgroup':'0::/owned','/sys/fs/cgroup/owned/memory.current':'128','/sys/fs/cgroup/owned/memory.events':'oom 0\\noom_kill 0'}[self.path]
+def inspect(*args,**kwargs):return json.dumps(next(records))
+scope={'json':json,'subprocess':SimpleNamespace(check_output=inspect,PIPE=-1),'Path':File,'process_start':lambda pid:'same-start'}
+exec(compile(ast.Module(body=[function],type_ignores=[]),'<monitor-memory>','exec'),scope)
+measure=scope['container_memory']
+mode='normal';records=iter([running]);assert measure('owned',{})==128
+mode='missing';records=iter([running,terminal]);assert measure('owned',{})==0
+for after in [running,dict(terminal,id='replacement'),dict(terminal,oom=True),dict(terminal,swap=1024),dict(terminal,restart='always'),dict(running,pid=456)]:
+ records=iter([running,after])
+ try:measure('owned',{})
+ except RuntimeError:pass
+ else:raise AssertionError('lost ownership, limits or live observation accepted')
+mode='permission';records=iter([running])
+try:measure('owned',{})
+except PermissionError:pass
+else:raise AssertionError('permission failure ignored')
+mode='normal';records=iter([dict(running,pid=0)])
+try:measure('owned',{})
+except RuntimeError:pass
+else:raise AssertionError('unobserved running process counted as zero')
+`;
+ expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
+});

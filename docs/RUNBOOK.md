@@ -27,7 +27,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
 
-현재 ingress 등록 대행은 허용됐지만 등록 페이지가 요구하는 계정 로그인 연결은 제공되지 않았다. 보호된 등록 링크를 사용하는 실제 계정 인증이 필요하며 다른 앱의 자격을 재사용하지 않는다. 등록만으로 Funnel이 열리지 않는다. [공식 Funnel 문서](https://tailscale.com/docs/features/tailscale-funnel)는 활성화가 tailnet 정책을 바꿀 수 있다고 명시하므로, 기존 전체 구성원을 허용하는 기본 정책을 자동 적용하지 않는다. 새 노드만의 범위와 실제 미디어 경로를 확인해야 한다.
+사용자가 전용 노드 등록과 해당 노드의 Funnel 권한·HTTPS 인증서 발급을 완료했다. 등록 링크 재승인을 요구하거나 기존 전체 구성원용 정책을 추가하지 않는다. 보존 identity로 실제 등록/권한을 조회하고, 진단 성공과 제품 backend·미디어 연결을 구분한다. [Funnel의 TLS 종료 TCP 전달](https://tailscale.com/docs/reference/tailscale-cli/funnel#use-a-tcp-forwarder)은 사용할 수 있는 전송 옵션이며, TURN 연동·외부 relay 성공을 입증한 것은 아니다.
 
 Vercel은 [현재 공식 문서](https://vercel.com/docs/functions/websockets)에서 native WebSocket Function을 지원하지만 현재 저장소는 정적 SPA이고 API/WS proxy를 구현·검증한 상태가 아니다. HTTP rewrite만으로 SIP·분석 WSS나 TURN을 확인했다고 쓰지 않는다. 같은 origin의 cookie·CSRF·Origin을 유지하고 실제 backend와 trust가 준비되기 전 미연결 Production을 실제 모드로 바꾸지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
 
@@ -63,7 +63,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash s
 
 status는 역할·deployment label이 맞는 서비스 ID/state/health만 출력한다. health와 전체 readiness는 다르며 monitor 생존을 증명하지 않는다. stop은 검사한 full container ID로 앱/worker/미디어를 먼저, DB/chain을 뒤에 중지하고 volume·키·genesis를 삭제하지 않는다. resource-stop은 보호 설정 디렉터리의 resource-stop.json을 먼저 보존하고 동일하게 중지한다. start/restart는 이 latch가 있으면 거절한다. stop/status는 latch 뒤에도 가능하다. 도구에 자동 latch 삭제·seed·NEW·prune는 없다. restart는 검토한 같은 이미지/영속 상태를 사용하고 초기화하지 않는다.
 
-Compose 로그는 AWS 제한 overlay의 json-file 크기/개수 제한을 유지한다. 현재 개발 서버용 무인 supervisor·지속 감시/누적 디스크 정책은 아직 실행 검증하지 않았다. 사용자의 지속 실행 허가는 사용자 중지까지의 환경 유지로 이해하며 시험90분 deadline은 C에만 적용한다. 이것이 압박·상한·중단 기준을 없애는 허가는 아니다. 시험90분을 무기한 운영 허가로 해석하거나 unless-stopped로 자원 중단을 무력화하지 않는다.
+Compose 로그는 각 실행 overlay의 json-file 크기/개수 제한을 유지한다. 지속 감시는 위24시간 승인 안에서만 사용하며 준비 시간을 포함해 더 일찍 만료될 수 있다. 정상 종료 중 사라진 cgroup은 같은 full container ID의 종료와 OOM/강제 한도를 Docker에서 재확인할 때만0으로 집계한다. 실행 중 관측 누락·권한 오류·identity 변경은 중단 사유다. 시험90분을 무기한 운영 허가로 해석하거나 restart policy로 자원 중단을 무력화하지 않는다.
 
 ### Deepgram 한국어 + OpenAI 분석의 보호 입력
 
