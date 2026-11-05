@@ -73,7 +73,7 @@ if options.archive_phase:
     if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or controller['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
-    names=['runtime-media-test.log','runtime-media-results.json','runtime-process-result.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
+    names=['runtime-media-test.log','runtime-media-results.json','runtime-process-result.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json','demo-route-media-proof.json']
     names += [p.name for pattern in ['analysis-observation-*','media-failure-*','decoded-audio-*','device-result-*','delivery-work-*','delivery-device-*','delivery-recipient-*','delivery-agent-*','delivery-workspace-*','pbx-control-*','call-trial-*'] for p in root.glob(pattern)]
     for name in names:
         if (root/name).exists(): (root/name).rename(phase/name)
