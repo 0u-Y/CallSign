@@ -47,3 +47,8 @@ it('refuses an existing paid smoke result before input or credential loading',as
  const root=await mkdtemp(join(tmpdir(),'callsign-provider-result-')),output=join(root,'existing.json');
  try{await writeFile(output,'preserved');expect(()=>execFileSync(process.execPath,['--import','tsx','scripts/provider-smoke.ts','llm','/missing-input',output],{env:{PATH:process.env.PATH,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'media',CALLSIGN_PROVIDER_CONFIRMATION:'CONSENTED-SAMPLE-WITH-BUDGET',OPENAI_API_KEY_FILE:'/missing-key'},stdio:'pipe'})).toThrow(/OUTPUT_ALREADY_EXISTS/);}finally{await rm(root,{recursive:true,force:true});}
 });
+
+it('rejects a model converting negation or quoted examples into a current request without erasing a real request',async()=>{
+ for(const text of ['인증번호는 말씀하지 마세요.','“인증번호를 알려주세요”라는 요구에는 응하지 마세요.'])await expect(analyzeServiceWithOpenAI({...input,text,fetcher:async()=>response({...analysis,signals:[{category:'인증번호 요구',evidenceSpan:text,explanation:'incorrect synthetic model interpretation'}],purpose:{relation:'undetermined',evidenceSpan:'',reason:'no context'}})})).rejects.toThrow('LLM_EVIDENCE_INVALID');
+ const text='인증번호는 말씀하지 마세요. 지금은 OTP를 알려주세요.';const result=await analyzeServiceWithOpenAI({...input,text,fetcher:async()=>response({...analysis,signals:[{category:'인증번호 요구',evidenceSpan:'OTP를 알려주세요.',explanation:'current explicit demand'}],purpose:{relation:'undetermined',evidenceSpan:'',reason:'no context'}})});expect(result.signals).toHaveLength(1);
+});

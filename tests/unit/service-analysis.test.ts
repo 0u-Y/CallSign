@@ -51,3 +51,8 @@ it('uses provider segment positions for reverse delivery and rejects a model rev
 });
 it('classifies a provider timeout as unavailable while retaining a grounded rule finding',async()=>{const {a,events}=fixture(async()=>{throw new DOMException('deadline','TimeoutError');});await a.accept(rev('송금해 주세요.'));await a.flush();expect(events.at(-1)).toMatchObject({status:'unavailable',purpose:{relation:'undetermined'},signals:[{category:'송금 유도'}]});});
 it('does not treat explicit unverified continuation as a current-purpose confirmation',async()=>{const {purposeAuthorityCurrent}=await import('../../services/api/src/service-analysis.js');const f=await serviceFixture();await f.consume();await f.lease(1);const t=(await f.store.read(f.institution.institutionId)).serviceV3!.attempts[f.attempt.id]!;expect(purposeAuthorityCurrent(t,f.authority.now())).toBe(true);t.authorityStatus='unavailable';t.unverifiedChoice='continue';t.lease!.payload.authority='unavailable';expect(purposeAuthorityCurrent(t,f.authority.now())).toBe(false);});
+
+it('keeps punctuation and correction words inside quotes from creating or retracting a real demand',async()=>{
+ const quoted=fixture();await quoted.a.accept(rev('“OTP를 알려주세요.”라는 요청에는 응하지 마세요.'));await quoted.a.flush();expect(quoted.events.at(-1)?.signals).toEqual([]);
+ const actual=fixture();await actual.a.accept(rev('OTP를 알려주세요. “정정합니다.”라는 단어를 읽습니다.'));await actual.a.flush();expect(actual.events.at(-1)?.signals.map(s=>s.category)).toEqual(['인증번호 요구']);
+});
