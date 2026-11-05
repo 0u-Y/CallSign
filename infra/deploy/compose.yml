@@ -2,6 +2,7 @@ name: callsign-finals
 x-deployment-labels: &deployment-labels
   org.callsign.lifecycle: persistent
   org.callsign.deployment-id: ${DEPLOYMENT_ID:?immutable deployment identity}
+  org.callsign.run-id: ''
 x-app: &app
   labels: *deployment-labels
   image: ${CALLSIGN_APP_IMAGE:?pin registry image tag or digest}
