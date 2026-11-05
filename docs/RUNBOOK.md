@@ -15,11 +15,15 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 ## 지속 서비스와 시험 환경의 분리
 
-현재 공개 Vercel은 API 미연결 제품 미리보기다. 최신 상태와 [지속 환경 준비 근거](../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 확인한다. 지속 backend는 아직 생성하지 않았다. 현재 443은 다른 프로젝트 소유이고, CallSign 전용 외부 TLS/WSS·UDP 경로·실제 OIDC·지속 자원 관측·중단 범위이 미정이다. 전체 구성은 기동 직전 기존40GiB 시작 조건과 압박 사전 관측을 모두 통과해야 한다. 과거 미달과 현재 단일 표본을 구분하며 자동 기동하지 않는다. localhost 시험 성공을 외부 접속으로 확대하지 않는다.
+현재 공개 Vercel은 API 미연결 제품 미리보기다. 전용 Funnel의 공개 HTTPS/WSS 진단은 성공했지만 제품 로그인·PBX/TURN·외부 음성은 아직 확인하지 않았다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
 
-전용 공개 경로 준비는 승인됐지만 등록 대기 중인 별도 userspace 노드는 정상 종료한 상태다. `scripts/prepare-demo-ingress.py`는 명시적 guard 아래 등록만 준비하며 공개 backend를 만들지 않는다. 같은 identity는 `--resume-identity PRIVATE_OWNED_ROOT`로만 이어가고 resource-stop latch를 자동 지우지 않는다. 등록 URL·state는 보호 경로에서만 취급한다. Tailscale Funnel은 TLS/TCP 경로이며 실제 TURN relay·외부 브라우저 시험을 대신하지 않는다. tailnet 정책을 자동 수정하는 Funnel 활성화는 실행하지 않았다.
+전용 userspace 노드의 등록·Funnel 권한·HTTPS 활성화와 보존 identity를 재사용한다. `scripts/prepare-demo-ingress.py`는 등록 준비 도구이며 지속 backend launcher가 아니다. Tailscale Funnel의 TLS/TCP 성공으로 TURN relay·외부 브라우저 음성 성공을 주장하지 않는다. Vercel rewrite의 실제 진단은 [관측 기록](../artifacts/vercel-ingress-transport-20261105.json)을 따른다.
 
-실제 OIDC 선택지는 `CALLSIGN_OIDC_PROVIDER=keycloak`과 `compose.oidc.yml`이다. 기본은 external로 유지한다. 정확한 HTTPS `KEYCLOAK_PUBLIC_ORIGIN`·신뢰하는 proxy 주소·불변 image와 보호 env/DB password 파일이 필요하다. `prepare-demo-oidc.ts --apply PRIVATE_NEW_PATH`는 실제 공개 origin에서 보호 realm/계정·무작위 password 입력만 생성하며 사용자를 생성하지 않는다. NEW의 별도 `oidc-init` profile만 `import --override false`를 실행하고 정상 `oidc` 시작은 `start`만 실행한다. 실제 서명된 issuer/sub를 검증한 뒤 기존 계정 등록 절차로 연결한다. realm JSON은 세션/폐기 상태를 포함한 완전한 IdP 백업이 아니므로 별도 영속 IdP DB를 함께 일관되게 백업한다. 이 overlay는 bridge 기반이며 현재 보호된 개발 서버에서 기동하지 않는다. 실제 import/login/RESTORE는 아직 NOT_RUN이다.
+실제 OIDC는 기존 `compose.oidc.yml`에 `compose.oidc-server.yml`을 합쳐 보호된 env와 고유 project로 준비한다. 이 추가 설정은 기존 host namespace의 loopback54329(DB)·38080(IdP)·39000(readiness)만 사용하며 bridge/port publish/자동 restart를 사용하지 않는다. `docker compose ... config`에서 실제 병합 결과를 확인하고 기존 listener와 충돌하면 기동하지 않는다. NEW의 `oidc-init`만 `import --override false`를 실행하고, 일반 `oidc` 기동은 `start`만 실행한다. 실제 issuer/sub 로그인 검증 뒤 계정을 제품에 연결한다. realm JSON은 완전한 IdP 백업이 아니므로 영속 IdP DB를 보존한다.
+
+지속 자원 감시는 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure python3 scripts/monitor-deployment.py --env-file PRIVATE_DEPLOYMENT_ENV --output PRIVATE_NEW_MONITOR_DIR`로 시작한다. 60초 사전 관측과 살아 있는 monitor의 `ready.json`을 확인한 뒤 기동하며 이 표시는 제품 readiness가 아니다. 5초마다 검증된 소유 컨테이너의 cgroup 메모리와 호스트 PSI/swap/OOM을 확인한다. 로그는10MiB씩 두 파일로 제한한다. 중단 시 최초 사유를 보존하고 소유 애플리케이션→DB 순서로 중지한다. 자동 재기동하지 않으며 감시 종료도 서비스를 중지한다. 준비 시간을 포함해 감시 시작부터 최대24시간으로 제한한다.
+
+첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 공개 로그인은 미실행이며 이 중단 뒤 재개는 별도 확인 대상이다.
 
 첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
 

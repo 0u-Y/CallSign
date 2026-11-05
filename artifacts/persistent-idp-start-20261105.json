@@ -1,0 +1,30 @@
+{
+  "scope": "Persistent IdP preparation; no public login or product call proven",
+  "reason": "DEPLOYMENT_CONTROL template failed on a container without .State.Health",
+  "statusAfterFix": {
+    "project": "callsign-demo-live",
+    "deploymentId": "callsign-live-20261105",
+    "resourceStopLatched": true,
+    "services": [
+      {
+        "service": "oidc-init",
+        "id": "4d6cbdbb798808590158e04b38e5d65c74e95b7209e9cc38cefe9d4d1521c3a3",
+        "state": "exited",
+        "health": null
+      },
+      {
+        "service": "oidc-db",
+        "id": "b1cfa936c9fdff4dd1c892a0fd7af10feba3e3f8abdfdda769677e68e3a6c9b0",
+        "state": "exited",
+        "health": "unhealthy"
+      }
+    ],
+    "scope": "Owned containers only; health is not complete readiness; resource monitor availability is not established by this command."
+  },
+  "originalMonitorStopPreserved": true,
+  "automaticRestart": false,
+  "passwordsAndRealmNotPublished": true,
+  "initialImportExitCode": 0,
+  "normalLoginVerified": false,
+  "sameDeploymentRestartedAfterStop": false
+}

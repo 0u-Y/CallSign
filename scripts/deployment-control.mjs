@@ -18,7 +18,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
   if(!['status','check','owned','latch','stop'].includes(command)||!file||compose[0]!=='docker'||compose[1]!=='compose')throw Error('DEPLOYMENT_CONTROL_ARGUMENTS_INVALID');
   const env={...parseEnv(readFileSync(file,'utf8')),...process.env},project=env.CALLSIGN_PROJECT||'callsign-finals';
   const ids=execFileSync('docker',['ps','--all','--no-trunc','--quiet','--filter','label=com.docker.compose.project='+project],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split(/\s+/).filter(Boolean);
-  const format='{"id":{{json .Id}},"labels":{{json .Config.Labels}},"state":{{json .State.Status}},"health":{{if .State.Health}}{{json .State.Health.Status}}{{else}}null{{end}}}';
+  const format='{"id":{{json .Id}},"labels":{{json .Config.Labels}},"state":{{json .State.Status}},"health":{{if (index .State "Health")}}{{json (index .State "Health").Status}}{{else}}null{{end}}}';
   const records=ids.length?execFileSync('docker',['inspect','--format',format,...ids],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split('\n').map(line=>JSON.parse(line)):[];
   assertManagedDeployment(records,project,env.DEPLOYMENT_ID);
   if(!env.FINALS_DATA_DIR)throw Error('PERSISTENT_STATE_DIRECTORY_REQUIRED');

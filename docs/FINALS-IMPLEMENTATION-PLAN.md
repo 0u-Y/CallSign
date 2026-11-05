@@ -1,5 +1,9 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 지속 IdP 첫 기동과 관측 결함
+
+loopback 전용 host-mode overlay와 기존 소유권 제어를 사용해 별도 영속 IdP DB를 기동했다. DB healthy, NEW import exit0이며 공개 로그인은 미실행이다. healthcheck 없는 컨테이너의 Docker template 조회가 실패하면서 monitor와 자동 중지도 실패했다. 조회식을 수정해 실제 health=null/소유권/중지 동작을 확인했고 두 소유 컨테이너는 exited다. 원본 최초 오류·영속 DB·latch는 보존했으며 자동 재기동하지 않았다. [결과](../artifacts/persistent-idp-start-20261105.json). 수정한 감시/소유권/IdP 단위5건 통과. 이미지 config가 보고하는 실제 Keycloak 버전은26.8.1이며 보호 실행 설정은 config ID에 고정한다.
+
 ## 2026-11-05 실제 IdP 이미지 준비 완료
 
 검증된 OCI blob을 Docker archive로 스트리밍 변환하고 각 압축 해제 layer hash를 이미지 config의 diff_id와 대조했다. 추가 다운로드 없이 `callsign-keycloak-received:26.6.4` 로드와 amd64/config ID 일치를 확인했다. 최초 OCI archive 직접 로드 실패는 보존했다. 이미지 로드는 기동·realm import·공개 로그인 성공이 아니다.
