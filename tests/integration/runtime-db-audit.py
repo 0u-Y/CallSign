@@ -12,6 +12,7 @@ SELECT json_build_object(
  'sessions',(SELECT json_build_object('validByExpiry',count(*) FILTER(WHERE expires_at>now()),'expired',count(*) FILTER(WHERE expires_at<=now())) FROM public.sessions),
  'outbox',(SELECT coalesce(json_object_agg(status,n),'{}') FROM (SELECT status,count(*) n FROM issuer_v2.outbox GROUP BY status) q),
  'overduePending',(SELECT count(*) FROM issuer_v2.outbox WHERE status='pending' AND retry_at<=now()),
+ 'pendingDiagnostics',(SELECT coalesce(json_agg(q),'[]') FROM (SELECT kind,created_at,retry_at,attempts,lease_until FROM issuer_v2.outbox WHERE status='pending' ORDER BY created_at LIMIT 20) q),
  'expiredClaims',(SELECT count(*) FROM issuer_v2.outbox WHERE status='processing' AND (lease_until IS NULL OR lease_until<=now())),
  'futureRetries',(SELECT count(*) FROM issuer_v2.outbox WHERE status='pending' AND retry_at>now()),
  'signerLeases',(SELECT json_build_object('current',count(*) FILTER(WHERE expires_at>now()),'expired',count(*) FILTER(WHERE expires_at<=now())) FROM issuer_v2.signer_leases),
@@ -42,6 +43,6 @@ def main():
     result=subprocess.run(['docker','exec','-e','PGPASSWORD','-i',entry['id'],'psql','-X','-Atq','--no-password','-v','ON_ERROR_STOP=1','-U','callsign_migrator','-d',db['database']],env={**os.environ,'PGPASSWORD':db['ownerPassword']},input=SQL,capture_output=True,text=True,timeout=15)
     if result.returncode:raise RuntimeError('OWNED_SQL_AUDIT_QUERY_FAILED')
     values=[json.loads(x) for x in result.stdout.splitlines() if x.startswith('{')];assert len(values)==1
-    value=values[0];out={**assess(value,a.final),'final':a.final,'observations':value,'scope':'One repeatable-read read-only SQL snapshot; this owned DB only. No raw rows, keys, tokens, receipt payloads or manual correction.'}
+    value=values[0];out={**assess(value,a.final),'final':a.final,'observations':value,'scope':'One repeatable-read read-only SQL snapshot; this owned DB only. Pending job kind/timing/retry metadata is bounded to 20 entries; no identifiers, payloads, keys, tokens, receipts or manual correction.'}
     a.output.write_text(json.dumps(out,indent=2)+'\n');a.output.chmod(0o600);print(json.dumps({'status':out['status'],'final':a.final}));raise SystemExit(0 if out['status']=='PASS' else 2)
 if __name__=='__main__':main()

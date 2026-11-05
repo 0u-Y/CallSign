@@ -1,5 +1,5 @@
 """Explicit host-side driver for the owned final-image integration test; creates no network or published port."""
-import argparse, json, os, re, shutil, subprocess, time
+import argparse, json, os, re, shutil, subprocess, sys, time
 from pathlib import Path
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -65,6 +65,14 @@ if options.archive_phase:
         info = json.loads(observed.stdout)[0]
         if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or info['HostConfig']['NetworkMode'] != 'container:'+keeper['Id'] or not any(c['id']==info['Id'] for c in owner['containers']):
             raise RuntimeError('OWNED_PHASE_RESOURCE_REQUIRED')
+        if role == 'worker' and options.archive_phase == 'final-audit':
+            # Producers stop first; preserve each read-only result while the real worker can drain.
+            for observation in range(3):
+                audit = subprocess.run([sys.executable, 'tests/integration/runtime-db-audit.py', '--root', str(root), '--output', str(phase/('worker-drain-'+str(observation)+'.json')), '--final'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=15)
+                if audit.returncode not in (0, 2) or not (phase/('worker-drain-'+str(observation)+'.json')).is_file():
+                    raise RuntimeError('OWNED_PHASE_DRAIN_AUDIT_OBSERVATION_FAILED')
+                if audit.returncode == 0: break
+                if observation < 2: time.sleep(2)
         (phase/(role+'.log')).write_bytes(subprocess.run(['docker','logs',info['Id']],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout)
         command(['docker','stop','-t','5',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
         command(['docker','rm',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
