@@ -42,5 +42,20 @@
     "originalStopPreserved": true,
     "automaticRestart": false,
     "paidCalls": 0
+  },
+  "publicIngress20261106": {
+    "recordedAt": "2026-11-05T23:22:07.469655+00:00",
+    "method": "Owned host-network containers, existing userspace identity, no published ports or bridge",
+    "existingNodeReused": true,
+    "publicDiscoveryStatus": 200,
+    "issuerMatchesPreparedOrigin": true,
+    "adminPathStatus": 404,
+    "defaultPathStatus": 404,
+    "firstFailure": "nginx read-only fastcgi temporary directory; first public responses 502",
+    "correction": "All nginx temporary paths in owned /tmp; failure logs preserved",
+    "publicBrowserLoginVerified": false,
+    "productApiConnected": false,
+    "resourceRestart": false,
+    "paidCalls": 0
   }
 }

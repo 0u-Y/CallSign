@@ -1,0 +1,35 @@
+# Existing userspace identity only; no bridge, published port or host daemon mutation.
+name: ${CALLSIGN_PROJECT:?owned project}
+x-ingress: &ingress
+  image: ${CALLSIGN_INGRESS_IMAGE:?reviewed local nginx image}
+  network_mode: host
+  user: '1000:1000'
+  restart: 'no'
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  mem_limit: 256m
+  memswap_limit: 256m
+  cpus: 0.5
+  pids_limit: 128
+  labels:
+    org.callsign.lifecycle: persistent
+    org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+services:
+  web:
+    <<: *ingress
+    entrypoint: [nginx]
+    command: [-c, /config/nginx.conf, -g, 'daemon off;']
+    volumes:
+      - {type: bind, source: '${CALLSIGN_INGRESS_CONFIG:?owned rendered config}', target: /config/nginx.conf, read_only: true, bind: {create_host_path: false}}
+  https:
+    <<: *ingress
+    entrypoint: [/usr/sbin/tailscaled]
+    command: ['--tun=userspace-networking', '--state=/state/tailscaled.state', '--statedir=/state', '--socket=/tmp/tailscaled.sock', '--port=0', '--no-logs-no-support', '--encrypt-state=false']
+    environment: {TS_LOGS_DIR: /tmp/tailscale-logs}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_INGRESS_STATE:?existing owned identity state}', target: /state, bind: {create_host_path: false}}
+      - {type: bind, source: /usr/sbin/tailscaled, target: /usr/sbin/tailscaled, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: /usr/bin/tailscale, target: /usr/bin/tailscale, read_only: true, bind: {create_host_path: false}}
