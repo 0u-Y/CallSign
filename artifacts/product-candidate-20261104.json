@@ -1497,8 +1497,8 @@
       "persistentBackend": "BLOCKED_NO_APPROVED_INGRESS_OIDC_AND_FULL_RESOURCE_START",
       "vercel": {
         "status": "PASS_PRODUCTION_HTTP_NOT_BROWSER",
-        "recordedAt": "2026-11-05T07:10:23.860996+00:00",
-        "source": "935f44a66c31f50e0c0013faad741000f3aeaead",
+        "recordedAt": "2026-11-05T07:18:24.231591+00:00",
+        "source": "20986b0049b2f0240a3d1c619964268a43320f89",
         "production": "https://callsign-rouge.vercel.app",
         "preview": {
           "status": 200,
@@ -1507,7 +1507,7 @@
           "remoteAccess": "PROTECTED_SSO"
         },
         "buildMeta": {
-          "commit": "935f44a66c31f50e0c0013faad741000f3aeaead",
+          "commit": "20986b0049b2f0240a3d1c619964268a43320f89",
           "target": "production",
           "publicPreview": true
         },
@@ -1592,10 +1592,18 @@
         "persistentServicesCreated": 0,
         "existingResourcesUnchangedByCommands": true
       },
-      "firstBatchBrowserStarted": false
+      "firstBatchBrowserStarted": false,
+      "validationDetails": {
+        "offline": "pnpm light 67 files / 342 tests PASS, API/web/light TypeScript PASS",
+        "browserFixture": "4 roles synthetic API interceptions; no real middleware/CSRF/chain/media",
+        "visualReview": "recapture; latest compacted layout not observed",
+        "fullStartSampleGiB": 30.61,
+        "fullMedia": "NOT_RUN_40_GIB_START_CONDITION_NOT_MET",
+        "preflightObservationLimit": "Independent light check overlapped part of visual-confirmation preflight and was not included in its owned RSS. That confirmation was stopped by host PSI before build/browser; no resource-compliance PASS claimed."
+      }
     },
     "demoPreparationCandidate": {
-      "status": "PRIVATE_IMAGE_RECEIVED_RELEASE_PENDING",
+      "status": "PREPARATION_PRERELEASE_PUBLISHED_AND_FRESHLY_RECEIVED_NOT_INTEGRATED",
       "runtimeProductSource": "935f44a66c31f50e0c0013faad741000f3aeaead",
       "configId": "sha256:16886ae4f69b6e9144d52b0044cdb22a0d31d022ac17f64a9fd259e291791f41",
       "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:07bea15bcbd62840b7d44bd1fd50a17ecd2bee1cbbe03e255910b281c6c1d48a",
@@ -1607,10 +1615,44 @@
       "fullMediaRestore": "NOT_RUN_NEW_IMAGE",
       "latestUiVisual": "RECAPTURE_BLOCKED_MEMORY_PSI",
       "releaseTag": "aws-demo-preparation-20261105t071306z",
-      "publicObserverSource": "PENDING_DOCS_COMMIT",
-      "remoteImageReceipt": "PASS_FRESH_HTTPS_PUBLISHER_CONTEXT_NOT_INDEPENDENT_READER",
+      "publicObserverSource": "20986b0049b2f0240a3d1c619964268a43320f89",
+      "remoteImageReceipt": "PASS_MANIFEST_CONFIG_ALL_LAYERS_FRESH_NETWORK_PUBLISHER_AUTH_ONLY",
       "finalAwsWeb": "DEFERRED_REAL_METADATA_TRUST_CERTIFICATE",
-      "sourceRuntimeDiff": "UI and operational head-hash observation; previous provider code included; previous runtime PASS not transferred"
+      "sourceRuntimeDiff": "UI and operational head-hash observation; previous provider code included; previous runtime PASS not transferred",
+      "release": {
+        "isPrerelease": true,
+        "tagName": "aws-demo-preparation-20261105t071306z",
+        "targetCommitish": "20986b0049b2f0240a3d1c619964268a43320f89",
+        "url": "https://github.com/0u-Y/CallSign/releases/tag/aws-demo-preparation-20261105t071306z"
+      },
+      "releaseFiles": [
+        {
+          "name": "observer-tests.tar",
+          "bytes": 389120,
+          "sha256": "259986592915047427a734fd974d0acd9ffd7d866eb4a58f0a5e0c1c717be6e2"
+        },
+        {
+          "name": "images.json",
+          "bytes": 5015,
+          "sha256": "8cc8a77cf354a89e753437ba681508a55db3463db443ecd8de9e36c2b6cd1c06"
+        },
+        {
+          "name": "deployment-files.tar",
+          "bytes": 573440,
+          "sha256": "b65e79f0c26a1d4937dd349bc49d9cc4e3a5cd5a806f988f4236aa86941148b5"
+        },
+        {
+          "name": "publication-audit.json",
+          "bytes": 47501,
+          "sha256": "ab75c02d993bc4299bb9d1443bc4ffa05489664be2f6b46df58ebe71e528016f"
+        },
+        {
+          "name": "SHA256SUMS",
+          "bytes": 339,
+          "sha256": "764fa930f3470767cf2d84b446d84aa1ac3fa005799a97334da6fdb576ee52c5"
+        }
+      ],
+      "existingReleasePreserved": true
     }
   }
 }
