@@ -5,7 +5,7 @@ import {resolve} from 'node:path';
 import {parseEnv} from 'node:util';
 import {pathToFileURL} from 'node:url';
 
-export const deploymentServices=['platform','issuer','sender','worker','web','https','witness1','witness2','witness3','witness4','asterisk','turn','besu1','besu2','besu3','besu4','postgres','oidc','oidc-db','oidc-init'];
+export const deploymentServices=['platform','issuer','sender','worker','web','https','witness1','witness2','witness3','witness4','asterisk','turn','besu1','besu2','besu3','besu4','postgres','oidc','oidc-db','oidc-init','anchor','anchor-db','migration-runner'];
 export function assertManagedDeployment(records,project,deploymentId){
  if(!/^[a-z0-9][a-z0-9_-]*$/.test(project??'')||!deploymentId)throw Error('DEPLOYMENT_IDENTITY_REQUIRED');
  for(const record of records){
@@ -52,7 +52,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
    protectedState();writeFileSync(latch,JSON.stringify({reason:'OPERATOR_RESOURCE_STOP',recordedAt:new Date().toISOString(),deploymentId:env.DEPLOYMENT_ID})+'\n',{flag:'wx',mode:0o600});
   }
   if(command==='stop'){
-   const data=new Set(['postgres','besu1','besu2','besu3','besu4','oidc-db']);
+   const data=new Set(['postgres','besu1','besu2','besu3','besu4','oidc-db','anchor-db']);
    for(const dataStage of [false,true]){
     const selected=records.filter(r=>data.has(r.labels['com.docker.compose.service'])===dataStage).map(r=>r.id);
     // Stop the validated full IDs, so replacement containers cannot inherit permission from a name.

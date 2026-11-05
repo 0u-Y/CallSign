@@ -1,0 +1,44 @@
+# Stage the normal product roles independently of the not-yet-connected public media path.
+name: ${CALLSIGN_PROJECT:?owned project}
+x-app: &app
+  image: ${CALLSIGN_APP_IMAGE:?reviewed runtime}
+  network_mode: host
+  user: '1000:1000'
+  restart: 'no'
+  init: true
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  mem_limit: 512m
+  memswap_limit: 512m
+  cpus: 1
+  pids_limit: 128
+  labels:
+    org.callsign.lifecycle: persistent
+    org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+    org.callsign.run-id: ''
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  environment: {LISTEN_HOST: 127.0.0.1}
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://127.0.0.1:'+process.env.PORT+'/readiness').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 15s
+    timeout: 4s
+    retries: 3
+services:
+  platform:
+    <<: *app
+    env_file: ${CALLSIGN_PLATFORM_ENV_FILE:?protected platform environment}
+  issuer:
+    <<: *app
+    env_file: ${CALLSIGN_ISSUER_ENV_FILE:?protected issuer environment}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/issuer', target: /keys/issuer, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/trust', target: /trust, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_ANCHOR_TLS_DIR:?Anchor CA}/cert.pem', target: /tls/anchor.pem, read_only: true, bind: {create_host_path: false}}
+  sender:
+    <<: *app
+    env_file: ${CALLSIGN_SENDER_ENV_FILE:?protected sender environment}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/sender', target: /keys/sender, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/trust', target: /trust, read_only: true, bind: {create_host_path: false}}

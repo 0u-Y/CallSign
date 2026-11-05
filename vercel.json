@@ -2,6 +2,10 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
+      "source": "/api/v3/:path*",
+      "destination": "https://callsign-demo-l-fixed.tail37b235.ts.net/api/v3/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
@@ -40,7 +44,7 @@
   ],
   "framework": "vite",
   "installCommand": "pnpm install --frozen-lockfile",
-  "buildCommand": "VITE_PUBLIC_PREVIEW=true pnpm --filter @callsign/web build",
+  "buildCommand": "VITE_PUBLIC_PREVIEW=${VITE_PUBLIC_PREVIEW:-true} pnpm --filter @callsign/web build",
   "outputDirectory": "apps/web/dist",
   "redirects": [
     {

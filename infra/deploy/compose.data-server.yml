@@ -1,0 +1,86 @@
+# Current server only: separate persistent app/Anchor stores on loopback, no published ports.
+name: ${CALLSIGN_PROJECT:?owned project}
+x-labels: &labels
+  org.callsign.lifecycle: persistent
+  org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+  org.callsign.run-id: ''
+x-store: &store
+  image: ${POSTGRES_IMAGE:?reviewed PostgreSQL image}
+  network_mode: host
+  restart: 'no'
+  mem_limit: 512m
+  memswap_limit: 512m
+  cpus: 1
+  pids_limit: 128
+  labels: *labels
+  logging: &logging {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+services:
+  postgres:
+    <<: *store
+    command: [postgres, -c, listen_addresses=127.0.0.1, -p, '54339']
+    environment:
+      POSTGRES_DB: callsign
+      POSTGRES_USER: callsign_migrator
+      POSTGRES_PASSWORD_FILE: /run/secrets/database.password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - {type: bind, source: '${CALLSIGN_DB_PASSWORD_FILE:?protected owner password}', target: /run/secrets/database.password, read_only: true, bind: {create_host_path: false}}
+    healthcheck: {test: [CMD, pg_isready, -h, 127.0.0.1, -p, '54339', -U, callsign_migrator, -d, callsign], interval: 5s, timeout: 3s, retries: 12}
+  anchor-db:
+    <<: *store
+    command: [postgres, -c, listen_addresses=127.0.0.1, -p, '54349']
+    environment:
+      POSTGRES_DB: callsign_anchor
+      POSTGRES_USER: anchor_owner
+      POSTGRES_PASSWORD_FILE: /run/secrets/database.password
+    volumes:
+      - anchor-data:/var/lib/postgresql/data
+      - {type: bind, source: '${CALLSIGN_ANCHOR_DB_PASSWORD_FILE:?separate protected owner password}', target: /run/secrets/database.password, read_only: true, bind: {create_host_path: false}}
+    healthcheck: {test: [CMD, pg_isready, -h, 127.0.0.1, -p, '54349', -U, anchor_owner, -d, callsign_anchor], interval: 5s, timeout: 3s, retries: 12}
+  anchor:
+    image: ${CALLSIGN_APP_IMAGE:?reviewed runtime}
+    network_mode: host
+    user: '1000:1000'
+    restart: 'no'
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    labels: *labels
+    logging: *logging
+    entrypoint: [pnpm, anchor]
+    env_file: ${CALLSIGN_ANCHOR_ENV_FILE:?protected Anchor environment}
+    environment:
+      CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+      ANCHOR_HOST: 127.0.0.1
+      ANCHOR_TLS_KEY_PATH: /tls/key.pem
+      ANCHOR_TLS_CERT_PATH: /tls/cert.pem
+      PORT: '14300'
+    volumes:
+      - {type: bind, source: '${CALLSIGN_ANCHOR_TLS_DIR:?owned Anchor TLS}', target: /tls, read_only: true, bind: {create_host_path: false}}
+  migration-runner:
+    image: ${CALLSIGN_APP_IMAGE:?reviewed runtime}
+    network_mode: host
+    user: '1000:1000'
+    restart: 'no'
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    labels: *labels
+    logging: *logging
+    profiles: [operations]
+    entrypoint: [pnpm, exec, tsx, scripts/migrate-finals.ts, --apply]
+    env_file: ${CALLSIGN_MIGRATION_ENV_FILE:?protected owner environment}
+    environment: {CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure}
+volumes:
+  postgres-data: {labels: *labels}
+  anchor-data: {labels: *labels}

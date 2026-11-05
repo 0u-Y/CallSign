@@ -33,3 +33,7 @@ it('refuses the offline media package recipe before any host install when owned-
 it('blocks the final-image media driver before Docker or test preparation without explicit integration authorization',()=>{
  try{execFileSync('python3',['tests/integration/runtime-media-driver.py'],{encoding:'utf8',env:{PATH:process.env.PATH},timeout:3000});throw new Error('MEDIA_DRIVER_GUARD_MISSING');}catch(error){expect((error as {status:number;stderr:Buffer}).status).toBe(1);expect(String((error as {stderr:Buffer}).stderr)).toContain('INTEGRATION_EXECUTION_BLOCKED');}
 });
+
+it.each(['http://127.0.0.1:1','http://127.0.0.1:1,http://127.0.0.1:1,http://127.0.0.1:3,http://127.0.0.1:4','http://user:password@127.0.0.1:1,http://127.0.0.1:2,http://127.0.0.1:3,http://127.0.0.1:4','file:///tmp/1,http://127.0.0.1:2,http://127.0.0.1:3,http://127.0.0.1:4'])('rejects invalid fixed witness origins before trust preparation',value=>{
+ expect(()=>execFileSync(process.execPath,['--import','tsx','scripts/prepare-finals.ts','trust','/must-not-be-opened','--apply'],{env:{...process.env,CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'infrastructure',WITNESS_ENDPOINT_URLS:value},stdio:'pipe',timeout:10000})).toThrow(/FOUR_FIXED_WITNESS_ORIGINS_REQUIRED/);
+});

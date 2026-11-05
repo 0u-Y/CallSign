@@ -8,6 +8,7 @@ import {assertManagedDeployment} from '../../scripts/deployment-control.mjs';
 it('separates persistent deployment resources from test identities and other projects before mutation',()=>{
  const labels={'com.docker.compose.project':'owned-project','com.docker.compose.service':'issuer','org.callsign.deployment-id':'owned-deployment','org.callsign.lifecycle':'persistent'};
  expect(()=>assertManagedDeployment([{labels}],'owned-project','owned-deployment')).not.toThrow();
+ for(const service of ['anchor','anchor-db','migration-runner'])expect(()=>assertManagedDeployment([{labels:{...labels,'com.docker.compose.service':service}}],'owned-project','owned-deployment')).not.toThrow();
  for(const change of [{'org.callsign.lifecycle':'ephemeral'},{'org.callsign.run-id':'test-collision'},{'com.docker.compose.project':'other-project'},{'org.callsign.deployment-id':'old-deployment'},{'com.docker.compose.service':'test-runner'}])expect(()=>assertManagedDeployment([{labels},{labels:{...labels,...change}}],'owned-project','owned-deployment')).toThrow('IDENTITY_MISMATCH');
 });
 
