@@ -300,6 +300,20 @@ with tempfile.TemporaryDirectory() as d:
  except RuntimeError:pass
 `],{stdio:'pipe'});
 });
+it('keeps the full start guard by default and requires an explicit staged plan without lowering the reserve',()=>{
+ execFileSync('python3',['-c',`
+import runpy
+f=runpy.run_path('scripts/validation-runtime-media.py')['start_memory_reason'];g=1024**3
+p={'startPolicy':'staged-memory-v1','reserveGiB':16,'totalObservedGiB':24}
+assert f(35*g,'full-40-gib',p)=='START_40_GIB_REQUIRED'
+assert f(40*g,'full-40-gib',{}) is None
+assert f(35*g,'staged-memory-v1',p) is None
+assert f(15*g,'staged-memory-v1',p)=='HOST_16_GIB_RESERVE'
+for bad in [{},{**p,'reserveGiB':8},{**p,'totalObservedGiB':32}]:
+ try:f(35*g,'staged-memory-v1',bad);raise AssertionError('unsafe plan accepted')
+ except ValueError:pass
+`],{stdio:'pipe'});
+});
 it('compares full Docker identities without converting missing or malformed observations into preservation PASS',()=>{
  execFileSync('python3',['-c',`
 import importlib.util,tempfile,json

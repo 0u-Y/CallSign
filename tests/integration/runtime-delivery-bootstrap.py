@@ -7,6 +7,7 @@ p.add_argument('--root',type=Path,required=True)
 p.add_argument('--browser-cache',type=Path,required=True,help='Observer-only installed Chromium directory')
 p.add_argument('--apply',action='store_true')
 p.add_argument('--resume',action='store_true')
+p.add_argument('--start-policy',choices=['full-40-gib','staged-memory-v1'],default='full-40-gib')
 options=p.parse_args();r=options.root.resolve();delivery=options.delivery.resolve();run=r.name
 if not run.startswith('media-delivery-') or not r.is_relative_to(Path.cwd().resolve()/'.local'):raise SystemExit('OWNED_LOCAL_REHEARSAL_ROOT_REQUIRED')
 if not options.apply:
@@ -18,7 +19,11 @@ for required in ['tests/integration/runtime-media.test.ts','tests/integration/se
  if not Path(required).exists():raise SystemExit('OBSERVER_INPUT_MISSING:'+required)
 if not (options.browser_cache/'chromium-1243/chrome-linux64/chrome').is_file():raise SystemExit('INSTALLED_OBSERVER_CHROMIUM_REQUIRED_NO_DOWNLOAD')
 mem={k:int(v.split()[0]) for k,v in (line.split(':',1) for line in Path('/proc/meminfo').read_text().splitlines())}
-if mem['MemAvailable']<40*1024*1024:raise SystemExit('REHEARSAL_23_GIB_BUDGET_PLUS_16_GIB_HEADROOM_REQUIRED')
+if options.start_policy=='staged-memory-v1':
+ plan_dir=r.parents[2];plan=json.loads((plan_dir/'plan.json').read_text())
+ if Path((plan_dir/'full-root-path').read_text().strip())!=r or plan.get('startPolicy')!='staged-memory-v1' or plan.get('reserveGiB')!=16 or plan.get('totalObservedGiB')!=24 or not time.monotonic_ns()<plan['deadlineMonotonicNs']<=time.monotonic_ns()+90*60*10**9:raise SystemExit('EXPLICIT_STAGED_MEMORY_PLAN_REQUIRED')
+ if mem['MemAvailable']<16*1024*1024:raise SystemExit('HOST_16_GIB_RESERVE')
+elif mem['MemAvailable']<40*1024*1024:raise SystemExit('REHEARSAL_23_GIB_BUDGET_PLUS_16_GIB_HEADROOM_REQUIRED')
 checks={}
 for line in (delivery/'SHA256SUMS').read_text().splitlines():
  digest,name=line.split(None,1);name=name.strip();path=delivery/name

@@ -71,10 +71,17 @@ def read_cgroup(path):
     if current<0 or swap<0 or maximum!='0' or any(not math.isfinite(v) or v<0 for v in values) or any(events[k]<0 for k in ['oom','oom_kill']):raise ValueError('INVALID_CGROUP_OBSERVATION_OR_SWAP_LIMIT')
     return {'memoryCurrentBytes':current,'swapCurrentBytes':swap,'swapMax':maximum,'memoryEvents':events,'memoryPressure':pressure}
 
+def start_memory_reason(available, mode, plan):
+    if mode == 'staged-memory-v1':
+        if plan.get('startPolicy') != mode or plan.get('reserveGiB') != 16 or plan.get('totalObservedGiB') != 24:
+            raise ValueError('EXPLICIT_STAGED_MEMORY_PLAN_REQUIRED')
+        return 'HOST_16_GIB_RESERVE' if available < 16*1024**3 else None
+    return 'START_40_GIB_REQUIRED' if available < 40*1024**3 else None
+
 def main():
     sys.path.insert(0,str(Path(__file__).resolve().parent))
     from validation_resources import host_sample,SwapWatch,PRESSURE_POLICY,owned_rss,process_start
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--work-dir',type=Path,required=True);parser.add_argument('--policy',choices=[PRESSURE_POLICY],required=True);parser.add_argument('--browser-cache',type=Path,required=True);parser.add_argument('--apply',action='store_true');options=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--work-dir',type=Path,required=True);parser.add_argument('--policy',choices=[PRESSURE_POLICY],required=True);parser.add_argument('--start-policy',choices=['full-40-gib','staged-memory-v1'],default='full-40-gib');parser.add_argument('--browser-cache',type=Path,required=True);parser.add_argument('--apply',action='store_true');options=parser.parse_args()
     if not options.apply or os.environ.get('CALLSIGN_ALLOW_EXTERNAL_EXECUTION')!='integration':raise SystemExit('EXPLICIT_INTEGRATION_EXECUTION_REQUIRED')
     r=options.work_dir.resolve()
     if not r.is_relative_to(Path.cwd().resolve()/'.local') or r.stat().st_uid!=os.getuid() or r.stat().st_mode&0o077:raise SystemExit('OWNED_PRIVATE_WORK_DIRECTORY_REQUIRED')
@@ -197,7 +204,8 @@ def main():
     result={}
     try:
      first=host_sample();(r/'first-sample.json').write_text(json.dumps(first)+'\n')
-     if first['memAvailableBytes']<40*1024**3:stop='START_40_GIB_REQUIRED';raise RuntimeError(stop)
+     stop=start_memory_reason(first['memAvailableBytes'],options.start_policy,plan)
+     if stop:raise RuntimeError(stop)
      try:capture_baseline(evidence,'before')
      except Exception:stop='BASELINE_OBSERVATION_ERROR';raise
      began=time.monotonic()
@@ -205,7 +213,7 @@ def main():
       sample()
       if time.monotonic()-began>=60:break
       time.sleep(5)
-     action('bootstrap',[sys.executable,'tests/integration/runtime-delivery-bootstrap.py','--delivery',str(r/'delivery-final'),'--root',str(root),'--browser-cache',str(options.browser_cache.resolve()),'--apply'],600)
+     action('bootstrap',[sys.executable,'tests/integration/runtime-delivery-bootstrap.py','--delivery',str(r/'delivery-final'),'--root',str(root),'--browser-cache',str(options.browser_cache.resolve()),'--start-policy',options.start_policy,'--apply'],600)
      if plan.get('databaseAudit'):action('database-audit-start',[sys.executable,'tests/integration/runtime-db-audit.py','--root',str(root),'--output',str(root/'db-audit-start.json')],30)
      image=json.loads((root/'images-loaded.json').read_text())['CALLSIGN_APP_IMAGE'];extra={'CALLSIGN_RUNTIME_TEST_ROOT':str(root),'CALLSIGN_EXPECTED_RUNTIME_IMAGE':image}
      if any(not isinstance(plan.get(k),int) or not 0<=plan[k]<=(5 if k=='normalRepeatAttempts' else 2) for k in ['normalSmokeAttempts','normalRepeatAttempts']):raise RuntimeError('BOUNDED_TRIAL_PLAN_REQUIRED')

@@ -1,5 +1,7 @@
 # 로컬 검증 절차와 과거 준비 환경
 
+2026-11-05 메모리 실측 한정 예외: 사용자 승인 batch는 launcher의 `--start-policy staged-memory-v1`과 같은 값의 plan `startPolicy`를 함께 지정한다. 시작40GiB 검사만 가용16GiB 검사로 바꾸며, 60초 사전 관측·5초 실행 표본·소유 전체24GiB/host1GiB·가용16GiB·PSI/swap-out/OOM·90분 deadline은 유지한다. 내부 bootstrap에도 명시적으로 전달하고 root identity와 plan을 검사한다. 옵션을 생략한 일반 실행은 여전히 시작40GiB다. 부분 기동이나 fixture IdP 결과를 공개 지속 환경 전체의 RAM 요구량으로 보고하지 않는다.
+
 현재 DB 감사/복원 시험은 `scripts/validation-runtime-media.py`의 명시적 plan `databaseAudit`/`fullRestore`에서 선택한다. 시작 snapshot→정해진 통화→앱/worker 정리→DB가 살아 있는 최종 감사→기반 자원 정리 순서를 유지한다. 정상 반복은 최대5회·자동 재시도0으로 제한한다. `fullRestore`는 기존 암호화 bundle CLI와 현재 이미지에서 복사한 Node/코드, 기존 PostgreSQL 이미지의 native client를 사용하며 원본 fence·새 DB volume·정지한4개 Besu snapshot·독립 Anchor 보존을 요구한다. **이전 service-hardening 소스의 전체 RESTORE·복원 후 통화·양쪽 DB 감사는 PASS다. 새 지속 데모/provider 후보의 전체 RESTORE는 NOT_RUN이며 이전 PASS를 전용하지 않는다.** [실행 근거](../artifacts/restore-audit-20261105.json)를 확인한다. 별도 사용자의 실행 승인과 기존40GiB/24GiB/16GiB·압박/OOM/deadline 조건 없이 기동하지 않는다.
 
 
