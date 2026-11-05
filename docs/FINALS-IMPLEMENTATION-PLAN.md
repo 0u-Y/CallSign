@@ -2,6 +2,8 @@
 
 ## 2026-11-05 단계별 메모리 실측
 
+현재 실행 장소는 개발 서버의 전용 지속 환경으로 결정했고 AWS 이전은 후속이다. 이번 실측은 임시 환경이며 지속 환경으로 전환하지 않았다. [실측 원본 요약](../artifacts/staged-memory-20261105.json): 첫 시도는 중복 상태 문구의 observer strict locator 실패, 수신 상태 영역으로 수정 후 같은 원래 deadline에서 정상2·취소1·정지/공동복구1 통과(실행5, 성공4, 실패1). 소유 cgroup+host 5초 표본 최대4.557GiB, 호스트 가용 최소30.558GiB, 자원 중단 없음. Keycloak·공개 ingress·유료 AI·장시간 사용은 미포함이며 서비스 최소 RAM으로 확대하지 않는다. 최종 DB 감사는 overdue pending1건으로 FAIL; 미종료 통화0·미정산 예약0·소비 영수증4는 확인했다. 전체 PASS로 기록하지 않으며 원인 미확정 pending을 수동 삭제하지 않았다. 두 환경 소유 컨테이너/volume 정리 및 기존 interface/route/network/컨테이너 보존 비교 통과.
+
 사용자는 이번 새 소유 batch 1회에 한해 시작40GiB 대신 `--start-policy staged-memory-v1`을 승인했다. 가용16GiB·소유 전체24GiB·host1GiB·기존 PSI/swap-out/OOM 중단·90분/마지막10분 정리는 유지한다. 기본40GiB 정책과 과거 중단 기록은 변경하지 않는다. 동일 runtime과 기존 실제 통화 runner로 측정하며 실제 Keycloak/공개 ingress/외부 제공자는 포함되지 않는다. 기동·통화별 관측과 미포함 구성요소를 구분해 결과를 여기에 연결한다.
 
 ## 2026-11-05 첨부 디자인의 실제 이식
