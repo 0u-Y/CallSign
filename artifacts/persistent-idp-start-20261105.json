@@ -26,5 +26,21 @@
   "passwordsAndRealmNotPublished": true,
   "initialImportExitCode": 0,
   "normalLoginVerified": false,
-  "sameDeploymentRestartedAfterStop": false
+  "sameDeploymentRestartedAfterStop": false,
+  "manualResume20261106": {
+    "source": "9947da0ef10b8c0cda1f443825f2a08011b2735c",
+    "recordedAt": "2026-11-05T23:19:22.716579+00:00",
+    "authorization": "Explicit user continue and updated goal",
+    "normalStartExitCode": 0,
+    "realmImportRepeated": false,
+    "localReadiness": "UP",
+    "readinessPath": "/idp/health/ready",
+    "initialWrongReadinessPathStatus": 404,
+    "discoveryStatus": 200,
+    "issuerMatchesPreparedPublicOrigin": true,
+    "publicLoginVerified": false,
+    "originalStopPreserved": true,
+    "automaticRestart": false,
+    "paidCalls": 0
+  }
 }

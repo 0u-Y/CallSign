@@ -8,7 +8,7 @@
 |---|---|---|---|
 | 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 현재 공개 `publicPreview:true` |
 | 공개 API·분석 WSS | 직접 Funnel HTTPS/WSS 진단 성공. [Vercel rewrite](../artifacts/vercel-ingress-transport-20261105.json)는 HTTPS200/WSS404 | 실제 backend 인증·cookie·CSRF·WS 연결 | Vercel 주소 유지 또는 서비스 도메인 이동의 배치 결정 |
-| 실제 로그인 | 영속 IdP DB 준비·NEW import exit0, [감시 오류 후 소유 컨테이너 중지](../artifacts/persistent-idp-start-20261105.json) | 기존 DB의 정상 Keycloak 기동·공개 callback·역할 로그인 | 원본 latch를 보존한 중단 후 재개 승인 대기 |
+| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·realm discovery200. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | 공개 HTTPS callback·역할별 로그인 | 공개 IdP/API 경로 연결 필요; realm import 반복 금지 |
 | 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 지속 backend·미디어 경로 미검증 |
 | 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
 | 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
