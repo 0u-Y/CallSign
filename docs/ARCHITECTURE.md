@@ -1,6 +1,6 @@
 # 시스템 아키텍처
 
-기본 제품은 `/service` → `/v3`의 등록 URI·교환기 통화 경로다. 이 문서는 구성·키·데이터·신뢰 경계를 설명한다. 요구는 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 데이터 형식은 [프로토콜](PROTOCOL.md), 실제 실행 범위는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), 설정·기동은 [RUNBOOK](RUNBOOK.md)이 기준이다.
+현재 데모 진입점은 `/demo/call`·`/demo/governance`이며 기존 `/service` → `/v3`의 등록 URI·교환기 통화 로직을 재사용한다. 이 문서는 구성·키·데이터·신뢰 경계를 설명한다. 요구는 [MASTER](MASTER-DEVELOPMENT-SPEC.md), 데이터 형식은 [프로토콜](PROTOCOL.md), 실제 실행 범위는 [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), 설정·기동은 [RUNBOOK](RUNBOOK.md)이 기준이다.
 
 ## 확정 기본 서비스와 이행 상태
 
@@ -38,7 +38,7 @@ Asterisk는 음성 종단이므로 PBX와 그 운영자는 신뢰 대상이다. 
 
 ## 분석과 신뢰 경계
 
-수신한 상대 remote stream만 동의 후 분석 경로에 보낸다. Deepgram STT adapter는 음성→전사, 규칙·Anthropic adapter는 전사/목적 정책→위험 근거를 처리한다. 동의·세션·revision이 바뀌면 추가 전송과 늦은 결과 반영을 차단한다. 외부 제공자 품질·보관·취소·비용 조건은 미검증이다.
+수신한 상대 remote stream만 동의 후 분석 경로에 보낸다. Deepgram STT adapter는 음성→전사, 규칙·OpenAI adapter(선택 Anthropic)는 전사/목적 정책→위험 근거를 처리한다. 동의·세션·revision이 바뀌면 추가 전송과 늦은 결과 반영을 차단한다. 외부 제공자 품질·보관·취소·비용 조건은 미검증이다.
 
 웹 코드·trust bundle 배포자, 등록 기관/콜센터·PBX·Witness 키, 브라우저/OS, DB/Anchor 운영자는 여전히 신뢰 경계다. Witness 정족수는 native chain proof가 아니고, 한 호스트의 여러 validator/Witness는 독립 운영기관의 장애 내성을 입증하지 않는다. [위협 모델](THREAT-MODEL.md)을 따른다.
 
@@ -82,7 +82,7 @@ journal 전체 순번·hash chain·권한 metadata와 독립 Anchor를 대조한
 
 [기본 Compose](../infra/deploy/compose.yml), [PBX overlay](../infra/deploy/compose.pbx.yml), [AWS override](../infra/deploy/compose.aws.yml), [별도 Anchor](../infra/deploy/compose.anchor.yml)를 사용한다. DB/RPC/ARI는 내부 전용이고 브라우저 공개 origin과 내부 DNS를 구별한다. `SERVICE_EXTRA_CA_PATH`는 공개 CA bundle이며 서버 역할에만 mount한다. 서비스 시작과 readiness도 구별한다.
 
-대회 대상은 AWS다. 개발 서버의 IP·파일·DB·Anchor·로그인·이미지 제공 경로에 의존하지 않는다. GitHub Release/비공개 GHCR 전달과 실제 AWS 운영은 별도 단계이며 [현재 고정 버전·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 관리한다. NEW는 새 identity를 준비하고, 일반 재시작/RESTORE는 기존 키·genesis·epoch·소비 이력을 초기화하지 않는다. GCP/Vercel 구성은 과거 보존물이다.
+현재 실행 대상은 서버컴 전용 지속 환경이며 AWS 이전은 후속이다. 환경별 주소·보호 파일·영속 데이터를 소스에 하드코딩하지 않는다. GitHub Release/비공개 GHCR 전달과 실제 AWS 운영은 별도 단계이며 [현재 고정 버전·수령 절차](RUNBOOK.md#github-delivery-20261102)에서 관리한다. NEW는 새 identity를 준비하고, 일반 재시작/RESTORE는 기존 키·genesis·epoch·소비 이력을 초기화하지 않는다. GCP 구성은 과거 보존물이고, Vercel은 현재 공개 데모 frontend로 실제 backend 연결을 준비 중이다.
 
 <details>
 <summary>초기 시청 시연의 구성 기록</summary>

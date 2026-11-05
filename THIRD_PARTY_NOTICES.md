@@ -1,6 +1,6 @@
 # Third-party notices
 
-JavaScript 의존성의 정확한 버전은 `pnpm-lock.yaml` 및 `package.json`이 기준이다. Besu·PostgreSQL·Asterisk·coturn·nginx 등 별도 이미지의 provenance는 [배포 inventory와 절차](docs/RUNBOOK.md#github-delivery-20261102), 공급 고지는 해당 이미지/원본의 LICENSE를 확인한다. 이 고지 목록은 프로젝트 자체의 LICENSE를 부여하지 않는다.
+JavaScript 의존성의 정확한 버전은 `pnpm-lock.yaml` 및 `package.json`이 기준이다. Besu·PostgreSQL·Asterisk·coturn·nginx·Keycloak 등 별도 이미지의 provenance는 [배포 inventory와 절차](docs/RUNBOOK.md#github-delivery-20261102), 공급 고지는 해당 이미지/원본의 LICENSE를 확인한다. 이 고지 목록은 프로젝트 자체의 LICENSE를 부여하지 않는다.
 
 - Radix UI Primitives, Copyright WorkOS, MIT License
 - Lucide, Copyright Lucide Contributors, ISC License

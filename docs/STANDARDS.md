@@ -1,6 +1,6 @@
 # 표준과 적용 범위
 
-2026-10-26 공식 원문 확인. 아래는 CallSign이 채택한 데이터·서명 형식이며 상호운용 인증이나 전체 적합성 시험 통과 주장이 아니다.
+2026-10-26 기본 표준 원문 확인, 2026-11-05 OpenAI 연결 형식과 현재 실행 경계 대조. 아래는 CallSign이 채택한 데이터·서명 형식이며 상호운용 인증이나 전체 적합성 시험 통과 주장이 아니다.
 
 | 공식 원문 | 적용 |
 |---|---|
@@ -11,7 +11,8 @@
 | [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) | JCS UTF-8 bytes의 SHA-256, 소문자 64자 hex. 배열 순서는 의미가 있으며 그대로 유지 |
 | [EIP-712](https://eips.ethereum.org/EIPS/eip-712) | 계약의 등록·복구·정책/공식 경로·콜센터 키 관리 명령을 domain/chain/registry/action·정확한 변경 내용·nonce/만료에 결합. 주요 관리 3명 중 2명 승인 |
 | [TURN REST 초안](https://datatracker.ietf.org/doc/html/draft-uberti-behave-turn-rest-00) | 만료시각을 포함한 username과 HMAC-SHA1 단기 credential. 만료된 Internet-Draft이며 정식 RFC로 표현하지 않음 |
-| [Deepgram Listen streaming](https://developers.deepgram.com/reference/speech-to-text/listen-streaming) | 서버 전용 Token 인증 WSS, Results의 start/is_final/transcript, KeepAlive. 실제 제공자 호출/한국어 모델 호환은 미검증 |
+| [Deepgram Listen streaming](https://developers.deepgram.com/reference/speech-to-text/listen-streaming) | 서버 전용 Token 인증 WSS, Results의 start/is_final/transcript, KeepAlive. 직접 합성 한국어 음원의 제한된 전사는 관측했으며 실제 통화 remote-track 전체 경로·품질은 미검증 |
+| [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) | Responses adapter의 `text.format` JSON schema·strict 출력과 로컬 근거 검증. 형식 준수는 사실성·위험 탐지 정확도 보장이 아님. 제한된 텍스트 smoke와 제품 음성 전체 경로를 구분 |
 | [Anthropic Messages](https://platform.claude.com/docs/en/api/beta/messages/create), [인증](https://platform.claude.com/docs/en/manage-claude/authentication) | 서버 전용 Messages HTTP adapter, system과 untrusted user transcript 분리, 도구 미제공·출력 근거 검사. 실제 호출은 미실행 |
 
 `CallSignRegistryStatus`와 사용자 정의 어휘는 프로젝트 전용이다. 기존 직접 통화는 `urn:callsign:v2:`, 등록 주소 기반 서버 확장은 `urn:callsign:delegation:v1:`를 사용한다. 이 문자열의 숫자는 어휘 식별자이며 통화 형식 번호와 별개다. W3C Bitstring Status List를 구현했다고 주장하지 않는다. JSON-LD 문맥은 코드에서 고정하고 원격 context를 다운로드하지 않는다. policyHash는 `PurposePolicy` 전체의 JCS hash, VC digest는 서명 전 VC payload 전체의 JCS hash다. compact JWS 바이트나 JWT header의 hash가 아니다.

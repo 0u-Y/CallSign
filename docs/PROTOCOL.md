@@ -10,7 +10,7 @@
 |---|---|---|
 | 초기 시연 경로 | `version=1`, [서명 형식 코드](../packages/protocol/src/index.ts) | 시청 사례·생성 음원·브라우저 직접 통화. 2026-09-14 증거와 회귀 시험을 보존한다. |
 | 역할 분리 직접 통화 경로 | `version=2`, `/v2`, [직접 통화 형식](../packages/protocol/src/finals.ts) | 기관 승인자·발신 대행·플랫폼을 분리한 업무 화면. `/finals` 호환 화면에서만 사용한다. DID 조회와 짧은 승인 만료에 통화가 종속되는 제약이 남아 있다. |
-| 통화 유지·PBX 경로 | `version=3`, `/v3`, [교환기·유지 형식](../packages/protocol/src/service.ts) | 등록 기관 주소·키, 최초 연결 시작과 통화 유지 허가 분리, Asterisk 교환기 증거. 기본 `/service` 화면·서버·SDK·PBX/worker·배포 코드에 연결했다. 선택한 실제 원장·DB·PBX 연결은 검증했고 외부 IdP/AI·AWS는 미검증이다. [실행 범위](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. |
+| 통화 유지·PBX 경로 | `version=3`, `/v3`, [교환기·유지 형식](../packages/protocol/src/service.ts) | 등록 기관 주소·키, 최초 연결 시작과 통화 유지 허가 분리, Asterisk 교환기 증거. 현재 데모와 `/service`가 공유하는 화면·서버·SDK·PBX/worker·배포 코드에 연결했다. 선택한 실제 원장·DB·PBX 연결은 검증했고 공개 IdP·실제 통화의 외부 AI 경로는 미검증이며 AWS는 후속 범위다. [실행 범위](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. |
 
 세 경로는 입력 형식을 엄격하게 구별하며 실패했다고 이전 형식으로 자동 전환하지 않는다. 모든 경로는 같은 기관·승인 ID의 이중 사용을 막는 공통 SQL 소비 namespace를 사용한다. 선택한 실제 PostgreSQL 경합·동일 binding 재시도는 검증했으며 [DB 증거](../artifacts/local-postgres-result-20261029.json)를 따른다.
 
@@ -49,7 +49,7 @@ PBX는 양측 웹↔Asterisk PJSIP/WSS+ARI↔웹이다. browser report는 각 �
 
 통화 유지·PBX 경로 verifier는 Witness 관측 age<8초/미래 오차≤1초로 검사한다. 각 시계 오차≤1초일 때 최대10초를 목표로 하는 정책이며 미측정이다. `service-current.ts` checkpoint는 기관 transaction의 DB aggregate에 보존하고 낮은 높이/같은 높이 다른 hash/state/clock rollback을 거절한다. 복원 gate·공통 소비 식별 범위 SQL·독립 HTTPS Anchor/CAS·영속 worker를 연결했다. 선택한 실제 PG 경합·CAS·앱 복원은 검증했고 외부 CAS/DB의 분산 원자성이나 전체 체인 복원을 뜻하지 않는다.
 
-초기 시연·역할 분리 직접 통화·통화 유지/PBX의 세 형식은 별도 strict 진입점이며 자동 downgrade하지 않는다. 추가 서버 API는 `/v3`이며, 기본 화면은 `/service`, 배포 설정과 서버 호출은 `/v3`를 사용한다. `/finals`만 이전 직접 통화 호환 경로다. SDK 파일 존재·타입 통과만으로 전체 연결 완료라고 보지 않는다. [현행 구현·검증 범위](guide/05-IMPLEMENTATION-STATUS.md).
+초기 시연·역할 분리 직접 통화·통화 유지/PBX의 세 형식은 별도 strict 진입점이며 자동 downgrade하지 않는다. 추가 서버 API는 `/v3`이며, 데모 진입점은 `/demo/call`·`/demo/governance`, 기존 인증 callback은 `/service`, 배포 설정과 서버 호출은 `/v3`를 사용한다. `/finals`만 이전 직접 통화 호환 경로다. SDK 파일 존재·타입 통과만으로 전체 연결 완료라고 보지 않는다. [현행 구현·검증 범위](guide/05-IMPLEMENTATION-STATUS.md).
 
 ## 공동 설정·정책과 상태 증언
 
