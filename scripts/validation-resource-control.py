@@ -17,7 +17,7 @@ def identity(state):
 
 def db_info(data):
     info=json.loads(subprocess.check_output(['docker','inspect',data['containerId']],timeout=3,stderr=subprocess.DEVNULL))[0]
-    if info['Id']!=data['containerId'] or info['Config']['Labels'].get('callsign.test')!=data['runId'] or info['HostConfig']['NetworkMode']!='none' or info['HostConfig']['PortBindings']:raise RuntimeError('OWNED_NONE_DATABASE_REQUIRED')
+    if info['Id']!=data['containerId'] or info['Config']['Labels'].get('callsign.test')!=data['runId'] or info['Config']['Labels'].get('org.callsign.lifecycle')=='persistent' or info['HostConfig']['NetworkMode']!='none' or info['HostConfig']['PortBindings']:raise RuntimeError('OWNED_NONE_DATABASE_REQUIRED')
     if not 0<info['HostConfig']['Memory']<=512*1024**2 or not 0<info['HostConfig']['NanoCpus']<=1_000_000_000 or not 0<info['HostConfig']['MemorySwap']<=512*1024**2:raise RuntimeError('DATABASE_BUDGET_NOT_ENFORCED')
     return info
 

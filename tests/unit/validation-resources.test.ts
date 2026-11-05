@@ -3,6 +3,21 @@ import {it,expect} from 'vitest';
 import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
+it('refuses a persistent database even when its full ID and trial label collide',()=>{
+ execFileSync('python3',['-c',`import ast,json
+from pathlib import Path
+from types import SimpleNamespace
+tree=ast.parse(Path('scripts/validation-resource-control.py').read_text());fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='db_info')
+info={'Id':'same-id','Config':{'Labels':{'callsign.test':'unit-run'}},'HostConfig':{'NetworkMode':'none','PortBindings':{},'Memory':536870912,'MemorySwap':536870912,'NanoCpus':1000000000}}
+scope={'json':json,'subprocess':SimpleNamespace(DEVNULL=None,check_output=lambda *a,**kw:json.dumps([info]))}
+exec(compile(ast.Module(body=[fn],type_ignores=[]),'database-ownership-check','exec'),scope)
+data={'containerId':'same-id','runId':'unit-run'};scope['db_info'](data)
+info['Config']['Labels']['org.callsign.lifecycle']='persistent'
+try:scope['db_info'](data)
+except RuntimeError:pass
+else:raise AssertionError('persistent database accepted by trial control')
+`],{stdio:'pipe'});
+});
 it('uses interval deltas, actual elapsed time/page size and a baseline; counter reset never means swap pressure',()=>{
  execFileSync('python3',['-c',`
 from scripts.validation_resources import SwapWatch
