@@ -20,15 +20,15 @@
 
 ## 사실과 경계
 
-역할은 서버 세션으로 결정한다. 합성 상태는 시험에만 사용한다. 공개 프런트엔드에서 API가 없으면 로그인·통화 불가를 표시하며 성공 화면으로 대체하지 않는다. AWS는 실제 인증·통화 runtime이고 Vercel 공개 배포는 연결이 확인되기 전까지 프런트엔드 미리보기다.
+역할은 서버 세션으로 결정한다. 합성 상태는 시험에만 사용한다. 공개 프런트엔드에서 API가 없으면 로그인·통화 불가를 표시하며 성공 화면으로 대체하지 않는다. 현재 실행 대상은 서버컴의 전용 지속 backend다. Vercel 공개 배포는 실제 연결이 확인되기 전까지 프런트엔드 미리보기다. AWS 이전은 이번 목표에서 제외한다.
 
 참고 패턴은 [기존 조사](docs/DESIGN-REFERENCES.md)의 task/list-detail, summary/details, persistent warning, status message를 사용한다. 외형이나 라이브러리를 복제하지 않는다.
 
 ## 2026-11-05 실제 데모 작업면
 
-사용자 제공 `docs/CallSign_Demo_Design.html`의 시각 방향을 `/demo/call`, `/demo/governance`에 적용한다. 기존 `/service` 작업면은 유지하며 같은 ServicePage/controller를 공유한다. `/service` callback과 `/official`의 별도 인증 문맥은 보존한다. 원본 HTML/PDF는 검토 입력이며 Git 추적 대상에 넣지 않는다.
+반영 기준 HTML의 SHA-256은 `9af0f3b42548b6a259baba4286a195c3335b2a8fa8b375535f1436a2c6c90257`이다. 최종 인계 전 다시 비교한다. 사용자 제공 `docs/CallSign_Demo_Design.html`의 시각 방향을 `/demo/call`, `/demo/governance`에 적용한다. 기존 `/service` 작업면은 유지하며 같은 ServicePage/controller를 공유한다. `/service` callback과 `/official`의 별도 인증 문맥은 보존한다. 원본 HTML/PDF는 검토 입력이며 Git 추적 대상에 넣지 않는다.
 
-- 연락은 왼쪽 기관·상담원 조작, 중앙 현재 상태·실제 분석 근거, 오른쪽 녹색 휴대폰 프레임으로 구성한다. 모바일은 휴대폰→현재 상태·분석 근거→기관 조작 순이다. 휴대폰 상단 경고는 중앙의 근거 발언과 대응 안내로 연결하며, 진행 통화의 종료 막대는 스크롤 중에도 sticky로 유지한다.
+- 연락은 왼쪽 기관·상담원 조작, 중앙 수평 처리 안내·실제 전사, 오른쪽 녹색 휴대폰의 통화·분석 프레임으로 구성한다. 모바일은 휴대폰→현재 상태·분석 근거→기관 조작 순이다. 휴대폰 상단 경고는 같은 휴대폰의 근거 발언과 대응 안내로 연결하며, 진행 통화의 종료 막대는 스크롤 중에도 sticky로 유지한다.
 - 공동 관리는 변경 검토·독립 승인 / 네 노드 관측 / 서비스 반영을 나란히 두고, 하단에서 관리 승인·원장·Witness/서비스의 세 계층을 설명한다. 모바일은 변경 검토→노드→서비스 반영 순이다.
 - 옅은 청회색 바탕·흰 작업 면·남색 본문·파란 주요 행동과 기존 로고·Noto Sans KR을 사용한다. 휴대폰에는 옅은 녹색 면과 짙은 녹색 테두리를 사용하고, 경고는 호박/적색과 문구로 구분한다. 큰 목적 제목과 접을 수 있는 기술 상세를 유지한다.
 - HTML의 합성 타이머·상태 전환·승인자 역할 전환·전체 초기화는 이식하지 않는다. 제품 작업면은 실제 props와 기존 controller/API/서버 세션 경계를 따른다.
@@ -42,6 +42,7 @@
 | 화면 요소 | 실제 데이터 출처 | 실행 권한 | 갱신 방식 | 미확인 시 표시 |
 |---|---|---|---|---|
 | 업무·기관·목적 | `/v3/workspace` | 현재 기관/상담원/수신자 scope | 기존 5초 polling, 수동 재조회 | 이전 목록 숨김·현재성 미확인 |
+| 중앙 전사 | 분석 WS의 실제 transcript revision | 수신자의 분석 동의·현재 세션 | stream/segment/revision 검사·정정 반영 | 전사 대기; 철회·종료 시 삭제 |
 | 승인·연결·분석 | 기존 ServiceCall callback, 서명/lease/WS 검증 | 해당 통화 actor 세션 | 실제 controller 이벤트 | 미확인·분석 불가를 성공과 구분 |
 | 취소·회수 | 기존 cancel/recalls API | contact.manage | 실제 요청·기존 회수 조회 | 요청·서버 적용·PBX 관측 분리 |
 | 공동 변경·승인자 | `/v3/management`·기존 configuration review | 기관 관리/독립 승인 permission | 기존 3초 polling·서명 검증·제출 | 승인 대기·조회 실패 |
@@ -53,4 +54,4 @@
 
 통화 작업면과 관리 작업면은 하나의 parent route 아래 유지한다. 숨긴 작업면을 unmount하지 않고 audio를 공통 위치에 두어 탐색만으로 controller를 닫지 않는다. 새로고침은 기존 WebRTC를 복원한 것처럼 표시하지 않는다. 실제 브라우저/미디어 검증 범위는 최신 실행 기록을 따른다.
 
-시각 확인 자료는 [연락 desktop](artifacts/service-hardening-20261105/design-html-demo-call-1366.png), [390px](artifacts/service-hardening-20261105/design-html-demo-call-390.png), [공동 관리](artifacts/service-hardening-20261105/design-html-demo-governance-1366.png), [합성 경고 컴포넌트](artifacts/service-hardening-20261105/design-html-component-warning-390.png)다. 제품 캡처는 API 미연결·로그인 전 화면이며 인증된 세션의 증거가 아니다. 경고 컴포넌트는 합성 props를 사용한 시각 검토 전용으로 실제 로그인·API·통화 결과가 아니다. 이 자료로 공개 로그인, WebRTC 연결이나 분석 제공자 품질의 통과를 주장하지 않는다.
+시각 확인 자료는 [연락 desktop](artifacts/service-hardening-20261105/latest-demo-call-1366.png), [390px](artifacts/service-hardening-20261105/latest-demo-call-390.png), [공동 관리](artifacts/service-hardening-20261105/latest-demo-governance-1366.png), [합성 경고 컴포넌트](artifacts/service-hardening-20261105/design-html-component-warning-390.png)다. 제품 캡처는 API 미연결·로그인 전 화면이며 인증된 세션의 증거가 아니다. 경고 컴포넌트는 합성 props를 사용한 시각 검토 전용으로 실제 로그인·API·통화 결과가 아니다. 이 자료로 공개 로그인, WebRTC 연결이나 분석 제공자 품질의 통과를 주장하지 않는다.

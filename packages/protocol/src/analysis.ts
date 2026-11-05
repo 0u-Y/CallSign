@@ -8,3 +8,9 @@ export const serviceAnalysisSchema=riskAnalysisSchema.extend({purpose:purposeAss
 export type ServiceAnalysis=z.infer<typeof serviceAnalysisSchema>;
 export const serviceAnalysisEventSchema=z.object({streamId:z.string().min(1).max(100),segmentId:z.string().max(100),revision:z.number().int().nonnegative(),contextRevision:z.number().int().positive(),eventSequence:z.number().int().positive(),contextId:z.string().regex(/^[0-9a-f]{64}$/),dependencies:z.array(z.object({segmentId:z.string().max(100),revision:z.number().int().positive()}).strict()).max(6),policyHash:z.string().regex(/^[0-9a-f]{64}$/),policyVersion:z.number().int().positive(),analyzerVersion:z.literal('purpose-context-1'),status:z.enum(['partial','analyzing','analyzed','unavailable','withdrawn']),engine:z.string().max(40),signals:riskAnalysisSchema.shape.signals,purpose:purposeAssessmentSchema}).strict();
 export type ServiceAnalysisEvent=z.infer<typeof serviceAnalysisEventSchema>;
+
+export const transcriptRevisionSchema = z.object({
+  streamId: z.string().min(1).max(100), segmentId: z.string().min(1).max(100), revision: z.number().int().positive(),
+  final: z.boolean(), text: z.string().max(4000), source: z.literal("remote"),
+}).strict();
+export type TranscriptRevision = z.infer<typeof transcriptRevisionSchema>;

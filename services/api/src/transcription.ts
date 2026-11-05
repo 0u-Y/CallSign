@@ -3,11 +3,8 @@ import { z } from "zod";
 import type { PurposePolicy } from "@callsign/protocol";
 import { analyzeWithRules, riskAnalysisSchema, type RiskAnalysis } from "./risk.js";
 
-export const transcriptRevisionSchema = z.object({
-  streamId: z.string().min(1).max(100), segmentId: z.string().min(1).max(100), revision: z.number().int().positive(),
-  final: z.boolean(), text: z.string().max(4000), source: z.literal("remote"),
-}).strict();
-export type TranscriptRevision = z.infer<typeof transcriptRevisionSchema>;
+import {transcriptRevisionSchema,type TranscriptRevision} from '@callsign/protocol';
+export {transcriptRevisionSchema,type TranscriptRevision};
 export interface RiskEvent { segmentId: string; revision: number; status: "partial" | "analyzed" | "unavailable" | "withdrawn"; engine: string; signals: RiskAnalysis["signals"] }
 export class RevisionAnalyzer {
   private readonly segments = new Map<string, TranscriptRevision>();
