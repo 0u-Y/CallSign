@@ -1777,5 +1777,265 @@
       "limitations": "Bridge-based optional deployment overlay must not be started on this protected development host. Actual Keycloak import, login and restart remain NOT_RUN.",
       "offlineChecks": "pnpm light: 69 files / 350 tests PASS; offline Compose interpolation PASS. No service start."
     }
+  },
+  "designHtmlIntegration": {
+    "recordedAt": "2026-11-05T11:03:56.287270+00:00",
+    "sourceBase": "87c59945b206e99505d61b633f96946682b895d3",
+    "runtimeProductSource": "ce9f5011260272d12cf07efc9a0c9d88b3bee21d",
+    "observerSource": "537ec9c19b353626abbf883a8628bed43c11a52b",
+    "designInput": {
+      "name": "CallSign_Demo_Design.html",
+      "sha256": "ea3549d54c9ea46e779e3752141491efef8dc517c31911dc3de00fe2ebaee127",
+      "inspected": "Rendered supplied HTML at1366/390px and opened actual reference screenshots",
+      "tracked": false,
+      "prototypeTimersAndFakeCommands": "NOT_PORTED"
+    },
+    "requirementsInput": {
+      "name": "CallSign_서비스기획서_5차멘토링반영_최종설계.pdf",
+      "sha256": "3c01469215151df32dd4f0e26ceaa1caedc0429538ca3c03c02939b6cf6b7254",
+      "tracked": false
+    },
+    "ui": {
+      "status": "PASS_LOCAL_DISCONNECTED_AND_COMPONENT_VISUAL_ONLY",
+      "screenshots": [
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-demo-call-1366.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "c8aada43dff134cbd8b84a58700971a759c3201de1cdd7fb7b8722c2493aa7b1"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-demo-call-390.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "638e6dccc9c1e7ba0d45ea71a38edd2a7b80e8586448fa36b3901afc1a71310c"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-demo-governance-1366.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "92e17c0d80455048ce3beb49b6984ed1f2f065e48fb99b5a996d661a6bae7287"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-demo-governance-390.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "4cd1f24815cfaab57310c1eb7f5298ecf6a81171862a8ce933c36ab00a15086b"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-official-1366.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "71ce45275fa87eb50a9727bc738465c9212e113d0acfc5cfc05c4f167648ca38"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-official-390.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "37cfedc874ede5f4f9cf4d5712cf5fedf9057dadc23093c3d9dc615cf56bbaae"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-component-warning-1366.png",
+          "scope": "synthetic component visual review only",
+          "sha256": "e3a264098abd0252fab5f8c58c7a7e78031c15a0d2705fc8b46eda1abcac18c6"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-component-warning-390.png",
+          "scope": "synthetic component visual review only",
+          "sha256": "70598257d44c98c1acbd15d17a4700422b021c884b14e8c8142c787ca2baee0d"
+        },
+        {
+          "path": "artifacts/service-hardening-20261105/design-html-call-css-2x.png",
+          "scope": "actual local product frontend disconnected from API; not auth/call proof",
+          "sha256": "29dd75aaf7848fd9f7fc0817cf7e11f94b48ad247d6032616a232af99763e9e3"
+        }
+      ],
+      "review": "Pinned composition visually coherent; early phone warning finding resolved in final captures. Static visual scope only.",
+      "productInteractions": [
+        "navigation/back",
+        "drawer Escape and eventual focus return",
+        "390px overflow check"
+      ],
+      "firstConfirmationFailure": {
+        "status": "FAIL",
+        "reason": "Focus test checked synchronously after asynchronous Radix close; corrected to wait for actual focused trigger within1s. Original failure retained."
+      },
+      "authenticatedDemo": "NOT_RUN",
+      "actualWebrtcAcrossRoutes": "BLOCKED_START_40_GIB_REQUIRED",
+      "verificationCodeSource": "ce9f5011260272d12cf07efc9a0c9d88b3bee21d",
+      "vercel": {
+        "source": "ddef57b4d6698c225c5f730d3ddb912a0b94cc3c",
+        "deployment": "dpl_211vL4SvJrDZwXir4xeA9MZ7Rhio",
+        "status": "READY",
+        "metadataMatchesSource": true,
+        "permissionsPolicy": "camera=(), microphone=(self), geolocation=()",
+        "scope": "Actual remote HTTP metadata/header verification. Source-equivalent local screenshots; final remote DOM/browser not recaptured in this batch."
+      }
+    },
+    "confirmedDefects": [
+      {
+        "scope": "API analysis",
+        "before": "A provider could classify explicit negated/quoted demands as a current risk solely because quoted text exists. Periods inside quotes also split corrections incorrectly.",
+        "fix": "Shared current-evidence gate rejects quoted/negated demand context; sentence splitting respects balanced quotes; quoted correction words do not retract real demands.",
+        "validation": "Focused regressions and pnpm light PASS; no universal Korean semantic guarantee."
+      },
+      {
+        "scope": "Vercel deployment policy",
+        "before": "microphone=() disabled first-party microphone use even if backend later connects",
+        "fix": "microphone=(self), camera/location remain disabled; no automatic permission request",
+        "validation": "Configuration reviewed; actual remote response to be checked after deployment."
+      }
+    ],
+    "newProviderExecutions": {
+      "openai": {
+        "logicalAttempts": 3,
+        "retries": 0,
+        "http200": 2,
+        "timeout": 1,
+        "rows": [
+          {
+            "id": "normal-diagnostic",
+            "status": "FAILED",
+            "httpStatus": null,
+            "usage": null,
+            "failure": "TimeoutError",
+            "elapsedMs": 4001.6237699999997
+          },
+          {
+            "id": "normal-after",
+            "status": "PASS_CONTRACT",
+            "httpStatus": 200,
+            "usage": {
+              "inputTokens": 578,
+              "outputTokens": 80
+            },
+            "usagePriceEstimateUsd": 0.0007935,
+            "result": {
+              "signals": [],
+              "recommendedAction": "별도 인증한 공식 업무 화면에서 확인하세요.",
+              "limitations": "최근 상대방 발화만 분석한 보조 안내이며 통화 전체의 안전 판정이 아닙니다.",
+              "purpose": {
+                "relation": "not-detected",
+                "evidenceSpan": "어제 오후 세 시 해외 가맹점 결제는 본인이 하셨나요?",
+                "reason": "Allowed question asking whether the user attempted a transaction; no forbidden request is present."
+              },
+              "validatedEvidence": true
+            },
+            "elapsedMs": 3530.449445
+          },
+          {
+            "id": "purpose-after",
+            "status": "PASS_CONTRACT",
+            "httpStatus": 200,
+            "usage": {
+              "inputTokens": 575,
+              "outputTokens": 71
+            },
+            "usagePriceEstimateUsd": 0.00075075,
+            "result": {
+              "signals": [],
+              "recommendedAction": "별도 인증한 공식 업무 화면에서 확인하세요.",
+              "limitations": "최근 상대방 발화만 분석한 보조 안내이며 통화 전체의 안전 판정이 아닙니다.",
+              "purpose": {
+                "relation": "not-detected",
+                "evidenceSpan": "",
+                "reason": "The transcript is a loan-product offer, which is unrelated to the approved fraud-confirmation purpose and does not match a forbidden request category."
+              },
+              "validatedEvidence": true
+            },
+            "elapsedMs": 2876.4379449999997
+          }
+        ],
+        "developmentCasesOnly": true,
+        "knownUsagePriceEstimateUsd": 0.00154425,
+        "timeoutInvoice": "UNKNOWN_NOT_ZERO",
+        "finding": "Normal repeat has no risk signal. Loan solicitation still returns not-detected despite reason saying unrelated to purpose; unresolved semantic classification defect/quality limit. No more paid retries or model tuning performed."
+      },
+      "deepgram": {
+        "connections": 1,
+        "status": "PASS_TRANSCRIPTION_OBSERVED",
+        "audioSeconds": 11.426,
+        "inputSha256": "cef1eaa95579ba0ad1a6eea6823d38f7a9b7e9db1c941612ac5d262e4870f612",
+        "generator": "Installed espeak-ng ko, offline, user-authorized synthetic audio; no paid TTS",
+        "observedFinalTexts": [
+          "",
+          "",
+          "그런데 저금리에 부산분도 안내해드리겠습니다."
+        ],
+        "sentBytes": 37197,
+        "priceEstimateUsd": 0.0014663366666666667,
+        "scope": "Direct existing STT adapter only. First two utterances produced empty finals; last transcription contains errors. Not human speech quality or remote-track/product-screen validation."
+      },
+      "combinedFirstSmoke": {
+        "approvedMaximumUsd": 0.1,
+        "llmLogicalAttemptsIncludingPrior": 6,
+        "llmRetries": 0,
+        "knownCombinedUsagePriceEstimateUsd": 0.005727836666666667,
+        "timeoutReservedEstimateUsd": 0.027726,
+        "actualInvoice": "NOT_OBSERVED",
+        "remainingLlmRequestsUnderOriginalSixRequestPlan": 0,
+        "sttConnectionsUsed": 1,
+        "sttAudioSecondsUsed": 11.426,
+        "noUnlimitedPersistentAiApproval": true
+      }
+    },
+    "persistentService": {
+      "status": "NOT_STARTED",
+      "publicOidc": "NOT_CONNECTED",
+      "externalMedia": "NOT_RUN",
+      "nodeRegistrationAuthorizedByUser": true,
+      "accountAuthenticationConnection": "NOT_PROVIDED; enrollment page HTTP200 requires account sign-in. User authorization does not supply account authentication.",
+      "keycloak": "Verified5 partial blob hashes; resource-stopped download not resumed without pending one-resume answer.",
+      "nodeRegistrationResult": "USER_NODE_APPROVAL_REQUIRED",
+      "ownedIngressDaemonStopped": true,
+      "ingressStatePreserved": true,
+      "publicEndpointCreated": false
+    },
+    "runtime": {
+      "source": "ce9f5011260272d12cf07efc9a0c9d88b3bee21d",
+      "configId": "sha256:e8e47edcd7ff05b217cc716a3339159148bae8b576dd526fc1d8b8801051d5c7",
+      "status": "BUILT_AUDITED_NOT_RUNTIME_VERIFIED",
+      "auditStatus": "PASS_WITH_REVIEW",
+      "matchedInputFiles": 221,
+      "architecture": "linux/amd64",
+      "user": "1000:1000",
+      "buildHardMemoryGiB": 2,
+      "buildCpu": 1,
+      "runtimeStartup": "NOT_RUN_NEW_IMAGE",
+      "publication": {
+        "status": "PUSHED_PRIVATE_AND_FRESH_REMOTE_RECEIPT_PASS",
+        "registryReference": "ghcr.io/0u-y/callsign-runtime@sha256:39b637df7a9e392f5aaab4e04784db01f1fafcf78228d78d6d2c03341f71f8f7",
+        "registryManifestDigest": "sha256:39b637df7a9e392f5aaab4e04784db01f1fafcf78228d78d6d2c03341f71f8f7",
+        "configId": "sha256:e8e47edcd7ff05b217cc716a3339159148bae8b576dd526fc1d8b8801051d5c7",
+        "anonymousAccess": "DENIED",
+        "dockerCacheUsed": false,
+        "networkBytes": 221643419,
+        "tag": "aws-demo-design-preparation-20261105t111610z",
+        "release": "PREPARING_NOT_CREATED",
+        "separateAwsReaderVerified": false
+      }
+    },
+    "fullMedia": {
+      "status": "BLOCKED",
+      "reason": "START_40_GIB_REQUIRED",
+      "plannedLogicalCalls": 4,
+      "executedLogicalCalls": 0,
+      "batchStartFailures": 1,
+      "automaticRetries": 0,
+      "firstAvailableGiB": 35.23187255859375,
+      "firstSamplePreserved": true,
+      "ownedContainersCreated": 0,
+      "ownedVolumesCreated": 0,
+      "baselineComparison": {
+        "interfaces": "UNKNOWN_MISSING_SNAPSHOT",
+        "routes": "UNKNOWN_MISSING_SNAPSHOT",
+        "container-ids": "UNKNOWN_MISSING_SNAPSHOT",
+        "network-ids": "UNKNOWN_MISSING_SNAPSHOT"
+      },
+      "baselineLimit": "Guard stopped before host baseline capture; cannot turn missing baseline into host-preservation PASS. No bootstrap commands ran.",
+      "generalEntrypointFirst": "PLANNED_NOT_RUN",
+      "remainingAnalysisFixtures": "PLANNED_NOT_RUN",
+      "routeDecodedAudioCheck": "IMPLEMENTED_NOT_RUN",
+      "originalRuntimePassesReused": false
+    },
+    "light": {
+      "files": 69,
+      "tests": 352,
+      "status": "PASS"
+    }
   }
 }

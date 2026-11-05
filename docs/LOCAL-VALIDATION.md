@@ -23,6 +23,8 @@
 
 <a id="ui-only-validation"></a>
 
+실제 데모 경로의 media 회귀는 기존 전체 plan의 `demoUi:true`로 선택한다. `generalEntrypointFirst:true`는 첫 normal-smoke만 일반 서비스 entrypoint로 실행하고 나머지의 명시적 분석 fixture와 구분한다. 같은 실제 통화에서 관리 화면으로 이동·뒤로 간 뒤 remote track identity와 디코딩 음성을 각각 검사한다. 오디오 DOM 보존만으로 PASS하지 않는다. 선택 env와 경로 증거는 논리적 시도 사이에 보관한다. 최신 새 이미지의 이 경로는 시작 가용 RAM 미달로 아직 NOT_RUN이다.
+
 ## UI 전용 검증과 실제 통화 검증의 분리
 
 실제 `/service`·`/official` 화면 검토는 기존 HTTP fixture·격리 PostgreSQL·loopback API/OIDC/웹·설치 Chromium을 사용한다. 원장/ARI/Anchor/분석 제공자는 명시적 adapter이며 전체 통화 성공으로 세지 않는다. 별도 사용자 승인이 있는 새 batch에서만 `--profile ui-only-v1 --policy integration-pressure-v1`을 선택한다. 환경변수만으로 선택하지 않으며 identity의 `executionProfile`도 일치해야 한다.

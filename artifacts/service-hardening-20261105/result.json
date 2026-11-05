@@ -651,5 +651,56 @@
     "unexpectedNetworkFailures": 0,
     "peakHostGiB": 1.170265,
     "minimumAvailableGiB": 35.670673
+  },
+  "suppliedDesignIntegration": {
+    "canonical": "artifacts/product-candidate-20261104.json#designHtmlIntegration",
+    "screenshots": [
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-demo-call-1366.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "c8aada43dff134cbd8b84a58700971a759c3201de1cdd7fb7b8722c2493aa7b1"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-demo-call-390.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "638e6dccc9c1e7ba0d45ea71a38edd2a7b80e8586448fa36b3901afc1a71310c"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-demo-governance-1366.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "92e17c0d80455048ce3beb49b6984ed1f2f065e48fb99b5a996d661a6bae7287"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-demo-governance-390.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "4cd1f24815cfaab57310c1eb7f5298ecf6a81171862a8ce933c36ab00a15086b"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-official-1366.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "71ce45275fa87eb50a9727bc738465c9212e113d0acfc5cfc05c4f167648ca38"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-official-390.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "37cfedc874ede5f4f9cf4d5712cf5fedf9057dadc23093c3d9dc615cf56bbaae"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-component-warning-1366.png",
+        "scope": "synthetic component visual review only",
+        "sha256": "e3a264098abd0252fab5f8c58c7a7e78031c15a0d2705fc8b46eda1abcac18c6"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-component-warning-390.png",
+        "scope": "synthetic component visual review only",
+        "sha256": "70598257d44c98c1acbd15d17a4700422b021c884b14e8c8142c787ca2baee0d"
+      },
+      {
+        "path": "artifacts/service-hardening-20261105/design-html-call-css-2x.png",
+        "scope": "actual local product frontend disconnected from API; not auth/call proof",
+        "sha256": "29dd75aaf7848fd9f7fc0817cf7e11f94b48ad247d6032616a232af99763e9e3"
+      }
+    ],
+    "scope": "Local actual product disconnected UI plus labeled synthetic component visual review. Authenticated public calls NOT_RUN."
   }
 }

@@ -21,6 +21,12 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 실제 OIDC 선택지는 `CALLSIGN_OIDC_PROVIDER=keycloak`과 `compose.oidc.yml`이다. 기본은 external로 유지한다. 정확한 HTTPS `KEYCLOAK_PUBLIC_ORIGIN`·신뢰하는 proxy 주소·불변 image와 보호 env/DB password 파일이 필요하다. `prepare-demo-oidc.ts --apply PRIVATE_NEW_PATH`는 실제 공개 origin에서 보호 realm/계정·무작위 password 입력만 생성하며 사용자를 생성하지 않는다. NEW의 별도 `oidc-init` profile만 `import --override false`를 실행하고 정상 `oidc` 시작은 `start`만 실행한다. 실제 서명된 issuer/sub를 검증한 뒤 기존 계정 등록 절차로 연결한다. realm JSON은 세션/폐기 상태를 포함한 완전한 IdP 백업이 아니므로 별도 영속 IdP DB를 함께 일관되게 백업한다. 이 overlay는 bridge 기반이며 현재 보호된 개발 서버에서 기동하지 않는다. 실제 import/login/RESTORE는 아직 NOT_RUN이다.
 
+첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
+
+현재 ingress 등록 대행은 허용됐지만 등록 페이지가 요구하는 계정 로그인 연결은 제공되지 않았다. 보호된 등록 링크를 사용하는 실제 계정 인증이 필요하며 다른 앱의 자격을 재사용하지 않는다. 등록만으로 Funnel이 열리지 않는다. [공식 Funnel 문서](https://tailscale.com/docs/features/tailscale-funnel)는 활성화가 tailnet 정책을 바꿀 수 있다고 명시하므로, 기존 전체 구성원을 허용하는 기본 정책을 자동 적용하지 않는다. 새 노드만의 범위와 실제 미디어 경로를 확인해야 한다.
+
+Vercel은 [현재 공식 문서](https://vercel.com/docs/functions/websockets)에서 native WebSocket Function을 지원하지만 현재 저장소는 정적 SPA이고 API/WS proxy를 구현·검증한 상태가 아니다. HTTP rewrite만으로 SIP·분석 WSS나 TURN을 확인했다고 쓰지 않는다. 같은 origin의 cookie·CSRF·Origin을 유지하고 실제 backend와 trust가 준비되기 전 미연결 Production을 실제 모드로 바꾸지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
+
 ### 브라우저부터 실제 서비스까지
 
 | 연결 | 현재 소비 코드/계약 | 지속 환경에서 필요한 확인 |
@@ -59,7 +65,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 선택 overlay `infra/deploy/compose.providers.yml`은 두 보호 파일만 issuer에 read-only mount한다. CALLSIGN_PROVIDER_CONFIG=deepgram-openai를 보호 CFG에서 명시해야 deployment.sh가 연결한다. 기본 none은 mount하지 않는다. 모델은 OPENAI_MODEL·DEEPGRAM_MODEL로 별도 지정하며 API 키의 존재를 운영 비용 승인으로 간주하지 않는다. 기존 Anthropic 경로는 명시/기존 설정에서만 유지하고 OpenAI 오류의 자동 fallback으로 사용하지 않는다.
 
-첫 제안 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개인 서비스 분석 설정이며 한국어 품질은 미측정이다. 최대6 LLM 요청·STT2연결×30초·재시도0, 요청당 입력8,000토큰 가정의 예상 비용은 약$0.063이다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 첫 smoke $0.10 계획만 승인됐고 입력은 별도 제공 예정이다. 후속 실제 텍스트 smoke는3요청·재시도0이며 계약 통과와 품질 제한을 분리했다. 음성은 아직0초다. 최신 사용량·원본 상태는 [후보 기록](../artifacts/product-candidate-20261104.json)의 persistentDemoConnection을 따른다. 지속 서비스의 무제한 비용 승인이 아니다.
+서비스 분석 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개다. 첫 smoke의 총$0.10·LLM 최대6요청·STT2연결×30초·재시도0 계획만 승인됐다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 현재 첫 계획의 LLM 요청 수는 timeout 포함 소진했다. 동의한 로컬 합성 한국어 음원의 직접 전사도 확인했지만 빈 전사·오인식과 목적 관계 label 불일치가 있어 품질 PASS가 아니다. timeout의 실제 과금은 미확인이며 추정 비용을 청구 상한 보장으로 쓰지 않는다. 최신 사용량·실행 분모는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 따른다. 지속 서비스의 추가 AI 실행에는 별도 제한 계획이 필요하다.
 
 평가 CLI는 기존 비용 guard에 CALLSIGN_EVALUATION_MAX_REQUESTS를 추가해6 이하 계획을 선언할 수 있다. provider-smoke는 기존 결과 파일을 호출 전에 거절하고 STT 입력은 설치 ffprobe로30초 이하 단일 오디오인지 검사한다. 도구/동의 입력이 없으면 중단한다. 숫자 선언은 실제 invoice 강제 상한이 아니며 실제 가격·보관/학습 정책·계정 지출 제한은 실행 전 대조한다. OpenAI store:false도 제공자의 모든 보관을 없앤다는 보장이 아니다.
 
@@ -100,7 +106,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 데모/제공자 **준비 후보**: `aws-demo-preparation-20261105t071306z`. 새 runtime은 게시/수령했지만 일반 entrypoint·실제 통화·RESTORE는 NOT_RUN이며 최신 화면 재캡처도 압박 중단이다. 아래 수령 예시는 이 준비 후보를 선택한다. 기존 실제 통합 결과를 새 이미지에 전용하지 않는다.
+- 최신 첨부 디자인/분석 **준비 후보**: `aws-demo-design-preparation-20261105t111610z`. 새 runtime의 비공개 게시·원격 수령을 확인했다. 전체 통화는 시작40GiB 조건 미달로 자원 생성 전 차단됐으며 공개 인증/미디어는 미연결이다. Release 발행·첨부물 수령 상태는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 확인한다. 아래 수령 예시는 이 준비 후보이며 이전 이미지의 통합 PASS를 전용하지 않는다.
 - 이전 실제 서비스/복원 검증 후보: [aws-restore-candidate-20261104t180638z](https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z). runtime은 새 제품 종료 수정과 UI를 포함하고, 전체 RESTORE·별도 합성 분석 경로의 실제 검증은 위 후속 기록을 따른다. 비공개 GHCR와 공개5파일 게시·실제 원격 재수령을 완료했다. 정확한 source/digest·checksum은 단일 후보 기록의 serviceHardeningFollowup에서 확인한다.
 - 이전 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
 - 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.
@@ -119,7 +125,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 ```bash
 set +x
 umask 077
-TAG=aws-demo-preparation-20261105t071306z
+TAG=aws-demo-design-preparation-20261105t111610z
 RECEIVED="$(mktemp -d)"
 for FILE in deployment-files.tar observer-tests.tar images.json publication-audit.json SHA256SUMS; do
   curl --fail --location --proto '=https' --proto-redir '=https' --max-time 60 \

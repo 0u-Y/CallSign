@@ -1,6 +1,6 @@
 # 05. 구현 및 검증 현황
 
-최신 데모는 `/demo/call`·`/demo/governance`에서 기존 서비스 controller/API를 재사용한다. 실제 공개 Production의 desktop/390px/CSS2배 화면을 다시 캡처하고 직접 검토했으며 가독성 검토는 통과했다. 공개 frontend는 API 미연결이다. 역할별 합성 응답·실제 인증·통화 검증을 구분하며 새 준비 이미지의 일반 entrypoint/미디어/복원은 미검증이다. [단일 후보 기록](../../artifacts/product-candidate-20261104.json)의 persistentDemoConnection·demoPreparationCandidate를 따른다.
+최신 데모는 사용자 제공 HTML의 기관 조작–처리 과정–수신자 핸드폰과 공동 관리 배치를 기존 controller/API에 이식했다. 실제 로컬 제품의 미연결 화면과 명시적 component fixture의 경고를 직접 검토했다. 인증·WebRTC 성공과 구분한다. 부정/인용 근거 검사·문장 분리와 Vercel 마이크 정책을 수정했으며 모델 목적 판정의 불일치는 남아 있다. [단일 후보 기록](../../artifacts/product-candidate-20261104.json)의 designHtmlIntegration이 이번 상태의 기준이다. 새 이미지·전체 경로 결과는 실행 후에만 갱신한다.
 
 
 ## 현재 작업표
@@ -11,7 +11,7 @@
 | CALL-005/006·AI-001/005 | ServiceCall/remote track·동의·정책 결합 | [최신 일반/합성 분석 경로](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup | 이전 분석/프로세스 실패의 원인 미확정 | 재발 시 보존한 exit·WS·lease 관측으로 원인 확인 | 미재현 원인을 추정 확정하지 않음 |
 | OPS-004 복원·DB 감사 | 일관된 암호화 백업·별도 DB/chain 복원·독립 Anchor | 같은 기록의 restore: 전체 RESTORE·복원 후 통화·원본/대상 SQL 감사 PASS | 별도 장애 영역 운영 검증 | 실제 AWS 저장소/Anchor 배치와 복구 | AWS 환경 |
 | OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 별도 reader·AWS 실행 | 새 후보 게시·공개/이미지 원격 수령 PASS; reader는 별도 | 독립 reader, AWS 환경 입력 |
-| AI-003 실제 제공자 평가 | OpenAI adapter·Deepgram/ko·동의/취소·quota·비용 선검사 | 실제 OpenAI 텍스트3요청: 계약 통과·품질 제한; 음성0초 | 동의한 한국어 음성·전체 경로 | 텍스트 출력 원본·사용량 보존; 모델 품질 PASS 아님 | 보호 음원 참조·전송 동의, 지속 비용/보관 조건 별도 |
+| AI-003 실제 제공자 평가 | OpenAI adapter·Deepgram/ko·동의/취소·quota·비용 선검사 | 실제 OpenAI 텍스트·직접 Deepgram 합성 음성: 계약 관측·품질 제한 | 실제 통화 remote track의 STT·분석 전체 경로 | 텍스트 출력 원본·사용량 보존; 모델 품질 PASS 아님 | 공개 연결·후속 AI 제한 계획, 지속 비용/보관 조건 별도 |
 
 지속 환경 A는 미기동이다. 전용 ingress 등록 승인·실제 OIDC 및 지속 감시 연결이 남았다. RAM은 기동 시점의 사전 관측으로 판단하며 이후의 한 표본으로 과거 중단이나 기동 적합성을 소급 확정하지 않는다. 새 provider 코드의 전체 원장/미디어 검증은 미실행이다. 아래 일반 entrypoint/복원/합성 분석 PASS는 이전 제품 소스의 선택 경로이며 새 OpenAI 실제 품질 증거가 아니다. [현재 준비 상태](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
 
