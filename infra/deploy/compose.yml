@@ -1,5 +1,9 @@
 name: callsign-finals
+x-deployment-labels: &deployment-labels
+  org.callsign.lifecycle: persistent
+  org.callsign.deployment-id: ${DEPLOYMENT_ID:?immutable deployment identity}
 x-app: &app
+  labels: *deployment-labels
   image: ${CALLSIGN_APP_IMAGE:?pin registry image tag or digest}
   restart: unless-stopped
   init: true
@@ -195,6 +199,7 @@ services:
         bind: {create_host_path: false}
   test-runner:
     <<: *app
+    labels: {org.callsign.lifecycle: ephemeral}
     profiles: [validation]
     restart: 'no'
     healthcheck: {disable: true}
@@ -219,6 +224,7 @@ services:
         read_only: true
         bind: {create_host_path: false}
   postgres:
+    labels: *deployment-labels
     image: ${POSTGRES_IMAGE:-postgres:17.6-alpine}
     restart: unless-stopped
     environment:
@@ -234,6 +240,7 @@ services:
       retries: 15
     # No host DB port. No startup migration or seed.
   web:
+    labels: *deployment-labels
     image: ${CALLSIGN_WEB_IMAGE:-callsign-web-not-prepared:blocked}
     volumes: ["${FINALS_DATA_DIR}/asterisk/tls/public/ca.pem:/etc/nginx/pbx-ca.pem:ro"]
     restart: unless-stopped
@@ -241,6 +248,7 @@ services:
     depends_on: { platform: { condition: service_started } }
     ports: ['127.0.0.1:8080:8080']
   https:
+    labels: *deployment-labels
     image: ${HTTPS_IMAGE:-caddy:2.10.2-alpine}
     profiles: [https]
     restart: unless-stopped
@@ -251,6 +259,7 @@ services:
     ports: ['80:80', '443:443']
     networks: [public]
   turn:
+    labels: *deployment-labels
     image: ${TURN_IMAGE:?pin coturn image digest}
     profiles: [media]
     restart: unless-stopped
@@ -259,6 +268,7 @@ services:
     ports: ['3478:3478/udp', '3478:3478/tcp', '5349:5349/tcp', '49160-49200:49160-49200/udp']
     networks: [public]
   besu1:
+    labels: *deployment-labels
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
@@ -280,6 +290,7 @@ services:
       retries: 20
 
   besu2:
+    labels: *deployment-labels
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
@@ -298,6 +309,7 @@ services:
     healthcheck: *besu-health
 
   besu3:
+    labels: *deployment-labels
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
@@ -316,6 +328,7 @@ services:
     healthcheck: *besu-health
 
   besu4:
+    labels: *deployment-labels
     image: ${BESU_IMAGE:-hyperledger/besu:26.8.1}
     restart: unless-stopped
     entrypoint: ["bash", "-lc"]
@@ -334,6 +347,7 @@ services:
     healthcheck: *besu-health
 
   witness1:
+    labels: *deployment-labels
     init: true
     read_only: true
     tmpfs: [/tmp]
@@ -363,6 +377,7 @@ services:
     restart: unless-stopped
 
   witness2:
+    labels: *deployment-labels
     init: true
     read_only: true
     tmpfs: [/tmp]
@@ -388,6 +403,7 @@ services:
     restart: unless-stopped
 
   witness3:
+    labels: *deployment-labels
     init: true
     read_only: true
     tmpfs: [/tmp]
@@ -413,6 +429,7 @@ services:
     restart: unless-stopped
 
   witness4:
+    labels: *deployment-labels
     init: true
     read_only: true
     tmpfs: [/tmp]
@@ -439,12 +456,19 @@ services:
 
 volumes:
   besu1-data:
+    labels: *deployment-labels
   besu2-data:
+    labels: *deployment-labels
   besu3-data:
+    labels: *deployment-labels
   besu4-data:
+    labels: *deployment-labels
   postgres-data:
+    labels: *deployment-labels
   caddy-data:
+    labels: *deployment-labels
   asterisk-data:
+    labels: *deployment-labels
 networks:
   application: { internal: true }
   public:

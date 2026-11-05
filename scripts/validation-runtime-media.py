@@ -105,7 +105,7 @@ def main():
      nonlocal stop
      raw=host_sample();row=watch.update(raw);host=raw['observerRssBytes']+(owned_rss(child.pid,start) if child and child.poll() is None else 0);containers=[];ids=subprocess.check_output(['docker','ps','-aq','--no-trunc','--filter','label=org.callsign.run-id='+run],text=True,timeout=5).split();total=0
      for info in inspect(ids):
-      assert info['Config']['Labels'].get('org.callsign.run-id')==run and not info['HostConfig']['PortBindings'] and (info['HostConfig']['NetworkMode']=='none' or info['HostConfig']['NetworkMode'].startswith('container:'))
+      assert info['Config']['Labels'].get('org.callsign.run-id')==run and info['Config']['Labels'].get('org.callsign.lifecycle')!='persistent' and not info['HostConfig']['PortBindings'] and (info['HostConfig']['NetworkMode']=='none' or info['HostConfig']['NetworkMode'].startswith('container:'))
       if info['HostConfig']['MemorySwap']!=info['HostConfig']['Memory']:raise RuntimeError('OWNED_SWAP_LIMIT_MISMATCH')
       if info['State']['OOMKilled']:stop=stop or 'OWNED_CONTAINER_OOM'
       used=memory(info) if info['State']['Running'] else 0
@@ -169,7 +169,7 @@ def main():
        if output.exists():shutil.copyfile(output,evidence/'db-audit-final.json')
       if time.monotonic_ns()>plan['deadlineMonotonicNs']-30_000_000_000:errors.append('CLEANUP_DEADLINE_REMAINING_RESOURCES');break
       for info in inspect([entry['id']]):
-       if info['Id']!=entry['id'] or (info['Config'].get('Labels') or {}).get('org.callsign.run-id')!=run:errors.append('OWNERSHIP_MISMATCH');continue
+       if info['Id']!=entry['id'] or (info['Config'].get('Labels') or {}).get('org.callsign.run-id')!=run or (info['Config'].get('Labels') or {}).get('org.callsign.lifecycle')=='persistent':errors.append('OWNERSHIP_MISMATCH');continue
        try:
         state_file=evidence/('container-'+info['Id']+'-state.json');state_file.write_text(json.dumps(exit_observation(info['State']))+'\n');state_file.chmod(0o600)
         logs=subprocess.run(['docker','logs','--tail','200',info['Id']],stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=5)
@@ -186,7 +186,7 @@ def main():
      for name in owned['volumes']:
       if time.monotonic_ns()>plan['deadlineMonotonicNs']-30_000_000_000:errors.append('CLEANUP_DEADLINE_REMAINING_VOLUMES');break
       info=json.loads(subprocess.check_output(['docker','volume','inspect',name],text=True,timeout=5))[0]
-      if info.get('Labels',{}).get('org.callsign.run-id')!=run:errors.append('VOLUME_OWNERSHIP_MISMATCH');continue
+      if info.get('Labels',{}).get('org.callsign.run-id')!=run or info.get('Labels',{}).get('org.callsign.lifecycle')=='persistent':errors.append('VOLUME_OWNERSHIP_MISMATCH');continue
       try:subprocess.run(['docker','volume','rm',name],check=True,stdout=subprocess.DEVNULL,timeout=10)
       except Exception as e:errors.append(type(e).__name__)
      try:capture_baseline(evidence,'after')

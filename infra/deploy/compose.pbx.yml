@@ -1,6 +1,9 @@
 # Merge with compose.yml. Asterisk terminates DTLS-SRTP and mixes media; no external Edge service.
 services:
   asterisk:
+    labels:
+      org.callsign.lifecycle: persistent
+      org.callsign.deployment-id: ${DEPLOYMENT_ID:?immutable deployment identity}
     image: ${ASTERISK_IMAGE:?reviewed Asterisk 22 image digest with SHA-256 digest auth and ODBC modules}
     profiles: [pbx]
     restart: unless-stopped

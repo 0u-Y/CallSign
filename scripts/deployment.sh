@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
-if [ "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != "infrastructure" ]; then echo 'BLOCKED: separate deployment approval required' >&2; exit 78; fi
-: "${CALLSIGN_ENV_FILE:?path to protected deployment.env}"
 command="${1:-}"
+case "$command" in start|status|stop|restart|resource-stop) ;; *) echo 'Usage: deployment.sh start|status|stop|restart|resource-stop (no init, build, pull, seed, reset)' >&2; exit 64 ;; esac
+if [[ "$command" != status && "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != infrastructure ]]; then echo 'BLOCKED: separate deployment approval required' >&2; exit 78; fi
+: "${CALLSIGN_ENV_FILE:?path to protected deployment.env}"
 deployment_target="$(node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
 import {readFileSync} from 'node:fs';import {parseEnv} from 'node:util';
 const value=process.env.CALLSIGN_DEPLOYMENT_TARGET??parseEnv(readFileSync(process.argv[2],'utf8')).CALLSIGN_DEPLOYMENT_TARGET??'';
@@ -11,14 +12,23 @@ JS
 )"
 compose=(docker compose --env-file "$CALLSIGN_ENV_FILE" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml --profile https --profile pbx --profile media)
 if [[ "$deployment_target" == aws ]]; then
-  [[ "${CALLSIGN_AWS_TARGET_CONFIRMATION:-}" == AWS-ONLY ]] || { echo 'BLOCKED: AWS target confirmation required; never run on development host' >&2; exit 78; }
+  [[ "$command" == status || "${CALLSIGN_AWS_TARGET_CONFIRMATION:-}" == AWS-ONLY ]] || { echo 'BLOCKED: AWS target confirmation required; never run on development host' >&2; exit 78; }
   if [[ "$command" == start || "$command" == restart ]]; then
     mountpoint -q "${CALLSIGN_AWS_MOUNT:?AWS persistent mount to check}" || { echo 'BLOCKED: AWS EBS mount missing' >&2; exit 78; }
   fi
   compose=(docker compose --env-file "$CALLSIGN_ENV_FILE" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml -f infra/deploy/compose.aws.yml --profile https --profile pbx --profile media)
 fi
+# The shipped Compose creates bridges/published ports. It is not the no-network-change development-host launcher.
+if [[ "$deployment_target" != aws && ( "$command" == start || "$command" == restart ) ]]; then echo 'BLOCKED: development host network preservation requires a separately reviewed ingress/topology; this Compose creates bridges and publishes ports' >&2; exit 78; fi
+if [[ "$command" == status ]]; then exec node scripts/deployment-control.mjs status "$CALLSIGN_ENV_FILE" "${compose[@]}"; fi
+control=owned
+if [[ "$command" == start || "$command" == restart ]]; then control=check; fi
+if [[ "$command" == resource-stop ]]; then control=latch; fi
+node scripts/deployment-control.mjs "$control" "$CALLSIGN_ENV_FILE" "${compose[@]}"
+applications=(https web platform sender issuer worker witness1 witness2 witness3 witness4 asterisk turn)
+data=(besu1 besu2 besu3 besu4 postgres)
 case "$command" in
-  start)
+  start|restart)
     # Validate actual generated image identities without sourcing env as executable shell text.
     node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
 import {readFileSync} from 'node:fs';
@@ -32,8 +42,11 @@ if(env.CALLSIGN_DEPLOYMENT_TARGET==='aws'){
 for(const key of ['CALLSIGN_APP_IMAGE','CALLSIGN_WEB_IMAGE','ASTERISK_IMAGE','TURN_IMAGE','BESU_IMAGE','POSTGRES_IMAGE','HTTPS_IMAGE'])if(!immutableImageReference(env[key]))throw new Error(`REVIEWED_IMAGE_DIGEST_REQUIRED:${key}`);
 if(!/^[0-9a-f]{64}$/.test(env.VITE_SERVICE_TRUST_SHA256??''))throw new Error('PUBLISHED_TRUST_PIN_REQUIRED_BEFORE_START');
 JS
-    "${compose[@]}" up -d --no-build --pull never postgres besu1 besu2 besu3 besu4 witness1 witness2 witness3 witness4 issuer sender worker platform web https turn asterisk ;;
-  stop) "${compose[@]}" stop ;;
-  restart) "${compose[@]}" restart ;;
-  *) echo 'Usage: deployment.sh start|stop|restart (no init, build, pull, seed, reset)' >&2; exit 64 ;;
+    if [[ "$command" == restart ]]; then
+      node scripts/deployment-control.mjs stop "$CALLSIGN_ENV_FILE" "${compose[@]}"
+    fi
+    "${compose[@]}" up -d --no-build --pull never "${data[@]}" "${applications[@]}" ;;
+  stop|resource-stop)
+    # Manual stop suppresses unless-stopped restart policies; volumes and identities remain intact.
+    node scripts/deployment-control.mjs stop "$CALLSIGN_ENV_FILE" "${compose[@]}" ;;
 esac

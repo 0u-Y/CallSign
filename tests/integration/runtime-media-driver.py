@@ -52,7 +52,7 @@ if len(base64.urlsafe_b64decode(credential + '=' * (-len(credential) % 4))) != 3
     raise SystemExit('PBX_CREDENTIAL_SECRET_MUST_DECODE_TO_32_BYTES')
 
 keeper = inspect(run_id + '-net')
-if keeper['Config']['Labels'].get('org.callsign.run-id') != run_id or keeper['HostConfig']['NetworkMode'] != 'none':
+if keeper['Config']['Labels'].get('org.callsign.run-id') != run_id or keeper['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or keeper['HostConfig']['NetworkMode'] != 'none':
     raise SystemExit('OWNED_NONE_NAMESPACE_REQUIRED')
 
 if options.archive_phase:
@@ -63,14 +63,14 @@ if options.archive_phase:
         observed = subprocess.run(['docker','container','inspect',run_id+'-'+role],capture_output=True,text=True)
         if observed.returncode: continue
         info = json.loads(observed.stdout)[0]
-        if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['HostConfig']['NetworkMode'] != 'container:'+keeper['Id'] or not any(c['id']==info['Id'] for c in owner['containers']):
+        if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or info['HostConfig']['NetworkMode'] != 'container:'+keeper['Id'] or not any(c['id']==info['Id'] for c in owner['containers']):
             raise RuntimeError('OWNED_PHASE_RESOURCE_REQUIRED')
         (phase/(role+'.log')).write_bytes(subprocess.run(['docker','logs',info['Id']],stdout=subprocess.PIPE,stderr=subprocess.STDOUT).stdout)
         command(['docker','stop','-t','5',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
         command(['docker','rm',info['Id']],stdout=subprocess.DEVNULL,timeout=15)
         if (root/(role+'.env')).exists(): (root/(role+'.env')).rename(phase/(role+'.env'))
     controller = inspect(run_id+'-controller')
-    if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
+    if controller['Config']['Labels'].get('org.callsign.run-id') != run_id or controller['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or not any(c['id']==controller['Id'] for c in owner['containers']): raise RuntimeError('OWNED_CONTROLLER_REQUIRED')
     command(['docker','stop','-t','3',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     command(['docker','start',controller['Id']],stdout=subprocess.DEVNULL,timeout=15)
     names=['runtime-media-test.log','runtime-media-results.json','runtime-process-result.json','image-services-request.json','image-services-started.json','media-contact.json','delivery-web-build.json','web-image-id.txt','natural-session-wait.json','natural-expiry-lease-observation.json']
@@ -96,7 +96,7 @@ def write_env(name, values):
 def start(role, env, mounts, args=None, image=app_image, memory='512m'):
     name = run_id + '-' + role
     env_path = write_env(role, env)
-    request = ['docker', 'run', '-d', '--name', name, '--label', 'org.callsign.run-id=' + run_id,
+    request = ['docker', 'run', '-d', '--name', name, '--label', 'org.callsign.run-id=' + run_id,'--label','org.callsign.lifecycle=ephemeral',
                '--pull=never', '--init', '--network', 'container:' + run_id + '-net', '--memory', memory, '--memory-swap', memory,
                '--cpus', '1', '--pids-limit', '128', '--read-only', '--cap-drop', 'ALL',
                '--security-opt', 'no-new-privileges', '--tmpfs', '/tmp:rw,nosuid,nodev,size=67108864',
@@ -116,7 +116,7 @@ log = open(root / 'runtime-media-test.log', 'x', opener=lambda p, f: os.open(p, 
 controller = run_id + '-controller'
 controller_info = inspect(controller)
 def assert_controller(info):
-    if info['Config']['Labels'].get('org.callsign.run-id') != run_id or not info['HostConfig'].get('Init') or info['Image'] != app_image or info['HostConfig']['NetworkMode'] != 'container:' + keeper['Id'] or not any(c['id'] == info['Id'] for c in owner['containers']):
+    if info['Config']['Labels'].get('org.callsign.run-id') != run_id or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or not info['HostConfig'].get('Init') or info['Image'] != app_image or info['HostConfig']['NetworkMode'] != 'container:' + keeper['Id'] or not any(c['id'] == info['Id'] for c in owner['containers']):
         raise RuntimeError('OWNED_CONTROLLER_INIT_REQUIRED')
 assert_controller(controller_info)
 selection = ['--testNamePattern', 'boots final image|after (' + '|'.join(selected_cases) + ')$']
@@ -182,7 +182,7 @@ try:
             with open(root/('normal-entrypoint-'+str(time.time_ns())+'.json'),'x') as output:json.dump({'image':app_image,'normalCommand':True,'health':200,'unauthenticatedAuth':401,'fixtureMounted':False,'scope':'startup/auth challenge, not full readiness or media'},output)
         finally:
             info=inspect(probe)
-            if info['Image']!=app_image or info['Config']['Labels'].get('org.callsign.run-id')!=run_id or not any(c['id']==info['Id'] for c in owner['containers']):raise RuntimeError('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED')
+            if info['Image']!=app_image or info['Config']['Labels'].get('org.callsign.run-id')!=run_id or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or not any(c['id']==info['Id'] for c in owner['containers']):raise RuntimeError('OWNED_NORMAL_ENTRYPOINT_PROBE_REQUIRED')
             command(['docker','stop','-t','3',info['Id']],stdout=log,stderr=subprocess.STDOUT,timeout=10)
             command(['docker','rm',info['Id']],stdout=log,stderr=subprocess.STDOUT,timeout=10)
             (root/'issuer-entrypoint-probe.env').unlink()
@@ -257,7 +257,7 @@ try:
             request, done = root / ('pbx-control-' + action + '.request'), root / ('pbx-control-' + action + '.done')
             if request.exists() and not done.exists():
                 pbx = inspect(run_id + '-pbx')
-                if pbx['Config']['Labels'].get('org.callsign.run-id') != run_id or pbx['HostConfig']['NetworkMode'] != 'container:' + keeper['Id']:
+                if pbx['Config']['Labels'].get('org.callsign.run-id') != run_id or pbx['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or pbx['HostConfig']['NetworkMode'] != 'container:' + keeper['Id']:
                     raise RuntimeError('OWNED_PBX_CONTROL_REQUIRED')
                 command(['docker', action, pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
                 done.write_text(json.dumps({action+'d':True})+'\n')
@@ -279,7 +279,7 @@ finally:
         try:
             if 'pbx-outage' in selected_cases:
                 pbx = inspect(run_id + '-pbx')
-                if pbx['Config']['Labels'].get('org.callsign.run-id') == run_id and pbx['State']['Paused']:
+                if pbx['Config']['Labels'].get('org.callsign.run-id') == run_id and pbx['Config']['Labels'].get('org.callsign.lifecycle') != 'persistent' and pbx['State']['Paused']:
                     command(['docker','unpause',pbx['Id']], stdout=log, stderr=subprocess.STDOUT, timeout=15)
         finally:
             try:

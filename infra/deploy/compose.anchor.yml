@@ -1,7 +1,11 @@
 # Separate AWS host/storage/credential lifetime. Never included in the application backup.
 name: ${CALLSIGN_ANCHOR_PROJECT:?unique anchor project}
+x-deployment-labels: &deployment-labels
+  org.callsign.lifecycle: persistent
+  org.callsign.deployment-id: ${DEPLOYMENT_ID:?immutable deployment identity}
 services:
   anchor-db:
+    labels: *deployment-labels
     image: ${POSTGRES_IMAGE:?reviewed postgres 17.6 image}
     platform: linux/amd64
     restart: unless-stopped
@@ -21,6 +25,7 @@ services:
       timeout: 3s
       retries: 15
   anchor:
+    labels: *deployment-labels
     image: ${CALLSIGN_APP_IMAGE:?runtime including remote TLS anchor support}
     platform: linux/amd64
     command: [pnpm, anchor]

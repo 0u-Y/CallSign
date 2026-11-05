@@ -54,11 +54,11 @@ def envfile(name,values):
 def imageinfo(ref):return json.loads(capture(['docker','image','inspect',ref]))[0]
 def owned_container(name,image,network):
  info=json.loads(capture(['docker','container','inspect',name]))[0]
- if info['Config']['Labels'].get('org.callsign.run-id')!=run or info['Image']!=image or info['HostConfig']['NetworkMode']!=network or info['HostConfig'].get('PortBindings') or not any(c['id']==info['Id'] for c in owner['containers']):raise RuntimeError('EXISTING_CONTAINER_IDENTITY_MISMATCH')
+ if info['Config']['Labels'].get('org.callsign.run-id')!=run or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent' or info['Image']!=image or info['HostConfig']['NetworkMode']!=network or info['HostConfig'].get('PortBindings') or not any(c['id']==info['Id'] for c in owner['containers']):raise RuntimeError('EXISTING_CONTAINER_IDENTITY_MISMATCH')
  return info
 def owned_volume(name):
  info=json.loads(capture(['docker','volume','inspect',name]))[0]
- if name not in owner['volumes'] or info.get('Name')!=name or info.get('Labels',{}).get('org.callsign.run-id')!=run:raise RuntimeError('EXISTING_VOLUME_NOT_OWNED')
+ if name not in owner['volumes'] or info.get('Name')!=name or info.get('Labels',{}).get('org.callsign.run-id')!=run or info.get('Labels',{}).get('org.callsign.lifecycle')=='persistent':raise RuntimeError('EXISTING_VOLUME_NOT_OWNED')
  return info
 def start(role,image,args=None,env=None,mounts=(),memory='512m',cpu='1',pids=128,namespace=True,readonly=True,init=True,hosts=True):
  name=run+'-'+role
@@ -71,7 +71,7 @@ def start(role,image,args=None,env=None,mounts=(),memory='512m',cpu='1',pids=128
   if not info['State']['Running']:raise RuntimeError('OWNED_EXISTING_CONTAINER_NOT_RUNNING:'+role)
   return name
  except subprocess.CalledProcessError:pass
- cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--pull=never','--network','container:'+run+'-net' if namespace else 'none','--memory',memory,'--memory-swap',memory,'--cpus',cpu,'--pids-limit',str(pids)]
+ cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--label','org.callsign.lifecycle=ephemeral','--pull=never','--network','container:'+run+'-net' if namespace else 'none','--memory',memory,'--memory-swap',memory,'--cpus',cpu,'--pids-limit',str(pids)]
  if init:cmd+=['--init']
  if role.startswith('besu'):cmd+=['--user','1000:1000']
  if readonly:cmd+=['--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,exec,size=268435456,uid=1000,gid=1000']
@@ -83,7 +83,7 @@ def start(role,image,args=None,env=None,mounts=(),memory='512m',cpu='1',pids=128
 counter=0
 def tool(args,env=None,image=None,network=True,stdin=None,memory='512m',mountroot=True):
  global counter;counter+=1;name=run+'-tool-'+str(time.time_ns())
- cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--pull=never','--network','container:'+run+'-net' if network else 'none','--memory',memory,'--memory-swap',memory,'--cpus','1','--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,exec,size=268435456,uid=1000,gid=1000']
+ cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--label','org.callsign.lifecycle=ephemeral','--pull=never','--network','container:'+run+'-net' if network else 'none','--memory',memory,'--memory-swap',memory,'--cpus','1','--pids-limit','256','--cap-drop','ALL','--security-opt','no-new-privileges','--tmpfs','/tmp:rw,nosuid,nodev,exec,size=268435456,uid=1000,gid=1000']
  if image==images['BESU_IMAGE']:cmd+=['--user','1000:1000']
  if mountroot:cmd+=['--mount',f'type=bind,src={r},dst=/run/callsign']
  if 'scripts/prepare-pbx.ts' in args and '--turn' in args:
@@ -96,7 +96,7 @@ def tool(args,env=None,image=None,network=True,stdin=None,memory='512m',mountroo
  try:
   p=subprocess.run(['docker','start','--attach']+(['--interactive'] if stdin is not None else [])+[cid],input=stdin,text=True,stdout=log,stderr=subprocess.STDOUT,timeout=120)
   info=json.loads(capture(['docker','container','inspect',name]))[0]
-  if info['Config']['Labels'].get('org.callsign.run-id')!=run:raise RuntimeError('OWNER_MISMATCH')
+  if info['Config']['Labels'].get('org.callsign.run-id')!=run or info['Config']['Labels'].get('org.callsign.lifecycle') == 'persistent':raise RuntimeError('OWNER_MISMATCH')
   if info['State']['OOMKilled']:raise RuntimeError('OWNED_TOOL_OOM')
   if p.returncode or info['State']['ExitCode']!=0:raise RuntimeError('OWNED_TOOL_FAILED:'+str(p.returncode)+':'+str(args[:4]))
  finally:
@@ -191,7 +191,7 @@ for role,port in [('database',5432),('anchor-database',5543)]:
  vol=run+'-'+role
  try:owned_volume(vol)
  except subprocess.CalledProcessError:
-  run_cmd(['docker','volume','create','--label','org.callsign.run-id='+run,vol]);owner['volumes'].append(vol);save()
+  run_cmd(['docker','volume','create','--label','org.callsign.run-id='+run,'--label','org.callsign.lifecycle=ephemeral',vol]);owner['volumes'].append(vol);save()
  name=run+'-'+role
  try:
   keeper=json.loads(capture(['docker','container','inspect',run+'-net']))[0]
@@ -199,7 +199,7 @@ for role,port in [('database',5432),('anchor-database',5543)]:
   if not info['State']['Running'] or not any(m['Type']=='volume' and m['Name']==vol and m['Destination']=='/var/lib/postgresql/data' for m in info['Mounts']):raise RuntimeError('OWNED_DB_STORAGE_OR_STATE_MISMATCH')
  except subprocess.CalledProcessError:
   settings={'POSTGRES_DB':db['database'] if port==5432 else 'callsign_anchor','POSTGRES_USER':'callsign_migrator' if port==5432 else 'anchor_owner','POSTGRES_PASSWORD':db['ownerPassword'] if port==5432 else db['anchorOwnerPassword']}
-  e=envfile(role+'.env',settings);cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--pull=never','--network','container:'+run+'-net','--memory','512m','--memory-swap','512m','--cpus','1','--pids-limit','128','--env-file',e,'--mount','type=volume,src='+vol+',dst=/var/lib/postgresql/data',images['POSTGRES_IMAGE'],'postgres','-p',str(port)]
+  e=envfile(role+'.env',settings);cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--label','org.callsign.lifecycle=ephemeral','--pull=never','--network','container:'+run+'-net','--memory','512m','--memory-swap','512m','--cpus','1','--pids-limit','128','--env-file',e,'--mount','type=volume,src='+vol+',dst=/var/lib/postgresql/data',images['POSTGRES_IMAGE'],'postgres','-p',str(port)]
   result=capture(cmd);owner['containers'].append({'id':result,'name':name,'role':role});save();run_cmd(['docker','start',result])
  wait_pg(name,db['database'] if port==5432 else 'callsign_anchor',port)
 owner_url='postgres://callsign_migrator:'+db['ownerPassword']+'@127.0.0.1:5432/'+db['database']
@@ -267,7 +267,7 @@ try:
  info=owned_container(name,images['ASTERISK_IMAGE'],'container:'+json.loads(capture(['docker','container','inspect',run+'-net']))[0]['Id'])
  if not info['State']['Running']:raise RuntimeError('OWNED_PBX_IDENTITY_OR_STATE_MISMATCH')
 except subprocess.CalledProcessError:
- cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--pull=never','--network','container:'+run+'-net','--memory','512m','--memory-swap','512m','--cpus','1','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges']
+ cmd=['docker','create','--name',name,'--label','org.callsign.run-id='+run,'--label','org.callsign.lifecycle=ephemeral','--pull=never','--network','container:'+run+'-net','--memory','512m','--memory-swap','512m','--cpus','1','--pids-limit','128','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges']
  for directory in ['/tmp','/var/run/asterisk','/var/log/asterisk','/var/spool/asterisk']:cmd+=['--tmpfs',directory+':rw,nosuid,nodev,size=67108864,uid=1000,gid=1000']
  for source,dest in [(r/'asterisk','/etc/asterisk'),(r/'asterisk/odbc.ini','/etc/odbc.ini'),(r/'media-tls','/etc/asterisk/tls')]:cmd+=['--mount',f'type=bind,src={source},dst={dest},readonly']
  cid=capture(cmd+[images['ASTERISK_IMAGE']]);owner['containers'].append({'id':cid,'name':name,'role':'pbx'});save();run_cmd(['docker','start',cid])

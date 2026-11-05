@@ -63,8 +63,9 @@ scope={'json':json,'run':'unit-owned','owner':{'containers':[{'id':'owned-id'}]}
 exec(compile(ast.Module(body=[fn],type_ignores=[]),'real-owned-container-guard','exec'),scope)
 verify=scope['owned_container'];assert verify('name','reviewed-image','container:unit-namespace')['Id']=='owned-id'
 original=copy.deepcopy(info)
-for mutation in ['label','image','network','ports','id']:
+for mutation in ['label','image','network','ports','id','persistent']:
  info=copy.deepcopy(original)
+ if mutation=='persistent':info['Config']['Labels']['org.callsign.lifecycle']='persistent'
  if mutation=='label':info['Config']['Labels']['org.callsign.run-id']='another-workload'
  if mutation=='image':info['Image']='different-image'
  if mutation=='network':info['HostConfig']['NetworkMode']='host'
@@ -77,7 +78,7 @@ volume_fn=next(node for node in module.body if isinstance(node,ast.FunctionDef) 
 exec(compile(ast.Module(body=[volume_fn],type_ignores=[]),'real-owned-volume-guard','exec'),scope)
 info={'Name':'unit-volume','Labels':{'org.callsign.run-id':'unit-owned'}};scope['owner']['volumes']=['unit-volume']
 assert scope['owned_volume']('unit-volume')['Name']=='unit-volume'
-for labels,recorded in [({'org.callsign.run-id':'another-workload'},['unit-volume']),({'org.callsign.run-id':'unit-owned'},[])]:
+for labels,recorded in [({'org.callsign.run-id':'unit-owned','org.callsign.lifecycle':'persistent'},['unit-volume']),({'org.callsign.run-id':'another-workload'},['unit-volume']),({'org.callsign.run-id':'unit-owned'},[])]:
  info={'Name':'unit-volume','Labels':labels};scope['owner']['volumes']=recorded
  try:scope['owned_volume']('unit-volume')
  except RuntimeError:continue
@@ -95,8 +96,9 @@ scope={'run_id':'unit-owned','app_image':'reviewed-image','keeper':{'Id':'namesp
 exec(compile(ast.Module(body=[fn],type_ignores=[]),'real-controller-guard','exec'),scope)
 info={'Id':'controller-id','Image':'reviewed-image','Config':{'Labels':{'org.callsign.run-id':'unit-owned'}},'HostConfig':{'Init':True,'NetworkMode':'container:namespace'}}
 scope['assert_controller'](info)
-for field in ['id','image','label','init','network']:
+for field in ['id','image','label','init','network','persistent']:
  candidate=copy.deepcopy(info)
+ if field=='persistent':candidate['Config']['Labels']['org.callsign.lifecycle']='persistent'
  if field=='id':candidate['Id']='another-controller'
  if field=='image':candidate['Image']='another-image'
  if field=='label':candidate['Config']['Labels']['org.callsign.run-id']='another-workload'
