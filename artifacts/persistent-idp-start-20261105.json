@@ -184,5 +184,57 @@
     "automaticRestart": false,
     "configurationFix": "Persistent Compose explicitly overrides inherited run-id with an empty value; strict guard unchanged",
     "resume": "Pending user authorization"
+  },
+  "explicitRestart20261106": {
+    "source": "158870fb3427f501b61ec34fd8e6325fdf26516a",
+    "authorization": "User explicitly requested restart",
+    "evidence": ".local/persistent-demo-connect-20261105T073906Z/live-20261105/resume-20261105T233718Z",
+    "previousStopsPreserved": true,
+    "realmImportedAgain": false,
+    "readiness": {
+      "idp": {
+        "http": 200,
+        "status": "UP",
+        "head": null
+      },
+      "witness1": {
+        "http": 200,
+        "status": "ok",
+        "head": "157"
+      },
+      "witness2": {
+        "http": 200,
+        "status": "ok",
+        "head": "157"
+      },
+      "witness3": {
+        "http": 200,
+        "status": "ok",
+        "head": "157"
+      },
+      "witness4": {
+        "http": 200,
+        "status": "ok",
+        "head": "157"
+      },
+      "besu1": {
+        "head": 157
+      },
+      "besu2": {
+        "head": 157
+      },
+      "besu3": {
+        "head": 157
+      },
+      "besu4": {
+        "head": 157
+      }
+    },
+    "publicDiscovery": {
+      "http": 200,
+      "issuer": "https://callsign-demo-l-fixed.tail37b235.ts.net/idp/realms/callsign-demo",
+      "scope": "Public OIDC discovery only, not browser product login"
+    },
+    "scope": "Existing IdP/ingress/Besu/Witness services restarted. Product API and public call still incomplete."
   }
 }
