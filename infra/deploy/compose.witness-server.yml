@@ -1,0 +1,67 @@
+name: ${CALLSIGN_PROJECT:?owned project}
+x-witness: &witness
+  image: ${CALLSIGN_APP_IMAGE:?reviewed runtime}
+  network_mode: host
+  user: '1000:1000'
+  restart: 'no'
+  read_only: true
+  tmpfs: [/tmp]
+  mem_limit: 512m
+  memswap_limit: 512m
+  cpus: 0.5
+  pids_limit: 128
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  labels:
+    org.callsign.lifecycle: persistent
+    org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  entrypoint: [pnpm, --filter, '@callsign/witness', start]
+  environment: &env
+    CALLSIGN_ALLOW_EXTERNAL_EXECUTION: infrastructure
+    LISTEN_HOST: 127.0.0.1
+    SERVICE_REGISTRY_PROFILE: CALLSIGN_SERVICE_JOINT_CONFIGURATION_1
+    WITNESS_PREPROVISIONED_KEYS: 'true'
+    DEPLOYMENT_PATH: /trust/deployment.json
+    WITNESS_KEY_PATH: /keys/witness.json
+services:
+  witness1:
+    <<: *witness
+    environment:
+      <<: *env
+      WITNESS_ID: witness-1
+      WITNESS_PORT: '14201'
+      BESU_RPC_URL: http://127.0.0.1:18541
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared inputs}/witness-keys/witness-1.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
+  witness2:
+    <<: *witness
+    environment:
+      <<: *env
+      WITNESS_ID: witness-2
+      WITNESS_PORT: '14202'
+      BESU_RPC_URL: http://127.0.0.1:18542
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared inputs}/witness-keys/witness-2.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
+  witness3:
+    <<: *witness
+    environment:
+      <<: *env
+      WITNESS_ID: witness-3
+      WITNESS_PORT: '14203'
+      BESU_RPC_URL: http://127.0.0.1:18543
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared inputs}/witness-keys/witness-3.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
+  witness4:
+    <<: *witness
+    environment:
+      <<: *env
+      WITNESS_ID: witness-4
+      WITNESS_PORT: '14204'
+      BESU_RPC_URL: http://127.0.0.1:18544
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared inputs}/witness-keys/witness-4.json', target: /keys/witness.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}

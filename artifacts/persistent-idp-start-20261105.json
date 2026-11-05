@@ -118,5 +118,59 @@
     "firstFailure": "Four nodes exited before startup: newly created data volume root not writable; OOM false",
     "correction": "Verify owned volume labels, set new volume root UID/GID1000 only; no recursive changes, data deletion or identity regeneration",
     "composeSha256": "81fadafd5cfb6bcdaf9ee26f8fd189f9c356b09857fdca8ac1f030ca7b42df91"
+  },
+  "registryAndWitness20261106": {
+    "deployment": {
+      "networkId": "20260914",
+      "genesisHash": "0xf895109f42b6238d144bc346f694a02a313cca065abf854e6ce6b6b1152b01e5",
+      "registryAddress": "0xe11bc7d971878497f8fc6ef4f8c5bc20af6c10e9",
+      "registryCodeHash": "0x136adc95c6870f82c6d89b7a07a49262479c50286253404027cfd7d84368eeb8",
+      "deploymentBlock": "51",
+      "deployTransaction": "0xe2f0bf0a4742dc893efe8ffc08c4dbda5d48f63935b5e7dde313edaba0347085",
+      "registryProfile": "CALLSIGN_SERVICE_JOINT_CONFIGURATION_1",
+      "artifactHash": "44106b7087d542431cee1264df10d2c50d255e90ef36916090cb27db54753b23"
+    },
+    "institutionRegistered": false,
+    "approvers": "Three distinct protected synthetic credentials; separate actor sessions still required",
+    "runtime": {
+      "status": "BUILT_NOT_RUNTIME_VERIFIED",
+      "source": "0a62aefde46e5edd8e8cf65ec4636ed74b06a232",
+      "configId": "sha256:a3718bcb3470e0c0cbb82967372bd36ef93fbdf8994934135464f7febf15adbd",
+      "memoryGiB": 2,
+      "cpu": 1,
+      "timeoutSeconds": 90,
+      "durationSeconds": 1.5019879499450326,
+      "network": "none",
+      "originalFailurePreserved": true
+    },
+    "runtimeFirstFailure": "Public archive file modes affected by private umask; corrected by preserving git archive modes; first log retained",
+    "witnessHealth": [
+      {
+        "witnessId": "witness-1",
+        "status": 200,
+        "kid": "urn:callsign:witness:1#3x3i-rYmLF8A8xg0_I7phZ",
+        "blockNumber": "121"
+      },
+      {
+        "witnessId": "witness-2",
+        "status": 200,
+        "kid": "urn:callsign:witness:2#7vSbYX8lJ4HhkXeH1qwFo1",
+        "blockNumber": "121"
+      },
+      {
+        "witnessId": "witness-3",
+        "status": 200,
+        "kid": "urn:callsign:witness:3#-gI-BBkkmtgGm2N8czUDg6",
+        "blockNumber": "121"
+      },
+      {
+        "witnessId": "witness-4",
+        "status": 200,
+        "kid": "urn:callsign:witness:4#gTPVpQa6WD0SMys2L9oRJO",
+        "blockNumber": "121"
+      }
+    ],
+    "authorityQuorumVerified": false,
+    "publicProductLoginVerified": false
   }
 }
