@@ -217,7 +217,7 @@ def main():
        action('post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),*analysis_args,'--case','normal-end'],600,extra=extra)
        action('archive-post-restore-normal',[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase','post-restore-normal'],90,extra=extra)
        action('stale-restore',[sys.executable,'tests/integration/runtime-restore-driver.py'],120,extra={**extra,'CALLSIGN_RESTORE_CHECK_PHASE':'stale'})
-      phase_extra={**extra,'CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label==plan.get('workspaceFailureCase','normal-repeat-2') else 'no'}
+      phase_extra={**extra,'CALLSIGN_DEMO_UI_TEST':'yes' if plan.get('demoUi') else 'no','CALLSIGN_WORKSPACE_FAILURE_TEST':'yes' if label==plan.get('workspaceFailureCase','normal-repeat-2') else 'no'}
       action(label,[sys.executable,'tests/integration/runtime-media-driver.py','--delivery-files',str(root/'public'),*analysis_args,'--case',case],600,extra=phase_extra)
       if label!='emergency-stop':action('archive-'+label,[sys.executable,'tests/integration/runtime-media-driver.py','--archive-phase',label],90,extra=extra)
      if plan.get('databaseAudit'):

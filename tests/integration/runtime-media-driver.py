@@ -128,7 +128,7 @@ if options.analysis_fixture:
     if not token_path.exists():
         with open(token_path,'x',opener=lambda p,f:os.open(p,f,0o600)) as output:output.write(secrets.token_urlsafe(32))
     values=dict(line.split('=',1) for line in test_environment.read_text().splitlines() if '=' in line)
-    values.update(CALLSIGN_WORKSPACE_FAILURE_TEST='yes' if os.environ.get('CALLSIGN_WORKSPACE_FAILURE_TEST')=='yes' else 'no',CALLSIGN_MEDIA_ANALYSIS_MODE='fixture',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL='http://127.0.0.1:4101/__fixture/analysis',CALLSIGN_MEDIA_ANALYSIS_TOKEN_FILE='/run/callsign/analysis-fixture.token')
+    values.update(CALLSIGN_DEMO_UI_TEST='yes' if os.environ.get('CALLSIGN_DEMO_UI_TEST')=='yes' else 'no',CALLSIGN_WORKSPACE_FAILURE_TEST='yes' if os.environ.get('CALLSIGN_WORKSPACE_FAILURE_TEST')=='yes' else 'no',CALLSIGN_MEDIA_ANALYSIS_MODE='fixture',CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL='http://127.0.0.1:4101/__fixture/analysis',CALLSIGN_MEDIA_ANALYSIS_TOKEN_FILE='/run/callsign/analysis-fixture.token')
     test_environment=write_env('runtime-analysis-test',values)
 child = subprocess.Popen(['timeout', str(limit + 30), 'docker', 'exec', '--env-file', str(test_environment), controller,
                           'timeout', '--signal=TERM', '--kill-after=5s', str(limit), 'node', 'node_modules/vitest/vitest.mjs', 'run', '--config', 'vitest.http.config.ts',
