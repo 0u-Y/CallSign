@@ -1,5 +1,11 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 공개 ingress 활성화 확인
+
+사용자 계정에서 전용 노드 등록, 해당 노드의 Funnel 권한, HTTPS 인증서 발급을 승인했다. 보존 identity `callsign-demo-l-fixed.tail37b235.ts.net`으로 실제 공개 HTTPS와 WSS 왕복을 확인했다. 증거는 작업 보호 경로 `ingress-public-cert-20261105T2155/result.json`이며 제품 인증·API·PBX/TURN 검증은 아니다. 확인용 서버와 소유 ingress 프로세스는 정상 종료했고 등록 state는 보존했다. 기존 daemon·443 서비스·호스트 네트워크 설정은 변경하지 않았다. 인증서 최초 발급 대기 없이 요청했던 TLS timeout은 별도 실패로 보존했다.
+
+Keycloak 공식 linux/amd64 이미지의 manifest와 모든 blob 검증을 완료했다(누적 다운로드 425,908,101 bytes, 승인 상한 500MiB). 이미지 기동과 공개 로그인은 아직 미실행이다. 실제 공개 origin을 사용한 보호 OIDC 입력은 한 번 생성해 보존했으며 계정이 이미 운영 중이라는 뜻은 아니다. 지속 backend는 미기동이며 HTTPS/WSS 성공을 TURN relay·외부 음성·실제 분석 성공으로 확대하지 않는다.
+
 ## 2026-11-05 단계별 메모리 실측
 
 현재 실행 장소는 개발 서버의 전용 지속 환경으로 결정했고 AWS 이전은 후속이다. 이번 실측은 임시 환경이며 지속 환경으로 전환하지 않았다. [실측 원본 요약](../artifacts/staged-memory-20261105.json): 첫 시도는 중복 상태 문구의 observer strict locator 실패, 수신 상태 영역으로 수정 후 같은 원래 deadline에서 정상2·취소1·정지/공동복구1 통과(실행5, 성공4, 실패1). 소유 cgroup+host 5초 표본 최대4.557GiB, 호스트 가용 최소30.558GiB, 자원 중단 없음. Keycloak·공개 ingress·유료 AI·장시간 사용은 미포함이며 서비스 최소 RAM으로 확대하지 않는다. 최종 DB 감사는 overdue pending1건으로 FAIL; 미종료 통화0·미정산 예약0·소비 영수증4는 확인했다. 전체 PASS로 기록하지 않으며 원인 미확정 pending을 수동 삭제하지 않았다. 두 환경 소유 컨테이너/volume 정리 및 기존 interface/route/network/컨테이너 보존 비교 통과.

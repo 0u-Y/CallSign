@@ -42,7 +42,7 @@ r.mkdir(mode=0o700)
 if not args.resume_identity:
  state.mkdir(mode=0o700);(r/'identity.json').write_text(json.dumps(identity));(r/'identity.json').chmod(0o600)
 logs=r/'logs';logs.mkdir(mode=0o700);watch=SwapWatch(PRESSURE_POLICY);children=[];result={'status':'NOT_RUN'};events=(r/'resource-samples.jsonl').open('x');os.chmod(r/'resource-samples.jsonl',0o600)
-plan={'scope':'One isolated userspace ingress enrollment, no application/backend/OIDC/chain/media services or existing daemon mutation','authorization':'Caller must hold explicit isolated ingress approval; guards do not grant permission. No firewall/NAT/global changes','resourceProfile':'Lightweight enrollment thresholds; not a full-stack or persistent-service policy','startGiB':24,'reserveGiB':16,'hostGiB':3,'wholeGiB':4,'deadlineMonotonic':deadline,'cleanupReserveSeconds':600,'enrollmentWaitSeconds':300,'automaticRetry':False,'persistentBackendCreated':False,'identityRoot':str(identity_root),'resumesExistingNode':bool(args.resume_identity)};(r/'plan.json').write_text(json.dumps(plan,indent=2))
+plan={'scope':'One isolated userspace ingress enrollment, no application/backend/OIDC/chain/media services or existing daemon mutation','authorization':'Caller must hold explicit isolated ingress approval; guards do not grant permission. No firewall/NAT/global changes','resourceProfile':'Lightweight enrollment thresholds; not a full-stack or persistent-service policy','startGiB':24,'reserveGiB':16,'hostGiB':3,'wholeGiB':4,'deadlineMonotonic':deadline,'cleanupReserveSeconds':600,'enrollmentWaitSeconds':max(0,int(deadline-time.monotonic()-600)),'automaticRetry':False,'persistentBackendCreated':False,'identityRoot':str(identity_root),'resumesExistingNode':bool(args.resume_identity)};(r/'plan.json').write_text(json.dumps(plan,indent=2))
 def stop_on(reason):
  if children:
   latch=identity_root/'resource-stop.json'
@@ -94,7 +94,7 @@ try:
  if matches:
   link=r/'enrollment-url.protected.txt';link.write_text(matches[0]+'\n');link.chmod(0o600);print(json.dumps({'status':'USER_NODE_APPROVAL_REQUIRED','protectedEnrollmentReference':str(link),'oldDaemonUntouched':True}),flush=True)
  begin=time.monotonic()
- while time.monotonic()-begin<300:
+ while time.monotonic()<deadline-605:
   sample()
   if daemon.poll()is not None:raise RuntimeError('OWNED_DAEMON_EXITED')
   status=subprocess.run(scoped_tailscale(socket_dir,'status','--json'),capture_output=True,text=True,timeout=5)
