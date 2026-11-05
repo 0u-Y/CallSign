@@ -57,5 +57,24 @@
     "productApiConnected": false,
     "resourceRestart": false,
     "paidCalls": 0
+  },
+  "productPreparation20261106": {
+    "recordedAt": "2026-11-05T23:24:35.395633+00:00",
+    "existingProductDirectoryWasAbsent": true,
+    "keysAndManagementPrepared": true,
+    "genesisAndFourValidatorKeysPrepared": true,
+    "loopbackPeerPorts": [
+      30311,
+      30312,
+      30313,
+      30314
+    ],
+    "generatorSha256": "f2be2411da839835d2758a57cf956a7aee8640e7bb5380d41cbefca11976394c",
+    "besuConfigId": "sha256:f3713c713ca4f9e89c09e1478d2a85116ba9ce8343129d709420ba2af009598b",
+    "validatorProcessesStarted": false,
+    "existingOidcRealmPreserved": true,
+    "additionalPreparationContainerMemoryLimitGiB": 1,
+    "existingMemoryPlusPreparationBelow16GiB": true,
+    "privateInputsPublished": false
   }
 }

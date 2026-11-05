@@ -8,6 +8,12 @@ OUTPUT_DIR="${CALLSIGN_BESU_DIR:-${ROOT_DIR}/.local/besu}"
 NETWORK_CONFIG="${CALLSIGN_NETWORK_CONFIG:-${ROOT_DIR}/infra/besu/network-config.json}"
 GENERATED_DIR="${OUTPUT_DIR}/generated"
 PEER_ARGS=("${OUTPUT_DIR}")
+PEER_MODE_ARGS=()
+case "${CALLSIGN_BESU_PEER_MODE:-private-network}" in
+  private-network) ;;
+  host-loopback) PEER_MODE_ARGS+=(--host-loopback) ;;
+  *) echo 'BESU_PEER_MODE_INVALID' >&2; exit 78 ;;
+esac
 if [[ -n "${CALLSIGN_ENV_FILE:-}" ]]; then PEER_ARGS+=(--env-file "${CALLSIGN_ENV_FILE}"); fi
 prepare_peers() {
   if [[ -n "${CALLSIGN_TOOL_IMAGE:-}" ]]; then
@@ -16,9 +22,9 @@ prepare_peers() {
       --user "$(id -u):$(id -g)" --memory 256m --memory-swap 256m --cpus 1 --pids-limit 64 \
       --env-file "${CALLSIGN_ENV_FILE:?protected deployment env}" --env CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure \
       --mount "type=bind,src=${OUTPUT_DIR},dst=/network" \
-      "$CALLSIGN_TOOL_IMAGE" pnpm exec tsx scripts/prepare-besu-peers.ts /network --apply
+      "$CALLSIGN_TOOL_IMAGE" pnpm exec tsx scripts/prepare-besu-peers.ts /network "${PEER_MODE_ARGS[@]}" --apply
   else
-    pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" --apply
+    pnpm --dir "${ROOT_DIR}" exec tsx "${ROOT_DIR}/scripts/prepare-besu-peers.ts" "${PEER_ARGS[@]}" "${PEER_MODE_ARGS[@]}" --apply
   fi
 }
 if [[ -f "${OUTPUT_DIR}/genesis.json" && -f "${OUTPUT_DIR}/keys/node4/key" ]]; then
