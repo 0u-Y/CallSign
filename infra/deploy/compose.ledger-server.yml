@@ -1,0 +1,63 @@
+# Current server only: fixed loopback listeners, no bridge or published ports.
+name: ${CALLSIGN_PROJECT:?owned project}
+x-labels: &labels
+  org.callsign.lifecycle: persistent
+  org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+x-node: &node
+  image: ${BESU_IMAGE:?reviewed local Besu image}
+  user: '1000:1000'
+  network_mode: host
+  restart: 'no'
+  mem_limit: 3g
+  memswap_limit: 3g
+  cpus: 1
+  pids_limit: 256
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  labels: *labels
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  entrypoint: [bash, -ec]
+  command:
+    - exec besu --data-path=/var/lib/besu --genesis-file=/network/genesis.json --node-private-key-file=/keys/key --network-id=${NETWORK_ID:?prepared network} --p2p-interface=127.0.0.1 --p2p-host=127.0.0.1 --p2p-port=$$P2P_PORT --discovery-enabled=false --static-nodes-file=/network/static-nodes.json --permissions-nodes-config-file-enabled=true --rpc-http-enabled=true --rpc-http-host=127.0.0.1 --rpc-http-port=$$RPC_PORT --rpc-http-api=ETH,NET,WEB3 --host-allowlist=localhost,127.0.0.1 --min-gas-price=0
+services:
+  besu1:
+    <<: *node
+    environment: {JAVA_OPTS: '-Xmx2g', P2P_PORT: '30311', RPC_PORT: '18541'}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/keys/node1/key', target: /keys/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
+      - besu1-data:/var/lib/besu
+  besu2:
+    <<: *node
+    environment: {JAVA_OPTS: '-Xmx2g', P2P_PORT: '30312', RPC_PORT: '18542'}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/keys/node2/key', target: /keys/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
+      - besu2-data:/var/lib/besu
+  besu3:
+    <<: *node
+    environment: {JAVA_OPTS: '-Xmx2g', P2P_PORT: '30313', RPC_PORT: '18543'}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/keys/node3/key', target: /keys/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
+      - besu3-data:/var/lib/besu
+  besu4:
+    <<: *node
+    environment: {JAVA_OPTS: '-Xmx2g', P2P_PORT: '30314', RPC_PORT: '18544'}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/besu/genesis.json', target: /network/genesis.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/static-nodes.json', target: /network/static-nodes.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/keys/node4/key', target: /keys/key, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/besu/permissions_config.toml', target: /var/lib/besu/permissions_config.toml, read_only: true, bind: {create_host_path: false}}
+      - besu4-data:/var/lib/besu
+volumes:
+  besu1-data: {labels: *labels}
+  besu2-data: {labels: *labels}
+  besu3-data: {labels: *labels}
+  besu4-data: {labels: *labels}

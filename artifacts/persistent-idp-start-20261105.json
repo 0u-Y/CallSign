@@ -76,5 +76,47 @@
     "additionalPreparationContainerMemoryLimitGiB": 1,
     "existingMemoryPlusPreparationBelow16GiB": true,
     "privateInputsPublished": false
+  },
+  "ledgerStartup20261106": {
+    "status": "FOUR_LOOPBACK_NODES_ADVANCING",
+    "heads": [
+      12,
+      12,
+      12,
+      12
+    ],
+    "sameComparedHeight": 12,
+    "sameHeightHash": "0x8e45ecec60c3f6a252a379707a481ab88b3222d870d30f10cbf0c07487c4005a",
+    "genesisHash": "0xf895109f42b6238d144bc346f694a02a313cca065abf854e6ce6b6b1152b01e5",
+    "peers": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "firstHeads": [
+      {
+        "node": 1,
+        "head": "0x1"
+      },
+      {
+        "node": 2,
+        "head": "0x1"
+      },
+      {
+        "node": 3,
+        "head": "0x1"
+      },
+      {
+        "node": 4,
+        "head": "0x1"
+      }
+    ],
+    "independentOperators": false,
+    "publicRpc": false,
+    "contractDeployed": false,
+    "firstFailure": "Four nodes exited before startup: newly created data volume root not writable; OOM false",
+    "correction": "Verify owned volume labels, set new volume root UID/GID1000 only; no recursive changes, data deletion or identity regeneration",
+    "composeSha256": "81fadafd5cfb6bcdaf9ee26f8fd189f9c356b09857fdca8ac1f030ca7b42df91"
   }
 }
