@@ -23,31 +23,31 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
   const records=ids.length?execFileSync('docker',['inspect','--format',format,...ids],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split('\n').map(line=>JSON.parse(line)):[];
   assertManagedDeployment(records,project,env.DEPLOYMENT_ID);
   if(!env.FINALS_DATA_DIR)throw Error('PERSISTENT_STATE_DIRECTORY_REQUIRED');
-  const original=resolve(env.FINALS_DATA_DIR,'resource-stop.json'),reviewPath=resolve(env.FINALS_DATA_DIR,'resource-stop.review.json'),followup=resolve(env.FINALS_DATA_DIR,'resource-stop.after-review.json');
+  let latch=resolve(env.FINALS_DATA_DIR,'resource-stop.json'),reviewPath=resolve(env.FINALS_DATA_DIR,'resource-stop.review.json');
   const protectedState=()=>{
    const parent=lstatSync(env.FINALS_DATA_DIR);
    if(!parent.isDirectory()||parent.isSymbolicLink()||parent.uid!==process.getuid()||(parent.mode&0o077))throw Error('OWNED_PROTECTED_STATE_DIRECTORY_REQUIRED');
   };
-  const stoppedBytes=()=>{protectedState();const info=lstatSync(original);if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||(info.mode&0o077)||info.size>4096)throw Error('PROTECTED_RESOURCE_STOP_REQUIRED');return readFileSync(original);};
-  let reviewed=false;
-  if(['status','check','latch','review'].includes(command)&&existsSync(reviewPath)){
-   protectedState();const info=lstatSync(reviewPath);
-   if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||(info.mode&0o077)||info.size>4096)throw Error('PROTECTED_RESOURCE_REVIEW_REQUIRED');
-   const review=JSON.parse(readFileSync(reviewPath,'utf8'));
-   if(review.deploymentId!==env.DEPLOYMENT_ID||review.stopSha256!==createHash('sha256').update(stoppedBytes()).digest('hex')||review.format!=='callsign-operator-stop-review-v1')throw Error('RESOURCE_REVIEW_IDENTITY_MISMATCH');
-   reviewed=true;
+  const protectedBytes=(path)=>{protectedState();const info=lstatSync(path);if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||(info.mode&0o077)||info.size>4096)throw Error('PROTECTED_RESOURCE_STOP_OR_REVIEW_REQUIRED');return readFileSync(path);};
+  let reviewed=false,index=0;
+  // Each explicit review binds one immutable stop; a later stop needs another operator decision.
+  while(existsSync(reviewPath)){
+   const review=JSON.parse(protectedBytes(reviewPath).toString('utf8'));
+   if(review.deploymentId!==env.DEPLOYMENT_ID||review.stopSha256!==createHash('sha256').update(protectedBytes(latch)).digest('hex')||review.format!=='callsign-operator-stop-review-v1')throw Error('RESOURCE_REVIEW_IDENTITY_MISMATCH');
+   reviewed=true;index++;
+   latch=resolve(env.FINALS_DATA_DIR,index===1?'resource-stop.after-review.json':`resource-stop.after-review-${index}.json`);
+   reviewPath=resolve(env.FINALS_DATA_DIR,`resource-stop.review-${index+1}.json`);
   }
-  const latched=existsSync(followup)||(existsSync(original)&&!reviewed);
+  const latched=existsSync(latch);
   if(command==='check'&&latched)throw Error('RESOURCE_STOP_LATCHED_OPERATOR_REVIEW_REQUIRED');
   if(command==='review'){
    const reference=process.env.CALLSIGN_RESOURCE_REVIEW_REFERENCE;
    if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='infrastructure'||!reference||reference.length<8||reference.length>200||/[\r\n]/.test(reference))throw Error('EXPLICIT_OPERATOR_RESOURCE_REVIEW_REQUIRED');
-   if(reviewed||existsSync(followup))throw Error('RESOURCE_REVIEW_ALREADY_USED');
-   const bytes=stoppedBytes(),prior=JSON.parse(bytes.toString('utf8'));
+   if(!latched)throw Error('RESOURCE_REVIEW_ALREADY_USED');
+   const bytes=protectedBytes(latch),prior=JSON.parse(bytes.toString('utf8'));
    if(prior.deploymentId!==env.DEPLOYMENT_ID)throw Error('RESOURCE_REVIEW_IDENTITY_MISMATCH');
    writeFileSync(reviewPath,JSON.stringify({format:'callsign-operator-stop-review-v1',deploymentId:env.DEPLOYMENT_ID,stopSha256:createHash('sha256').update(bytes).digest('hex'),reference,recordedAt:new Date().toISOString(),automaticRestart:false})+'\n',{flag:'wx',mode:0o600});
   }
-  const latch=reviewed?followup:original;
   if(command==='latch'&&!existsSync(latch)){
    protectedState();writeFileSync(latch,JSON.stringify({reason:'OPERATOR_RESOURCE_STOP',recordedAt:new Date().toISOString(),deploymentId:env.DEPLOYMENT_ID})+'\n',{flag:'wx',mode:0o600});
   }

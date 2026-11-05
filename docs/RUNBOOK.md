@@ -23,6 +23,8 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 지속 자원 감시는 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure python3 scripts/monitor-deployment.py --env-file PRIVATE_DEPLOYMENT_ENV --output PRIVATE_NEW_MONITOR_DIR`로 시작한다. 60초 사전 관측과 살아 있는 monitor의 `ready.json`을 확인한 뒤 기동하며 이 표시는 제품 readiness가 아니다. 5초마다 검증된 소유 컨테이너의 cgroup 메모리와 호스트 PSI/swap/OOM을 확인한다. 로그는10MiB씩 두 파일로 제한한다. 중단 시 최초 사유를 보존하고 소유 애플리케이션→DB 순서로 중지한다. 자동 재기동하지 않으며 감시 종료도 서비스를 중지한다. 준비 시간을 포함해 감시 시작부터 최대24시간으로 제한한다.
 
+자원 중단 뒤 사용자가 명시적으로 재개하면 `deployment-control.mjs review`에 보호 env와 `CALLSIGN_RESOURCE_REVIEW_REFERENCE`를 전달한다. 각 승인은 해당 중단 파일의 SHA에 연결된 새 review 파일로 남는다. 원본 중단·이전 review를 삭제하거나 덮어쓰지 않으며, 이후 중단은 다시 기동을 차단한다.
+
 첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 공개 로그인은 미실행이며 이 중단 뒤 재개는 별도 확인 대상이다.
 
 첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.

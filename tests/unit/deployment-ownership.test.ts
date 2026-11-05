@@ -39,9 +39,15 @@ else if(a[0]==='inspect')for(const service of ['issuer','oidc','postgres','oidc-
   execFileSync('node',check,{env,stdio:'pipe'});
   expect(JSON.parse(run('status')).priorResourceStopReviewed).toBe(true);
   expect(readFileSync(join(root,'resource-stop.json'),'utf8')).toBe(original);
+  expect(()=>execFileSync('node',review,{env:{...env,CALLSIGN_RESOURCE_REVIEW_REFERENCE:'Duplicate request without a new stop'},stdio:'pipe'})).toThrow(/RESOURCE_REVIEW_ALREADY_USED/);
   run('resource-stop');
   expect(()=>execFileSync('node',check,{env,stdio:'pipe'})).toThrow(/RESOURCE_STOP_LATCHED/);
-  expect(()=>execFileSync('node',review,{env:{...env,CALLSIGN_RESOURCE_REVIEW_REFERENCE:'Explicit further request'},stdio:'pipe'})).toThrow(/RESOURCE_REVIEW_ALREADY_USED/);
+  const second=readFileSync(join(root,'resource-stop.after-review.json'),'utf8');
+  execFileSync('node',review,{env:{...env,CALLSIGN_RESOURCE_REVIEW_REFERENCE:'Explicit further user restart request'},stdio:'pipe'});
+  execFileSync('node',check,{env,stdio:'pipe'});
+  run('resource-stop');
+  expect(()=>execFileSync('node',check,{env,stdio:'pipe'})).toThrow(/RESOURCE_STOP_LATCHED/);
+  expect(readFileSync(join(root,'resource-stop.after-review.json'),'utf8')).toBe(second);
   expect(readFileSync(join(root,'resource-stop.json'),'utf8')).toBe(original);
  }finally{rmSync(root,{recursive:true,force:true});}
 });
