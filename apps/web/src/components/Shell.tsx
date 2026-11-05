@@ -1,10 +1,11 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { Brand } from "./Brand.js";
 import { publicPreview } from "../config.js";
 
 export function Shell() {
+  const demo=useLocation().pathname.startsWith('/demo');
   return (
-    <div className={`app-shell${publicPreview ? " public-preview" : ""}`}>
+    <div className={`app-shell${publicPreview ? " public-preview" : ""}${demo?" demo-shell":""}`}>
       <a className="skip-link" href="#main">본문으로 건너뛰기</a>
       <header className="site-header">
         <NavLink to="/" className="brand-link"><Brand /></NavLink>
