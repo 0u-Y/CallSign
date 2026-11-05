@@ -27,6 +27,13 @@ if(!['none','deepgram-openai'].includes(value))throw new Error('PROVIDER_CONFIGU
 JS
 )"
 if [[ "$provider_config" == deepgram-openai ]]; then compose+=(-f infra/deploy/compose.providers.yml); fi
+oidc_provider="$(node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
+import {readFileSync} from 'node:fs';import {parseEnv} from 'node:util';
+const env={...parseEnv(readFileSync(process.argv[2],'utf8')),...process.env};const provider=env.CALLSIGN_OIDC_PROVIDER||'external';
+if(!['external','keycloak'].includes(provider))throw Error('OIDC_PROVIDER_INVALID');process.stdout.write(provider);
+JS
+)"
+if [[ "$oidc_provider" == keycloak ]]; then compose+=(-f infra/deploy/compose.oidc.yml --profile oidc); fi
 if [[ "$command" == status ]]; then exec node scripts/deployment-control.mjs status "$CALLSIGN_ENV_FILE" "${compose[@]}"; fi
 control=owned
 if [[ "$command" == start || "$command" == restart ]]; then control=check; fi
@@ -34,6 +41,7 @@ if [[ "$command" == resource-stop ]]; then control=latch; fi
 node scripts/deployment-control.mjs "$control" "$CALLSIGN_ENV_FILE" "${compose[@]}"
 applications=(https web platform sender issuer worker witness1 witness2 witness3 witness4 asterisk turn)
 data=(besu1 besu2 besu3 besu4 postgres)
+if [[ "$oidc_provider" == keycloak ]]; then applications+=(oidc); data+=(oidc-db); fi
 case "$command" in
   start|restart)
     # Validate actual generated image identities without sourcing env as executable shell text.
@@ -46,6 +54,7 @@ if(env.CALLSIGN_DEPLOYMENT_TARGET==='aws'){
   const {awsPreflight}=await import('./scripts/preflight-aws.ts');
   if(awsPreflight(env,'runtime',(env.CALLSIGN_FORBIDDEN_HOSTS??'').split(',').filter(Boolean)).some(c=>c.status==='FAIL'||c.status==='BLOCKED'))throw new Error('AWS_RUNTIME_CONFIGURATION_BLOCKED');
 }
+if(env.CALLSIGN_OIDC_PROVIDER==='keycloak'&&!immutableImageReference(env.KEYCLOAK_IMAGE))throw Error('REVIEWED_KEYCLOAK_IMAGE_REQUIRED');
 for(const key of ['CALLSIGN_APP_IMAGE','CALLSIGN_WEB_IMAGE','ASTERISK_IMAGE','TURN_IMAGE','BESU_IMAGE','POSTGRES_IMAGE','HTTPS_IMAGE'])if(!immutableImageReference(env[key]))throw new Error(`REVIEWED_IMAGE_DIGEST_REQUIRED:${key}`);
 if(!/^[0-9a-f]{64}$/.test(env.VITE_SERVICE_TRUST_SHA256??''))throw new Error('PUBLISHED_TRUST_PIN_REQUIRED_BEFORE_START');
 JS

@@ -20,6 +20,13 @@ export function awsPreflight(env:Record<string,string|undefined>,step='prepare',
  for(const key of ['AWS_RELEASE_DIR','AWS_VOLUME_ROOT','FINALS_DATA_DIR','AWS_WEB_TLS_DIR']){const v=required(key);if(v)check(key,v.startsWith('/')&&!/(?:^|\/)(?:home|tmp|\.local)(?:\/|$)/.test(v),'AWS의 영속 mount/배포 경로를 사용하며 개발 홈·임시 경로를 금지합니다.');}
  for(const key of ['ISSUER_URI','SERVICE_URI','WEB_ORIGIN','OIDC_ISSUER','OIDC_JWKS_URL','OIDC_AUTHORIZATION_URL','OIDC_TOKEN_URL','CONSUMPTION_ANCHOR_URL']){const value=required(key);if(!value)continue;try{const u=new URL(value);check(key,u.protocol==='https:'&&!u.username&&!u.password&&!['localhost','0.0.0.0','::1','[::1]'].includes(u.hostname)&&!u.hostname.startsWith('127.')&&!developmentHosts.includes(u.hostname),'AWS 또는 선택한 외부 HTTPS 주소여야 하며 개발 서버·loopback을 거절합니다.');}catch{check(key,false,'HTTPS URL 형식이 잘못됐습니다.');}}
  for(const key of ['OIDC_CLIENT_ID','OFFICIAL_OIDC_CLIENT_ID','OIDC_AUDIENCE','OFFICIAL_OIDC_AUDIENCE','INSTITUTION_ID','DEPLOYMENT_ID','CALLSIGN_PROJECT','NETWORK_ID'])required(key);
+ check('aws-oidc-provider',['external','keycloak'].includes(env.CALLSIGN_OIDC_PROVIDER??'external'),'Select an external IdP or the explicitly prepared Keycloak overlay.');
+ if(env.CALLSIGN_OIDC_PROVIDER==='keycloak'){
+  for(const key of ['KEYCLOAK_PUBLIC_ORIGIN','KEYCLOAK_ENV_FILE','KEYCLOAK_DB_PASSWORD_FILE','KEYCLOAK_TRUSTED_PROXY_CIDRS'])required(key);
+  const origin=env.KEYCLOAK_PUBLIC_ORIGIN;
+  if(origin)try{const u=new URL(origin);check('aws-keycloak-origin',u.protocol==='https:'&&!u.username&&!u.password&&!u.search&&!u.hash&&env.OIDC_ISSUER===origin.replace(/\/$/,'')+'/realms/callsign-demo','Keycloak HTTPS origin and the configured realm issuer must match.');}catch{check('aws-keycloak-origin',false,'Invalid Keycloak public origin.');}
+  if(step==='runtime'){const ref=required('KEYCLOAK_IMAGE');if(ref)check('KEYCLOAK_IMAGE',ghcrImageReference(ref),'Use the reviewed private GHCR manifest digest, not the downloaded tag or local config ID.');}
+ }
  check('aws-chain-id',/^[1-9][0-9]*$/.test(env.NETWORK_ID??'')&&Number.isSafeInteger(Number(env.NETWORK_ID)),'NETWORK_ID는 새 genesis/계약/서비스가 공유하는 양의 안전 정수여야 합니다.',!env.NETWORK_ID);
  if(env.WEB_ORIGIN)try{const origin=new URL(env.WEB_ORIGIN);check('aws-web-origin',origin.origin===env.WEB_ORIGIN,'WEB_ORIGIN에는 경로·query·fragment를 넣지 않습니다.');}catch{/* URL validation above reports the error. */}
  check('aws-oidc-separation',!!env.OIDC_CLIENT_ID&&!!env.OIDC_AUDIENCE&&!!env.OFFICIAL_OIDC_CLIENT_ID&&!!env.OFFICIAL_OIDC_AUDIENCE&&env.OIDC_CLIENT_ID!==env.OFFICIAL_OIDC_CLIENT_ID&&env.OIDC_AUDIENCE!==env.OFFICIAL_OIDC_AUDIENCE,'업무/공식 public client와 audience를 분리합니다.',true);

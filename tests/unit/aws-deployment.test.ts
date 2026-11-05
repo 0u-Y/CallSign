@@ -58,3 +58,11 @@ it('blocks documentation hosts, missing NEW identity and malformed origins witho
  expect(awsPreflight({...env,TURN_URLS:'turn:turn.example:3478'},'runtime').find(c=>c.id==='TURN_URLS')?.status).toBe('BLOCKED');
  expect(awsPreflight({...env,REGISTRY_ADDRESS:'0x'+'0'.repeat(40)},'runtime').find(c=>c.id==='aws-registry-address')?.status).toBe('FAIL');
 });
+
+it('requires optional Keycloak inputs and an immutable private registry image without changing external IdP defaults',()=>{
+ const selected={...env,CALLSIGN_OIDC_PROVIDER:'keycloak',KEYCLOAK_PUBLIC_ORIGIN:'https://identity.callsign-fixture.org/idp',OIDC_ISSUER:'https://identity.callsign-fixture.org/idp/realms/callsign-demo',KEYCLOAK_ENV_FILE:'/srv/private/oidc.env',KEYCLOAK_DB_PASSWORD_FILE:'/srv/private/oidc.password',KEYCLOAK_TRUSTED_PROXY_CIDRS:'10.205.0.4/32'};
+ expect(awsPreflight(selected).filter(c=>['FAIL','BLOCKED'].includes(c.status))).toEqual([]);
+ expect(awsPreflight({...selected,KEYCLOAK_ENV_FILE:''}).find(c=>c.id==='KEYCLOAK_ENV_FILE')?.status).toBe('BLOCKED');
+ expect(awsPreflight({...selected,OIDC_ISSUER:env.OIDC_ISSUER}).find(c=>c.id==='aws-keycloak-origin')?.status).toBe('FAIL');
+ for(const [ref,status] of [['quay.io/keycloak/keycloak:26.8.1','FAIL'],['ghcr.io/unit/keycloak@sha256:'+'1'.repeat(64),'PASS']]as const)expect(awsPreflight({...selected,KEYCLOAK_IMAGE:ref},'runtime').find(c=>c.id==='KEYCLOAK_IMAGE')?.status).toBe(status);
+});

@@ -1,0 +1,74 @@
+# Optional real OIDC provider. This bridge-based overlay is not a host-preserving dev launcher.
+x-oidc-labels: &labels
+  org.callsign.lifecycle: persistent
+  org.callsign.deployment-id: ${DEPLOYMENT_ID:?deployment identity}
+x-oidc: &oidc
+  image: ${KEYCLOAK_IMAGE:?reviewed immutable Keycloak image}
+  platform: linux/amd64
+  user: '1000:1000'
+  labels: *labels
+  env_file: ${KEYCLOAK_ENV_FILE:?protected server env file}
+  environment:
+    KC_DB: postgres
+    KC_DB_URL: ${KEYCLOAK_DB_JDBC_URL:-jdbc:postgresql://oidc-db:5432/callsign_oidc}
+    KC_DB_USERNAME: callsign_oidc
+    KC_HOSTNAME: ${KEYCLOAK_PUBLIC_ORIGIN:?actual provider HTTPS origin and optional path}
+    KC_HTTP_RELATIVE_PATH: ${KEYCLOAK_HTTP_PATH:-/idp}
+    KC_HTTP_ENABLED: 'true'
+    KC_PROXY_HEADERS: xforwarded
+    KC_PROXY_TRUSTED_ADDRESSES: ${KEYCLOAK_TRUSTED_PROXY_CIDRS:?actual owned proxy addresses only}
+  networks: [application, identity]
+  mem_limit: 1g
+  memswap_limit: 1g
+  cpus: 1
+  pids_limit: 256
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+services:
+  oidc-db:
+    image: ${POSTGRES_IMAGE:?reviewed PostgreSQL image}
+    platform: linux/amd64
+    labels: *labels
+    profiles: [oidc]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: callsign_oidc
+      POSTGRES_USER: callsign_oidc
+      POSTGRES_PASSWORD_FILE: /run/secrets/oidc-database.password
+    volumes:
+      - oidc-db:/var/lib/postgresql/data
+      - type: bind
+        source: ${KEYCLOAK_DB_PASSWORD_FILE:?protected OIDC database password file}
+        target: /run/secrets/oidc-database.password
+        read_only: true
+        bind: {create_host_path: false}
+    networks: [identity]
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+    healthcheck: {test: [CMD, pg_isready, -U, callsign_oidc, -d, callsign_oidc], interval: 5s, timeout: 3s, retries: 12}
+  oidc:
+    <<: *oidc
+    profiles: [oidc]
+    restart: unless-stopped
+    # Normal restart never runs realm import or recreates accounts.
+    command: [start]
+    depends_on: {oidc-db: {condition: service_healthy}}
+  oidc-init:
+    <<: *oidc
+    profiles: [oidc-init]
+    restart: 'no'
+    command: [import, --file, /provision/callsign-demo-realm.json, --override, 'false']
+    volumes:
+      - type: bind
+        source: ${KEYCLOAK_REALM_IMPORT_FILE:-/nonexistent-callsign-realm-import}
+        target: /provision/callsign-demo-realm.json
+        read_only: true
+        bind: {create_host_path: false}
+volumes:
+  oidc-db: {labels: *labels}
+networks:
+  identity: {internal: true}
