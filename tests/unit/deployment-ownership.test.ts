@@ -32,5 +32,16 @@ else if(a[0]==='inspect')for(const service of ['issuer','oidc','postgres','oidc-
   expect(stops).toHaveLength(4);expect(stops[0]).toContain('unit-issuer');expect(stops[0]).not.toContain('unit-postgres');expect(stops[0]).toContain('unit-oidc');expect(stops[0]).not.toContain('unit-oidc-db');expect(stops[1]).toContain('unit-postgres');expect(stops[1]).toContain('unit-oidc-db');expect(records.every(row=>!row.some(v=>['down','rm','prune','test-runner','seed'].includes(v)))).toBe(true);
   expect(readFileSync(calls,'utf8').slice(before.length)).not.toContain('"stop"');
   expect(()=>run('start')).toThrow(/development host network preservation/);
+  const original=readFileSync(join(root,'resource-stop.json'),'utf8');
+  const review=['scripts/deployment-control.mjs','review',file,'docker','compose'];
+  expect(()=>execFileSync('node',review,{env,stdio:'pipe'})).toThrow(/EXPLICIT_OPERATOR_RESOURCE_REVIEW_REQUIRED/);
+  execFileSync('node',review,{env:{...env,CALLSIGN_RESOURCE_REVIEW_REFERENCE:'Explicit user resume after reviewed observation failure'},stdio:'pipe'});
+  execFileSync('node',check,{env,stdio:'pipe'});
+  expect(JSON.parse(run('status')).priorResourceStopReviewed).toBe(true);
+  expect(readFileSync(join(root,'resource-stop.json'),'utf8')).toBe(original);
+  run('resource-stop');
+  expect(()=>execFileSync('node',check,{env,stdio:'pipe'})).toThrow(/RESOURCE_STOP_LATCHED/);
+  expect(()=>execFileSync('node',review,{env:{...env,CALLSIGN_RESOURCE_REVIEW_REFERENCE:'Explicit further request'},stdio:'pipe'})).toThrow(/RESOURCE_REVIEW_ALREADY_USED/);
+  expect(readFileSync(join(root,'resource-stop.json'),'utf8')).toBe(original);
  }finally{rmSync(root,{recursive:true,force:true});}
 });
