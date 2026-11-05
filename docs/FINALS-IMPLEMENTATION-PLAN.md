@@ -1,5 +1,13 @@
 # 개발 현황과 검증 기록
 
+## 2026-11-05 실제 IdP 이미지 준비 완료
+
+검증된 OCI blob을 Docker archive로 스트리밍 변환하고 각 압축 해제 layer hash를 이미지 config의 diff_id와 대조했다. 추가 다운로드 없이 `callsign-keycloak-received:26.6.4` 로드와 amd64/config ID 일치를 확인했다. 최초 OCI archive 직접 로드 실패는 보존했다. 이미지 로드는 기동·realm import·공개 로그인 성공이 아니다.
+
+## 2026-11-05 Vercel 프록시 연결 진단
+
+기존 프로젝트의 전용 Preview에서 동일 Funnel 진단 서버로 HTTPS는200·JSON, WSS는404였다. Funnel 직접 WSS는 성공했다. [관측](../artifacts/vercel-ingress-transport-20261105.json). 이 rewrite 구성의 결과이며 모든 Vercel WebSocket 기능의 불가능을 주장하지 않는다. 제품 계정/음성 시험이 아니다. 소유 Preview2개 삭제·임시 automation 자격 폐기·확인 서버/ingress 정상 종료를 확인했다. Vercel 진입 후 같은 origin의 전용 서비스 주소로 이동하는 방안과 Vercel 주소를 유지하는 별도 인증 연결 중 사용자 선택을 요청했다.
+
 ## 2026-11-05 녹음 송신 경계 재확인
 
 기존 파일 전환 실패는 측정기 FFT 평활화가 이전 마이크 peak를 남긴 시험 결함이었다. 파일 stream RMS와 sender track 일치를 확인한 뒤 평활화만 끄자 실제 두 RTCPeerConnection 사이에서 마이크445.31Hz→파일878.91Hz→음소거RMS0→마이크445.31Hz가 확인됐다. [결과](../artifacts/recording-switch-20261105.json). 공개 PBX/TURN·인증·실제 제공자 경로로 확대하지 않는다. 파일 자연 종료 시 재생/context/track을 정리하도록 보완했고 단위 회귀를 통과했다.

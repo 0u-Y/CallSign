@@ -1,0 +1,19 @@
+{
+  "https": {
+    "status": 200,
+    "body": {
+      "service": "callsign-connectivity-probe",
+      "productBackend": false
+    }
+  },
+  "wss": {
+    "status": "HTTP",
+    "code": 404
+  },
+  "scope": "Owned diagnostic endpoint only; no product login/media proof",
+  "directFunnelWss": "callsign-wss-probe",
+  "previewDeployment": "dpl_E8NmtvXe24YwuYPsf678eUdW8ECP",
+  "temporaryAutomationAccessRevoked": true,
+  "ownedProbePreviewsDeleted": true,
+  "ownIngressProcessesStopped": true
+}
