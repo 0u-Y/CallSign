@@ -15,7 +15,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 ## 지속 서비스와 시험 환경의 분리
 
-현재 공개 Vercel은 API 미연결 제품 미리보기다. 전용 Funnel의 공개 HTTPS/WSS 진단은 성공했지만 제품 로그인·PBX/TURN·외부 음성은 아직 확인하지 않았다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
+현재 공개 Vercel은 실제 로그인·업무 API에 연결돼 있다. 기관·상담원·수신자·승인자의 공개 브라우저 로그인과 업무 조회·로그아웃을 확인했다. 전용 Funnel의 HTTPS/WSS 진단과 별개로 제품 분석 WSS·PBX/TURN·외부 음성은 미검증이다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
 
 전용 userspace 노드의 등록·Funnel 권한·HTTPS 활성화와 보존 identity를 재사용한다. `scripts/prepare-demo-ingress.py`는 등록 준비 도구이며 지속 backend launcher가 아니다. Tailscale Funnel의 TLS/TCP 성공으로 TURN relay·외부 브라우저 음성 성공을 주장하지 않는다. Vercel rewrite의 실제 진단은 [관측 기록](../artifacts/vercel-ingress-transport-20261105.json)을 따른다.
 
@@ -32,6 +32,8 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 사용자가 전용 노드 등록과 해당 노드의 Funnel 권한·HTTPS 인증서 발급을 완료했다. 등록 링크 재승인을 요구하거나 기존 전체 구성원용 정책을 추가하지 않는다. 보존 identity로 실제 등록/권한을 조회하고, 진단 성공과 제품 backend·미디어 연결을 구분한다. [Funnel의 TLS 종료 TCP 전달](https://tailscale.com/docs/reference/tailscale-cli/funnel#use-a-tcp-forwarder)은 사용할 수 있는 전송 옵션이며, TURN 연동·외부 relay 성공을 입증한 것은 아니다.
 
 Vercel은 [현재 공식 문서](https://vercel.com/docs/functions/websockets)에서 native WebSocket Function을 지원하지만 현재 저장소는 정적 SPA이고 API/WS proxy를 구현·검증한 상태가 아니다. HTTP rewrite만으로 SIP·분석 WSS나 TURN을 확인했다고 쓰지 않는다. 같은 origin의 cookie·CSRF·Origin을 유지하고 실제 backend와 trust가 준비되기 전 미연결 Production을 실제 모드로 바꾸지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
+
+현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 기존 보호 `oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. PBX 미준비에 따른 전체 readiness503을 health200과 구분한다.
 
 ### 브라우저부터 실제 서비스까지
 

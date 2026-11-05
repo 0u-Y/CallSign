@@ -5,7 +5,7 @@ import {resolve} from 'node:path';
 import {parseEnv} from 'node:util';
 import {pathToFileURL} from 'node:url';
 
-export const deploymentServices=['platform','issuer','sender','worker','web','https','witness1','witness2','witness3','witness4','asterisk','turn','besu1','besu2','besu3','besu4','postgres','oidc','oidc-db','oidc-init','anchor','anchor-db','migration-runner'];
+export const deploymentServices=['platform','issuer','sender','worker','web','https','witness1','witness2','witness3','witness4','asterisk','turn','besu1','besu2','besu3','besu4','postgres','oidc','oidc-db','oidc-init','anchor','anchor-db','migration-runner','browser-check'];
 export function assertManagedDeployment(records,project,deploymentId){
  if(!/^[a-z0-9][a-z0-9_-]*$/.test(project??'')||!deploymentId)throw Error('DEPLOYMENT_IDENTITY_REQUIRED');
  for(const record of records){

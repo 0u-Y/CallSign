@@ -6,14 +6,18 @@
 
 | 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
 |---|---|---|---|
-| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 현재 공개 `publicPreview:true` |
-| 공개 API·분석 WSS | 직접 Funnel HTTPS/WSS 진단 성공. [Vercel rewrite](../artifacts/vercel-ingress-transport-20261105.json)는 HTTPS200/WSS404 | 실제 backend 인증·cookie·CSRF·WS 연결 | Vercel 주소 유지 또는 서비스 도메인 이동의 배치 결정 |
-| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | 공개 HTTPS callback·역할별 로그인 | 공개 callback·제품 API 연결 필요; realm import 반복 금지 |
+| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 공개 연결 모드; 통화·분석 미검증 |
+| 공개 API·분석 WSS | 직접 Funnel HTTPS/WSS 진단 성공. [Vercel rewrite](../artifacts/vercel-ingress-transport-20261105.json)는 HTTPS200/WSS404 | 실제 backend 인증·cookie·CSRF·WS 연결 | HTTP는 Vercel same-origin rewrite 연결; 인증 WSS는 별도 미검증 |
+| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
 | 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 지속 backend·미디어 경로 미검증 |
 | 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
 | 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
 | DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
-| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4 재가동, 제품 API 준비 중; 중단 뒤 자동 재기동 금지 |
+| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
+
+## 2026-11-06 공개 로그인과 제품 API 연결
+
+Production source `80a6df1`에서 실제 Keycloak PKCE callback·cookie·CSRF·역할별 업무 조회·로그아웃을 브라우저로 확인했다. 실제 업무 생성·재조회·배정 확인과 상담원의 생성403은 공개 HTTPS API로 검증했다. 새 제품 DB의 migration11개와 비특권 LOGIN4개, 별도 TLS Anchor·복구 gate를 기존 도구로 준비했다. 상세는 [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 publicProductConnection20261106을 따른다. 통화·유료 AI·회수·복구는 이 결과에 포함하지 않는다.
 
 ## 2026-11-06 명시적 재가동
 

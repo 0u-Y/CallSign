@@ -236,5 +236,233 @@
       "scope": "Public OIDC discovery only, not browser product login"
     },
     "scope": "Existing IdP/ingress/Besu/Witness services restarted. Product API and public call still incomplete."
+  },
+  "publicProductConnection20261106": {
+    "source": "80a6df12f992d616355f2ecad9193aac4404ed3e",
+    "runtimeConfigId": "sha256:a3718bcb3470e0c0cbb82967372bd36ef93fbdf8994934135464f7febf15adbd",
+    "runtimeApiSource": "0a62aefde46e5edd8e8cf65ec4636ed74b06a232",
+    "database": {
+      "migrations": 11,
+      "users": 6,
+      "loginRoles": [
+        {
+          "role": "callsign_issuer_login",
+          "login": true,
+          "superuser": false,
+          "createDb": false,
+          "createRole": false
+        },
+        {
+          "role": "callsign_auth_login",
+          "login": true,
+          "superuser": false,
+          "createDb": false,
+          "createRole": false
+        },
+        {
+          "role": "callsign_worker_login",
+          "login": true,
+          "superuser": false,
+          "createDb": false,
+          "createRole": false
+        },
+        {
+          "role": "callsign_pbx_login",
+          "login": true,
+          "superuser": false,
+          "createDb": false,
+          "createRole": false
+        }
+      ],
+      "institutions": 1
+    },
+    "anchor": {
+      "unauthenticatedStatus": 401,
+      "authenticatedStatus": 200,
+      "sequence": "0",
+      "epoch": "1",
+      "tlsVerified": true
+    },
+    "publicHttp": {
+      "actors": [
+        {
+          "role": "institution",
+          "login": 200,
+          "workspace": 200,
+          "createIntentStatus": 200,
+          "persistedIntentVisible": true,
+          "logoutRejectsSession": true
+        },
+        {
+          "role": "gateway",
+          "login": 200,
+          "workspace": 200,
+          "createIntentStatus": 403,
+          "persistedIntentVisible": true,
+          "logoutRejectsSession": true
+        },
+        {
+          "role": "recipient",
+          "login": 200,
+          "workspace": 200,
+          "logoutRejectsSession": true
+        },
+        {
+          "role": "approver",
+          "login": 200,
+          "workspace": 200,
+          "logoutRejectsSession": true
+        }
+      ],
+      "scope": "Real public HTTPS API and IdP form, legitimate PKCE/cookie sessions; automated HTTP clients, not Vercel browser UI or call/media"
+    },
+    "previewBrowser": {
+      "metadata": {
+        "commit": "80a6df12f992d616355f2ecad9193aac4404ed3e",
+        "target": "preview",
+        "publicPreview": false
+      },
+      "auth": {
+        "status": 401,
+        "type": "application/json; charset=utf-8"
+      },
+      "captures": [
+        {
+          "path": "call",
+          "width": 1366,
+          "overflow": false
+        },
+        {
+          "path": "call",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "path": "governance",
+          "width": 1366,
+          "overflow": false
+        },
+        {
+          "path": "governance",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "pageErrors": [],
+      "scope": "Actual protected Preview; no product login or media claim"
+    },
+    "productionBrowser": {
+      "source": "80a6df12f992d616355f2ecad9193aac4404ed3e",
+      "actors": [
+        {
+          "role": "institution",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 1,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        },
+        {
+          "role": "gateway",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 1,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        },
+        {
+          "role": "recipient",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 1,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        },
+        {
+          "role": "approver",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 0,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        }
+      ],
+      "scope": "Vercel Production browser role login, actual product cookies/API/DB, desktop/mobile captures; call and analysis not yet verified"
+    },
+    "authenticatedRecapture": {
+      "source": "80a6df12f992d616355f2ecad9193aac4404ed3e",
+      "actors": [
+        {
+          "role": "institution",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 1,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        },
+        {
+          "role": "recipient",
+          "loginCallback": 200,
+          "session": 200,
+          "workspace": 200,
+          "visibleWorkItems": 1,
+          "logout": 200,
+          "afterLogout": 401,
+          "pageErrors": []
+        }
+      ],
+      "scope": "Vercel Production browser role login, actual product cookies/API/DB, desktop/mobile captures; call and analysis not yet verified"
+    },
+    "captures": {
+      "directory": ".local/persistent-demo-connect-20261105T073906Z/live-20261105/resume-20261105T233718Z/browser-check",
+      "reviewed": [
+        "production-institution-1366.png",
+        "production-recipient-390.png"
+      ],
+      "limitations": [
+        "Original role captures were too early and showed login-before state; institution/recipient recaptured after actual role render.",
+        "Institution URI is too prominent and institution controls produce a long column; visual follow-up required."
+      ]
+    },
+    "preview": {
+      "id": "dpl_DEaENfH2Jc59WZ1FkbD8sGqFnswn",
+      "url": "callsign-7wyfhwkqa-0u-ys-projects.vercel.app",
+      "readyState": "INITIALIZING",
+      "target": null,
+      "source": "80a6df12f992d616355f2ecad9193aac4404ed3e"
+    },
+    "production": {
+      "id": "dpl_9LH8dqLNxLURQ1TpHbufUW7ZVLyw",
+      "url": "callsign-nunqn6zss-0u-ys-projects.vercel.app",
+      "readyState": "INITIALIZING",
+      "target": "production",
+      "source": "80a6df12f992d616355f2ecad9193aac4404ed3e"
+    },
+    "corrections": [
+      "Missing sender trust mount caused startup ENOENT; original failure retained, mount corrected, sender readiness200.",
+      "Browser harness CommonJS import and collapsed login-panel waits corrected; original logs retained."
+    ],
+    "cleanup": {
+      "temporaryBrowserRemoved": true,
+      "temporaryPreviewBypassRevoked": true,
+      "persistentDataPreserved": true
+    },
+    "notRun": [
+      "Public PBX/TURN and external audio",
+      "Real provider audio/analysis",
+      "Current persistent work cancellation/media recall and joint recovery"
+    ],
+    "paidProviderCalls": 0,
+    "scope": "Real public IdP and Vercel product cookie/CSRF/role/API/DB flows. Does not establish media, AI or full-stack readiness."
   }
 }
