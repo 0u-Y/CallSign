@@ -74,8 +74,9 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
   await sender.locator('li').filter({hasText:contact.intentId}).getByRole('button',{name:'새 통화 시도'}).click();await sender.getByLabel('위임 증서',{exact:true}).selectOption(contact.digest);observation!.mark('authorization-request');const authorizationResponse=sender.waitForResponse(r=>r.url().includes('/api/v3/authorizations')&&r.request().method()==='POST');await sender.getByRole('button',{name:'개별 연락 승인 받기'}).click();const approvalResponse=await authorizationResponse;expect(approvalResponse.ok()).toBe(true);observation!.mark('authorization-response');
   const attempt=await sender.getByLabel('선택한 통화 시도',{exact:true}).inputValue();expect(attempt).not.toBe('');await receiver.getByRole('button',{name:'업무 새로고침',exact:true}).click();await receiver.getByLabel('선택한 통화 시도',{exact:true}).selectOption(attempt);
   await sender.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();await receiver.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();
-  await sender.getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();await receiver.getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();
-  await sender.getByRole('button',{name:'양측 웹으로 발신'}).click();await receiver.getByText(/PBX 협상 완료/).waitFor({timeout:20000});
+  const connectionStatus=(page:typeof sender)=>process.env.CALLSIGN_DEMO_UI_TEST==='yes'?page.getByRole('region',{name:'이번 연락과 수신 상태',exact:true}):page;
+  await connectionStatus(sender).getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();await connectionStatus(receiver).getByText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{exact:true}).waitFor();
+  await sender.getByRole('button',{name:'양측 웹으로 발신'}).click();await connectionStatus(receiver).getByText(/PBX 협상 완료/).waitFor({timeout:20000});
   // Clone/enable the receiver track only in the observer, so UI track muting alone cannot satisfy silence.
   const audio=async(page:typeof sender,expectedHz:number,ownHz:number)=>page.evaluate(async({expectedHz,ownHz})=>{
    const w=window as unknown as {callSignTestPeers:RTCPeerConnection[];callSignAudioProof?:{context:AudioContext;probes:Map<string,{analyser:AnalyserNode;track:MediaStreamTrack}>}};
@@ -86,7 +87,7 @@ it.each(['normal-end','logout','work-cancel','lease-expiry','delegation-revoke',
    return {target,self,rms,receiverTracks:proof.probes.size,source:'actual-decoded-remote-track',syntheticMicrophone:true};
   },{expectedHz,ownHz});
   const before={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};expect(before.sender.target).toBeLessThan(.003);expect(before.recipient.target).toBeLessThan(.003);
-  observation!.mark('connect-action');await receiver.getByRole('button',{name:'통화 수락 및 검증 시작'}).click();await receiver.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});await sender.getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});
+  observation!.mark('connect-action');await receiver.getByRole('button',{name:'통화 수락 및 검증 시작'}).click();await connectionStatus(receiver).getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});await connectionStatus(sender).getByText('양측 세션과 PBX 연결 검증 후 통화 중',{exact:true}).waitFor({timeout:30000});
   observation!.mark('verification-visible');
   const during={sender:await audio(sender,990,660),recipient:await audio(receiver,660,990)};
   for(const result of [during.sender,during.recipient]){expect(result.receiverTracks).toBeGreaterThan(0);expect(result.target).toBeGreaterThan(.003);expect(result.target).toBeGreaterThan(result.self*3);expect(result.rms).toBeGreaterThan(.003);}
