@@ -18,7 +18,7 @@ if(['--inventory','--bundle'].includes(process.argv[2]??'')){
  if(bundle){
   if(dirty)throw new Error('COMMIT_REVIEWED_SOURCES_BEFORE_TRANSFER_BUNDLE');
   await mkdir(output,{mode:0o700});const files=resolve(output,'deployment-files.tar');
-  const paths=['.dockerignore','infra/deploy','infra/besu/network-config.json','scripts/deployment.sh','scripts/deployment-control.mjs','scripts/generate-besu.sh','scripts/image-reference.mjs','scripts/preflight-aws.ts','scripts/restricted.mjs','scripts/verify-release-files.mjs','scripts/audit-image-archive.py','docs/RUNBOOK.md','docs/LOCAL-VALIDATION.md','docs/KNOWN-LIMITATIONS.md','artifacts/service-registry-build-20261027.json','artifacts/test-results.json','tests/fixtures/service-purpose-evaluation.json'];
+  const paths=['.dockerignore','infra/deploy','infra/besu/network-config.json','scripts/deployment.sh','scripts/deployment-control.mjs','scripts/prepare-demo-ingress.py','scripts/prepare-demo-oidc.ts','scripts/generate-besu.sh','scripts/image-reference.mjs','scripts/preflight-aws.ts','scripts/restricted.mjs','scripts/verify-release-files.mjs','scripts/audit-image-archive.py','docs/RUNBOOK.md','docs/LOCAL-VALIDATION.md','docs/KNOWN-LIMITATIONS.md','artifacts/service-registry-build-20261027.json','artifacts/test-results.json','tests/fixtures/service-purpose-evaluation.json'];
   execFileSync('git',['archive','--format=tar','--output',files,head,...paths],{timeout:30000});
   const entries=execFileSync('tar',['-tf',files],{encoding:'utf8'}).trim().split('\n'),included=new Set(entries.map(p=>p.replace(/\/$/,''))),tracked=new Set(execFileSync('git',['ls-files'],{encoding:'utf8'}).trim().split('\n'));
   const stage=await mkdtemp(resolve(output,'public-docs-'));
