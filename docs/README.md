@@ -1,6 +1,6 @@
 # CallSign 문서 안내
 
-처음 방문했다면 [저장소 소개](../README.md) → [서비스 가이드](guide/README.md)를 읽습니다. 실행 담당자는 [AWS 배포·산출물 수령](RUNBOOK.md#github-delivery-20261102)에서 시작하세요. 현재 배포 기준 tag·digest·수령 명령은 RUNBOOK에서 관리하며 `latest`로 추정하지 않습니다.
+처음 방문했다면 [저장소 소개](../README.md) → [서비스 가이드](guide/README.md)를 읽습니다. 실행 담당자는 [현재 서버컴 지속 운영](RUNBOOK.md#지속-서비스와-시험-환경의-분리)에서 시작하세요. 현재 배포 기준 tag·digest·수령 명령은 RUNBOOK에서 관리하며 `latest`로 추정하지 않습니다.
 
 ## 기준 문서의 역할
 
@@ -12,7 +12,7 @@
 | 구성요소·키·데이터·신뢰 경계 | [아키텍처](ARCHITECTURE.md) | 기본 PBX 경로와 보존한 호환 경로 |
 | 데이터·서명·세션 결합 | [프로토콜](PROTOCOL.md) | 등록 URI/VC/JWS·EIP-712·lease·Witness 형식 |
 | 공격자·신뢰 가정 | [위협 모델](THREAT-MODEL.md) | 방어 조건과 신뢰에 남는 위험 |
-| AWS 수령·배포·복구 | [RUNBOOK](RUNBOOK.md) | 입력·NEW/재개/RESTORE·영속 경로 |
+| 지속 운영·수령·배포·복구 | [RUNBOOK](RUNBOOK.md) | 입력·NEW/재개/RESTORE·영속 경로 |
 | 로컬 통화·HTTP·DB·EVM 검증 | [검증 절차](LOCAL-VALIDATION.md) | 환경별 guard·예산·관측·정리. 새 실행 허가를 대신하지 않음 |
 | 현재 확인한 범위와 남은 경계 | [구현 현황](guide/05-IMPLEMENTATION-STATUS.md), [알려진 한계](KNOWN-LIMITATIONS.md) | 실제 구성요소·fixture·미검증의 구분 |
 | 날짜별 변경·원래 SHA·결과 | [개발 진행 기록](FINALS-IMPLEMENTATION-PLAN.md) | 원본 증거로 연결하는 작업 이력 |
@@ -28,9 +28,9 @@
 - 코드 변경은 관련 회귀와 함께 검토하고, 증거에는 실제 소스·환경·대체 경계를 기록합니다. 과거 PASS를 새 실행으로 복사하지 않습니다.
 - 설치·다운로드·key 생성·migration·seed는 단순 문서 확인 작업에 포함되지 않습니다.
 
-## AWS 배포·운영
+## 현재 운영과 후속 이전
 
-[현재 전달 버전과 AWS 수령 명령](RUNBOOK.md#github-delivery-20261102) → [NEW 초기 배포](RUNBOOK.md#new-초기-배포-순서) → [재시작·재개·RESTORE](RUNBOOK.md#재시작실패-재개기존-배포-restore) 순서로 확인합니다.
+현재 목표는 서버컴의 지속 데모이며 AWS 이전은 후속이다. 보존된 이전 준비 절차는 [현재 전달 버전과 AWS 수령 명령](RUNBOOK.md#github-delivery-20261102) → [NEW 초기 배포](RUNBOOK.md#new-초기-배포-순서) → [재시작·재개·RESTORE](RUNBOOK.md#재시작실패-재개기존-배포-restore) 순서로 확인합니다.
 
 Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니다. bootstrap 전달은 검증했지만 최종 AWS 웹·별도 GHCR 수령용 읽기 자격 검증·AWS 실행은 미완료입니다. 시험 chain/DB를 대회 identity로 간주하지 않으며, 기존 키·genesis·계약·소비 이력·Anchor를 초기화해 재개하지 않습니다. `infra/gcp`는 과거 보존물입니다. 현재 Vercel 공개 frontend는 API 미연결 제품 미리보기이며 AWS 대회 runtime이 아닙니다.
 

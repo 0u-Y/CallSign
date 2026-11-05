@@ -716,5 +716,319 @@
     "linkCheck": "669 references, 0 errors",
     "deletionOrMove": false,
     "newLongReports": false
-  }
+  },
+  "followupReviews": [
+    {
+      "recordedAt": "2026-11-05T13:54:58.655350+00:00",
+      "sourceHead": "4a2540174e1cbe844ae03d3582afb7974c4e582b",
+      "status": "IN_PROGRESS",
+      "trackedMarkdownCount": 43,
+      "trackedMdxCount": 0,
+      "reviewedThisPass": 6,
+      "note": "Original 2026-11-04 assessment retained. This current pass is incomplete; no full-review claim. User-provided untracked sources and personal summaries excluded.",
+      "inventory": [
+        {
+          "path": "AGENTS.md",
+          "sha256": "cf412bd90d54f3ac1c9a050f81b6629f69d172bc000001fb41918a9df3263db7",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "DESIGN.md",
+          "sha256": "dca4d3f4565bd9db190caa9025d38023116bb33a93f90313d47c9b7daf6ec123",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "PRODUCT.md",
+          "sha256": "4f817234848ffe45f31fc8102f0321c6fb1308637d864632b16ee1b30425d49f",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "README.md",
+          "sha256": "78ec98b53bc6a83b5ee1d4699ce9c3e1b93317ffefe9584226a59c56e1eac500",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "THIRD_PARTY_NOTICES.md",
+          "sha256": "fd4a6c4f446f46b9aec0345a68cdbf837fe3af531121751f11af0c4853b711ca",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/ARCHITECTURE.md",
+          "sha256": "6f99d07946b3ecfed11ce52c7654c1ea58f0781b5cf713b62e422d459ed7ee20",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/DESIGN-QA.md",
+          "sha256": "9dc7a5e1d09a07e77a53795123a96b3ca01213a8a849212708dbbfa41d5aea74",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/DESIGN-REFERENCES.md",
+          "sha256": "c645ac0bce1737eb75ddf7f2e1a51c1864117a9f839dbc76143a0b0d7917ee02",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/FACT-CHECK.md",
+          "sha256": "ef31abc3f0b487d9fade30ac90b2726582de594943f3a9217408ab4e3ad199f3",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/FINALS-IMPLEMENTATION-PLAN.md",
+          "sha256": "7126ef4fed9a5327b52aca38c202cfc897753e5dd3ac54e419c3dfbab5f2ff7c",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/KNOWN-LIMITATIONS.md",
+          "sha256": "7903c1487f7115d756af2f838ebac4fa3a5a5fc09573dcdf3f57a3e0712a510d",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "docs/LOCAL-VALIDATION.md",
+          "sha256": "24f1796eba8e06118d72dfbaa8829d012381a5cab9e3f3a64d5be7c1b4e2e64e",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/MASTER-DEVELOPMENT-SPEC.md",
+          "sha256": "24e840c84b92b889c3cfef7a06fb3dc5b6eaefd828ae3d0df0d3d3a77aa20314",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/PRODUCT.md",
+          "sha256": "b32631315f18538ddbca5b0d40d1acbf607da671865ab19a751bb0288f0d8f7a",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/PROGRESS.md",
+          "sha256": "dede8549ff4ce84d88476cf3b0bafc92cfabe056a53759d01f84ef162eef376d",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/PROTOCOL.md",
+          "sha256": "15d336d06fed1947ddc66095c01b7d2c5806936069c0876425909a8885686a47",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/README.md",
+          "sha256": "d5089b18f3a0befee2cb6dc22f635565f1bc2d8fb2c3b237afdede7de68de46c",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "docs/RUNBOOK.md",
+          "sha256": "54a319967a2e9514c12a2fc11ad229ee200f3239db141a8edd9dbe4e1a55288d",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/STANDARDS.md",
+          "sha256": "471df6792c6cd50a49df915afb0075529c2f7aa8aea5491af5dd17e19e5a63df",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/TEST-RESULTS.md",
+          "sha256": "37c75f904ff48214810a3767999f76ad26eb6dd8b01f4d0185afbf5c009cc4f3",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/THREAT-MODEL.md",
+          "sha256": "5a90f37449e024447221794669a496c0801c07a8d2a0c150565401df90d7c258",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/WHY-BLOCKCHAIN.md",
+          "sha256": "6412635e891d4027e36dc5c81afff0af75a3810c79703095e28413a8d227c823",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/adr/0001-foundation.md",
+          "sha256": "426c98682533639cbc83743921a8ddd3ae4e7d545f1d0fbc164459721b789a38",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/adr/0002-finals-offline.md",
+          "sha256": "0cfe53dace92663c6e89cf5def7b2cae33e965ba683d70cc6e9a588a8ed2136e",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/archive/2026-10-26/FINALS-DEVELOPMENT-REPORT.md",
+          "sha256": "c9c2dfda20981bad47a3dc6bea6ce8f7bfc782d31b39b79d27b13931d2baf04a",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/archive/2026-10-26/FINALS-ROUND4.md",
+          "sha256": "61926d0ff55fb6ffb96b13377ed74e8352b247ad4199b3eb5201b8b4fa9714d9",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/archive/DEVELOPMENT-HISTORY-20261104.md",
+          "sha256": "10a74e9f6ab9e8590554bac20ac12fa137c528c83fb6544aa97f606232c854bd",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/guide/01-SERVICE-OVERVIEW.md",
+          "sha256": "d7a4050b90a9044e63ff51634973780d647924e334310afeb4e6ebd71a5f9284",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/guide/02-ARCHITECTURE.md",
+          "sha256": "846d6a6d6ce284a014a1a35af33a17efcc1f8e040997cd16ed49345f2ca70934",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/guide/03-CALL-FLOW.md",
+          "sha256": "a50cf3e8e905ade070bda555a68bef4f8a934cdc3008000b60e978a65ba56cac",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/guide/04-TRUST-AND-SECURITY.md",
+          "sha256": "6b692da4b87c280eafc093872152a6ca7ab97bb988e0fa1fe61ddc0f24e2f4c5",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/guide/05-IMPLEMENTATION-STATUS.md",
+          "sha256": "11f355943189c48d56ec9f5c01f2648a35e57118e866acacb519998dce481ca5",
+          "reviewStatus": "read-and-updated",
+          "action": "modified",
+          "reason": "Current server demo scope and actual ingress/IdP preparation boundary corrected"
+        },
+        {
+          "path": "docs/guide/README.md",
+          "sha256": "5195fc2f8a98844b5aed45b793afbdfd98c04c7b4e19852f8648b9926b2b1923",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "docs/mentoring/README.md",
+          "sha256": "5d0b8425bc01e430747d6097a043889c187b57ff0e5ec28fa400079431990fa0",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/REQUIREMENTS-CHECK.md",
+          "sha256": "03ddbb56e2ce589c862348ab3acbe8537be346e97ad8be6f055245617cd143dc",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/SELECTED-EVIDENCE.md",
+          "sha256": "1f47cbc0a35360ab72b155f22edc7653c780d92ca3226da05eda739e9f0ebd9c",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/TEAM-INPUTS.md",
+          "sha256": "6f0d4bc99a23171d47e529d540575e212f79a26b3c62e926e0edb4d845c7fe77",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/application-ko.md",
+          "sha256": "22e756af075a2cc97daa2e81fb1e52f3e571fee4f3a20ff80928aec148075704",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/demo-3min.md",
+          "sha256": "1d675125b7f67d83bd53bf977b69fa8ef077a30aa3a22acaee7982beee7645ab",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/judge-qa.md",
+          "sha256": "d2147704c40b9d9ca0415a713102fe7f944ae8137debafc1b4b201b2951218db",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/pitch-10min.md",
+          "sha256": "ccbcc97586f011a30575ef7ca553ced38d52d48e09cf2fc90e8eca8754bdb703",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/pitch-8min.md",
+          "sha256": "7faa134485fe9babde37a9485251ac18d06d4c35726c11a5a99101dcbbe3d520",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        },
+        {
+          "path": "submission/slides.md",
+          "sha256": "adb55a751b1b7dda1ba6b4065ddd842ee97843e666d1616f36b0fe35a5a732fc",
+          "reviewStatus": "pending-current-pass",
+          "action": null,
+          "reason": null
+        }
+      ]
+    }
+  ]
 }

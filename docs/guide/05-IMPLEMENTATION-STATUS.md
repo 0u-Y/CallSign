@@ -13,7 +13,7 @@
 | OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 별도 reader·AWS 실행 | 새 후보 게시·공개/이미지 원격 수령 PASS; reader는 별도 | 독립 reader, AWS 환경 입력 |
 | AI-003 실제 제공자 평가 | OpenAI adapter·Deepgram/ko·동의/취소·quota·비용 선검사 | 실제 OpenAI 텍스트·직접 Deepgram 합성 음성: 계약 관측·품질 제한 | 실제 통화 remote track의 STT·분석 전체 경로 | 텍스트 출력 원본·사용량 보존; 모델 품질 PASS 아님 | 공개 연결·후속 AI 제한 계획, 지속 비용/보관 조건 별도 |
 
-지속 환경 A는 미기동이다. 전용 ingress 등록 승인·실제 OIDC 및 지속 감시 연결이 남았다. RAM은 기동 시점의 사전 관측으로 판단하며 이후의 한 표본으로 과거 중단이나 기동 적합성을 소급 확정하지 않는다. 새 provider 코드의 전체 원장/미디어 검증은 미실행이다. 아래 일반 entrypoint/복원/합성 분석 PASS는 이전 제품 소스의 선택 경로이며 새 OpenAI 실제 품질 증거가 아니다. [현재 준비 상태](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
+지속 환경 A는 첫 IdP 준비 실행 후 관측 결함을 수정하고 중지한 상태다. 등록·HTTPS/WSS·이미지 준비는 확인했으며 공개 로그인과 전체 backend는 미완료다. 현재 운영 조건·차단은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리)을 따른다. RAM은 기동 시점의 사전 관측으로 판단하며 이후의 한 표본으로 과거 중단이나 기동 적합성을 소급 확정하지 않는다. 새 provider 코드의 전체 원장/미디어 검증은 미실행이다. 아래 일반 entrypoint/복원/합성 분석 PASS는 이전 제품 소스의 선택 경로이며 새 OpenAI 실제 품질 증거가 아니다. [현재 준비 상태](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
 
 일반 entrypoint/분석 미사용 복원 계획의4통화와 별도 합성 분석 계획의3통화는 각각 PASS다. 원본과 복원 대상 DB를 삭제 전에 read-only 감사했다. 과거5회 정상 반복·이전4개 사례·이번 진단 재실행을 합쳐 성공률을 만들지 않는다. 단독 복구400은 HTTP schema 거절이고 이번 EVM 정족수 거절 증거는 아니다.
 
@@ -23,7 +23,7 @@
 
 [서비스 가이드](README.md) · [신뢰·보안](04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
 
-기본 제품은 `/service` → `/v3`, 별도 공식 확인은 `/official`입니다. 아래의 이전 초기 미디어 후보는6e3cd23이며 후속 후보·실행 기록과 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
+현재 시연 진입점은 `/demo/call`·`/demo/governance`이며 기존 `/service` → `/v3` 로직과 `/official` 인증 문맥을 재사용합니다. 아래의 이전 초기 미디어 후보는6e3cd23이며 후속 후보·실행 기록과 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
 
 ## 이전 실제 미디어 후보에서 확인한 범위
 
@@ -49,7 +49,7 @@
 
 과거 날짜별 본문은 [이력 보관본](../archive/DEVELOPMENT-HISTORY-20261104.md)에 보존합니다. 원본 실패·SHA·시험 결과를 최신 값으로 고치지 않습니다. light CI는 통합 실행·실음성·AWS 검증을 대신하지 않습니다.
 
-## 다음 배포 단계
+## 보존된 AWS 이전 절차 (현재 목표 제외)
 
 [RUNBOOK의 고정 전달 기준](../RUNBOOK.md#github-delivery-20261102)과 최신 후보 기록의 source/digest·원격 수령 판정을 함께 사용합니다. 게시용 인증과 AWS reader 인증을 분리합니다.
 
