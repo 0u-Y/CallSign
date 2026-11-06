@@ -60,6 +60,15 @@ services:
       ANCHOR_TLS_KEY_PATH: /tls/key.pem
       ANCHOR_TLS_CERT_PATH: /tls/cert.pem
       PORT: '14300'
+      NODE_EXTRA_CA_CERTS: /tls/cert.pem
+      DEPLOYMENT_ID: ${DEPLOYMENT_ID:?owned identity}
+      INSTITUTION_ID: ${INSTITUTION_ID:?prepared institution}
+    healthcheck:
+      test: [CMD, node, -e, "const e=process.env;fetch('https://127.0.0.1:'+e.PORT+'/anchor?'+new URLSearchParams({deployment:e.DEPLOYMENT_ID,institutionId:e.INSTITUTION_ID}),{headers:{authorization:'Bearer '+e.ANCHOR_TOKEN},signal:AbortSignal.timeout(2500)}).then(async r=>{if(!r.ok)throw Error();const a=await r.json();process.exit(a.deployment===e.DEPLOYMENT_ID&&a.institutionId===e.INSTITUTION_ID?0:1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 6
+      start_period: 10s
     volumes:
       - {type: bind, source: '${CALLSIGN_ANCHOR_TLS_DIR:?owned Anchor TLS}', target: /tls, read_only: true, bind: {create_host_path: false}}
   migration-runner:
