@@ -1,5 +1,6 @@
 export const deploymentServices:string[];
 export function assertManagedDeployment(records:ReadonlyArray<{labels?:Record<string,string>|null}>,project:string|undefined,deploymentId:string|undefined):void;
+export function safeStopRecords<T extends {labels?:Record<string,string>|null}>(records:ReadonlyArray<T>,project:string|undefined,deploymentId:string|undefined):{owned:T[];excluded:T[]};
 export const serverStartStages:string[][];
 export interface ExistingServerRecord {
  id:string; labels:Record<string,string>; state:string; imageReference:string; image:string;

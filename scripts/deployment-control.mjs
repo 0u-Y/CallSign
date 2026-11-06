@@ -14,6 +14,12 @@ export function assertManagedDeployment(records,project,deploymentId){
   if(labels['com.docker.compose.project']!==project||labels['org.callsign.deployment-id']!==deploymentId||labels['org.callsign.lifecycle']!=='persistent'||labels['org.callsign.run-id']||!deploymentServices.includes(labels['com.docker.compose.service']))throw Error('DEPLOYMENT_RESOURCE_IDENTITY_MISMATCH');
  }
 }
+export function safeStopRecords(records,project,deploymentId){
+ const owned=[],excluded=[];
+ for(const record of records){try{assertManagedDeployment([record],project,deploymentId);owned.push(record);}catch{excluded.push(record);}}
+ if(!owned.length&&excluded.length)throw Error('DEPLOYMENT_RESOURCE_IDENTITY_MISMATCH');
+ return {owned,excluded};
+}
 export const serverStartStages=[['oidc-db','postgres','anchor-db','besu1','besu2','besu3','besu4'],['oidc','anchor'],['witness1','witness2','witness3','witness4','turn','asterisk'],['platform','issuer','sender','worker','web','https']];
 export function existingServerStages(records,env,issuerImage){
  assertManagedDeployment(records,env.CALLSIGN_PROJECT,env.DEPLOYMENT_ID);
@@ -55,8 +61,10 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
   const env={...parseEnv(readFileSync(file,'utf8')),...process.env},project=env.CALLSIGN_PROJECT||'callsign-finals';
   const ids=execFileSync('docker',['ps','--all','--no-trunc','--quiet','--filter','label=com.docker.compose.project='+project],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split(/\s+/).filter(Boolean);
   const format='{"id":{{json .Id}},"labels":{{json .Config.Labels}},"state":{{json .State.Status}},"health":{{if (index .State "Health")}}{{json (index .State "Health").Status}}{{else}}null{{end}},"image":{{json .Image}},"imageReference":{{json .Config.Image}},"network":{{json .HostConfig.NetworkMode}},"ports":{{json .HostConfig.PortBindings}},"privileged":{{json .HostConfig.Privileged}},"memory":{{.HostConfig.Memory}},"cpu":{{.HostConfig.NanoCpus}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}},"oom":{{.State.OOMKilled}},"entrypoint":{{json .Config.Entrypoint}},"command":{{json .Config.Cmd}},"environment":{{json .Config.Env}}}';
-  const records=ids.length?execFileSync('docker',['inspect','--format',format,...ids],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split('\n').map(line=>JSON.parse(line)):[];
-  assertManagedDeployment(records,project,env.DEPLOYMENT_ID);
+  let records=ids.length?execFileSync('docker',['inspect','--format',format,...ids],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split('\n').map(line=>JSON.parse(line)):[];
+  let excludedCount=0;
+  if(['latch','stop'].includes(command)){const selected=safeStopRecords(records,project,env.DEPLOYMENT_ID);records=selected.owned;excludedCount=selected.excluded.length;}
+  else assertManagedDeployment(records,project,env.DEPLOYMENT_ID);
   if(!env.FINALS_DATA_DIR)throw Error('PERSISTENT_STATE_DIRECTORY_REQUIRED');
   let latch=resolve(env.FINALS_DATA_DIR,'resource-stop.json'),reviewPath=resolve(env.FINALS_DATA_DIR,'resource-stop.review.json');
   const protectedState=()=>{
@@ -134,6 +142,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
     if(selected.length)execFileSync('docker',['stop','--time','15',...selected],{timeout:60000,stdio:['ignore','ignore','pipe']});
    }
   }
+  if(excludedCount)console.error('UNOWNED_RESOURCES_EXCLUDED_FROM_STOP');
   if(command==='status')console.log(JSON.stringify({project,deploymentId:env.DEPLOYMENT_ID,resourceStopLatched:latched,priorResourceStopReviewed:reviewed,services:records.map(r=>({service:r.labels['com.docker.compose.service'],id:r.id,state:r.state,health:r.health})),scope:'Owned containers only; health is not complete readiness; resource monitor availability is not established by this command.'}));
  }catch(error){console.error(error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'DEPLOYMENT_CONTROL_FAILED');process.exitCode=78;}
 }

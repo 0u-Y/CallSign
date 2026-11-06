@@ -39,6 +39,7 @@ JS
 )"
 if [[ "$oidc_provider" == keycloak ]]; then compose+=(-f infra/deploy/compose.oidc.yml --profile oidc); fi
 if [[ "$command" == status ]]; then exec node scripts/deployment-control.mjs status "$CALLSIGN_ENV_FILE" "${compose[@]}"; fi
+if [[ "$command" == stop ]]; then exec node scripts/deployment-control.mjs stop "$CALLSIGN_ENV_FILE" "${compose[@]}"; fi
 control=owned
 if [[ "$command" == start || "$command" == restart ]]; then control=check; fi
 if [[ "$command" == resource-stop ]]; then control=latch; fi

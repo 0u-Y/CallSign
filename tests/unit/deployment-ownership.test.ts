@@ -3,7 +3,7 @@ import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
-import {assertManagedDeployment} from '../../scripts/deployment-control.mjs';
+import {assertManagedDeployment,safeStopRecords} from '../../scripts/deployment-control.mjs';
 
 it('separates persistent deployment resources from test identities and other projects before mutation',()=>{
  const labels={'com.docker.compose.project':'owned-project','com.docker.compose.service':'issuer','org.callsign.deployment-id':'owned-deployment','org.callsign.lifecycle':'persistent'};
@@ -21,6 +21,7 @@ it('retains a resource stop latch and stops apps before data without touching te
 const fs=require('node:fs'),a=process.argv.slice(2);fs.appendFileSync(process.env.UNIT_CALLS,JSON.stringify(a)+'\\n');
 if(a[0]==='ps'&&a.includes('label=com.docker.compose.project=callsign-finals'))console.log('unit-issuer\\nunit-oidc\\nunit-postgres\\nunit-oidc-db');
 else if(a[0]==='inspect')for(const service of ['issuer','oidc','postgres','oidc-db'])console.log(JSON.stringify({id:'unit-'+service,state:'running',health:'healthy',labels:{'com.docker.compose.project':'callsign-finals','com.docker.compose.service':service,'org.callsign.deployment-id':'owned-deployment','org.callsign.lifecycle':process.env.UNIT_LIFECYCLE||'persistent'}}));
+if(a[0]==='inspect'&&process.env.UNIT_MIXED)console.log(JSON.stringify({id:'foreign-trial',labels:{'com.docker.compose.project':'callsign-finals','com.docker.compose.service':'browser-check','org.callsign.deployment-id':'owned-deployment','org.callsign.lifecycle':'trial','org.callsign.run-id':'separate'}}));
 `,{mode:0o700});
   const run=(command:string)=>execFileSync('bash',['scripts/deployment.sh',command],{env,encoding:'utf8',stdio:['ignore','pipe','pipe']});
   const status=run('status');expect(status).toContain('complete readiness');expect(status).not.toContain('unit-only-never');
@@ -32,6 +33,10 @@ else if(a[0]==='inspect')for(const service of ['issuer','oidc','postgres','oidc-
   const records=readFileSync(calls,'utf8').trim().split('\n').map(row=>JSON.parse(row)as string[]),stops=records.filter(row=>row.includes('stop'));
   expect(stops).toHaveLength(4);expect(stops[0]).toContain('unit-issuer');expect(stops[0]).not.toContain('unit-postgres');expect(stops[0]).toContain('unit-oidc');expect(stops[0]).not.toContain('unit-oidc-db');expect(stops[1]).toContain('unit-postgres');expect(stops[1]).toContain('unit-oidc-db');expect(records.every(row=>!row.some(v=>['down','rm','prune','test-runner','seed'].includes(v)))).toBe(true);
   expect(readFileSync(calls,'utf8').slice(before.length)).not.toContain('"stop"');
+  execFileSync('bash',['scripts/deployment.sh','resource-stop'],{env:{...env,UNIT_MIXED:'1'},stdio:'pipe'});
+  const mixed=readFileSync(calls,'utf8').slice(before.length).trim().split('\n').map(row=>JSON.parse(row)as string[]).filter(row=>row[0]==='stop');
+  expect(mixed).toHaveLength(2);expect(mixed.flat()).not.toContain('foreign-trial');expect(mixed[0]).toContain('unit-issuer');
+  expect(()=>execFileSync('bash',['scripts/deployment.sh','stop'],{env:{...env,UNIT_MIXED:'1'},stdio:'pipe'})).not.toThrow();
   expect(()=>run('start')).toThrow(/development host network preservation/);
   const original=readFileSync(join(root,'resource-stop.json'),'utf8');
   const review=['scripts/deployment-control.mjs','review',file,'docker','compose'];
@@ -51,4 +56,13 @@ else if(a[0]==='inspect')for(const service of ['issuer','oidc','postgres','oidc-
   expect(readFileSync(join(root,'resource-stop.after-review.json'),'utf8')).toBe(second);
   expect(readFileSync(join(root,'resource-stop.json'),'utf8')).toBe(original);
  }finally{rmSync(root,{recursive:true,force:true});}
+});
+
+it('stops only independently validated persistent resources when a trial collides with the project',()=>{
+ const labels={'com.docker.compose.project':'owned','com.docker.compose.service':'issuer','org.callsign.deployment-id':'deployment','org.callsign.lifecycle':'persistent'};
+ const persistent={id:'persistent',labels},trial={id:'trial',labels:{...labels,'org.callsign.lifecycle':'trial','org.callsign.run-id':'case31'}},foreign={id:'foreign',labels:{...labels,'org.callsign.deployment-id':'foreign'}};
+ expect(safeStopRecords([persistent,trial,foreign],'owned','deployment')).toEqual({owned:[persistent],excluded:[trial,foreign]});
+ expect(()=>assertManagedDeployment([persistent,trial],'owned','deployment')).toThrow('IDENTITY_MISMATCH');
+ expect(()=>safeStopRecords([trial,foreign],'owned','deployment')).toThrow('IDENTITY_MISMATCH');
+ expect(safeStopRecords([persistent],'owned','deployment')).toEqual({owned:[persistent],excluded:[]});
 });
