@@ -2,10 +2,11 @@ import {readFile,lstat} from 'node:fs/promises';
 import {expect,type Page,type BrowserContext} from '@playwright/test';
 import type {CallObserver} from '../../scripts/evaluate-performance.js';
 export async function installAnalysisTrackObserver(context:BrowserContext){await context.addInitScript(()=>{
- const w=window as any,Native=window.MediaRecorder;w.callSignRecorderTracks=[];w.callSignAnalysisLifecycle=[];
+ const w=window as any,Native=window.MediaRecorder,NativeSocket=window.WebSocket;w.callSignRecorderTracks=[];w.callSignAnalysisLifecycle=[];w.callSignAudioChunks={count:0,bytes:0};
  const note=(stage:string)=>{if(w.callSignAnalysisLifecycle.length<100)w.callSignAnalysisLifecycle.push({stage,atMs:performance.now(),hidden:document.hidden});};
  document.addEventListener('visibilitychange',()=>note('visibility'));
- window.MediaRecorder=class extends Native{constructor(stream:MediaStream,options?:MediaRecorderOptions){super(stream,options);w.callSignRecorderTracks.push(stream.getAudioTracks().map(t=>t.id));for(const stage of ['start','stop','error'])this.addEventListener(stage,()=>note('recorder-'+stage));}};
+ window.MediaRecorder=class extends Native{constructor(stream:MediaStream,options?:MediaRecorderOptions){super(stream,options);w.callSignRecorderTracks.push(stream.getAudioTracks().map(t=>t.id));this.addEventListener('dataavailable',e=>{w.callSignAudioChunks.count++;w.callSignAudioChunks.bytes+=e.data.size;});for(const stage of ['start','stop','error'])this.addEventListener(stage,()=>note('recorder-'+stage));}};
+ window.WebSocket=class extends NativeSocket{constructor(url:string|URL,protocols?:string|string[]){super(url,protocols);if(new URL(url,location.href).pathname.endsWith('/v3/audio'))this.addEventListener('close',e=>{if(w.callSignAnalysisLifecycle.length<100)w.callSignAnalysisLifecycle.push({stage:'audio-ws-close',atMs:performance.now(),code:e.code,wasClean:e.wasClean});});}};
 });}
 export async function analysisControl(env:NodeJS.ProcessEnv){
  if(!['media','integration'].includes(env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION??'')||env.CALLSIGN_MEDIA_ANALYSIS_MODE!=='fixture')throw new Error('ANALYSIS_MEDIA_SCOPE_REQUIRED');
@@ -48,7 +49,7 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   await expect(finding.getByText('적용 기준·근거 정보',{exact:true})).toBeVisible();
   await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
  }finally{
-  try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{
+  try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,chunks:(window as any).callSignAudioChunks,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{
   await recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true}).click();
   const stop=sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true});if(await stop.isVisible())await stop.click();
   }
