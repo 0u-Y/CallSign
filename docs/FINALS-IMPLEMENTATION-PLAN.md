@@ -6,14 +6,20 @@
 
 | 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
 |---|---|---|---|
-| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 공개 연결 모드; 통화·분석 미검증 |
+| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 실제 통화 캡처 검토 후 compact 배치 보완; 새 배치 재캡처 필요 |
 | 공개 API·분석 WSS | 실제 HTTP API 연결·native WSS relay 배포. Origin/비인증 거절 확인; 과거 단순 rewrite WSS404와 구분 | 인증 음성 WS와 실제 분석 이벤트 확인 | HTTP same-origin 연결·native 분석 WS relay 배포. 실제 인증 음성 WS는 미검증 |
 | 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
-| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 SIP/ICE·ACK 확인; 수락 뒤 최초 검증 실패 조사 중 |
+| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 relay 양방향 합성 음원·승인/소비/lease·이동·정상 종료 확인; 독립 외부 기기는 미확인 |
 | 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
-| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
+| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | 최신 지속 환경의 실제 정지·키 활성화·새 업무 시연 필요 |
 | DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
 | 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
+
+## 2026-11-06 실제 공개 경로 통화와 병렬 보완
+
+`20cbd65` frontend·기존 `0a62aef` runtime에서 승인·소비·lease와 양방향 서로 다른 합성 음원 디코딩, 페이지 이동 유지, 정상 종료·양측 음성 중단을 확인했다. 원래 시험은 종료 후 정리 코드가 이미 ended인 통화를 failed로 바꾸려 해 FAIL이었으며 그대로 보존했다. 같은 통화의 후속 읽기 조회는 ended/user-ended·소비 영수증·PBX 부재 및 ARI channel/bridge0을 확인했다. 검사 기준은 낮추지 않았고, Chromium 권고대로 합성 WAV의 capture processing만 시험 경계에서 끈 결과다. 독립 외부 단말·사람 마이크·실제 STT/LLM 성공은 아니다. 상세는 [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 normalPublicCall20261106을 따른다.
+
+서로 다른 파일 소유 범위로 공동 복구 요청/공개 서명 검토 화면, 유한 AI 승인 ID quota, 기존21개 자원의 guard 적용 start/restart를 병렬 보완했다. 실제 통화 캡처에서 확인한 긴 URI·제어 위치·중복 안내도 줄였다. 새 UI·녹음 파일 송출·실제 재시작은 아직 후속 실행 대상이며 AI는 기존 한도 소진으로 추가 승인 전까지 비활성이다. 현재 DB 순간 읽기 조회에서 overdue outbox·만료 claim·미정산 예약은0이지만 과거 pending1건의 원인은 원본 부족으로 계속 미확정이다.
 
 ## 2026-11-06 공개 통화 협상 진단
 
