@@ -259,3 +259,5 @@
 .demo-workspace .demo-call-identity .demo-phone-connection time{font-size:12px}
 
 .demo-phone-live:has(.call-consent-keypad[data-choice=pending]) #demo-analysis-result{bottom:320px}
+
+.demo-director{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px;margin:12px 0}.demo-director small{font-size:12px;color:#53677b}.demo-director .button{min-height:44px}

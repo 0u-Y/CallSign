@@ -1,6 +1,7 @@
 import '../demo-workspace.css';
+import {DemoDirector} from './DemoDirector.js';
 import * as Dialog from '@radix-ui/react-dialog';
-import {useEffect,useState,type ComponentProps} from 'react';
+import {useEffect,useState,useRef,type ComponentProps} from 'react';
 import {DemoCallFlow,callScene} from './DemoCallFlow.js';
 import type {ServiceCallStatus} from '../lib/serviceCall.js';
 import {NavLink} from 'react-router-dom';
@@ -12,17 +13,19 @@ type Props=ComponentProps<typeof ServiceWorkspace>&{phoneTitle?:string;controlle
 function CallClock({started}:{started:number}){const [now,setNow]=useState(()=>performance.now());useEffect(()=>{const id=setInterval(()=>setNow(performance.now()),1000);return()=>clearInterval(id);},[]);const seconds=Math.max(0,Math.floor((now-started)/1000));return <time aria-label="통화 시간">{String(Math.floor(seconds/60)).padStart(2,'0')}:{String(seconds%60).padStart(2,'0')}</time>;}
 function WaitingClock(){const [now,setNow]=useState(()=>new Date());useEffect(()=>{const timer=setInterval(()=>setNow(new Date()),1000);return()=>clearInterval(timer);},[]);return <div className="demo-lock-clock"><p>{now.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'long'})}</p><time>{now.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:false})}</time><span>연락 대기 중</span></div>;}
 export function DemoWorkspace(p:Props){
+ const root=useRef<HTMLDivElement>(null);
  const [scene,setScene]=useState(0);
  const status=p.controllerStatus??{connection:p.connection,authority:'미확인',analysis:'미확인',active:false};
  const flow=callScene(status,!!p.analysisAlert?.risk,!!p.analysisAlert?.unavailable);
  const waiting=p.role==='recipient'&&!status.active&&!status.incoming&&!status.accepting&&!status.ending&&!status.terminal&&!status.error;
  const scenes=['정상 연락','위험 요구','동의 철회','업무 취소'];
- return <div className={`service-app demo-workspace demo-role-${p.role??'anonymous'}`}>
+ return <div ref={root} className={`service-app demo-workspace demo-role-${p.role??'anonymous'}`}>
   <header className="demo-heading"><div><h1>{p.workActive?'연락 업무 관리':p.governance?'기관 권한과 공동 관리':'이상거래 연락 검증'}</h1><p>{p.workActive?'업무 배정과 콜센터 위임을 확인하고 연락을 준비합니다.':p.governance?'변경 검토와 원장 관측, 서비스 적용을 구분합니다.':'승인과 연결을 확인하고, 동의한 음성의 위험을 따로 안내합니다.'}</p></div><span className="demo-environment">{p.role?`인증된 역할: ${p.roleName}`:'역할 연결 전'}</span></header>
 
   <div className="demo-tools"><details className="demo-preparation"><summary>로그인 · 역할 연결 · 실행 준비</summary><p>조작은 현재 로그인한 역할의 권한으로만 실행됩니다. 다른 역할은 독립 브라우저 프로필에서 로그인하세요. 이 화면은 다른 역할의 세션을 공유하지 않습니다.</p><div className="workspace-account">{p.account}</div><NavLink to="/official">별도 인증한 공식 업무 열기</NavLink><p>선택 업무: {p.identity||'미선택'}</p></details>
   <Dialog.Root><Dialog.Trigger asChild><button className="button quiet">상세 확인 근거 열기</button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="demo-drawer-overlay"/><Dialog.Content className="demo-evidence-drawer"><Dialog.Title>현재 실행의 확인 근거</Dialog.Title><Dialog.Description>현재 로그인 역할에 허용된 정보만 표시합니다. 이 창을 여는 동작은 통화·승인·권한을 변경하지 않습니다.</Dialog.Description><dl><dt>역할</dt><dd>{p.roleName}</dd><dt>선택 문맥</dt><dd>{p.identity||'미선택'}</dd><dt>업무 조회 현재성</dt><dd>{p.stale?'조회 실패 · 과거 성공 미표시':p.observedAt?new Date(p.observedAt).toLocaleTimeString('ko-KR'):'미관측'}</dd><dt>연결 controller 상태</dt><dd>{p.connection}</dd></dl><p>개별 서명·nonce·만료·hash는 해당 업무 또는 공동 변경의 검토 상세에서 확인하세요. 노드 조회만으로 Witness나 PBX 회수 성공을 확인하지 않습니다.</p>{p.contact}{p.analysisAvailability}{p.evidence}<Dialog.Close asChild><button className="button secondary">확인 근거 닫기</button></Dialog.Close></Dialog.Content></Dialog.Portal></Dialog.Root></div>
   {p.notice}
+  <DemoDirector root={root} enabled={!p.workActive&&!p.governance} role={p.role} status={status} connected={p.connected} scene={scene}/>
   <div className="demo-live-bar" role="status" hidden={!p.connected}><span>진행 중인 연락 · {p.connection}</span><button className="button service-end" disabled={!p.connected} onClick={p.end}>진행 통화 종료</button></div>
   <section hidden={!p.workActive} aria-label="업무 관리 화면">{p.work}</section>
   <section hidden={p.governance||p.workActive} aria-label="연락과 통화 화면" data-attention={flow.focus}>

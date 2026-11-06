@@ -1,0 +1,19 @@
+import {createRequire} from 'node:module';
+import {resolve} from 'node:path';
+import {chromium,expect} from '@playwright/test';
+if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration')throw Error('ISOLATED_UI_APPROVAL_REQUIRED');
+const require=createRequire(import.meta.url),{build}=await import(createRequire(require.resolve('tsx')).resolve('esbuild'));
+const result=await build({entryPoints:['tests/ui/demo-director-fixture.tsx'],bundle:true,write:false,format:'iife',jsx:'automatic',nodePaths:[resolve('apps/web/node_modules')]});
+const browser=await chromium.launch({headless:true});
+try{const page=await browser.newPage();await page.setContent('<div id="root"></div>');await page.addScriptTag({content:result.outputFiles[0].text});const count=page.getByRole('status',{name:'calls'});const body=()=>page.locator('body').evaluate(e=>{document.activeElement?.blur();e.focus();});
+await body();await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.up('Space');await page.keyboard.press('Space');await expect(count).toHaveText('2');
+await page.getByRole('textbox',{name:'typing'}).fill('a');await page.keyboard.press('Space');await expect(count).toHaveText('2');await expect(page.getByRole('textbox',{name:'typing'})).toHaveValue('a ');
+await page.getByLabel('editable').click();await page.keyboard.press('Space');await expect(count).toHaveText('2');
+await page.getByRole('button',{name:'연락 준비',exact:true}).focus();await page.keyboard.press('Space');await expect(count).toHaveText('3');
+await page.getByRole('button',{name:'disable',exact:true}).click();await body();await page.keyboard.press('Space');await expect(count).toHaveText('3');
+await page.getByRole('button',{name:'disable',exact:true}).click();await page.getByRole('button',{name:'dialog',exact:true}).click();await body();await page.keyboard.press('Space');await expect(count).toHaveText('3');
+await page.getByRole('button',{name:'dialog',exact:true}).click();await page.getByRole('button',{name:'route',exact:true}).click();await body();await page.keyboard.press('Space');await expect(count).toHaveText('3');
+await page.getByRole('button',{name:'route',exact:true}).click();await page.getByRole('button',{name:'Space · 연락 준비',exact:true}).click();await expect(count).toHaveText('4');
+await page.getByRole('button',{name:'recipient',exact:true}).click();await body();await page.keyboard.press('Space');await expect(page.getByRole('button',{name:'1번 동의',exact:true})).toBeVisible();await page.keyboard.press('Space');await expect(count).toHaveText('4');
+console.log('PASS: real-control routing, repeat, native focus, typing, dialog, disabled and route boundaries; synthetic callbacks only');
+}finally{await browser.close();}
