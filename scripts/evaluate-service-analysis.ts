@@ -32,7 +32,7 @@ export async function runServiceEvaluation(fixturePath:string,output:string,prov
  const bytes=await readFile(fixturePath);if(bytes.length>65536)throw new Error('FIXTURE_TOO_LARGE');const parsed:unknown=JSON.parse(bytes.toString());
  if(riskEvaluationFixtureSchema.safeParse(parsed).success){
   const fixture=riskEvaluationFixtureSchema.parse(parsed),selected=fixture.cases.filter(c=>c.split==='evaluation'),observations:RiskEvaluationObservation[]=[];
-  evaluateRiskAnalysis(fixture,[],'synthetic-replay');const costBudget=provider?assertEvaluationCostBudget(process.env,selected.length):null;
+  evaluateRiskAnalysis(fixture,[],'synthetic-replay');if(provider&&selected.length>20)throw Error('PROVIDER_CASE_BUDGET_EXCEEDED');const costBudget=provider?assertEvaluationCostBudget(process.env,selected.length):null;
   const configuration=provider?await speechProviderConfiguration():undefined;if(provider&&!configuration?.llm)throw Error('PROVIDER_NOT_CONFIGURED');let providerCalls=0;
   if(provider)for(const c of selected){const units=riskSnapshot(c.segments.map((text,i)=>({segmentId:String(i),revision:1,text}))),start=performance.now();providerCalls++;try{observations.push({id:c.id,output:await analyzeRiskWithProvider(configuration!.llm!,{units,policy:bankPolicy,signal:AbortSignal.timeout(4000)}),elapsedMs:performance.now()-start});}catch{observations.push({id:c.id,failed:true,elapsedMs:performance.now()-start});}}
   const report={...evaluateRiskAnalysis(fixture,observations,provider?'actual-provider':'synthetic-replay'),providerCalls,costBudget,invoice:'NOT_MEASURED',fixtureSha256:createHash('sha256').update(bytes).digest('hex'),model:configuration?.llm?.model??null,sourceSha256:process.env.CALLSIGN_EVALUATION_SOURCE_SHA256??null};

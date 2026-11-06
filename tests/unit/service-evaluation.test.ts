@@ -20,7 +20,7 @@ it('uses observed cases as the abstention denominator and rejects family leakage
 it('rejects more than twenty provider evaluation cases before any network request',async()=>{
  const {mkdtemp,writeFile,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const {join}=await import('node:path');
  const directory=await mkdtemp(join(tmpdir(),'callsign-evaluation-'));const previous={...process.env};
- const f=JSON.parse(await readFile('tests/fixtures/service-purpose-evaluation.json','utf8'));f.cases=Array.from({length:21},(_,n)=>({...f.cases[0],id:'budget-'+n,family:'budget-'+n,split:'evaluation'}));
+ const f=JSON.parse(await readFile('tests/fixtures/risk-analysis-v2.json','utf8'));f.cases=Array.from({length:21},(_,n)=>({...f.cases[0],id:'budget-'+n,family:'budget-'+n,split:'evaluation'}));
  try{Object.assign(process.env,{CALLSIGN_ALLOW_EXTERNAL_EXECUTION:'media',CALLSIGN_PROVIDER_CONFIRMATION:'CONSENTED-SAMPLE-WITH-BUDGET',CALLSIGN_PURPOSE_EVALUATION_CONFIRMATION:'MAX20-SYNTHETIC-TEXT-REQUESTS',CALLSIGN_EVALUATION_SOURCE_SHA256:'a'.repeat(64),CALLSIGN_EVALUATION_IMAGE:'sha256:'+'b'.repeat(64),ANTHROPIC_API_KEY:'synthetic-unit-only',ANTHROPIC_MODEL:'synthetic-unit-model'});const input=join(directory,'fixture.json');await writeFile(input,JSON.stringify(f));await expect(runServiceEvaluation(input,join(directory,'output.json'),true)).rejects.toThrow('PROVIDER_CASE_BUDGET_EXCEEDED');}
  finally{for(const key of Object.keys(process.env))if(!(key in previous))delete process.env[key];Object.assign(process.env,previous);await rm(directory,{recursive:true,force:true});}
 });

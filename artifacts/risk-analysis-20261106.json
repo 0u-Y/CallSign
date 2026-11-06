@@ -32,6 +32,11 @@
         "existing dynamic/static imports",
         "bundle over 500kB"
       ]
+    },
+    {
+      "command": "service-evaluation and demo-contact-layout regression plus light typecheck",
+      "result": "PASS",
+      "tests": 8
     }
   ],
   "actualProviderCalls": 0,
@@ -48,5 +53,17 @@
     "Synthetic expected labels are not independent human review.",
     "Legacy purpose event parsing remains explicit compatibility only.",
     "No original failures or persistent data were overwritten."
-  ]
+  ],
+  "initialCI": {
+    "run": 42205029591,
+    "result": "FAIL",
+    "testsPassed": 443,
+    "testsFailed": 2,
+    "reason": "Legacy evaluation fixture and empty-panel copy assertions did not follow the new contract."
+  },
+  "frontendObservation": {
+    "productionMetadata": "0835b810041f6152409870a28602213726f8dd69",
+    "publicPreview": false,
+    "scope": "Metadata only; no authenticated browser/model verification."
+  }
 }

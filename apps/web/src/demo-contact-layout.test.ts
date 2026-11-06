@@ -20,7 +20,7 @@ it('uses an honest short address label while preserving full identity and prohib
 });
 it('keeps compact empty analysis distinct from completed results',()=>{
  const html=renderToStaticMarkup(createElement(ServiceAnalysisPanel,{compact:true}));
- expect(html).toContain('아직 분석 결과 없음');expect(html).toContain('동의와 실행 상태를 위에서 확인');
+ expect(html).toContain('아직 분석 전입니다.');expect(html).toContain('동의와 제공자 상태를 확인');
  expect(html).not.toContain('안전한 통화');
 });
 it('keeps actual verification before recipient analysis and phone controls',()=>{
