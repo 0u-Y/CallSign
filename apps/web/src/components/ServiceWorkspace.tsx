@@ -1,7 +1,7 @@
 import type {ReactNode} from 'react';
 import {Headphones,Phone,ClipboardList,ShieldCheck} from 'lucide-react';
 
-export function ServiceWorkspace({role,roleName,account,notice,queue,contact,verification,controls,analysis,operations,notifications,audio}:{role?:string|undefined;roleName:string;account:ReactNode;notice:ReactNode;queue:ReactNode;contact:ReactNode;verification:ReactNode;controls:ReactNode;analysis:ReactNode;operations:ReactNode;notifications:ReactNode;audio:ReactNode;transcript?:ReactNode}){
+export function ServiceWorkspace({role,roleName,account,notice,queue,contact,verification,controls,analysis,operations,notifications,audio}:{role?:string|undefined;roleName:string;account:ReactNode;notice:ReactNode;queue:ReactNode;contact:ReactNode;verification:ReactNode;controls:ReactNode;analysis:ReactNode;operations:ReactNode;notifications:ReactNode;audio:ReactNode;transcript?:ReactNode;evidence?:ReactNode;outcome?:ReactNode;work?:ReactNode;workActive?:boolean}){
  const operator=role==='institution'||role==='gateway',approver=role==='approver';
  const title=role==='institution'?'연락 업무':role==='gateway'?'상담 업무':approver?'공동 승인':'기관 승인 연락';
  const Icon=role==='institution'?ClipboardList:role==='gateway'?Headphones:approver?ShieldCheck:Phone;

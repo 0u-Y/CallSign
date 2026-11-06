@@ -1,0 +1,37 @@
+/* Keep the reference palette and horizontal phone composition. */
+.demo-workspace{font-size:16px;line-height:1.65}
+.demo-workspace h1{font-size:30px}.demo-workspace h2{font-size:22px}.demo-workspace h3{font-size:18px}
+.demo-workspace :is(input,select,textarea){max-width:100%;min-width:0;font:inherit}
+.demo-workspace :is(p,label,summary,.button){font-size:16px}
+.demo-workspace small,.demo-workspace .field-help{font-size:14px}
+.demo-workspace button{white-space:normal;min-height:44px}
+.demo-workspace [hidden]{display:none!important}
+.demo-workspace :is(dd,code,p,small){overflow-wrap:anywhere}
+.demo-workspace .demo-call-grid{grid-template-columns:minmax(245px,.85fr) minmax(0,1.4fr) minmax(330px,1fr);gap:24px}
+.demo-workspace .demo-live-evidence{padding-top:12px}
+.demo-live-evidence .service-verification{margin:16px 0;padding:20px 0;gap:20px}
+.demo-live-evidence .service-verification dt{font-size:14px}.demo-live-evidence .service-verification dd{font-size:20px}
+.demo-institution>section{display:grid;gap:12px}.demo-institution label{display:grid;gap:8px}
+.demo-workspace .demo-recipient .service-call-controls>.button{font-size:16px}
+.demo-workspace .demo-recipient :is(.service-next-action,.contact-work-state,.contact-policy){font-size:16px}
+.demo-phone-connection{font-weight:650;border-block:1px solid #c5d6cc;padding-block:12px}
+.demo-workspace .demo-governance-grid{grid-template-columns:minmax(0,1.25fr) minmax(300px,1fr) minmax(240px,.8fr);gap:24px}
+.demo-node-grid small{display:block}.demo-workspace .demo-node-grid{gap:20px;margin:24px 0}
+.demo-workspace .demo-governance-outcome .service-recalls{padding:0;background:none}
+.work-management{display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,2.2fr);gap:28px;align-items:start}
+.work-list,.work-detail{min-width:0;background:white;border:1px solid var(--border);border-radius:16px;padding:24px}
+.work-list-heading{display:grid;gap:12px;margin-bottom:24px}.work-list-heading h2{margin:0}
+.work-list ul{list-style:none;padding:0;margin:0 0 20px}.work-select{display:grid;gap:8px;width:100%;text-align:left;padding:18px 12px;background:none;border:0;border-bottom:1px solid var(--border);color:inherit;font:inherit}
+.work-select[aria-pressed=true]{background:var(--teal-soft);outline:1px solid var(--teal);outline-offset:-1px;border-radius:6px}.work-select strong{font-size:18px}.work-select small{overflow-wrap:anywhere}
+.work-detail-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--border);padding-bottom:20px}.work-detail-heading h2{margin:0}.work-detail-heading p{margin:8px 0 0}.work-detail-heading .button{flex-shrink:0}
+.work-facts{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:28px 0}.work-facts dt{color:var(--muted);font-size:14px}.work-facts dd{font-size:18px;margin:4px 0 0;font-weight:600}
+.work-create{padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--border)}.work-create fieldset,.work-delegations fieldset{border:0;padding:0;display:grid;gap:16px}.work-management label{display:grid;gap:8px}.work-management select,.work-management input{width:100%}.work-management .button{margin:4px 8px 4px 0}.work-attempts,.work-delegations{border-top:1px solid var(--border);padding-top:20px;margin-top:24px}.work-delegations article{border-bottom:1px solid var(--border);padding:16px 0}.work-delegations h4{font-size:18px;margin:0}
+.work-confirm{border:1px solid #d2b8a9;padding:12px 18px;margin:16px 0;background:#fff5ed}.work-empty{padding:32px 0}.work-recalls .service-recalls{padding:16px}
+@media(max-width:1000px){.demo-workspace .demo-call-grid{grid-template-columns:minmax(0,1fr) 340px}.demo-workspace .demo-governance-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.demo-governance-outcome{grid-column:1/-1}.work-management{grid-template-columns:240px minmax(0,1fr)}.work-detail-heading{display:block}.work-detail-heading .button{margin-top:16px}}
+@media(max-width:700px){.demo-workspace{padding:24px 16px}.demo-workspace h1{font-size:28px}.work-management{grid-template-columns:1fr;gap:20px}.work-list,.work-detail{padding:20px}.work-facts{gap:20px}.demo-workspace .demo-call-grid,.demo-workspace .demo-governance-grid{display:flex;flex-direction:column}.demo-workspace .demo-recipient{width:100%;max-width:360px}.demo-shell .site-header nav a{font-size:16px}.demo-workspace .demo-institution{order:0}.demo-workspace .demo-live-evidence{order:1}.demo-workspace .demo-recipient{order:2}}
+
+.demo-workspace .demo-commands>.finals-controls{display:grid;gap:16px}.demo-commands>.finals-controls>h2{margin:8px 0 0}.demo-commands .service-summary-list>div{font-size:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.demo-commands .service-summary-list dd{font-size:18px}
+.demo-commands .recovery-review{padding:16px}.demo-commands .recovery-review .approver-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;border:0;padding:12px 0;margin:12px 0}.demo-commands .recovery-review .approver-list article{display:block;padding:0;background:none;border:0}.demo-commands .approver-list small{display:block}.demo-commands .approver-list .avatar{width:28px;height:28px;margin-bottom:8px}.demo-shell .site-header nav a{font-size:16px}
+
+.demo-workspace .demo-live-bar{max-width:100%;flex-wrap:wrap}.demo-workspace .demo-live-bar .service-end{flex:0 0 auto}
+@media(max-width:700px){.demo-role-recipient .demo-recipient{order:0}.demo-role-recipient .demo-live-evidence{order:1}.demo-role-recipient .demo-institution{order:2}}

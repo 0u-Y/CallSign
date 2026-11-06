@@ -9,7 +9,7 @@ export function Shell() {
       <a className="skip-link" href="#main">본문으로 건너뛰기</a>
       <header className="site-header">
         <NavLink to="/" className="brand-link"><Brand /></NavLink>
-        <nav aria-label="주요 탐색"><NavLink to="/demo/call">연락과 통화</NavLink><NavLink to="/demo/governance">공동 관리</NavLink><NavLink to="/official">공식 업무</NavLink></nav>
+        <nav aria-label="주요 탐색"><NavLink to="/demo/work">업무 관리</NavLink><NavLink to="/demo/call">연락 검증</NavLink><NavLink to="/demo/governance">공동 관리</NavLink></nav>
       </header>
       {publicPreview && <aside className="public-preview-banner" aria-label="공개 배포 범위">
         <strong>프런트엔드 미리보기</strong><span>API 미연결 · 로그인과 실제 통화는 사용할 수 없습니다. <a href="https://github.com/0u-Y/CallSign/blob/main/docs/RUNBOOK.md">실제 서비스 배포 안내</a></span>
