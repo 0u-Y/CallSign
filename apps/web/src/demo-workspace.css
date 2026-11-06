@@ -87,3 +87,5 @@
 .demo-evidence-drawer .button.primary{background:#246afa;border-color:#246afa;color:#fff}.demo-evidence-drawer .button.primary:disabled{opacity:.5}
 .demo-workspace .demo-phone-app{flex-direction:column;align-items:flex-start;gap:4px}
 @media(max-width:720px){.work-table{min-width:790px}.work-list-heading h2{flex-basis:100%;margin-right:0}.work-list-heading .button{min-width:120px}.work-table-scroll{max-width:100%}}
+
+.work-table-scroll:focus-visible{outline:3px solid #82aaff;outline-offset:3px}
