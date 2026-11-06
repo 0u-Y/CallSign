@@ -57,6 +57,7 @@
     "tests/media/analysis-path.ts",
     "tests/media/service-pbx.spec.ts",
     "scripts/call-trials.ts",
-    "scripts/evaluate-service-analysis.ts"
+    "scripts/evaluate-service-analysis.ts",
+    "api/**/*.ts"
   ]
 }
