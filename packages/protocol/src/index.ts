@@ -260,3 +260,4 @@ export async function exportSigningPrivateJwk(key: SigningKeyPair): Promise<JWK>
 export * from "./configuration.js";
 
 export * from "./analysis.js";
+export * from "./recovery.js";
