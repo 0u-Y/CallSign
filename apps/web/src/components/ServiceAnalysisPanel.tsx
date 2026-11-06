@@ -15,5 +15,6 @@ export function ServiceAnalysisPanel({event,compact=false}:{event?:ServiceAnalys
 }
 
 export function ServiceTranscript({segments}:{segments:TranscriptRevision[]}){
- return <section className="demo-transcript" aria-label="상대 음성 전사"><h2>실시간 전사</h2>{segments.length?segments.map(s=><p key={s.segmentId}><span>{s.final?'확정':'인식 중'}</span>{s.text||'발화 내용 없음'}</p>):<p>수신자의 분석 동의 후 상대 음성을 표시합니다.</p>}</section>;
+ const render=(s:TranscriptRevision)=><p key={s.segmentId}><span>{s.final?'확정':'인식 중'}</span>{s.text||'발화 내용 없음'}</p>;
+ return <section className="demo-transcript" aria-label="상대 음성 전사"><h2>실시간 전사</h2>{segments.length?<>{segments.slice(-3).map(render)}{segments.length>3&&<details><summary>이전 전사 {segments.length-3}개</summary>{segments.slice(0,-3).map(render)}</details>}</>:<p>수신자의 분석 동의 후 상대 음성을 표시합니다.</p>}</section>;
 }

@@ -1,0 +1,73 @@
+{
+  "scope": "built frontend with synthetic API interception; no backend/media/provider verification",
+  "checks": [
+    "lost create response retries identical intent and idempotency key",
+    "real UI create payload and response selection",
+    "cancel selected only, confirmation, response refresh",
+    "route keeps audio DOM; evidence drawer Escape restores focus",
+    "R2 success then different query failure clears JSON",
+    "R3 initial failure has no empty claim; recovered success empty",
+    "valid recovery request reviewed; zero signatures cannot submit",
+    "R2 late old-account response discarded after unmount",
+    "assigned agent creates existing-profile attempt",
+    "agent cannot create/cancel work or read recipient transcript",
+    "call evidence shows missing binding receipt lease as unobserved",
+    "recipient consent controls only recipient; no institutional writes",
+    "approver cannot perform institution stop",
+    "R4 failed callback stripped; SPA remount rechecks session without replay"
+  ],
+  "captures": [
+    {
+      "name": "work-desktop",
+      "width": 1440,
+      "path": "artifacts/demo-ui-20261106/work-desktop.png"
+    },
+    {
+      "name": "work-mobile",
+      "width": 390,
+      "path": "artifacts/demo-ui-20261106/work-mobile.png"
+    },
+    {
+      "name": "governance-desktop",
+      "width": 1440,
+      "path": "artifacts/demo-ui-20261106/governance-desktop.png"
+    },
+    {
+      "name": "governance-mobile",
+      "width": 390,
+      "path": "artifacts/demo-ui-20261106/governance-mobile.png"
+    },
+    {
+      "name": "call-agent-desktop",
+      "width": 1440,
+      "path": "artifacts/demo-ui-20261106/call-agent-desktop.png"
+    },
+    {
+      "name": "call-recipient-desktop",
+      "width": 1440,
+      "path": "artifacts/demo-ui-20261106/call-recipient-desktop.png"
+    },
+    {
+      "name": "call-recipient-mobile",
+      "width": 390,
+      "path": "artifacts/demo-ui-20261106/call-recipient-mobile.png"
+    }
+  ],
+  "errors": [],
+  "checkedAt": "2026-11-06",
+  "uiSource": "e52b56505590d23ac5380aebc0ca256028f20869",
+  "light": {
+    "files": 79,
+    "tests": 393,
+    "passed": true,
+    "method": "Existing lint, four typechecks and vitest --maxWorkers=2 invoked directly from installed binaries; pnpm workspace verification rejected symlinked dependencies. No installation or hook bypass."
+  },
+  "webBuild": "PASS; existing chunk-size and ineffective dynamic import warnings retained",
+  "visualReview": "1440px and 390px captures inspected. Fresh reviewer found only stale DESIGN route/analysis descriptions; corrected and scored resolved. No live media verdict.",
+  "limits": [
+    "No persistent backend writes or public call/provider execution in this UI session",
+    "Route fixture checks audio DOM lifetime, not live media continuity",
+    "Account names and credential validity are absent from workspace/management list contracts; IDs and unavailable detail are explicit",
+    "No runtime/GHCR/Release rebuild or manual deployment"
+  ]
+}

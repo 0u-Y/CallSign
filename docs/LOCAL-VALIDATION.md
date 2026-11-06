@@ -5,7 +5,7 @@
 현재 DB 감사/복원 시험은 `scripts/validation-runtime-media.py`의 명시적 plan `databaseAudit`/`fullRestore`에서 선택한다. 시작 snapshot→정해진 통화→앱/worker 정리→DB가 살아 있는 최종 감사→기반 자원 정리 순서를 유지한다. 정상 반복은 최대5회·자동 재시도0으로 제한한다. `fullRestore`는 기존 암호화 bundle CLI와 현재 이미지에서 복사한 Node/코드, 기존 PostgreSQL 이미지의 native client를 사용하며 원본 fence·새 DB volume·정지한4개 Besu snapshot·독립 Anchor 보존을 요구한다. **이전 service-hardening 소스의 전체 RESTORE·복원 후 통화·양쪽 DB 감사는 PASS다. 새 지속 데모/provider 후보의 전체 RESTORE는 NOT_RUN이며 이전 PASS를 전용하지 않는다.** [실행 근거](../artifacts/restore-audit-20261105.json)를 확인한다. 별도 사용자의 실행 승인과 기존40GiB/24GiB/16GiB·압박/OOM/deadline 조건 없이 기동하지 않는다.
 
 
-현재 후보의 실제 준비·일반 entrypoint·자원 중단은 [후속 실행 기록](../artifacts/candidate-media-followup-20261104.json)을 따른다. 통화 완료 전 중단됐고 기존 실행 정책을 바꾸지 않았다. 새로운 허가 없이 자동 재기동하지 않는다.
+2026-11-04 후보의 실제 준비·일반 entrypoint·자원 중단은 [후속 실행 기록](../artifacts/candidate-media-followup-20261104.json)을 따른다. 통화 완료 전 중단됐고 기존 실행 정책을 바꾸지 않았다. 새로운 허가 없이 자동 재기동하지 않는다.
 
 정리 전에 원본 로그와 최초 자원 중단 표본, 소유 ID, host baseline/after snapshot을 **보호된 로컬 경로에 먼저 보존**한다. env·키·세션·DB/chain 데이터는 공개 증거에서 제외한다. Docker ID를 비교할 때 전후 모두 `--no-trunc`를 쓰거나 명시적으로 prefix를 정규화한다. 전체 interface snapshot의 차이는 수명/외부 작업 등의 원인을 확인하기 전 설정 변경으로 단정하지 않는다. baseline을 잃었거나 비교 형식이 잘못됐으면 보존 PASS 대신 미확인으로 기록한다. 원본 보존을 확인한 뒤 소유 label/ID를 대조해 앱/브라우저→기반 서비스→보호 trial root 순서로 정리한다.
 
@@ -1197,7 +1197,7 @@ NEW·일반 restart·resume·RESTORE는 기존 절차를 유지한다. `deployme
 
 기본 제품 경로는 `/service`, 별도 인증 공식 확인은 `/official`이다. 기관·상담원·수신자는 독립 브라우저 프로필에서 실제 로그인한다. 기관은 고객/상담원/콜센터 선택→업무·위임 생성→원장 확정 확인, 상담원은 배정 업무→새 통화→개별 승인→마이크/PBX 등록→발신, 수신자는 자기 통화 선택→마이크/PBX 등록→수락/검증→선택적 분석 동의 순서다. 종료·취소·정지는 각 실제 권한/API로 수행하고 원장/서버/PBX/양 끝 음성 관측을 분리한다. 복구는 현재 proposal/nonce/epoch/만료에 맞는 서로 다른 관리 승인자2명 서명이 필요하며 과거 통화를 재사용하지 않는다. 별도 발표 화면·장면 버튼·기록 재생을 만들지 않는다.
 
-현재 `vercel.json`은 PUBLIC_PREVIEW build, self connect-src, microphone=()다. 실제 AWS API/WSS로 이어진 배포 연결이나 서비스 URL은 확인되지 않았다. 이를 풀어 쿠키/CSRF/origin 정책을 우회하지 않는다. 실제 서비스는 적절한 AWS 동일 origin과 OIDC callback/TLS/WSS/TURN 입력을 준비해 검증해야 하며 Vercel 공개 preview를 통화 성공으로 표시하지 않는다.
+당시 공개 preview의 `self` connect-src·`microphone=()` 조건은 과거 실행 환경이다. 현행 공개 HTTP/분석 relay·SIP/TURN 입력은 [RUNBOOK](RUNBOOK.md#브라우저부터-실제-서비스까지), 실행 여부는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 과거 CSP를 현재 설정으로 복사하거나 cookie·CSRF·Origin 보호를 완화하지 않는다.
 
 ### 최신 제품 후보의 사용·인계 상태 (2026-11-04)
 

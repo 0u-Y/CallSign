@@ -2,18 +2,13 @@
 
 ## 현재 상태와 다음 단계
 
-아래 날짜별 기록과 시험 수치는 당시 소스·환경의 결과다. 현재 공개 사용 가능 여부는 이 표를 기준으로 보고, 원본 실패·후속 결과는 각 증거에서 확인한다. AWS 이전은 현재 목표에서 제외한다.
+현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
-| 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
-|---|---|---|---|
-| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 실제 통화 캡처 검토 후 compact 배치 보완; 새 배치 재캡처 필요 |
-| 공개 API·분석 WSS | 실제 HTTP API 연결·native WSS relay 배포. Origin/비인증 거절 확인; 과거 단순 rewrite WSS404와 구분 | 인증 음성 WS와 실제 분석 이벤트 확인 | HTTP same-origin 연결·native 분석 WS relay 배포. 실제 인증 음성 WS는 미검증 |
-| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
-| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 relay 양방향 합성 음원·승인/소비/lease·이동·정상 종료 확인; 독립 외부 기기는 미확인 |
-| 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
-| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | 최신 지속 환경의 실제 정지·키 활성화·새 업무 시연 필요 |
-| DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
-| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
+## 2026-11-06 문서 통합과 역할별 UI
+
+문서 `09af92b`·`f0f4e4a`를 최신 실행 기록과 병합했다. 별도 문서 worktree에서 R2 관리 조회 실패/늦은 응답, R3 미조회와 실패의 거짓 빈 목록, R4 callback 실패 Promise 잔류를 수정했다. 업무 관리·연락 검증·공동 관리의 실제 API 연결과 역할 제한을 재사용하며 controller·미디어·분석 내부 구현과 지속 운영 설정은 변경하지 않았다.
+
+변경 검사와 실행 근거·캡처는 [UI 검증 기록](../artifacts/demo-ui-20261106/result.json), 현재 판정은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 아래 읽기 전용 감사의 R2~R4는 당시 발견 기록이며 이 후속 수정으로 처리했다. 공개 통화 성공 범위는 다른 개발 세션의 기록과 구분한다.
 
 ## 2026-11-06 실제 공개 경로 통화와 병렬 보완
 
@@ -431,3 +426,74 @@ Git은 사용자 지시에 따라 검증 변경을 main에 정상 반영·일반
 | 지속 backend | 기존 공개 ingress/OIDC 없음·전체40GiB 미달 | 승인된 TLS/WSS/UDP·IdP·지속 감시 구성 |
 | AI | 보호 자격 로딩·오프라인 adapter 검증, $0.10 첫 smoke 승인 | 별도 동의 음성/전사 입력; 실제 호출0 |
 | 전달 후보 | 새 소스 오프라인 image build; 실제 runtime/media NOT_RUN | 후보별 상태를 보존한 게시·수령; 실제 통합 후 검증 완료 판정 |
+
+<a id="submission-review-20261106"></a>
+
+## 2026-11-06 제출 문서 정리와 읽기 전용 구현 리뷰
+
+기준 main `20cbd659783ab08791fbbb0abefc939a016391aa`, 확인일 2026-11-06(KST). 별도 `docs/submission-review-20261106` worktree에서 문서만 수정했다. 원본 checkout의 branch·staging·미커밋 파일과 HTML/PDF·개인 메모는 건드리지 않았다. [전체 Markdown 검토 목록](../artifacts/document-review-20261106.json)에 43개 파일의 독자·용도·기존 감사 대비 hash·변경 사유·검증 범위를 기록한다. 기존 감사와 동일한 자료는 보존 판정을 재사용하고 현재 상태 표현·명령/경로·문서 역할을 다시 대조했다.
+
+공개 로그인/API 미연결이라는 오래된 설명을 정정하고 현황표로 연결했다. RUNBOOK의 HTTP rewrite·분석 relay·SIP/TURN 경계를 현재 코드에 맞췄다. MASTER의 요구 ID·완료 조건은 유지하면서 서버컴 우선/AWS 후속을 구분했다. 이전 현황 문장은 이력 문서에 보존했다. AGENTS의 권한·사용자 지시는 수정하지 않았다. AGENTS가 길어진 문제는 이후 별도 승인 아래 과거 예외를 보관하고 현행 조건을 연결하는 방식만 제안하며 이번에 적용하지 않는다.
+
+### 우선순위와 판정
+
+P1은 공개 시연의 핵심 미완료 경계, P2는 잘못된 상태 표시나 실패 후 복귀 문제다. 아래 위치는 **기준 SHA의 줄 번호**다. 제품 코드·시험은 수정하거나 실행하지 않았으며, “코드상 확정”도 브라우저 재현 완료를 뜻하지 않는다.
+
+#### R1 · P1 · 공개 통화 완료 증거 없음 — 기존 개발 세션 소관
+
+- **문제:** 공개 인증 성공을 공개 통화·회수·분석까지 성공한 것으로 제출할 수 없다.
+- **근거:** [공개 조사 기록](../artifacts/persistent-idp-start-20261105.json)의 `publicMediaInvestigation20261106`(468행 이후), `completeCalls: 0`; [통화 controller](../apps/web/src/lib/serviceCall.ts)의 검증/lease/연결 단계(64~116행).
+- **발생 조건:** 공개 주소를 사용하는 SIP/ICE 협상과 수락 후 실제 연결 검증. 원래 기록에는 ICE timeout과 수락 뒤 verification-unavailable이 각각 남아 있다.
+- **사용자 영향:** 통화가 종료되거나 실제 양방향 음성 확인까지 도달하지 못한다. 후속 분석·회수의 공개 성공도 이 근거만으로 주장할 수 없다.
+- **판정:** 미완료 실행은 확정. 단일 원인·현재 수정 후 재현 여부는 미확정. 상대 측 PBX_BINDING_CONTEXT_INVALID를 최초 원인으로 확정하지 않는다.
+- **최소 수정안:** 새 구현을 중복하지 않고 기존 세션의 첫 오류 진단·수정 결과를 받아 현황표의 해당 행만 갱신한다.
+- **필요 검증:** 기존 세션이 승인된 범위에서 같은 후보의 양방향 음성 디코딩과 종료/회수·분석을 각각 확인. 이 문서 세션에서 재현하지 않음.
+
+#### R2 · P2 · 수동 관리 조회 실패 뒤 이전 결과가 남음
+
+- **문제:** ‘관리 상태 기술 상세’는 다음 조회가 실패해도 마지막 성공 JSON을 그대로 유지한다. 어떤 종류의 조회·언제의 결과인지 표시하지 않는다.
+- **근거:** [ServiceManagement](../apps/web/src/pages/Service.tsx) 105~112행의 `state`와 `setState(await api(...))`; 같은 파일 48행 `action`의 오류 처리. 별도 [ServiceAdministration](../apps/web/src/components/ServiceAdministration.tsx) 9행은 실패 시 state를 지우므로 두 영역의 처리가 다르다.
+- **발생 조건:** 관리 상태/작업/health 중 하나를 성공 조회한 뒤 다른 조회가 5xx·네트워크 오류로 실패하고, workspace 조회 자체는 정상인 경우.
+- **사용자 영향:** 이전 활성 상태·노드/작업 결과를 새 조회의 결과로 오해할 수 있다. 서버 권한 우회가 확인된 것은 아니다.
+- **판정:** 코드상 확정된 표시 결함. 실제 공개 브라우저 재현은 미실행.
+- **최소 수정안:** 수동 조회 시작/실패 시 상세 결과를 비우거나 조회 종류·시각·실패 후 오래된 결과임을 명시한다. 기존 조회 상태 패턴을 재사용한다.
+- **필요 검증:** 성공→다른 조회 실패의 작은 UI 회귀 1건. 전체 체인·PBX 재실행 불필요. Service.tsx가 개발 중이므로 통합 시 재확인.
+
+#### R3 · P2 · 관리 조회 불가를 ‘공동 변경 요청 없음’으로 표시
+
+- **문제:** 관리 state가 아직 없거나 조회에 실패했을 때 빈 요청 안내가 표시된다.
+- **근거:** [ConfigurationReviewPanel](../apps/web/src/components/ConfigurationReviewPanel.tsx) 25행의 `!state?.configurationProposals.length`; [ServiceAdministration](../apps/web/src/components/ServiceAdministration.tsx) 9행은 조회 실패 시 `setState(undefined)`를 호출한다.
+- **발생 조건:** 최초 조회 대기 또는 `/v3/management`/jobs 조회 실패.
+- **사용자 영향:** 실패 안내와 ‘공동 변경 요청이 없습니다’가 함께 보이며 실제 제안이 없는 것으로 오해할 수 있다. 서버의 제안/서명은 삭제되지 않는다.
+- **판정:** 코드상 확정된 표시 결함.
+- **최소 수정안:** state가 있고 성공 응답의 배열이 비었을 때만 빈 상태를 표시한다. 미조회/실패는 기존 조회 실패 안내를 사용한다.
+- **필요 검증:** state undefined와 성공 empty 배열을 구분하는 컴포넌트 렌더 검사. 기존 `configuration-review` 시험을 확장하면 충분하다.
+
+#### R4 · P2 · 실패한 로그인 callback Promise가 모듈에 남음
+
+- **문제:** callback 실패 시 모듈 변수 `loginCompletion`이 비워지지 않는다. 전체 reload 없이 ServicePage가 다시 mount되면 이전 rejected Promise를 다시 await하고 `refresh()`에 도달하지 못한다.
+- **근거:** [ServicePage](../apps/web/src/pages/Service.tsx) 25·41행. URL의 code/state는 먼저 제거하고, `loginCompletion=undefined`는 await 성공 뒤에만 실행한다. catch/clearLocal에는 초기화가 없다.
+- **발생 조건:** callback 요청이 실패한 뒤 SPA 내 다른 화면에서 업무 화면으로 복귀. 전체 페이지 reload를 동반한 새 로그인은 모듈을 초기화하므로 영향 범위가 다르다.
+- **사용자 영향:** 복귀한 화면에서 과거 로그인 오류가 반복되고 현재 세션 확인이 생략된다. 새 로그인 자체가 영구 차단된다는 주장은 아니다.
+- **판정:** 코드상 캐시 잔류 확정. 해당 사용자 이동의 브라우저 재현은 추가 확인 필요.
+- **최소 수정안:** 완료/실패한 자신과 같은 callback Promise만 정리해 동시 mount 중 중복 교환 방지는 유지한다.
+- **필요 검증:** callback 1회 실패→unmount/remount→auth/me 재조회와 중복 mount 시 callback 1회만 교환하는 UI 회귀. 외부 IdP 호출 없이 mock 응답으로 충분하다.
+
+### 검토한 방어와 아직 확인하지 않은 것
+
+ServiceCall은 종료/동의 철회 때 분석 generation을 바꾸고 결과·전사를 지우며, 새 contextRevision보다 오래된 분석을 무시한다. 업무 조회 실패는 목록을 숨기고 통화 종료를 남긴다. 관련 `analysis-stop.test.ts`, `service-controller.test.ts`, `service-analysis.test.ts`는 이러한 선택 경계를 다루지만 공개 STT 품질·브라우저 수명 전체를 입증하지 않는다. 승인 소비/lease·관리 EIP-712·Witness 검증과 DB/Anchor 복원은 코드와 기존 기록을 대조했으며 새 실환경 성공을 선언하지 않는다.
+
+준비 문서에서 빠진 내부 계정 ID·위임 등록 대기·동일 시도 선택·브라우저 단기키 소실·공개 경로별 입력은 RUNBOOK에 보완했다. 실제 금융기관 계정 연결, 상용 CTI/PSTN, 독립 원장 운영, native chain proof는 후속 범위이며 이번 리뷰의 신규 필수 개발 작업으로 만들지 않는다.
+
+### 기존 개발 세션 통합 안내
+
+문서 커밋만 순서대로 검토해 반영한다. 이 branch에서 main 병합·push·PR·배포를 하지 않는다. 전체 파일을 원본 checkout에 복사하지 말고 diff 단위로 통합한다. 공개 통화·STT/AI·회수·공동 복구·지속 운영의 최신 결과는 현황표의 근거/소스만 갱신한다. R1은 기존 진행 작업이며 R2~R4도 최신 코드에서 해결됐는지 먼저 대조한다.
+
+충돌 가능성이 높은 문서는 `docs/RUNBOOK.md`(원본에서 이미 수정 중), `docs/FINALS-IMPLEMENTATION-PLAN.md`, `docs/guide/05-IMPLEMENTATION-STATUS.md`, `docs/KNOWN-LIMITATIONS.md`다. `README.md`·`docs/README.md`·`DESIGN.md`는 공개 모드/설명 변경과 겹칠 수 있다. HTML 디자인·제품 코드의 변경은 이 branch에 가져오지 않았다. 보관본은 append 내용만 통합한다.
+
+
+### 최종 대조와 검증
+
+마지막 확인한 공유 main은 `1e6a090dace651c99140b8835597db34a24c8850`다. 기준 이후 5개 커밋·제품/시험 23개 파일의 변경 목록을 확인하고 종료 controller, 분석 예산, 복구 계약/검토 화면, ServicePage·관리/분석 표시의 관련 diff를 읽었다. 해당 구간의 Markdown·기존 공개 실행 증거에는 변경이 없다. R2의 수동 관리 결과 잔류, R3의 undefined 빈 상태, R4의 callback 캐시는 최신 main에도 남는다. 종료 중 검증 경합은 `5d130df`에서 별도 수정됐으므로 신규 미해결 결함으로 보고하지 않았다. 새 복구 파일 UI와 분석 예산의 설명만 보완했으며 제품 파일을 가져오거나 원본 checkout을 덮어쓰지 않았다.
+
+이번 검증은 추적 Markdown 43개(MDX 0개)의 로컬 링크·GitHub식 heading/명시 anchor 723개, 명시 소스 경로, package.json 명령 이름 대조 및 `git diff --check`다. 누락 링크/anchor는 0개다. `contracts/out` 참조는 생성 컴파일 산출물/예시 경로로 분류하고 생성하지 않았다. 외부 URL 89개의 가용성, 문서 명령 실행, light/브라우저/통합/AI 시험은 수행하지 않았다. 원격 fetch 없이 공유 로컬 main을 대조했으며 이후 main의 추가 변경은 통합 담당자가 같은 경계만 확인한다.

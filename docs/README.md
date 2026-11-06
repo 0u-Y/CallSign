@@ -30,9 +30,9 @@
 
 ## 현재 운영과 후속 이전
 
-현재 목표는 서버컴의 지속 데모이며 AWS 이전은 후속이다. 보존된 이전 준비 절차는 [현재 전달 버전과 AWS 수령 명령](RUNBOOK.md#github-delivery-20261102) → [NEW 초기 배포](RUNBOOK.md#new-초기-배포-순서) → [재시작·재개·RESTORE](RUNBOOK.md#재시작실패-재개기존-배포-restore) 순서로 확인합니다.
+현재 목표는 서버컴의 지속 데모이며 AWS 이전은 후속이다. 보존된 이전 준비 절차는 [보존된 전달 버전과 AWS 수령 명령](RUNBOOK.md#github-delivery-20261102) → [NEW 초기 배포](RUNBOOK.md#new-초기-배포-순서) → [재시작·재개·RESTORE](RUNBOOK.md#재시작실패-재개기존-배포-restore) 순서로 확인합니다.
 
-Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니다. bootstrap 전달은 검증했지만 최종 AWS 웹·별도 GHCR 수령용 읽기 자격 검증·AWS 실행은 미완료입니다. 시험 chain/DB를 대회 identity로 간주하지 않으며, 기존 키·genesis·계약·소비 이력·Anchor를 초기화해 재개하지 않습니다. `infra/gcp`는 과거 보존물입니다. 현재 Vercel 공개 frontend는 API 미연결 제품 미리보기이며 AWS 대회 runtime이 아닙니다.
+Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니다. bootstrap 전달은 검증했지만 최종 AWS 웹·별도 GHCR 수령용 읽기 자격 검증·AWS 실행은 미완료입니다. 시험 chain/DB를 대회 identity로 간주하지 않으며, 기존 키·genesis·계약·소비 이력·Anchor를 초기화해 재개하지 않습니다. `infra/gcp`는 과거 보존물입니다. 공개 frontend의 연결 범위는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따르며 AWS 배포 완료와 구분합니다.
 
 ## 기록과 자료
 
@@ -52,4 +52,4 @@ Git 소스·공개 Release·비공개 GHCR·보호 파일은 역할이 다릅니
 
 현재 저장소에는 프로젝트 LICENSE 파일이 없습니다. 이번 정리에서 라이선스를 선택하거나 새로 부여하지 않았습니다. 의존성 고지는 프로젝트 자체의 LICENSE를 대신하지 않습니다. 비밀값이나 개인정보가 의심되면 공개 issue·diff에 원문을 붙이지 말고 위치·유형만 전달하세요.
 
-전체 관리 대상 Markdown의 독자·역할·유지/수정/통합 내역은 [파일별 검토 기록](../artifacts/document-review-20261104.json)을 참고하세요. 새 UI의 오프라인 검사와 기동 차단은 [현재 진행표](FINALS-IMPLEMENTATION-PLAN.md#2026-11-04-실제-업무-ui-후속과-시작-조건-차단)에서 이전 실제 통화 증거와 구분합니다.
+전체 추적 Markdown/MDX의 독자·역할·유지/수정/통합 내역은 [2026-11-06 파일별 검토 목록](../artifacts/document-review-20261106.json)을 참고하세요. [이전 감사](../artifacts/document-review-20261104.json)는 원본으로 보존합니다. 구현 리뷰와 통합 안내는 [제출 정리 기록](FINALS-IMPLEMENTATION-PLAN.md#submission-review-20261106)에 있습니다. 새 UI의 오프라인 검사와 기동 차단은 [현재 진행표](FINALS-IMPLEMENTATION-PLAN.md#2026-11-04-실제-업무-ui-후속과-시작-조건-차단)에서 이전 실제 통화 증거와 구분합니다.

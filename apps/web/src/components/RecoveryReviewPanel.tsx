@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {verifyRecoveryRequest,verifyRecoverySignature,type RecoveryManagement,type RecoveryReview} from '../lib/recoveryReview.js';
 
 function download(name:string,value:unknown){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)+'\n'],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),0);}
-export function RecoveryReviewPanel({state,permissions,action,post,reload,busy=false}:{state:RecoveryManagement|undefined;permissions:string[];action:(fn:()=>Promise<unknown>)=>Promise<void>;post:<T=unknown>(path:string,body:unknown)=>Promise<T>;reload:()=>Promise<void>;busy?:boolean}){
+export function RecoveryReviewPanel({state,permissions,action,post,reload,busy=false,loadError=false}:{state:RecoveryManagement|undefined;permissions:string[];action:(fn:()=>Promise<unknown>)=>Promise<void>;post:<T=unknown>(path:string,body:unknown)=>Promise<T>;reload:()=>Promise<void>;busy?:boolean;loadError?:boolean}){
  const [request,setRequest]=useState<RecoveryReview['request']>(),[signatures,setSignatures]=useState<Record<string,string>>({}),[message,setMessage]=useState('');
  const now=Math.floor(Date.now()/1000);let review:RecoveryReview|undefined,invalid='';
  if(request&&state)try{review=verifyRecoveryRequest(request,state,now);}catch(e){invalid=(e as Error).message;}
@@ -12,14 +12,14 @@ export function RecoveryReviewPanel({state,permissions,action,post,reload,busy=f
  const count=Object.keys(signatures).length,manage=permissions.includes('institution.recover');
  return <fieldset className="recovery-review" disabled={busy}><legend>공동 복구 · 독립 서명 검토</legend>
  <p>기관 정지 후, 등록 승인키 3개 중 서로 다른 2개의 서명으로 새 권한을 준비합니다.</p>
- <dl className="service-summary-list"><div><dt>기관 상태</dt><dd>{state?state.status==='suspended'?'정지':state.status==='active'?'활성':'확인 필요':'조회 중'}</dd></div><div><dt>서버 / 원장 관측 세대</dt><dd>{state?`${state.epoch} / ${state.observedEpoch??'미관측'}`:'미관측'}</dd></div><div><dt>복구 접수</dt><dd>{state?.recovery?.submitted?'서버 접수 기록 있음 · 원장 확정·활성화와 구분':'현재 접수 기록 없음'}</dd></div></dl>
+ <dl className="service-summary-list"><div><dt>기관 상태</dt><dd>{state?state.status==='suspended'?'정지':state.status==='active'?'활성':'확인 필요':loadError?'확인 불가':'조회 중'}</dd></div><div><dt>서버 / 원장 관측 세대</dt><dd>{state?`${state.epoch} / ${state.observedEpoch??'미관측'}`:'미관측'}</dd></div><div><dt>복구 접수</dt><dd>{!state?'미관측':state.recovery?.submitted?'서버 접수 기록 있음 · 원장 확정·활성화와 구분':'현재 접수 기록 없음'}</dd></div></dl>
  <div className="approver-list" aria-label="등록 승인키별 로컬 서명 검증">{state?.approvers.map((address,index)=><article key={address}><span className={`avatar ${review&&signatures[address.toLowerCase()]?'signed':''}`}>{index+1}</span><div><strong>등록 승인키 {index+1}</strong><small>{review&&signatures[address.toLowerCase()]?'같은 요청의 서명 검증됨':review?'서명 파일 대기':'복구 요청 검토 전'}</small></div></article>)}</div>
  <label>검토할 공개 복구 요청 파일<input disabled={!state} type="file" accept="application/json,.json" onChange={e=>{const file=e.target.files?.[0];e.target.value='';void action(()=>importRequest(file));}}/></label>
  {!request&&<p>운영자가 현재 원장 세대와 실제 배치할 새 공개키·관리 주소·nonce·만료로 준비한 요청을 가져오세요.</p>}
  {invalid&&<p role="alert">{invalid} 이전 서명은 새 요청에 사용하지 않습니다.</p>}
  {review&&<><h3>복구 목표 · 권한 세대 {review.request.expectedEpoch} → {String(BigInt(review.request.expectedEpoch)+1n)}</h3><p>서버 접수 후에도 원장 확인과 배치된 새 승인키 활성화가 필요합니다. 이전 통화·위임은 되살아나지 않습니다.</p>
  <p role="status">로컬 검증 <strong>{count}/3</strong> · 서로 다른 2개부터 제출 가능 · 원장 확정 전</p>
- 
+
  <label>각 승인자의 공개 서명 파일<input type="file" accept="application/json,.json" onChange={e=>{const file=e.target.files?.[0];e.target.value='';void action(()=>importSignature(file));}}/></label>
  <button className="button secondary" onClick={()=>download(`callsign-recovery-${review.operation}.json`,review.request)}>같은 복구 요청 내보내기</button>
  {manage&&<button className="button primary" disabled={count<2||state?.recovery?.hash===review.operation} onClick={()=>void action(async()=>{if(!state||!request)throw new Error('현재 복구 요청이 필요합니다.');const current=verifyRecoveryRequest(request,state,Math.floor(Date.now()/1000));await post('/v3/management/recover',{request:current.request,signatures:Object.values(signatures)});setMessage('서버가 복구 요청을 접수했습니다. 원장 확정과 새 키 활성화는 별도로 확인하세요.');await reload();})}>검증한 공동 복구 요청 제출</button>}

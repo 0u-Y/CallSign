@@ -17,6 +17,7 @@ export function App() {
         <Route element={<ServicePage />} >
           <Route path="service" />
           <Route path="demo" />
+          <Route path="demo/work" />
           <Route path="demo/call" />
           <Route path="demo/governance" />
         </Route>
