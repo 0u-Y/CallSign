@@ -1,3 +1,4 @@
+import {sipFailureCode} from '../../apps/web/src/lib/pbxSip.js';
 import { expect, it } from 'vitest';
 import { parseSip, sipDigest } from '../../apps/web/src/lib/pbxSip.js';
 import { createHash } from 'node:crypto';
@@ -13,4 +14,10 @@ it('uses registered realm and SHA-256 digest auth with qop, rejecting weaker cha
   const hash=(s:string)=>createHash('sha256').update(s).digest('hex');
   const expected=hash(`${hash('endpoint:callsign.example:password')}:random-nonce:00000001:client-nonce:auth:${hash('REGISTER:sip:callsign.example')}`);
   expect(value).toContain(`response="${expected}"`);await expect(sipDigest(challenge.replace('SHA-256','MD5'),credentials,'REGISTER','sip:callsign.example','nonce')).rejects.toThrow('SIP_AUTH_PROFILE_UNSUPPORTED');await expect(sipDigest(challenge,{...credentials,realm:'evil.example'},'REGISTER','sip:callsign.example','nonce')).rejects.toThrow('SIP_AUTH_PROFILE_UNSUPPORTED');
+});
+
+it('keeps a bounded SIP failure code without logging SDP, credentials or arbitrary provider messages',()=>{
+ expect(sipFailureCode(new Error('ICE_TIMEOUT'))).toBe('ICE_TIMEOUT');
+ expect(sipFailureCode(new Error('password=private-value; SDP session detail'))).toBe('SIP_NEGOTIATION_FAILED');
+ const error=new Error('raw SDP must stay private');error.name='OperationError';expect(sipFailureCode(error)).toBe('SDP_OPERATION_ERROR');
 });

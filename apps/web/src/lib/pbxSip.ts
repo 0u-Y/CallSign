@@ -20,6 +20,11 @@ export async function sipDigest(challenge:string,credentials:{username:string;pa
   const ha1=await sha256(`${credentials.username}:${credentials.realm}:${credentials.password}`),ha2=await sha256(`${method}:${uri}`),response=await sha256(`${ha1}:${fields.nonce}:${nc}:${cnonce}:auth:${ha2}`);
   return `Digest username="${credentials.username}", realm="${credentials.realm}", nonce="${fields.nonce}", uri="${uri}", algorithm=SHA-256, response="${response}", qop=auth, nc=${nc}, cnonce="${cnonce}"${fields.opaque?`, opaque="${fields.opaque}"`:''}`;
 }
+export function sipFailureCode(error:unknown){
+ if(error instanceof Error&&/^[A-Z][A-Z0-9_]{2,80}$/.test(error.message))return error.message;
+ if(error instanceof Error&&error.name==='OperationError')return 'SDP_OPERATION_ERROR';
+ return 'SIP_NEGOTIATION_FAILED';
+}
 const token=()=>crypto.randomUUID().replaceAll('-','');
 export class PbxSip {
   readonly media:LiveMedia; private socket:WebSocket|undefined;private closed=false;private registered=false;private cseq=0;private registerId=token();private tag=token();private invite:SipMessage|undefined;private response='';private acked=false;private timer:ReturnType<typeof setTimeout>|undefined;private authRetries=0;private registerBranch='';private localSequence=0;private ackTimer:ReturnType<typeof setTimeout>|undefined;private registeredResolve:(()=>void)|undefined;private registeredReject:((e:Error)=>void)|undefined;private queue=Promise.resolve();
@@ -29,7 +34,7 @@ export class PbxSip {
   async start(){await this.media.prepareMicrophone();if(this.closed)return;const socket=new WebSocket(this.credentials.wssUrl,'sip');this.socket=socket;
     socket.onopen=()=>{this.status('SIP 등록 중');this.register();};socket.onerror=()=>{this.status('PBX 연결 실패');this.close();};socket.onclose=()=>{this.status('PBX 연결 종료');this.close();};
     const registered=new Promise<void>((resolve,reject)=>{this.registeredResolve=resolve;this.registeredReject=reject;});
-    socket.onmessage=event=>{if(typeof event.data!=='string'){this.close();return;}if(event.data!=='\r\n\r\n'&&event.data.startsWith('CANCEL ')){try{this.cancel(parseSip(event.data));}catch{this.close();}return;}this.queue=this.queue.then(async()=>{if(this.closed)return;if(event.data==='\r\n\r\n'){socket.send('\r\n');return;}await this.receive(parseSip(String(event.data)));}).catch(()=>{this.status('SIP 협상 실패: 재검증 필요');this.close();});};
+    socket.onmessage=event=>{if(typeof event.data!=='string'){this.close();return;}if(event.data!=='\r\n\r\n'&&event.data.startsWith('CANCEL ')){try{this.cancel(parseSip(event.data));}catch{this.close();}return;}this.queue=this.queue.then(async()=>{if(this.closed)return;if(event.data==='\r\n\r\n'){socket.send('\r\n');return;}await this.receive(parseSip(String(event.data)));}).catch(error=>{console.warn('CallSign SIP negotiation failed',sipFailureCode(error));this.status('SIP 협상 실패: 재검증 필요');this.close();});};
     this.timer=setTimeout(()=>{if(!this.registered){this.status('SIP 등록 시간 초과');this.close();}},10000);return registered;
   }
   private send(value:string){if(this.closed||this.socket?.readyState!==WebSocket.OPEN)throw new Error('SIP_SOCKET_CLOSED');this.socket.send(value);}
