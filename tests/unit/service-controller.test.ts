@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SigningKeyPair, RuntimePolicy } from '../../packages/protocol/src/index.js';
 import type { ServiceTrust } from '../../packages/verifier/src/index.js';
-const mocked=vi.hoisted(()=>({context:{} as Record<string,unknown>,requests:[] as string[],ids:[] as unknown[],failClaim:false}));
-vi.mock('../../apps/web/src/lib/api.js',()=>({ApiError:class extends Error{},api:vi.fn(async(path:string,init?:RequestInit)=>{mocked.requests.push(path);if(path==='/v3/claim'){mocked.ids.push((init?.headers as Record<string,string>)?.['idempotency-key']);if(mocked.failClaim){mocked.failClaim=false;throw new TypeError('response lost');}}return path.startsWith('/v3/call-context')?mocked.context:{};})}));
+const mocked=vi.hoisted(()=>({context:{} as Record<string,unknown>,requests:[] as string[],ids:[] as unknown[],failClaim:false,holdOutcome:undefined as Promise<void>|undefined}));
+vi.mock('../../apps/web/src/lib/api.js',()=>({ApiError:class extends Error{},api:vi.fn(async(path:string,init?:RequestInit)=>{mocked.requests.push(path);if(path==='/v3/outcome'&&mocked.holdOutcome)await mocked.holdOutcome;if(path==='/v3/claim'){mocked.ids.push((init?.headers as Record<string,string>)?.['idempotency-key']);if(mocked.failClaim){mocked.failClaim=false;throw new TypeError('response lost');}}return path.startsWith('/v3/call-context')?mocked.context:{};})}));
 import {hashSdp,extractSingleSdpFingerprint} from '../../packages/protocol/src/index.js';
 import { ServiceCall } from '../../apps/web/src/lib/serviceCall.js';
 describe('product controller identity pinning before SIP enrollment',()=>{
- beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
+ beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.holdOutcome=undefined;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
  function controller(){return new ServiceCall({role:'recipient',attemptId:'attempt',intentId:'intent',recipientId:'recipient',agentId:'agent',key:{} as SigningKeyPair,trust:{} as ServiceTrust,runtimePolicy:{} as RuntimePolicy,status:()=>{},remote:()=>{},risk:()=>{}});}
  it('rejects an authorization for another recipient instead of using its recipient as the expectation',async()=>{
   const warning=vi.spyOn(console,'warn').mockImplementation(()=>{});mocked.context.authorization={payload:{recipientId:'someone-else'}};
@@ -32,6 +32,13 @@ describe('product controller identity pinning before SIP enrollment',()=>{
   peer.connectionState='connected';await expect(tick()).rejects.toThrow('DTLS_STATS_NOT_CONNECTED');
   peer.connectionState='connecting';(mocked.context.attempt as {firstConnectBy:number}).firstConnectBy=now-1;
   await expect(tick()).rejects.toThrow('CALL_WINDOW_EXPIRED');
+ });
+
+ it('sends one terminal request and stops verification while explicit termination is pending',async()=>{
+  let release!:()=>void;mocked.holdOutcome=new Promise<void>(resolve=>{release=resolve;});
+  const c=controller();Object.assign(c,{context:{attempt:{status:'accepted'}},sip:{pause:vi.fn(),close:vi.fn()}});
+  const first=c.end();await Promise.resolve();const second=c.end();await Promise.resolve();
+  try{expect(mocked.requests.filter(p=>p==='/v3/outcome')).toHaveLength(1);await (Reflect.get(c,'tick').bind(c) as ()=>Promise<void>)();expect(mocked.requests.filter(p=>p.startsWith('/v3/call-context'))).toHaveLength(0);}finally{release();await Promise.all([first,second]);}
  });
 
 });
