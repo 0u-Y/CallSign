@@ -903,6 +903,47 @@
         "All three actual authenticated captures opened and reviewed"
       ],
       "limits": "Narrow viewport is zoom-layout emulation, not browser zoom. No active call or AI in this check."
+    },
+    "activeCallFollowup": {
+      "case": 29,
+      "source": "ba0ae0c630e489c34ca208fac945b11cd30686e0",
+      "runtimeSource": "7c5a83936a6435d03dcaabbf287e418d3b5d1436",
+      "logicalAttempts": 1,
+      "automaticRetries": 0,
+      "reasonForOneCheck": "Ordinary restart, fresh OIDC sessions, and two successful public UI checks after prior failure",
+      "result": "TIMEOUT_BEFORE_RECIPIENT_PBX_REGISTRATION",
+      "approvalResponseMs": 1594.794316,
+      "clock": "single observer performance.now",
+      "requestFailures": [
+        {
+          "role": "sender",
+          "path": "/api/v3/claim",
+          "networkCode": "net::ERR_NETWORK_CHANGED"
+        },
+        {
+          "role": "recipient",
+          "path": "/api/v3/workspace",
+          "networkCode": "net::ERR_NETWORK_CHANGED"
+        },
+        {
+          "role": "recipient",
+          "path": "/api/v3/auth/me",
+          "networkCode": "net::ERR_NETWORK_CHANGED"
+        }
+      ],
+      "uiCancellation": "NOT_REACHED",
+      "paidCalls": 0,
+      "cleanup": {
+        "attempt": "failed",
+        "pbx": "pbx-absent",
+        "activeCalls": 0,
+        "reservations": 0,
+        "reservedBalance": 0,
+        "outbox": {
+          "done": 187
+        }
+      },
+      "limits": "Does not prove which workload caused network-change events; no host changes or automatic retries. Further same-host repetition stopped; external-device verification deferred by user."
     }
   }
 }
