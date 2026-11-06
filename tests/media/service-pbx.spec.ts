@@ -50,13 +50,20 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   }
   if(pagePath==='/demo/call')for(const page of [sender,receiver]){const details=page.locator('.demo-flow-details');if(await details.count()&&await details.getAttribute('open')===null)await details.locator('summary').click();}
   await expect(connection(sender)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});await expect(connection(receiver)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});
-  await sender.getByRole('button',{name:'양측 웹으로 발신'}).click();
+  const nextAction=async(page:Page,buttonName:string)=>{
+   await expect(page.getByRole('button',{name:buttonName,exact:true})).toBeEnabled();
+   if(pagePath==='/demo/call'&&process.env.CALLSIGN_MEDIA_DIRECTOR_KEYS==='true'){
+    await page.evaluate(()=>{if(document.activeElement instanceof HTMLElement)document.activeElement.blur();});
+    await page.keyboard.press('Space');note({input:'physical-Space',expectedAction:buttonName});
+   }else await page.getByRole('button',{name:buttonName,exact:true}).click();
+  };
+  await nextAction(sender,'양측 웹으로 발신');
   const observed=(page:Page)=>page.evaluate(async()=>{let sent=0,received=0,energy=0,samples=0;for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers)for(const r of (await pc.getStats()).values())if(r.kind==='audio'){if(r.type==='outbound-rtp')sent+=Number(r.bytesSent??0);if(r.type==='inbound-rtp'){received+=Number(r.bytesReceived??0);energy+=Number(r.totalAudioEnergy??0);samples+=Number(r.totalSamplesReceived??0);}}return {sent,received,energy,samples};});
   // Disabled tracks may send silence/CN RTP; decoded energy and track gating decide pre-accept safety.
   const sent=async()=>(await observed(sender)).sent;
   await expect(connection(receiver)).toContainText('PBX 협상 완료',{timeout:20000});for(const page of [sender,receiver])expect(await page.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.getSenders().every(sender=>!sender.track||!sender.track.enabled)))).toBe(true);expect((await observed(sender)).energy).toBe(0);expect((await observed(receiver)).energy).toBe(0);await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.getReceivers().every(r=>!r.track||!r.track.enabled)))).toBe(true);await expect.poll(()=>sender.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.getReceivers().every(r=>!r.track||!r.track.enabled)))).toBe(true);
   await testInfo.attach('before-accept-media',{body:JSON.stringify({sender:await observed(sender),recipient:await observed(receiver)}),contentType:'application/json'});
-  observation.mark('connect-action');await receiver.getByRole('button',{name:'통화 수락 및 검증 시작'}).click();await expect(connection(receiver)).toHaveText('양측 세션과 PBX 연결 검증 후 통화 중',{timeout:process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION==='OWNED_PUBLIC_DEMO'?60000:20000});observation.mark('verification-visible');await expect.poll(sent).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).sent).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).received).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).received).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).energy).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).energy).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).samples).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).samples).toBeGreaterThan(0);
+  observation.mark('connect-action');await nextAction(receiver,'통화 수락 및 검증 시작');await expect(connection(receiver)).toHaveText('양측 세션과 PBX 연결 검증 후 통화 중',{timeout:process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION==='OWNED_PUBLIC_DEMO'?60000:20000});observation.mark('verification-visible');await expect.poll(sent).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).sent).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).received).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).received).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).energy).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).energy).toBeGreaterThan(0);await expect.poll(async()=>(await observed(sender)).samples).toBeGreaterThan(0);await expect.poll(async()=>(await observed(receiver)).samples).toBeGreaterThan(0);
   await testInfo.attach('received-audio-before-frequency-check',{body:JSON.stringify({sender:await observed(sender),recipient:await observed(receiver)}),contentType:'application/json'});
   const decoded=async(page:Page,remoteHz:number,ownHz:number)=>page.evaluate(async({remoteHz,ownHz})=>{const ctx=new AudioContext();try{await ctx.resume();let remote=0,own=0;for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers)for(const receiver of pc.getReceivers()){if(receiver.track?.kind!=='audio')continue;const analyser=ctx.createAnalyser();analyser.fftSize=4096;ctx.createMediaStreamSource(new MediaStream([receiver.track])).connect(analyser);await new Promise(r=>setTimeout(r,100));const bins=new Float32Array(analyser.frequencyBinCount);analyser.getFloatFrequencyData(bins);const power=(hz:number)=>{const index=Math.round(hz/ctx.sampleRate*analyser.fftSize);return 10**(Math.max(...Array.from(bins.slice(Math.max(0,index-2),index+3)),-120)/20);};remote=Math.max(remote,power(remoteHz));own=Math.max(own,power(ownHz));}return {remote,own,contextState:ctx.state};}finally{await ctx.close();}},{remoteHz,ownHz});
   // The two input WAVs must carry 660Hz and 990Hz respectively. Decoding, not RTP counters, decides success.
@@ -76,6 +83,13 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   }
   if(pagePath==='/demo/call'){
    await sender.evaluate(()=>{(window as unknown as {savedCallPeers:RTCPeerConnection[];callSignTestPeers:RTCPeerConnection[]}).savedCallPeers=[...(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers];});
+   if(process.env.CALLSIGN_MEDIA_DIRECTOR_KEYS==='true'){
+    await sender.evaluate(()=>{if(document.activeElement instanceof HTMLElement)document.activeElement.blur();});
+    await sender.keyboard.press('f');await expect(sender.locator('#callsign-recording')).toHaveClass(/\brecording\b/);
+    await expect.poll(async()=>(await decoded(receiver,660,990)).remote).toBeGreaterThan(.003);
+    await sender.keyboard.press('Escape');await expect(sender.locator('#callsign-recording')).not.toHaveClass(/\brecording\b/);
+    note({filmingMode:'actual-F-Escape-remote-audio-maintained'});
+   }
    await sender.getByRole('link',{name:'공동 관리',exact:true}).click();await sender.getByRole('link',{name:'연락 검증',exact:true}).click();
    expect(await sender.evaluate(()=>{const w=window as unknown as {savedCallPeers:RTCPeerConnection[];callSignTestPeers:RTCPeerConnection[]};return w.savedCallPeers.every((p,i)=>p===w.callSignTestPeers[i]&&p.connectionState==='connected');})).toBe(true);
    await expect.poll(async()=>(await decoded(receiver,660,990)).remote).toBeGreaterThan(.003);
@@ -97,7 +111,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
      const context=await browsers[0]!.newContext({storageState:state});contexts.push(context);const page=await context.newPage();
      const [response]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/workspace'),page.goto(`${origin}/demo/work`)]);expect(response.ok()).toBe(true);
      const data=await response.json(),index=data.intents.findIndex((work:{id:string})=>work.id===intentId);expect(index).toBeGreaterThanOrEqual(0);
-     await page.getByRole('searchbox',{name:'고객·담당자·업무 검색'}).fill(intentId!);await expect(page.locator('.work-select')).toHaveCount(1);await page.locator('.work-select').click();await page.getByRole('button',{name:'선택 업무 취소',exact:true}).click();
+     await page.getByRole('searchbox',{name:'업무 검색'}).fill(intentId!);await expect(page.locator('.work-select')).toHaveCount(1);await page.locator('.work-select').click();await page.getByRole('button',{name:'선택 업무 취소',exact:true}).click();
      const [cancelled]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/cancel'&&r.request().method()==='POST'),page.getByRole('button',{name:'이 업무 취소 요청',exact:true}).click()]);expect(cancelled.ok()).toBe(true);
      note({managementAction:'work-cancel',source:'actual-independent-institution-work-ui',status:cancelled.status()});
      await testInfo.attach('institution-cancelled-work',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
