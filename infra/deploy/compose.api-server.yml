@@ -36,9 +36,22 @@ services:
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/issuer', target: /keys/issuer, read_only: true, bind: {create_host_path: false}}
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/trust', target: /trust, read_only: true, bind: {create_host_path: false}}
       - {type: bind, source: '${CALLSIGN_ANCHOR_TLS_DIR:?Anchor CA}/cert.pem', target: /tls/anchor.pem, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/pbx', target: /keys/pbx, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/asterisk/tls/cert.pem', target: /pbx-public/cert.pem, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${SERVICE_EXTRA_CA_PATH:?public Anchor and PBX certificates}', target: /tls/extra-ca.pem, read_only: true, bind: {create_host_path: false}}
   sender:
     <<: *app
     env_file: ${CALLSIGN_SENDER_ENV_FILE:?protected sender environment}
     volumes:
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/sender', target: /keys/sender, read_only: true, bind: {create_host_path: false}}
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/trust', target: /trust, read_only: true, bind: {create_host_path: false}}
+  worker:
+    <<: *app
+    entrypoint: [pnpm, worker]
+    env_file: ${CALLSIGN_WORKER_ENV_FILE:?protected worker environment}
+    healthcheck: {disable: true}
+    volumes:
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/admin', target: /keys/admin, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/operator', target: /keys/operator, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/deployment.json', target: /trust/deployment.json, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${SERVICE_EXTRA_CA_PATH:?public Anchor and PBX certificates}', target: /tls/extra-ca.pem, read_only: true, bind: {create_host_path: false}}

@@ -1,0 +1,52 @@
+# Existing host namespace only; no bridge, published port or automatic restart.
+name: ${CALLSIGN_PROJECT:?owned project}
+services:
+  turn:
+    image: ${TURN_IMAGE:?reviewed local coturn image}
+    network_mode: host
+    user: '1000:1000'
+    restart: 'no'
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 128
+    labels:
+      org.callsign.lifecycle: persistent
+      org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+      org.callsign.run-id: ''
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+    command: [/usr/local/bin/turnserver, -c, /config/turnserver.conf]
+    volumes:
+      - {type: bind, source: '${CALLSIGN_TURN_CONFIG_FILE:?protected TURN configuration}', target: /config/turnserver.conf, read_only: true, bind: {create_host_path: false}}
+  asterisk:
+    image: ${ASTERISK_IMAGE:?reviewed local Asterisk image}
+    network_mode: host
+    user: '1000:1000'
+    restart: 'no'
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:uid=1000,gid=1000,size=67108864
+      - /var/run/asterisk:uid=1000,gid=1000,size=16777216
+      - /var/log/asterisk:uid=1000,gid=1000,size=16777216
+      - /var/spool/asterisk:uid=1000,gid=1000,size=16777216
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 1
+    pids_limit: 128
+    labels:
+      org.callsign.lifecycle: persistent
+      org.callsign.deployment-id: ${DEPLOYMENT_ID:?owned identity}
+      org.callsign.run-id: ''
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+    command: [/usr/sbin/asterisk, -f, -n]
+    volumes:
+      - {type: bind, source: '${CALLSIGN_ASTERISK_CONFIG_DIR:?owned PBX configuration}', target: /etc/asterisk, read_only: true, bind: {create_host_path: false}}
+      - {type: bind, source: '${CALLSIGN_ASTERISK_CONFIG_DIR}/odbc.ini', target: /etc/odbc.ini, read_only: true, bind: {create_host_path: false}}
+    healthcheck: {test: [CMD, asterisk, -rx, 'core show uptime'], interval: 10s, timeout: 3s, retries: 3}
