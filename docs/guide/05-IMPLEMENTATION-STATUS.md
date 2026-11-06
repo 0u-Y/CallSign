@@ -1,5 +1,7 @@
 # 05. 구현 및 검증 현황
 
+최신 분석 후속: Vercel `e013780` / issuer `d5c959c`의 case41에서 실제 전사→OpenAI 위험 근거·설명 표시→동의 철회→통화 종료를 통과했다. 제공자는 시험 후 OFF이며 외부 단말은 미검증이다. [현재 실행·예산 근거](../FINALS-IMPLEMENTATION-PLAN.md#2026-11-06-2047-kst--actual-analysis-completion-and-withdrawal-passed)를 따른다. 아래 17~18시 기록은 당시 결과다.
+
 확인일 **2026-11-06(KST)** · Recording UI 제품 frontend **`db32c55`**, 실행 issuer 제품 소스 **`1ac1c0d`**, 나머지 runtime 제품 소스 **`e267dbf`**. 사용자 승인에 따라 17:05 새 감시를 만들고 기존 persistent21개를 재개했다. 원본 case30 stop/latch·DB·체인·realm·계정·키는 보존하며 만료는 **2026-11-07 08:37 KST** 그대로다. 공개 metadata `publicPreview=false`, 실제 역할별 로그인·업무 조회·화면 검증을 확인했다. **case31은 업무 생성 전 진입 실패로 보존했다. 별도 추가1회 승인 case32에서 실제 새 업무→승인→양방향 합성 음원 디코딩→페이지 이동→기관 UI 취소→양측 음성 중단·PBX 부재·재발신409를 통과했다. 실제 AI는 OFF이며 외부 단말과 완료 분석 표시까지 전체 검증된 것은 아니다.** 같은 조건의 별도 GET-only 진단은 로그인·업무 화면 성공이지만 최초 실패 원인을 확정하지 못했다. [현재 근거](../../artifacts/demo-ui-20261106/recording/result.json).
 
 현재 목표는 **서버컴의 전용 지속 데모**다. Vercel frontend·서버컴 backend/인프라·외부 Deepgram/OpenAI 배치를 사용한다. AWS 운영·학교 서버 비의존 요구는 이번 완료 조건에서 제외한다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
