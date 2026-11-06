@@ -14,6 +14,7 @@ export function CallConsentKeypad({active,connected,available,withdrawn,onConsen
  useEffect(()=>{if(!open)return;const escape=(event:KeyboardEvent)=>{if(event.key==='Escape'){setOpen(false);}};document.addEventListener('keydown',escape);return()=>document.removeEventListener('keydown',escape);},[open]);
  useLayoutEffect(()=>{if(!open&&wasOpen.current)keypadButton.current?.focus();wasOpen.current=open;},[open]);
  const selecting=choice==='pending';
+ if(!connected)return <p className="call-consent-idle" role="status">통화 연결 후 분석을 선택할 수 있습니다.</p>;
  return <section className="call-consent-keypad" aria-label="음성 분석 선택">
   {!open&&<p role="status">{!active?'통화 연결 후 분석을 선택할 수 있습니다.':pending?'서버 동의 확인 중':choice==='granted'?'분석 동의 확인됨':choice==='declined'?'미동의 · 일반 통화 유지':choice==='withdrawn'?'분석 철회 · 일반 통화 유지':'1 동의 · 2 미동의 · 9 다시 듣기'}</p>}
   {selecting&&<><p className="consent-voice-status" role="status">{voice}</p><details><summary>음성 분석 처리 안내</summary><p>동의하면 이 통화의 상대 음성을 Deepgram에, 전사와 승인 정책을 OpenAI에 전송해 네 유형의 위험 요구를 분석합니다. 동의하지 않아도 통화할 수 있고 언제든 철회할 수 있습니다. 이미 전송된 요청의 제공자 처리는 철회 후에도 진행될 수 있습니다. 기관 승인은 통화 내용의 안전 보장이 아닙니다.</p><p>웹 키패드 선택입니다. PBX DTMF나 전화망 ARS가 아닙니다.</p></details></>}
