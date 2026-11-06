@@ -21,6 +21,12 @@ export interface WorkerStore {
  cleanup(job:DurableJob):Promise<void>;
  recordStage?(stage:"events"|"maintenance"|"job",code?:string):Promise<void>;
 }
+// This receipt is attached only after the worker verifies the exact persisted transaction succeeded.
+export function recordRecoveryReceipt(record:InstitutionRecord,operation:string,transactionHash:string|null,block:string|undefined,now:number){
+ if(!record.recovery||record.recovery.hash!==operation)return false;
+ if(!transactionHash||!/^0x[0-9a-fA-F]{64}$/.test(transactionHash)||!block||!/^\d+$/.test(block))throw new Error('RECOVERY_RECEIPT_REQUIRED');
+ record.recovery.ledger={transactionHash,block,confirmedAt:now};return true;
+}
 export class PermanentJobError extends Error {constructor(message:string,readonly receiptBlock?:string){super(message);}}
 const auditOnlyEvents=new Set(['intent.cancelled','configuration.proposed','configuration.approved','configuration.activated','member.registered','intent.created','attempt.created','authorization.issued','authorization.consumed','call.lease','official.completed','analysis.consented','analysis.withdrawn','key.activated','member.updated','intent.reassigned','attempt.ended','attempt.declined','attempt.no-answer','attempt.failed','attempt.cancelled']);
 // The exact signed transaction is committed before any broadcast. A retry never allocates a new nonce.
@@ -79,6 +85,10 @@ export function postgresWorkerStore(url:string,cleanup:(job:DurableJob)=>Promise
     },
     async complete(j,block){await sql.begin(async tx=>{await enterBackupWrite(tx,true);await tx`SELECT id FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`;const rows=await tx`SELECT * FROM issuer_v2.outbox WHERE id=${j.id} AND claim_token=${j.claim_token} AND status='processing' AND lease_until>now() AND (kind='call.cleanup' OR EXISTS(SELECT 1 FROM issuer_v2.recovery_gate g WHERE g.institution_id=issuer_v2.outbox.institution_id AND g.status='ready')) FOR UPDATE`;if(!rows[0])throw new Error('CLAIM_LOST');
       if(j.kind==='institution.register')await tx`UPDATE issuer_v2.institutions SET state=jsonb_set(state,'{registrationState}','"confirmed"'::jsonb),revision=revision+1 WHERE id=${j.institution_id} AND state->>'registrationOperation'=${j.object_id}`;
+      if(j.kind==='institution.recover'){
+        const records=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`,record=records[0]!.state as InstitutionRecord;
+        if(recordRecoveryReceipt(record,j.object_id,rows[0]!.transaction_hash,block,Math.floor(Date.now()/1000)))await tx`UPDATE issuer_v2.institutions SET state=${tx.json(record as unknown as postgres.JSONValue)},revision=revision+1 WHERE id=${j.institution_id}`;
+      }
       if(j.kind==='call.cleanup'){
         const records=await tx`SELECT state FROM issuer_v2.institutions WHERE id=${j.institution_id} FOR UPDATE`,record=records[0]?.state as InstitutionRecord;
         const t=record?.serviceV3?.attempts[j.object_id];if(t&&['ended','cancelled','declined','failed','no-answer'].includes(t.status)){const code=`attempt.${t.status}`;for(const userId of notificationRecipients(record,{kind:code,objectId:t.id}))await tx`INSERT INTO issuer_v2.notifications(id,institution_id,user_id,code) VALUES(${`terminal:${t.id}:${code}`},${record.id},${userId},${code}) ON CONFLICT DO NOTHING`;}if(t?.pbx&&['ended','cancelled','declined','failed','no-answer'].includes(t.status)){t.cleanup={status:'pbx-absent',observedAt:Math.floor(Date.now()/1000),source:'ari-delete-readback',attempts:Math.max(j.attempts,(t.cleanup?.attempts??0)+1)};t.pbx.state='ended';t.pbx.credentials={};t.pbx.reports={};delete t.pbx.evidence;await tx`UPDATE issuer_v2.institutions SET state=${tx.json(record as unknown as postgres.JSONValue)},revision=revision+1 WHERE id=${j.institution_id}`;}

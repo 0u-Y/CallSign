@@ -42,3 +42,22 @@ it('imports existing public signature files and preserves the server distinct-ke
  const highS=`${files[0]!.signature.slice(0,66)}${'f'.repeat(64)}1b` as Hex;
  await expect(verifyRecoverySignature({...files[0],signature:highS},review,state.approvers,now)).rejects.toThrow('EVM_SIGNATURE_NON_CANONICAL');
 });
+
+it('keeps submitted approval, successful receipt and matching activation separate',async()=>{
+ const {state,request,review}=fixture();
+ const {recoveryEvidence}=await import('../../apps/web/src/lib/recoveryReview.js');
+ expect(recoveryEvidence(state).ledger).toBeUndefined();
+ state.recovery={hash:review.operation,submitted:true,request:review.request,signatures:Object.fromEntries(state.approvers.slice(0,2).map(a=>[a,'verified-server-signature']))};
+ expect(recoveryEvidence(state).signers).toHaveLength(2);
+ expect(recoveryEvidence(state).activation).toBeUndefined();
+ state.recovery.ledger={transactionHash:`0x${'d'.repeat(64)}`,block:'42',confirmedAt:now};
+ expect(recoveryEvidence(state).ledger?.block).toBe('42');
+ state.recovery.activation={epoch:'3',keyVersion:2,verifiedAt:now};
+ expect(recoveryEvidence(state).activation).toBeUndefined();
+ Object.assign(state,{status:'active',epoch:'3',observedEpoch:'3'});
+ expect(recoveryEvidence(state,review.operation).activation?.epoch).toBe('3');
+ expect(recoveryEvidence(state,'another-command').signers).toEqual([]);
+ expect(recoveryEvidence({...state,observedEpoch:'4'}).activation).toBeUndefined();
+ state.recovery.signatures={[state.approvers[0]!]: 'one'};
+ expect(recoveryEvidence(state).ledger).toBeUndefined();
+});

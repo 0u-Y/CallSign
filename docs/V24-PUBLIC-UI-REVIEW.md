@@ -227,3 +227,7 @@ case54 (`public-call-smoke-54-space-cancel`)는 승인·PBX 협상과 Space 수�
 별도로 `DemoDirector`의 객체 의존성 결함을 재현했다. 같은 행동 상태를 새 객체로 전달하는 부모 갱신만으로 effect cleanup이 강조/클릭 타이머를 지웠다. 실제 Space → 100ms 후 같은 상태 재렌더 회귀는 수정 전 호출 0으로 FAIL, 행동에 필요한 scalar 상태 의존성으로 수정 후 호출 1로 PASS다. 역할/identity/종료 등 의미 있는 변화의 취소, 연타·입력·dialog·라우트 경계는 유지했다. 이는 재현한 UI 결함의 수정이며 case54의 모든 네트워크 오류가 해결됐다는 뜻은 아니다. 수정 후 실제 공개 재검증은 별도다.
 
 원본/공개 동일1440px computed-style 대조(`compare-layout/layout.json`)에서 제품의 상속 16px/26.4px line-height 및 전역 article min-height76px이 공동 관리 카드를 원본보다 키우는 것을 확인했다. governance 범위에 원본14px/normal과 approver 행의 원본 최소높이를 복원했다. 관련 fixture1440/1920/390 검사 PASS, 데스크톱·390px 캡처를 직접 검토했다. 독립 서명 가져오기·실제 관측 미확인 안내는 시뮬레이션 버튼으로 바꾸지 않는다.
+
+수정 후 case55 (`public-call-smoke-55-space-fix-cancel`)는 frontend `7835956`에서 실제 Space 발신·수락, TURN 양방향 합성 음원, F/Escape·페이지 왕복, 기관 UI 취소 200, 양측 음성 중단·PBX 부재, 취소 업무의 추가 시도 409를 확인했다. 1회 약37.81초이며 유료 분석 동의/호출은 없었다. 동일 배포의 `public-space-fix/result.json`에서 독립 4역할 실제 폼 로그인·조회·허용/거절 화면도 PASS했다. case54의 원인 미확정 네트워크 오류는 해결 완료로 바꾸지 않는다.
+
+공동 복구의 실제 처리 근거 연결을 보완했다. 서버가 검증한 독립 서명, 해당 outbox 명령의 성공 transaction 영수증, 설치 키 및 Witness 문맥 검증을 통과한 활성화 기록을 서로 구분해 저장·표시한다. 예전 기록에 없는 근거는 소급 생성하지 않는다. 관련 29개 오프라인 검사와 API/web/light 타입 검사 및 source hygiene를 통과했다. 이 변경의 실행 runtime 반영·실제 복구는 아직 별도 검증 전이다. 사용자의 최신 결정에 따라 남은 실제 AI 연결은 촬영용으로 보존하며 추가 유료 호출하지 않는다.

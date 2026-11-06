@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import {expect,it} from 'vitest';
+import {keccak256,stringToHex} from 'viem';
 import {privateKeyToAccount} from 'viem/accounts';
 import {hashCanonical} from '@callsign/protocol';
 import {registerServiceManagement} from './service-management.js';
@@ -36,5 +37,21 @@ it('requires fresh confirmation for directory-only activation and preserves the 
   await f.store.transact(f.institution.institutionId,async r=>{const p=r.configurationProposals![operation]!;p.status='confirmed';p.transactionHash='fixture';p.block='12';});
   expect((await post('/v3/management/configuration/activate',{operation})).json().code).toBe('WITNESS_REQUIRED');expect((await f.store.read(f.institution.institutionId)).configurationProposals![operation]!.activatedAt).toBeUndefined();
   confirmed=true;expect((await post('/v3/management/configuration/activate',{operation})).json()).toEqual({active:true,newDelegationAndTrustPublicationRequired:false});const r=await f.store.read(f.institution.institutionId);expect(r.epoch).toBe('1');expect(r.policy.version).toBe(1);expect(r.configurationProposals![operation]!.activatedAt).toBeDefined();expect(checks).toBe(2);
+ }finally{await app.close();}
+});
+
+it('records recovery activation only after installed-key and Witness confirmation succeeds',async()=>{
+ const f=await serviceFixture(),app=Fastify();let confirmed=false;
+ const {generateEd25519KeyPair}=await import('@callsign/protocol'),next=await generateEd25519KeyPair();
+ app.setErrorHandler((e,_r,p)=>p.code(409).send({code:(e as Error).message}));
+ registerServiceManagement(app,{authority:f.authority,actorFor:async()=>f.institution,approvers:[],confirmKey:async()=>{if(!confirmed)throw new Error('WITNESS_REQUIRED');}});
+ const request={institutionId:keccak256(stringToHex(f.institution.institutionId)),expectedEpoch:'2',newAdministrator:`0x${'1'.repeat(40)}`,newApprovalPublicKey:`0x${Buffer.from(next.publicJwk.x!,'base64url').toString('hex')}`,newEmergencyStopper:`0x${'2'.repeat(40)}`,nonce:`0x${'c'.repeat(64)}`,deadline:'1800000300'};
+ await f.store.transact(f.institution.institutionId,async r=>{r.status='suspended';r.recovery={hash:hashCanonical(request),request,submitted:true,signatures:{}};});
+ const post=()=>app.inject({method:'POST',url:'/v3/management/activate-key',headers:{'idempotency-key':crypto.randomUUID()},payload:{kid:next.kid,publicKey:next.publicJwk,epoch:'3',version:2}});
+ try{
+  expect((await post()).json().code).toBe('WITNESS_REQUIRED');
+  expect((await f.store.read(f.institution.institutionId)).recovery?.activation).toBeUndefined();
+  confirmed=true;expect((await post()).statusCode).toBe(200);
+  expect((await f.store.read(f.institution.institutionId)).recovery?.activation).toEqual({epoch:'3',keyVersion:2,verifiedAt:1800000000});
  }finally{await app.close();}
 });

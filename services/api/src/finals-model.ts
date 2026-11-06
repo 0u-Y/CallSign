@@ -15,7 +15,7 @@ export interface InstitutionRecord {
   registrationState?:"pending"|"failed"|"confirmed";
   directory?:{hash:string;version:number;entries:import("./configuration.js").ConfigurationContents["directory"]};
   configurationProposals?:Record<string,import("./configuration.js").ConfigurationProposal>;
-  recovery?:{hash:string;request:unknown;signatures:Record<string,string>;submitted:boolean};
+  recovery?:{hash:string;request:unknown;signatures:Record<string,string>;submitted:boolean;ledger?:{transactionHash:string;block:string;confirmedAt:number};activation?:{epoch:string;keyVersion:number;verifiedAt:number}};
   serviceV3?: import("./service-state.js").ServiceState;
   pendingEvents?: Array<{ id: string; kind: string; objectId: string; at: number; payload: unknown }>;
   pendingUsage?: Array<{ key: string; units: number; limit: number; expiresAt: number }>;

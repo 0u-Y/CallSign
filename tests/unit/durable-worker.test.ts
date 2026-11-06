@@ -21,3 +21,15 @@ it('validates restored transaction context before trusting an observed success r
 it('continues maintenance and durable cleanup when the chain event source is unavailable',async()=>{const f=await fixture(),maintenance=vi.fn(async()=>{}),report=vi.fn();f.store.claim=async()=>({...f.job,kind:'call.cleanup'});await processWorkerCycle(f.store,f.ledger,{events:async()=>{throw new Error('RPC unavailable');},maintenance,report});expect(report).toHaveBeenCalledWith('events');expect(maintenance).toHaveBeenCalledOnce();expect(f.store.cleanup).toHaveBeenCalledOnce();expect(f.complete).toHaveBeenCalledOnce();expect(f.ledger.broadcast).not.toHaveBeenCalled();});
 
 it('binds a restored signed call to its durable operation and institution before any receipt lookup',async()=>{const f=await fixture(),abi=parseAbi(['function revokeDelegation(bytes32 delegationId,uint64 expectedEpoch)','function suspendInstitution(bytes32 institutionId,uint64 expectedEpoch)']);const job={...f.job,kind:'credential.revoke'},right=encodeFunctionData({abi,functionName:'revokeDelegation',args:[keccak256(stringToHex(job.object_id)),1n]});expect(()=>assertWorkerCalldata(right,job)).not.toThrow();expect(()=>assertWorkerCalldata(right,{...job,object_id:'another-vc'})).toThrow('CALL_MISMATCH');const wrong=encodeFunctionData({abi,functionName:'suspendInstitution',args:[keccak256(stringToHex(job.institution_id)),1n]});expect(()=>assertWorkerCalldata(wrong,job)).toThrow('CALL_MISMATCH');});
+
+it('attaches a recovery receipt only to the matching command and requires exact receipt coordinates',async()=>{
+ const f=await serviceFixture(),record=await f.store.read(f.institution.institutionId);
+ const {recordRecoveryReceipt}=await import('../../services/api/src/service-worker.js');
+ record.recovery={hash:'current',request:{},signatures:{},submitted:true};
+ expect(recordRecoveryReceipt(record,'old',null,undefined,1800000000)).toBe(false);
+ expect(record.recovery.ledger).toBeUndefined();
+ expect(()=>recordRecoveryReceipt(record,'current',null,'42',1800000000)).toThrow('RECOVERY_RECEIPT_REQUIRED');
+ const hash=`0x${'a'.repeat(64)}`;
+ expect(recordRecoveryReceipt(record,'current',hash,'42',1800000000)).toBe(true);
+ expect(record.recovery.ledger).toEqual({transactionHash:hash,block:'42',confirmedAt:1800000000});
+});

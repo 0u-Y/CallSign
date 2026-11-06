@@ -1,7 +1,7 @@
 import {assertEvmSignature,hashCanonical,recoverySignatureFileSchema,recoveryV2Schema,recoveryTypedData,type RecoveryV2} from '@callsign/protocol';
 import {hashTypedData,recoverTypedDataAddress,type Hex} from 'viem';
 
-export interface RecoveryManagement {status:string;epoch:string;observedEpoch?:string;chainId:string;registryAddress:string;institutionKey:string;approvers:string[];recovery?:{hash:string;submitted:boolean}|null}
+export interface RecoveryManagement {status:string;epoch:string;observedEpoch?:string;chainId:string;registryAddress:string;institutionKey:string;approvers:string[];recovery?:{hash:string;submitted:boolean;request?:unknown;signatures?:Record<string,string>;ledger?:{transactionHash:string;block:string;confirmedAt:number};activation?:{epoch:string;keyVersion:number;verifiedAt:number}}|null}
 export interface RecoveryReview {request:RecoveryV2;operation:string;digest:Hex;chainId:number;registryAddress:Hex}
 export function verifyRecoveryRequest(input:unknown,state:RecoveryManagement,now:number):RecoveryReview{
  const parsed=recoveryV2Schema.safeParse(input);if(!parsed.success)throw new Error('복구 요청 JSON 형식이 올바르지 않습니다. 개인키가 아닌 공개 요청 파일을 선택하세요.');
@@ -24,4 +24,16 @@ export async function verifyRecoverySignature(input:unknown,review:RecoveryRevie
  const signature=file.signature as Hex,signer=(await recoverTypedDataAddress({...recoveryTypedData(review.chainId,review.registryAddress,review.request),signature})).toLowerCase();
  if(signer!==file.signer.toLowerCase()||!trusted.includes(signer))throw new Error('현재 등록된 승인키의 유효한 서명이 아닙니다.');
  return {signer,signature};
+}
+
+// These are historical server checks for one command, not fresh node-health or quorum observations.
+export function recoveryEvidence(state:RecoveryManagement|undefined,operation?:string){
+ const empty={signers:[] as string[],ledger:undefined as NonNullable<NonNullable<RecoveryManagement['recovery']>['ledger']>|undefined,activation:undefined as NonNullable<NonNullable<RecoveryManagement['recovery']>['activation']>|undefined};
+ const r=state?.recovery,request=recoveryV2Schema.safeParse(r?.request);
+ if(!state||!r?.submitted||!request.success||r.hash!==hashCanonical(request.data)||(operation&&operation!==r.hash)||request.data.institutionId.toLowerCase()!==state.institutionKey.toLowerCase())return empty;
+ const signers=Object.keys(r.signatures??{}).map(s=>s.toLowerCase());
+ if(signers.length<2||signers.length>3||new Set(signers).size!==signers.length||signers.some(s=>!state.approvers.some(a=>a.toLowerCase()===s)))return empty;
+ const ledger=r.ledger&&/^0x[0-9a-fA-F]{64}$/.test(r.ledger.transactionHash)&&/^\d+$/.test(r.ledger.block)?r.ledger:undefined;
+ const activation=ledger&&r.activation&&r.activation.epoch===String(BigInt(request.data.expectedEpoch)+1n)&&state.epoch===r.activation.epoch&&state.observedEpoch===r.activation.epoch&&state.status==='active'?r.activation:undefined;
+ return {signers,ledger,activation};
 }
