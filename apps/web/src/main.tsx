@@ -10,6 +10,8 @@ import { App } from "./App.js";
 import "./styles.css";
 import "./demo-workspace.css";
 import "./recording-reference.css";
+import "./recording-source.css";
+import "./recording-adapters.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 2_000 } } });
 

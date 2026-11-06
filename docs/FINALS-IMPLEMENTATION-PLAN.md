@@ -692,3 +692,26 @@ Validation closeout: focused unit checks15/15, frontend type/build/source checks
 The corrected complete synthetic workspace browser regression passed under `v24-local-contract-final`: create response-loss/idempotency, selected-only cancellation, stop confirmation dismissal, drawer white background/Escape focus, route audio-DOM identity, management failure/late-account clearing, independent role restrictions, pagination and provider-OFF display. This is fixture verification, not a new call or actual cancellation. Original failed harness runs are preserved: selected-row versus old button-color assertion, closed work-picker, and visually collapsed role-label assertions were corrected to the new UI without dropping command/permission checks. Phone9state/keypad checks1440/390 and composition1440×900/1920×1080/390 checks are separately recorded. Original HTML Space was exercised on `/call` simulation and captured during its preparation animation (`reference-space-call`); its timer results are not product evidence.
 
 Public recheck boundary: actual OIDC login/callback succeeded in the earlier read-only run, then a duplicated “업무 관리” link caused a strict-locator failure. After scoping navigation, two fresh public entry checks failed loading JS/CSS with `net::ERR_NETWORK_CHANGED` before login, including the READY `bbc12f6` deployment. HTTPS asset/metadata GETs succeed. Root cause remains unknown; no host/network changes or further automatic browser retries were made. Latest authenticated production call/governance interaction therefore remains NOT_VERIFIED. No real call, cancellation, stop/recovery or paid provider request was executed for this UI update. Protected evidence: `.local/v24-review/public-deployed-bbc12f6/`; successful fixture: `.local/v24-review/workspace-contract-final/`. Read-only inspection found no resource stop; trial browser processes close in finally, persistent resources remain running.
+
+### 2026-11-07 공개 로그인 우선 추적
+
+- Production `ea4830f`에서 새 Chromium context로 실제 Keycloak 폼 제출 → `/service` callback 200 → `auth/me`/`workspace` 200 및 기관 역할을 확인했다. 쿠키/세션 주입은 하지 않았다. Vercel host-only `ip_session`의 Secure·HttpOnly·SameSite=Strict 속성과 후속 요청의 Cookie 전달을 값 없이 관측했다. `/service`, `/demo/work` 재접속 및 같은 context의 새 탭 업무 표도 확인했다.
+- 증거: `.local/login-trace-20261107/result.json`, `.local/login-trace-20261107-cookies/result.json`. 첫 관측의 `request.headers()`는 Cookie를 생략하므로 `cookiePresent=false`는 미관측으로 정정하고 원본을 보존했다. 후속 `allHeaders()` 관측은 전달을 확인했지만 브라우저 종료 중 listener 예외로 guard는 FAIL이며, 로그인 단계 성공과 구분한다.
+- 사용자가 보고한 GPT 제어 브라우저의 세션 소실은 재현하지 못했다. 해당 세션에 접근할 도구가 없어 클라우드 제한/제품 결함 어느 쪽으로도 확정하지 않는다. 인증·쿠키 보안 조건과 실행 backend는 변경하지 않았다. 통화·유료 제공자 호출 없음.
+
+### 2026-11-07 v24 원본 연출 이식 진행
+
+기준은 `docs/CallSign_Recording_Demo_ShortVoice_v24 (1).html`, SHA-256 `381f86b8f299d3b2f1f1c135bf7ccaa503ba3dfc72e204f52139fedddc5e9f7d`다. 원본의 최종 CSSOM 19블록/656규칙을 순서대로 추출하고 폰트·선택자 범위·keyframe 이름만 격리했다. 원본의 타이머 성공·가상 계정·역할 전환은 가져오지 않는다.
+
+|원본 실제 조작|관측된 표현 순서|제품 연결/차이|
+|---|---|---|
+|Space 발신|역할 강조·확대 약950ms → 클릭 연출 약520ms → 중앙 승인 요청/수신 대기|현재 인증 역할의 실제 준비/발신 버튼. 서버 확인 없이 성공 전환 없음|
+|수락|수신자 강조 → 중앙 수락 전달 → 연결|수신자의 독립 세션에서만 실행|
+|ARS/키패드|음성 안내 또는 안내문 → 키패드 → 1/2/9|실제 동의/미동의/안내. Space로 동의 우회 없음|
+|발언/분석|중앙 이동 → 전사/결과 → 수신자 경고|실제 상대 track/event만 사용. 유료 호출 미실행|
+|철회/종료/취소|요청 이동 → 처리 상태 → 종료 관측|안전 동작을 연출 타이머로 지연하지 않음|
+|공동 관리|정지 → 독립 승인 → 원장/서비스 적용|실제 명령과 독립 서명 절차 유지, 원본 성공 버튼 미이식|
+
+원본 실행 증거: `.local/v24-exact/reference-complete/steps.json`, 94개 단계 캡처 및 영상. 네 장면과 공동 관리를 실제 키/버튼으로 진행했으며 시뮬레이션 근거다. 로그인 실패는 사용자 지시에 따라 UI 선행조건에서 제외하고 별도 미확인으로 유지한다.
+
+관련 검증: 실제 Space 키 입력 director fixture, 휴대폰9상태·키패드1440/390 fixture, 업무 전체 fixture(`.local/v24-exact/workspace-accessible/fixture-result.json`)가 통과했다. 발신 중복·연결 후 늦은 발신 응답을 포함한14개 단위 검사 통과. 실제 통화·제공자 호출 근거는 아니며 backend 재시작 없음. 원본 `drawer.png`는 실제 drawer가 열린 장면이 아니므로 drawer 일치 증거로 사용하지 않는다. 공개 배포 후 독립 역할 폼 로그인·조회·Space 취소 검토만 재확인한다.

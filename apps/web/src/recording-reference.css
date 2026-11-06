@@ -90,7 +90,13 @@
 @media(max-width:850px){.demo-shell .site-header{padding:12px 20px 0;gap:10px}.demo-shell .demo-workspace{padding:24px 20px 0}.demo-shell .demo-tools{right:20px;top:4px}.demo-shell .demo-heading h1{font-size:23px}.demo-shell .demo-recording-work .demo-heading{margin-bottom:80px}.demo-shell .work-list-heading{top:-65px;left:0;right:auto}.demo-shell .work-management .work-filters{padding:16px;gap:10px}.demo-shell .work-filters label:first-child{max-width:none}.demo-shell .work-status-tabs{padding:0 16px;gap:20px}.demo-shell .recording-recovery-grid{grid-template-columns:1fr}.demo-shell .recording-recovery-grid>section{padding:20px}.demo-shell .demo-recording-call .demo-call-grid{display:flex;flex-direction:column}.demo-shell .demo-recording-call .demo-institution{height:auto;min-height:0;width:100%;margin-top:0}.demo-shell .site-footer{padding:18px 20px;flex-wrap:wrap}.demo-shell .demo-recording-call .demo-tools{position:relative;right:auto;top:auto}.demo-shell .recording-gov-summary{padding:20px;gap:12px}}
 @media(prefers-reduced-motion:reduce){.demo-shell *,.demo-shell *::before,.demo-shell *::after{animation:none!important;transition:none!important}}
 .recording-click-cue{position:fixed;z-index:10000;pointer-events:none;width:34px;height:40px;transform-origin:3px 2px}.recording-click-cue svg{width:100%;height:100%;fill:#20314c;stroke:white;stroke-width:1.5;filter:drop-shadow(0 2px 3px #17243b30)}
-.demo-shell [data-director-focus=sender] .demo-institution,.demo-shell [data-director-focus=recipient] .demo-recipient{outline:2px solid #246afa44;outline-offset:5px;transition:outline-color .4s}
+/* v24 final focus zoom: visual staging only; no authority or consent changes. */
+@media(min-width:951px){
+.demo-shell .demo-recording-call :is(.demo-institution,.demo-recipient,.demo-institution-strip){transform:scale(1);transform-origin:center center;transition:transform .9s cubic-bezier(.22,1,.36,1),box-shadow .9s ease}
+.demo-shell [data-director-focus=sender] .demo-institution{transform:scale(1.05);box-shadow:0 12px 32px #29456e12}
+.demo-shell [data-director-focus=recipient] .demo-recipient{transform:scale(1.04)}
+}
+@media(prefers-reduced-motion:reduce){.demo-shell .demo-recording-call :is(.demo-institution,.demo-recipient,.demo-institution-strip){transform:none!important;transition:none!important}}
 .demo-shell .demo-flow-packet{width:10px;height:10px;top:50%;left:8px;box-shadow:0 0 0 4px #246afa14;animation:recording-to-recipient 1500ms cubic-bezier(.4,0,.2,1) both}
 .demo-shell :is(.demo-flow-accepting,.demo-flow-analyzing) .demo-flow-packet{animation-name:recording-from-recipient}
 .demo-shell :is(.demo-flow-error,.demo-flow-ended,.demo-flow-ready,.demo-flow-unavailable) .demo-flow-packet{display:none}

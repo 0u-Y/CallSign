@@ -31,3 +31,5 @@ it('distinguishes actual transcript processing and completed events from media c
  expect(callScene({...idle,active:true,analysis:'상대 발화 분석 결과 수신'},false,false).id).toBe('analyzed');
  expect(callScene({...idle,active:true,analysis:'상대 발화 분석 결과 수신',analysisWithdrawn:true},false,false).id).toBe('withdrawn');
 });
+
+it('shows a dial in progress without claiming a connected call',()=>{expect(callScene({...idle,dialing:true},false,false).id).toBe('dialing');expect(callScene({...idle,dialing:true,active:true},false,false).id).toBe('connected');});

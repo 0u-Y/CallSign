@@ -10,7 +10,7 @@ export interface CallContext {
   attempt:ServiceAttempt; authorization?:Signed<StartAuthorization>&{serviceProofJws:string};
   credential?:{vc:ServiceCredential;jws:string}; receipt?:Signed<ServiceReceipt>; policy:PurposePolicy;
 }
-export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; connectedAt?:number; invitationVerified?:boolean; incoming?:boolean; accepting?:boolean; ending?:boolean; analysisWithdrawn?:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
+export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; connectedAt?:number; invitationVerified?:boolean; incoming?:boolean; dialing?:boolean; accepting?:boolean; ending?:boolean; analysisWithdrawn?:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
 // One controller owns one attempt and one ephemeral browser key. Reconnection starts a new attempt.
 export class ServiceCall {
   private sip:PbxSip|undefined; private stopped=false;private ending=false;private polling=false; private timer:ReturnType<typeof setTimeout>|undefined;
@@ -26,7 +26,7 @@ export class ServiceCall {
   private readonly visibility=()=>{if(document.hidden){this.sip?.pause();this.stopAnalysis('document-hidden');this.show({connection:'화면 비활성: 음성 일시 정지, 다시 열면 재검증',active:false});}else this.schedule(0);};
   private view:ServiceCallStatus={connection:'연결 준비 중: 마이크 송신 차단',authority:'기관 승인 확인 전',analysis:'동의 전: 분석 중단',active:false};
   constructor(private readonly o:{role:'gateway'|'recipient';attemptId:string;intentId:string;recipientId:string;agentId:string;key:SigningKeyPair;trust:ServiceTrust;runtimePolicy:RuntimePolicy;status:(s:ServiceCallStatus)=>void;remote:(s:MediaStream)=>void;risk:(e:unknown)=>void}){}
-  private show(p:Partial<ServiceCallStatus>){if(!this.stopped){this.view={...this.view,...p,...(p.active&&this.view.connectedAt===undefined?{connectedAt:performance.now()}:{})};this.o.status({...this.view});}}
+  private show(p:Partial<ServiceCallStatus>){if(!this.stopped){this.view={...this.view,...p,...(p.active?{dialing:false}:{}),...(p.active&&this.view.connectedAt===undefined?{connectedAt:performance.now()}:{})};this.o.status({...this.view});}}
   private async get<T>(path:string){const value=await api<T>(path,{signal:AbortSignal.any([this.abort.signal,AbortSignal.timeout(4000)])});this.alive();return value;}
   private alive(allowEnding=false){if(this.stopped||this.ending&&!allowEnding)throw new Error('CALL_CLOSED');}
   private async post<T>(path:string,body:unknown,action=path):Promise<T>{
@@ -52,7 +52,7 @@ export class ServiceCall {
   private async read(){const c=await this.get<CallContext>(`/v3/call-context?attemptId=${encodeURIComponent(this.o.attemptId)}`);if(c.attempt.id!==this.o.attemptId||c.attempt.intentId!==this.o.intentId||c.attempt.agentId!==this.o.agentId||(this.context&&c.attempt.sessionId!==this.context.attempt.sessionId)||(c.authorization&&c.authorization.payload.recipientId!==this.o.recipientId))throw new Error('CALL_CONTEXT_IDENTITY_CHANGED');this.context=c;return c;}
   private base(c:CallContext){const a=c.authorization!.payload;return {protocol:'callsign',version:3,networkId:a.networkId,registryAddress:a.registryAddress};}
   private sign(payload:Record<string,unknown>){return signPayload(payload,{privateKey:this.o.key.privateKey,kid:hashCanonical(this.o.key.publicJwk)});}
-  async dial(){await this.post('/v3/pbx/dial',{attemptId:this.o.attemptId});this.show({connection:'상대 연결 대기'});}
+  async dial(){this.alive();if(this.view.dialing||this.view.active)return;this.show({dialing:true,connection:'발신 요청 중'});try{await this.post('/v3/pbx/dial',{attemptId:this.o.attemptId});if(!this.view.active)this.show({connection:'상대 연결 대기'});}catch(error){this.show({dialing:false,connection:'발신 요청 확인 실패'});throw error;}}
   accept(){this.alive();if(this.o.role!=='recipient')throw new Error('RECIPIENT_REQUIRED');this.wantAccept=true;this.show({connection:'수락: 양측 세션 검증 중',incoming:false,accepting:true});}
   chooseContinuation(value:boolean){this.choicePending=true;this.continuation=value;if(!value){this.sip?.pause();this.stopAnalysis();this.show({active:false});}this.show({authority:value?'권한 확인 불가: 사용자가 통화 유지를 선택함':'권한 확인 불가: 음성 일시 정지'});}
   async playRecording(file:File){if(!this.view.active||this.stopped||!this.sip)throw new Error('CALL_NOT_ACTIVE');await this.sip.media.playRecording(file,()=>{if(!this.stopped)this.show({audioSource:'녹음 종료 · 마이크로 전환할 수 있습니다'});});if(!this.stopped)this.show({audioSource:'녹음 파일 송출 중'});}

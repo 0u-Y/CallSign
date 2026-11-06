@@ -24,3 +24,17 @@ it('retains the actual first media-ready clock through status refresh and tempor
  access.show({active:true});const start=f.status.mock.lastCall?.[0].connectedAt;expect(start).toEqual(expect.any(Number));
  access.show({active:false});access.show({active:true});expect(f.status.mock.lastCall?.[0].connectedAt).toBe(start);
 });
+
+it('holds one dial request through repeated controls until its response',async()=>{
+ const f=fixture();let resolve!:()=>void;const post=vi.fn(()=>new Promise<void>(r=>{resolve=r;}));Object.assign(f.call,{post});
+ const first=f.call.dial();expect(f.status).toHaveBeenLastCalledWith(expect.objectContaining({dialing:true,active:false}));await f.call.dial();expect(post).toHaveBeenCalledOnce();resolve();await first;await f.call.dial();expect(post).toHaveBeenCalledOnce();
+});
+it('keeps failed dialing distinct from waiting for a recipient',async()=>{
+ const f=fixture();Object.assign(f.call,{post:vi.fn().mockRejectedValue(new Error('failed'))});await expect(f.call.dial()).rejects.toThrow('failed');expect(f.status).toHaveBeenLastCalledWith(expect.objectContaining({dialing:false,active:false,connection:'발신 요청 확인 실패'}));
+});
+
+it('clears pending dialing on verified media and does not replace connected status with a late dial response',async()=>{
+ const f=fixture();let resolve!:()=>void;Object.assign(f.call,{post:()=>new Promise<void>(r=>{resolve=r;})});const pending=f.call.dial();
+ (f.call as unknown as {show(p:Record<string,unknown>):void}).show({active:true,connection:'verified connected'});resolve();await pending;
+ expect(f.status).toHaveBeenLastCalledWith(expect.objectContaining({active:true,dialing:false,connection:'verified connected'}));
+});

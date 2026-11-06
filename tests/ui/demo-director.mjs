@@ -7,7 +7,7 @@ const result=await build({entryPoints:['tests/ui/demo-director-fixture.tsx'],bun
 const browser=await chromium.launch({headless:true});
 try{const page=await browser.newPage();await page.setContent('<div id="root"></div>');await page.addScriptTag({content:result.outputFiles[0].text});const count=page.getByRole('status',{name:'calls'});const body=()=>page.locator('body').evaluate(e=>{document.activeElement?.blur();e.focus();});
 await body();await page.keyboard.press('Space');await page.getByRole('button',{name:'identity',exact:true}).click();await page.waitForTimeout(600);await expect(count).toHaveText('0');
-await body();await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.up('Space');await page.keyboard.press('Space');await expect(count).toHaveText('2');
+await body();await page.keyboard.down('Space');await page.waitForTimeout(700);await expect(page.locator('#callsign-recording')).toHaveAttribute('data-attention','sender');await expect(page.locator('.attention-mask')).toHaveCount(3);await expect(count).toHaveText('0');await expect(page.locator('.recording-click-cue')).toHaveCount(0);await expect(count).toHaveText('1');await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.up('Space');await page.keyboard.press('Space');await expect(count).toHaveText('2');
 await page.getByRole('textbox',{name:'typing'}).fill('a');await page.keyboard.press('Space');await expect(count).toHaveText('2');await expect(page.getByRole('textbox',{name:'typing'})).toHaveValue('a ');
 await page.getByLabel('editable').click();await page.keyboard.press('Space');await expect(count).toHaveText('2');
 await page.getByRole('button',{name:'연락 준비',exact:true}).focus();await page.keyboard.press('Space');await expect(count).toHaveText('3');
@@ -16,5 +16,6 @@ await page.getByRole('button',{name:'disable',exact:true}).click();await page.ge
 await page.getByRole('button',{name:'dialog',exact:true}).click();await page.getByRole('button',{name:'route',exact:true}).click();await body();await page.keyboard.press('Space');await expect(count).toHaveText('3');
 await page.getByRole('button',{name:'route',exact:true}).click();await page.getByRole('button',{name:'Space · 연락 준비',exact:true}).click();await expect(count).toHaveText('4');
 await page.getByRole('button',{name:'recipient',exact:true}).click();await body();await page.keyboard.press('Space');await expect(page.getByRole('button',{name:'1번 동의',exact:true})).toBeVisible();await page.keyboard.press('Space');await expect(count).toHaveText('4');
+await page.getByRole('button',{name:'institution',exact:true}).click();await body();await page.keyboard.press('Space');await expect(page.getByRole('group',{name:'선택 업무 취소 확인'})).toBeVisible();await body();await page.keyboard.press('Space');await expect(count).toHaveText('4');await expect(page.getByRole('button',{name:'이 업무 취소 요청',exact:true})).toBeVisible();
 console.log('PASS: real-control routing, repeat, native focus, typing, dialog, disabled and route boundaries; synthetic callbacks only');
 }finally{await browser.close();}

@@ -1,0 +1,935 @@
+/* Direct CSSOM extraction of all 19 style blocks, in source order.
+Source: CallSign_Recording_Demo_ShortVoice_v24 (1).html
+SHA-256: 381f86b8f299d3b2f1f1c135bf7ccaa503ba3dfc72e204f52139fedddc5e9f7d
+Only scope, asset URLs, keyframe namespaces and native-link/dialog adapters changed. */
+@font-face{ font-family: RecordingUI; src: url("./assets/recording-0.woff") format("woff"); font-weight: 400; }
+@font-face{ font-family: RecordingUI; src: url("./assets/recording-1.woff") format("woff"); font-weight: 600 900; }
+#callsign-recording{ --blue: #315efb; --ink: #16233b; --muted: #738097; --line: #e3e8f1; --red: #c83d4e; }
+#callsign-recording *{ box-sizing: border-box; }
+#callsign-recording{ margin: 0px; background: rgb(243, 246, 251); color: var(--ink); font-family: RecordingUI, Arial, sans-serif; font-size: 14px; }
+#callsign-recording button, #callsign-recording select{ font: inherit; }
+#callsign-recording button{ cursor: pointer; border: 0px; background: rgb(237, 241, 248); color: var(--ink); border-radius: 11px; padding: 12px 17px; font-weight: 650; transition: background 0.15s, transform 0.15s; }
+#callsign-recording button:hover:not(:disabled){ filter: brightness(0.96); transform: translateY(-1px); }
+#callsign-recording button:disabled{ opacity: 0.4; cursor: not-allowed; }
+#callsign-recording button:focus-visible, #callsign-recording select:focus-visible{ outline: rgb(137, 164, 255) solid 3px; outline-offset: 3px; }
+#callsign-recording .primary{ background: var(--blue); color: white; }
+#callsign-recording .danger{ background: rgb(255, 240, 241); color: var(--red); }
+#callsign-recording .outline{ border: 1px solid var(--line); background: white; }
+#callsign-recording .small{ padding: 8px 12px; font-size: 12px; }
+#callsign-recording .top{ height: 78px; padding: 0px 4%; display: flex; align-items: center; justify-content: space-between; background: rgb(255, 255, 255); border-bottom: 1px solid var(--line); }
+#callsign-recording .brand{ font-size: 24px; font-weight: 850; letter-spacing: -1px; display: flex; gap: 11px; align-items: center; }
+#callsign-recording .mark{ display: grid; place-items: center; background: var(--blue); color: white; width: 36px; height: 36px; border-radius: 12px; font-size: 23px; }
+#callsign-recording .topright, #callsign-recording .row{ display: flex; align-items: center; gap: 9px; }
+#callsign-recording .tag{ font-size: 11px; letter-spacing: 0.02em; color: var(--muted); border: 1px solid var(--line); padding: 7px 10px; border-radius: 7px; }
+#callsign-recording .workspace{ max-width: 1500px; margin: auto; padding: 26px 4% 18px; }
+#callsign-recording .intro{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 21px; }
+#callsign-recording .eyebrow{ font-size: 10px; letter-spacing: 1.7px; color: var(--blue); font-weight: 800; margin-bottom: 7px; }
+#callsign-recording h1{ font-size: 27px; letter-spacing: -1.2px; margin: 0px 0px 7px; }
+#callsign-recording p{ line-height: 1.65; margin: 0px; color: var(--muted); }
+#callsign-recording .scene-tabs{ display: flex; gap: 7px; margin-bottom: 17px; }
+#callsign-recording .scene-tabs button{ background: transparent; color: var(--muted); border: 1px solid transparent; padding: 10px 15px; }
+#callsign-recording .scene-tabs button.active{ background: white; color: var(--blue); border-color: rgb(217, 226, 255); box-shadow: rgba(41, 69, 110, 0.024) 0px 2px 8px; }
+#callsign-recording .scene-tabs b{ font-size: 11px; margin-right: 8px; }
+#callsign-recording .stage{ display: grid; grid-template-columns: minmax(0px, 1fr) 104px minmax(0px, 1fr); align-items: stretch; }
+#callsign-recording .panel{ background: white; border: 1px solid var(--line); border-radius: 21px; overflow: hidden; box-shadow: rgba(36, 52, 85, 0.02) 0px 8px 30px; }
+#callsign-recording .panelhead{ display: flex; align-items: center; justify-content: space-between; padding: 19px 25px; border-bottom: 1px solid var(--line); }
+#callsign-recording .role{ font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+#callsign-recording .who{ font-size: 16px; font-weight: 750; }
+#callsign-recording .avatar{ width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; background: rgb(237, 242, 255); color: var(--blue); font-weight: 750; }
+#callsign-recording .dot{ width: 7px; height: 7px; border-radius: 50%; background: var(--blue); display: inline-block; margin-right: 6px; }
+#callsign-recording .body{ padding: 20px 24px; min-height: 370px; }
+#callsign-recording .work{ padding: 16px 18px; background: rgb(246, 248, 252); border-radius: 13px; margin: 14px 0px; }
+#callsign-recording .work .label{ font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+#callsign-recording .work strong{ font-size: 19px; letter-spacing: -0.6px; }
+#callsign-recording .kv{ display: flex; justify-content: space-between; padding: 10px 0px; font-size: 12px; border-bottom: 1px solid rgb(237, 240, 245); }
+#callsign-recording .kv span{ color: var(--muted); }
+#callsign-recording .actions{ display: flex; gap: 8px; margin-top: 20px; }
+#callsign-recording .actions button{ flex: 1 1 0%; }
+#callsign-recording .badge{ display: inline-flex; align-items: center; background: rgb(237, 242, 255); color: var(--blue); font-size: 12px; border-radius: 7px; padding: 7px 10px; }
+#callsign-recording .badge.off{ background: rgb(240, 242, 245); color: var(--muted); }
+#callsign-recording .badge.red{ background: rgb(255, 240, 241); color: var(--red); }
+#callsign-recording .connector{ display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: rgb(153, 166, 188); }
+#callsign-recording .bridge{ width: 64px; height: 64px; background: rgb(255, 255, 255); border: 1px solid var(--line); border-radius: 50%; display: grid; place-items: center; color: var(--blue); font-size: 22px; }
+#callsign-recording .linklabel{ font-size: 10px; text-align: center; line-height: 1.6; }
+#callsign-recording .connector svg{ width: 68px; height: 16px; }
+#callsign-recording .statusTitle{ font-size: 24px; letter-spacing: -1px; margin: 20px 0px 9px; line-height: 1.35; }
+#callsign-recording .customer{ background: linear-gradient(150deg, rgb(255, 255, 255), rgb(250, 251, 255)); }
+#callsign-recording .consent{ font-size: 11px; line-height: 1.6; background: rgb(244, 246, 251); color: rgb(104, 118, 140); padding: 12px; border-radius: 10px; margin-top: 15px; }
+#callsign-recording .alert{ padding: 18px; border: 1px solid rgb(244, 204, 209); border-radius: 13px; background: rgb(255, 243, 244); margin-top: 17px; }
+#callsign-recording .alert h3{ font-size: 21px; line-height: 1.4; color: rgb(182, 47, 66); margin: 0px 0px 8px; }
+#callsign-recording .alert p{ color: rgb(155, 82, 96); font-size: 12px; }
+#callsign-recording .alert.amber{ background: rgb(255, 249, 237); border-color: rgb(244, 226, 185); }
+#callsign-recording .alert.amber h3{ color: rgb(157, 101, 20); }
+#callsign-recording .alert.amber p{ color: rgb(152, 115, 64); }
+#callsign-recording .transcript{ border-left: 3px solid rgb(202, 215, 255); padding: 1px 0px 1px 13px; margin: 18px 0px; }
+#callsign-recording .transcript small{ font-size: 10px; color: var(--muted); }
+#callsign-recording .transcript p{ color: var(--ink); font-size: 15px; margin-top: 7px; }
+#callsign-recording .footnote{ font-size: 10px; color: var(--muted); text-align: center; margin-top: 13px; }
+#callsign-recording .institution{ margin-top: 18px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+#callsign-recording .institution p{ font-size: 12px; }
+#callsign-recording .insttitle{ font-weight: 750; margin-bottom: 4px; }
+#callsign-recording .director{ margin-top: 18px; border: 1px solid rgb(220, 228, 244); border-radius: 15px; background: rgb(234, 240, 251); padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+#callsign-recording .director small{ color: rgb(96, 115, 153); font-size: 11px; }
+#callsign-recording .director strong{ display: block; font-size: 14px; margin-top: 5px; }
+#callsign-recording .steps{ display: flex; gap: 7px; margin-top: 12px; flex-wrap: wrap; }
+#callsign-recording .step{ font-size: 10px; color: rgb(135, 146, 165); padding: 5px 8px; border-radius: 5px; background: rgb(243, 246, 252); }
+#callsign-recording .step.done{ color: var(--blue); background: rgb(231, 238, 255); }
+#callsign-recording .step.current{ background: var(--blue); color: white; }
+#callsign-recording .footer{ display: flex; justify-content: space-between; margin-top: 15px; font-size: 10px; color: rgb(135, 146, 165); }
+#callsign-recording.recording .director, #callsign-recording.recording .scene-tabs, #callsign-recording.recording #guideBtn{ display: none; }
+#callsign-recording.recording .workspace{ padding-top: 32px; }
+#callsign-recording.recording .body{ min-height: 420px; }
+#callsign-recording .nextFocus{ box-shadow: rgba(49, 94, 251, 0.14) 0px 0px 0px 3px; }
+#callsign-recording.recording .nextFocus{ box-shadow: none; }
+#callsign-recording [role="dialog"]{ max-width: 580px; width: 90%; border: 1px solid var(--line); border-radius: 20px; padding: 28px; color: var(--ink); background: white; }
+#callsign-recording [role="dialog"]::backdrop{ background: rgba(23, 36, 59, 0.4); backdrop-filter: blur(4px); }
+#callsign-recording [role="dialog"] h2{ margin: 0px 0px 14px; }
+#callsign-recording [role="dialog"] p{ font-size: 13px; margin: 12px 0px; }
+#callsign-recording [role="dialog"] .row{ justify-content: flex-end; margin-top: 20px; }
+#callsign-recording .guideitem{ padding: 12px 0px; border-bottom: 1px solid var(--line); }
+#callsign-recording .guideitem b{ display: block; margin-bottom: 5px; }
+#callsign-recording .guideitem p{ margin: 0px; font-size: 12px; }
+#callsign-recording .toast{ position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); background: rgb(23, 36, 59); color: white; padding: 12px 20px; border-radius: 10px; font-size: 12px; z-index: 5; }
+#callsign-recording .pulse{ animation: 1.5s ease 0s infinite normal none running recording_pulse; }
+@keyframes recording_pulse{ 
+  50% { box-shadow: rgba(49, 94, 251, 0.063) 0px 0px 0px 10px; }
+}
+@media (min-width: 1500px){
+#callsign-recording .body{ min-height: 430px; }
+#callsign-recording .statusTitle{ font-size: 28px; }
+}
+@media (max-width: 800px){
+#callsign-recording .stage{ grid-template-columns: 1fr 35px 1fr; }
+#callsign-recording .connector svg{ width: 30px; }
+#callsign-recording .bridge{ width: 30px; height: 30px; font-size: 15px; }
+#callsign-recording .linklabel{ display: none; }
+#callsign-recording .body{ padding: 15px; min-height: 430px; }
+#callsign-recording .panelhead{ padding: 15px; }
+#callsign-recording .top{ padding: 0px 18px; }
+#callsign-recording .workspace{ padding: 20px 16px; }
+#callsign-recording .tag{ font-size: 9px; }
+#callsign-recording .scene-tabs{ flex-wrap: wrap; }
+#callsign-recording .statusTitle{ font-size: 21px; }
+#callsign-recording .actions{ flex-wrap: wrap; }
+#callsign-recording .institution, #callsign-recording .director{ align-items: flex-start; }
+#callsign-recording .intro p{ font-size: 12px; }
+#callsign-recording .topright{ gap: 5px; }
+}
+@media (max-width: 540px){
+#callsign-recording .stage{ grid-template-columns: 1fr; }
+#callsign-recording .connector{ padding: 10px; flex-direction: row; }
+#callsign-recording .connector svg{ display: none; }
+#callsign-recording .body{ min-height: 0px; }
+#callsign-recording .top .tag{ display: none; }
+#callsign-recording .intro{ align-items: flex-start; gap: 10px; }
+#callsign-recording h1{ font-size: 22px; }
+#callsign-recording .director, #callsign-recording .institution{ flex-direction: column; }
+#callsign-recording .footer{ gap: 10px; }
+#callsign-recording.recording .body{ min-height: 0px; }
+}
+#callsign-recording .phone{ border: 7px solid rgb(32, 54, 44); box-shadow: rgb(161, 173, 167) 0px 0px 0px 2px, rgb(53, 72, 61) 5px 5px 0px, rgba(32, 62, 41, 0.07) 0px 15px 32px; border-radius: 43px; background: rgb(247, 250, 248); color: rgb(36, 75, 58); min-height: 592px; padding: 14px 19px 18px; display: flex; flex-direction: column; position: relative; }
+#callsign-recording .phonestatus{ display: flex; justify-content: space-between; height: 30px; font-size: 10px; font-weight: 650; }
+#callsign-recording .island{ position: absolute; top: 13px; width: 105px; height: 22px; left: 50%; transform: translateX(-50%); background: rgb(18, 35, 26); border-radius: 20px; }
+#callsign-recording .phoneapp{ font-size: 20px; font-weight: 750; margin: 15px 0px 23px; color: rgb(36, 75, 58); letter-spacing: -0.04em; }
+#callsign-recording .phoneapp small{ font-size: 10px; color: rgb(116, 138, 125); display: block; font-weight: 400; margin-top: 1px; }
+#callsign-recording .caller{ display: flex; align-items: center; gap: 11px; }
+#callsign-recording .callericon{ background: rgb(229, 239, 233); color: rgb(71, 121, 99); width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; }
+#callsign-recording .caller strong{ font-size: 18px; display: block; }
+#callsign-recording .caller small{ font-size: 11px; color: rgb(115, 137, 124); }
+#callsign-recording .phone .verify{ margin: 22px 0px 15px; font-size: 12px; color: rgb(43, 113, 83); display: flex; align-items: center; gap: 7px; }
+#callsign-recording .phone .verify.off{ color: rgb(138, 100, 85); }
+#callsign-recording .phone .phonepurpose{ font-size: 12px; color: rgb(103, 126, 112); padding-bottom: 16px; border-bottom: 1px solid rgb(224, 232, 226); }
+#callsign-recording .phonemessage{ margin: 22px 0px 10px; }
+#callsign-recording .phonemessage h3{ font-size: 23px; line-height: 1.45; letter-spacing: -0.05em; color: rgb(39, 76, 57); word-break: keep-all; }
+#callsign-recording .phonemessage p{ font-size: 13px; line-height: 1.7; color: rgb(112, 130, 119); margin-top: 11px; word-break: keep-all; }
+#callsign-recording .phonealert{ padding: 18px 15px; border-radius: 13px; background: rgb(255, 240, 232); margin: 20px 0px; color: rgb(157, 75, 38); }
+#callsign-recording .phonealert h3{ font-size: 19px; line-height: 1.5; color: rgb(164, 70, 40); }
+#callsign-recording .phonealert p{ font-size: 12px; line-height: 1.65; margin-top: 9px; color: rgb(151, 108, 89); }
+#callsign-recording .phonealert.purpose{ background: rgb(255, 245, 223); color: rgb(150, 107, 41); }
+#callsign-recording .phonealert.purpose h3{ color: rgb(139, 96, 26); }
+#callsign-recording .phonealert.error{ background: rgb(237, 240, 238); }
+#callsign-recording .phonealert.error h3{ color: rgb(82, 100, 88); }
+#callsign-recording .phonealert.error p{ color: rgb(104, 119, 110); }
+#callsign-recording .phoneactions{ margin-top: auto; padding-top: 20px; }
+#callsign-recording .phoneactions .btn{ font-size: 13px; min-height: 43px; border-radius: 12px; }
+#callsign-recording .phoneactions .secondary{ background: rgb(230, 238, 232); color: rgb(61, 102, 80); }
+#callsign-recording .phoneactions .consent{ color: rgb(83, 116, 95); font-size: 11px; line-height: 1.6; margin-bottom: 12px; }
+#callsign-recording .phoneactions .consent button{ font-size: 11px; color: rgb(71, 108, 86); text-decoration: underline; padding: 0px; }
+#callsign-recording .phonehint{ font-size: 10px; color: rgb(125, 141, 129); text-align: center; margin-top: 10px; }
+#callsign-recording .homebar{ width: 92px; height: 4px; background: rgb(40, 75, 55); border-radius: 5px; margin: 19px auto -5px; }
+#callsign-recording{ --blue: #246afa; --ink: #202d3e; --muted: #718095; --line: #e7ecf2; }
+#callsign-recording{ background: rgb(247, 248, 250); }
+#callsign-recording .workspace{ max-width: 1440px; padding: 24px 40px; }
+#callsign-recording .top{ padding: 0px 40px; }
+#callsign-recording .brand .mark{ background: rgb(36, 106, 250); }
+#callsign-recording .intro h1{ font-size: 27px; }
+#callsign-recording .topnav{ display: flex; align-self: stretch; gap: 18px; }
+#callsign-recording .topnav :is(button,a){ background: none; border-radius: 0px; border-bottom: 3px solid transparent; font-size: 14px; padding: 0px 15px; color: var(--muted); }
+#callsign-recording .topnav :is(button,a).active{ border-bottom-color: var(--blue); color: var(--blue); }
+#callsign-recording .stage{ grid-template-columns: 260px minmax(270px, 1fr) 334px; gap: 30px; align-items: center; }
+#callsign-recording .sender{ box-shadow: none; }
+#callsign-recording .sender .panelhead{ padding: 20px 22px; }
+#callsign-recording .sender .body{ min-height: 0px; padding: 22px; }
+#callsign-recording .sender .work{ background: none; padding: 15px 0px 20px; margin: 0px; border-bottom: 1px solid var(--line); border-radius: 0px; }
+#callsign-recording .sender .work strong{ font-size: 21px; line-height: 1.55; }
+#callsign-recording .sender .kv{ align-items: flex-start; gap: 10px; }
+#callsign-recording .sender .kv b{ text-align: right; }
+#callsign-recording .sender .actions{ flex-direction: column; }
+#callsign-recording .sender .transcript{ display: none; }
+#callsign-recording .sender .footnote{ line-height: 1.6; }
+#callsign-recording .sender .eyebrow{ display: none; }
+#callsign-recording .evidence{ align-self: center; }
+#callsign-recording .evidence-card{ padding: 26px; border: 1px solid var(--line); border-radius: 20px; background: white; min-height: 320px; }
+#callsign-recording .flowcaption{ display: flex; align-items: center; gap: 13px; font-size: 12px; color: rgb(113, 128, 149); margin-bottom: 18px; }
+#callsign-recording .flowcaption i{ height: 1px; flex: 1 1 0%; background: rgb(205, 216, 230); position: relative; }
+#callsign-recording .flowcaption i::after{ content: "›"; position: absolute; right: -1px; top: -10px; font-size: 18px; }
+#callsign-recording .evidence h2{ font-size: 24px; margin: 23px 0px 12px; letter-spacing: -0.8px; line-height: 1.45; }
+#callsign-recording .evidence p{ font-size: 13px; }
+#callsign-recording .checkline{ padding: 7px 0px; font-size: 12px; color: rgb(100, 116, 139); }
+#callsign-recording .checkline b{ color: rgb(36, 106, 250); margin-right: 8px; }
+#callsign-recording .evidence .transcript{ border-left: 0px; border-top: 1px solid var(--line); padding: 18px 0px; margin-top: 20px; }
+#callsign-recording .evidence .transcript p{ font-size: 21px; line-height: 1.7; color: var(--ink); }
+#callsign-recording .evidence-bottom{ border-top: 1px solid var(--line); padding-top: 16px; margin-top: 20px; color: rgb(113, 128, 149); font-size: 11px; }
+#callsign-recording .techlinks{ display: flex; justify-content: space-between; margin-top: 10px; }
+#callsign-recording .techlinks button{ padding: 7px 0px; font-size: 11px; background: none; color: rgb(113, 128, 149); }
+#callsign-recording .phone .badge{ font-size: 11px; }
+#callsign-recording .phone .statusTitle{ font-size: 23px; color: rgb(39, 76, 57); margin: 20px 0px 10px; }
+#callsign-recording .phone p{ font-size: 12px; color: rgb(112, 130, 119); word-break: keep-all; }
+#callsign-recording .phone .actions{ display: flex; flex-wrap: wrap; margin-top: 15px; }
+#callsign-recording .phone .actions button{ font-size: 12px; padding: 11px 9px; min-width: 95px; }
+#callsign-recording .phone .primary{ background: rgb(36, 106, 250); color: rgb(255, 255, 255); }
+#callsign-recording .phone .outline{ background: rgb(237, 243, 238); border-color: rgb(224, 232, 226); color: rgb(61, 102, 80); }
+#callsign-recording .phone .consent{ background: rgb(237, 243, 238); color: rgb(83, 116, 95); font-size: 10px; padding: 11px; }
+#callsign-recording .phone .alert{ background: rgb(255, 240, 232); border: 0px; padding: 16px 13px; margin-top: 18px; }
+#callsign-recording .phone .alert h3{ color: rgb(164, 70, 40); font-size: 20px; }
+#callsign-recording .phone .alert p{ color: rgb(151, 108, 89); font-size: 11px; }
+#callsign-recording .phone .alert.amber{ background: rgb(255, 245, 223); }
+#callsign-recording .phone .alert.amber h3{ color: rgb(139, 96, 26); }
+#callsign-recording .phone .work{ background: rgb(237, 243, 238); padding: 14px; margin-top: 18px; }
+#callsign-recording .phonecontent{ flex: 1 1 0%; display: flex; flex-direction: column; }
+#callsign-recording .phonecontent > .actions:last-child{ margin-top: auto; padding-top: 15px; }
+#callsign-recording .phone .homebar{ flex: 0 0 auto; }
+#callsign-recording .phone .footnote{ font-size: 9px; margin-top: 15px; }
+#callsign-recording .phone{ width: 334px; min-height: 610px; }
+#callsign-recording .institution{ margin-top: 25px; }
+#callsign-recording.recording .body{ min-height: 0px; }
+#callsign-recording.recording .workspace{ padding-top: 24px; }
+#callsign-recording.recording .phone{ min-height: 625px; }
+#callsign-recording .tablepanel{ background: white; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+#callsign-recording .tabletop{ padding: 20px 24px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--line); }
+#callsign-recording .workrow{ display: grid; grid-template-columns: 2fr 1.1fr 1fr 1fr 80px; gap: 15px; padding: 19px 24px; align-items: center; font-size: 13px; }
+#callsign-recording .workrow.labels{ background: rgb(248, 249, 251); color: rgb(125, 137, 152); font-size: 11px; }
+#callsign-recording .workrow.selected{ background: rgb(242, 246, 255); border-left: 3px solid rgb(36, 106, 250); padding-left: 21px; }
+#callsign-recording .workrow small{ display: block; color: rgb(125, 137, 152); margin-top: 6px; }
+#callsign-recording .govgrid{ display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 24px; }
+#callsign-recording .govcard{ padding: 25px; }
+#callsign-recording .govcard h2{ font-size: 21px; margin: 12px 0px 20px; }
+#callsign-recording .nodes{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#callsign-recording .node{ border: 1px solid var(--line); border-radius: 12px; padding: 17px; background: white; }
+#callsign-recording .node small{ color: rgb(125, 137, 152); font-size: 10px; }
+#callsign-recording .node strong{ display: block; font-size: 22px; margin: 12px 0px 5px; }
+#callsign-recording .signrow{ padding: 14px 0px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+#callsign-recording .govcard .actions{ flex-direction: column; }
+#callsign-recording .note{ font-size: 11px; line-height: 1.8; color: rgb(113, 128, 149); margin-top: 20px; }
+#callsign-recording .drawer{ margin: 0px 0px 0px auto; height: 100dvh; max-height: 100dvh; width: 480px; border-radius: 20px 0px 0px 20px; }
+#callsign-recording .facts{ display: flex; justify-content: space-between; padding: 14px 0px; border-bottom: 1px solid var(--line); font-size: 13px; }
+#callsign-recording .facts span{ color: rgb(113, 128, 149); }
+#callsign-recording .modalclose{ float: right; border-radius: 50%; padding: 5px 10px; font-size: 20px; }
+#callsign-recording.recording .topnav{ display: flex; }
+@media (max-width: 1150px){
+#callsign-recording .workspace{ padding: 20px 24px; }
+#callsign-recording .stage{ grid-template-columns: 225px minmax(220px, 1fr) 305px; gap: 20px; }
+#callsign-recording .phone{ width: 305px; padding: 14px; }
+#callsign-recording .top{ padding: 0px 24px; }
+#callsign-recording .topnav{ gap: 0px; }
+#callsign-recording .topnav :is(button,a){ padding: 0px 10px; }
+#callsign-recording .topright .tag{ display: none; }
+#callsign-recording .evidence-card{ padding: 20px; }
+#callsign-recording .govgrid{ gap: 14px; }
+}
+@media (max-width: 950px){
+#callsign-recording .stage{ grid-template-columns: 1fr 320px; gap: 20px; }
+#callsign-recording .sender{ grid-area: 1 / 1; }
+#callsign-recording .evidence{ grid-area: 2 / 1; }
+#callsign-recording .phone{ grid-area: 1 / 2 / 3; width: 320px; align-self: start; }
+#callsign-recording .topnav :is(button,a){ font-size: 12px; }
+#callsign-recording .govgrid{ grid-template-columns: 1fr; }
+#callsign-recording .top{ flex-wrap: wrap; height: auto; min-height: 90px; padding: 12px 20px; gap: 10px; }
+#callsign-recording .topnav{ order: 3; width: 100%; height: 40px; justify-content: center; }
+#callsign-recording .workrow{ grid-template-columns: 1.5fr 1fr 1fr; }
+#callsign-recording .workrow > :nth-child(2), #callsign-recording .workrow > :nth-child(5){ display: none; }
+}
+@media (max-width: 650px){
+#callsign-recording .workspace{ padding: 20px; }
+#callsign-recording .stage{ display: flex; flex-direction: column; align-items: stretch; }
+#callsign-recording .phone{ order: 1; width: min(334px, 100%); align-self: center; }
+#callsign-recording .sender{ order: 0; }
+#callsign-recording .evidence{ order: 2; }
+#callsign-recording .phone .actions{ flex-direction: row; }
+#callsign-recording .sender .actions{ flex-direction: row; }
+#callsign-recording .topright .small{ font-size: 10px; padding: 8px; }
+#callsign-recording .brand{ font-size: 21px; }
+#callsign-recording .institution{ margin-top: 20px; }
+#callsign-recording.recording .phone{ min-height: 610px; }
+#callsign-recording .intro h1{ font-size: 23px; }
+#callsign-recording .workrow{ padding: 15px; }
+#callsign-recording .tabletop{ padding: 15px; }
+#callsign-recording .scene-tabs button{ padding: 8px 9px; font-size: 12px; }
+}
+#callsign-recording.workpage .intro > div > p, #callsign-recording.workpage .scene-tabs, #callsign-recording.workpage #director{ display: none; }
+#callsign-recording.workpage .intro{ margin: 12px 0px 28px; align-items: center; }
+#callsign-recording.workpage .intro h1{ font-size: 28px; }
+#callsign-recording.workpage .intro > button{ display: none; }
+#callsign-recording .work-actions{ display: flex; gap: 10px; align-items: center; }
+#callsign-recording .work-actions .quiet{ background: none; color: rgb(113, 128, 149); font-size: 12px; }
+#callsign-recording .queue{ background: white; border: 1px solid rgb(227, 232, 239); border-radius: 16px; overflow: hidden; min-height: 470px; }
+#callsign-recording .queue-tabs{ display: flex; gap: 27px; padding: 0px 26px; border-bottom: 1px solid var(--line); }
+#callsign-recording .queue-tabs button{ background: none; border-radius: 0px; padding: 19px 2px; font-size: 13px; color: rgb(113, 128, 149); border-bottom: 2px solid transparent; }
+#callsign-recording .queue-tabs button.active{ border-bottom-color: rgb(36, 106, 250); color: rgb(36, 106, 250); }
+#callsign-recording .queue-tabs span{ font-size: 10px; background: rgb(241, 244, 248); color: rgb(132, 144, 162); padding: 3px 6px; border-radius: 5px; margin-left: 7px; }
+#callsign-recording .queue-tools{ padding: 22px 26px; display: flex; gap: 11px; align-items: center; }
+#callsign-recording .queue-search{ display: flex; gap: 10px; align-items: center; border: 1px solid rgb(223, 229, 238); border-radius: 9px; width: 320px; padding: 0px 12px; color: rgb(138, 152, 170); }
+#callsign-recording .queue-search:focus-within{ outline: rgb(153, 184, 255) solid 2px; }
+#callsign-recording .queue-search input{ border: 0px; outline: 0px; padding: 12px 0px; width: 100%; min-width: 0px; font-style: inherit; font-variant: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; font-size: 12px; color: rgb(38, 55, 76); background: white; }
+#callsign-recording .queue-tools select{ border: 1px solid rgb(223, 229, 238); border-radius: 9px; padding: 11px 12px; background: white; color: rgb(97, 112, 132); font-size: 12px; }
+#callsign-recording .queue-count{ margin-left: auto; color: rgb(135, 147, 164); font-size: 11px; }
+#callsign-recording .qrow{ display: grid; grid-template-columns: minmax(220px, 2.2fr) minmax(140px, 1.2fr) 115px 110px 110px 90px; gap: 16px; align-items: center; padding: 21px 27px; border-bottom: 1px solid rgb(237, 240, 245); font-size: 13px; cursor: pointer; }
+#callsign-recording .qrow:hover{ background: rgb(248, 250, 255); }
+#callsign-recording .qrow.selected{ background: rgb(241, 246, 255); box-shadow: rgb(36, 106, 250) 3px 0px inset; }
+#callsign-recording .qrow.selected .qname{ color: rgb(36, 106, 250); }
+#callsign-recording .qrow.labels{ padding: 12px 27px; background: rgb(248, 249, 251); color: rgb(122, 135, 153); font-size: 11px; cursor: default; }
+#callsign-recording .qperson{ display: flex; align-items: center; gap: 13px; }
+#callsign-recording .qavatar{ width: 37px; height: 37px; border-radius: 12px; background: rgb(240, 243, 248); color: rgb(123, 138, 157); display: grid; place-items: center; font-size: 12px; }
+#callsign-recording .selected .qavatar{ background: rgb(226, 236, 255); color: rgb(36, 106, 250); }
+#callsign-recording .qname{ background: none; padding: 0px; font-size: 14px; }
+#callsign-recording .qid{ font-size: 10px; color: rgb(148, 160, 176); margin-left: 10px; }
+#callsign-recording .qsub{ font-size: 11px; color: rgb(129, 144, 162); margin-top: 6px; line-height: 1.5; }
+#callsign-recording .qstate{ font-size: 11px; display: inline-block; padding: 5px 8px; border-radius: 6px; background: rgb(237, 243, 255); color: rgb(50, 103, 199); }
+#callsign-recording .qstate.closed{ background: rgb(240, 242, 245); color: rgb(124, 136, 152); }
+#callsign-recording .qstate.pending{ background: rgb(255, 245, 229); color: rgb(154, 101, 30); }
+#callsign-recording .qlink{ background: none; color: rgb(113, 128, 149); font-size: 11px; padding: 8px 0px; text-align: right; }
+#callsign-recording .qfoot{ display: flex; justify-content: space-between; padding: 18px 27px; font-size: 11px; color: rgb(138, 151, 168); }
+#callsign-recording .qempty{ padding: 75px 20px; text-align: center; color: rgb(125, 139, 157); }
+#callsign-recording .qempty strong{ display: block; color: rgb(52, 68, 90); margin-bottom: 10px; }
+#callsign-recording .qempty button{ margin-top: 20px; }
+#callsign-recording .drawer .detailhero{ margin: 25px 0px; }
+#callsign-recording .detailhero h2{ font-size: 29px; margin: 12px 0px 6px; }
+#callsign-recording .drawer .facts{ font-size: 12px; }
+#callsign-recording .drawer details{ border-top: 1px solid var(--line); padding: 19px 0px; color: rgb(97, 112, 132); font-size: 12px; }
+#callsign-recording .drawer summary{ cursor: pointer; }
+#callsign-recording .drawer details p{ font-size: 12px; line-height: 1.8; }
+#callsign-recording .drawer .full{ width: 100%; margin: 22px 0px 8px; }
+#callsign-recording .drawer .sectiontitle{ margin: 25px 0px 10px; font-size: 14px; }
+#callsign-recording .drawer input, #callsign-recording .drawer select, #callsign-recording [role="dialog"] .field select{ font: inherit; border: 1px solid rgb(223, 229, 238); border-radius: 9px; padding: 11px; background: white; color: var(--ink); width: 100%; }
+#callsign-recording .field{ margin: 17px 0px; }
+#callsign-recording .field label{ display: block; font-size: 12px; color: rgb(113, 128, 149); margin-bottom: 8px; }
+#callsign-recording.workpage .footer{ margin-top: 24px; }
+@media (max-width: 1100px){
+#callsign-recording .qrow{ grid-template-columns: minmax(200px, 2fr) 130px 100px 100px 75px; gap: 10px; }
+#callsign-recording .qrow > :nth-child(5){ display: none; }
+}
+@media (max-width: 700px){
+#callsign-recording.workpage .intro{ flex-wrap: wrap; gap: 14px; }
+#callsign-recording .work-actions{ width: 100%; justify-content: flex-end; }
+#callsign-recording .queue-tools{ padding: 15px; flex-wrap: wrap; }
+#callsign-recording .queue-search{ width: 100%; }
+#callsign-recording .queue-tabs{ gap: 15px; padding: 0px 15px; }
+#callsign-recording .queue-tabs button{ font-size: 12px; }
+#callsign-recording .qrow{ grid-template-columns: minmax(160px, 1fr) 80px; padding: 17px 15px; gap: 8px; }
+#callsign-recording .qrow > :nth-child(2), #callsign-recording .qrow > :nth-child(4), #callsign-recording .qrow > :nth-child(5), #callsign-recording .qrow > :nth-child(6){ display: none; }
+#callsign-recording .qrow.labels{ padding: 12px 15px; }
+#callsign-recording .qid{ display: block; margin: 4px 0px 0px; }
+#callsign-recording .qperson{ gap: 9px; }
+#callsign-recording .qfoot{ padding: 16px; font-size: 10px; }
+#callsign-recording .qfoot span:last-child{ display: none; }
+}
+#callsign-recording.callpage .intro > div > p, #callsign-recording.callpage .intro .eyebrow, #callsign-recording.callpage #director, #callsign-recording.callpage .footer{ display: none; }
+#callsign-recording.callpage .intro{ margin: 2px 0px 18px; }
+#callsign-recording.callpage .intro h1{ font-size: 21px; margin: 0px; letter-spacing: -0.6px; }
+#callsign-recording.callpage .scene-tabs{ margin-bottom: 24px; }
+#callsign-recording.callpage .sender .footnote, #callsign-recording.callpage .sender .note, #callsign-recording.callpage .phone > .footnote{ display: none; }
+#callsign-recording.callpage .sender .panelhead .badge{ white-space: nowrap; font-size: 10px; padding: 6px 8px; }
+#callsign-recording.callpage .sender .actions{ margin-top: 24px; }
+#callsign-recording.callpage .institution{ padding: 14px 20px; box-shadow: none; }
+#callsign-recording.callpage .institution p{ font-size: 11px; }
+#callsign-recording.callpage.recording .intro{ display: none; }
+#callsign-recording.callpage.recording .workspace{ padding-top: 30px; }
+#callsign-recording.callpage .evidence{ min-width: 0px; --flow-accent: #246afa; --flow-tint: #edf3ff; }
+#callsign-recording .flow-top{ display: flex; align-items: center; justify-content: space-between; color: rgb(123, 138, 157); font-size: 10px; letter-spacing: 0.06em; }
+#callsign-recording .flow-top strong{ font-size: 11px; font-weight: 400; letter-spacing: 0px; color: rgb(96, 115, 141); }
+#callsign-recording .flow-top strong::before{ content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: rgb(156, 172, 194); margin-right: 7px; }
+#callsign-recording .flow-top.live strong::before{ background: rgb(36, 106, 250); }
+#callsign-recording .motion-stage{ position: relative; height: 218px; margin: 4px 0px 0px; isolation: isolate; }
+#callsign-recording .flow-halo{ position: absolute; width: 168px; height: 168px; left: 50%; top: 15px; transform: translateX(-50%); border-radius: 50%; border: 1px solid rgb(229, 235, 244); background: radial-gradient(circle, rgba(237, 243, 255, 0.6), transparent 70%); z-index: -1; }
+#callsign-recording .flow-halo::after{ content: ""; position: absolute; inset: 22px; border: 1px solid rgb(225, 233, 246); border-radius: 50%; }
+#callsign-recording .flow-track{ position: absolute; left: 8px; right: 8px; top: 99px; height: 1px; background: rgb(213, 222, 235); }
+#callsign-recording .flow-track::before, #callsign-recording .flow-track::after{ content: ""; position: absolute; top: -3px; width: 7px; height: 7px; border-radius: 50%; background: rgb(196, 209, 227); }
+#callsign-recording .flow-track::before{ left: 0px; }
+#callsign-recording .flow-track::after{ right: 0px; }
+#callsign-recording .flow-track.connected{ background: rgb(169, 196, 247); }
+#callsign-recording .flow-track.connected::before, #callsign-recording .flow-track.connected::after{ background: rgb(36, 106, 250); }
+#callsign-recording .flow-track.ended{ background: repeating-linear-gradient(90deg, rgb(212, 220, 231) 0px, rgb(212, 220, 231) 5px, transparent 5px, transparent 10px); }
+#callsign-recording .flow-node{ position: absolute; left: 50%; top: 66px; transform: translateX(-50%); width: 66px; height: 66px; border-radius: 21px; display: grid; place-items: center; background: rgb(255, 255, 255); border: 1px solid rgb(220, 230, 247); box-shadow: rgba(40, 79, 152, 0.063) 0px 8px 24px; color: var(--flow-accent); }
+#callsign-recording .flow-node svg{ width: 32px; height: 32px; fill: none; stroke: currentcolor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#callsign-recording .flow-node-label{ position: absolute; left: 50%; top: 143px; transform: translateX(-50%); font-size: 13px; font-weight: 750; color: rgb(53, 73, 102); letter-spacing: -0.3px; }
+#callsign-recording .flow-endpoint{ position: absolute; top: 116px; font-size: 11px; color: rgb(124, 139, 159); }
+#callsign-recording .flow-endpoint.left{ left: 0px; }
+#callsign-recording .flow-endpoint.right{ right: 0px; }
+#callsign-recording .flow-packet{ position: absolute; left: 50%; top: 44px; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 6px; padding: 9px 12px; border-radius: 10px; background: rgb(255, 255, 255); color: var(--flow-accent); border: 1px solid color-mix(in srgb,var(--flow-accent) 22%,white); box-shadow: rgba(35, 61, 98, 0.063) 0px 5px 16px; font-size: 11px; font-weight: 700; white-space: nowrap; z-index: 2; animation-duration: 900ms; animation-timing-function: cubic-bezier(0.3, 0.05, 0.25, 1); animation-fill-mode: both; }
+#callsign-recording .flow-packet::after{ content: ""; position: absolute; left: 50%; width: 5px; height: 5px; top: 68px; border-radius: 50%; background: var(--flow-accent); box-shadow: 0 0 0 4px var(--flow-tint); }
+#callsign-recording .flow-packet svg{ width: 13px; height: 13px; stroke: currentcolor; fill: none; stroke-width: 1.8; }
+#callsign-recording .flow-packet.to-hub{ animation-name: recording_toHub; }
+#callsign-recording .flow-packet.to-recipient{ animation-name: recording_toRecipient; }
+#callsign-recording .flow-packet.from-recipient{ animation-name: recording_fromRecipient; }
+#callsign-recording .flow-packet.to-sender{ animation-name: recording_toSender; }
+#callsign-recording .flow-packet.from-institution{ animation-name: recording_fromInstitution; }
+@keyframes recording_toHub{ 
+  0% { left: 15%; opacity: 0; }
+  15% { opacity: 1; }
+  100% { left: 50%; opacity: 1; }
+}
+@keyframes recording_toRecipient{ 
+  0% { left: 50%; opacity: 0; }
+  15% { opacity: 1; }
+  100% { left: 85%; opacity: 1; }
+}
+@keyframes recording_fromRecipient{ 
+  0% { left: 85%; opacity: 0; }
+  15% { opacity: 1; }
+  100% { left: 50%; opacity: 1; }
+}
+@keyframes recording_toSender{ 
+  0% { left: 50%; opacity: 0; }
+  15% { opacity: 1; }
+  100% { left: 15%; opacity: 1; }
+}
+@keyframes recording_fromInstitution{ 
+  0% { top: 201px; opacity: 0; }
+  15% { opacity: 1; }
+  100% { top: 44px; opacity: 1; }
+}
+#callsign-recording .flow-origin{ position: absolute; top: 175px; left: 50%; transform: translateX(-50%); font-size: 10px; color: rgb(177, 74, 91); }
+#callsign-recording .flow-vertical{ position: absolute; top: 131px; height: 57px; left: 50%; border-left: 1px dashed rgb(228, 189, 197); z-index: -1; }
+#callsign-recording .flow-copy{ min-height: 76px; text-align: center; }
+#callsign-recording .flow-copy h2{ font-size: 25px; line-height: 1.45; letter-spacing: -0.9px; margin: 0px 0px 8px; color: rgb(39, 57, 82); word-break: keep-all; }
+#callsign-recording .flow-copy p{ font-size: 12px; line-height: 1.7; color: rgb(123, 139, 160); word-break: keep-all; }
+#callsign-recording .flow-note{ margin: 17px 0px 20px; padding: 17px 19px; min-height: 110px; border: 1px solid rgb(225, 232, 242); border-radius: 15px; background: rgb(255, 255, 255); display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+#callsign-recording .flow-note .flow-quote-label{ font-size: 10px; color: rgb(140, 154, 175); display: flex; justify-content: space-between; gap: 5px; }
+#callsign-recording .flow-note blockquote{ margin: 0px; font-size: 17px; line-height: 1.65; letter-spacing: -0.35px; color: rgb(45, 63, 86); word-break: keep-all; }
+#callsign-recording .flow-note .flow-result{ font-size: 11px; color: var(--flow-accent); display: flex; align-items: center; gap: 6px; font-weight: 700; }
+#callsign-recording .flow-note.placeholder{ border-color: transparent; background: transparent; text-align: center; min-height: 110px; }
+#callsign-recording .flow-note.placeholder b{ font-size: 12px; color: rgb(101, 123, 152); font-weight: 400; }
+#callsign-recording .flow-note.placeholder p{ font-size: 11px; color: rgb(150, 163, 181); }
+#callsign-recording .flow-statuses{ display: grid; grid-template-columns: repeat(3, minmax(0px, 1fr)); border-top: 1px solid rgb(226, 232, 240); padding-top: 17px; gap: 12px; }
+#callsign-recording .flow-statuses small{ display: block; color: rgb(140, 155, 173); font-size: 10px; margin-bottom: 7px; }
+#callsign-recording .flow-statuses strong{ font-size: 11px; color: rgb(111, 128, 152); font-weight: 400; display: block; white-space: nowrap; }
+#callsign-recording .flow-statuses strong.on{ color: rgb(36, 106, 250); }
+#callsign-recording .flow-statuses strong.off{ color: rgb(154, 167, 184); }
+#callsign-recording .flow-statuses strong.alerted{ color: rgb(187, 77, 92); }
+#callsign-recording .flow-detail{ display: block; margin: 16px auto 0px; background: none; padding: 6px 10px; font-size: 10px; font-weight: 400; color: rgb(139, 154, 175); }
+#callsign-recording .flow-waves{ display: inline-flex; gap: 3px; align-items: center; height: 15px; margin-left: 7px; vertical-align: middle; }
+#callsign-recording .flow-waves i{ display: block; background: rgb(132, 169, 237); width: 2px; border-radius: 3px; height: 5px; animation: 1.3s ease-in-out 0s infinite normal none running recording_wave; }
+#callsign-recording .flow-waves i:nth-child(2){ animation-delay: -0.4s; }
+#callsign-recording .flow-waves i:nth-child(3){ animation-delay: -0.8s; }
+#callsign-recording .flow-waves i:nth-child(4){ animation-delay: -0.2s; }
+@keyframes recording_wave{ 
+  0%, 100% { height: 4px; }
+  50% { height: 12px; }
+}
+#callsign-recording .flow-risk{ --flow-accent: #be4c5b; --flow-tint: #fff0f2; }
+#callsign-recording .flow-purpose{ --flow-accent: #ac7623; --flow-tint: #fff5df; }
+#callsign-recording .flow-risk .flow-note{ border-color: rgb(237, 207, 213); }
+#callsign-recording .flow-purpose .flow-note{ border-color: rgb(234, 219, 189); }
+#callsign-recording .flow-risk .flow-node, #callsign-recording .flow-purpose .flow-node{ color: var(--flow-accent); }
+#callsign-recording .flow-busy .flow-node{ box-shadow: rgb(234, 241, 255) 0px 0px 0px 6px, rgba(40, 79, 152, 0.063) 0px 8px 24px; }
+#callsign-recording .flow-muted .flow-node{ color: rgb(149, 164, 183); }
+#callsign-recording .flow-muted .flow-halo{ background: none; }
+#callsign-recording.callpage .top .tag{ white-space: nowrap; font-size: 10px; display: inline-flex !important; }
+@media (min-width: 1500px){
+#callsign-recording.callpage .workspace{ max-width: 1620px; padding-left: 48px; padding-right: 48px; }
+#callsign-recording.callpage .stage{ grid-template-columns: 280px minmax(350px, 1fr) 354px; gap: 44px; }
+#callsign-recording.callpage .phone{ width: 354px; min-height: 660px; }
+#callsign-recording.callpage .motion-stage{ height: 232px; }
+#callsign-recording.callpage .flow-copy h2{ font-size: 28px; }
+}
+@media (max-width: 1150px){
+#callsign-recording .flow-copy h2{ font-size: 21px; }
+#callsign-recording .flow-packet{ font-size: 9px; padding: 8px; }
+#callsign-recording .flow-statuses{ gap: 6px; }
+#callsign-recording .flow-statuses strong{ font-size: 10px; }
+#callsign-recording .flow-note{ padding: 13px; }
+#callsign-recording .flow-note blockquote{ font-size: 15px; }
+#callsign-recording .flow-halo{ width: 145px; height: 145px; top: 26px; }
+}
+@media (max-width: 950px){
+#callsign-recording.callpage .evidence{ padding-top: 15px; }
+#callsign-recording .topright .tag{ font-size: 9px !important; }
+#callsign-recording .flow-note.placeholder{ min-height: 70px; }
+#callsign-recording .flow-copy{ min-height: 65px; }
+}
+@media (max-width: 650px){
+#callsign-recording.callpage .intro{ margin: 0px 0px 15px; }
+#callsign-recording .topright{ flex-wrap: wrap; justify-content: flex-end; }
+#callsign-recording .topright .tag{ order: 3; width: 100%; justify-content: center; }
+#callsign-recording .top .brand{ flex-shrink: 0; }
+#callsign-recording.callpage .top{ display: grid; grid-template-columns: auto 1fr; }
+#callsign-recording.callpage .topnav{ grid-column: 1 / -1; }
+#callsign-recording.callpage .scene-tabs{ gap: 4px; }
+#callsign-recording.callpage .scene-tabs button{ font-size: 11px; padding: 8px; }
+#callsign-recording.callpage .scene-tabs b{ margin-right: 4px; }
+#callsign-recording.callpage .evidence{ order: 1; padding: 0px 8px; width: 100%; }
+#callsign-recording.callpage .phone{ order: 2; }
+#callsign-recording.callpage .flow-note.placeholder{ display: none; }
+#callsign-recording.callpage .flow-statuses{ margin-top: 17px; }
+#callsign-recording.callpage .flow-copy h2{ font-size: 23px; }
+#callsign-recording.callpage.recording .workspace{ padding-top: 20px; }
+#callsign-recording .flow-packet{ font-size: 10px; }
+#callsign-recording.callpage .institution{ flex-direction: row; align-items: center; }
+#callsign-recording.callpage .institution button{ white-space: nowrap; }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .flow-packet{ left: 50%; top: 44px; animation: auto ease 0s 1 normal none running none !important; }
+#callsign-recording .flow-waves i{ animation: auto ease 0s 1 normal none running none; height: 7px; }
+#callsign-recording button{ transition: none; }
+}
+#callsign-recording[data-attention="sender"] .attention-mask[data-role="sender"], #callsign-recording[data-attention="recipient"] .attention-mask[data-role="recipient"], #callsign-recording[data-attention="institution"] .attention-mask[data-role="institution"]{ opacity: 0; transition-duration: 0.18s; }
+#callsign-recording .phone.phone-wallpaper{ background: radial-gradient(at 82% 14%, rgb(181, 201, 189) 0%, transparent 48%), radial-gradient(at 5% 80%, rgb(83, 111, 102) 0%, transparent 58%), linear-gradient(155deg, rgb(129, 157, 144), rgb(37, 63, 54) 85%); color: rgb(255, 255, 255); overflow: hidden; position: relative; }
+#callsign-recording .phone-wallpaper::before{ content: ""; position: absolute; width: 470px; height: 470px; border: 1px solid rgba(255, 255, 255, 0.133); border-radius: 46%; left: -290px; top: 175px; transform: rotate(30deg); box-shadow: rgba(255, 255, 255, 0.02) 0px 0px 0px 45px, rgba(255, 255, 255, 0.016) 0px 0px 0px 90px; pointer-events: none; }
+#callsign-recording .phone-wallpaper .phonestatus{ color: white; }
+#callsign-recording .phone-wallpaper .island{ background: rgb(20, 39, 31); }
+#callsign-recording .lock-date{ text-align: center; font-size: 16px; margin-top: 39px; color: rgb(238, 246, 240); }
+#callsign-recording .lock-time{ text-align: center; font-size: 78px; letter-spacing: -4px; font-weight: 500; line-height: 1.12; color: rgb(245, 250, 247); }
+#callsign-recording .lock-bottom{ margin-top: auto; display: flex; justify-content: space-between; padding: 0px 15px 18px; }
+#callsign-recording .lock-bottom span{ width: 42px; height: 42px; border-radius: 50%; background: rgba(16, 45, 52, 0.376); display: grid; place-items: center; }
+#callsign-recording .lock-bottom svg{ width: 21px; height: 21px; fill: none; stroke: white; stroke-width: 1.7; }
+#callsign-recording .phone-wallpaper .homebar{ background: rgb(240, 245, 241); }
+#callsign-recording .phone .incoming-verified{ gap: 9px; padding: 6px 13px 6px 7px; border-radius: 14px; background: linear-gradient(135deg, rgb(244, 248, 255), rgb(223, 235, 255)); border: 1px solid rgba(255, 255, 255, 0.72); color: rgb(32, 68, 121); box-shadow: rgba(14, 37, 69, 0.17) 0px 5px 18px, rgb(255, 255, 255) 0px 1px 0px inset; min-height: 41px; }
+#callsign-recording .phone .incoming-verified strong{ font-size: 12px; font-weight: 700; letter-spacing: -0.2px; color: rgb(32, 68, 121); }
+#callsign-recording .phone .incoming-verified .verified-seal{ width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: linear-gradient(145deg, rgb(80, 137, 255), rgb(36, 99, 231)); box-shadow: rgba(39, 101, 220, 0.196) 0px 2px 5px; }
+#callsign-recording .verified-seal svg{ width: 21px; height: 21px; fill: none; stroke: rgb(255, 255, 255); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#callsign-recording .verified-seal svg path:first-child{ fill: rgba(255, 255, 255, 0.082); }
+#callsign-recording .iphone-incoming .incoming-avatar{ margin-top: 24px; }
+#callsign-recording [hidden]{ display: none !important; }
+#callsign-recording .simulation-options{ margin-top: 12px; color: rgb(82, 100, 124); font-size: 12px; }
+#callsign-recording .simulation-options summary{ cursor: pointer; padding: 10px 0px; }
+#callsign-recording .simulation-options select{ margin: 8px; padding: 7px; border: 1px solid rgb(216, 224, 233); border-radius: 6px; }
+#callsign-recording .simulation-options button{ margin: 5px; }
+#callsign-recording .risk-reason{ border-top: 1px solid rgb(234, 205, 189); padding-top: 9px; }
+#callsign-recording .phone .alert small{ display: block; font-size: 10px; margin-top: 8px; color: rgb(128, 106, 90); }
+#callsign-recording .top .tag{ display: inline-block !important; }
+#callsign-recording .phone .alert h3{ font-size: 18px; }
+#callsign-recording .phone .alert p{ font-size: 12px; }
+@media (min-width: 951px){
+#callsign-recording.callpage .workspace{ padding-top: 16px; }
+#callsign-recording.callpage .intro{ margin-bottom: 12px; }
+#callsign-recording.callpage .scene-tabs{ margin-bottom: 12px; }
+#callsign-recording.callpage .phone, #callsign-recording.callpage.recording .phone{ min-height: 570px; }
+#callsign-recording.callpage .phoneapp{ margin: 10px 0px 14px; }
+#callsign-recording.callpage .phone .verify{ margin: 15px 0px 12px; }
+#callsign-recording.callpage .phone .statusTitle{ font-size: 21px; margin: 14px 0px 10px; }
+#callsign-recording.callpage .phone .actions{ margin-top: 10px; }
+#callsign-recording.callpage .phone .alert{ margin-top: 10px; padding: 12px; }
+#callsign-recording.callpage .institution{ margin-top: 16px; padding: 12px 20px; }
+#callsign-recording.callpage .motion-stage{ height: 210px; }
+#callsign-recording.callpage .flow-note{ min-height: 92px; }
+#callsign-recording.callpage .phone .consent{ padding: 9px; }
+#callsign-recording.callpage .phone .footnote{ display: block; }
+#callsign-recording.callpage.recording .workspace{ padding-top: 16px; }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording *, #callsign-recording ::before, #callsign-recording ::after{ animation: auto ease 0s 1 normal none running none !important; transition: none !important; }
+}
+#callsign-recording .flow-packet{ top: 99px; width: 12px; height: 12px; padding: 0px; border: 0px; border-radius: 50%; background: var(--flow-accent); box-shadow: 0 0 0 5px var(--flow-tint); animation-duration: 1450ms; animation-timing-function: ease-in-out; pointer-events: none; }
+#callsign-recording .flow-packet::after{ display: none; }
+#callsign-recording .flow-packet svg{ display: none; }
+#callsign-recording .flow-waves{ visibility: hidden; }
+#callsign-recording .flow-copy{ height: 102px; min-height: 102px; display: flex; flex-direction: column; justify-content: center; }
+#callsign-recording .flow-copy h2{ font-size: 23px; }
+#callsign-recording .flow-copy p{ min-height: 21px; }
+#callsign-recording .flow-note{ height: 122px; min-height: 122px; }
+#callsign-recording .flow-note.placeholder{ height: 122px; min-height: 122px; }
+#callsign-recording .flow-node{ z-index: 3; }
+#callsign-recording .flow-halo{ background: none; }
+#callsign-recording .flow-packet.from-institution{ animation-name: recording_anchoredInstitution; }
+@keyframes recording_anchoredInstitution{ 
+  0% { top: 190px; opacity: 0; }
+  15% { opacity: 1; }
+  100% { top: 99px; opacity: 1; }
+}
+#callsign-recording.callpage button:hover:not(:disabled){ transform: none; }
+#callsign-recording .director-controls{ position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 6; background: rgb(255, 255, 255); border: 1px solid rgb(220, 228, 239); border-radius: 12px; box-shadow: rgba(37, 55, 83, 0.047) 0px 4px 20px; display: flex; gap: 16px; align-items: center; padding: 10px 16px; white-space: nowrap; }
+#callsign-recording .director-controls span, #callsign-recording .director-controls small{ font-size: 11px; color: rgb(113, 128, 149); }
+#callsign-recording.recording .director-controls{ display: none; }
+#callsign-recording .click-cue{ position: fixed; z-index: 99999; pointer-events: none; width: 25px; height: 29px; animation: 0.7s ease 0s 1 normal both running recording_cueFade; }
+#callsign-recording .click-cue svg{ position: absolute; width: 20px; height: 24px; left: 0px; top: 0px; fill: rgb(32, 49, 76); stroke: white; stroke-width: 1.5; filter: drop-shadow(rgba(0, 0, 0, 0.133) 0px 1px 2px); }
+#callsign-recording .click-cue i{ position: absolute; left: 3px; top: 2px; width: 12px; height: 12px; border: 2px solid rgb(36, 106, 250); border-radius: 50%; transform: translate(-50%, -50%); animation: 0.65s ease-out 0s 1 normal both running recording_cueRing; }
+#callsign-recording .director-press{ box-shadow: rgba(36, 106, 250, 0.208) 0px 0px 0px 3px !important; filter: brightness(0.92) !important; transform: scale(0.98) !important; }
+@keyframes recording_cueRing{ 
+  0% { width: 8px; height: 8px; opacity: 0; }
+  25% { opacity: 0.8; }
+  100% { width: 40px; height: 40px; opacity: 0; }
+}
+@keyframes recording_cueFade{ 
+  0% { opacity: 0; }
+  18%, 65% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (max-width: 650px){
+#callsign-recording .director-controls{ gap: 8px; max-width: 95%; white-space: normal; }
+#callsign-recording .director-controls small{ display: none; }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .click-cue{ animation: auto ease 0s 1 normal none running none; }
+#callsign-recording .click-cue i{ animation: auto ease 0s 1 normal none running none; }
+#callsign-recording .director-press{ transform: none !important; }
+}
+#callsign-recording .flow-copy{ height: 100px; min-height: 100px; }
+#callsign-recording .flow-statuses{ margin-top: 26px; }
+#callsign-recording .flow-detail{ margin-top: 15px; }
+#callsign-recording .flow-surface{ min-height: 450px; }
+#callsign-recording .flow-copy h2{ font-size: 23px; }
+#callsign-recording .flow-halo::after{ display: none; }
+#callsign-recording .flow-halo{ border-color: rgb(232, 237, 245); }
+#callsign-recording .flow-node{ transition: box-shadow 0.4s; }
+#callsign-recording .flow-packet{ width: 10px; height: 10px; box-shadow: 0 0 0 4px var(--flow-tint); animation-duration: 1500ms; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); padding: 0px !important; }
+@keyframes recording_toHub{ 
+  0% { left: 8px; opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  88% { opacity: 1; }
+  100% { left: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65); }
+}
+@keyframes recording_toRecipient{ 
+  0% { left: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  85% { opacity: 1; }
+  100% { left: calc(100% - 8px); opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+}
+@keyframes recording_fromRecipient{ 
+  0% { left: calc(100% - 8px); opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  88% { opacity: 1; }
+  100% { left: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65); }
+}
+@keyframes recording_toSender{ 
+  0% { left: 50%; opacity: 0; transform: translate(-50%, -50%) scale(0.65); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  85% { opacity: 1; }
+  100% { left: 8px; opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+}
+@keyframes recording_anchoredInstitution{ 
+  0% { top: 190px; opacity: 0; }
+  12%, 85% { opacity: 1; }
+  100% { top: 99px; opacity: 0; }
+}
+#callsign-recording .click-cue{ width: 38px; height: 44px; animation: 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0s 1 normal both running recording_cueNatural; transform-origin: 3px 2px; }
+#callsign-recording .click-cue svg{ width: 34px; height: 40px; filter: drop-shadow(rgba(23, 36, 59, 0.19) 0px 2px 3px); }
+#callsign-recording .click-cue i{ left: 4px; top: 3px; border-width: 2px; animation: 0.65s ease-out 0.25s 1 normal both running recording_cueRingNatural; }
+#callsign-recording .director-press{ animation: 0.52s ease 0s 1 normal both running recording_buttonNatural; transition: filter 0.15s, box-shadow 0.15s; transform: none !important; box-shadow: rgba(36, 106, 250, 0.133) 0px 0px 0px 3px !important; }
+@keyframes recording_cueNatural{ 
+  0% { opacity: 0; transform: translate(5px, 7px) scale(1.08); }
+  20% { opacity: 1; transform: translate(0px, 0px) scale(1); }
+  38% { transform: scale(0.86); }
+  55%, 72% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: translate(2px, 3px) scale(1); }
+}
+@keyframes recording_cueRingNatural{ 
+  0% { width: 12px; height: 12px; opacity: 0; }
+  15% { opacity: 0.65; }
+  100% { width: 58px; height: 58px; opacity: 0; }
+}
+@keyframes recording_buttonNatural{ 
+  0%, 25% { filter: brightness(1); }
+  65% { filter: brightness(0.88); }
+  100% { filter: brightness(0.96); }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .click-cue, #callsign-recording .click-cue i, #callsign-recording .director-press{ animation: auto ease 0s 1 normal none running none !important; }
+#callsign-recording .flow-packet{ animation: auto ease 0s 1 normal none running none !important; top: 99px !important; }
+}
+#callsign-recording.workpage .queue-tools{ gap: 12px; }
+#callsign-recording.workpage .qrow:not(.labels){ min-height: 86px; }
+#callsign-recording.workpage .qrow.labels{ min-height: 48px; }
+#callsign-recording.workpage .qid{ font-size: 10px; color: rgb(129, 144, 162); }
+#callsign-recording.workpage .qsub{ font-size: 12px; }
+#callsign-recording.workpage .qfoot{ justify-content: flex-start; }
+#callsign-recording.workpage .intro .eyebrow{ letter-spacing: 0.04em; }
+#callsign-recording.workpage .queue-search{ max-width: 360px; }
+#callsign-recording .phone .alert{ margin-top: 18px !important; }
+#callsign-recording .phonecontent{ min-height: 180px; }
+#callsign-recording .topright{ display: none !important; }
+#callsign-recording .top{ justify-content: flex-start; gap: 70px; }
+#callsign-recording .topnav{ margin-left: 0px; }
+#callsign-recording .footer{ display: flex !important; margin-top: 14px; }
+#callsign-recording .volume table{ width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; font-size: 12px; }
+#callsign-recording .volume th{ background: rgb(248, 249, 251); color: rgb(113, 128, 149); font-size: 11px; font-weight: 500; padding: 14px 20px; }
+#callsign-recording .volume td{ padding: 13px 20px; border-top: 1px solid rgb(237, 240, 244); }
+#callsign-recording .volume td small{ display: block; font-size: 10px; color: rgb(133, 145, 162); margin-top: 4px; }
+#callsign-recording .volume .selected{ background: rgb(242, 246, 255); }
+#callsign-recording .volume-scroll{ overflow: auto; max-height: 460px; }
+#callsign-recording .volume thead{ position: sticky; top: 0px; z-index: 1; }
+#callsign-recording .volume-total{ margin-left: auto; font-size: 12px; color: rgb(113, 128, 149); }
+#callsign-recording .volume-pagination{ display: flex; gap: 14px; align-items: center; justify-content: flex-end; padding: 15px 20px; border-top: 1px solid rgb(231, 236, 242); font-size: 12px; }
+#callsign-recording .volume-pagination > span:first-child{ margin-right: auto; color: rgb(113, 128, 149); }
+#callsign-recording .volume-pagination select{ border: 1px solid rgb(224, 230, 239); background: white; padding: 5px; border-radius: 5px; }
+#callsign-recording .volume .queue-tools{ padding: 16px 24px; }
+#callsign-recording .volume .queue-tabs{ overflow: auto; }
+#callsign-recording.workpage .workspace{ padding-top: 18px; }
+#callsign-recording.workpage .intro{ margin-bottom: 18px; }
+#callsign-recording .gov-summary{ background: white; border: 1px solid rgb(227, 232, 239); border-radius: 16px; padding: 22px 26px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; gap: 24px; }
+#callsign-recording .gov-summary small{ color: rgb(113, 128, 149); font-size: 12px; }
+#callsign-recording .gov-summary h2{ font-size: 25px; margin: 8px 0px; }
+#callsign-recording .gov-summary p{ font-size: 13px; }
+#callsign-recording .gov-redesign{ display: grid; grid-template-columns: minmax(280px, 0.8fr) minmax(440px, 1.35fr); gap: 24px; }
+#callsign-recording .approval-panel, #callsign-recording .recovery-panel{ padding: 25px; box-shadow: none; }
+#callsign-recording .gov-section-title{ display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+#callsign-recording .gov-section-title > span{ font-size: 12px; color: rgb(36, 106, 250); }
+#callsign-recording .gov-section-title h2{ font-size: 19px; margin: 0px; }
+#callsign-recording .approval-panel > p{ font-size: 13px; }
+#callsign-recording .approval-count{ margin: 22px 0px 12px; display: flex; align-items: baseline; gap: 8px; }
+#callsign-recording .approval-count b{ font-size: 32px; }
+#callsign-recording .approval-count span{ font-size: 13px; color: rgb(113, 128, 149); }
+#callsign-recording .approver{ display: flex; align-items: center; justify-content: space-between; padding: 13px 0px; border-bottom: 1px solid rgb(237, 240, 244); }
+#callsign-recording .approver > div{ display: flex; gap: 12px; align-items: center; font-size: 13px; }
+#callsign-recording .approver-avatar{ display: grid; place-items: center; width: 32px; height: 32px; background: rgb(240, 244, 250); border-radius: 50%; color: rgb(96, 115, 140); }
+#callsign-recording .gov-sim{ display: block; color: rgb(131, 144, 162); font-size: 10px; text-align: center; line-height: 1.6; }
+#callsign-recording .recovery-item{ display: flex; align-items: center; gap: 15px; padding: 15px 0px; border-bottom: 1px solid rgb(237, 240, 244); }
+#callsign-recording .recovery-number{ display: grid; place-items: center; border-radius: 50%; width: 29px; height: 29px; background: rgb(241, 243, 247); color: rgb(131, 144, 162); flex: 0 0 auto; font-size: 12px; }
+#callsign-recording .recovery-item b{ font-size: 14px; }
+#callsign-recording .recovery-item p{ font-size: 11px; margin-top: 4px; }
+#callsign-recording .recovery-state{ margin-left: auto; font-size: 11px; color: rgb(133, 145, 162); white-space: nowrap; }
+#callsign-recording .recovery-item.complete .recovery-number{ background: rgb(237, 243, 255); color: rgb(36, 106, 250); }
+#callsign-recording .recovery-item.current .recovery-number{ background: rgb(36, 106, 250); color: white; }
+#callsign-recording .recovery-action{ margin: 20px 0px; }
+#callsign-recording .recovery-action p, #callsign-recording .recovery-note{ font-size: 12px; color: rgb(113, 128, 149); }
+#callsign-recording .recovery-note{ padding: 12px; background: rgb(246, 248, 251); border-radius: 8px; line-height: 1.6; }
+#callsign-recording .ledger-details{ margin-top: 16px; font-size: 12px; color: rgb(113, 128, 149); }
+#callsign-recording .ledger-details summary{ cursor: pointer; }
+#callsign-recording .ledger-data{ display: flex; gap: 20px; margin: 12px 0px; flex-wrap: wrap; }
+#callsign-recording .ledger-data p{ font-size: 11px; }
+#callsign-recording .ledger-data b{ display: block; color: rgb(53, 73, 102); margin-top: 4px; }
+@media (max-width: 800px){
+#callsign-recording .gov-redesign{ grid-template-columns: 1fr; }
+#callsign-recording .gov-summary{ align-items: flex-start; }
+#callsign-recording .approval-panel, #callsign-recording .recovery-panel{ padding: 20px; }
+}
+#callsign-recording .sender.panel{ border: 1px solid rgb(226, 232, 241); border-radius: 20px; background: rgb(255, 255, 255); box-shadow: rgba(32, 56, 92, 0.02) 0px 8px 30px; overflow: hidden; }
+#callsign-recording .sender-brand{ display: flex; gap: 10px; align-items: center; padding: 20px 18px; border-bottom: 1px solid rgb(237, 240, 245); position: relative; flex-wrap: wrap; }
+#callsign-recording .sender-symbol{ width: 35px; height: 35px; background: rgb(237, 243, 255); border-radius: 11px; display: grid; place-items: center; color: rgb(36, 106, 250); flex: 0 0 auto; }
+#callsign-recording .sender-symbol svg{ width: 22px; height: 22px; fill: none; stroke: currentcolor; stroke-width: 1.6; }
+#callsign-recording .sender-brand strong{ font-size: 15px; display: block; letter-spacing: -0.3px; }
+#callsign-recording .sender-brand small{ font-size: 9px; color: rgb(133, 146, 164); display: block; margin-top: 4px; }
+#callsign-recording .sender-live{ font-size: 10px; color: rgb(123, 138, 158); margin-left: auto; white-space: nowrap; }
+#callsign-recording .sender-live.is-live{ color: rgb(36, 106, 250); }
+#callsign-recording .sender-live.is-live::before{ content: ""; display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: rgb(36, 106, 250); margin-right: 4px; }
+#callsign-recording .sender-main{ padding: 24px 20px 20px; }
+#callsign-recording .sender-person{ display: flex; align-items: center; gap: 12px; }
+#callsign-recording .sender-person-icon{ width: 43px; height: 43px; background: rgb(242, 245, 249); border: 1px solid rgb(232, 237, 243); border-radius: 50%; display: grid; place-items: center; font-size: 17px; color: rgb(109, 125, 146); }
+#callsign-recording .sender-person small, #callsign-recording .sender-purpose > small{ font-size: 10px; color: rgb(128, 144, 165); }
+#callsign-recording .sender-person h2{ font-size: 21px; margin: 4px 0px 0px; letter-spacing: -0.5px; }
+#callsign-recording .sender-purpose{ margin: 24px 0px 20px; }
+#callsign-recording .sender-purpose h3{ font-size: 23px; line-height: 1.45; letter-spacing: -0.8px; font-weight: 650; margin: 8px 0px 0px; color: rgb(36, 52, 77); }
+#callsign-recording .sender-meta{ display: flex; justify-content: space-between; font-size: 11px; padding-bottom: 18px; }
+#callsign-recording .sender-meta span{ color: rgb(130, 144, 163); }
+#callsign-recording .sender-meta b{ font-weight: 500; color: rgb(80, 96, 120); }
+#callsign-recording .sender-approval{ display: flex; gap: 10px; align-items: center; padding: 12px; background: rgb(245, 248, 253); border: 1px solid rgb(234, 240, 248); border-radius: 10px; }
+#callsign-recording .approval-icon{ width: 24px; height: 24px; border-radius: 50%; background: rgb(232, 240, 255); color: rgb(36, 106, 250); display: grid; place-items: center; font-size: 12px; }
+#callsign-recording .sender-approval small{ display: block; font-size: 9px; color: rgb(129, 144, 164); margin-bottom: 4px; }
+#callsign-recording .sender-approval b{ font-size: 12px; font-weight: 600; color: rgb(57, 84, 119); }
+#callsign-recording .sender-approval.revoked{ background: rgb(255, 246, 245); border-color: rgb(242, 226, 225); }
+#callsign-recording .sender-approval.revoked b, #callsign-recording .sender-approval.revoked .approval-icon{ color: rgb(177, 73, 73); }
+#callsign-recording .sender-controls{ margin-top: 22px; }
+#callsign-recording .sender-controls .actions{ gap: 9px; margin: 0px !important; }
+#callsign-recording .sender-controls button{ min-height: 42px; border-radius: 10px !important; font-size: 12px !important; }
+#callsign-recording .sender-controls .outline{ background: rgb(255, 255, 255); border-color: rgb(228, 234, 242); color: rgb(105, 121, 143); }
+#callsign-recording .sender-controls > p{ font-size: 12px; line-height: 1.6; color: rgb(123, 138, 158); }
+#callsign-recording .sender-controls .actions{ display: flex; flex-direction: column; }
+@media (min-width: 651px){
+#callsign-recording .sender.panel{ height: 530px; min-height: 530px; max-height: 530px; align-self: start; margin-top: 20px; display: flex; flex-direction: column; }
+#callsign-recording .sender-brand{ height: 76px; min-height: 76px; flex-wrap: nowrap; padding: 18px 16px; gap: 8px; }
+#callsign-recording .sender-brand > div{ min-width: 0px; }
+#callsign-recording .sender-brand strong{ white-space: nowrap; }
+#callsign-recording .sender-brand small{ white-space: nowrap; font-size: 9px; }
+#callsign-recording .sender-live{ font-size: 9px; flex: 0 0 auto; }
+#callsign-recording .sender-main{ flex: 1 1 0%; min-height: 0px; display: flex; flex-direction: column; padding: 22px 20px 20px; }
+#callsign-recording .sender-person{ flex: 0 0 auto; height: 43px; }
+#callsign-recording .sender-purpose{ flex: 0 0 auto; margin: 22px 0px 18px; }
+#callsign-recording .sender-meta{ flex: 0 0 auto; }
+#callsign-recording .sender-approval{ flex: 0 0 auto; min-height: 59px; }
+#callsign-recording .sender-controls{ margin-top: auto; min-height: 101px; height: 101px; flex: 0 0 auto; padding-top: 8px; }
+#callsign-recording .sender-controls .actions{ min-height: 93px; height: 93px; justify-content: flex-start; }
+#callsign-recording .sender-controls .actions button{ flex: 0 0 42px; height: 42px; min-height: 42px; }
+#callsign-recording .sender-controls > p{ margin: 0px; min-height: 85px; display: flex; align-items: center; }
+}
+#callsign-recording.callpage .sender, #callsign-recording.callpage .phone, #callsign-recording.callpage .institution{ transition: filter 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.65s; will-change: filter, opacity; }
+#callsign-recording.callpage[data-attention="sender"] .phone, #callsign-recording.callpage[data-attention="sender"] .institution, #callsign-recording.callpage[data-attention="recipient"] .sender, #callsign-recording.callpage[data-attention="recipient"] .institution, #callsign-recording.callpage[data-attention="institution"] .sender, #callsign-recording.callpage[data-attention="institution"] .phone, #callsign-recording.callpage[data-attention="center"] .sender, #callsign-recording.callpage[data-attention="center"] .phone, #callsign-recording.callpage[data-attention="center"] .institution{ filter: blur(1.5px) saturate(0.78); opacity: 0.48; }
+#callsign-recording.callpage[data-attention="sender"] .sender, #callsign-recording.callpage[data-attention="recipient"] .phone, #callsign-recording.callpage[data-attention="institution"] .institution{ filter: none; opacity: 1; }
+@media (prefers-reduced-motion: reduce){
+#callsign-recording.callpage .sender, #callsign-recording.callpage .phone, #callsign-recording.callpage .institution{ filter: none !important; opacity: 1 !important; transition: none !important; }
+}
+#callsign-recording.callpage .sender, #callsign-recording.callpage .phone, #callsign-recording.callpage .institution{ transition: none; will-change: auto; filter: none !important; opacity: 1 !important; }
+#callsign-recording .attention-mask{ position: fixed; pointer-events: none; z-index: 4; opacity: 0; background: rgba(247, 248, 250, 0.58); backdrop-filter: blur(2.4px); transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1); }
+#callsign-recording[data-attention="sender"] .attention-mask:not([data-role="sender"]), #callsign-recording[data-attention="recipient"] .attention-mask:not([data-role="recipient"]), #callsign-recording[data-attention="institution"] .attention-mask:not([data-role="institution"]){ opacity: 1; }
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .attention-mask{ display: none !important; }
+}
+@media (min-width: 951px){
+#callsign-recording.callpage .sender, #callsign-recording.callpage .phone, #callsign-recording.callpage .institution{ transform: scale(1); transform-origin: center center; transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.9s; will-change: transform; }
+#callsign-recording.callpage[data-attention="sender"] .sender{ transform: scale(1.05); box-shadow: rgba(41, 69, 110, 0.07) 0px 12px 32px; }
+#callsign-recording.callpage[data-attention="recipient"] .phone{ transform: scale(1.04); }
+#callsign-recording.callpage[data-attention="institution"] .institution{ transform: scale(1.018); }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording.callpage .sender, #callsign-recording.callpage .phone, #callsign-recording.callpage .institution{ transform: none !important; transition: none !important; }
+}
+#callsign-recording .phone.iphone-incoming{ background: radial-gradient(at 25% 15%, rgb(89, 107, 101) 0%, rgb(53, 75, 67) 44%, rgb(29, 48, 41) 100%); color: rgb(255, 255, 255); overflow: hidden; }
+#callsign-recording .iphone-incoming .phonestatus{ color: rgb(246, 250, 247); }
+#callsign-recording .iphone-incoming .island{ background: rgb(16, 25, 20); }
+#callsign-recording .incoming-identity{ text-align: center; margin-top: 24px; }
+#callsign-recording .incoming-service{ font-size: 12px; color: rgb(211, 221, 215); letter-spacing: 0.2px; }
+#callsign-recording .incoming-identity h2{ font-size: 31px; font-weight: 500; letter-spacing: -1px; margin: 9px 0px 13px; color: white; }
+#callsign-recording .incoming-verified{ display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: rgb(229, 247, 233); background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(255, 255, 255, 0.125); border-radius: 20px; padding: 6px 10px; }
+#callsign-recording .incoming-verified span{ color: rgb(183, 234, 201); }
+#callsign-recording .phone .incoming-identity p{ font-size: 12px; color: rgb(208, 220, 212); margin-top: 12px; }
+#callsign-recording .incoming-avatar{ position: relative; width: 96px; height: 96px; margin: 34px auto 0px; display: grid; place-items: center; flex: 0 0 auto; }
+#callsign-recording .incoming-avatar > span{ position: relative; width: 80px; height: 80px; border-radius: 50%; background: rgba(255, 255, 255, 0.086); border: 1px solid rgba(255, 255, 255, 0.14); display: grid; place-items: center; z-index: 1; }
+#callsign-recording .incoming-avatar svg{ width: 37px; height: 37px; fill: none; stroke: rgb(234, 243, 237); stroke-width: 1.5; }
+#callsign-recording .incoming-avatar i{ position: absolute; inset: 0px; border: 1px solid rgba(220, 239, 227, 0.282); border-radius: 50%; animation: 2.8s ease-out 0s infinite normal none running recording_incomingWave; }
+#callsign-recording .incoming-avatar i:nth-child(2){ animation-delay: 1.4s; }
+#callsign-recording .incoming-caption{ text-align: center; color: rgb(205, 219, 210); font-size: 11px; margin-top: 19px; min-height: 18px; }
+#callsign-recording .incoming-actions{ display: flex; justify-content: space-between; margin-top: auto; padding: 35px 22px 0px; gap: 36px; }
+#callsign-recording .incoming-actions > div{ display: flex; flex-direction: column; align-items: center; gap: 10px; }
+#callsign-recording .incoming-actions button{ width: 64px; height: 64px; padding: 19px; border: 0px; display: grid; place-items: center; box-shadow: rgba(0, 0, 0, 0.07) 0px 5px 15px; border-radius: 50% !important; }
+#callsign-recording .incoming-actions svg{ width: 27px; height: 27px; fill: white; }
+#callsign-recording .incoming-actions .incoming-decline{ background: rgb(255, 69, 58); }
+#callsign-recording .incoming-actions .incoming-decline svg{ transform: rotate(135deg); }
+#callsign-recording .incoming-actions .incoming-accept{ background: rgb(48, 209, 88); }
+#callsign-recording .incoming-actions span{ font-size: 12px; color: white; }
+#callsign-recording .incoming-recipient{ text-align: center; font-size: 10px; color: rgb(175, 192, 181); margin-top: 21px; }
+#callsign-recording .iphone-incoming .homebar{ background: rgb(240, 245, 241); margin-top: 16px; }
+@keyframes recording_incomingWave{ 
+  0% { transform: scale(0.85); opacity: 0; }
+  15% { opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .incoming-avatar i{ animation: auto ease 0s 1 normal none running none; opacity: 0.25; }
+}
+#callsign-recording .phone.ios-call{ background: radial-gradient(at 25% 12%, rgb(89, 107, 101), rgb(53, 75, 67) 47%, rgb(29, 48, 41)); color: white; overflow: hidden; gap: 0px; }
+#callsign-recording .ios-call .phonestatus{ color: white; flex: 0 0 auto; }
+#callsign-recording .ios-call .island{ background: rgb(16, 25, 20); }
+#callsign-recording .ios-call .homebar{ background: rgb(240, 245, 241); margin-top: 15px; }
+#callsign-recording .ios-call-head{ text-align: center; padding: 13px 0px 14px; flex: 0 0 auto; }
+#callsign-recording .ios-call-head h2{ font-size: 26px; font-weight: 500; letter-spacing: -0.8px; margin: 5px 0px 9px; color: white; }
+#callsign-recording .ios-call-state{ font-size: 12px; color: rgb(214, 226, 219); font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+#callsign-recording .ios-approval{ display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: rgb(237, 244, 255); background: rgba(255, 255, 255, 0.08); padding: 5px 10px; border: 1px solid rgba(255, 255, 255, 0.133); border-radius: 20px; }
+#callsign-recording .ios-approval svg{ width: 16px; height: 16px; fill: rgb(76, 133, 250); stroke: white; stroke-width: 1.5; }
+#callsign-recording .ios-call-head p{ color: rgb(199, 215, 206); font-size: 10px; margin-top: 8px; }
+#callsign-recording .ios-sheet{ background: rgb(247, 249, 252); border: 1px solid rgba(255, 255, 255, 0.376); box-shadow: rgba(16, 44, 37, 0.125) 0px 8px 25px; border-radius: 20px; padding: 13px 14px; color: rgb(36, 52, 73); flex: 1 1 0%; min-height: 0px; overflow-y: auto; scrollbar-width: thin; }
+#callsign-recording .ios-sheet-brand{ display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 750; color: rgb(38, 92, 195); border-bottom: 1px solid rgb(226, 232, 239); padding-bottom: 9px; margin-bottom: 10px; }
+#callsign-recording .ios-sheet-brand span{ font-size: 9px; font-weight: 500; color: rgb(123, 135, 152); }
+#callsign-recording .ios-sheet .statusTitle{ font-size: 16px; color: rgb(37, 54, 77); margin: 0px 0px 9px; line-height: 1.4; }
+#callsign-recording .ios-sheet p{ font-size: 11px; line-height: 1.65; color: rgb(102, 116, 137); }
+#callsign-recording .ios-sheet .consent{ font-size: 10px; line-height: 1.65; background: rgb(237, 241, 247); color: rgb(98, 113, 132); border-radius: 10px; margin: 8px 0px; padding: 10px; }
+#callsign-recording .ios-sheet .actions{ margin-top: 10px; gap: 6px; }
+#callsign-recording .ios-sheet .actions button{ padding: 9px 10px; min-height: 35px; font-size: 11px; flex: 1 1 0%; border-radius: 10px; }
+#callsign-recording .ios-sheet .actions:empty{ display: none; }
+#callsign-recording .ios-sheet .work{ margin: 0px; padding: 10px; background: rgb(237, 241, 247); border-radius: 10px; }
+#callsign-recording .ios-sheet .work strong{ font-size: 14px !important; }
+#callsign-recording .phone .ios-sheet .alert{ padding: 12px; border-radius: 12px; margin: 0px !important; }
+#callsign-recording .ios-sheet .alert h3{ font-size: 17px; line-height: 1.45; }
+#callsign-recording .ios-sheet .alert p{ font-size: 11px; }
+#callsign-recording .ios-sheet .outline{ background: rgb(233, 238, 246); border-color: rgb(220, 227, 238); color: rgb(66, 96, 132); }
+#callsign-recording .ios-controls{ display: flex; justify-content: space-around; align-items: start; flex: 0 0 auto; padding: 17px 9px 0px; }
+#callsign-recording .ios-controls > div{ display: flex; align-items: center; flex-direction: column; gap: 7px; }
+#callsign-recording .ios-controls button{ width: 48px; height: 48px; border-radius: 50%; padding: 13px; background: rgba(255, 255, 255, 0.125); color: white; border: 0px; }
+#callsign-recording .ios-controls button[aria-pressed="true"]{ background: white; color: rgb(39, 64, 57); }
+#callsign-recording .ios-controls button:disabled{ opacity: 0.4; }
+#callsign-recording .ios-controls button.ios-hangup{ background: rgb(255, 69, 58); color: white; }
+#callsign-recording .ios-controls svg{ width: 23px; height: 23px; fill: none; stroke: currentcolor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+#callsign-recording .ios-controls .ios-hangup svg{ fill: white; stroke: none; transform: rotate(135deg); }
+#callsign-recording .ios-controls small{ font-size: 10px; color: rgb(225, 235, 229); }
+#callsign-recording .ios-status-icons{ display: flex; gap: 5px; align-items: flex-start; }
+#callsign-recording .ios-status-icons svg{ height: 11px; fill: currentcolor; width: auto; }
+#callsign-recording .phone.ios-call{ height: 570px !important; min-height: 570px !important; }
+#callsign-recording .ios-call .ios-call-head{ padding: 8px 0px; }
+#callsign-recording .ars-copy{ margin: 6px 0px; font-size: 11px !important; line-height: 1.55 !important; }
+#callsign-recording .ars-title{ font-size: 15px; color: rgb(37, 54, 77); margin: 0px 0px 4px; }
+#callsign-recording .ars-options{ display: flex; gap: 7px; margin: 7px 0px; font-size: 10px; color: rgb(83, 100, 123); }
+#callsign-recording .ars-options span{ flex: 1 1 0%; background: rgb(234, 240, 248); padding: 8px 3px; text-align: center; border-radius: 9px; }
+#callsign-recording .ars-options b{ display: inline; font-size: 13px; color: rgb(40, 95, 200); margin-right: 4px; }
+#callsign-recording .ars-audio{ display: flex; align-items: center; gap: 7px; font-size: 11px; color: rgb(40, 97, 203); min-height: 22px; }
+#callsign-recording .ars-audio i{ height: 12px; width: 3px; border-radius: 2px; background: rgb(59, 119, 235); animation: 0.9s ease-in-out 0s infinite alternate none running recording_arsWave; }
+#callsign-recording .ars-audio i:nth-child(2){ animation-delay: 0.2s; }
+#callsign-recording .ars-audio i:nth-child(3){ animation-delay: 0.4s; }
+#callsign-recording .ars-note{ margin-top: 8px; font-size: 9px !important; color: rgb(127, 139, 155) !important; }
+#callsign-recording .ars-small{ background: transparent; color: rgb(54, 104, 186); text-decoration: underline; font-size: 10px !important; padding: 6px !important; }
+#callsign-recording .ars-keyboard{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 20px; max-width: 215px; margin: 7px auto 0px; }
+#callsign-recording .ars-keyboard button{ width: 36px; height: 36px; margin: auto; border-radius: 50%; background: rgb(229, 235, 243); color: rgb(37, 54, 75); font-size: 21px; padding: 0px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.05; transition: background 0.15s, transform 0.15s; }
+#callsign-recording .ars-keyboard button small{ font-size: 7px; letter-spacing: 1px; margin-top: 2px; }
+#callsign-recording .ars-keyboard button.director-press, #callsign-recording .ars-keyboard button.ars-pressed{ transform: scale(0.92); background: rgb(40, 106, 250) !important; color: white !important; }
+#callsign-recording .ars-input{ text-align: center; height: 20px; color: rgb(44, 98, 199); font-size: 14px; font-weight: 650; }
+#callsign-recording .ars-key-hint{ text-align: center; font-size: 10px !important; margin: 0px !important; }
+#callsign-recording .ars-keyboard button:disabled{ opacity: 0.5; }
+@keyframes recording_arsWave{ 
+  100% { transform: scaleY(0.35); }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .ars-audio i{ animation: auto ease 0s 1 normal none running none; }
+}
+#callsign-recording .ios-call .ios-controls{ padding-left: 0px; padding-right: 0px; }
+#callsign-recording .ios-call .ios-controls button{ width: 44px; height: 44px; padding: 11px; }
+#callsign-recording .ios-call .ios-controls small{ font-size: 10px; }
+#callsign-recording .phone.ios-keypad-open > .ios-call-head, #callsign-recording .phone.ios-keypad-open > .ios-sheet, #callsign-recording .phone.ios-keypad-open > .ios-controls{ visibility: hidden; }
+#callsign-recording .ios-dial-screen{ position: absolute; inset: 57px 22px 34px; display: flex; flex-direction: column; align-items: stretch; color: white; animation: 0.22s ease-out 0s 1 normal none running recording_dialReveal; }
+#callsign-recording .ios-dial-name{ text-align: center; font-size: 14px; color: rgb(220, 231, 223); line-height: 22px; }
+#callsign-recording .ios-dial-screen .ars-input{ font-size: 31px; font-weight: 400; color: white; height: 54px; line-height: 48px; letter-spacing: 2px; margin-top: 3px; }
+#callsign-recording .ios-dial-screen .ars-key-hint{ color: rgb(191, 207, 197); font-size: 10px !important; margin: 0px 0px 14px !important; }
+#callsign-recording .ios-dial-screen .ars-keyboard{ display: grid; grid-template-columns: repeat(3, 60px); gap: 10px 23px; width: 226px; max-width: none; margin: 0px auto; }
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button{ width: 60px; height: 60px; border: 0px; border-radius: 50%; background: rgba(255, 255, 255, 0.125); color: white; font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-weight: 400; font-size: 31px; padding: 0px; box-shadow: rgba(255, 255, 255, 0.024) 0px 1px 0px inset; transition: background 0.14s, transform 0.14s; }
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button small{ font-family: inherit; font-size: 9px; font-weight: 600; letter-spacing: 1.5px; min-height: 10px; margin-top: 1px; color: inherit; }
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button[data-ars-digit="*"]{ font-size: 42px; padding-top: 10px; }
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button[data-ars-digit="#"]{ font-size: 32px; }
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button.director-press, #callsign-recording .phone .ios-dial-screen .ars-keyboard button.ars-pressed{ transform: scale(0.95); background: rgb(229, 238, 233) !important; color: rgb(38, 61, 49) !important; }
+#callsign-recording .ios-dial-footer{ position: relative; display: flex; justify-content: center; align-items: center; margin-top: auto; padding-top: 12px; min-height: 68px; }
+#callsign-recording .ios-dial-footer .ios-hangup{ width: 56px; height: 56px; border-radius: 50%; background: rgb(255, 69, 58); padding: 15px; }
+#callsign-recording .ios-dial-footer .ios-hangup svg{ width: 26px; height: 26px; fill: white; transform: rotate(135deg); }
+#callsign-recording .ios-dial-hide{ position: absolute; right: 0px; background: none; color: white; font-size: 13px; padding: 12px 0px; }
+#callsign-recording .ios-dial-status{ text-align: center; font-size: 11px; color: rgb(219, 231, 223); height: 19px; margin: 4px 0px 0px; }
+@keyframes recording_dialReveal{ 
+  0% { opacity: 0; transform: translateY(5px); }
+  100% { opacity: 1; transform: translateY(0px); }
+}
+@media (prefers-reduced-motion: reduce){
+#callsign-recording .ios-dial-screen{ animation: auto ease 0s 1 normal none running none; }
+}
+#callsign-recording .phone.ars-voice-only > .ios-sheet{ display: none; }
+#callsign-recording .phone.ars-voice-only .ios-call-head{ padding-top: 23px; }
+#callsign-recording .phone.ars-voice-only > .ios-controls{ margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); row-gap: 31px; padding: 0px 6px 16px; }
+#callsign-recording .phone.ars-voice-only > .ios-controls > div:last-child{ grid-area: 2 / 2; }
+#callsign-recording .phone.ars-voice-only > .ios-controls button{ width: 62px; height: 62px; padding: 18px; }
+#callsign-recording .phone.ars-voice-only > .ios-controls small{ font-size: 12px; margin-top: 2px; }
+#callsign-recording .phone.ars-voice-only > .ios-controls > div:last-child small{ visibility: hidden; height: 0px; margin: 0px; }
+#callsign-recording .phone.ars-voice-only > .homebar{ margin-top: 8px; }
+#callsign-recording .voice-recovery{ margin-top: auto; text-align: center; color: rgb(225, 235, 230); font-size: 11px; line-height: 1.6; padding: 12px 0px; }
+#callsign-recording .voice-recovery button{ font-size: 11px; padding: 8px; color: rgb(255, 255, 255); background: none; text-decoration: underline; }
+#callsign-recording .phone.ios-keypad-open .voice-recovery{ display: none; }
+#callsign-recording .phone.ios-call .ios-sheet{ background: transparent; border-width: 1px 0px 0px; border-style: solid none none; border-color: rgba(255, 255, 255, 0.14) currentcolor currentcolor; border-image: none; border-radius: 0px; box-shadow: none; padding: 17px 2px 8px; color: rgb(239, 246, 242); margin-top: 12px; }
+#callsign-recording .phone.ios-call .ios-sheet-brand{ color: rgb(220, 233, 225); border: 0px; padding: 0px; margin: 0px 0px 22px; font-size: 12px; font-weight: 600; }
+#callsign-recording .phone.ios-call .ios-sheet-brand span{ color: rgb(177, 198, 185); font-size: 10px; }
+#callsign-recording .phone.ios-call .ios-sheet .statusTitle, #callsign-recording .phone.ios-call .ios-sheet .ars-title{ color: rgb(241, 247, 243); font-size: 21px; line-height: 1.45; margin: 0px 0px 14px; }
+#callsign-recording .phone.ios-call .ios-sheet p{ font-size: 12px; line-height: 1.7; color: rgb(193, 208, 199) !important; }
+#callsign-recording .phone.ios-call .ios-sheet .work{ background: transparent; margin: 0px; padding: 20px 0px 22px; border: 0px; border-radius: 0px; }
+#callsign-recording .phone.ios-call .ios-sheet .work::before{ content: ""; display: block; width: 29px; height: 4px; background: rgb(189, 213, 200); box-shadow: rgba(189, 213, 200, 0.333) 0px -7px 0px, rgba(189, 213, 200, 0.333) 0px 7px 0px; border-radius: 4px; margin: 5px 0px 24px; }
+#callsign-recording .phone.ios-call .ios-sheet .work strong{ line-height: 1.5; color: rgb(240, 247, 243); font-weight: 600; font-size: 21px !important; }
+#callsign-recording .phone.ios-call .ios-sheet .work .label{ display: none; }
+#callsign-recording .phone.ios-call .ios-sheet .actions{ margin-top: 18px; }
+#callsign-recording .phone.ios-call .ios-sheet .outline{ background: rgba(255, 255, 255, 0.043); border: 1px solid rgba(255, 255, 255, 0.196); color: rgb(221, 234, 226); min-height: 39px; border-radius: 12px; font-weight: 500; }
+#callsign-recording .phone.ios-call .ios-sheet .primary{ background: rgb(220, 233, 225); color: rgb(36, 67, 53); }
+#callsign-recording .phone.ios-call .ios-sheet .alert{ background: rgb(89, 61, 54); border-radius: 16px; border: 1px solid rgba(255, 171, 135, 0.314) !important; padding: 17px !important; }
+#callsign-recording .phone.ios-call .ios-sheet .alert h3{ color: rgb(255, 209, 185); font-size: 21px; line-height: 1.45; }
+#callsign-recording .phone.ios-call .ios-sheet .alert p{ color: rgb(239, 212, 200) !important; border-color: rgba(255, 209, 185, 0.16) !important; }
+#callsign-recording .phone.ios-call .ios-sheet .consent{ background: rgba(255, 255, 255, 0.047); color: rgb(193, 208, 199); border: 1px solid rgba(255, 255, 255, 0.094); }
+#callsign-recording .phone.ios-call .ios-sheet .alert.error, #callsign-recording .phone.ios-call .ios-sheet .alert.amber{ background: rgb(71, 74, 64); border-color: rgba(213, 202, 163, 0.267) !important; }
+#callsign-recording .phone.ios-call .ios-sheet .alert.error h3, #callsign-recording .phone.ios-call .ios-sheet .alert.amber h3{ color: rgb(238, 228, 200); }
+#callsign-recording .phone .ios-dial-screen .ars-key-hint{ display: none !important; }
+#callsign-recording .phone .ios-dial-screen .ars-input{ height: 72px; line-height: 58px; }

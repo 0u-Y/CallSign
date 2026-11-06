@@ -3,13 +3,13 @@ import { Brand } from "./Brand.js";
 import { publicPreview } from "../config.js";
 
 export function Shell() {
-  const demo=useLocation().pathname.startsWith('/demo');
+  const path=useLocation().pathname;const demo=path.startsWith('/demo');
   return (
-    <div className={`app-shell${publicPreview ? " public-preview" : ""}${demo?" demo-shell":""}`}>
+    <div id={demo?'callsign-recording':undefined} className={`app-shell${publicPreview ? " public-preview" : ""}${demo?` demo-shell ${path==='/demo/call'?'callpage':path==='/demo/work'?'workpage':'govpage'}`:""}`}>
       <a className="skip-link" href="#main">본문으로 건너뛰기</a>
-      <header className="site-header">
+      <header className={demo?"site-header top":"site-header"}>
         <NavLink to="/" className="brand-link"><Brand compact={demo} recording={demo}/></NavLink>
-        <nav aria-label="주요 탐색"><NavLink to="/demo/work">업무 관리</NavLink><NavLink to="/demo/call">연락 검증</NavLink><NavLink to="/demo/governance">공동 관리</NavLink></nav>
+        <nav className={demo?"topnav":undefined} aria-label="주요 탐색"><NavLink to="/demo/work">업무 관리</NavLink><NavLink to="/demo/call">연락 검증</NavLink><NavLink to="/demo/governance">공동 관리</NavLink></nav>
       </header>
       {publicPreview && <aside className="public-preview-banner" aria-label="공개 배포 범위">
         <strong>프런트엔드 미리보기</strong><span>API 미연결 · 로그인과 실제 통화는 사용할 수 없습니다. <a href="https://github.com/0u-Y/CallSign/blob/main/docs/RUNBOOK.md">실제 서비스 배포 안내</a></span>

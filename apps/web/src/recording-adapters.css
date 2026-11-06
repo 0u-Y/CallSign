@@ -1,0 +1,78 @@
+/* Existing controller wrappers around the original v24 markup. */
+#callsign-recording #main{padding:0;max-width:none}
+#callsign-recording .demo-workspace.workspace{width:100%;padding:18px 40px 0;max-width:none}
+#callsign-recording .demo-heading.intro{margin-bottom:22px}
+#callsign-recording .demo-tools{top:17px}
+#callsign-recording .demo-scene-hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+#callsign-recording .demo-recording-call .demo-call-grid.stage{gap:30px;grid-template-columns:260px minmax(0,1fr) 334px;align-items:center}
+#callsign-recording .demo-recording-call .demo-institution.sender{padding:0;display:block;margin-top:20px}
+#callsign-recording .sender-brand h2{font-size:14px;margin:0}
+#callsign-recording .sender-person strong{font-size:21px}
+#callsign-recording .sender-meta{padding:0;border:0;margin:0 0 20px}
+#callsign-recording .sender-approval{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+#callsign-recording .demo-work-picker{font-size:11px;margin:12px 0}
+#callsign-recording .demo-work-picker[open]{max-height:160px;overflow:auto}
+#callsign-recording .demo-sender-actions{margin-top:auto}
+#callsign-recording .demo-live-evidence.evidence{padding:0;border:0;background:none;min-width:0}
+#callsign-recording .flow-surface{padding:0;border:0;background:none}
+#callsign-recording .flow-top strong,#callsign-recording .flow-copy>p,#callsign-recording .demo-flow-contract{display:none}
+#callsign-recording .demo-flow-copy h2{font-size:23px!important}
+#callsign-recording .flow-statuses{margin:0;display:grid}
+#callsign-recording .flow-statuses dt,#callsign-recording .flow-statuses dd{font-size:10px;font-weight:400;margin:0;color:var(--muted)}
+#callsign-recording .flow-statuses div{padding:0;border:0;background:none;display:block}
+#callsign-recording .flow-statuses dd{margin-top:6px}
+#callsign-recording .demo-flow-details{font-size:10px;text-align:center;margin-top:20px;color:var(--muted)}
+#callsign-recording .demo-current-source{font-size:10px;margin-top:16px}
+#callsign-recording .flow-packet{box-shadow:none;width:10px;height:10px;top:99px;left:auto}
+#callsign-recording .demo-recipient.phone{padding:22px 22px 16px}
+#callsign-recording .demo-phone-top{position:relative;flex:none;height:24px}
+#callsign-recording .demo-phone-island{position:absolute;left:50%;transform:translateX(-50%);top:0}
+#callsign-recording .demo-lock-clock{padding-top:30px}
+#callsign-recording .demo-lock-clock p{font-size:16px;color:#e2ece6}
+#callsign-recording .demo-lock-clock time{font-size:80px;font-weight:400;letter-spacing:-4px;color:#eff6f1}
+#callsign-recording .demo-lock-clock>span{font-size:11px}
+#callsign-recording .demo-phone-home{flex:none}
+#callsign-recording .demo-phone-connection{margin-top:18px}
+#callsign-recording .demo-director{z-index:30}
+@media(max-width:950px){#callsign-recording .demo-workspace.workspace{padding:18px 20px 0}#callsign-recording .demo-recording-call .demo-call-grid.stage{display:flex;flex-direction:column}#callsign-recording .demo-recording-call .demo-institution.sender{width:100%;height:auto;min-height:0;margin:0}#callsign-recording .demo-live-evidence{width:100%}}
+#callsign-recording .demo-scene-tabs button::before{content:none}
+#callsign-recording .demo-recipient.phone{height:570px;min-height:570px;width:334px;transform:scale(1)}
+#callsign-recording .demo-flow-copy h2{color:#273952;margin:0 0 8px;line-height:1.45}
+#callsign-recording .flow-node svg{border:0;padding:0;margin:0}
+#callsign-recording .scene-tabs button{font-size:12px;font-weight:400;min-height:36px}
+
+#callsign-recording .demo-recording-call .demo-live-evidence{opacity:1;filter:none}
+#callsign-recording .recording-recovery-grid.gov-redesign{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(440px,1.35fr);gap:24px}
+#callsign-recording .approval-panel>h2,#callsign-recording .recovery-panel>h2{font-size:19px;margin:0 0 14px}
+#callsign-recording .approval-count strong{font-size:32px}
+@media(max-width:800px){#callsign-recording .recording-recovery-grid.gov-redesign{grid-template-columns:1fr}}
+#callsign-recording .phone .ios-controls{display:grid;grid-template-columns:repeat(3,1fr);row-gap:20px;padding:0 6px 8px;margin-top:auto}
+#callsign-recording .phone .ios-controls>div:last-child{grid-column:2;grid-row:2}
+#callsign-recording .phone .ios-controls button{width:62px;height:62px;padding:18px;min-height:0}
+#callsign-recording .phone .ios-controls small{font-size:12px;margin-top:8px;color:#f0f5f1}
+#callsign-recording .phone .ios-controls>div:last-child small{visibility:hidden;height:0;margin:0}
+#callsign-recording .phone .consent-feedback{flex:none;margin:auto 0 16px;text-align:center;max-height:120px;overflow:auto}
+#callsign-recording .phone .consent-feedback p{color:#d6e2db}
+#callsign-recording .phone .consent-feedback button,#callsign-recording .phone .call-analysis,#callsign-recording .phone .call-withdraw{background:transparent;color:#d6e2db;font-size:10px;padding:5px;min-height:24px}
+#callsign-recording .phone .ios-call-head{padding:8px 0;flex:none}
+#callsign-recording .phone .ios-approval{color:#dce9e1}
+#callsign-recording .phone .ios-dial-screen{padding:42px 20px 14px}
+#callsign-recording .phone .ios-dial-screen .ars-keyboard{gap:12px 20px;margin:0 auto;max-width:250px}
+#callsign-recording .phone .ios-dial-screen .ars-keyboard button{min-height:0;line-height:1.05;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#callsign-recording .phone .ios-dial-screen .ars-input{height:52px;line-height:42px;font-size:28px}
+#callsign-recording .phone .ios-dial-screen>p{font-size:10px;color:#d6e2db;text-align:center;margin:0 0 8px}
+#callsign-recording .phone .ios-dial-footer{margin-top:12px}
+#callsign-recording .phone .ios-dial-footer .ios-hangup{min-height:0}
+#callsign-recording .phone .ios-dial-footer .ios-dial-hide{background:transparent;color:white}
+#callsign-recording .phone .ios-controls[hidden]{display:none}
+#callsign-recording .demo-live-bar{position:fixed;right:18px;bottom:18px;z-index:35;font-size:11px;padding:7px 10px;margin:0;gap:10px}
+#callsign-recording .demo-live-bar button{font-size:11px;min-height:30px;padding:6px 9px}
+#callsign-recording .flow-node::after{content:none}
+#callsign-recording .demo-live-bar{top:16px;bottom:auto;max-width:310px}
+@media(max-width:950px){#callsign-recording .demo-live-bar{top:12px;right:12px;max-width:150px}#callsign-recording .demo-live-bar>span{display:none}}
+#callsign-recording .phone .service-call-controls,#callsign-recording .phone .call-consent-keypad{display:contents}
+#callsign-recording .phone .ios-controls{position:static;left:auto;right:auto;bottom:auto;margin:0 0 6px}
+#callsign-recording .phone .consent-feedback{position:static;left:auto;right:auto;bottom:auto;margin:auto 0 14px}
+#callsign-recording .phone .ios-dial-screen{inset:42px 16px 16px;padding:12px 12px 8px}
+#callsign-recording .phone .ios-dial-screen .ars-keyboard{row-gap:8px}
+#callsign-recording .phone .ios-dial-screen .ars-input{height:42px;line-height:42px;min-height:42px}
