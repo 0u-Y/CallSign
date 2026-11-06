@@ -37,3 +37,20 @@ it('releases an uninvoked model reservation when shutdown wins its final authori
   expect(f.analyze).not.toHaveBeenCalled();expect(f.reserve).toHaveBeenCalledTimes(2);const llm=f.settle.mock.calls.filter(([id])=>String(id).startsWith('llm:'));expect(llm).toHaveLength(1);expect(llm[0]![1]).toBe(0);
  }finally{release.resolve();await f.close();}
 });
+
+it.each(['deliver','withdraw','overflow'] as const)('handles recorder chunks during a delayed authority check: %s',async mode=>{
+ const f=await fixture(),entered=deferred(),release=deferred(),push=vi.fn();
+ f.stream.mockImplementation(options=>({connect(){options.onReady?.();},push,stop(){}}));
+ f.socket.emit('message',Buffer.from(JSON.stringify({type:'consent',consent:true})),false);await vi.waitFor(()=>expect(f.stream).toHaveBeenCalledOnce());
+ const read=f.store.read;let hold=true;f.store.read=async id=>{if(hold){hold=false;entered.resolve();await release.promise;}return read(id);};
+ try{
+  f.socket.emit('message',Buffer.from([1]),true);await entered.promise;
+  f.socket.emit('message',Buffer.from([2]),true);
+  if(mode==='withdraw')f.socket.emit('message',Buffer.from(JSON.stringify({type:'stop',consent:false})),false);
+  if(mode==='overflow')for(let i=0;i<8;i++)f.socket.emit('message',Buffer.from([3]),true);
+  if(mode==='deliver')expect(f.socket.readyState).toBe(1);else expect(f.socket.readyState).toBe(3);
+  release.resolve();
+  if(mode==='deliver'){await vi.waitFor(()=>expect(push).toHaveBeenCalledTimes(2));expect(push.mock.calls.map(x=>[...x[0]])).toEqual([[1],[2]]);}
+  else{await f.close();expect(push).not.toHaveBeenCalled();}
+ }finally{release.resolve();await f.close();}
+});

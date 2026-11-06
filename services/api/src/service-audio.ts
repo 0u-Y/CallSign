@@ -34,9 +34,10 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
   });
   app.get('/v3/audio',{websocket:true},async(socket,request)=>{
     const revisions=new Map<string,number>();
+    const frames:Buffer[]=[];let queuedBytes=0,pumping=false;
     let processing=false;let stopped=false,stt:Pick<DeepgramStream,'connect'|'push'|'stop'>|undefined,analyzer:ServiceRevisionAnalyzer|undefined,unwatch:(()=>void)|undefined,sequence=0,started=false,reservation='',reserved=false,connectionReservation='',connectionReserved=false,providerStartedAt=0,firstAudioAt=0,firstRevisionMeasured=false;
     const send=(value:unknown)=>{if(!stopped&&socket.readyState===WebSocket.OPEN){if(socket.bufferedAmount>524288){stop();return;}socket.send(JSON.stringify(value));}};
-    const stop=()=>{if(stopped)return;stopped=true;stops.delete(stop);unwatch?.();stt?.stop();analyzer?.stop();socket.close(1000,'analysis stopped');if(reserved)void settle(reservation,providerStartedAt?Math.min(streamSeconds,Math.ceil((Date.now()-providerStartedAt)/1000)):0).catch(()=>{});if(connectionReserved)void settle(connectionReservation,providerStartedAt?1:0).catch(()=>{});};stops.add(stop);socket.on('close',stop);
+    const stop=()=>{if(stopped)return;stopped=true;frames.length=0;queuedBytes=0;stops.delete(stop);unwatch?.();stt?.stop();analyzer?.stop();socket.close(1000,'analysis stopped');if(reserved)void settle(reservation,providerStartedAt?Math.min(streamSeconds,Math.ceil((Date.now()-providerStartedAt)/1000)):0).catch(()=>{});if(connectionReserved)void settle(connectionReservation,providerStartedAt?1:0).catch(()=>{});};stops.add(stop);socket.on('close',stop);
     try{
       const actor=await actorFor(request),{attemptId}=z.object({attemptId:z.string().min(3).max(200)}).strict().parse(request.query);
       if(actor.role!=='recipient'||request.headers.origin!==options.origin)throw new Error('AUDIO_FORBIDDEN');
@@ -81,7 +82,16 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
             onRevision:revision=>{if(stopped||revision.streamId!==streamId||revision.revision<=(revisions.get(revision.segmentId)??0))return;revisions.set(revision.segmentId,revision.revision);void allowed().then(()=>{if(stopped||revisions.get(revision.segmentId)!==revision.revision)return;if(firstAudioAt&&!firstRevisionMeasured){measurements.observe('stt','success',performance.now()-firstAudioAt);firstRevisionMeasured=true;}return analyzer!.accept(revision).then(accepted=>{if(accepted&&!stopped&&revisions.get(revision.segmentId)===revision.revision)send({type:'revision',revision,contextRevision:analyzer!.contextRevision});});}).catch(()=>{send({type:'unavailable',code:'ANALYSIS_LIMIT'});stop();});},
             onUnavailable:code=>{if(stopped)return;if(firstAudioAt)measurements.observe('stt','failure',performance.now()-firstAudioAt);send({type:'unavailable',code});stop();}};stt=options.providers?options.providers.stream(streamOptions):new DeepgramStream(streamOptions);providerStartedAt=Date.now();stt.connect();
         }catch(error){send({type:'unavailable',code:error instanceof Error&&/^(ANALYSIS_SMOKE_BUDGET_|QUOTA_EXHAUSTED$)/.test(error.message)?'ANALYSIS_LIMIT':'AUDIO_REJECTED_OR_BACKPRESSURE'});stop();}finally{processing=false;}
-      };socket.on('message',(raw,binary)=>{void track(message(raw,binary));});
+      };socket.on('message',(raw,binary)=>{
+        if(stopped)return;
+        if(!binary){void track(message(raw,false));return;}
+        const frame=raw as Buffer;
+        if(!frame.length||frame.length>262144||frames.length>=8||queuedBytes+frame.length>524288){send({type:'unavailable',code:'AUDIO_REJECTED_OR_BACKPRESSURE'});stop();return;}
+        frames.push(frame);queuedBytes+=frame.length;
+        if(pumping)return;pumping=true;
+        // Serialize authority checks across recorder chunks; withdrawal bypasses and clears the bounded queue.
+        void track((async()=>{try{while(!stopped&&frames.length){const next=frames.shift()!;queuedBytes-=next.length;await message(next,true);}}finally{pumping=false;}})());
+      });
       send({type:'ready',source:'remote-only',persistence:'disabled',consentGeneration:generation});
     }catch(error){send({type:'unavailable',code:error instanceof Error&&error.message.startsWith('ANALYSIS_SMOKE_BUDGET_')?'ANALYSIS_LIMIT':'AUDIO_UNAUTHORIZED'});stop();}
   });

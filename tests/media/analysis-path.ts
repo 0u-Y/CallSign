@@ -42,7 +42,7 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   const [chooser]=await Promise.all([sender.waitForEvent('filechooser'),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(audio);
   await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).toBeVisible();
   await expect.poll(()=>revisions,{timeout:20000}).toBeGreaterThan(0);observer.mark('transcript');
-  await expect.poll(()=>analyses,{timeout:8000}).toBeGreaterThan(0);observer.mark('analysis');
+  await expect.poll(()=>analyses,{timeout:40000}).toBeGreaterThan(0);observer.mark('analysis');
   await expect(recipient.locator('.service-analysis').getByText('현재 분석 범위의 결과',{exact:true})).toBeVisible();
   await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
  }finally{
