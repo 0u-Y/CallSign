@@ -614,5 +614,63 @@
       "meaning": "Retained work sessions; expiry count is not current authorization proof"
     },
     "historicalPendingOne": "UNKNOWN: original job details unavailable; current zero does not retroactively resolve prior FAIL"
+  },
+  "publicRuntimeFollowup20261106": {
+    "productSource": "8ee3b1f3bbecf28bd515f5fbe752880ccd4ed0ed",
+    "runtimeConfigId": "sha256:2207f0c936f6c653c2ee9737f7e9c82b71fc099d72451f70640371fe0972f477",
+    "registryManifestDigest": null,
+    "runtimeReplacement": "9 owned app services; existing data and identity retained; API readiness 200; worker manually started after initial Anchor readiness race",
+    "case18": {
+      "status": "PASS",
+      "verified": [
+        "actual public OIDC sessions",
+        "real approval and consumption",
+        "two-way decoded relay audio",
+        "recording440Hz then microphone660Hz on remote track",
+        "route navigation preserves live call",
+        "normal end and PBX cleanup"
+      ],
+      "viewport": [
+        "1366x768",
+        "390x844"
+      ],
+      "visualReview": "recipient screenshot opened; fixed call bar overlap remains for UI followup"
+    },
+    "case19": {
+      "status": "FAIL",
+      "cancelExecuted": false,
+      "initialFailure": "recipient call-context network failure; exact network code not captured",
+      "terminalReason": "verification-unavailable",
+      "subsequentPbx": "No matching endpoint; SIP challenge rejected; root network cause unknown"
+    },
+    "case20": {
+      "status": "PASS",
+      "verified": [
+        "real decoded relay call",
+        "independently authenticated institution cancellation API 200",
+        "receiver terminal UI",
+        "both remote audio stopped",
+        "PBX absence via actual call-context cleanup"
+      ],
+      "networkObservation": "ERR_NETWORK_CHANGED observed during state/context reads; not proof of case19 cause"
+    },
+    "latestDbReadOnly": {
+      "attempts": 20,
+      "nonterminal": 0,
+      "cancelledWork": 1,
+      "receipts": 9,
+      "journal": 12,
+      "overduePending": 0,
+      "processingClaims": 0,
+      "reservedReservations": 0,
+      "scope": "point-in-time owned database; not historical pending1 resolution"
+    },
+    "limits": [
+      "server-hosted independent browser contexts over public route, not independent external networks",
+      "synthetic tones, no human microphone or real STT/LLM",
+      "cancel used real institution API; institution button interaction not covered",
+      "full stop and joint recovery still pending"
+    ],
+    "temporaryBrowserContainers": "removed by exact IDs; persistent services retained"
   }
 }

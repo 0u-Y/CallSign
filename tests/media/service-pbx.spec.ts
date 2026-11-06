@@ -25,7 +25,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   const sender=await contexts[0]!.newPage(),receiver=await contexts[1]!.newPage();
   for(const [role,page] of [['sender',sender],['recipient',receiver]] as const){
    page.on('console',message=>{if(message.type()==='warning'&&(message.text().startsWith('CallSign SIP negotiation failed')||message.text().startsWith('CallSign ICE diagnostic')||message.text().startsWith('CallSign call verification failed')))note({role,connectionDiagnostic:message.text()});});
-   page.on('requestfailed',request=>{const path=new URL(request.url()).pathname;if(path.startsWith('/api/'))note({role,path,requestFailed:true,aborted:request.failure()?.errorText==='net::ERR_ABORTED'});});
+   page.on('requestfailed',request=>{const path=new URL(request.url()).pathname;if(path.startsWith('/api/'))note({role,path,requestFailed:true,networkCode:/^net::ERR_[A-Z_]+$/.test(request.failure()?.errorText??'')?request.failure()?.errorText:'UNCLASSIFIED',aborted:request.failure()?.errorText==='net::ERR_ABORTED'});});
    page.on('response',response=>{const path=new URL(response.url()).pathname;if(path.startsWith('/api/')&&response.status()>=400)void response.json().then(body=>note({role,path,status:response.status(),code:/^[A-Z_]{3,80}$/.test(body?.error?.code??'')?body.error.code:'UNKNOWN'})).catch(()=>{});});
    page.on('websocket',socket=>{if(new URL(socket.url()).pathname!=='/pbx/ws')return;socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;try{const message=parseSip(frame.payload);note({role,sip:message.start.startsWith('SIP/2.0')?message.start.split(' ').slice(0,2).join(' '):message.start.split(' ')[0],hasRecordRoute:message.headers.has('record-route'),sdp:message.headers.get('content-type')?.[0]==='application/sdp'});}catch(error){note({role,parseError:error instanceof Error?error.message:'UNKNOWN'});}});socket.on('close',()=>note({role,sipSocketClosed:true}));});
   }
@@ -66,7 +66,16 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
 
   if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation);
   await testInfo.attach('two-way-decoded-audio',{body:JSON.stringify({sender:await observed(sender),recipient:await observed(receiver)}),contentType:'application/json'});
-  observation.mark(process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'termination-request':'revocation-request');await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
+  observation.mark(process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'termination-request':'revocation-request');
+  if(process.env.CALLSIGN_TRIAL_MODE==='work-cancel'){
+   const state=process.env.CALLSIGN_MEDIA_INSTITUTION_STORAGE;if(!state)throw Error('INDEPENDENT_INSTITUTION_SESSION_REQUIRED');
+   const institution=await playwright.request.newContext({storageState:state});
+   try{
+    const me=await institution.get(`${origin}/api/v3/auth/me?purpose=work`);expect(me.ok()).toBe(true);const auth=await me.json();
+    const workspace=await institution.get(`${origin}/api/v3/workspace`);expect(workspace.ok()).toBe(true);expect((await workspace.json()).actor.role).toBe('institution');
+    const cancelled=await institution.post(`${origin}/api/v3/cancel`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:{intentId}});expect(cancelled.ok()).toBe(true);note({workCancellation:'actual-independent-institution-api',status:cancelled.status()});
+   }finally{await institution.dispose();}
+  }else await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
   await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.connectionState==='closed'&&pc.getSenders().every(s=>!s.track||s.track.readyState==='ended')))).toBe(true);
   for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const)await expect.poll(async()=>(await decoded(page,remoteHz,ownHz)).remote).toBeLessThan(.003);observation.mark('audio-reclaimed');if(finishAnalysis)await finishAnalysis();outcome='success';
   // Default mode grants no consent; fixture mode never contacts a paid provider.
