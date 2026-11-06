@@ -169,3 +169,9 @@
 #callsign-recording .phone .ios-dial-screen .ars-keyboard{row-gap:8px}
 
 #callsign-recording.recording .demo-heading,#callsign-recording.recording .demo-tools,#callsign-recording.recording .demo-director{display:none}
+@media(max-width:720px){
+ #callsign-recording .work-list-heading{position:static;padding:12px 16px;margin:0;gap:8px}
+ #callsign-recording .work-list-heading .button{flex:1;min-width:120px;min-height:38px;padding:8px;font-size:12px}
+ #callsign-recording .work-pagination{gap:8px;padding:12px 16px}
+ #callsign-recording .work-pagination label{font-size:12px}
+}
