@@ -32,3 +32,15 @@ export async function speechProviderConfiguration(env:NodeJS.ProcessEnv=process.
  if(model&&(!/^[-A-Za-z0-9_.:]{1,120}$/.test(model)||/^sk-/i.test(model)||model===apiKey))throw new Error('ANALYSIS_MODEL_INVALID');
  return {stt:{apiKey:await providerCredential(env,'DEEPGRAM_API_KEY'),model:env.DEEPGRAM_MODEL},llm:apiKey&&model&&provider!=='disabled'?{provider:provider as 'openai'|'anthropic',apiKey,model}:undefined};
 }
+
+// One durable approval scope across institutions, streams, failures and issuer restarts.
+export function openAICostBudget(env:NodeJS.ProcessEnv=process.env){
+ if(!env.CALLSIGN_OPENAI_COST_BUDGET)return undefined;
+ try{return z.object({id:z.string().regex(/^[A-Za-z0-9_-]{3,80}$/),maxMicroUsd:z.number().int().positive().max(1000000),expiresAt:z.number().int().positive(),model:z.literal('gpt-5.4-mini-2026-03-17')}).strict().parse(JSON.parse(env.CALLSIGN_OPENAI_COST_BUDGET));}catch{throw Error('OPENAI_COST_BUDGET_INVALID');}
+}
+// Standard text rates verified 2026-11-06: https://developers.openai.com/api/docs/models/gpt-5.4-mini
+// Reserve uncached pricing for all input; no tools, regional processing or priority tier are requested.
+export function openAIMicroUsd(inputTokens:number,outputTokens:number){
+ if(!Number.isSafeInteger(inputTokens)||inputTokens<0||!Number.isSafeInteger(outputTokens)||outputTokens<0)throw Error('OPENAI_USAGE_INVALID');
+ return Math.ceil(inputTokens*0.75+outputTokens*4.5);
+}

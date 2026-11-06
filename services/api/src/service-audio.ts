@@ -10,7 +10,7 @@ import { ServiceAuthority } from './service-authority.js';
 import { SessionConnections } from './session-connections.js';
 import type {RiskUnit} from './risk-assessment.js';
 import { DeepgramStream } from './transcription.js';
-import {analysisSmokeBudget,speechProviderConfiguration} from './provider-configuration.js';
+import {analysisSmokeBudget,speechProviderConfiguration,openAICostBudget,openAIMicroUsd} from './provider-configuration.js';
 import { ServiceRevisionAnalyzer, analyzeRiskWithProvider, assertAnalysisPolicy, purposeAuthorityCurrent } from './service-analysis.js';
 
 export interface AudioProviders {
@@ -19,6 +19,7 @@ export interface AudioProviders {
 }
 export async function registerServiceAudio(app:FastifyInstance,options:{authority:ServiceAuthority;actorFor(r:FastifyRequest):Promise<Actor>;sessionId(r:FastifyRequest):Promise<string>;connections:SessionConnections;origin:string;quota:QuotaStore;providers?:AudioProviders}){
  const configuration=options.providers?undefined:await speechProviderConfiguration();
+ const costBudget=openAICostBudget();
  const budget=analysisSmokeBudget(),streamSeconds=budget?.sttSeconds??300;
  const budgetScopes=(unit:string,limit:number)=>budget?[{key:`provider-smoke:${budget.id}:${unit}`,limit}]:[];
  const assertBudget=()=>{if(budget&&a.now()>=budget.expiresAt)throw new Error('ANALYSIS_SMOKE_BUDGET_EXPIRED');};
@@ -67,7 +68,7 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
             let cancel:(()=>void)|undefined,invoked=false;const requestStarted=performance.now();
             try{assertBudget();if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
               const cancelled=new Promise<never>((_,reject)=>{cancel=()=>reject(new Error('ANALYSIS_CANCELLED'));signal.addEventListener('abort',cancel,{once:true});});
-              invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(units,policy,signal):analyzeRiskWithProvider(configuration!.llm!,{units,policy,signal}),cancelled]));
+              invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(units,policy,signal):analyzeRiskWithProvider(configuration!.llm!,{units,policy,signal,...(costBudget?{billing:{reserve:async(inputBound:number,outputBound:number)=>{if(configuration!.llm!.provider!=='openai'||configuration!.llm!.model!==costBudget.model||a.now()>=costBudget.expiresAt)throw Error('OPENAI_COST_BUDGET_INVALID');const costId=`openai-cost:${streamId}:${requests}`,reserved=openAIMicroUsd(inputBound,outputBound);await options.quota.reserve(costId,actor.institutionId,'openai-micro-usd',reserved,[{key:`openai-cost:${costBudget.id}`,limit:costBudget.maxMicroUsd}],costBudget.expiresAt);return async(usage:import('./openai-analysis.js').OpenAIUsage)=>{await settle(costId,openAIMicroUsd(usage.input_tokens,usage.output_tokens));process.stderr.write(JSON.stringify({code:'OPENAI_USAGE',requestId:costId,inputTokens:usage.input_tokens,outputTokens:usage.output_tokens,microUsd:openAIMicroUsd(usage.input_tokens,usage.output_tokens)})+'\n');};}}}:{})}),cancelled]));
             }catch(error){
               const reason=signal.aborted?'CANCELLED':error instanceof Error&&/^LLM_(?:PROVIDER_HTTP_[45][0-9]{2}|EVIDENCE_INVALID|RESPONSE_TOO_LARGE|RESPONSE_JSON_INVALID|ANALYSIS_JSON_INVALID|INPUT_TOO_LARGE|CANCELLED|UNAVAILABLE)$/.test(error.message)?error.message:error instanceof Error&&error.name==='TimeoutError'?'TIMEOUT':error instanceof Error&&error.name==='ZodError'?'RESPONSE_SCHEMA_INVALID':'UNCLASSIFIED';
               // The normal entrypoint disables request logging; emit only these allowlisted diagnostics.

@@ -16,9 +16,9 @@ const serviceAnalysisFormat='Return JSON only: {"signals":[{"category":"송금 �
 export async function analyzeServiceWithAnthropic(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{return checkedServiceAnalysis(await requestAnthropic(input,serviceAnalysisFormat),input.text);}
 export async function analyzeServiceWithOpenAI(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{return checkedServiceAnalysis(await requestOpenAI(input,serviceAnalysisFormat),input.text);}
 export function analyzeServiceWithProvider(config:{provider:'openai'|'anthropic';apiKey:string;model:string},input:Omit<Parameters<typeof requestAnthropic>[0],'apiKey'|'model'>){return (config.provider==='openai'?analyzeServiceWithOpenAI:analyzeServiceWithAnthropic)({...input,apiKey:config.apiKey,model:config.model});}
-export async function analyzeRiskWithProvider(config:{provider:'openai'|'anthropic';apiKey:string;model:string},input:{units:RiskUnit[];policy:PurposePolicy;signal:AbortSignal}){
+export async function analyzeRiskWithProvider(config:{provider:'openai'|'anthropic';apiKey:string;model:string},input:{units:RiskUnit[];policy:PurposePolicy;signal:AbortSignal;billing?:import('./openai-analysis.js').OpenAIBilling}){
  const request={text:input.units.map(u=>u.text).join(''),policy:input.policy,signal:input.signal,apiKey:config.apiKey,model:config.model};
- const raw=config.provider==='openai'?await requestOpenAI(request,RISK_SYSTEM_PROMPT,input.units):await requestAnthropic(request,RISK_SYSTEM_PROMPT,input.units);
+ const raw=config.provider==='openai'?await requestOpenAI({...request,...(input.billing?{billing:input.billing}:{})},RISK_SYSTEM_PROMPT,input.units):await requestAnthropic(request,RISK_SYSTEM_PROMPT,input.units);
  try{return JSON.parse(raw) as unknown;}catch{throw Error('LLM_ANALYSIS_JSON_INVALID');}
 }
 export type RiskAnalyzerProvider={scope:'risk-2';analyze?:(units:RiskUnit[],policy:PurposePolicy,signal:AbortSignal)=>Promise<unknown>};
