@@ -6,7 +6,7 @@ export function nextAnalysis(previous:ServiceAnalysisEvent|undefined,value:unkno
  return event;
 }
 export function ServiceAnalysisPanel({event,compact=false}:{event?:ServiceAnalysisEvent|undefined;compact?:boolean}){
- if(compact&&!event)return <p className="analysis-before" role="status">아직 분석 전 · 통화 안전 판정이 아닙니다.</p>;
+ if(compact&&!event)return <p className="analysis-before" role="status">아직 분석 전입니다. 동의와 제공자 상태를 확인하세요.</p>;
  const state=!event?'아직 분석 전입니다. 동의와 제공자 상태를 확인하세요.':event.status==='withdrawn'?'분석 철회 또는 종료':event.status==='partial'||event.status==='analyzing'?'분석 중':event.status==='unavailable'?'분석 실패 또는 제공자 미설정 · 아래 규칙 결과와 구분하세요.':'분석 완료';
  const current=event?.analyzerVersion==='risk-context-2'?event:undefined;
  const assessment=(a:NonNullable<typeof current>['assessments'][number])=><article key={a.source+a.code}><strong>{({OTP:'인증 비밀 요구',TRANSFER:'자금 이체 요구',REMOTE_CONTROL:'원격제어 요구',SECRECY:'독립 확인 차단'} as const)[a.code]}</strong> · {a.source==='rules'?'규칙':'AI'} · {a.result==='detected'?'요구 탐지':a.result==='not-detected'?'현재 분석 구간에서 미탐지':'판단 불가'}
