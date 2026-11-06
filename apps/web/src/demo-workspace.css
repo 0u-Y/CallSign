@@ -136,11 +136,11 @@
 .demo-phone-live:has(.call-dial-screen) .service-call-controls>.call-speaker{visibility:hidden}
 
 .phone-media-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 16px}
-.demo-workspace .phone-media-buttons .button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:0;border-radius:22px;min-height:82px;padding:12px 4px;background:#ffffff18;color:inherit;font-size:12px}
-.phone-media-buttons svg{width:24px;height:24px}.demo-workspace .phone-media-buttons [aria-pressed=true]{background:#fff;color:#263e34}
+.demo-workspace .phone-media-buttons .button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;min-height:88px;padding:4px;background:transparent;color:inherit;font-size:12px}
+.phone-media-buttons svg{width:24px;height:24px}.demo-workspace .phone-media-buttons [aria-pressed=true] .phone-control-icon{background:#fff;color:#263e34}
 .demo-workspace .phone-media-buttons .button:disabled{opacity:.45}.phone-media-buttons .button:focus-visible,.call-consent-keypad>.button:focus-visible{outline:3px solid #91baff;outline-offset:3px}
 .output-support-note{display:block;font-size:11px;line-height:1.5;opacity:.8;text-align:center}
-.demo-workspace .call-consent-keypad>.phone-end{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;width:100%;margin:20px 0 12px;border:0;font-weight:700}
+.demo-workspace .call-consent-keypad>.phone-end,.demo-workspace .call-dial-screen>.service-end{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:88px;width:88px;margin:16px auto 12px;padding:4px;border:0;border-radius:12px;background:transparent;color:#fff;font-weight:700}
 .call-consent-keypad>.call-analysis{width:100%;min-height:44px}.demo-phone-live .call-consent-keypad>.secondary{color:#fff;background:#ffffff16;border-color:#ffffff40}
 .call-dial-screen>.secondary{min-height:44px}.call-dial-screen>.service-end{min-height:52px}.call-dial-screen>.service-end svg{width:20px;height:20px;margin-right:8px}
 .demo-workspace .demo-phone-live .service-analysis{color:#203047}
@@ -194,3 +194,18 @@
 .demo-workspace .demo-heading h1{font-size:24px}.demo-workspace .demo-heading{margin-bottom:12px}.demo-workspace .demo-heading p{margin-bottom:8px}
 .demo-workspace .demo-scene-hint{min-height:0;font-size:12px!important;margin-bottom:18px}
 .demo-workspace .demo-phone-waiting .analysis-before{color:#edf4f0;font-size:12px}
+
+/* v24 handset controls keep their labels outside the actual circular control surface. */
+.phone-control-icon{display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background:#ffffff20;flex-shrink:0}
+.demo-workspace .phone-end .phone-control-icon,.demo-workspace .call-dial-screen>.service-end .phone-control-icon{background:#ff453a;color:white}
+.demo-workspace .phone-end svg,.demo-workspace .call-dial-screen>.service-end svg{width:26px;height:26px;margin:0;transform:rotate(135deg)}
+.phone-media-buttons .button:not(:disabled):hover .phone-control-icon{background:#ffffff35}
+.phone-media-buttons .button[aria-pressed=true]:hover .phone-control-icon{background:#fff}
+.call-keypad-digit{display:block;min-height:48px;text-align:center;font-size:30px;line-height:1.6;color:white}
+
+.demo-phone-live .call-dial-screen{display:flex;flex-direction:column;align-items:stretch;padding:12px 16px}
+.call-dial-screen .call-keypad-grid{width:100%;max-width:210px;gap:8px;margin:8px auto}
+.call-dial-screen .call-keypad-digit{min-height:40px;font-size:26px}
+.call-dial-screen>p{margin:4px 0;text-align:center;font-size:12px}
+.demo-workspace .call-dial-screen>.secondary{background:transparent;color:#edf4f0;border:1px solid #ffffff40;min-height:44px;padding:8px}
+.demo-workspace .call-dial-screen>.service-end{margin:6px auto;min-height:80px}
