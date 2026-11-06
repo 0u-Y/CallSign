@@ -22,9 +22,9 @@ it('keeps the compact empty analysis honest and its authenticated official actio
  expect(html).toContain('아직 분석 결과 없음');expect(html).toContain('href="/official"');expect(html).toContain('민감한 요구는 수행하지 말고');
  expect(html).not.toContain('안전한 통화');
 });
-it('puts actual verification and recipient controls before supporting analysis without changing role scope',()=>{
+it('keeps actual verification and analysis central and recipient controls in the phone',()=>{
  const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(DemoWorkspace,{role:'recipient',roleName:'수신자',account:null,notice:null,queue:null,contact:null,verification:createElement('div',{'data-check':'verification'}),controls:createElement('button',{'data-check':'phone-controls'},'통화 종료'),analysis:createElement('section',{'data-check':'analysis'}),operations:null,notifications:null,audio:null,governance:false,connected:true,connection:'검증된 실제 상태',end:()=>{},canObserve:false,identity:'scoped-work',stale:false})));
  expect(html.indexOf('data-check="verification"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));
- expect(html.indexOf('data-check="phone-controls"')).toBeLessThan(html.indexOf('data-check="analysis"'));
+ expect(html.indexOf('data-check="analysis"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));
  expect(html).toContain('현재 역할의 조회 범위');expect(html).toContain('진행 통화 종료');
 });
