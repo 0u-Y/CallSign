@@ -78,7 +78,7 @@ UI만 격리 검증할 때는 설치된 의존성으로 웹을 build한 뒤 `CAL
 
 배포 Compose의 서비스/volume에는 `org.callsign.lifecycle=persistent`와 고유 `org.callsign.deployment-id`를 붙인다. 시험은 별도 run ID/DB/키이며 full runner의 ephemeral label 또는 HTTP의 callsign.test marker를 사용한다. 시험 도구는 persistent label을 거절한다. 실제 운영 중인 환경을 ownership.json에 넣어 시험 cleanup을 적용하지 않는다.
 
-현재 `callsign-demo-live`/`callsign-live-20261105`의 일반 서비스는21개이며 영속 DB·chain·Anchor·IdP를 유지한다. issuer만 독립 갱신했다면 `CALLSIGN_APP_IMAGE`는 나머지 앱의 기존 고정값을 유지하고 `CALLSIGN_ISSUER_IMAGE`에 검토한 issuer 이미지 고정값을 설정한다. Compose와 기존 컨테이너 재시작 검사는 같은 선택 규칙을 사용하며 다른 서비스의 이미지 불일치를 허용하지 않는다. 종료된 `oidc-init`·migration·browser helper는 일반 재시작 대상이 아니다. 현재 감시의 만료는 **2026-11-07 08:37 KST**다. 기존 monitor PID/start·최근 표본·monotonic 만료를 확인하며 새 monitor를 띄워 승인 기간을 연장하지 않는다.
+현재 `callsign-demo-live`/`callsign-live-20261105`의 일반 서비스는21개이며 영속 DB·chain·Anchor·IdP를 유지한다. issuer만 독립 갱신했다면 `CALLSIGN_APP_IMAGE`는 나머지 앱의 기존 고정값을 유지하고 `CALLSIGN_ISSUER_IMAGE`에 검토한 issuer 이미지 고정값을 설정한다. Compose와 기존 컨테이너 재시작 검사는 같은 선택 규칙을 사용하며 다른 서비스의 이미지 불일치를 허용하지 않는다. 종료된 `oidc-init`·migration·browser helper는 일반 재시작 대상이 아니다. 현재 승인된 갱신의 만료는 **2026-11-07 22:03:42 KST**다. 이전 monitor의 중단 기록과 review를 보존한 뒤 기존 컨테이너로 재개했다. 현재 경로는 `.local/current-persistent-resume.path`를 따른다. PID/start·최근 표본·monotonic 만료를 확인하고 승인 없이 추가 연장하지 않는다.
 
 저장소 루트에서 다음 보호 참조를 사용한다. env 내용이나 비밀번호를 출력하지 않는다.
 
@@ -1072,3 +1072,14 @@ Refined UI 후속 반영(2026-11-06): runtime 소스 `e267dbf`, config ID `sha25
 - finally에서 철회·송출 정리·통화 종료, 전용 provider overlay 제거/`CALLSIGN_PROVIDER_CONFIG=none` 복귀와 issuer readiness, 활성통화/예약·trial 정리를 확인한다. 운영 만료는 변경하지 않는다. 늦은 결과가 실제 발생하지 않으면 오프라인 회귀만 확인한 것으로 남긴다. Deepgram Usage Logs의 opt-out 확인은 권한이 있을 때만 하며403은 미확인이다.
 
 촬영은 기관/상담원/수신자를 독립 브라우저 프로필의 창으로 배치한다. 기관 업무 생성·배정 → 상담원 선택 업무의 연락 준비/전화 걸기 → 수신자 수락. 정상 연락과 기관 UI 취소(영향 확인 후 취소)는 case32 실제 검증, 녹음 송출/마이크 복귀는 과거 case18 범위다. 위험 요구·목적 이탈의 실제 완료 화면 촬영은 위 승인 시험 결과 전에는 미확인이다. 시험 후 OFF이므로 이후 실제 AI 촬영도 별도의 유한 예산과 활성화가 필요하다.
+
+### Filming handoff — 2026-11-06 evening
+
+Use independent institution, gateway and recipient browser profiles. Credentials remain in the protected `oidc-persistent-inputs/login-credentials.protected.json`; never publish them. Open `/demo/work` for institution and `/demo/call` for the other actors. Scene selectors explain the recording; they do not execute commands.
+
+1. Normal contact: institution `업무 만들기` and assignment → gateway selects that work and prepares contact → recipient accepts → confirm audio → `통화 종료`.
+2. Risk: in a connected call, recipient explicitly consents to analysis; send the approved synthetic audio through the call and inspect the actual transcript, OTP evidence and explanation.
+3. Withdrawal: recipient withdraws analysis consent; analysis input stops while the call remains available. End the call separately.
+4. Work cancellation: institution selects the exact active work and confirms cancellation; wait for actual authority/media termination rather than treating request acceptance as completion.
+
+Filming providers are ON under quantity ID `public-risk-filming-20261106-goal`:180STT seconds,3connections,12LLM requests, expiry2026-11-07 22:02:42KST. The existing OpenAI USD1 cost ID is not reset; pending reservations remain charged against availability. The limits are local controls, not a supplier invoice guarantee. Budget/expiry ends analysis availability; do not substitute synthetic results. Current usage and execution evidence are in [the current state table](guide/05-IMPLEMENTATION-STATUS.md). The service expiry is one minute later. Stop/restart commands above preserve data; do not restart after a safety stop without its review and authorization.

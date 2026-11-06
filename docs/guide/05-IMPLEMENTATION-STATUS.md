@@ -1,6 +1,21 @@
 # 05. 구현 및 검증 현황
 
-최신 분석 후속: Vercel `e013780` / issuer `d5c959c`의 case41에서 실제 전사→OpenAI 위험 근거·설명 표시→동의 철회→통화 종료를 통과했다. 제공자는 시험 후 OFF이며 외부 단말은 미검증이다. [현재 실행·예산 근거](../FINALS-IMPLEMENTATION-PLAN.md#2026-11-06-2047-kst--actual-analysis-completion-and-withdrawal-passed)를 따른다. 아래 17~18시 기록은 당시 결과다.
+## Current filming state — 2026-11-06 22:15 KST
+
+Frontend product `f104759` is deployed in Vercel Production (`publicPreview=false`); CI run42221342135 succeeded. Issuer product `d5c959c` remains pinned independently. The following replaces earlier current-state claims; historical failures below remain evidence of their original executions.
+
+| Requirement | Actual evidence | Remaining boundary |
+|---|---|---|
+| v18 UI | Original v18 SHA256 `1e4deaf666cbb395bca032d0c658f6e29947ac545dfbe1674faf60877a3f2c10`; product components, fixture states and authenticated1440/390px captures | Independent actor profiles, no mock authority; external devices deferred |
+| A: normal call | case46: new work/approval/acceptance, two-way decoded TURN relay audio, page continuity, normal end, both audio stopped and PBX absent | Server-host browsers with synthetic audio, not a general SLA |
+| B: actual analysis | case48: remote audio → Deepgram → OpenAI completed OTP evidence/explanation → recipient UI → withdrawal → call remains live → normal end | Actual late response after withdrawal not observed; offline rejection regression separate; not model-quality certification |
+| C: institution UI cancel | case47: exact work selected/cancelled in UI, authority blocked, both audio stopped, PBX absent, new attempt409 | Latest lease checks included; no unnecessary governance replay |
+| Persistent operation | Existing21 services renewed without NEW; platform/issuer/sender readiness200, fresh OIDC sessions and workspace reads for3roles | Ends **2026-11-07 22:03:42 KST**; original stop/review preserved, pressure guards unchanged |
+| Filming analysis | **ON** `deepgram-openai`;180STT seconds,3connections,12LLM requests; expires **2026-11-07 22:02:42 KST** | Shared OpenAI USD1 ID unchanged; activation snapshot used$0.025929, reserved$0.019879, remaining$0.954192; estimates, not invoices |
+
+Evidence: protected previous resume `resume-20261106T1705/public-call-smoke-{46-recording-goal,47-recording-goal,48-analysis-completion}`; current resume pointer `.local/current-persistent-resume.path`, renewal/filming receipts; `.local/v18-review/final-authenticated-settled/`. Recordings/transcripts/credentials remain local. See [operator commands](../RUNBOOK.md#소유-자원과-운영-명령). Network-change root cause remains undetermined despite successful subsequent calls.
+
+## Historical snapshots before the final filming run
 
 확인일 **2026-11-06(KST)** · Recording UI 제품 frontend **`db32c55`**, 실행 issuer 제품 소스 **`1ac1c0d`**, 나머지 runtime 제품 소스 **`e267dbf`**. 사용자 승인에 따라 17:05 새 감시를 만들고 기존 persistent21개를 재개했다. 원본 case30 stop/latch·DB·체인·realm·계정·키는 보존하며 만료는 **2026-11-07 08:37 KST** 그대로다. 공개 metadata `publicPreview=false`, 실제 역할별 로그인·업무 조회·화면 검증을 확인했다. **case31은 업무 생성 전 진입 실패로 보존했다. 별도 추가1회 승인 case32에서 실제 새 업무→승인→양방향 합성 음원 디코딩→페이지 이동→기관 UI 취소→양측 음성 중단·PBX 부재·재발신409를 통과했다. 실제 AI는 OFF이며 외부 단말과 완료 분석 표시까지 전체 검증된 것은 아니다.** 같은 조건의 별도 GET-only 진단은 로그인·업무 화면 성공이지만 최초 실패 원인을 확정하지 못했다. [현재 근거](../../artifacts/demo-ui-20261106/recording/result.json).
 
@@ -14,7 +29,7 @@
 
 2026-11-06 위험 요구 전용 후속: 사용자 핵심 요구와 실제 코드 기준으로 `callsign-risk-2` 프롬프트·근거/정정 계약·서버·수신자 표시·평가 준비를 구현했다. 목적 이탈 LLM 판정은 제외하지만 기관 권한/목적 검증은 유지한다. 코드/오프라인 검사와 runtime 반영·실제 모델 결과는 별개이며, 이번 수정의 실호출/인증 브라우저 확인은 미실행이다. [구현·검증 경계](../FINALS-IMPLEMENTATION-PLAN.md#2026-11-06-risk-only-grounded-analysis-offline-implementation)를 따른다.
 
-## 현재 작업표
+## Historical implementation table
 
 | 영역·요구 ID | 구현과 저장된 실행 근거 | 남은 확인 |
 |---|---|---|
