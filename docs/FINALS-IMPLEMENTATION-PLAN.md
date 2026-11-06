@@ -4,6 +4,14 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 분석 완료 표시 준비 (실행 승인 대기)
+
+17:59 KST 읽기 전용 확인: API readiness 3개 200, 감시 fresh/stop 없음, 소유 관측 약4.73GiB, 제공자 `none`, 기존 만료11월7일08:37 유지. case32 `ea423456`와 frontend 제품 `db32c555`의 diff는 문서/화면 증거뿐이며 제품 파일 변경은 없다. 연속 전사 coalescing 수정 `547290b`·`7c5a839`는 실행 runtime `e267dbf`에 포함된다. 과거 분석 실패와 case31/ERR_NETWORK_CHANGED의 근본 원인은 계속 미확정이다.
+
+이번에는 완료된 분석 뒤 다른 segment의 partial이 같은 확정 문맥의 목적 결과를 `undetermined/partial`로 지우는 결함을 오프라인에서 재현했다. 확정 문맥이 그대로인 partial은 분석 이벤트를 덮지 않으며 전사 이벤트는 계속 보낸다. 새 final/정정/만료/철회는 기존대로 무효화한다. 신규 회귀 수정 전 FAIL·수정 후 PASS. 관련 분석/provider/controller/전사/파일송출 단위51건 및 API/light 타입·소스 검사 통과. 실제 runtime 반영과 유료 재검증은 아직 하지 않았다.
+
+유료 observer는 `rules+llm/analyzed` 이벤트와 수신자 제품의 완료 문구·결과 패널을 모두 요구한다. 파일 종료를 기다리다 20초 제공자 한도가 먼저 닫히는 일을 피하도록 완료 표시를 먼저 관측하고 즉시 철회/마이크 복귀한다. 원본 합성 WAV의 streaming 길이 헤더는 보존하고 실제 PCM15.3초와 동일한 데이터의 정상 길이 사본을 보호 경로에 준비했다. TTS/외부 호출0. 이 변경은 모델 품질이나 실제 완료 표시 PASS가 아니다.
+
 ## 2026-11-06 Recording 적용과 동일 기한 재개
 
 Recording 원본을 직접 렌더링하고 업무 표·상태 검색·흰 상세 drawer·휴대폰 구성, 순차 연락 준비를 실제 API/controller에 반영했다. 독립 역할·마이크·분석 동의 경계는 유지한다. 혼합 label 때문에 안전 중단까지 막히던 경로는 latch/stop에서 개별 소유권이 확인된 persistent 자원만 처리하도록 수정했다. start/status는 계속 전체 불일치를 거절한다. trial project 분리·full ID 정리·persistent+trial+host 합산 예산을 실제 launcher/guard에 적용했다.

@@ -27,9 +27,9 @@ export async function exerciseServiceCallAnalysis(page:Page,control:Awaited<Retu
 
 export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observer:CallObserver,capture:(events:unknown[])=>Promise<void>){
  const audio=process.env.CALLSIGN_MEDIA_PAID_AUDIO;
- if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-approval3'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
- let revisions=0,analyses=0,sent=0;const events:unknown[]=[];
- recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:performance.now(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed')analyses++;});});
+ if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-completion1'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
+ let revisions=0,analyses=0,sent=0;const started=performance.now(),events:unknown[]=[];
+ recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed'&&value.event.engine==='rules+llm')analyses++;});});
  expect(await recipient.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);
  await recipient.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();
  try{
@@ -37,8 +37,9 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   const [chooser]=await Promise.all([sender.waitForEvent('filechooser'),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(audio);
   await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).toBeVisible();
   await expect.poll(()=>revisions,{timeout:20000}).toBeGreaterThan(0);observer.mark('transcript');
-  await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).not.toBeVisible({timeout:18000});
   await expect.poll(()=>analyses,{timeout:8000}).toBeGreaterThan(0);observer.mark('analysis');
+  await expect(recipient.locator('.service-analysis').getByText('현재 분석 범위의 결과',{exact:true})).toBeVisible();
+  await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
  }finally{
   try{await capture(events);}finally{
   await recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true}).click();
@@ -47,4 +48,5 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
  }
  const before=sent;await recipient.waitForTimeout(1500);expect(sent).toBe(before);
  await expect(recipient.locator('.service-analysis strong')).toHaveCount(0);
+ await expect.poll(()=>recipient.evaluate(()=>(window as any).callSignTestPeers.some((peer:RTCPeerConnection)=>peer.connectionState==='connected'))).toBe(true);
 }

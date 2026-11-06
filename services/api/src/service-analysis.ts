@@ -64,6 +64,8 @@ export class ServiceRevisionAnalyzer {
  }
  private changed(status:'analyzing'|'partial',appendOnly=false){
   const context=hashCanonical(this.context().map(s=>({segmentId:s.segmentId,revision:s.revision,text:s.text})));
+  // Partial speech is delivered separately; it must not erase a result for unchanged finalized context.
+  if(status==='partial'&&context===this.analysisContext&&this.text())return;
   // Interim speech outside the finalized context must not cancel or rebill its analysis.
   if(context!==this.analysisContext){
    this.analysisContext=context;this.version++;if(!appendOnly){this.controller.abort();this.runningController?.abort();}this.controller=new AbortController();clearTimeout(this.timer);

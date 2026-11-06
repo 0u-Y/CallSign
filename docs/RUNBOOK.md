@@ -1058,3 +1058,17 @@ A(새 업무·실제 음성·최신 UI 취소)는 분석 off로 별도 한정 �
 Refined UI 후속 반영(2026-11-06): runtime 소스 `e267dbf`, config ID `sha256:17572369cea1623d7e11a0fbfa52c37523fbb35bcb20cd479e0267a0c9ef5bf5`로 인증된 workspace에 제공자 실행 설정 조회를 연결했다. 위 9개 앱 교체 범위·영속 데이터·제공자 OFF·기존 만료는 유지했다. API readiness 3개200, 실행 파일 대응, 활성통화/예약0·outbox done187 확인. frontend의 후속 `ea13da3`/`3e1a719` 변경은 계정 요약·버튼 줄간격·회수 근거 접기·UI 검사뿐이며 backend와 호환된다. 이 교체는 새 통화·실제 분석 검증이 아니다. 최종 UI 증거는 [현재 구현 현황](guide/05-IMPLEMENTATION-STATUS.md)을 따른다.
 
 같은 UI 검증에서 운영 노드 조회503(`42501`)을 발견했다. `117e674`의 기존 migration runner로 `0011_operational_cursor_read`를 소유 지속 DB에 적용했다. issuer는 event cursor의 조회 세 열만 읽고 쓰기 권한은 없다. 공개 health200·네 노드 응답 확인. 실행 앱 코드 `e267dbf`는 그대로이며 migration 파일/적용 이력의 소스는 별도로 기록한다.
+
+
+### 실제 분석 완료 최소 시험 — 승인 대기 (2026-11-06)
+
+기존 Recording UI를 사용한다. 새 업무/통화1회, 자동 재시도0, 외부 단말/공동 복구/추가 TTS 없음. 먼저 수정 runtime의 issuer 반영 승인과 현재 활성통화0·감시/기한을 확인한다. DB/chain/realm/키는 그대로 두며 다른 정상 서비스를 편의상 재시작하지 않는다. 실패 시 기존 issuer image/config로 복귀하되 자원 중단이면 재기동하지 않는다.
+
+- 모델: `nova-3`, `language=ko`, `mip_opt_out=true`; `gpt-5.4-mini-2026-03-17`, Responses, `store=false`, reasoning none, 출력700토큰, 전사 문맥4000자, HTTP4초, fetch 재시도0.
+- 승인 ID `public-audio-20261106-completion1`은 아직 미승인이다. durable quota에 새 ID로 STT1연결/20초·LLM2요청·짧은 expiresAt을 등록해야 하며 기존 사용량을 초기화하거나 기존 승인 ID를 재사용하지 않는다. 공개 사용자 무제한 분석 활성화 금지.
+- 기존 합성 음성15.3초: “어제 오후 세 시 해외 가맹점 결제는 본인이 하셨나요? 인증번호는 말씀하지 마세요. 문자로 받은 인증번호를 알려주세요. 그런데 저금리 대출 상품도 안내해 드리겠습니다.” 보호된 준비 사본/원본 checksum은 현재 resume의 `analysis-completion-preparation/input-receipt.json`에 있다. 원본 음성/전사는 공개 증거에 복사하지 않는다.
+- [OpenAI 공식 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini): 입력 $0.75/백만·출력 $4.50/백만. [Deepgram 공식 가격](https://deepgram.com/pricing): Nova-3 multilingual $0.0092/분. 2026-11-06 조회. Deepgram opt-out/계정별 가격 차이에 여유를 두어 2배 단가, OpenAI 각 요청 약34000 입력 토큰 상당의 보수적 여유(실제 bounded body는32768bytes 이하)와 출력700을 가정하면 합계 약$0.064, 계획$0.07·요청 승인$0.10. 추정치이며 실제 청구 상한 보장이 아니다. 계정 모델 접근은 새 호출 없이 확정하지 않는다.
+- 로그인/조회/연결/양측 음성 확인에 실패하면 제공자 연결 전 종료한다. 수신자 `상대 음성 분석에 동의` → 상담원 `녹음 파일 송출 (최대 20MB)` → remote track 전사 → rules+llm 완료 이벤트와 결과 패널 → `분석 동의 철회·삭제` → 필요 시 `파일 송출 중지 · 마이크 사용` → 통화 유지 확인 → 통화 종료. 결과는 실제 출력 그대로 보존한다. 정상/위험/목적 이탈의 개별 품질 통과는 이 한 번의 완료 시험으로 주장하지 않는다.
+- finally에서 철회·송출 정리·통화 종료, 전용 provider overlay 제거/`CALLSIGN_PROVIDER_CONFIG=none` 복귀와 issuer readiness, 활성통화/예약·trial 정리를 확인한다. 운영 만료는 변경하지 않는다. 늦은 결과가 실제 발생하지 않으면 오프라인 회귀만 확인한 것으로 남긴다. Deepgram Usage Logs의 opt-out 확인은 권한이 있을 때만 하며403은 미확인이다.
+
+촬영은 기관/상담원/수신자를 독립 브라우저 프로필의 창으로 배치한다. 기관 업무 생성·배정 → 상담원 선택 업무의 연락 준비/전화 걸기 → 수신자 수락. 정상 연락과 기관 UI 취소(영향 확인 후 취소)는 case32 실제 검증, 녹음 송출/마이크 복귀는 과거 case18 범위다. 위험 요구·목적 이탈의 실제 완료 화면 촬영은 위 승인 시험 결과 전에는 미확인이다. 시험 후 OFF이므로 이후 실제 AI 촬영도 별도의 유한 예산과 활성화가 필요하다.

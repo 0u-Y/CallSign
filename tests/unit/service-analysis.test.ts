@@ -76,6 +76,16 @@ it('does not cancel or rebill finalized context for interim speech in a differen
  expect(provider).toHaveBeenCalledOnce();expect(events.at(-1)?.status).toBe('analyzed');
 });
 
+it('keeps a completed result current during unrelated partial speech until its finalized context changes',async()=>{
+ vi.useFakeTimers();const provider=vi.fn(async()=>response('suspected','대출 상품을 권유합니다.'));
+ const {a,events}=fixture(provider,()=>Date.now());await a.accept(rev('대출 상품을 권유합니다.',1,'0'));await a.flush();
+ const completed=events.at(-1)!;
+ for(let n=1;n<=3;n++)await a.accept({...rev('다음 안내',n,'1'),final:false});
+ expect(events.at(-1)).toBe(completed);expect(a.isCurrent(completed)).toBe(true);expect(provider).toHaveBeenCalledOnce();
+ await a.accept(rev('추가 안내입니다.',4,'1'));expect(a.isCurrent(completed)).toBe(false);expect(events.at(-1)?.status).toBe('analyzing');
+ await vi.advanceTimersByTimeAsync(60001);expect(events.at(-1)?.dependencies).toEqual([]);
+});
+
 it('finishes one in-flight request while coalescing appended final segments, without publishing stale context',async()=>{
  vi.useFakeTimers();const calls:Array<{signal:AbortSignal;complete:(value:ReturnType<typeof response>)=>void}>=[];
  const provider=vi.fn(async(_text:string,_policy:unknown,signal:AbortSignal)=>new Promise<ReturnType<typeof response>>(complete=>calls.push({signal,complete})));
