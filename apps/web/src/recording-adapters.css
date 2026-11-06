@@ -256,3 +256,4 @@
 #callsign-recording.filming-child .demo-institution.sender .sender-main{flex-shrink:0;min-height:max-content}
 #callsign-recording.filming-child .demo-institution.sender .sender-controls{position:static}
 #callsign-recording.filming-child .demo-workspace.workspace{padding:0;max-width:none}
+#callsign-recording.filming-child .demo-recording-call .demo-institution.sender{height:max-content;min-height:600px}
