@@ -35,9 +35,9 @@ export class ServiceRevisionAnalyzer {
  private readonly policy:PurposePolicy;private readonly segments=new Map<string,TranscriptRevision&{at:number;order:number}>();
  private readonly seen=new Map<string,{revision:number;final:boolean;order:number}>();private streamId='';private active=false;private version=0;private calls=0;
  private controller=new AbortController();private timer:ReturnType<typeof setTimeout>|undefined;private expiry:ReturnType<typeof setTimeout>|undefined;
- private running=false;private queued=false;private eventSequence=0;
+ private running=false;private queued=false;private eventSequence=0;private analysisContext='';
  constructor(policy:PurposePolicy,private readonly emit:(e:ServiceAnalysisEvent)=>void,private readonly llm?: (text:string,policy:PurposePolicy,signal:AbortSignal)=>Promise<ServiceAnalysis>,private readonly now=()=>performance.now()) {this.policy=structuredClone(policy);}
- start(streamId:string){this.stop();this.streamId=streamId;this.active=true;this.calls=0;this.seen.clear();}
+ start(streamId:string){this.stop();this.streamId=streamId;this.active=true;this.calls=0;this.analysisContext='';this.seen.clear();}
  stop(){clearTimeout(this.timer);clearTimeout(this.expiry);this.controller.abort();this.version++;this.queued=false;if(this.active)this.publish('withdrawn','stopped',[],unknown('동의 철회 또는 통화 종료로 분석을 중단했습니다.'));this.active=false;this.segments.clear();this.seen.clear();}
  get contextRevision(){return this.version;}
  isCurrent(event:ServiceAnalysisEvent){return this.active&&event.streamId===this.streamId&&event.contextRevision===this.version&&event.eventSequence===this.eventSequence;}
@@ -60,9 +60,14 @@ export class ServiceRevisionAnalyzer {
   this.changed(segment.final?'analyzing':'partial');return true;
  }
  private changed(status:'analyzing'|'partial'){
-  this.version++;this.controller.abort();this.controller=new AbortController();clearTimeout(this.timer);clearTimeout(this.expiry);
+  const context=hashCanonical(this.context().map(s=>({segmentId:s.segmentId,revision:s.revision,text:s.text})));
+  // Interim speech outside the finalized context must not cancel or rebill its analysis.
+  if(context!==this.analysisContext){
+   this.analysisContext=context;this.version++;this.controller.abort();this.controller=new AbortController();clearTimeout(this.timer);
+   this.queued=!!this.text();this.timer=setTimeout(()=>{void this.flush();},ANALYSIS_LIMITS.debounceMs);this.timer.unref?.();
+  }
+  clearTimeout(this.expiry);
   this.publish(status,'rules',this.rules(),unknown('최근 상대 발화의 목적 관계를 확인 중입니다. 고객 발화는 수집하지 않습니다.'));
-  this.queued=!!this.text();this.timer=setTimeout(()=>{void this.flush();},ANALYSIS_LIMITS.debounceMs);this.timer.unref?.();
   const first=[...this.segments.values()].reduce((min,s)=>Math.min(min,s.at),Infinity);
   if(Number.isFinite(first)){this.expiry=setTimeout(()=>{if(!this.active)return;for(const [id,s]of this.segments)if(s.at+ANALYSIS_LIMITS.retentionMs<=this.now())this.segments.delete(id);this.changed('analyzing');},Math.max(1,first+ANALYSIS_LIMITS.retentionMs-this.now()));this.expiry.unref?.();}
  }

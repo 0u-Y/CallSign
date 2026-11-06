@@ -63,3 +63,15 @@ it('does not display an unsupported no-deviation label while retaining independe
  expect(events.at(-1)).toMatchObject({status:'unavailable',purpose:{relation:'undetermined'},signals:[{category:'인증번호 요구'}]});
  expect(events.at(-1)?.purpose.reason).not.toContain('unrelated');
 });
+
+it('does not cancel or rebill finalized context for interim speech in a different segment',async()=>{
+ vi.useFakeTimers();let complete!:(x:ReturnType<typeof response>)=>void,signal!:AbortSignal;
+ const provider=vi.fn(async(_text:string,_policy:unknown,s:AbortSignal)=>{signal=s;return new Promise<ReturnType<typeof response>>(resolve=>{complete=resolve;});});
+ const {a,events}=fixture(provider,()=>Date.now());
+ await a.accept(rev('해외 결제를 확인하겠습니다.',1,'0'));const pending=a.flush();
+ for(let n=1;n<=3;n++){await a.accept({...rev('다음 안내',n,'1'),final:false});await vi.advanceTimersByTimeAsync(300);}
+ expect(signal.aborted).toBe(false);
+ complete(response('not-detected','해외 결제를 확인하겠습니다.'));await pending;
+ await vi.advanceTimersByTimeAsync(300);
+ expect(provider).toHaveBeenCalledOnce();expect(events.at(-1)?.status).toBe('analyzed');
+});

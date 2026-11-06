@@ -52,3 +52,7 @@ it('rejects a model converting negation or quoted examples into a current reques
  for(const text of ['인증번호는 말씀하지 마세요.','“인증번호를 알려주세요”라는 요구에는 응하지 마세요.'])await expect(analyzeServiceWithOpenAI({...input,text,fetcher:async()=>response({...analysis,signals:[{category:'인증번호 요구',evidenceSpan:text,explanation:'incorrect synthetic model interpretation'}],purpose:{relation:'undetermined',evidenceSpan:'',reason:'no context'}})})).rejects.toThrow('LLM_EVIDENCE_INVALID');
  const text='인증번호는 말씀하지 마세요. 지금은 OTP를 알려주세요.';const result=await analyzeServiceWithOpenAI({...input,text,fetcher:async()=>response({...analysis,signals:[{category:'인증번호 요구',evidenceSpan:'OTP를 알려주세요.',explanation:'current explicit demand'}],purpose:{relation:'undetermined',evidenceSpan:'',reason:'no context'}})});expect(result.signals).toHaveLength(1);
 });
+
+it('reports provider HTTP status without exposing its response body',async()=>{
+ await expect(analyzeServiceWithOpenAI({...input,fetcher:async()=>new Response('private provider diagnostic',{status:429})})).rejects.toThrow(/^LLM_PROVIDER_HTTP_429$/);
+});

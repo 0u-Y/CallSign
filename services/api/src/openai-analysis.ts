@@ -12,7 +12,7 @@ export async function requestOpenAI(input:Parameters<typeof requestAnthropic>[0]
  if(Buffer.byteLength(body)>32768)throw new Error('LLM_INPUT_TOO_LARGE');
  const signal=AbortSignal.any([input.signal,AbortSignal.timeout(4000)]);
  const response=await(input.fetcher??fetch)('https://api.openai.com/v1/responses',{method:'POST',redirect:'error',signal,headers:{'content-type':'application/json',authorization:'Bearer '+input.apiKey},body});
- if(!response.ok)throw new Error('LLM_PROVIDER_FAILED');
+ if(!response.ok)throw new Error('LLM_PROVIDER_HTTP_'+response.status);
  const raw=await response.text();if(raw.length>32768)throw new Error('LLM_RESPONSE_TOO_LARGE');
  if(signal.aborted)throw new Error('LLM_CANCELLED');
  const result=z.object({status:z.literal('completed'),output:z.array(z.object({type:z.literal('message'),role:z.literal('assistant'),content:z.array(z.object({type:z.literal('output_text'),text:z.string()})).min(1).max(8)})).min(1).max(8)}).parse(JSON.parse(raw));
