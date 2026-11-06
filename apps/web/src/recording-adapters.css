@@ -97,3 +97,62 @@
 .work-detail>details{border-top:1px solid #e7ecf2;padding:18px 0;font-size:12px}
 .work-detail .work-cancel-open{width:100%;background:#fff0f2;color:#e83954;font-size:12px}
 .demo-drawer-overlay:has(+.work-detail){backdrop-filter:blur(3px)}
+/* Keep the source table's visual weight without a second vertical scroll area. */
+#callsign-recording .work-management .work-table-scroll{max-height:none;overflow-x:auto}
+#callsign-recording .work-management .work-table{table-layout:fixed;min-width:940px}
+#callsign-recording .work-table th:nth-child(1){width:17%}
+#callsign-recording .work-table th:nth-child(2){width:19%}
+#callsign-recording .work-table th:nth-child(3){width:12%}
+#callsign-recording .work-table th:nth-child(4){width:17%}
+#callsign-recording .work-table th:nth-child(5){width:15%}
+#callsign-recording .work-table th:nth-child(6){width:13%}
+#callsign-recording .work-table th:nth-child(7){width:7%}
+#callsign-recording .work-management .work-table :is(th,td){padding:13px 20px;min-width:0}
+#callsign-recording .work-table td small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#callsign-recording .work-table .work-select.qlink{display:inline-block;width:auto;min-width:44px;min-height:32px;padding:8px 0;background:transparent;border:0;border-radius:5px;box-shadow:none;outline-offset:2px;color:#718095;font-size:11px;font-weight:400;text-align:right}
+#callsign-recording .work-table .work-select.qlink:hover{color:#246afa;text-decoration:underline}
+#callsign-recording .work-table .work-select.qlink[aria-pressed=true]{outline:0;color:#246afa}
+#callsign-recording .work-table .work-select.qlink:focus-visible{outline:2px solid #246afa}
+#callsign-recording .work-table tr.selected{background:#f2f6ff}
+#callsign-recording .work-identity-details{margin:0;padding:12px 24px;font-size:10px;color:#718095;overflow-wrap:anywhere}
+#callsign-recording .work-pagination .button{background:white;border:1px solid #e3e8f1;border-radius:9px;font-weight:400}
+#callsign-recording .recording-recovery-grid{align-items:stretch}
+#callsign-recording .recovery-review .approval-panel,#callsign-recording .recovery-review .recovery-panel{padding:25px;border:1px solid #e3e8f1;border-radius:20px;background:#fff;box-shadow:none}
+#callsign-recording .recording-recovery-process ol{list-style:none;padding:0;margin:0}
+#callsign-recording .recording-recovery-process .recovery-item{display:flex;padding:15px 0;gap:15px}
+#callsign-recording .recording-recovery-process .recovery-item>div{flex:1}
+#callsign-recording .recording-recovery-process .recovery-state{max-width:140px;white-space:normal;text-align:right}
+#callsign-recording .recovery-import{margin-top:20px;font-size:12px}
+#callsign-recording .recovery-import summary{padding:12px;border-radius:9px;background:#edf3ff;color:#246afa;cursor:pointer}
+#callsign-recording .approver-list .approver{display:flex;justify-content:space-between;padding:13px 0;background:transparent;border:0;border-bottom:1px solid #edf0f4;border-radius:0}
+#callsign-recording .approver-list .approver>div{display:flex;gap:12px;align-items:center}
+#callsign-recording .approver-list .approver small{font-size:11px;color:#718095}
+#callsign-recording .governance-access{background:white;border:1px solid #e3e8f1;border-radius:16px;padding:28px;max-width:720px}
+.work-detail .work-permission-note{font-size:12px;line-height:1.6;color:#718095}
+@media(max-width:720px){#callsign-recording .demo-workspace.workspace{padding:18px 16px 0}#callsign-recording .work-management .work-table{min-width:940px}#callsign-recording .recording-recovery-grid{grid-template-columns:minmax(0,1fr)}#callsign-recording .recovery-review .approval-panel,#callsign-recording .recovery-review .recovery-panel{padding:20px}#callsign-recording .recording-recovery-process .recovery-state{max-width:80px}}
+#callsign-recording .demo-institution-label{display:block;color:#246afa;font-size:10px;font-weight:600;margin-bottom:5px}
+#callsign-recording .recording-toolbar{display:flex;gap:8px;margin-left:auto}
+#callsign-recording .recording-toolbar button{font-size:11px;min-height:32px;padding:7px 10px;background:white;border:1px solid #e3e8f1;color:#536175;border-radius:9px}
+#callsign-recording.recording .demo-tools,#callsign-recording.recording .demo-director,#callsign-recording.recording .demo-scene-hint{display:none}
+#callsign-recording.recording .demo-institution-label{visibility:hidden}
+#callsign-recording .demo-governance-grid{gap:12px}
+#callsign-recording .demo-ledger,#callsign-recording .demo-governance-outcome,#callsign-recording .recording-advanced-management,#callsign-recording .recording-administration>details{margin:0;padding:12px 0;font-size:12px}
+#callsign-recording .recording-gov-summary{margin-bottom:0}
+#callsign-recording .recording-administration{gap:20px}
+.recording-guide{font-size:14px;line-height:1.7}
+@media(max-width:720px){#callsign-recording .top{flex-wrap:wrap;height:auto;padding:14px 16px;gap:12px}#callsign-recording .recording-toolbar{margin-left:0}#callsign-recording .demo-tools{position:static;justify-content:flex-end;margin-bottom:12px}#callsign-recording .demo-heading.intro{margin-bottom:16px}#callsign-recording .topnav{order:3;width:100%}}
+/* Neutralize inherited flex-form rules inside the source governance layout. */
+#callsign-recording .demo-governance-grid,#callsign-recording .recording-administration{align-items:stretch;width:100%}
+#callsign-recording .recording-administration{flex-wrap:nowrap}
+#callsign-recording .gov-section-title>span{flex:none;white-space:nowrap}
+#callsign-recording .gov-section-title h2{flex:none;margin:0}
+#callsign-recording .approver-list .approver>div{flex-direction:row}
+#callsign-recording .demo-recording-governance details>summary{min-height:32px;padding:6px 0;font-size:12px;font-weight:500}
+#callsign-recording .demo-recording-governance .recovery-import>summary{padding:12px}
+#callsign-recording .demo-ledger,#callsign-recording .demo-governance-outcome,#callsign-recording .recording-advanced-management,#callsign-recording .recording-administration>details{padding:0;margin:0}
+#callsign-recording .demo-recording-governance .demo-evidence{padding-top:8px;margin-top:8px}
+#callsign-recording .work-table .work-permission{font-size:10px;color:#718095;margin-left:6px;white-space:normal}
+#callsign-recording .work-table :is(th,td){line-height:1.6}
+#callsign-recording .work-pagination .button{min-height:32px;padding:5px 10px;font-size:12px}
+#callsign-recording .work-pagination select{min-height:28px;padding:5px;font-size:12px}
+#callsign-recording .work-identity-details>summary{font-size:11px;font-weight:400;min-height:28px;padding:4px 0}
