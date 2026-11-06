@@ -41,8 +41,8 @@ export function CallConsentKeypad({active,connected,available,withdrawn,onConsen
    <p role="status">{pending?'서버 동의 확인 중':'1 동의 · 2 미동의 · 9 다시 듣기'}</p>{error&&<p role="alert">{error}</p>}
    <div className="call-keypad-grid ars-keyboard">{['1','2','3','4','5','6','7','8','9','*','0','#'].map((d,i)=><button key={d} data-ars-digit={d} disabled={!active||pending||d!=='9'&&!selecting||d==='1'&&!available} aria-label={d==='1'?'1번 동의':d==='2'?'2번 미동의':d==='9'?'9번 다시 듣기':`${d}번 안내 선택 없음`} onClick={()=>{setDigit(d);if(d==='9'){setOpen(false);replay();}else if(d==='1'||d==='2')void choose(d==='1');else setError('분석 동의는 1번, 미동의는 2번입니다.');}}><span>{d}</span><small>{['','ABC','DEF','GHI','JKL','MNO','PQRS','TUV','WXYZ','','+',''][i]}</small></button>)}</div>
    <div className="call-dial-footer ios-dial-footer"><button className="service-end ios-hangup" onClick={onEnd} aria-label="통화 종료"><Phone aria-hidden="true"/></button><button className="ios-dial-hide" onClick={()=>setOpen(false)}>가리기</button></div>
-   {(choice==='granted'||pending)&&<button className="button quiet call-withdraw" disabled={!connected} onClick={withdraw}>분석 동의 철회·삭제</button>}
+   {(choice==='granted'||pending||!active)&&<button className="button quiet call-withdraw" disabled={!connected} onClick={withdraw}>분석 동의 철회·삭제</button>}
   </section>}
-  {!open&&(choice==='granted'||pending)&&<button className="button quiet call-analysis" disabled={!connected} onClick={withdraw}>분석 동의 철회·삭제</button>}
+  {!open&&(choice==='granted'||pending||!active)&&<button className="button quiet call-analysis" disabled={!connected} onClick={withdraw}>분석 동의 철회·삭제</button>}
  </section>;
 }
