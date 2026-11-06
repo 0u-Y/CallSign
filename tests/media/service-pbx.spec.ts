@@ -63,7 +63,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
    expect(await sender.evaluate(()=>{const w=window as unknown as {savedCallPeers:RTCPeerConnection[];callSignTestPeers:RTCPeerConnection[]};return w.savedCallPeers.every((p,i)=>p===w.callSignTestPeers[i]&&p.connectionState==='connected');})).toBe(true);
    await expect.poll(async()=>(await decoded(receiver,660,990)).remote).toBeGreaterThan(.003);
   }
-  for(const [name,page] of [['sender',sender],['recipient',receiver]] as const)await testInfo.attach(name+'-actual-call',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+  for(const [name,page] of [['sender',sender],['recipient',receiver]] as const){await page.evaluate(()=>window.scrollTo(0,0));await testInfo.attach(name+'-actual-call-viewport',{body:await page.screenshot(),contentType:'image/png'});await testInfo.attach(name+'-actual-call',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});}
 
   if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation);
   if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='paid-smoke')await exercisePaidCallAnalysis(sender,receiver,observation,async(events)=>{await testInfo.attach('provider-event-states',{body:JSON.stringify(events),contentType:'application/json'});await testInfo.attach('actual-provider-analysis',{body:await receiver.screenshot({fullPage:true}),contentType:'image/png'});});
@@ -75,7 +75,16 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
    try{
     const me=await institution.get(`${origin}/api/v3/auth/me?purpose=work`);expect(me.ok()).toBe(true);const auth=await me.json();
     const workspace=await institution.get(`${origin}/api/v3/workspace`);expect(workspace.ok()).toBe(true);expect((await workspace.json()).actor.role).toBe('institution');
-    const stopping=process.env.CALLSIGN_TRIAL_MODE==='emergency-stop';const cancelled=await institution.post(`${origin}/api/v3/${stopping?'management/suspend':'cancel'}`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:stopping?{}:{intentId}});expect(cancelled.ok()).toBe(true);note({managementAction:stopping?'emergency-stop':'work-cancel',source:'actual-independent-institution-api',status:cancelled.status()});
+    const stopping=process.env.CALLSIGN_TRIAL_MODE==='emergency-stop';
+    if(!stopping&&pagePath==='/demo/call'){
+     const context=await browsers[0]!.newContext({storageState:state});contexts.push(context);const page=await context.newPage();
+     const [response]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/workspace'),page.goto(`${origin}/demo/work`)]);expect(response.ok()).toBe(true);
+     const data=await response.json(),index=data.intents.findIndex((work:{id:string})=>work.id===intentId);expect(index).toBeGreaterThanOrEqual(0);
+     await page.locator('.work-select').nth(index).click();await page.getByRole('button',{name:'선택 업무 취소',exact:true}).click();
+     const [cancelled]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/cancel'&&r.request().method()==='POST'),page.getByRole('button',{name:'이 업무 취소 요청',exact:true}).click()]);expect(cancelled.ok()).toBe(true);
+     note({managementAction:'work-cancel',source:'actual-independent-institution-work-ui',status:cancelled.status()});
+     await testInfo.attach('institution-cancelled-work',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
+    }else{const cancelled=await institution.post(`${origin}/api/v3/${stopping?'management/suspend':'cancel'}`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:stopping?{}:{intentId}});expect(cancelled.ok()).toBe(true);note({managementAction:stopping?'emergency-stop':'work-cancel',source:'actual-independent-institution-api',status:cancelled.status()});}
    }finally{await institution.dispose();}
   }else await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
   await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.connectionState==='closed'&&pc.getSenders().every(s=>!s.track||s.track.readyState==='ended')))).toBe(true);
