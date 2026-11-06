@@ -196,3 +196,59 @@
 #callsign-recording .flow-node .callsign-logo{width:56px;height:56px}
 #callsign-recording .flow-node:has(.callsign-logo){padding:0}
 #callsign-recording .sender-symbol .callsign-logo{width:35px;height:35px;max-width:none}
+
+/* v26.5 recording surface; server state remains authoritative. */
+.r26{--ink:#142b49;--blue:#2868ff;--soft:#eef4ff;color:var(--ink);background:white;border:1px solid #e4eaf3;border-radius:24px;padding:30px 36px 24px;overflow:hidden}.r26-top{display:flex;justify-content:space-between;align-items:center;gap:20px}.r26-brand{display:flex;gap:12px;align-items:center;font-weight:700}.r26-mark{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#eef4ff;color:#2868ff;font-size:24px}.r26-status{padding:8px 13px;border-radius:30px;background:#fff0f2;color:#c1485a;font-size:12px;font-weight:700}.r26-status.open{background:#ecf3ff;color:#2868ff}.r26-head{margin:26px 0 12px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px}.r26-head h2{font-size:32px;line-height:1.4;letter-spacing:-1px;margin:0}.r26-head p{font-size:14px;color:#73849b;margin:10px 0 0}.r26-count{font-size:42px;letter-spacing:-2px;color:#2868ff;white-space:nowrap}.r26-count small{font-size:13px;color:#8491a4;letter-spacing:0;margin-left:10px}.r26-canvas{display:grid;grid-template-columns:270px 1fr 240px;align-items:center;gap:26px;min-height:300px;padding:22px 0}.r26-people{display:grid;gap:12px}.r26-person{background:#fafbfd;border:1px solid #e6ebf3;border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}.r26-person.signed{background:#f0f5ff;border-color:#c5d8ff}.r26-avatar{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:white;border:1px solid #e2e9f3;color:#6e829e;font-size:14px}.r26-person b{font-size:13px;flex:1}.r26-person button{padding:8px 11px;font-size:12px;color:#2868ff;background:white;border:1px solid #dbe6fc;border-radius:8px}.r26-check{color:#2868ff;font-size:12px}.r26-hub{position:relative;text-align:center;min-width:0;isolation:isolate}.r26-wire{position:absolute;top:69px;left:-26px;right:-26px;height:1px;background:#dfe7f2;z-index:-1}.r26-wire:after{content:'';display:block;width:35%;height:2px;background:#90b6ff;opacity:.6}.r26.active .r26-wire:after{animation:r26Travel 1.9s linear infinite}.r26-seal{position:relative;display:grid;place-items:center;width:140px;height:140px;border:1px solid #e0e9f7;background:radial-gradient(circle,#f2f6ff,white 70%);border-radius:50%;margin:auto;box-shadow:0 0 0 18px #f7faff,0 0 0 19px #edf2fa}.r26-seal svg{width:46px;height:46px;stroke:#2868ff;fill:none;stroke-width:1.6}.r26-seal:after{content:'';position:absolute;inset:-9px;border-radius:50%;border:2px solid transparent}.r26.active .r26-seal:after{border-top-color:#2868ff;animation:r26Spin 2.6s linear infinite}.r26-hub b{display:block;font-size:16px;margin-top:30px}.r26-hub p{font-size:12px;color:#8190a4;margin-top:7px}.r26-gate{border:1px solid #e4eaf3;background:#fafbfd;border-radius:20px;padding:26px 22px;text-align:center}.r26-gate.open{background:#f0f5ff;border-color:#c7d8ff}.r26-gate-icon{display:grid;place-items:center;width:54px;height:54px;border-radius:16px;margin:0 auto 18px;background:#fff0f2;color:#c1485a}.r26-gate.open .r26-gate-icon{background:white;color:#2868ff}.r26-gate-icon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.7}.r26-gate small{font-size:12px;color:#7a8a9f}.r26-gate strong{display:block;font-size:23px;margin:9px 0}.r26-gate p{font-size:12px;line-height:1.7;color:#7a8a9f;margin:0}.r26-rail{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e9edf5;padding-top:22px;gap:18px}.r26-step{position:relative;padding-top:10px;border-top:3px solid #edf1f7}.r26-step.complete{border-color:#2868ff}.r26-step.current{border-color:#a1bdff}.r26-step div{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700}.r26-step i{font-style:normal;color:#8999ae}.r26-step.complete i{color:#2868ff}.r26-step p{font-size:11px;color:#8b98ab;margin:8px 0 0}.r26-step.current p{color:#2868ff}.r26-bottom{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-top:24px}.r26-bottom p{font-size:12px;color:#7a8a9f;margin:0;line-height:1.7}.r26-bottom button{min-width:200px;padding:14px 20px;border-radius:12px}.r26-technical{margin:16px 3px;color:#8391a4;font-size:11px}.r26-technical summary{cursor:pointer}.r26-technical p{line-height:1.9;margin:12px 0}.r26-tools{display:flex;justify-content:space-between;align-items:center;color:#7c8ca3;font-size:11px;margin:16px 2px;gap:16px}.r26-tools label{display:flex;align-items:center;gap:6px}.recording .r26-tools,.recording .r26-technical,.recording .mic-scene-control{display:none!important}
+@keyframes r26Travel{from{transform:translateX(0)}to{transform:translateX(185%)}}
+@keyframes r26Spin{to{transform:rotate(360deg)}}
+@media(max-width:1000px){.r26{padding:24px}.r26-canvas{grid-template-columns:230px 1fr 190px;gap:18px}.r26-head h2{font-size:27px}}
+@media(max-width:700px){.r26{padding:20px;border-radius:18px}.r26-head{align-items:flex-start}.r26-head h2{font-size:23px}.r26-count{font-size:30px}.r26-count small{display:block;font-size:11px;margin:4px 0}.r26-canvas{grid-template-columns:1fr;gap:32px;padding:24px 0}.r26-hub{margin:10px 0}.r26-wire{display:none}.r26-gate{padding:20px}.r26-rail{grid-template-columns:1fr 1fr;gap:20px}.r26-bottom{flex-direction:column;align-items:stretch}.r26-top{gap:10px}.r26-brand{font-size:13px}.r26-status{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.r26.active .r26-wire:after,.r26.active .r26-seal:after{animation:none}}
+/* The filming menu stays separate from the four real call actions. */
+#callsign-recording .demo-workspace.workspace{max-width:1520px;margin-inline:auto}
+#callsign-recording .film-menu{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 22px;padding:12px 14px;background:#fff;border:1px solid #e3e8f1;border-radius:14px}
+#callsign-recording .film-menu small{color:#718095;margin-right:8px}
+#callsign-recording .film-menu button{border:0;font-size:12px;padding:10px 14px;border-radius:9px;background:#f4f6fa;color:#52627a;min-height:36px}
+#callsign-recording .film-menu button.active{background:#eaf1ff;color:#246afa}
+#callsign-recording.recording .film-menu{display:none}
+#callsign-recording .demo-recording-call .demo-call-grid.stage{align-items:start}
+#callsign-recording .demo-recording-call .demo-institution.sender{margin-top:0;height:auto;min-height:530px}
+#callsign-recording .demo-recording-call .demo-institution .sender-main{overflow:visible}
+#callsign-recording .demo-recording-call .demo-institution .sender-controls{position:static}
+#callsign-recording .demo-recording-call .demo-recipient.phone{height:auto;min-height:570px;max-height:none;overflow:hidden}
+#callsign-recording .demo-recording-call .demo-live-evidence{align-self:center}
+#callsign-recording .demo-recording-governance .demo-governance-grid{display:block}
+#callsign-recording .demo-recording-governance .demo-commands{width:100%;padding:0;border:0;background:transparent}
+#callsign-recording .demo-recording-governance .recording-administration{display:block;width:100%}
+#callsign-recording .demo-recording-governance .recovery-review.r26{width:100%;min-width:0;margin:0;border:1px solid #e4eaf3;padding:30px 36px 24px}
+#callsign-recording .demo-recording-governance .r26 :is(h2,b,p){max-width:none}
+#callsign-recording .demo-recording-governance .recording-stop-tools,#callsign-recording .demo-recording-governance .recording-advanced-management{margin:16px 2px;padding:0;border:0;background:transparent;font-size:11px;color:#7c8ca3}
+#callsign-recording .demo-recording-governance .recording-administration>details:not(.recording-stop-tools){margin:16px 2px;padding:0}
+#callsign-recording .r26-technical label{display:block;margin:12px 0}
+#callsign-recording .r26-technical input{display:block;margin:8px 0}
+#callsign-recording .r26-gate b{display:block;font-size:18px}
+#callsign-recording .r26-gate p{font-size:12px;color:#8190a4}
+#callsign-recording .r26-bottom button:disabled{opacity:.55}
+#callsign-recording .work-management .work-table-scroll{max-height:550px;overflow:auto}
+#callsign-recording .demo-recording-work .work-list-heading .work-list-title{display:none}
+#callsign-recording .demo-recording-work .work-list-heading .button.secondary{display:none}
+#callsign-recording .demo-recording-work .work-list-heading{position:absolute;right:40px;top:-73px;z-index:2}
+#callsign-recording .demo-recording-work .work-management{position:relative}
+#callsign-recording.callpage[data-attention] .sender,#callsign-recording.callpage[data-attention] .phone,#callsign-recording.callpage[data-attention] .institution{transition:filter .4s ease,opacity .4s ease;transform:none!important}
+#callsign-recording.callpage[data-attention="sender"] .phone,#callsign-recording.callpage[data-attention="sender"] .institution,#callsign-recording.callpage[data-attention="recipient"] .sender,#callsign-recording.callpage[data-attention="recipient"] .institution,#callsign-recording.callpage[data-attention="institution"] .sender,#callsign-recording.callpage[data-attention="institution"] .phone{filter:blur(3px);opacity:.5}
+#callsign-recording.callpage[data-attention="sender"] .sender,#callsign-recording.callpage[data-attention="recipient"] .phone,#callsign-recording.callpage[data-attention="institution"] .institution{filter:none;opacity:1}
+@media(max-width:850px){#callsign-recording .demo-recording-call .demo-call-grid.stage{display:flex;flex-direction:column;gap:24px}#callsign-recording .demo-recording-call .demo-institution.sender{width:100%;min-height:0}#callsign-recording .demo-recording-call .demo-live-evidence{width:100%}#callsign-recording .demo-recording-call .demo-recipient.phone{width:334px;max-width:100%;align-self:center}#callsign-recording .demo-recording-work .work-list-heading{position:static}#callsign-recording .demo-recording-work .work-list-heading .button.secondary{display:inline-flex}}
+#callsign-recording .demo-recording-work{position:relative}
+#callsign-recording .demo-recording-work .work-management{position:static}
+#callsign-recording .demo-recording-work .work-list-heading{top:16px}
+#callsign-recording .demo-recording-governance .demo-commands{display:flex;flex-direction:column}
+#callsign-recording .demo-recording-governance .recording-administration{display:flex;flex-direction:column;gap:0;order:0}
+#callsign-recording .demo-recording-governance .recording-advanced-management{order:1}
+#callsign-recording .demo-recording-governance .recovery-review.r26{order:0}
+#callsign-recording .demo-recording-governance .recording-stop-tools{order:1}
+#callsign-recording .demo-recording-governance .recording-administration>details:not(.recording-stop-tools){order:2}
+#callsign-recording .demo-recording-call .demo-observer-label{display:none}
+@media(max-width:850px){#callsign-recording .demo-recording-work .work-list-heading{position:static}}
+#callsign-recording.recording .recording-stop-tools,#callsign-recording.recording .recording-advanced-management,#callsign-recording.recording .recording-administration>details,#callsign-recording.recording .demo-evidence{display:none}
+#callsign-recording .recording-pressed{outline:3px solid #74a2ff!important;outline-offset:3px;box-shadow:0 0 0 12px #2b69ff24!important;transform:scale(.97);transition:box-shadow .2s,transform .2s}
+#callsign-recording .demo-workspace .demo-tools{position:static;justify-content:flex-end;margin:18px 0 0}
