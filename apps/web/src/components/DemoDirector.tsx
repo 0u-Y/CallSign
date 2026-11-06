@@ -57,7 +57,8 @@ export function DemoDirector({root,enabled,role,status,connected,scene,identity}
   const observer=new MutationObserver(refresh);observer.observe(host,{subtree:true,childList:true,attributes:true,attributeFilter:['disabled','hidden','data-choice']});
   host.addEventListener('callsign-director-step',run);document.addEventListener('keydown',down);document.addEventListener('keyup',up);window.addEventListener('blur',blur);refresh();
   return()=>{if(focusTimer)clearTimeout(focusTimer);if(actionTimer)clearTimeout(actionTimer);for(const cue of cues){cue.getAnimations().forEach(a=>a.cancel());cue.remove();}observer.disconnect();host.removeEventListener('callsign-director-step',run);document.removeEventListener('keydown',down);document.removeEventListener('keyup',up);window.removeEventListener('blur',blur);};
- },[root,enabled,role,status,connected,scene,identity]);
+ // Polling replaces the status object; only actionable changes may cancel the focus/click sequence.
+ },[root,enabled,role,status.active,status.incoming,status.dialing,status.ending,status.accepting,status.terminal,status.error,status.analysis,connected,scene,identity]);
  if(!enabled)return null;
  return <div className="demo-director"><button className="button secondary" disabled={!ready} onClick={()=>root.current?.dispatchEvent(new Event('callsign-director-step'))}>Space · {label}</button><small>현재 로그인한 역할의 실제 조작 · 동의는 키패드에서 직접 선택</small></div>;
 }

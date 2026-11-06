@@ -221,3 +221,7 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 `resume-observe-20261106T193144Z/public-call-smoke-53-space-normal/`에서 Production `2ed790b`에 새 합성 업무를 실제 기관 UI로 생성하고, 직전 실제 폼 로그인으로 얻은 독립 상담원·수신자 세션을 이어 사용했다. 세션을 임의 발급하거나 주입하지 않았다. 실제 Space 키로 발신·수락, 승인 전 미디어 차단, TURN relay 양방향 660/990Hz 수신·디코딩, 분석 미동의 후 일반 통화 유지, F/Escape 및 공동 관리 왕복 중 동일 peer·음성 유지, 명시적 종료와 PBX 부재를 PASS했다. 논리적 1회, 자동 재시도 0회, 관측 약39.44초. 사람 마이크·유료 분석 호출 없음. 시험 컨테이너는 full ID·trial label로 확인 후 제거했고 지속 서비스는 유지했다.
 
 실제 인증 조회 `public-final/result.json`은 기관·상담원·수신자·승인자 4역할 PASS이나 해당 실행 frontend는 `cca203f`다. 후속 `2ed790b` 전체 역할 재확인과 최신 상태별 원본 비교는 별도로 완료해야 한다. 30분 연속 관측도 진행 중이며 readiness 성공으로 대신하지 않는다.
+
+case54 (`public-call-smoke-54-space-cancel`)는 승인·PBX 협상과 Space 수락 입력 뒤 연결 완료 대기에서 timeout했다. 기관 취소 단계에는 도달하지 않았다. workspace/call-context의 `ERR_NETWORK_CHANGED`가 함께 관측됐으며 인과관계는 미확정이다. 원본 실패를 보존하고 추가 자동 시도는 하지 않았다. 종료 후 두 시험의 DB 상태는 각각 ended/failed, 전체 비종료 시도 0, 만료 예약 0, 처리 시각이 지난 pending 0, PBX 채널 0이었다.
+
+별도로 `DemoDirector`의 객체 의존성 결함을 재현했다. 같은 행동 상태를 새 객체로 전달하는 부모 갱신만으로 effect cleanup이 강조/클릭 타이머를 지웠다. 실제 Space → 100ms 후 같은 상태 재렌더 회귀는 수정 전 호출 0으로 FAIL, 행동에 필요한 scalar 상태 의존성으로 수정 후 호출 1로 PASS다. 역할/identity/종료 등 의미 있는 변화의 취소, 연타·입력·dialog·라우트 경계는 유지했다. 이는 재현한 UI 결함의 수정이며 case54의 모든 네트워크 오류가 해결됐다는 뜻은 아니다. 수정 후 실제 공개 재검증은 별도다.
