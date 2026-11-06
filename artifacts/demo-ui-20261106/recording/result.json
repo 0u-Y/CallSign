@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-11-06T17:27:00+09:00",
+  "checkedAt": "2026-11-06T17:36:00+09:00",
   "design": {
     "path": "docs/CallSign_Recording_Demo.html",
     "sha256": "4430eb14109d9c61968eb3ee2dbc5a062caa86a22444adf00e04ca1e115ca505",
@@ -111,7 +111,7 @@
     "scope": "Persistent owned DB read-only snapshot after case31 start failure; no row changes"
   },
   "limitations": [
-    "No real call or UI cancellation completed in case31",
+    "Case31 initial navigation failure remains unexplained; case32 success does not erase it",
     "Actual STT to completed OpenAI result still unverified; provider OFF",
     "Server-hosted browsers are not independent external devices",
     "No new recovery or AWS validation"
@@ -269,6 +269,222 @@
       "minimumAvailableBytes": 44046831616,
       "resourceStop": false,
       "sampleCount": 15
+    },
+    "call32-check": {
+      "peakCombinedOwnedBytes": 6597664768,
+      "minimumAvailableBytes": 42919067648,
+      "resourceStop": false,
+      "sampleCount": 30
     }
+  },
+  "case32": {
+    "status": "PASS",
+    "approval": "Explicit additional one attempt, providers OFF, original expiry and limits unchanged",
+    "logicalExecutions": 1,
+    "workCreated": 1,
+    "callsStarted": 1,
+    "automaticRetries": 0,
+    "providersCalled": 0,
+    "frontendDeployment": "ea4234560a8373bf9cebcf5c7f5d40425f54a313",
+    "productSource": "db32c55571c6ddb50e89aad404e8459fe4af2064",
+    "actualFlow": [
+      "Institution UI created and assigned new work",
+      "Gateway simplified contact preparation and individual approval",
+      "Independent recipient prepared and accepted",
+      "No outgoing audio before acceptance",
+      "Distinct 660Hz/990Hz synthetic audio decoded both directions",
+      "Selected ICE pair relay asserted for both sides with force-relay",
+      "WebRTC survived governance navigation and return",
+      "Independent institution selected work in actual UI and cancelled",
+      "Both sides audio stopped, terminal state and PBX absent",
+      "New attempt on cancelled work rejected409"
+    ],
+    "analysis": "OFF; not AI verification",
+    "fixture": "Synthetic audio input only; real authentication/API/DB/ledger/Witness/Anchor/PBX/TURN and public frontend",
+    "externalDevice": "NOT_RUN: server-hosted independent browser sessions",
+    "observation": {
+      "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+      "outcome": "success",
+      "finishedMs": 59535.405597,
+      "events": [
+        {
+          "id": "0",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "authorization-request",
+          "atMs": 2495.542981
+        },
+        {
+          "id": "1",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "authorization-response",
+          "atMs": 6056.918941
+        },
+        {
+          "id": "2",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "connect-action",
+          "atMs": 17957.994758
+        },
+        {
+          "id": "3",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "verification-visible",
+          "atMs": 46865.002424
+        },
+        {
+          "id": "4",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "remote-decoded-both",
+          "atMs": 50949.504898
+        },
+        {
+          "id": "5",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "revocation-request",
+          "atMs": 51831.169823000004
+        },
+        {
+          "id": "6",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "ui-recalled",
+          "atMs": 57113.807557
+        },
+        {
+          "id": "7",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "audio-reclaimed",
+          "atMs": 57320.965847
+        },
+        {
+          "id": "8",
+          "observer": "playwright-abe3a60f-7dd0-46a4-b65d-dd16aa182b1f",
+          "phase": "resources-reclaimed",
+          "atMs": 59393.200584
+        }
+      ]
+    },
+    "beforeAcceptMedia": {
+      "sender": {
+        "sent": 0,
+        "received": 0,
+        "energy": 0,
+        "samples": 0
+      },
+      "recipient": {
+        "sent": 0,
+        "received": 0,
+        "energy": 0,
+        "samples": 0
+      }
+    },
+    "receivedAudio": {
+      "sender": {
+        "sent": 258880,
+        "received": 60800,
+        "energy": 0.2935822365357281,
+        "samples": 60720
+      },
+      "recipient": {
+        "sent": 260640,
+        "received": 60320,
+        "energy": 0.08476994350389364,
+        "samples": 60800
+      }
+    },
+    "trialContainerRemoved": true,
+    "finalDatabaseAudit": {
+      "status": "PASS",
+      "failures": [],
+      "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+      "observations": {
+        "migrations": {
+          "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+          "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+          "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+          "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+          "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+          "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+          "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+          "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+          "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+          "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+          "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53",
+          "0011_operational_cursor_read": "0069577fb77055750a91e9afe044dfb074c5be348a1f9e2c1a41ceb700733874"
+        },
+        "institutions": 1,
+        "attempts": 27,
+        "nonterminalAttempts": 0,
+        "cancelledWork": 3,
+        "sessions": {
+          "validByExpiry": 10,
+          "expired": 35
+        },
+        "outbox": {
+          "done": 200
+        },
+        "overduePending": 0,
+        "pendingDiagnostics": [],
+        "expiredClaims": 0,
+        "futureRetries": 0,
+        "signerLeases": {
+          "current": 0,
+          "expired": 0
+        },
+        "reservedReservations": 0,
+        "expiredReservations": 0,
+        "reservationStates": {
+          "settled": 12
+        },
+        "reservedBalance": 0,
+        "consumptionReceipts": 14,
+        "consumptionJournal": 22,
+        "recoveryGates": {
+          "ready": 1
+        }
+      },
+      "scope": "Persistent owned DB read-only snapshot after case32 UI cancellation; no row changes"
+    },
+    "cancelledUIFollowup": {
+      "status": "PASS",
+      "readOnly": true,
+      "cancelledStatusVisible": true,
+      "cancelActionAbsent": true
+    },
+    "cancelledUIObserverCorrection": "First read-only observer expected a disabled cancel button; product correctly omits the action for cancelled work. Original timeout preserved; corrected query confirms no action and cancelled heading.",
+    "sessionCleanup": [
+      {
+        "role": "institution",
+        "loggedOut": true,
+        "afterLogout": 401
+      },
+      {
+        "role": "gateway",
+        "loggedOut": true,
+        "afterLogout": 401
+      },
+      {
+        "role": "recipient",
+        "loggedOut": true,
+        "afterLogout": 401
+      }
+    ],
+    "screenshots": [
+      {
+        "path": "sender-actual-call-viewport.png",
+        "sha256": "c7471f01990075afc473c85a7465be4915f243a14683bb03a9ea417dc213086a"
+      },
+      {
+        "path": "recipient-actual-call-viewport.png",
+        "sha256": "6a8ca9fc831820aac3fbf12a6a7f184a8fef323b75fc64b6f9725d4a6d40e505"
+      },
+      {
+        "path": "recipient-actual-call.png",
+        "sha256": "83684df79d39b18c0e7aed29a9a3cf7a2efba91e26de901cdcdd14afb5767a9e"
+      },
+      {
+        "path": "institution-cancelled-confirmed.png",
+        "sha256": "d5788473824737c3fcfee769b0ea0fbc649d52cec66a77477c45b7e5baab204d"
+      }
+    ]
   }
 }

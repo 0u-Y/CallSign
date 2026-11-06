@@ -8,7 +8,7 @@
 
 Recording 원본을 직접 렌더링하고 업무 표·상태 검색·흰 상세 drawer·휴대폰 구성, 순차 연락 준비를 실제 API/controller에 반영했다. 독립 역할·마이크·분석 동의 경계는 유지한다. 혼합 label 때문에 안전 중단까지 막히던 경로는 latch/stop에서 개별 소유권이 확인된 persistent 자원만 처리하도록 수정했다. start/status는 계속 전체 불일치를 거절한다. trial project 분리·full ID 정리·persistent+trial+host 합산 예산을 실제 launcher/guard에 적용했다.
 
-새 감시와 기존21개 서비스의 재개, 공개 실제 역할 로그인·조회·Recording 화면을 확인했다. case31은 업무 생성 전 브라우저 진입에서 실패해 통화 시작0건으로 보존했고 재시도하지 않았다. 실패 전 대기 Promise가 종료 오류로 원인을 가리는 진단 누락을 보완했다. 별도 GET-only 동일 컨테이너 진단은200/인증 화면이지만 최초 원인은 미확정이다. read-only DB 감사는 활성통화·예약·기한 지난 pending/claim0, outbox done192·영수증13이었다. 유료 제공자 OFF, 기존 만료 유지. [화면·실행 경계](../artifacts/demo-ui-20261106/recording/result.json).
+새 감시와 기존21개 서비스의 재개, 공개 실제 역할 로그인·조회·Recording 화면을 확인했다. case31은 업무 생성 전 브라우저 진입에서 실패해 통화 시작0건으로 보존했고 재시도하지 않았다. 실패 전 대기 Promise가 종료 오류로 원인을 가리는 진단 누락을 보완했다. 별도 GET-only 동일 컨테이너 진단은200/인증 화면이지만 최초 원인은 미확정이다. read-only DB 감사는 활성통화·예약·기한 지난 pending/claim0, outbox done192·영수증13이었다. 사용자의 별도 추가1회 승인 case32는 새 업무·간소화 준비·실제 양방향 합성 음원·TURN relay·화면 이동·기관 UI 취소·양측 음성 회수·PBX 부재·취소 후 재발신409를 통과했다. 최종 감사는 활성통화/예약/overdue pending/만료claim0·done200·영수증14이며 trial은 정리했다. 유료 제공자 OFF, 기존 만료 유지. [화면·실행 경계](../artifacts/demo-ui-20261106/recording/result.json).
 
 ## 2026-11-06 조회 대기 중 분석 철회
 
