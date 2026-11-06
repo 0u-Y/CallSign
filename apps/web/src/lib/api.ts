@@ -6,9 +6,15 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
   if (init.method && !["GET", "HEAD", "OPTIONS"].includes(init.method.toUpperCase()) && csrfToken && !headers.has("x-csrf-token")) headers.set("x-csrf-token", csrfToken);
-  let response: Response;
   for (let attempt = 0; ; attempt++) {
-    try { response = await fetch(`/api${path}`, { ...init, headers, credentials: "include" }); break; }
+    try {
+      const response = await fetch(`/api${path}`, { ...init, headers, credentials: "include" });
+      if (!response.ok) {
+        const value = await response.json().catch(() => ({}));
+        throw new ApiError(response.status, value?.error?.code ?? "REQUEST_FAILED", value?.error?.message ?? "요청을 처리하지 못했습니다.");
+      }
+      return await response.json() as T;
+    }
     catch (error) {
       // A transient network change may interrupt reads; never replay a command here.
       if (attempt || (init.method ?? 'GET').toUpperCase() !== 'GET' || !(error instanceof TypeError) || init.signal?.aborted) throw error;
@@ -16,9 +22,6 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
       init.signal?.throwIfAborted();
     }
   }
-  const value = await response.json().catch(() => ({}));
-  if (!response.ok) throw new ApiError(response.status, value?.error?.code ?? "REQUEST_FAILED", value?.error?.message ?? "요청을 처리하지 못했습니다.");
-  return value as T;
 }
 
 export async function demoLogin(demoCode: string): Promise<SessionUser> {
