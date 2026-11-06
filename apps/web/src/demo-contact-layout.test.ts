@@ -23,7 +23,7 @@ it('keeps compact empty analysis distinct from completed results',()=>{
  expect(html).toContain('아직 분석 결과 없음');expect(html).toContain('동의와 실행 상태를 위에서 확인');
  expect(html).not.toContain('안전한 통화');
 });
-it('keeps actual verification and analysis central and recipient controls in the phone',()=>{
+it('keeps actual verification before recipient analysis and phone controls',()=>{
  const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(DemoWorkspace,{role:'recipient',roleName:'수신자',account:null,notice:null,queue:null,contact:null,verification:createElement('div',{'data-check':'verification'}),controls:createElement('button',{'data-check':'phone-controls'},'통화 종료'),analysis:createElement('section',{'data-check':'analysis'}),operations:null,notifications:null,audio:null,governance:false,connected:true,connection:'검증된 실제 상태',end:()=>{},canObserve:false,identity:'scoped-work',stale:false})));
  expect(html.indexOf('data-check="verification"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));
  expect(html.indexOf('data-check="analysis"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));

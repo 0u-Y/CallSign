@@ -12,7 +12,7 @@ it('shows unavailable purpose analysis alongside retained rule warnings and only
 it('ignores reverse analysis events in the same context and does not announce every normal utterance',()=>{expect(nextAnalysis(event,{...event,status:'analyzing',eventSequence:1})).toEqual(event);const html=renderToStaticMarkup(createElement(ServiceAnalysisPanel,{event:{...event,signals:[],status:'analyzed',purpose:{relation:'not-detected',evidenceSpan:'',reason:'범위 내 미탐지'}}}));expect(html).toContain('안전 판정 아님');expect(html).toContain('aria-live="polite" aria-atomic="true"></div>');});
 it('withdraws old recall success on query error or stale snapshot and distinguishes absent PBX from real audio silence',async()=>{
  const f=await serviceFixture();await f.store.transact(f.institution.institutionId,async r=>{r.serviceV3!.attempts[f.attempt.id]!.status='cancelled';});const snapshot=recallSnapshot(await f.store.read(f.institution.institutionId),f.institution,1800000000);
- const html=renderToStaticMarkup(createElement(RecallStatusView,{snapshot,now:1800000000}));expect(html).toContain('서버 종료 상태 반영됨');expect(html).toContain('실제 상대 음성 중단은 별도 검증 필요');
+ const html=renderToStaticMarkup(createElement(RecallStatusView,{snapshot,now:1800000000}));expect(html).toContain('서버 종료 상태 반영됨');expect(html.indexOf('서버 종료 상태 반영됨')).toBeGreaterThan(html.indexOf('<details'));expect(html).toContain('명령·통화별 실제 회수 근거');expect(html).toContain('실제 상대 음성 중단은 별도 검증 필요');
  for(const props of [{snapshot,now:1800000011},{snapshot,now:1800000000,error:'조회 실패'}]){const failed=renderToStaticMarkup(createElement(RecallStatusView,props));expect(failed).not.toContain('서버 종료 상태 반영됨');}
 });
 
