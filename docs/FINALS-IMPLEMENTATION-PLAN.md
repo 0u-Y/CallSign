@@ -4,6 +4,10 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 조회 대기 중 분석 철회
+
+일반 UI action의 busy/pending이 철회 버튼까지 막고, controller가 동의 응답 전에 analysisWanted를 켜는 결함을 오프라인으로 재현했다. 철회는 일반 작업 대기와 분리해 즉시 로컬 녹음/전송을 정리한다. 동의 쓰기는 controller 내 순서대로 보내고, 실패 또는 이전 generation 응답은 분석을 켜거나 최신 상태를 덮지 않는다. 반복 철회 클릭은 같은 controller의 진행 요청을 공유한다. 신규 회귀3건은 수정 전 실패·수정 후 통과, 기존 controller 포함8건 통과. 실제 provider·브라우저 회귀는 서비스 중단 및 비용 승인 대기로 미실행이며, 서버 저장소의 응답 유실 처리 전체를 이번 단위 시험으로 입증하지 않는다.
+
 ## 2026-11-06 Recording 후속 시험의 소유권 충돌
 
 case30의 trial browser를 persistent Compose project에 잘못 넣어 감시와 중지 controller가 소유권 불일치를 거절했다. 실제 업무 생성 후 시험이 중단됐으며 통화 성공은 미확인이다. 시험 container는 정확한 ID로 제거했고 후속 resource-stop으로 persistent21개를 중지했다. 데이터·중단 증거는 보존한다. 로컬 launcher의 project를 분리하고 trial 메모리를 전체16GiB 관측에 합산하도록 준비했으나 재실행하지 않았다. 감시는 controller의 안전한 오류 코드만 보존하도록 수정했으며 관련 단위6건 통과. 재개·유료 실행·최신 Recording 디자인 반영은 완료하지 않았다. [증거](../artifacts/demo-ui-20261106/recording-trial-30.json).

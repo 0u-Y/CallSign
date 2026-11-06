@@ -21,6 +21,7 @@ export class ServiceCall {
   private readonly signedPossessions=new Map<string,string>();
   private context:CallContext|undefined; private binding:ServiceBinding|undefined;private nonce=crypto.randomUUID();
   private choicePending=false;private wantAccept=false;private continuation=false;private previouslyVerified:string|undefined;private muted=false;
+  private consentQueue:Promise<unknown>=Promise.resolve();
   private minimumLeaseSequence=1;private generation=0;private analysisWanted=false;private analysisContextRevision=0;
   private readonly visibility=()=>{if(document.hidden){this.sip?.pause();this.stopAnalysis();this.show({connection:'화면 비활성: 음성 일시 정지, 다시 열면 재검증',active:false});}else this.schedule(0);};
   private view:ServiceCallStatus={connection:'연결 준비 중: 마이크 송신 차단',authority:'기관 승인 확인 전',analysis:'동의 전: 분석 중단',active:false};
@@ -120,7 +121,15 @@ export class ServiceCall {
   private measure(stage:'verification'|'media-ready'|'pbx'|'ice',durationMs:number,outcome:'success'|'failure'='success'){const key=`${stage}:${outcome}`;if(this.measured.has(key)||this.stopped)return;this.measured.add(key);void api('/v3/measurements',{method:'POST',body:JSON.stringify({stage,outcome,durationMs}),signal:this.abort.signal}).catch(()=>{});}
   private async possession(c:CallContext,nonce:string){const bindingHash=hashCanonical(this.binding),id=`${bindingHash}:${nonce}`,prior=this.signedPossessions.get(id);if(prior)return prior;const now=Math.floor(Date.now()/1000),jws=await this.sign({...this.base(c),type:'ServicePossession',role:this.role,authorizationId:c.authorization!.payload.authorizationId,sessionId:c.attempt.sessionId,bindingHash,nonce,issuedAt:now,expiresAt:now+20});this.signedPossessions.set(id,jws);return jws;}
   private evidence(state:'prepared'|'bridged'){return this.post<{jws:string}>('/v3/pbx/evidence',{attemptId:this.o.attemptId,binding:this.binding,state},`evidence:${state}:${crypto.randomUUID()}`);}
-  async analysis(granted:boolean){this.stopAnalysis();this.analysisWanted=granted;await this.post('/v3/consent',{attemptId:this.o.attemptId,granted},`consent:${crypto.randomUUID()}`);this.show({analysis:granted?'원격 음성 분석 연결 대기':'동의 철회: 분석·전송 중단'});if(granted&&this.view.active)await this.beginAnalysis();}
+  async analysis(granted:boolean){
+    this.stopAnalysis();const generation=this.generation;
+    // Stop capture immediately, but keep server consent writes in the user's order.
+    const request=this.consentQueue.then(()=>this.post('/v3/consent',{attemptId:this.o.attemptId,granted},`consent:${crypto.randomUUID()}`));
+    this.consentQueue=request.catch(()=>{});await request;
+    if(this.stopped||this.ending||generation!==this.generation)return;
+    this.analysisWanted=granted;this.show({analysis:granted?'원격 음성 분석 연결 대기':'동의 철회: 분석·전송 중단'});
+    if(granted&&this.view.active)await this.beginAnalysis();
+  }
   private async beginAnalysis(){if(!this.sip||this.stopped||!this.analysisWanted||document.hidden)return;const generation=++this.generation;this.analysisContextRevision=0;this.audioStop=streamRemoteAudio(this.sip.media.remote,this.o.attemptId,event=>{if(this.stopped||generation!==this.generation||!this.analysisWanted)return;const value=event as {type?:string;code?:string;engine?:string;llm?:string;contextRevision?:number;event?:{status?:string;contextRevision?:number}};if(value.type==='unavailable'){this.stopAnalysis();this.show({analysis:value.code==='ANALYSIS_LIMIT'?'분석 입력 한도: 현재 분석을 중단했습니다. 통화와 동의 상태를 확인하세요':'분석 중단: 동의·권한·제공자 상태를 확인할 수 없어 전송과 결과 표시를 중단했습니다'});return;}else if(value.type==='revision'&&value.contextRevision!==undefined&&value.contextRevision>this.analysisContextRevision){this.analysisContextRevision=value.contextRevision;this.o.risk({type:'context-changed'});this.show({analysis:'상대 발화 수정: 새 문맥 분석 중'});}if(value.event?.contextRevision!==undefined){if(value.event.contextRevision<this.analysisContextRevision)return;this.analysisContextRevision=value.event.contextRevision;}if(value.event?.status==='unavailable')this.show({analysis:'언어 모델 분석 장애: 규칙 근거만 표시'});else if(value.event?.status==='analyzed')this.show({analysis:'상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님'});else if(value.type==='provider-ready')this.show({analysis:`상대 음성 전사 ${value.engine} · 분석 ${value.llm}`});this.o.risk(event);},3);}
   private stopAnalysis(){this.analysisWanted=false;this.generation++;this.audioStop?.();this.audioStop=undefined;this.o.risk({type:'clear'});this.show({analysis:'분석 중단: 음성 전송 없음'});}
   async end(outcome:'ended'|'declined'|'failed'='ended',reason='user-ended'){

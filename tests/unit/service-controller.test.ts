@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SigningKeyPair, RuntimePolicy } from '../../packages/protocol/src/index.js';
 import type { ServiceTrust } from '../../packages/verifier/src/index.js';
-const mocked=vi.hoisted(()=>({context:{} as Record<string,unknown>,requests:[] as string[],ids:[] as unknown[],failClaim:false,holdOutcome:undefined as Promise<void>|undefined}));
-vi.mock('../../apps/web/src/lib/api.js',()=>({ApiError:class extends Error{},api:vi.fn(async(path:string,init?:RequestInit)=>{mocked.requests.push(path);if(path==='/v3/outcome'&&mocked.holdOutcome)await mocked.holdOutcome;if(path==='/v3/claim'){mocked.ids.push((init?.headers as Record<string,string>)?.['idempotency-key']);if(mocked.failClaim){mocked.failClaim=false;throw new TypeError('response lost');}}return path.startsWith('/v3/call-context')?mocked.context:{};})}));
+const mocked=vi.hoisted(()=>({context:{} as Record<string,unknown>,requests:[] as string[],ids:[] as unknown[],failClaim:false,holdOutcome:undefined as Promise<void>|undefined,holdConsent:undefined as Promise<void>|undefined}));
+vi.mock('../../apps/web/src/lib/api.js',()=>({ApiError:class extends Error{},api:vi.fn(async(path:string,init?:RequestInit)=>{mocked.requests.push(path);if(path==='/v3/consent'&&mocked.holdConsent)await mocked.holdConsent;if(path==='/v3/outcome'&&mocked.holdOutcome)await mocked.holdOutcome;if(path==='/v3/claim'){mocked.ids.push((init?.headers as Record<string,string>)?.['idempotency-key']);if(mocked.failClaim){mocked.failClaim=false;throw new TypeError('response lost');}}return path.startsWith('/v3/call-context')?mocked.context:{};})}));
 import {hashSdp,extractSingleSdpFingerprint} from '../../packages/protocol/src/index.js';
 import { ServiceCall } from '../../apps/web/src/lib/serviceCall.js';
 describe('product controller identity pinning before SIP enrollment',()=>{
- beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.holdOutcome=undefined;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
+ beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.holdOutcome=undefined;mocked.holdConsent=undefined;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
  function controller(){return new ServiceCall({role:'recipient',attemptId:'attempt',intentId:'intent',recipientId:'recipient',agentId:'agent',key:{} as SigningKeyPair,trust:{} as ServiceTrust,runtimePolicy:{} as RuntimePolicy,status:()=>{},remote:()=>{},risk:()=>{}});}
  it('rejects an authorization for another recipient instead of using its recipient as the expectation',async()=>{
   const warning=vi.spyOn(console,'warn').mockImplementation(()=>{});mocked.context.authorization={payload:{recipientId:'someone-else'}};
@@ -39,6 +39,30 @@ describe('product controller identity pinning before SIP enrollment',()=>{
   const c=controller();Object.assign(c,{context:{attempt:{status:'accepted'}},sip:{pause:vi.fn(),close:vi.fn()}});
   const first=c.end();await Promise.resolve();const second=c.end();await Promise.resolve();
   try{expect(mocked.requests.filter(p=>p==='/v3/outcome')).toHaveLength(1);await (Reflect.get(c,'tick').bind(c) as ()=>Promise<void>)();expect(mocked.requests.filter(p=>p.startsWith('/v3/call-context'))).toHaveLength(0);}finally{release();await Promise.all([first,second]);}
+ });
+
+ it('stops local capture immediately and serializes withdrawal after a pending grant',async()=>{
+  let release!:()=>void;mocked.holdConsent=new Promise<void>(resolve=>{release=resolve;});
+  const c=controller(),stop=vi.fn(),begin=vi.fn();Object.assign(c,{beginAnalysis:begin,view:{active:true},audioStop:stop});
+  const grant=c.analysis(true);await Promise.resolve();const withdraw=c.analysis(false);await Promise.resolve();
+  expect(stop).toHaveBeenCalledOnce();expect(Reflect.get(c,'analysisWanted')).toBe(false);
+  expect(mocked.requests.filter(p=>p==='/v3/consent')).toHaveLength(1);
+  release();await Promise.all([grant,withdraw]);
+  expect(begin).not.toHaveBeenCalled();expect(mocked.requests.filter(p=>p==='/v3/consent')).toHaveLength(2);
+  expect(Reflect.get(c,'view').analysis).toContain('동의 철회');
+ });
+ it('does not restart analysis after a late grant response crosses a local stop',async()=>{
+  let release!:()=>void;mocked.holdConsent=new Promise<void>(resolve=>{release=resolve;});
+  const c=controller(),begin=vi.fn();Object.assign(c,{beginAnalysis:begin,view:{active:true}});
+  const grant=c.analysis(true);await Promise.resolve();Reflect.get(c,'stopAnalysis').call(c);
+  release();await grant;expect(begin).not.toHaveBeenCalled();expect(Reflect.get(c,'analysisWanted')).toBe(false);
+ });
+ it('keeps capture off after consent failure and permits a later withdrawal',async()=>{
+  mocked.holdConsent=Promise.reject(new Error('CONSENT_REJECTED'));
+  const c=controller(),begin=vi.fn();Object.assign(c,{beginAnalysis:begin,view:{active:true}});
+  await expect(c.analysis(true)).rejects.toThrow('CONSENT_REJECTED');
+  expect(Reflect.get(c,'analysisWanted')).toBe(false);expect(begin).not.toHaveBeenCalled();
+  mocked.holdConsent=undefined;await c.analysis(false);expect(Reflect.get(c,'view').analysis).toContain('동의 철회');
  });
 
 });
