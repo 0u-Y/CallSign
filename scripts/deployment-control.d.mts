@@ -9,7 +9,7 @@ export interface ExistingServerRecord {
 }
 export function existingServerStages(records:ReadonlyArray<ExistingServerRecord>,env:Record<string,string|undefined>,issuerImage?:{id:string;labels?:Record<string,string>|null}):ExistingServerRecord[][];
 export function assertLiveServerMonitor(
- ready:{deploymentId?:string;pid?:number;processStart?:string;expiresMonotonicNs?:number},
- sample:{observerPid?:number;monotonicNs?:number;stop?:unknown;memAvailableBytes?:number|undefined;ownedBytes?:number},
- observed:{deploymentId:string;pid:number;processStart:string;ageSeconds:number;nowNs:number;starting?:boolean}
+ ready:{deploymentId?:string;pid?:number;processStart?:string;policy?:string;expiresMonotonicNs?:number|null},
+ sample:{observerPid?:number;monotonicNs?:number;stop?:unknown;memAvailableBytes?:number|null|undefined;ownedBytes?:number|null},
+ observed:{deploymentId:string;pid:number;processStart:string;ageSeconds:number;nowNs:number;starting?:boolean;resourcePolicy?:string}
 ):void;
