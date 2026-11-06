@@ -34,9 +34,18 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   const identity=await sender.request.get(`${origin}/api/v3/runtime-identity`);expect(identity.ok()).toBe(true);const target=await identity.json();assertCallTrialTarget(target,process.env);
 
   if(pagePath==='/demo/call')await sender.getByLabel('확인할 업무',{exact:true}).selectOption(intentId!);
+  if(pagePath==='/demo/call'){
+   await sender.getByText('연결 준비 상세 · 위임과 통화 선택',{exact:true}).click();await sender.getByLabel('위임 증서',{exact:true}).selectOption(digest!);
+   observation.mark('authorization-request');
+   const created=sender.waitForResponse(r=>r.url().includes('/api/v3/attempts')&&r.request().method()==='POST',{timeout:15000}),approved=sender.waitForResponse(r=>r.url().includes('/api/v3/authorizations')&&r.request().method()==='POST',{timeout:15000});
+   await sender.getByRole('button',{name:'연락 준비',exact:true}).click();const response=await created;expect(response.ok()).toBe(true);attempt=(await response.json()).id;
+   await writeFile(testInfo.outputPath('attempt.json'),JSON.stringify({attemptId:attempt}),{mode:0o600});expect((await approved).ok()).toBe(true);observation.mark('authorization-response');
+   await receiver.goto(`${origin}${pagePath}`);await receiver.getByLabel('확인할 업무',{exact:true}).selectOption(intentId!);await receiver.getByRole('button',{name:'연락 받을 준비',exact:true}).click();
+  }else{
   const [created]=await Promise.all([sender.waitForResponse(r=>r.url().includes('/api/v3/attempts')&&r.request().method()==='POST',{timeout:15000}),(pagePath==='/demo/call'?sender:sender.locator('li').filter({hasText:intentId!})).getByRole('button',{name:'새 통화 시도',exact:true}).click()]);expect(created.ok()).toBe(true);attempt=(await created.json()).id;await expect(sender.getByLabel('선택한 통화 시도',{exact:true})).toHaveValue(attempt);await writeFile(testInfo.outputPath('attempt.json'),JSON.stringify({attemptId:attempt}),{mode:0o600});await sender.getByLabel('위임 증서',{exact:true}).selectOption(digest!);observation.mark('authorization-request');const [approvalResponse]=await Promise.all([sender.waitForResponse(r=>r.url().includes('/api/v3/authorizations')&&r.request().method()==='POST',{timeout:15000}),sender.getByRole('button',{name:'개별 연락 승인 받기'}).click()]);expect(approvalResponse.ok()).toBe(true);observation.mark('authorization-response');
   attempt=await sender.getByLabel('선택한 통화 시도',{exact:true}).inputValue();await receiver.goto(`${origin}${pagePath}`);if(pagePath==='/demo/call')await receiver.getByLabel('확인할 업무',{exact:true}).selectOption(intentId!);await receiver.getByLabel('선택한 통화 시도',{exact:true}).selectOption(attempt);
   await sender.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();await receiver.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();
+  }
   await expect(connection(sender)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});await expect(connection(receiver)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});
   await sender.getByRole('button',{name:'양측 웹으로 발신'}).click();
   const observed=(page:Page)=>page.evaluate(async()=>{let sent=0,received=0,energy=0,samples=0;for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers)for(const r of (await pc.getStats()).values())if(r.kind==='audio'){if(r.type==='outbound-rtp')sent+=Number(r.bytesSent??0);if(r.type==='inbound-rtp'){received+=Number(r.bytesReceived??0);energy+=Number(r.totalAudioEnergy??0);samples+=Number(r.totalSamplesReceived??0);}}return {sent,received,energy,samples};});
@@ -89,7 +98,13 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
    }finally{await institution.dispose();}
   }else await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
   await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.connectionState==='closed'&&pc.getSenders().every(s=>!s.track||s.track.readyState==='ended')))).toBe(true);
-  for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const)await expect.poll(async()=>(await decoded(page,remoteHz,ownHz)).remote).toBeLessThan(.003);observation.mark('audio-reclaimed');if(finishAnalysis)await finishAnalysis();outcome='success';
+  for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const)await expect.poll(async()=>(await decoded(page,remoteHz,ownHz)).remote).toBeLessThan(.003);observation.mark('audio-reclaimed');
+  if(process.env.CALLSIGN_TRIAL_MODE==='work-cancel'){
+   const auth=await(await sender.request.get(`${origin}/api/v3/auth/me?purpose=work`)).json();
+   const rejected=await sender.request.post(`${origin}/api/v3/attempts`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:{intentId,profile:'asterisk-webrtc-v3'}});
+   expect(rejected.status()).toBe(409);note({cancelledWorkRedial:'rejected',status:rejected.status()});
+  }
+  if(finishAnalysis)await finishAnalysis();outcome='success';
   // Default mode grants no consent; fixture mode never contacts a paid provider.
  }catch(error){testFailed=true;if(testInfo.status==='timedOut'||/timeout|timed out/i.test((error as Error).message))outcome='timeout';throw error;}finally{
   note({phase:'before-cleanup'});

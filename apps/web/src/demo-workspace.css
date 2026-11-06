@@ -1,4 +1,4 @@
-/* Refined v5.1: keep real state and controls inside the supplied composition. */
+/* Recording design: real work table, evidence and restored handset. */
 .demo-shell{--ground:#f7f8fa;--ink:#202d3e;--border:#e5ebf1;--teal-soft:#edf3ff;background:var(--ground)}
 .demo-workspace{max-width:1440px;padding:24px 42px 32px;margin:auto}
 .demo-shell .site-header{height:68px;padding-inline:42px}
@@ -40,7 +40,7 @@
 .demo-workspace .demo-governance-grid{grid-template-columns:minmax(270px,1fr) minmax(0,1.5fr) minmax(260px,1fr);gap:32px}
 .demo-node-grid small{display:block}.demo-workspace .demo-node-grid{gap:14px;margin:20px 0}
 .demo-workspace .demo-governance-outcome .service-recalls{padding:0;background:none}
-.work-management{display:grid;grid-template-columns:minmax(260px,1fr) minmax(0,2.2fr);gap:28px;align-items:start}
+.work-management{display:block}
 .work-list,.work-detail{min-width:0;background:white;border:1px solid var(--border);border-radius:16px;padding:24px}
 .work-list-heading{display:grid;gap:12px;margin-bottom:24px}.work-list-heading h2{margin:0}
 .work-list ul{list-style:none;padding:0;margin:0 0 20px}.work-select{display:grid;gap:8px;width:100%;text-align:left;padding:18px 12px;background:none;border:0;border-bottom:1px solid var(--border);color:inherit;font:inherit}
@@ -74,3 +74,15 @@
 .demo-workspace .button.danger{background:#fff0ef;color:#a83232;border-color:#f0d2d0}
 
 .work-detail-heading>div{flex:1 1 200px}
+
+.work-list-heading{display:flex;flex-wrap:wrap;align-items:center;gap:16px}.work-list-heading h2{margin-right:auto}
+.work-filters{display:flex;align-items:end;flex-wrap:wrap;gap:18px;margin:20px 0}.work-filters label{max-width:420px}.work-filters>span{margin-left:auto;color:var(--muted)}
+.work-table-scroll{overflow-x:auto}.work-table{width:100%;border-collapse:collapse;text-align:left;font-size:15px}.work-table :is(th,td){padding:18px 16px;border-bottom:1px solid var(--border);vertical-align:middle}.work-table th{font-size:14px;font-weight:500;background:#f8f9fb;color:#536175}.work-table small{display:block;margin-top:5px;color:#536175}.work-table tr[data-selected=true]{background:#f2f6ff}.work-table td:first-child{min-width:220px}.work-table .work-select{border:0;min-width:95px;padding:10px}.work-table td{max-width:300px;overflow-wrap:anywhere}
+.work-detail.demo-evidence-drawer{width:min(660px,96vw);background:white}.work-detail .work-facts{gap:18px}.work-detail .work-detail-heading{margin-top:24px}
+.demo-call-grid .call-advanced{margin-top:14px}.demo-call-grid .call-advanced summary{font-size:14px;color:#536175}.demo-call-grid .call-preparation{margin-top:14px}
+.demo-workspace .demo-phone-app{font-size:23px;color:#244b3a}.demo-workspace .demo-phone-app span{display:block;font-size:13px;color:#526f5e}.demo-workspace .demo-recipient{min-height:610px;display:flex;flex-direction:column}.demo-phone-home{margin-top:auto}
+@media(max-width:720px){.work-list{padding:16px}.work-filters{gap:12px}.work-filters label{width:100%}.work-table :is(th,td){padding:12px}.work-detail .work-facts{grid-template-columns:1fr}.work-list-heading .button{flex:1}.demo-workspace .demo-recipient{width:100%;max-width:360px;margin-inline:auto}}
+
+.work-filters :is(input,select){min-height:44px;padding:10px 12px;border:1px solid #dce3eb;border-radius:8px;background:#fff;color:#202d3e}
+.demo-evidence-drawer .button.primary{background:#246afa;border-color:#246afa;color:#fff}.demo-evidence-drawer .button.primary:disabled{opacity:.5}
+.demo-workspace .demo-phone-app{flex-direction:column;align-items:flex-start;gap:4px}
