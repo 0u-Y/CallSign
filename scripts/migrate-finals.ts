@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-export const migrationNames=['0000_initial','0001_finals_authority','0002_session_scopes','0003_service_runtime','0004_worker_recovery','0005_account_management','0006_backup_drain','0007_pbx_lease_locks','0008_pjsip_contact_qualification','0009_pjsip_boolean_fields','0010_operation_lookup_indexes'] as const;
+export const migrationNames=['0000_initial','0001_finals_authority','0002_session_scopes','0003_service_runtime','0004_worker_recovery','0005_account_management','0006_backup_drain','0007_pbx_lease_locks','0008_pjsip_contact_qualification','0009_pjsip_boolean_fields','0010_operation_lookup_indexes','0011_operational_cursor_read'] as const;
 export async function applyMigrations(sql:postgres.Sql,through:typeof migrationNames[number]=migrationNames.at(-1)!){
  if(!['infrastructure','integration'].includes(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION??''))throw new Error('MIGRATION_EXECUTION_BLOCKED');
  const end=migrationNames.indexOf(through);if(end<0)throw new Error('UNKNOWN_MIGRATION_TARGET');

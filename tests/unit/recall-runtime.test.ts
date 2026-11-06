@@ -21,3 +21,7 @@ it('distinguishes ledger receipt confirmation from server terminal and retry obs
 it('includes operational indexes in the guarded migration plan without changing old migration sources',async()=>{
  const {readFile}=await import('node:fs/promises');const migration=await readFile('services/api/drizzle/0010_operation_lookup_indexes.sql','utf8'),runner=await readFile('scripts/migrate-finals.ts','utf8');expect(runner).toContain('0010_operation_lookup_indexes');expect(migration).toContain('institution_id, recorded_at DESC');expect(migration).toContain('institution_id, created_at DESC');expect(migration).not.toMatch(/DELETE|DROP|TRUNCATE|GRANT/);
 });
+
+it('limits issuer cursor observation to the selected columns without write grants',async()=>{
+ const {readFile}=await import('node:fs/promises');const sql=await readFile('services/api/drizzle/0011_operational_cursor_read.sql','utf8');expect(sql).toContain('GRANT SELECT (deployment_id, block_number, block_hash) ON issuer_v2.event_cursor TO callsign_issuer');expect(sql).not.toMatch(/INSERT|UPDATE|DELETE|ALL PRIVILEGES/);
+});
