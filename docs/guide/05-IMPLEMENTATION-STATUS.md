@@ -1,10 +1,12 @@
 # 05. 구현 및 검증 현황
 
-확인일 **2026-11-06(KST)** · 공개 frontend는 배포 시점 `/build-meta.json`으로 확인(Refined UI·운영 조회 수정 소스 `117e674`), 실행 runtime 제품 소스 **`e267dbf`**. 사용자 재개 승인 뒤 지속 서비스 21개를 다시 기동했고 실제 공개 OIDC 로그인과 복구 후 새 통화를 확인했다. 공개 metadata는 `publicPreview=false`, 복구 epoch3/승인키2의 trust와 일치한다. **실제 음성 전사는 수신했지만 완료된 분석 결과는 관측하지 못했으므로 전체 데모 완료가 아니다. 승인된 호출 수 소진 후 provider 연결을 껐으며, 로그인·업무·통화는 유지한다.** 상세 근거는 [승인 후 실행](../../artifacts/persistent-idp-start-20261105.json)의 `approvedResume20261106`을 따른다.
+확인일 **2026-11-06(KST)** · 공개 frontend는 배포 시점 `/build-meta.json`으로 확인(Refined UI·운영 조회 수정 소스 `117e674`), 실행 runtime 제품 소스 **`e267dbf`**. 사용자 재개 승인 뒤 지속 서비스 21개를 다시 기동했고 실제 공개 OIDC 로그인과 복구 후 새 통화를 확인했다. 공개 metadata는 `publicPreview=false`, 복구 epoch3/승인키2의 trust와 일치한다. **실제 음성 전사는 수신했지만 완료된 분석 결과는 관측하지 못했으므로 전체 데모 완료가 아니다. 승인된 호출 수 소진 후 provider 연결을 껐으며, 16:35 감시 중단 후 16:41 소유 서비스는 안전 중지했다. 현재 로그인·업무·통화는 재개 승인 대기다.** 상세 근거는 [승인 후 실행](../../artifacts/persistent-idp-start-20261105.json)의 `approvedResume20261106`을 따른다.
 
 현재 목표는 **서버컴의 전용 지속 데모**다. Vercel frontend·서버컴 backend/인프라·외부 Deepgram/OpenAI 배치를 사용한다. AWS 운영·학교 서버 비의존 요구는 이번 완료 조건에서 제외한다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
 
 이번 후속 코드 `fa28340`·`7cdf702`는 Deepgram opt-out 강제·종료 정리·분석 JSON 오류 구분과 안전한 관측을 보완했다. 관련 단위 36건, API/light/web 타입 검사와 소스 검사 통과. 사용자 승인 뒤 runtime `3db968c`에 반영했고 실제 수정 파일 대응·API readiness 3개 200·Anchor healthy를 확인했다. 활성통화/예약0·outbox done187, 제공자 OFF·기존 만료 유지다. 새 통화·유료 호출은 하지 않았다. 과거 요청 로그는 권한 부족(403)으로 확인하지 못했다. [세부 경계](../KNOWN-LIMITATIONS.md#2026-11-06-deepgram분석-후속-점검)와 [반영·롤백 절차](../RUNBOOK.md#deepgram-opt-out-수정본-반영-대기-2026-11-06)를 따른다.
+
+2026-11-06 16:41 후속: case30은 실제 업무 생성 뒤 미디어 시험 시작 중 시험 브라우저의 잘못된 Compose project/lifecycle 조합으로 지속 감시 소유권 검사가 실패했다. 브라우저 제거 후 상태 조회가 정상화됐고, `resource-stop`으로 소유 서비스21개를 중지했다. 영속 데이터·원본 stop/latch는 보존, 자동 재개·유료 호출 없음. 감시 오류를 비밀 없는 고정 코드로 보존하도록 수정했고 관련 오프라인6건 통과. 기존 개인 요약의 “시험 시작 전 차단”은 실제 업무 생성 기록과 달라 정정한다. [원본과 후속 범위](../../artifacts/demo-ui-20261106/recording-trial-30.json). 최신 Recording HTML 경로와 같은 만료/한도의 명시적 재개가 필요하다.
 
 ## 현재 작업표
 

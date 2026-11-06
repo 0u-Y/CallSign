@@ -3,6 +3,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import signal
@@ -67,6 +68,18 @@ def container_memory(cid, env):
         raise RuntimeError('OWNED_PROCESS_CHANGED_DURING_OBSERVATION')
 
 
+def control_command(control, action, env_file, env):
+    try:
+        return subprocess.check_output(['node', control, action, env_file, 'docker', 'compose'],
+                                       env=env, timeout=75, stderr=subprocess.PIPE, text=True)
+    except subprocess.CalledProcessError as error:
+        # Only the controller's fixed error code is safe to preserve, never raw stderr.
+        code = (error.stderr or '').strip()
+        raise RuntimeError(code if re.fullmatch(r'[A-Z_]{1,100}', code) else 'DEPLOYMENT_CONTROL_FAILED') from None
+    except subprocess.TimeoutExpired:
+        raise RuntimeError('DEPLOYMENT_CONTROL_TIMEOUT') from None
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file', required=True)
@@ -84,8 +97,7 @@ def main():
     control = str(Path(__file__).with_name('deployment-control.mjs').resolve())
     safe_env = {k: os.environ[k] for k in ['PATH', 'LANG', 'TZ'] if k in os.environ}
     def command(action):
-        return subprocess.check_output(['node', control, action, env_file, 'docker', 'compose'],
-                                       env=safe_env, timeout=75, stderr=subprocess.PIPE, text=True)
+        return control_command(control, action, env_file, safe_env)
     command('check')
     watch = SwapWatch(PRESSURE_POLICY)
     # Starting the expiry clock now gives at most the approved 24h, including preparation.
@@ -153,7 +165,8 @@ def main():
                 if action == 'stop':
                     record['containersStopped'] = True
             except Exception as error:
-                errors.append({'action': action, 'errorType': type(error).__name__})
+                errors.append({'action': action, 'errorType': type(error).__name__,
+                               'reason': str(error) if isinstance(error, RuntimeError) else 'DEPLOYMENT_CONTROL_FAILED'})
         record['cleanupErrors'] = errors
         (root / 'stop.json').write_text(json.dumps(record) + '\n')
         if errors:

@@ -68,3 +68,23 @@ for requested,expected in [(None,100+24*3600*10**9),(150,150),(50,50),(10**20,10
 `;
  expect(()=>execFileSync('python3',['-c',code],{stdio:'pipe'})).not.toThrow();
 });
+
+it('preserves safe controller failure codes without copying sensitive stderr',()=>{
+ const code=`import ast,pathlib,subprocess,re
+from types import SimpleNamespace
+source=ast.parse(pathlib.Path('scripts/monitor-deployment.py').read_text())
+function=next(n for n in source.body if isinstance(n,ast.FunctionDef) and n.name=='control_command')
+def run(*args,**kwargs):
+ assert kwargs['timeout']==75
+ if error:raise error
+ return 'ok'
+scope={'subprocess':SimpleNamespace(check_output=run,PIPE=-1,CalledProcessError=subprocess.CalledProcessError,TimeoutExpired=subprocess.TimeoutExpired),'re':re}
+exec(compile(ast.Module(body=[function],type_ignores=[]),'<control>','exec'),scope)
+error=None;assert scope['control_command']('control','status','protected',{})=='ok'
+for error,expected in [(subprocess.CalledProcessError(78,[],stderr='DEPLOYMENT_RESOURCE_IDENTITY_MISMATCH\\n'),'DEPLOYMENT_RESOURCE_IDENTITY_MISMATCH'),(subprocess.CalledProcessError(78,[],stderr='Authorization: private-value'),'DEPLOYMENT_CONTROL_FAILED'),(subprocess.TimeoutExpired([],75),'DEPLOYMENT_CONTROL_TIMEOUT')]:
+ try:scope['control_command']('control','status','protected',{})
+ except RuntimeError as actual:assert str(actual)==expected
+ else:raise AssertionError('failed observation accepted')
+`;
+ expect(()=>execFileSync('python3',['-c',code],{stdio:'pipe'})).not.toThrow();
+});

@@ -4,6 +4,10 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 Recording 후속 시험의 소유권 충돌
+
+case30의 trial browser를 persistent Compose project에 잘못 넣어 감시와 중지 controller가 소유권 불일치를 거절했다. 실제 업무 생성 후 시험이 중단됐으며 통화 성공은 미확인이다. 시험 container는 정확한 ID로 제거했고 후속 resource-stop으로 persistent21개를 중지했다. 데이터·중단 증거는 보존한다. 로컬 launcher의 project를 분리하고 trial 메모리를 전체16GiB 관측에 합산하도록 준비했으나 재실행하지 않았다. 감시는 controller의 안전한 오류 코드만 보존하도록 수정했으며 관련 단위6건 통과. 재개·유료 실행·최신 Recording 디자인 반영은 완료하지 않았다. [증거](../artifacts/demo-ui-20261106/recording-trial-30.json).
+
 ## 2026-11-06 문서 통합과 역할별 UI
 
 문서 `09af92b`·`f0f4e4a`를 최신 실행 기록과 병합했다. 별도 문서 worktree에서 R2 관리 조회 실패/늦은 응답, R3 미조회와 실패의 거짓 빈 목록, R4 callback 실패 Promise 잔류를 수정했다. 업무 관리·연락 검증·공동 관리의 실제 API 연결과 역할 제한을 재사용하며 controller·미디어·분석 내부 구현과 지속 운영 설정은 변경하지 않았다.

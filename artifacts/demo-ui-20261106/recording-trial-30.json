@@ -1,0 +1,40 @@
+{
+  "recordedAt": "2026-11-06T16:43:00+09:00",
+  "source": "43d1e1a3d83fff2b6d8c8f63a7e393f661b3dcdc",
+  "trial": "recording-goal-30",
+  "status": "FAIL",
+  "stage": "work-created-and-media-test-started",
+  "createdWorkEvidence": true,
+  "mediaCompletion": "NOT_VERIFIED",
+  "paidCalls": 0,
+  "automaticRetries": 0,
+  "cause": "Trial browser shared persistent Compose project but had trial lifecycle/run-id; assertManagedDeployment rejected the mixed ownership. Status succeeded after exact trial container removal.",
+  "monitorStop": {
+    "reason": "MANDATORY_OBSERVATION_FAILED",
+    "recordedAt": "2026-11-06T07:35:24.973583+00:00",
+    "phase": "owned-container-status",
+    "errorType": "CalledProcessError",
+    "observingContainer": null,
+    "automaticRestart": false,
+    "containersStopped": false,
+    "cleanupErrors": [
+      {
+        "action": "latch",
+        "errorType": "CalledProcessError"
+      },
+      {
+        "action": "stop",
+        "errorType": "CalledProcessError"
+      }
+    ]
+  },
+  "trialRemoved": true,
+  "persistentStop": {
+    "command": "deployment.sh resource-stop",
+    "exitCode": 0,
+    "runningContainers": 0,
+    "dataDeleted": false,
+    "automaticRestart": false
+  },
+  "offlineRegression": "deployment-monitor and deployment-ownership: 6 passed; real monitor not restarted"
+}
