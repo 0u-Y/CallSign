@@ -777,5 +777,87 @@
       "visual": "Opened sender desktop and recipient390px actual-call screenshots. Long actor identifiers and floating termination/skip-link overlap remain visible; no authenticated analysis-result screenshot captured.",
       "boundary": "Server-host independent browsers over public routes, not external user-device/NAT proof."
     }
+  },
+  "analysisFixFollowup20261106": {
+    "status": "PARTIAL",
+    "runtimeSource": "7c5a83936a6435d03dcaabbf287e418d3b5d1436",
+    "runtimeConfigId": "sha256:c3c3a19c2cf175ba7105ff4ef3f866431d9b9dfba0d580123c35f24439c89b7b",
+    "registryManifestDigest": null,
+    "changes": [
+      "Interim speech outside finalized context does not abort or rebill current analysis",
+      "Appended final segments coalesce behind an in-flight request; stale results discarded; corrections and withdrawal still abort",
+      "Allowlisted provider failure diagnostics emitted without transcript, keys or response body; normal entrypoint disables Fastify request logging"
+    ],
+    "offline": "22 focused unit tests PASS and API/light typechecks PASS",
+    "runs": {
+      "24": {
+        "outcome": "timeout",
+        "startedCall": true,
+        "authorizationMs": 1091.7,
+        "connectionConfirmationMs": 16365.4,
+        "connectToDecodedBothMs": 16943.8,
+        "transcriptFromConnectMs": 23143.8,
+        "reclaimed": true,
+        "clock": "same observer monotonic; no cross-host timestamp subtraction"
+      },
+      "25": {
+        "outcome": "timeout",
+        "startedCall": true,
+        "authorizationMs": 3001.6,
+        "connectionConfirmationMs": 38941.2,
+        "connectToDecodedBothMs": 41026.4,
+        "transcriptFromConnectMs": null,
+        "reclaimed": true,
+        "clock": "same observer monotonic; no cross-host timestamp subtraction"
+      },
+      "26": {
+        "outcome": "timeout",
+        "startedCall": false,
+        "authorizationMs": null,
+        "connectionConfirmationMs": null,
+        "connectToDecodedBothMs": null,
+        "transcriptFromConnectMs": null,
+        "reclaimed": false,
+        "clock": "same observer monotonic; no cross-host timestamp subtraction"
+      }
+    },
+    "case24": "Actual Korean remote-track transcription received, no analyzed event before timeout. Runtime547290b. Recipient auth refresh ERR_NETWORK_CHANGED observed; analysis stopped and transcript cleared. Do not attribute the entire failure to one cause. Latest coalescing runtime7c5a839 was not paid-retested.",
+    "paidApproval3": {
+      "ttsRequests": 0,
+      "sttConnectionsUsed": 1,
+      "sttSecondsSettled": 13,
+      "llmInvocationsSettled": 4,
+      "reserved": 0,
+      "invoiceUSD": null,
+      "additionalCalls": 0
+    },
+    "case25": "Runtime7c5a839 bidirectional decoded audio and440Hz recording observed; microphone-return frequency assertion failed. Concurrent ERR_NETWORK_CHANGED observed; exact causal attribution unresolved. UI cancellation not reached.",
+    "case26": "No call started: sender auth refresh ERR_NETWORK_CHANGED, bounded180s timeout. No AI consent/provider calls. UI cancellation NOT_RUN.",
+    "readOnlyNetworkObservation": {
+      "seconds": 65,
+      "netlinkOutputLines": 266,
+      "scope": "Host link/address/route notifications observed while same-host browser checked public routes; no network writes; not proof of historical cause or workload attribution"
+    },
+    "restart": {
+      "status": "PASS",
+      "authorityWorkAndCredentialsUnchanged": true,
+      "receiptsPreserved": 13,
+      "journalPreserved": 18,
+      "usersPreserved": 6,
+      "activeCalls": 0,
+      "reservedBalance": 0,
+      "outbox": {
+        "done": 180
+      },
+      "apiReadiness": [
+        200,
+        200,
+        200
+      ],
+      "scope": "Ordinary restart of owned existing containers; not RESTORE, not an external microphone test"
+    },
+    "externalDevices": "User deferred external-device verification; no external-device success claimed",
+    "visual": "Actual mobile analysis-failure screenshot opened. Full-page fixed-position overlap needs viewport confirmation; not independently established as a layout defect.",
+    "service": "21 persistent services retained; original expiry2026-11-07T08:37:38+09:00; automatic resource-stop restart remains disabled"
   }
 }
