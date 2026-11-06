@@ -302,3 +302,35 @@
 .demo-institution-strip>div:last-child{display:flex;align-items:center;gap:8px}.demo-institution-strip .work-cancel{position:relative}.demo-institution-strip .work-confirm{position:absolute;right:0;bottom:100%;width:min(420px,80vw);z-index:25;background:#fff;padding:20px;border:1px solid #ecd1d1;border-radius:14px;box-shadow:0 10px 35px #22364a20}.demo-institution-strip .work-confirm p{font-size:12px}
 .demo-recording-call .demo-phone-waiting::before{content:'';position:absolute;width:470px;height:470px;border:1px solid #ffffff22;border-radius:46%;left:-290px;top:175px;transform:rotate(30deg);box-shadow:0 0 0 45px #ffffff05,0 0 0 90px #ffffff04;pointer-events:none}.demo-recording-call .demo-lock-clock time{font-size:78px;letter-spacing:-4px}.demo-recording-call .demo-flow-endpoint svg{display:none}.demo-recording-call .demo-flow-endpoint::before{content:'';width:6px;height:6px;background:#c5d3e8;border-radius:50%}
 @media(max-width:850px){.demo-recording-call .demo-director{position:static;transform:none;width:100%;max-width:100%;margin-bottom:12px;box-shadow:none}}
+
+/* Recording work queue: real records, compact columns and one status filter. */
+.work-management .work-list{padding:0;overflow:hidden;background:#fff;border:1px solid #e2e8f0;border-radius:14px}
+.work-management .work-list-heading{padding:20px 24px;margin:0;gap:10px}
+.work-management .work-list-heading h2{font-size:18px}
+.work-status-tabs{display:flex;gap:26px;padding:0 24px;border-bottom:1px solid #e7ecf2;overflow-x:auto}
+.work-status-tabs button{display:flex;align-items:center;gap:7px;white-space:nowrap;background:transparent;color:#526175;border:0;border-bottom:3px solid transparent;border-radius:0;padding:16px 0;font-size:14px;font-weight:600}
+.work-status-tabs button[aria-pressed=true]{color:#286bff;border-bottom-color:#286bff}
+.work-status-tabs span{font-size:12px;background:#f0f3f8;padding:2px 7px;border-radius:5px;color:#526175}
+.work-management .work-filters{margin:0;padding:18px 24px;gap:14px}
+.work-management .work-filters label{font-size:12px;color:#526175;gap:6px}
+.work-management .work-filters label:first-child{flex:1;max-width:400px}
+.work-management .work-filters>span{font-size:13px}
+.work-management .work-table-scroll{max-height:520px}
+.work-management .work-table{font-size:14px;white-space:nowrap}
+.work-management .work-table th{position:sticky;top:0;background:#f8f9fb;z-index:1;font-size:12px}
+.work-management .work-table :is(th,td){padding:14px 20px}
+.work-management .work-table td:first-child{min-width:195px}
+.work-management .work-table small{font-size:12px;font-variant-numeric:tabular-nums}
+.work-management .work-table tbody tr:hover{background:#f8faff}
+.work-management .work-table tr[data-selected=true]{background:#edf3ff}
+.work-management .work-table .work-select{color:#286bff;background:transparent;font-weight:600;min-width:80px}
+.work-state{display:inline-block;padding:5px 10px;border-radius:6px;background:#f1f3f6;color:#536175;font-size:12px;font-weight:600}
+.work-state[data-state=open]{background:#edf3ff;color:#2458bc}
+.work-management .work-pagination{padding:14px 24px;margin:0;border-top:1px solid #e7ecf2;font-size:13px}
+.work-data-note{padding:12px 24px 0;font-size:12px;color:#526175;margin:0}
+.work-management .work-list>details{padding:12px 24px;font-size:12px;overflow-wrap:anywhere}
+.work-status-tabs button:focus-visible,.work-select:focus-visible{outline:3px solid #82aaff;outline-offset:-3px}
+@media(max-width:720px){.work-management .work-list-heading,.work-management .work-filters{padding:16px}.work-status-tabs{padding:0 16px;gap:20px}.work-management .work-filters label:first-child{flex-basis:100%}.work-management .work-filters>span{margin-left:0}.work-management .work-pagination{padding:14px 16px;gap:10px;flex-wrap:wrap}.work-data-note{padding-inline:16px}.work-management .work-list>details{padding-inline:16px}}
+.work-management .button.primary{background:#286bff;border-color:#286bff;color:#fff}
+.work-management .button.primary:hover{background:#205bdc}
+.work-management .work-data-note{font-size:12px;line-height:1.6}
