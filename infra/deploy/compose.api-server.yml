@@ -43,6 +43,7 @@ services:
       - {type: bind, source: '${SERVICE_EXTRA_CA_PATH:?public Anchor and PBX certificates}', target: /tls/extra-ca.pem, read_only: true, bind: {create_host_path: false}}
   sender:
     <<: *app
+    image: ${CALLSIGN_SENDER_IMAGE:-${CALLSIGN_APP_IMAGE:?reviewed runtime}}
     env_file: ${CALLSIGN_SENDER_ENV_FILE:?protected sender environment}
     volumes:
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/sender', target: /keys/sender, read_only: true, bind: {create_host_path: false}}
