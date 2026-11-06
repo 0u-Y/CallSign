@@ -64,3 +64,24 @@ it('reports provider-off without exposing credentials or opening a stream',async
  const status=await registerServiceAudio(app,{authority:f.authority,actorFor:async()=>f.receiver,sessionId:async()=> 'session',connections:new SessionConnections(),origin:'https://test.example',quota:{reserve:vi.fn(),settle:vi.fn(),close:async()=>{}}});
  expect(status()).toEqual({mode:'disabled',speech:false,model:false});
 });
+
+it('leaves subsequent filming connections their share without changing the shared total',async()=>{
+ vi.stubEnv('CALLSIGN_ANALYSIS_SMOKE_BUDGET',JSON.stringify({...budget,sttSeconds:180,connections:3,llmRequests:12,expiresAt:1800000300}));
+ let used=0,reserved=0;
+ const reserve=vi.fn<QuotaStore['reserve']>(async(_id,_institution,unit,amount)=>{if(unit==='stt-seconds'){if(used+reserved+amount>180)throw Error('QUOTA_EXHAUSTED');reserved+=amount;}});
+ for(let i=0;i<3;i++){
+  const f=await fixture(reserve);try{f.start();await vi.waitFor(()=>expect(f.stream).toHaveBeenCalledOnce());expect(f.stream.mock.calls[0]![0].maxDurationMs).toBe(60000);
+   const call=f.reserve.mock.calls.filter(c=>c[2]==='stt-seconds').at(-1)!;expect(call[3]).toBe(60);expect(call[4]).toContainEqual({key:'provider-smoke:approved-test-only:stt-seconds',limit:180});
+  }finally{await f.close();reserved-=60;used+=15;}
+ }
+ expect(used).toBe(45);expect(reserved).toBe(0);
+});
+it('does not let one stream spend later connections model requests',async()=>{
+ vi.stubEnv('CALLSIGN_ANALYSIS_SMOKE_BUDGET',JSON.stringify({...budget,connections:2,llmRequests:2}));const f=await fixture();
+ try{f.start();await vi.waitFor(()=>expect(f.stream).toHaveBeenCalledOnce());const options=f.stream.mock.calls[0]![0];
+  options.onRevision({streamId:options.streamId,segmentId:'one',revision:1,final:true,text:'합성 첫 발화',source:'remote'});
+  await vi.waitFor(()=>expect(f.analyze).toHaveBeenCalledOnce());await vi.waitFor(()=>expect(f.settle.mock.calls.some(([id])=>id.startsWith('llm:'))).toBe(true));
+  options.onRevision({streamId:options.streamId,segmentId:'two',revision:1,final:true,text:'합성 다음 발화',source:'remote'});
+  await vi.waitFor(()=>expect(f.socket.sent.some(e=>e.type==='risk'&&e.event?.status==='unavailable')).toBe(true));expect(f.analyze).toHaveBeenCalledOnce();
+ }finally{await f.close();}
+});

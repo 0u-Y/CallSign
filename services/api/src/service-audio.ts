@@ -20,7 +20,10 @@ export interface AudioProviders {
 export async function registerServiceAudio(app:FastifyInstance,options:{authority:ServiceAuthority;actorFor(r:FastifyRequest):Promise<Actor>;sessionId(r:FastifyRequest):Promise<string>;connections:SessionConnections;origin:string;quota:QuotaStore;providers?:AudioProviders}){
  const configuration=options.providers?undefined:await speechProviderConfiguration();
  const costBudget=openAICostBudget();
- const budget=analysisSmokeBudget(),streamSeconds=budget?.sttSeconds??300;
+ const budget=analysisSmokeBudget();
+ // Reserve one connection's share, not the entire filming allowance on every stream.
+ const streamSeconds=budget?Math.max(1,Math.floor(budget.sttSeconds/budget.connections)):300;
+ const streamRequests=budget?Math.floor(budget.llmRequests/budget.connections):20;
  const budgetScopes=(unit:string,limit:number)=>budget?[{key:`provider-smoke:${budget.id}:${unit}`,limit}]:[];
  const assertBudget=()=>{if(budget&&a.now()>=budget.expiresAt)throw new Error('ANALYSIS_SMOKE_BUDGET_EXPIRED');};
   const {authority:a,actorFor,connections}=options;
@@ -62,7 +65,7 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
           if(stopped)return;
           let requests=0;
           const llm=(options.providers?.analyze||configuration?.llm)?(units:RiskUnit[],policy:typeof initial.policy,signal:AbortSignal)=>track((async()=>{
-            assertBudget();if(budget&&budget.llmRequests===0)throw new Error('ANALYSIS_SMOKE_BUDGET_EXHAUSTED');if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');await a.idempotent(actor,`llm-${streamId}-${++requests}`,{streamId,requests},async record=>{const {attempt}=a.party(record,actor,attemptId);a.usage(record,actor,attempt,'llm-requests',1,20);a.usage(record,actor,attempt,'llm-input-bytes',Buffer.byteLength(units.map(u=>u.text).join('')),100000);return {reserved:true};});
+            assertBudget();if(requests>=streamRequests)throw new Error('ANALYSIS_SMOKE_BUDGET_EXHAUSTED');if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');await a.idempotent(actor,`llm-${streamId}-${++requests}`,{streamId,requests},async record=>{const {attempt}=a.party(record,actor,attemptId);a.usage(record,actor,attempt,'llm-requests',1,20);a.usage(record,actor,attempt,'llm-input-bytes',Buffer.byteLength(units.map(u=>u.text).join('')),100000);return {reserved:true};});
             if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
             const quotaId=`llm:${streamId}:${requests}`;await options.quota.reserve(quotaId,actor.institutionId,'llm-requests',1,[...analysisScopes(actor.institutionId,actor.userId,attemptId,'llm-requests',20,a.now()),...budgetScopes('llm-requests',budget?.llmRequests??20)],expiresAt);
             if(signal.aborted||stopped){await settle(quotaId,0);throw new Error('ANALYSIS_CANCELLED');}
