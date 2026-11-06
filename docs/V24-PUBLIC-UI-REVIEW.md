@@ -123,7 +123,7 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 
 아래 결과는 **이번 통합 후보** 기준이다. fixture는 합성 상태/응답을 사용하며 실제 계정·음성·원장·모델 성공을 뜻하지 않는다. BLOCKED는 운영 중단 또는 실행 승인 경계, NOT_RUN은 이번 후보에서 아직 검사하지 않은 항목이다. PASS는 행에 적힌 검사 범위에만 적용된다. 원본의 다중 역할 시뮬레이션과 자동 동의/성공은 제품에 복제하지 않는다.
 
-증거 약어: S=`tests/ui/recording-shell.mjs`, Q=`tests/ui/work-queue.mjs`, L=`tests/ui/workspace-layout.mjs`, P=`tests/ui/v24-phone.mjs`, K=`tests/ui/consent-keypad.mjs`, D=`tests/ui/demo-director.mjs`, C=`tests/ui/work-cancel.mjs`, R=`tests/ui/workspace-recovery.mjs`. 단위 검사는 해당 소스의 test와 light 로그를 따른다. 캡처는 `.local/v24-review/`에 있고 보호 자격정보는 포함하지 않는다. 공개 B는 모두 현재 backend 중단을 뜻하며, 원본 없는 제품 오류 상태는 안전한 차이로 명시한다.
+증거 약어: S=`tests/ui/recording-shell.mjs`, Q=`tests/ui/work-queue.mjs`, L=`tests/ui/workspace-layout.mjs`, P=`tests/ui/v24-phone.mjs`, K=`tests/ui/consent-keypad.mjs`, D=`tests/ui/demo-director.mjs`, C=`tests/ui/work-cancel.mjs`, R=`tests/ui/workspace-recovery.mjs`. 단위 검사는 해당 소스의 test와 light 로그를 따른다. 캡처는 `.local/v24-review/`에 있고 보호 자격정보는 포함하지 않는다. 공개 BLOCKED는 중단 또는 병행 감시 전환에 따른 실행 보류를 뜻하며, 원본 없는 제품 오류 상태는 안전한 차이로 명시한다.
 
 | ID | 페이지·역할 | 선행 상태·조작 | 원본 기대 화면·문구·전환 | 실제 구현·검사 방식 | fixture | 공개 | 증거·남은 작업 |
 |---|---|---|---|---|---|---|---|
@@ -138,12 +138,12 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 | W03 | 업무·모두 | 10/20/50·앞뒤 이동 | 페이지 변경 | 페이지 크기·선택 문맥 유지 | PASS | BLOCKED | Q; route 유지 L |
 | W04 | 업무·모두 | 상세 열기/Escape | 우측 drawer | 포커스 복귀·스크롤 잠금 | PASS | BLOCKED | Q/L |
 | W05 | 업무·기관 | 등록 열기 | 등록 입력 | 기존 계정/정책 선택, 상세와 분리 | PASS | BLOCKED | Q; 제출 성공은 이 행 범위 밖 |
-| W06 | 업무·기관 | 등록 제출·응답 유실 | 새 업무 추가 | 기존 멱등 API 재사용 | NOT_RUN | BLOCKED | 실제 생성 승인 없음 |
+| W06 | 업무·기관 | 등록 제출·응답 유실 | 새 업무 추가 | 실제 생성 컴포넌트·합성 응답 유실 재시도 | PASS | BLOCKED | demo-workspace.mjs; 같은 payload/멱등키·업무 중복 없음 |
 | W07 | 업무·모두 | 만료/완료/취소 업무 | 상태 배지 | 만료와 새 연락 권한 분리 | PASS | BLOCKED | workEvidence 단위; 완료 화면별 캡처 추가 필요 |
 | W08 | 업무·기관 | 선택 업무 취소 | 확인·처리 중 | 요청 전송 중, 음성 회수 미확인 | PASS | BLOCKED | C; 공개 취소 승인 없음 |
 | W09 | 업무·기관 | 취소 실패/재시도 | 오류·다시 시도 | 확인 유지, 성공 후 닫음 | PASS | BLOCKED | C; 합성 transport |
 | W10 | 업무·기관 | 위임 상세 | 위임 상태 | 등록 후보/철회 이력/유효성 미확인 분리 | PASS | BLOCKED | workEvidence 단위; 실제 검증 서버 담당 |
-| W11 | 업무·상담원/수신자 | 자기 업무 조회 | 역할별 목록 | 서버 범위 재사용 | NOT_RUN | BLOCKED | 최신 공개 역할 조회 필요 |
+| W11 | 업무·상담원/수신자 | 자기 업무 조회 | 역할별 목록 | 합성 역할별 관리 조작·전사 비노출 | PASS | BLOCKED | demo-workspace.mjs; 실제 세 역할은 인계 |
 | C01 | 연락·상담원 | 업무·통화 선택 | 연락 준비 | 현재 업무 시도만, 종료 시도는 이력 | PASS | BLOCKED | contact-preparation 단위 |
 | C02 | 연락·상담원 | 승인 준비 | 승인 확인 중 | 실제 준비 상태·PBX 준비 분리 | PASS | BLOCKED | P; API 성공 미실행 |
 | C03 | 연락·상담원 | 승인 거절 | 실패 안내 | 거절 상태, 성공 애니메이션 금지 | PASS | BLOCKED | P; 실제 권한 거절 미실행 |
@@ -152,7 +152,7 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 | C06 | 연락·양측 | 음소거·스피커 | 아이콘 상태 | 기존 미디어 controller 재사용 | NOT_RUN | BLOCKED | 실제 합성 통화에서 확인 |
 | C07 | 연락·수신자 | 키패드 열고 닫기 | 휴대폰 keypad | 종료/철회 접근·높이 검사 | PASS | BLOCKED | P/K |
 | C08 | 연락·수신자 | 음성 안내·1 | 안내 후 동의 | 고지 확인+음성 종료 전 grant 금지 | PASS | BLOCKED | K; 합성 음성 callback |
-| C09 | 연락·수신자 | 안내 실패·재시도 | 다시 듣기 | 기존 로컬 안내 fallback | NOT_RUN | BLOCKED | 실제 재생 실패 분기 검사 필요 |
+| C09 | 연락·수신자 | 안내 실패·재시도 | 다시 듣기 | 기존 로컬 안내 fallback | PASS | BLOCKED | K; 합성 onerror·재시도·동의 요청0 |
 | C10 | 연락·수신자 | 2·9 | 미동의·다시 듣기 | 9는 grant 요청하지 않음 | PASS | BLOCKED | K |
 | A01 | 연락·수신자 | 전사·분석 중 | 중앙 진행·전사 | 실제 상태 전달, 원문은 수신자만 | PASS | BLOCKED | P; 실제 remote STT 미검증 |
 | A02 | 연락·수신자 | OTP 결과 | 위험·근거 | 합성 인용/설명 표시 | PASS | BLOCKED | P; 모델 품질 증거 아님 |
@@ -168,8 +168,8 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 | E02 | 업무/연락·기관 | 업무 회수 | 종료·권한 회수 | 요청/회수 관측 별도 | NOT_RUN | BLOCKED | 공개 취소 승인 없음 |
 | G01 | 공동·기관 | 상태 조회 실패 | 원본 없는 확인 불가 | 정지 action 비활성·성공 표시 금지 | PASS | BLOCKED | L; 합성 관리 조회·역할 경계 |
 | G02 | 공동·상담원 | 공동 관리 진입 | 관찰/권한 안내 | 관리 실행 영역 비노출 | PASS | BLOCKED | L; 합성 관리 조회·역할 경계 |
-| G03 | 공동·승인자 | 서명 검토 | 서로 다른 승인2명 | 파일 검토·로그인과 키 소유 분리 | NOT_RUN | BLOCKED | 실제 서명 제출 승인 없음 |
-| G04 | 공동·기관 | 기관 정지 | 정지 영향 | 업무 취소와 구분, emergency 권한 | NOT_RUN | BLOCKED | 공개 쓰기 승인 없음 |
+| G03 | 공동·승인자 | 서명 검토 | 서로 다른 승인2명 | 유효 요청 검토·서명0개 제출 차단 | PASS | BLOCKED | demo-workspace.mjs; 실제 서명/제출 미실행 |
+| G04 | 공동·기관 | 기관 정지 | 정지 영향 | 기관 확인창 취소 시 요청0; 승인자 정지 미노출 | PASS | BLOCKED | demo-workspace.mjs; 실제 정지 미실행 |
 | G05 | 공동·승인자 | 복구 접수 | 단계 진행 | 접수/확정/명령 증거 미관측 구분 | NOT_RUN | BLOCKED | 원장 transaction 미실행 |
 | G06 | 공동·관찰자 | 노드 관측 | 4개 노드 | 높이·시각·동일 높이 hash 비교 | NOT_RUN | BLOCKED | 실제 backend 중단 |
 | G07 | 공동·기관 | Witness·적용 | 원장 후 서비스 적용 | 단순 노드 정상과 해당 명령 증거 분리 | NOT_RUN | BLOCKED | Witness/적용 미실행 |
@@ -177,12 +177,35 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 | X01 | 연락·모두 | 클릭·단계 변화 | 클릭점·확대·흐림·중앙 이동 | 실제 상태에 시각 효과 연결 | PASS | BLOCKED | P/D; 실제 이벤트 연속 촬영 필요 |
 | X02 | 연락·모두 | 반복 키·더블 입력 | 한 번 진행 | 반복 keydown·pending 차단 | PASS | BLOCKED | D/K/C; API 중복 실제 미실행 |
 | X03 | 공통·모두 | 조회 실패→복구 | 현재성 복구 | 과거 성공을 최신처럼 표시하지 않음 | PASS | BLOCKED | R |
-| X04 | 연락·양측 | 페이지 이동 | 연결 유지 | 상위 controller/audio DOM 유지 | NOT_RUN | BLOCKED | 실제 1회 통화에서 확인 |
+| X04 | 연락·양측 | 페이지 이동 | 연결 유지 | 라우트 이동 후 같은 audio DOM 보존 | PASS | BLOCKED | demo-workspace.mjs; 실제 연결 유지는 인계 |
 | X05 | 연락·양측 | 재접속·업무 변경 | 과거 성공 재생 금지 | 기존 identity/event 경계 유지 | NOT_RUN | BLOCKED | 순차 이벤트 별도 확인 필요 |
-| X06 | 공통·모두 | reduced-motion | 조작은 유지 | 기존 media query 유지 | NOT_RUN | BLOCKED | 별도 환경 캡처 필요 |
+| X06 | 공통·모두 | reduced-motion | 조작은 유지 | 기존 media query 유지 | PASS | BLOCKED | P; reduce에서 transform/animation none |
 
 이 목록의 NOT_RUN/BLOCKED가 남아 있으므로 전체 UI·촬영 완주 완료로 판정하지 않는다. 남은 구현 결함과 실행 제약을 동일한 PASS로 합치지 않는다.
 
 후속 통합 검사: `pnpm light` 92파일·504테스트 PASS, 웹 build PASS. L은1440×900·1920×1080·390×900에서 세 화면·권한·조회 실패·선택 유지·drawer 포커스 PASS, API 쓰기0회다. P는 네 위험 유형과 판단 불가를 실제 ServiceAnalysisPanel에 합성 스키마 이벤트로 전달해 검사했다. 초기 fixture의 잘못된 enum 및 fixture 버튼 겹침을 수정했다. 모델 실행 결과가 아니다. 캡처를 직접 열어 모바일 등록 버튼·표 가로 스크롤·공동 관리 배치·통화 프레임을 확인했으며, 상담원 카드의 긴 대체 식별자와 관측용 문구 대비를 보완했다.
 
 사용자가 동일 조건 재개1회를 승인했다. 실행 전 확인에서 제공자 설정은 `deepgram-openai`와 유한 시험 예산으로 관측됐다. 과거 OFF 기록을 현재 상태로 사용하지 않는다. 제공자 설정은 변경하지 않으며 이번 통화는 분석 미동의·유료 호출 없음 조건을 유지한다. 최초 보호 사전검사에서 OFF 가정이 틀려 서비스 동작 전에 멈췄고, 기존 설정 보존 조건으로 사전 관측을 진행했다.
+
+## 공개 재개 후 결과와 단일 실행 인계
+
+동일 조건 재개1회를 수행했다. 새 루트는 `resume-v24-approved-20261106T192728Z`, monitor PID753157이며 기존21개 container ID 유지·platform/issuer/sender readiness200을 확인했다. 만료는2026-11-07 22:03:42 KST로 유지했다. 이미지/제공자/호스트 설정은 변경하지 않았다.
+
+`4e94781e07c85160b7badece8016ac27e3702aac`의 main 일반 push, CI success, Vercel production/publicPreview=false를 확인했다. CI: https://github.com/0u-Y/CallSign/actions/runs/42279914223 . 이후 아래 가독성/확대 보완이 있으면 최종 SHA를 별도로 확인한다.
+
+| 실제 공개 검사 | 결과 | 한계·증거 |
+|---|---|---|
+| 상담원 실제 폼 로그인 | PASS | callback200 → auth/me200 → workspace200. 쿠키/세션 주입 없음 |
+| `/demo/work` 복귀 | PASS | 첫 검사에서 복귀 확인 후 업무 목록·상세·연락 화면 이동 |
+| 연락↔공동 관리·업무 선택 유지 | PASS | 첫 검사에서 해당 단계 완료. 실제 발신 아님 |
+| 안전한 Space/F·모바일 전체·다른 두 역할 | NOT_RUN | 첫 스크립트가 중첩 summary 선택자 오류로 중단, 원본 실패 보존 |
+| 재검사 callback | FAIL | `/service`의 JS asset 요청 ERR_NETWORK_CHANGED. callback API 전 단계이며 인증 결함 확정 아님 |
+| 실제 발신·분석 | NOT_RUN | 발신0회·유료0회. 기존 승인 통화 횟수 미소비 |
+
+공개 증거는 `.local/integration-20261107/public/`와 `public-confirm/`에 분리했다. 보호 값은 기록하지 않았다. 서버 호스트 Chromium 결과이며 외부 사용자 단말 검증이 아니다.
+
+그 뒤 기존 개발 세션이 별도 사용자 지시에 따른 운영 감시 전환을 예고하고, 공개 검증과 통화를 단일 담당하겠다고 요청했다. 이 세션은 그 새 정책을 승인하거나 적용하지 않았다. 공개 브라우저를 모두 종료하고 요청한 `.local/persistent-observe-20261107/ui-reader-finished.json`에 종료·발신0 상태를 남겼다. 답신 도구는 연결 오류였으므로 전달 성공을 주장하지 않는다. 이후 이 세션에서는 중복 재개·발신하지 않는다. 최신 운영 조건은 해당 세션의 전환 완료 기록에서 다시 확인해야 한다.
+
+오프라인 전체 UI 회귀에서는 업무 생성 응답 유실/동일 멱등 재시도, 선택 업무만 취소, audio DOM 보존, 관리 조회 성공→실패·늦은 이전 계정 응답 폐기, 실패와 성공 빈 목록 구분, 복구 서명0개 제출 차단, 역할별 조작/전사 경계, callback 실패 후 SPA 재진입을 통과했다. 200% CSS 확대 시 촬영 도구 가로 넘침을 고쳤고, 실제 panel의 어두운 설명 글자 대비를 보완했다. CSS 확대 검사는 OS/브라우저의 모든 확대 조합을 입증하지 않는다.
+
+촬영 전 기존 개발 세션의 최소 확인 순서는 **현재 감시/서비스 상태 → 세 역할 실제 폼 로그인 → 같은 유효 업무 선택 → 기존 승인된 합성 통화1회(최대60초, 미동의) → 실제 연결/페이지 이동/종료 관측**이다. 운영 정책 전환과 겹쳐 실행하지 않는다. 실제 분석·업무 취소·기관 정지/복구는 별도 승인과 검증이 남아 있다.
