@@ -76,3 +76,8 @@
 #callsign-recording .phone .ios-dial-screen{inset:42px 16px 16px;padding:12px 12px 8px}
 #callsign-recording .phone .ios-dial-screen .ars-keyboard{row-gap:8px}
 #callsign-recording .phone .ios-dial-screen .ars-input{height:42px;line-height:42px;min-height:42px}
+/* Real controls and confirmation may exceed the simulation's fixed content. */
+#callsign-recording .demo-recording-call .demo-institution.sender{display:flex;flex-direction:column}
+#callsign-recording .demo-institution .sender-main{overflow-y:auto}
+#callsign-recording .demo-institution .sender-controls{height:auto;min-height:0;position:sticky;bottom:-20px;background:white;padding:8px 0 20px}
+#callsign-recording .demo-institution-strip.institution{overflow:visible;position:relative;z-index:31}
