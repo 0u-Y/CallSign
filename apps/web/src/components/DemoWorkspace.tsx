@@ -15,7 +15,7 @@ function PhoneStatus(){return <div className="phonestatus" aria-hidden="true"><s
 
 export function DemoWorkspace(p:Props){
  const root=useRef<HTMLDivElement>(null);
- const integrated=location.pathname.startsWith("/filming/");
+ const integrated=typeof location!=='undefined'&&location.pathname.startsWith("/filming/");
  const navigate=useNavigate();
  const [scene,setScene]=useState(0);
  useEffect(()=>{if(!p.governance)setScene(current=>current===3?0:current);},[p.governance]);

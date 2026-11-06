@@ -252,3 +252,7 @@
 #callsign-recording.recording .recording-stop-tools,#callsign-recording.recording .recording-advanced-management,#callsign-recording.recording .recording-administration>details,#callsign-recording.recording .demo-evidence{display:none}
 #callsign-recording .recording-pressed{outline:3px solid #74a2ff!important;outline-offset:3px;box-shadow:0 0 0 12px #2b69ff24!important;transform:scale(.97);transition:box-shadow .2s,transform .2s}
 #callsign-recording .demo-workspace .demo-tools{position:static;justify-content:flex-end;margin:18px 0 0}
+#callsign-recording.filming-child .demo-institution.sender{height:auto;min-height:530px;overflow:visible}
+#callsign-recording.filming-child .demo-institution.sender .sender-main{flex-shrink:0;min-height:max-content}
+#callsign-recording.filming-child .demo-institution.sender .sender-controls{position:static}
+#callsign-recording.filming-child .demo-workspace.workspace{padding:0;max-width:none}
