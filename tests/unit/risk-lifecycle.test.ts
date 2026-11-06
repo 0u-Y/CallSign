@@ -38,3 +38,10 @@ it('keeps provider OFF and malformed responses unavailable, never not-detected',
 it('preserves whole 4000-character quotes without slicing a negation',async()=>{
  const text='인증번호를 알려주면 안 됩니다.'+' '.repeat(4000-'인증번호를 알려주면 안 됩니다.'.length);let observed='';const {engine}=setup(async units=>{observed=units[0]!.text;return result(units);});await engine.accept(revision(text));await engine.flush();expect(observed).toBe(text);
 });
+it('does not rebill silence or evict evidence, but invalidates an emptied existing transcript',async()=>{
+ const provider=vi.fn(async(units:RiskUnit[])=>result(units));const {engine,events}=setup(provider);
+ await engine.accept(revision('인증번호를 읽어주세요.'));await engine.flush();const completed=events.at(-1);
+ for(let n=0;n<8;n++){await engine.accept(revision(' ',`silence${n}`));await engine.flush();}
+ expect(provider).toHaveBeenCalledOnce();expect(events.at(-1)).toBe(completed);
+ await engine.accept(revision('','a',2));await engine.flush();expect(events.at(-1)?.signals).toEqual([]);expect(events.at(-1)?.contextRevision).toBeGreaterThan(completed!.contextRevision);expect(provider).toHaveBeenCalledOnce();
+});

@@ -43,7 +43,9 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).toBeVisible();
   await expect.poll(()=>revisions,{timeout:20000}).toBeGreaterThan(0);observer.mark('transcript');
   await expect.poll(()=>analyses,{timeout:40000}).toBeGreaterThan(0);observer.mark('analysis');
-  await expect(recipient.locator('.service-analysis').getByText('현재 분석 범위의 결과',{exact:true})).toBeVisible();
+  const finding=recipient.locator('.service-analysis article').filter({hasText:/· AI · 요구 탐지/}).first();
+  await expect(finding).toBeVisible();await expect(finding.locator('q').first()).toContainText(/\S/);
+  await expect(finding.getByText('적용 기준·근거 정보',{exact:true})).toBeVisible();
   await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
  }finally{
   try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{

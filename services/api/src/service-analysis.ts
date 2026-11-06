@@ -67,7 +67,8 @@ export class ServiceRevisionAnalyzer {
   const old=this.seen.get(segment.segmentId);if(old&&(segment.revision<=old.revision||(old.final&&!segment.final)))return false;
   if(!old&&this.seen.size>=256)throw new Error('TRANSCRIPT_SESSION_LIMIT');
   const previousContext=this.context();
-  const order=old?.order??this.seen.size;this.seen.set(segment.segmentId,{revision:segment.revision,final:segment.final,order});this.segments.set(segment.segmentId,{...segment,at:this.now(),order});
+  const order=old?.order??this.seen.size;this.seen.set(segment.segmentId,{revision:segment.revision,final:segment.final,order});
+  if(segment.text.trim())this.segments.set(segment.segmentId,{...segment,at:this.now(),order});else this.segments.delete(segment.segmentId);
   for(const [id,s]of this.segments)if(s.at+ANALYSIS_LIMITS.retentionMs<=this.now())this.segments.delete(id);
   while(this.segments.size>ANALYSIS_LIMITS.segments)this.segments.delete(this.ordered()[0]!.segmentId);
   while([...this.segments.values()].reduce((n,s)=>n+s.text.length+(typeof this.llm==='object'?0:1),0)>ANALYSIS_LIMITS.characters){const first=this.ordered()[0]!.segmentId;if(this.segments.size===1){this.segments.get(first)!.text=this.segments.get(first)!.text.slice(-3999);break;}this.segments.delete(first);}
@@ -77,7 +78,7 @@ export class ServiceRevisionAnalyzer {
  private changed(status:'analyzing'|'partial',appendOnly=false){
   const context=hashCanonical(this.context().map(s=>({segmentId:s.segmentId,revision:s.revision,text:s.text})));
   // Partial speech is delivered separately; it must not erase a result for unchanged finalized context.
-  if(status==='partial'&&context===this.analysisContext&&this.text())return;
+  if(context===this.analysisContext&&this.text())return;
   // Interim speech outside the finalized context must not cancel or rebill its analysis.
   if(context!==this.analysisContext){
    this.analysisContext=context;this.version++;if(!appendOnly){this.controller.abort();this.runningController?.abort();}this.controller=new AbortController();clearTimeout(this.timer);
