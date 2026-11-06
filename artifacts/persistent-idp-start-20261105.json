@@ -688,5 +688,94 @@
       ],
       "originalEvidencePreserved": true
     }
+  },
+  "approvedResume20261106": {
+    "recordedAt": "2026-11-06T04:58:00.683682+00:00",
+    "approval": "User approved one manual restart and additional USD0.10 AI smoke",
+    "previousStopPreserved": true,
+    "expiryKst": "2026-11-07T08:37:38+09:00",
+    "servicesStarted": 21,
+    "apiReadiness": [
+      200,
+      200,
+      200
+    ],
+    "publicInstitutionAuthentication": 200,
+    "authority": {
+      "status": "active",
+      "epoch": "3",
+      "approvalKeyVersion": 2
+    },
+    "recoveryRepeated": false,
+    "newDelegation": "registered",
+    "newWork": "created and requeried",
+    "newCall": "NOT_RUN",
+    "frontend": {
+      "sha": "8a6d52a78886b7878129ae31ec3568c98136d7f7",
+      "publicPreview": false,
+      "trustV2PinInBundle": true,
+      "previewRouteCheck": "Vercel authentication protected; not verified",
+      "productionStaticCheck": "PASS"
+    },
+    "providerSmoke": {
+      "ttsRequests": 1,
+      "generatedAudioSeconds": 15.3,
+      "sttConnections": 0,
+      "llmAnalysisRequests": 0,
+      "actualInvoiceUsd": null,
+      "limitUsd": 0.1,
+      "runtimeBudget": {
+        "sttSeconds": 30,
+        "connections": 1,
+        "llmRequests": 4
+      },
+      "fullAudioPath": "NOT_RUN"
+    },
+    "resourceSnapshot": {
+      "ownedBytes": 4897050624,
+      "memAvailableBytes": 46207983616
+    },
+    "limits": [
+      "Public authentication used actual API OIDC flow; current browser media recheck pending",
+      "No independent external device verification",
+      "No claim of model quality from generated speech"
+    ],
+    "actualAudioFollowup": {
+      "status": "PARTIAL",
+      "source": "8a6d52a78886b7878129ae31ec3568c98136d7f7",
+      "observer": "working tree: latest UI selectors and explicit paid-smoke path",
+      "firstAttempt": "NOT_STARTED: old expected trust pin rejected before creating a call; no provider request",
+      "call": "PASS: recovered epoch3/new delegation/new work, independent gateway and recipient OIDC sessions, signed acceptance, bidirectional 660/990Hz decoding, selected TURN relay, same RTCPeerConnection across navigation",
+      "speech": "PASS: generated 15.3s Korean WAV selected through sender UI, remote recorder track verified, actual Deepgram revision received",
+      "analysis": "FAIL: no analyzed event observed within 20s after first transcription; no automatic paid retry; exact cause unresolved",
+      "cleanup": "Consent withdrawal executed in finally; terminal/PBX cleanup recorded by observer. Cancellation stage NOT_RUN after analysis failure. Existing case20 is separate evidence.",
+      "quota": {
+        "providerBudget": [
+          {
+            "scope": "provider-smoke:public-audio-20261106-approval2:stt-connections",
+            "used": 1,
+            "reserved": 0
+          },
+          {
+            "scope": "provider-smoke:public-audio-20261106-approval2:stt-seconds",
+            "used": 24,
+            "reserved": 0
+          },
+          {
+            "scope": "provider-smoke:public-audio-20261106-approval2:llm-requests",
+            "used": 4,
+            "reserved": 0
+          }
+        ],
+        "reservedReservations": 0,
+        "reservedBalance": 0,
+        "outbox": {
+          "done": 164
+        }
+      },
+      "cost": "TTS one request plus STT connection24s and LLM invocations4. Invoice unknown; estimated budget is not confirmed billed cost. Additional connection/request quota exhausted.",
+      "visual": "Opened sender desktop and recipient390px actual-call screenshots. Long actor identifiers and floating termination/skip-link overlap remain visible; no authenticated analysis-result screenshot captured.",
+      "boundary": "Server-host independent browsers over public routes, not external user-device/NAT proof."
+    }
   }
 }
