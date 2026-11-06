@@ -1,12 +1,14 @@
 # 05. 구현 및 검증 현황
 
-확인일 **2026-11-06(KST)** · Recording UI 제품 frontend **`db32c55`**, 실행 runtime 제품 소스 **`e267dbf`**. 사용자 승인에 따라 17:05 새 감시를 만들고 기존 persistent21개를 재개했다. 원본 case30 stop/latch·DB·체인·realm·계정·키는 보존하며 만료는 **2026-11-07 08:37 KST** 그대로다. 공개 metadata `publicPreview=false`, 실제 역할별 로그인·업무 조회·화면 검증을 확인했다. **case31은 업무 생성 전 진입 실패로 보존했다. 별도 추가1회 승인 case32에서 실제 새 업무→승인→양방향 합성 음원 디코딩→페이지 이동→기관 UI 취소→양측 음성 중단·PBX 부재·재발신409를 통과했다. 실제 AI는 OFF이며 외부 단말과 완료 분석 표시까지 전체 검증된 것은 아니다.** 같은 조건의 별도 GET-only 진단은 로그인·업무 화면 성공이지만 최초 실패 원인을 확정하지 못했다. [현재 근거](../../artifacts/demo-ui-20261106/recording/result.json).
+확인일 **2026-11-06(KST)** · Recording UI 제품 frontend **`db32c55`**, 실행 issuer 제품 소스 **`1ac1c0d`**, 나머지 runtime 제품 소스 **`e267dbf`**. 사용자 승인에 따라 17:05 새 감시를 만들고 기존 persistent21개를 재개했다. 원본 case30 stop/latch·DB·체인·realm·계정·키는 보존하며 만료는 **2026-11-07 08:37 KST** 그대로다. 공개 metadata `publicPreview=false`, 실제 역할별 로그인·업무 조회·화면 검증을 확인했다. **case31은 업무 생성 전 진입 실패로 보존했다. 별도 추가1회 승인 case32에서 실제 새 업무→승인→양방향 합성 음원 디코딩→페이지 이동→기관 UI 취소→양측 음성 중단·PBX 부재·재발신409를 통과했다. 실제 AI는 OFF이며 외부 단말과 완료 분석 표시까지 전체 검증된 것은 아니다.** 같은 조건의 별도 GET-only 진단은 로그인·업무 화면 성공이지만 최초 실패 원인을 확정하지 못했다. [현재 근거](../../artifacts/demo-ui-20261106/recording/result.json).
 
 현재 목표는 **서버컴의 전용 지속 데모**다. Vercel frontend·서버컴 backend/인프라·외부 Deepgram/OpenAI 배치를 사용한다. AWS 운영·학교 서버 비의존 요구는 이번 완료 조건에서 제외한다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
 
 이번 후속 코드 `fa28340`·`7cdf702`는 Deepgram opt-out 강제·종료 정리·분석 JSON 오류 구분과 안전한 관측을 보완했다. 관련 단위 36건, API/light/web 타입 검사와 소스 검사 통과. 사용자 승인 뒤 runtime `3db968c`에 반영했고 실제 수정 파일 대응·API readiness 3개 200·Anchor healthy를 확인했다. 활성통화/예약0·outbox done187, 제공자 OFF·기존 만료 유지다. 새 통화·유료 호출은 하지 않았다. 과거 요청 로그는 권한 부족(403)으로 확인하지 못했다. [세부 경계](../KNOWN-LIMITATIONS.md#2026-11-06-deepgram분석-후속-점검)와 [반영·롤백 절차](../RUNBOOK.md#deepgram-opt-out-수정본-반영-대기-2026-11-06)를 따른다.
 
 2026-11-06 16:41 후속: case30은 실제 업무 생성 뒤 미디어 시험 시작 중 시험 브라우저의 잘못된 Compose project/lifecycle 조합으로 지속 감시 소유권 검사가 실패했다. 브라우저 제거 후 상태 조회가 정상화됐고, `resource-stop`으로 소유 서비스21개를 중지했다. 영속 데이터·원본 stop/latch는 보존, 자동 재개·유료 호출 없음. 감시 오류를 비밀 없는 고정 코드로 보존하도록 수정했고 관련 오프라인6건 통과. 기존 개인 요약의 “시험 시작 전 차단”은 실제 업무 생성 기록과 달라 정정한다. [원본과 후속 범위](../../artifacts/demo-ui-20261106/recording-trial-30.json). 이는 당시 상태다. 이후 최신 Recording 파일을 확보하고 사용자 승인으로 같은 만료/한도에서 재개한 결과는 위 현재 근거를 따른다.
+
+18:11 KST 후속: 승인된 case33은 실제 통화·파일 송출 표시·Deepgram ready 뒤 전사0으로 실패했다. OpenAI0요청, STT1연결/서버 정산 경과4초이며 실제 음성 길이·청구액은 미확인. 제공자OFF 복귀·수정 issuer readiness200·활성통화/예약0·trial/세션 정리 확인. 동일 확정 문맥의 partial이 완료 분석을 지우는 결함은 수정·반영했으나 실제 완료 표시까지 PASS가 아니다. 종료 타임라인 관측 누락은 후속 observer에서 보완했고 새 실호출은 승인 대기다. 상세는 기존 진행 기록과 Recording result의 analysisCompletion20261106을 따른다.
 
 ## 현재 작업표
 

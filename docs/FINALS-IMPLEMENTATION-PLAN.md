@@ -4,6 +4,14 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 승인된 분석 완료 시험 case33
+
+사용자가 수정 issuer 반영과 한정 통화/유료 시험1회를 승인했다. `1ac1c0d`의 runtime config ID `57e22e97…`를 issuer에만 반영하고 소스 hash·readiness를 확인했다. 다른20개 서비스·DB/키/원본 latch와 운영 만료는 유지했다. 기존 합성 PCM15.3초를 재사용했다.
+
+case33은 실제 업무·승인·독립 수락, TURN relay/양방향 합성 음원 디코딩·페이지 이동, 파일 선택/송출 표시, remote-track recorder와 Deepgram ready까지 진행했다. 이후 전사0으로20초 대기 timeout, OpenAI 호출0·완료 event/제품 표시 미실행이다. 자동 재시도0. quota 정산은 STT1연결/연결 경과4초이며 실제 전송 음성초·청구액은 미확인이다. provider-enabled issuer 로그를 OFF 교체 전에 보존하지 못했고 recorder/visibility/WS 종료 타임라인도 없으므로 원인을 확정하지 않는다. 후속 observer에 bounded lifecycle·WS close/error를 추가하고 단위3건·light 타입 검사로 확인했다. 다음 보호 launcher는 교체 전 로그를 보존하되 관측 실패가 OFF 복귀를 막지 않게 준비했다.
+
+finally 제공자OFF·수정 issuer readiness200, 활성통화/예약0·outbox done212·trial 제거를 확인했다. 세 역할의 첫 로그아웃 요청은 purpose 누락으로400이었으며 정확한 work scope 요청으로200·후속401 확인했다. [현재 실행 결과](../artifacts/demo-ui-20261106/recording/result.json)의 analysisCompletion20261106을 따른다. 새로운 통화/유료 연결은 추가 승인 없이는 실행하지 않는다.
+
 ## 2026-11-06 분석 완료 표시 준비 (실행 승인 대기)
 
 17:59 KST 읽기 전용 확인: API readiness 3개 200, 감시 fresh/stop 없음, 소유 관측 약4.73GiB, 제공자 `none`, 기존 만료11월7일08:37 유지. case32 `ea423456`와 frontend 제품 `db32c555`의 diff는 문서/화면 증거뿐이며 제품 파일 변경은 없다. 연속 전사 coalescing 수정 `547290b`·`7c5a839`는 실행 runtime `e267dbf`에 포함된다. 과거 분석 실패와 case31/ERR_NETWORK_CHANGED의 근본 원인은 계속 미확정이다.

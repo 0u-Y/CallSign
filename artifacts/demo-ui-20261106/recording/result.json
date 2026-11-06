@@ -486,5 +486,131 @@
         "sha256": "d5788473824737c3fcfee769b0ea0fbc649d52cec66a77477c45b7e5baab204d"
       }
     ]
+  },
+  "analysisCompletion20261106": {
+    "status": "FAIL",
+    "logicalAttempts": 1,
+    "automaticRetries": 0,
+    "source": "1ac1c0d41d14f27f2a6de8603cdf0773bb2469ff",
+    "issuerImageConfigId": "sha256:57e22e97c018b045f68c9dbcaa1a329f740d490e850927bb1d253951486c47d5",
+    "registryManifestDigest": null,
+    "otherRuntimeSource": "e267dbf7a0d44eb76b61f3297c07907b34ea50ad",
+    "frontendProductSource": "db32c55571c6ddb50e89aad404e8459fe4af2064",
+    "design": "Existing Recording UI; no animation redesign",
+    "callObservation": {
+      "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+      "outcome": "timeout",
+      "finishedMs": 52784.505393,
+      "events": [
+        {
+          "id": "0",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "authorization-request",
+          "atMs": 1070.2538359999999
+        },
+        {
+          "id": "1",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "authorization-response",
+          "atMs": 2290.625638
+        },
+        {
+          "id": "2",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "connect-action",
+          "atMs": 7658.1206870000005
+        },
+        {
+          "id": "3",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "verification-visible",
+          "atMs": 25015.170155
+        },
+        {
+          "id": "4",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "remote-decoded-both",
+          "atMs": 28206.775043
+        },
+        {
+          "id": "5",
+          "observer": "playwright-2bea1c9c-a06f-41f0-8173-7b2cf3a9c386",
+          "phase": "resources-reclaimed",
+          "atMs": 52653.998113999995
+        }
+      ]
+    },
+    "stages": {
+      "actualWorkApprovalAcceptance": "PASS",
+      "turnRelayAndBothSyntheticTonesDecoded": "PASS",
+      "senderFileSelectionAndPlaybackIndicator": "PASS",
+      "remoteTrackRecorder": "PASS",
+      "deepgramReady": "PASS",
+      "transcriptRevision": "NOT_OBSERVED",
+      "openaiRequest": 0,
+      "completedAnalysisEvent": "NOT_RUN",
+      "recipientCompletedPanel": "NOT_RUN",
+      "withdrawalDoesNotEndCall": "NOT_RUN_ASSERTION_NOT_REACHED",
+      "lateResultDiscard": "OFFLINE_ONLY"
+    },
+    "usage": {
+      "deepgramConnections": 1,
+      "serverSettledConnectionSeconds": 4,
+      "actualAudioSecondsSent": null,
+      "openaiRequests": 0,
+      "actualBillingUSD": null,
+      "newTTSRequests": 0,
+      "plannedBudgetUSD": 0.1
+    },
+    "providerAfter": "none",
+    "cleanup": {
+      "nonterminalAttempts": 0,
+      "reservedReservations": 0,
+      "reservedBalance": 0,
+      "outbox": {
+        "done": 212
+      },
+      "providerUsage": [
+        {
+          "unit": "stt-connections",
+          "used": 1,
+          "reserved": 0,
+          "limit": 1
+        },
+        {
+          "unit": "stt-seconds",
+          "used": 4,
+          "reserved": 0,
+          "limit": 20
+        }
+      ]
+    },
+    "sessionCleanup": [
+      {
+        "role": "institution",
+        "logout": 200,
+        "after": 401
+      },
+      {
+        "role": "gateway",
+        "logout": 200,
+        "after": 401
+      },
+      {
+        "role": "recipient",
+        "logout": 200,
+        "after": 401
+      }
+    ],
+    "trialRemoved": true,
+    "limits": [
+      "Server-hosted browsers, not external devices",
+      "No transcript revision was observed after Deepgram ready",
+      "Recorder/visibility/WS-close timeline not captured in this run",
+      "Provider-enabled issuer log was not preserved before OFF replacement; cannot recover past diagnostic values",
+      "New lifecycle observer is offline-tested only",
+      "Original case31/network-change root cause remains unknown"
+    ],
+    "protectedEvidenceDirectory": ".local/persistent-demo-connect-20261105T073906Z/live-20261105/resume-20261106T1705/public-call-smoke-33-analysis-completion"
   }
 }

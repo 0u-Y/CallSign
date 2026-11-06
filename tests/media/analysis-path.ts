@@ -1,7 +1,12 @@
 import {readFile,lstat} from 'node:fs/promises';
 import {expect,type Page,type BrowserContext} from '@playwright/test';
 import type {CallObserver} from '../../scripts/evaluate-performance.js';
-export async function installAnalysisTrackObserver(context:BrowserContext){await context.addInitScript(()=>{const Native=window.MediaRecorder;(window as any).callSignRecorderTracks=[];window.MediaRecorder=class extends Native{constructor(stream:MediaStream,options?:MediaRecorderOptions){super(stream,options);(window as any).callSignRecorderTracks.push(stream.getAudioTracks().map(t=>t.id));}};});}
+export async function installAnalysisTrackObserver(context:BrowserContext){await context.addInitScript(()=>{
+ const w=window as any,Native=window.MediaRecorder;w.callSignRecorderTracks=[];w.callSignAnalysisLifecycle=[];
+ const note=(stage:string)=>{if(w.callSignAnalysisLifecycle.length<100)w.callSignAnalysisLifecycle.push({stage,atMs:performance.now(),hidden:document.hidden});};
+ document.addEventListener('visibilitychange',()=>note('visibility'));
+ window.MediaRecorder=class extends Native{constructor(stream:MediaStream,options?:MediaRecorderOptions){super(stream,options);w.callSignRecorderTracks.push(stream.getAudioTracks().map(t=>t.id));for(const stage of ['start','stop','error'])this.addEventListener(stage,()=>note('recorder-'+stage));}};
+});}
 export async function analysisControl(env:NodeJS.ProcessEnv){
  if(!['media','integration'].includes(env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION??'')||env.CALLSIGN_MEDIA_ANALYSIS_MODE!=='fixture')throw new Error('ANALYSIS_MEDIA_SCOPE_REQUIRED');
  const url=new URL(env.CALLSIGN_MEDIA_ANALYSIS_CONTROL_URL??'');if(!['127.0.0.1','localhost','[::1]'].includes(url.hostname)||url.pathname!=='/__fixture/analysis'||!['http:','https:'].includes(url.protocol)||url.username||url.password||url.search||url.hash)throw new Error('LOOPBACK_FIXTURE_CONTROL_REQUIRED');
@@ -27,9 +32,9 @@ export async function exerciseServiceCallAnalysis(page:Page,control:Awaited<Retu
 
 export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observer:CallObserver,capture:(events:unknown[])=>Promise<void>){
  const audio=process.env.CALLSIGN_MEDIA_PAID_AUDIO;
- if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-completion1'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
+ if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-completion2'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
  let revisions=0,analyses=0,sent=0;const started=performance.now(),events:unknown[]=[];
- recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed'&&value.event.engine==='rules+llm')analyses++;});});
+ recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;const closed=(type:string)=>{if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type});};socket.on('close',()=>closed('close'));socket.on('socketerror',()=>closed('socketerror'));socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed'&&value.event.engine==='rules+llm')analyses++;});});
  expect(await recipient.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);
  await recipient.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();
  try{
@@ -41,7 +46,7 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   await expect(recipient.locator('.service-analysis').getByText('현재 분석 범위의 결과',{exact:true})).toBeVisible();
   await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
  }finally{
-  try{await capture(events);}finally{
+  try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{
   await recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true}).click();
   const stop=sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true});if(await stop.isVisible())await stop.click();
   }
