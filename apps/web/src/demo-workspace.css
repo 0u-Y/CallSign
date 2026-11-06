@@ -334,3 +334,6 @@
 .work-management .button.primary{background:#286bff;border-color:#286bff;color:#fff}
 .work-management .button.primary:hover{background:#205bdc}
 .work-management .work-data-note{font-size:12px;line-height:1.6}
+.work-management .work-pagination label{white-space:nowrap;flex-shrink:0}
+.work-management .work-pagination select{width:auto;min-width:64px}
+@media(max-width:720px){.work-management .work-pagination>span:first-child{flex-basis:100%}.work-management .work-pagination .button{padding:8px;min-width:44px}}
