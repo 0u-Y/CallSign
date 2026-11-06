@@ -257,3 +257,8 @@
 #callsign-recording.filming-child .demo-institution.sender .sender-controls{position:static}
 #callsign-recording.filming-child .demo-workspace.workspace{padding:0;max-width:none}
 #callsign-recording.filming-child .demo-recording-call .demo-institution.sender{height:max-content;min-height:600px}
+#callsign-recording.filming-child .filming-recipient-prep{position:absolute;z-index:3;left:18px;right:18px;bottom:84px;padding:12px;background:#f7faf8e8;border-radius:12px;color:#20362c}
+#callsign-recording.filming-child .filming-recipient-prep .call-setup{padding:0;border:0;background:none}
+#callsign-recording.filming-child .filming-recipient-prep .contact-prepare{width:100%;min-height:48px}
+#callsign-recording.filming-child .filming-recipient-prep .call-advanced{display:none}
+#callsign-recording.filming-child .filming-recipient-prep .call-setup>p{font-size:11px;line-height:1.35;margin:6px 0 0}
