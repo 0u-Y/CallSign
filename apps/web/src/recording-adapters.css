@@ -192,5 +192,7 @@
 
 .callsign-logo{object-fit:contain;flex-shrink:0}
 #callsign-recording .brand-mark.callsign-logo{background:transparent;border-radius:0}
-#callsign-recording .sender-symbol:has(.callsign-logo){background:transparent}
+#callsign-recording .sender-symbol:has(.callsign-logo){background:transparent;padding:0}
 #callsign-recording .flow-node .callsign-logo{width:56px;height:56px}
+#callsign-recording .flow-node:has(.callsign-logo){padding:0}
+#callsign-recording .sender-symbol .callsign-logo{width:35px;height:35px;max-width:none}
