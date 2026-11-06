@@ -8,7 +8,7 @@ export function Shell() {
     <div className={`app-shell${publicPreview ? " public-preview" : ""}${demo?" demo-shell":""}`}>
       <a className="skip-link" href="#main">본문으로 건너뛰기</a>
       <header className="site-header">
-        <NavLink to="/" className="brand-link"><Brand /></NavLink>
+        <NavLink to="/" className="brand-link"><Brand compact={demo} recording={demo}/></NavLink>
         <nav aria-label="주요 탐색"><NavLink to="/demo/work">업무 관리</NavLink><NavLink to="/demo/call">연락 검증</NavLink><NavLink to="/demo/governance">공동 관리</NavLink></nav>
       </header>
       {publicPreview && <aside className="public-preview-banner" aria-label="공개 배포 범위">

@@ -1,4 +1,4 @@
-import {Phone,ShieldCheck,ArrowRight,AudioLines} from 'lucide-react';
+import {Phone,ShieldCheck,ArrowUpRight,AudioLines} from 'lucide-react';
 import type {ServiceCallStatus} from '../lib/serviceCall.js';
 import type {ReactNode} from 'react';
 
@@ -19,9 +19,10 @@ export function DemoCallFlow({status,risk,unavailable,transcript,verification}:{
  const scene=callScene(status,risk,unavailable);
  return <div className={`demo-flow demo-flow-${scene.id}`}>
   <div className="demo-flow-top"><span>연락 흐름</span><strong>{status.active?'통화 중':status.terminal?'통화 종료':status.ending?'종료 확인 중':status.incoming?'수신 연락':status.accepting?'연결 확인 중':'연락 준비'}</strong></div>
-  <div className="demo-motion-stage" aria-hidden="true"><span className="demo-flow-endpoint"><Phone size={18}/>상담원</span><span className="demo-flow-track"/><span className="demo-flow-node"><ArrowRight size={30}/><small>CallSign</small></span><span className="demo-flow-track"/><span className="demo-flow-endpoint"><Phone size={18}/>수신자</span><i key={scene.id} className="demo-flow-packet"/></div>
-  <div className="demo-flow-copy" role="status"><h2>{scene.title}</h2><p>{scene.detail}</p></div>
+  <div className="demo-motion-stage" aria-hidden="true"><span className="demo-flow-endpoint"><Phone size={18}/>상담원</span><span className="demo-flow-track"/><span className="demo-flow-node"><ArrowUpRight size={30}/><small>CallSign</small></span><span className="demo-flow-track"/><span className="demo-flow-endpoint"><Phone size={18}/>수신자</span><i key={scene.id} className="demo-flow-packet"/></div>
+  <div className="demo-flow-copy" role="status"><h2>{scene.title}</h2>{scene.id!=='ready'&&<p>{scene.detail}</p>}</div>
   {transcript}
+  <dl className="demo-flow-statuses"><div><dt>연락 승인</dt><dd>{status.invitationVerified?'검증됨':'확인 전'}</dd></div><div><dt>통화 연결</dt><dd>{status.active?'연결됨':status.terminal?'종료':status.incoming?'수락 대기':'연결 전'}</dd></div><div><dt>음성 분석</dt><dd>{status.analysisWithdrawn?'철회됨':unavailable?'분석 불가':risk?'위험 근거 확인':status.analysis.startsWith('상대 발화 분석 결과 수신')?'결과 수신':'동의·결과 확인 전'}</dd></div></dl>
   <div className="demo-flow-contract"><ShieldCheck size={18}/><span>{status.invitationVerified?'기관 승인 서명 확인됨':'기관 승인 확인 전'} · 통화 내용의 안전 보장은 아닙니다.</span></div>
   <details className="demo-flow-details"><summary><AudioLines size={16}/>승인·연결·분석 상태</summary>{verification}</details>
  </div>;

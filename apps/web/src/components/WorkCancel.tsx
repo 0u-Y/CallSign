@@ -1,0 +1,5 @@
+import {useState} from 'react';
+export function WorkCancel({intent,busy,action,post}:{intent:{id:string;recipientId:string};busy:boolean;action:(fn:()=>Promise<unknown>)=>Promise<void>;post:(path:string,body:unknown)=>Promise<unknown>}){
+ const [confirm,setConfirm]=useState(false);
+ return <div className="work-cancel"><button className="button danger work-cancel-open" disabled={busy} onClick={()=>setConfirm(true)}>선택 업무 취소</button>{confirm&&<div className="work-confirm" role="group" aria-label="선택 업무 취소 확인"><p>고객 {intent.recipientId}의 이 업무와 관련 통화만 취소합니다. 다른 업무와 기관 전체 권한은 유지됩니다.</p><button className="button danger" disabled={busy} onClick={()=>void action(async()=>{await post('/v3/cancel',{intentId:intent.id});setConfirm(false);})}>이 업무 취소 요청</button><button className="button quiet" onClick={()=>setConfirm(false)}>돌아가기</button><p>요청 성공은 양측 음성 중단 완료가 아닙니다. 업무 관리의 회수 관측을 확인하세요.</p></div>}</div>;
+}

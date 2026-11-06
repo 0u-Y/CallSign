@@ -97,3 +97,5 @@ The duplicate `CallSign_Recording_Demo_ShortVoice_v24 (1).html` has the same ver
 | Fixed controls and analysis surface | Bounded scrolling evidence, stable end/withdraw controls | Error/OFF/permission states remain visible |
 
 Independent actors remain independent authenticated sessions. Scene navigation never executes a fabricated call, management signature or provider result. Work/governance APIs and the audio/controller lifecycle are reused.
+
+The v24 recording composition now uses the reference's contact card, central flow, handset and lower institutional action strip. Account/setup and technical evidence are secondary panels rather than default paragraphs. Contact names are not copied from the fictional source: permitted account suffixes and registered institution address labels are used. A non-recipient window explicitly does not claim access to the recipient's live media/analysis state. The lower cancellation control reuses the work-screen command and confirmation. No timer or scenario tab establishes approval, media, AI completion or recovery.
