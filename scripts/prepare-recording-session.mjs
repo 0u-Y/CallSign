@@ -27,7 +27,7 @@ const control=await preparation.newPage({viewport:{width:660,height:520}});
 await control.exposeFunction('prepareCallsSign',async()=>{
  if(preparing)return preparing;
  preparing=(async()=>{
-  const result=[];
+  const result=[];const openPages={};const activeWorks={};
   await Promise.allSettled(contexts.splice(0).map(x=>x.close()));
   try{for(const a of accounts){
    const dir=resolve(profiles,a.role);
@@ -52,18 +52,29 @@ await control.exposeFunction('prepareCallsSign',async()=>{
     await page.waitForURL(url=>url.origin===web,{timeout:25000});
     await marker.waitFor({timeout:20000});
    }
-   const work=await page.locator('.demo-work-picker select option').allTextContents();
-   if(!work.some(x=>x.includes('진행 중')))result.push({role:a.role,status:'로그인됨 · 진행 중 업무 미확인'});
+   const work=await page.locator('.demo-work-picker select option').evaluateAll(options=>options.filter(option=>option.textContent?.includes('진행 중')).map(option=>option.value));
+   openPages[a.role]=page;activeWorks[a.role]=work;
+   if(!work.length)result.push({role:a.role,status:'로그인됨 · 진행 중 업무 미확인'});
    else result.push({role:a.role,status:'로그인됨 · 진행 중 업무 조회됨'});
    if(a.role==='institution'){await page.goto(`${web}/demo/work`,{waitUntil:'domcontentloaded'});try{await page.locator('.work-table tbody tr').first().waitFor({timeout:12000})}catch{await page.reload({waitUntil:'domcontentloaded'});await page.locator('.work-table tbody tr').first().waitFor({timeout:15000})}}
    if(captureDir)await page.screenshot({path:resolve(captureDir,`${a.role}.png`),fullPage:true});
    if(!check)await page.bringToFront();
   }
+  async function selectWork(page,id){const picker=page.locator('.demo-work-picker');if(!await picker.evaluate(element=>element.open))await picker.locator(':scope > summary').click();await picker.locator('select').selectOption(id,{timeout:5000})}
+  const common=activeWorks.gateway?.filter(id=>activeWorks.recipient?.includes(id))??[];
+  let shared=common[0],canPrepare=false;
+  for(const id of common){await selectWork(openPages.gateway,id);await openPages.gateway.getByText('이번 연락 승인',{exact:true}).first().waitFor({timeout:10000});if(await openPages.gateway.getByRole('button',{name:'연락 준비',exact:true}).isEnabled({timeout:3000})){shared=id;canPrepare=true;break}}
+  if(shared){
+   if(!canPrepare)await selectWork(openPages.gateway,shared);
+   await selectWork(openPages.recipient,shared);
+   for(const role of ['gateway','recipient'])if(captureDir)await openPages[role].screenshot({path:resolve(captureDir,`${role}.png`),fullPage:true});
+   for(const item of result)if(item.role!=='institution')item.status=canPrepare?'로그인됨 · 같은 업무 선택됨 · 연락 준비 가능':'로그인됨 · 같은 업무 선택됨 · 연락 준비 불가(위임·권한 확인)';
+  }else for(const item of result)if(item.role!=='institution')item.status='로그인됨 · 공통 진행 중 업무 없음';
   return result;
   }catch(error){await Promise.allSettled(contexts.splice(0).map(x=>x.close()));throw error;}
  })().finally(()=>{preparing=undefined});
  return preparing;
 });
-await control.setContent(`<meta charset="utf-8"><title>CallSign 촬영 준비</title><style>body{font:16px system-ui;max-width:580px;margin:48px auto;color:#14243d}button{background:#2563eb;color:white;border:0;border-radius:8px;padding:14px 20px;font-size:16px}button:disabled{opacity:.5}li{margin:12px 0}</style><h1>CallSign 촬영 준비</h1><p>보호된 로컬 계정으로 기관·상담원·수신자를 각각 독립 브라우저 프로필에 로그인합니다. 발신·동의·분석·정지는 실행하지 않습니다.</p><button id="prepare">촬영 세션 준비</button><p id="status" role="status">준비 전</p><ul id="roles"></ul><p>세션이 만료되면 이 화면에서 다시 준비하세요. 각 역할 창의 업무와 연결 상태를 확인한 뒤 촬영을 시작하세요.</p><script>const button=document.querySelector('#prepare'),status=document.querySelector('#status'),list=document.querySelector('#roles');button.onclick=async()=>{if(button.disabled)return;button.disabled=true;status.textContent='실제 계정 로그인과 업무 조회 중';list.replaceChildren();try{const items=await window.prepareCallsSign();for(const item of items){const li=document.createElement('li');li.textContent=item.role+' · '+item.status;list.append(li)}status.textContent=items.every(x=>x.status.includes('업무 조회됨'))?'준비 완료 · 역할별 창에서 촬영 시작':'로그인 완료 · 일부 업무 상태 확인 필요'}catch(e){status.textContent='준비 실패 · '+e.message+' · 다시 준비하세요'}finally{button.disabled=false}};</script>`);
-if(check){await control.locator('#prepare').click();await control.waitForFunction(()=>!document.querySelector('#prepare').disabled,{timeout:120000});const state=await control.locator('#status').innerText();if(captureDir)await control.screenshot({path:resolve(captureDir,'preparation.png')});console.log(state);if(!state.startsWith('준비 완료'))process.exitCode=1;await Promise.allSettled(contexts.map(x=>x.close()));await preparation.close();}
+await control.setContent(`<meta charset="utf-8"><title>CallSign 촬영 준비</title><style>body{font:16px system-ui;max-width:580px;margin:48px auto;color:#14243d}button{background:#2563eb;color:white;border:0;border-radius:8px;padding:14px 20px;font-size:16px}button:disabled{opacity:.5}li{margin:12px 0}</style><h1>CallSign 촬영 준비</h1><p>보호된 로컬 계정으로 기관·상담원·수신자를 각각 독립 브라우저 프로필에 로그인합니다. 발신·동의·분석·정지는 실행하지 않습니다.</p><button id="prepare">촬영 세션 준비</button><p id="status" role="status">준비 전</p><ul id="roles"></ul><p>세션이 만료되면 이 화면에서 다시 준비하세요. 각 역할 창의 업무와 연결 상태를 확인한 뒤 촬영을 시작하세요.</p><script>const button=document.querySelector('#prepare'),status=document.querySelector('#status'),list=document.querySelector('#roles');button.onclick=async()=>{if(button.disabled)return;button.disabled=true;status.textContent='실제 계정 로그인과 업무 조회 중';list.replaceChildren();try{const items=await window.prepareCallsSign();for(const item of items){const li=document.createElement('li');li.textContent=item.role+' · '+item.status;list.append(li)}status.textContent=items.some(x=>x.role==='institution'&&x.status.includes('업무 조회됨'))&&items.filter(x=>x.role!=='institution').every(x=>x.status.includes('연락 준비 가능'))?'준비 완료 · 역할별 창에서 촬영 시작':'로그인 완료 · 촬영 전 업무·위임 상태 확인 필요'}catch(e){status.textContent='준비 실패 · '+e.message+' · 다시 준비하세요'}finally{button.disabled=false}};</script>`);
+if(check){await control.locator('#prepare').click();await control.waitForFunction(()=>!document.querySelector('#prepare').disabled,undefined,{timeout:120000});const state=await control.locator('#status').innerText();if(captureDir)await control.screenshot({path:resolve(captureDir,'preparation.png')});console.log(state);if(!state.startsWith('준비 완료'))process.exitCode=1;await Promise.allSettled(contexts.map(x=>x.close()));await preparation.close();}
 else{await control.bringToFront();await new Promise(resolve=>process.once('SIGINT',resolve));await Promise.allSettled(contexts.map(x=>x.close()));await preparation.close();}
