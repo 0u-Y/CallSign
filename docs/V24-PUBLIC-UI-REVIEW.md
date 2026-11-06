@@ -225,3 +225,5 @@ A=복원할 시각 차이, B=실제 인증·권한상 필요한 차이, C=동작
 case54 (`public-call-smoke-54-space-cancel`)는 승인·PBX 협상과 Space 수락 입력 뒤 연결 완료 대기에서 timeout했다. 기관 취소 단계에는 도달하지 않았다. workspace/call-context의 `ERR_NETWORK_CHANGED`가 함께 관측됐으며 인과관계는 미확정이다. 원본 실패를 보존하고 추가 자동 시도는 하지 않았다. 종료 후 두 시험의 DB 상태는 각각 ended/failed, 전체 비종료 시도 0, 만료 예약 0, 처리 시각이 지난 pending 0, PBX 채널 0이었다.
 
 별도로 `DemoDirector`의 객체 의존성 결함을 재현했다. 같은 행동 상태를 새 객체로 전달하는 부모 갱신만으로 effect cleanup이 강조/클릭 타이머를 지웠다. 실제 Space → 100ms 후 같은 상태 재렌더 회귀는 수정 전 호출 0으로 FAIL, 행동에 필요한 scalar 상태 의존성으로 수정 후 호출 1로 PASS다. 역할/identity/종료 등 의미 있는 변화의 취소, 연타·입력·dialog·라우트 경계는 유지했다. 이는 재현한 UI 결함의 수정이며 case54의 모든 네트워크 오류가 해결됐다는 뜻은 아니다. 수정 후 실제 공개 재검증은 별도다.
+
+원본/공개 동일1440px computed-style 대조(`compare-layout/layout.json`)에서 제품의 상속 16px/26.4px line-height 및 전역 article min-height76px이 공동 관리 카드를 원본보다 키우는 것을 확인했다. governance 범위에 원본14px/normal과 approver 행의 원본 최소높이를 복원했다. 관련 fixture1440/1920/390 검사 PASS, 데스크톱·390px 캡처를 직접 검토했다. 독립 서명 가져오기·실제 관측 미확인 안내는 시뮬레이션 버튼으로 바꾸지 않는다.

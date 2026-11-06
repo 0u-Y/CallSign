@@ -182,3 +182,10 @@
 
 #callsign-recording .phone #demo-analysis-result .service-analysis :is(p,small,summary){color:#eef3f5}
 #callsign-recording .top{flex-wrap:wrap;height:auto;min-height:78px;row-gap:8px}
+
+/* The product fieldset/article defaults must not expand the original governance cards. */
+#callsign-recording .demo-recording-governance :is(.gov-summary,.recovery-review,.approval-panel,.recovery-panel){font-size:14px;line-height:normal}
+#callsign-recording .demo-recording-governance :is(.gov-summary h2,.gov-section-title h2,.approval-count b){line-height:normal}
+#callsign-recording .approver-list article.approver{min-height:0}
+
+#callsign-recording .gov-summary>button{flex-shrink:0;white-space:nowrap}
