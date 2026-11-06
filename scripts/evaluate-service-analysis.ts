@@ -1,3 +1,5 @@
+import {riskEvaluationFixtureSchema,evaluateRiskAnalysis,type RiskEvaluationObservation} from '../services/api/src/risk-evaluation.js';
+import {riskSnapshot} from '../services/api/src/risk-assessment.js';
 import {analyzeWithRules} from '../services/api/src/risk.js';
 import {fixtureSchema,observedImageSchema} from '../services/api/src/observation-contract.js';
 import {readFile,writeFile,lstat} from 'node:fs/promises';
@@ -6,7 +8,7 @@ import {pathToFileURL} from 'node:url';
 import {createHash} from 'node:crypto';
 import {bankPolicy,riskCategorySchema,serviceAnalysisSchema,policyHash,type ServiceAnalysis} from '../packages/protocol/src/index.js';
 import {speechProviderConfiguration} from '../services/api/src/provider-configuration.js';
-import {mergePolicySignals,analyzeServiceWithProvider} from '../services/api/src/service-analysis.js';
+import {mergePolicySignals,analyzeServiceWithProvider,analyzeRiskWithProvider} from '../services/api/src/service-analysis.js';
 export function evaluateServiceAnalysis(fixtureValue:unknown,observations:Array<{id:string;result:ServiceAnalysis;unavailable?:boolean}>,provenance:'synthetic-replay'|'actual-provider'){
  const fixture=fixtureSchema.parse(fixtureValue);const families=new Map<string,string>();for(const c of fixture.cases){const family=c.family??c.id;const old=families.get(family);if(old&&old!==c.split)throw new Error('EVALUATION_FAMILY_SPLIT_LEAKAGE');families.set(family,c.split);}if(new Set(fixture.cases.map(c=>c.id)).size!==fixture.cases.length||new Set(observations.map(c=>c.id)).size!==observations.length||observations.some(o=>!fixture.cases.some(c=>c.id===o.id)))throw new Error('EVALUATION_CASE_ID_MISMATCH');
  const groups=(['development','evaluation'] as const).map(split=>{const cases=fixture.cases.filter(c=>c.split===split);let signalsFalsePositive=0,signalsFalseNegative=0,purposeFalsePositive=0,purposeFalseNegative=0,unsupportedPurposeJudgments=0,undetermined=0,unavailable=0,notRun=0;
@@ -27,7 +29,17 @@ export function assertEvaluationCostBudget(env:NodeJS.ProcessEnv,calls:number){
 export async function runServiceEvaluation(fixturePath:string,output:string,provider=false){
  if(provider)assertProviderEvaluation(process.env);
  try{await lstat(output);throw new Error('OUTPUT_ALREADY_EXISTS');}catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e;}
- const bytes=await readFile(fixturePath);if(bytes.length>65536)throw new Error('FIXTURE_TOO_LARGE');const fixture=fixtureSchema.parse(JSON.parse(bytes.toString())),observations:Array<{id:string;result:ServiceAnalysis;unavailable?:boolean}>=[];
+ const bytes=await readFile(fixturePath);if(bytes.length>65536)throw new Error('FIXTURE_TOO_LARGE');const parsed:unknown=JSON.parse(bytes.toString());
+ if(riskEvaluationFixtureSchema.safeParse(parsed).success){
+  const fixture=riskEvaluationFixtureSchema.parse(parsed),selected=fixture.cases.filter(c=>c.split==='evaluation'),observations:RiskEvaluationObservation[]=[];
+  evaluateRiskAnalysis(fixture,[],'synthetic-replay');const costBudget=provider?assertEvaluationCostBudget(process.env,selected.length):null;
+  const configuration=provider?await speechProviderConfiguration():undefined;if(provider&&!configuration?.llm)throw Error('PROVIDER_NOT_CONFIGURED');let providerCalls=0;
+  if(provider)for(const c of selected){const units=riskSnapshot(c.segments.map((text,i)=>({segmentId:String(i),revision:1,text}))),start=performance.now();providerCalls++;try{observations.push({id:c.id,output:await analyzeRiskWithProvider(configuration!.llm!,{units,policy:bankPolicy,signal:AbortSignal.timeout(4000)}),elapsedMs:performance.now()-start});}catch{observations.push({id:c.id,failed:true,elapsedMs:performance.now()-start});}}
+  const report={...evaluateRiskAnalysis(fixture,observations,provider?'actual-provider':'synthetic-replay'),providerCalls,costBudget,invoice:'NOT_MEASURED',fixtureSha256:createHash('sha256').update(bytes).digest('hex'),model:configuration?.llm?.model??null,sourceSha256:process.env.CALLSIGN_EVALUATION_SOURCE_SHA256??null};
+  await writeFile(output,JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});return report;
+ }
+ if(provider)throw Error('LEGACY_PURPOSE_PROVIDER_EVALUATION_DISABLED');
+ const fixture=fixtureSchema.parse(parsed),observations:Array<{id:string;result:ServiceAnalysis;unavailable?:boolean}>=[];
  evaluateServiceAnalysis(fixture,[],'synthetic-replay');
  // At most 20 sequential requests, <=4000 chars each, 4s per provider request, no retry.
  let providerCalls=0;

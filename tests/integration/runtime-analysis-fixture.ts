@@ -4,18 +4,18 @@ import {resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {timingSafeEqual} from 'node:crypto';
 import type {AudioProviders} from '../../services/api/src/service-audio.js';
-import {analyzeWithRules} from '../../services/api/src/risk.js';
+import type {RiskUnit} from '../../services/api/src/risk-assessment.js';
 export const fixtureSpeech='OTP를 알려주세요. 대출 상품을 안내하겠습니다.';
 export function analysisFixture(){
- const streams:Array<{options:Parameters<AudioProviders['stream']>[0];frames:number;stopped:boolean}>=[],calls:Array<{text:string;signal:AbortSignal;done:boolean;resolve:(v:any)=>void;reject:(e:Error)=>void}>=[];
- const providers:AudioProviders={stream(options){const s={options,frames:0,stopped:false};streams.push(s);return {connect(){options.onReady?.();},push(){if(s.stopped)throw new Error('FIXTURE_FRAME_AFTER_STOP');s.frames++;},stop(){s.stopped=true;}};},analyze(text,_policy,signal){return new Promise((resolve,reject)=>{calls.push({text,signal,done:false,resolve,reject});});}};
+ const streams:Array<{options:Parameters<AudioProviders['stream']>[0];frames:number;stopped:boolean}>=[],calls:Array<{units:RiskUnit[];policy:import('../../packages/protocol/src/index.js').PurposePolicy;signal:AbortSignal;done:boolean;resolve:(v:any)=>void;reject:(e:Error)=>void}>=[];
+ const providers:AudioProviders={stream(options){const s={options,frames:0,stopped:false};streams.push(s);return {connect(){options.onReady?.();},push(){if(s.stopped)throw new Error('FIXTURE_FRAME_AFTER_STOP');s.frames++;},stop(){s.stopped=true;}};},analyze(units,policy,signal){return new Promise((resolve,reject)=>{calls.push({units,policy,signal,done:false,resolve,reject});});}};
  function control(value:unknown){
   if(!value||typeof value!=='object'||Array.isArray(value))throw new Error('FIXTURE_COMMAND_INVALID');
   const b=value as Record<string,unknown>,op=b.op;
   if(op==='reset'&&Object.keys(b).length===1){if(streams.some(s=>!s.stopped)||calls.some(c=>!c.done))throw new Error('FIXTURE_NOT_DRAINED');streams.length=0;calls.length=0;return {reset:true};}
   if(op==='state'&&Object.keys(b).length===1)return {fixture:true,streams:streams.map(s=>({frames:s.frames,stopped:s.stopped})),requests:calls.map(c=>({aborted:c.signal.aborted,done:c.done}))};
   if(op==='emit'&&Object.keys(b).sort().join(',')==='op,revision,stream'&&Number.isInteger(b.stream)&&Number(b.stream)>=0&&Number.isInteger(b.revision)&&Number(b.revision)>0&&Number(b.revision)<=10){const s=streams[Number(b.stream)];if(!s||s.stopped)throw new Error('FIXTURE_STREAM_NOT_ACTIVE');s.options.onRevision({streamId:s.options.streamId,segmentId:'purpose',revision:Number(b.revision),final:true,text:fixtureSpeech,source:'remote'});return {injected:true};}
-  if(op==='resolve'&&Object.keys(b).sort().join(',')==='mode,op,request'&&Number.isInteger(b.request)&&Number(b.request)>=0&&['suspected','not-detected','failure'].includes(String(b.mode))){const c=calls[Number(b.request)];if(!c||c.done)throw new Error('FIXTURE_REQUEST_NOT_PENDING');c.done=true;if(b.mode==='failure')c.reject(new Error('SYNTHETIC_PROVIDER_FAILURE'));else c.resolve({...analyzeWithRules(c.text),purpose:{relation:b.mode,evidenceSpan:b.mode==='suspected'?'대출 상품을 안내하겠습니다.':'',reason:'합성 제공자 응답 · 모델 품질 평가 아님'}});return {resolved:true};}
+  if(op==='resolve'&&Object.keys(b).sort().join(',')==='mode,op,request'&&Number.isInteger(b.request)&&Number(b.request)>=0&&['suspected','not-detected','failure'].includes(String(b.mode))){const c=calls[Number(b.request)];if(!c||c.done)throw new Error('FIXTURE_REQUEST_NOT_PENDING');c.done=true;if(b.mode==='failure')c.reject(new Error('SYNTHETIC_PROVIDER_FAILURE'));else c.resolve({assessments:c.policy.forbiddenRequests.map(code=>({code,result:code==='OTP'?'detected':'undetermined',evidenceIds:code==='OTP'?[c.units[0]!.id]:[],explanation:'합성 제공자 응답 · 모델 품질 평가 아님'}))});return {resolved:true};}
   throw new Error('FIXTURE_COMMAND_INVALID');
  }
  return {providers,control};

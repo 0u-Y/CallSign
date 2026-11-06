@@ -8,13 +8,14 @@ import type { Actor } from './finals-model.js';
 import { activeIntent } from './finals-model.js';
 import { ServiceAuthority } from './service-authority.js';
 import { SessionConnections } from './session-connections.js';
+import type {RiskUnit} from './risk-assessment.js';
 import { DeepgramStream } from './transcription.js';
 import {analysisSmokeBudget,speechProviderConfiguration} from './provider-configuration.js';
-import { ServiceRevisionAnalyzer, analyzeServiceWithAnthropic, analyzeServiceWithProvider, assertAnalysisPolicy, purposeAuthorityCurrent } from './service-analysis.js';
+import { ServiceRevisionAnalyzer, analyzeRiskWithProvider, assertAnalysisPolicy, purposeAuthorityCurrent } from './service-analysis.js';
 
 export interface AudioProviders {
  stream(options:ConstructorParameters<typeof DeepgramStream>[0]):Pick<DeepgramStream,'connect'|'push'|'stop'>;
- analyze?:(text:string,policy:Parameters<typeof analyzeServiceWithAnthropic>[0]['policy'],signal:AbortSignal)=>ReturnType<typeof analyzeServiceWithAnthropic>;
+ analyze?:(units:RiskUnit[],policy:import('@callsign/protocol').PurposePolicy,signal:AbortSignal)=>Promise<unknown>;
 }
 export async function registerServiceAudio(app:FastifyInstance,options:{authority:ServiceAuthority;actorFor(r:FastifyRequest):Promise<Actor>;sessionId(r:FastifyRequest):Promise<string>;connections:SessionConnections;origin:string;quota:QuotaStore;providers?:AudioProviders}){
  const configuration=options.providers?undefined:await speechProviderConfiguration();
@@ -58,22 +59,22 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
           await a.options.store.transact(actor.institutionId,async record=>{const {attempt}=a.party(record,actor,attemptId);if(!attempt.consent?.granted||attempt.consent.generation!==generation||attempt.consent.streamId)throw new Error('CONSENT_STREAM_ALREADY_USED');attempt.consent.streamId=streamId;});
           if(stopped)return;
           let requests=0;
-          const llm=(options.providers?.analyze||configuration?.llm)?(text:string,policy:typeof initial.policy,signal:AbortSignal)=>track((async()=>{
-            assertBudget();if(budget&&budget.llmRequests===0)throw new Error('ANALYSIS_SMOKE_BUDGET_EXHAUSTED');if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');await a.idempotent(actor,`llm-${streamId}-${++requests}`,{streamId,requests},async record=>{const {attempt}=a.party(record,actor,attemptId);a.usage(record,actor,attempt,'llm-requests',1,20);a.usage(record,actor,attempt,'llm-input-bytes',Buffer.byteLength(text),100000);return {reserved:true};});
+          const llm=(options.providers?.analyze||configuration?.llm)?(units:RiskUnit[],policy:typeof initial.policy,signal:AbortSignal)=>track((async()=>{
+            assertBudget();if(budget&&budget.llmRequests===0)throw new Error('ANALYSIS_SMOKE_BUDGET_EXHAUSTED');if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');await a.idempotent(actor,`llm-${streamId}-${++requests}`,{streamId,requests},async record=>{const {attempt}=a.party(record,actor,attemptId);a.usage(record,actor,attempt,'llm-requests',1,20);a.usage(record,actor,attempt,'llm-input-bytes',Buffer.byteLength(units.map(u=>u.text).join('')),100000);return {reserved:true};});
             if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
             const quotaId=`llm:${streamId}:${requests}`;await options.quota.reserve(quotaId,actor.institutionId,'llm-requests',1,[...analysisScopes(actor.institutionId,actor.userId,attemptId,'llm-requests',20,a.now()),...budgetScopes('llm-requests',budget?.llmRequests??20)],expiresAt);
             if(signal.aborted||stopped){await settle(quotaId,0);throw new Error('ANALYSIS_CANCELLED');}
             let cancel:(()=>void)|undefined,invoked=false;const requestStarted=performance.now();
             try{assertBudget();if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
               const cancelled=new Promise<never>((_,reject)=>{cancel=()=>reject(new Error('ANALYSIS_CANCELLED'));signal.addEventListener('abort',cancel,{once:true});});
-              invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(text,policy,signal):analyzeServiceWithProvider(configuration!.llm!,{text,policy,signal}),cancelled]));
+              invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(units,policy,signal):analyzeRiskWithProvider(configuration!.llm!,{units,policy,signal}),cancelled]));
             }catch(error){
               const reason=signal.aborted?'CANCELLED':error instanceof Error&&/^LLM_(?:PROVIDER_HTTP_[45][0-9]{2}|EVIDENCE_INVALID|RESPONSE_TOO_LARGE|RESPONSE_JSON_INVALID|ANALYSIS_JSON_INVALID|INPUT_TOO_LARGE|CANCELLED|UNAVAILABLE)$/.test(error.message)?error.message:error instanceof Error&&error.name==='TimeoutError'?'TIMEOUT':error instanceof Error&&error.name==='ZodError'?'RESPONSE_SCHEMA_INVALID':'UNCLASSIFIED';
               // The normal entrypoint disables request logging; emit only these allowlisted diagnostics.
               process.stderr.write(JSON.stringify({code:'ANALYSIS_PROVIDER_REQUEST_FAILED',reason,streamId,requestNumber:requests,elapsedMs:Math.round(performance.now()-requestStarted)})+'\n');throw error;
             }finally{if(cancel)signal.removeEventListener('abort',cancel);await settle(quotaId,invoked?1:0);}
           })()):undefined;
-          analyzer=new ServiceRevisionAnalyzer(initial.policy,event=>{if(stopped||!analyzer?.isCurrent(event))return;void allowed().then(current=>{if(!stopped&&analyzer?.isCurrent(event))send({type:'risk',event:current?event:{...event,status:'unavailable',engine:'authority-unavailable',purpose:{relation:'undetermined',evidenceSpan:'',reason:'현재 권한·정책의 최신성을 확인할 수 없습니다. 기존 규칙 근거만 참고하세요.'}}});}).catch(stop);},llm);analyzer.start(streamId);
+          analyzer=new ServiceRevisionAnalyzer(initial.policy,event=>{if(stopped||!analyzer?.isCurrent(event))return;void allowed().then(current=>{if(!stopped&&analyzer?.isCurrent(event))send({type:'risk',event:current?event:{...event,status:'unavailable',engine:'authority-unavailable'}});}).catch(stop);},{scope:'risk-2',...(llm?{analyze:llm}:{})});analyzer.start(streamId);
           assertBudget();const streamOptions:ConstructorParameters<typeof DeepgramStream>[0]={apiKey:configuration?.stt.apiKey??'explicit-test-provider',model:configuration?.stt.model??'explicit-test-provider',streamId,maxDurationMs:Math.min(streamSeconds,budget?budget.expiresAt-a.now():streamSeconds)*1000,
             onReady:()=>{if(!providerStartedAt)providerStartedAt=Date.now();send({type:'provider-ready',engine:options.providers?'fixture-stream':'deepgram',llm:llm?(options.providers?'fixture-model':configuration!.llm!.provider):'disabled-rules-only'});},
             onRevision:revision=>{if(stopped||revision.streamId!==streamId||revision.revision<=(revisions.get(revision.segmentId)??0))return;revisions.set(revision.segmentId,revision.revision);void allowed().then(()=>{if(stopped||revisions.get(revision.segmentId)!==revision.revision)return;if(firstAudioAt&&!firstRevisionMeasured){measurements.observe('stt','success',performance.now()-firstAudioAt);firstRevisionMeasured=true;}return analyzer!.accept(revision).then(accepted=>{if(accepted&&!stopped&&revisions.get(revision.segmentId)===revision.revision)send({type:'revision',revision,contextRevision:analyzer!.contextRevision});});}).catch(()=>{send({type:'unavailable',code:'ANALYSIS_LIMIT'});stop();});},

@@ -17,7 +17,7 @@ it('invalidates the entire context on corrections and discards a delayed depende
  let complete!:(x:ReturnType<typeof response>)=>void;const {a,events}=fixture(async()=>new Promise(r=>{complete=r;}));
  await a.accept(rev('OTP를 알려주세요.'));const pending=a.flush();const first=events.at(-1)!;
  await a.accept(rev('OTP를 알려주지 마세요.',2));expect(a.isCurrent(first)).toBe(false);expect(events.at(-1)?.signals).toEqual([]);
- complete(response('suspected','OTP를 알려주세요.'));await pending;expect(events.at(-1)?.purpose.relation).toBe('undetermined');expect(events.at(-1)?.signals).toEqual([]);
+ complete(response('suspected','OTP를 알려주세요.'));await pending;expect((events.at(-1) as ReturnType<typeof import('../../packages/protocol/src/index.js').legacyServiceAnalysisEventSchema.parse>|undefined)?.purpose.relation).toBe('undetermined');expect(events.at(-1)?.signals).toEqual([]);
  expect(await a.accept(rev('OTP를 알려주세요.',1))).toBe(false);
 });
 it('handles split requests, correction across segments and bounded remote-only context',async()=>{
@@ -61,7 +61,7 @@ it('does not display an unsupported no-deviation label while retaining independe
  const {a,events}=fixture(async()=>({...response(),purpose:{relation:'not-detected',evidenceSpan:'',reason:'The unsolicited offer is unrelated to the approved purpose.'}}));
  await a.accept(rev('인증번호를 알려주세요. 대출 상품도 안내합니다.'));await a.flush();
  expect(events.at(-1)).toMatchObject({status:'unavailable',purpose:{relation:'undetermined'},signals:[{category:'인증번호 요구'}]});
- expect(events.at(-1)?.purpose.reason).not.toContain('unrelated');
+ expect((events.at(-1) as ReturnType<typeof import('../../packages/protocol/src/index.js').legacyServiceAnalysisEventSchema.parse>|undefined)?.purpose.reason).not.toContain('unrelated');
 });
 
 it('does not cancel or rebill finalized context for interim speech in a different segment',async()=>{
@@ -95,7 +95,7 @@ it('finishes one in-flight request while coalescing appended final segments, wit
  calls[0]!.complete(response('not-detected','거래 확인입니다.'));await pending;expect(events.at(-1)?.status).not.toBe('analyzed');
  await vi.advanceTimersByTimeAsync(300);expect(provider).toHaveBeenCalledTimes(2);
  await a.accept(rev('정정합니다. 상품 권유는 하지 않습니다.',2,'2'));expect(calls[1]!.signal.aborted).toBe(true);
- calls[1]!.complete(response('suspected','대출 상품을 권유합니다.'));await Promise.resolve();expect(events.at(-1)?.purpose.relation).not.toBe('suspected');
+ calls[1]!.complete(response('suspected','대출 상품을 권유합니다.'));await Promise.resolve();expect((events.at(-1) as ReturnType<typeof import('../../packages/protocol/src/index.js').legacyServiceAnalysisEventSchema.parse>|undefined)?.purpose.relation).not.toBe('suspected');
 });
 
 

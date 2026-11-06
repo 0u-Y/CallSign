@@ -10,6 +10,8 @@
 
 18:11 KST 후속: 승인된 case33은 실제 통화·파일 송출 표시·Deepgram ready 뒤 전사0으로 실패했다. OpenAI0요청, STT1연결/서버 정산 경과4초이며 실제 음성 길이·청구액은 미확인. 제공자OFF 복귀·수정 issuer readiness200·활성통화/예약0·trial/세션 정리 확인. 동일 확정 문맥의 partial이 완료 분석을 지우는 결함은 수정·반영했으나 실제 완료 표시까지 PASS가 아니다. 종료 타임라인 관측 누락은 후속 observer에서 보완했고 새 실호출은 승인 대기다. 상세는 기존 진행 기록과 Recording result의 analysisCompletion20261106을 따른다.
 
+2026-11-06 위험 요구 전용 후속: 사용자 핵심 요구와 실제 코드 기준으로 `callsign-risk-2` 프롬프트·근거/정정 계약·서버·수신자 표시·평가 준비를 구현했다. 목적 이탈 LLM 판정은 제외하지만 기관 권한/목적 검증은 유지한다. 코드/오프라인 검사와 runtime 반영·실제 모델 결과는 별개이며, 이번 수정의 실호출/인증 브라우저 확인은 미실행이다. [구현·검증 경계](../FINALS-IMPLEMENTATION-PLAN.md#2026-11-06-risk-only-grounded-analysis-offline-implementation)를 따른다.
+
 ## 현재 작업표
 
 | 영역·요구 ID | 구현과 저장된 실행 근거 | 남은 확인 |

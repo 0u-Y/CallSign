@@ -1,0 +1,52 @@
+{
+  "scope": "offline risk-only implementation from user-supplied core requirements and actual code; separate original prompt/design documents not reviewed",
+  "promptVersion": "callsign-risk-2",
+  "eventVersion": "risk-context-2",
+  "recordedAt": "2026-11-06T10:44:27.821676+00:00",
+  "checks": [
+    {
+      "command": "pnpm typecheck",
+      "result": "PASS"
+    },
+    {
+      "command": "pnpm lint",
+      "result": "PASS"
+    },
+    {
+      "command": "focused risk/provider/scheduler/audio/controller/panel vitest run",
+      "files": 10,
+      "tests": 83,
+      "result": "PASS"
+    },
+    {
+      "command": "risk assessment/lifecycle/evaluation and analysis-stop final focused vitest run",
+      "files": 4,
+      "tests": 37,
+      "result": "PASS",
+      "note": "Overlaps the prior run; counts are not added."
+    },
+    {
+      "command": "pnpm --filter @callsign/web build",
+      "result": "PASS",
+      "warnings": [
+        "existing dynamic/static imports",
+        "bundle over 500kB"
+      ]
+    }
+  ],
+  "actualProviderCalls": 0,
+  "actualMediaTrials": 0,
+  "runtimeChanged": false,
+  "authenticatedBrowserVerification": "NOT_RUN",
+  "modelQuality": "NOT_RUN",
+  "heldoutEvaluation": "NOT_RUN",
+  "priorIssuerSource": "1ac1c0d41d14f27f2a6de8603cdf0773bb2469ff",
+  "priorIssuerImageConfigId": "sha256:57e22e97c018b045f68c9dbcaa1a329f740d490e850927bb1d253951486c47d5",
+  "sourceIdentity": "the Git commit containing this file; tests ran with the documented changes uncommitted",
+  "limitations": [
+    "Known contradiction guards are not semantic proof.",
+    "Synthetic expected labels are not independent human review.",
+    "Legacy purpose event parsing remains explicit compatibility only.",
+    "No original failures or persistent data were overwritten."
+  ]
+}

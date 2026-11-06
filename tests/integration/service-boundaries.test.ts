@@ -1,3 +1,5 @@
+import {bankPolicy} from '../../packages/protocol/src/index.js';
+import {riskSnapshot,ruleRiskAssessments} from '../../services/api/src/risk-assessment.js';
 import {beforeEach,afterEach,it,expect} from 'vitest';
 import {readFile,writeFile} from 'node:fs/promises';
 import {randomUUID} from 'node:crypto';
@@ -221,26 +223,26 @@ async function analysisCall(){
  const stream=f.audio.streams[0]!,revision=(n:number,text:string,id='purpose')=>stream.options.onRevision({streamId:stream.options.streamId,segmentId:id,revision:n,final:true,text,source:'remote'});
  return {...call,...active,stream,revision};
 }
-const purposeResult=(text:string,relation:'suspected'|'not-detected'|'undetermined'='not-detected',evidenceSpan='')=>({...analyzeWithRules(text),purpose:{relation,evidenceSpan,reason:relation==='suspected'?'승인 목적과 다른 상품 권유':'분석 범위의 관계만 표시'}});
-it('analysis HTTP/WS: preserves rule warnings alongside purpose results and retracts corrected, duplicate and reversed evidence',async()=>{
+const riskResult=(text:string)=>({assessments:ruleRiskAssessments(riskSnapshot([{segmentId:'fixture',revision:1,text}]),bankPolicy).map(r=>({code:r.code,result:r.result,evidenceIds:r.evidence.length?['u0']:[],explanation:'합성 위험 요구 시험 결과입니다.'}))});
+it('analysis HTTP/WS: preserves separate rule and risk-only results and retracts corrected, duplicate and reversed evidence',async()=>{
  const c=await analysisCall();try{
   const text='OTP를 알려주세요. 대출 상품을 안내하겠습니다.';c.revision(1,text);await expect.poll(()=>f.audio.calls.length).toBe(1);
   expect(hashCanonical(f.audio.calls[0]!.policy)).toBe(hashCanonical((await f.state()).policy));
-  f.audio.calls[0]!.resolve(purposeResult(text,'suspected','대출 상품을 안내하겠습니다.'));
-  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.purpose.relation).toBe('suspected');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
-  c.revision(2,text);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(purposeResult(text));
-  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.purpose.relation).toBe('not-detected');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
-  c.revision(3,'OTP를 알려주지 마세요.');await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.resolve(purposeResult('OTP를 알려주지 마세요.'));await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('analyzed');expect(c.messages.findLast(m=>m.type==='risk').event.signals).toEqual([]);
+  f.audio.calls[0]!.resolve(riskResult(text));
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('analyzed');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+  c.revision(2,text);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(riskResult(text));
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('analyzed');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+  c.revision(3,'OTP를 알려주지 마세요.');await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.resolve(riskResult('OTP를 알려주지 마세요.'));await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('analyzed');expect(c.messages.findLast(m=>m.type==='risk').event.signals).toEqual([]);
   c.revision(2,text);c.revision(3,text);expect(f.audio.calls).toHaveLength(3);
   c.revision(1,'OTP를','1');c.revision(1,'알려주세요.','2');await expect.poll(()=>f.audio.calls.length).toBe(4);expect(f.audio.calls[3]!.text).toContain('OTP를 알려주세요.');f.audio.calls[3]!.reject(new Error('FIXTURE_PROVIDER_TIMEOUT'));
-  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(c.messages.findLast(m=>m.type==='risk').event).toMatchObject({purpose:{relation:'undetermined'}});expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(c.messages.findLast(m=>m.type==='risk').event).not.toHaveProperty('purpose');expect(c.messages.findLast(m=>m.type==='risk').event.signals.length).toBeGreaterThan(0);
  }finally{c.ws.terminate();}
 },20000);
 it.each(['invented-evidence','external-command'] as const)('analysis HTTP/WS: rejects %s while retaining supported rules and product-controlled actions',async mode=>{
  const c=await analysisCall();try{
   c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
-  f.audio.calls[0]!.resolve({...purposeResult('OTP를 알려주세요.','suspected',mode==='invented-evidence'?'실제 문맥에 없는 대출 권유':'OTP를 알려주세요.'),recommendedAction:'https://untrusted.invalid/execute',purpose:{relation:'suspected',evidenceSpan:mode==='invented-evidence'?'실제 문맥에 없는 대출 권유':'OTP를 알려주세요.',reason:mode==='external-command'?'https://untrusted.invalid/execute':'분석 근거'}});
-  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event.purpose.relation).toBe('undetermined');expect(JSON.stringify(event)).not.toContain('untrusted.invalid');expect((await f.state()).status).toBe('active');expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
+  const invalid=riskResult('OTP를 알려주세요.');invalid.assessments[0]!.evidenceIds=mode==='invented-evidence'?['u5']:['u0'];if(mode==='external-command')invalid.assessments[0]!.explanation='https://untrusted.invalid/execute';f.audio.calls[0]!.resolve(invalid);
+  await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event).not.toHaveProperty('purpose');expect(JSON.stringify(event)).not.toContain('untrusted.invalid');expect((await f.state()).status).toBe('active');expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
  }finally{c.ws.terminate();}
 });
 it.each(['epoch','key-generation','binding'] as const)('analysis HTTP/WS: rejects %s mismatch before forwarding a new frame',async change=>{
@@ -248,14 +250,14 @@ it.each(['epoch','key-generation','binding'] as const)('analysis HTTP/WS: reject
   c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
   await f.mutate(r=>{const t=r.serviceV3!.attempts[c.attempt.id]!;if(change==='epoch')t.lease!.payload.epoch='999';else if(change==='key-generation')t.lease!.payload.approvalKeyVersion=999;else t.lease!.payload.bindingHash='0'.repeat(64);});
   c.ws.send(Buffer.from([0,0]));await expect.poll(()=>c.stream.stopped).toBe(true);expect(c.stream.pushes).toBe(0);expect(f.audio.calls[0]!.signal.aborted).toBe(true);
-  const before=c.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.messages.filter(m=>m.type==='risk')).toHaveLength(before);
+  const before=c.messages.filter(m=>m.type==='risk').length;f.audio.calls[0]!.resolve(riskResult('OTP를 알려주세요.'));await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.messages.filter(m=>m.type==='risk')).toHaveLength(before);
  }finally{c.ws.terminate();}
 });
 it('analysis HTTP/WS: account disable invalidates real authenticated sockets and pending provider work',async()=>{
  const c=await analysisCall();try{
   c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
   expect((await c.manager.c.request('/v3/management/accounts',{issuer:f.oidc,subject:'recipient',displayName:'수신자 시험 계정',role:'recipient',active:false,permissions:[]})).status).toBe(200);
-  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
+  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(riskResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
  }finally{c.ws.terminate();}
 });
 it('analysis HTTP/WS: enforces the remote context identity cap and releases the stream',async()=>{
@@ -309,13 +311,13 @@ it('analysis HTTP/WS: rejects an expired session row and cancels its pending pro
  const c=await analysisCall();try{
   c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>f.audio.calls.length).toBe(1);
   const token=c.receiver.c.cookies.get('ip_session')!;await f.sql`UPDATE public.sessions SET expires_at=now()-interval '1 second' WHERE token_hash=${tokenHash(token)}`;
-  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
+  await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);const before=c.messages.length;f.audio.calls[0]!.resolve(riskResult('OTP를 알려주세요.'));expect(c.messages).toHaveLength(before);expect((await c.receiver.c.request('/v3/workspace')).status).toBe(401);
  }finally{c.ws.terminate();}
 });
 it('analysis HTTP/WS: SQL quota denial keeps rule evidence and never invokes the model adapter',async()=>{
  const c=await analysisCall(),quota=postgresQuotaStore(process.env.ISSUER_DATABASE_URL!),reservation='fixture-quota-'+randomUUID();try{
   await quota.reserve(reservation,f.id,'llm-requests',20,analysisScopes(f.id,f.uid('recipient'),c.attempt.id,'llm-requests',20,f.now()),f.now()+120);
-  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(f.audio.calls).toHaveLength(0);const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event.purpose.relation).toBe('undetermined');
+  c.revision(1,'OTP를 알려주세요.');await expect.poll(()=>c.messages.findLast(m=>m.type==='risk')?.event.status).toBe('unavailable');expect(f.audio.calls).toHaveLength(0);const event=c.messages.findLast(m=>m.type==='risk').event;expect(event.signals.length).toBeGreaterThan(0);expect(event).not.toHaveProperty('purpose');
  }finally{c.ws.terminate();await quota.settle(reservation,0);await quota.close();}
 });
 
@@ -334,15 +336,15 @@ it('analysis Chromium: renders authenticated WebSocket results in the shipped pa
  },c.attempt.id);
  await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.ready)).toBe(true);await expect.poll(()=>f.audio.streams.length).toBe(1);
  const stream=f.audio.streams[0]!,revision=(n:number)=>stream.options.onRevision({streamId:stream.options.streamId,segmentId:'browser-analysis',revision:n,final:true,text:'OTP를 알려주세요. 대출 상품을 안내하겠습니다.',source:'remote'}),panel=page.getByTestId('live-analysis-component');
- await panel.screenshot({path:`${f.runRoot}/analysis-component-off.png`});revision(1);await expect.poll(()=>f.audio.calls.length).toBe(1);await panel.getByText('분석 중',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-pending.png`});f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.','suspected','대출 상품을 안내하겠습니다.'));
- await panel.getByText('승인 목적 이탈 의심',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ await panel.screenshot({path:`${f.runRoot}/analysis-component-off.png`});revision(1);await expect.poll(()=>f.audio.calls.length).toBe(1);await panel.getByText('분석 중',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-pending.png`});f.audio.calls[0]!.resolve(riskResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));
+ await panel.getByText('분석 완료',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
  for(const width of [1440,390]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.evaluate(()=>scrollTo(0,0));await page.screenshot({path:`${f.runRoot}/analysis-component-${width}.png`,fullPage:true});}
- revision(2);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));await panel.getByText('분석 범위에서 목적 이탈 근거 미탐지 · 안전 판정 아님',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
- revision(3);await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FIXTURE_PROVIDER_UNAVAILABLE'));await panel.getByText('목적 분석 불가 · 규칙 근거는 별도 표시',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-unavailable.png`});expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ revision(2);await expect.poll(()=>f.audio.calls.length).toBe(2);f.audio.calls[1]!.resolve(riskResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));await panel.getByText('분석 완료',{exact:true}).waitFor();expect(await panel.locator('strong').count()).toBeGreaterThan(0);
+ revision(3);await expect.poll(()=>f.audio.calls.length).toBe(3);f.audio.calls[2]!.reject(new Error('FIXTURE_PROVIDER_UNAVAILABLE'));await panel.getByText('분석 실패 또는 제공자 미설정 · 아래 규칙 결과와 구분하세요.',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-unavailable.png`});expect(await panel.locator('strong').count()).toBeGreaterThan(0);
  revision(4);await expect.poll(()=>f.audio.calls.length).toBe(4);
  expect(await page.evaluate(async attemptId=>(await fetch('/api/v3/consent',{method:'POST',headers:{'content-type':'application/json','x-csrf-token':sessionStorage.getItem('ip_csrf')??'','idempotency-key':crypto.randomUUID()},body:JSON.stringify({attemptId,granted:false})})).status,c.attempt.id)).toBe(200);
- await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.closed)).toBe(true);expect(stream.stopped).toBe(true);expect(f.audio.calls[3]!.signal.aborted).toBe(true);f.audio.calls[3]!.resolve(purposeResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));
- await panel.getByText('아직 표시할 분석 결과가 없습니다. 실행 상태는 음성 분석 항목을 확인하세요.',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-consent-cleared.png`});expect(await panel.locator('strong').count()).toBe(0);
+ await expect.poll(()=>page.evaluate(()=>(window as any).__analysisTransport.closed)).toBe(true);expect(stream.stopped).toBe(true);expect(f.audio.calls[3]!.signal.aborted).toBe(true);f.audio.calls[3]!.resolve(riskResult('OTP를 알려주세요. 대출 상품을 안내하겠습니다.'));
+ await panel.getByText('아직 분석 전입니다. 동의와 제공자 상태를 확인하세요.',{exact:true}).waitFor();await panel.screenshot({path:`${f.runRoot}/analysis-component-consent-cleared.png`});expect(await panel.locator('strong').count()).toBe(0);
  expect(await page.evaluate(async()=>(await navigator.permissions.query({name:'microphone'})).state)).not.toBe('granted');
 },20000);
 
@@ -352,7 +354,7 @@ it('analysis HTTP/WS: drains real quota before issuer shutdown even when a provi
  await f.stopIssuer();expect(c.stream.stopped).toBe(true);expect(f.audio.calls[0]!.signal.aborted).toBe(true);await expect.poll(()=>c.ws.readyState).toBe(WebSocket.CLOSED);
  expect(Number((await f.sql`SELECT count(*) AS count FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND state='reserved'`)[0]!.count)).toBe(0);
  const model=await f.sql`SELECT state,actual FROM issuer_v2.usage_reservations WHERE institution_id=${f.id} AND unit='llm-requests'`;expect(model).toHaveLength(1);expect(model[0]!.state).toBe('settled');expect(Number(model[0]!.actual)).toBe(1);
- f.audio.calls[0]!.resolve(purposeResult('OTP를 알려주세요.'));expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
+ f.audio.calls[0]!.resolve(riskResult('OTP를 알려주세요.'));expect((await f.state()).serviceV3!.attempts[c.attempt.id]!.status).toBe('accepted');
 });
 
 async function holdAnalysisSql(take:(tx:import('postgres').TransactionSql)=>Promise<unknown>){
@@ -412,7 +414,7 @@ it('visual contract: renders recipient call states with explicit component-only 
   const sourceControls=document.querySelector('.service-call-controls')!.cloneNode(true) as HTMLElement;sourceControls.querySelectorAll('button,select').forEach(x=>(x as HTMLButtonElement).disabled=true);
   const host=document.createElement('div');host.dataset.testid='visual-call-only';document.body.append(host);const root=createRoot(host);
   (window as any).__showVisualCall=(stage:string)=>{
-   const live=stage==='active'||stage==='warning',event=stage==='warning'?{status:'analyzed',signals:[{category:'인증번호 요구',evidenceSpan:'인증번호를 알려주세요',explanation:'인증번호는 전화로 전달하지 마세요.'}],purpose:{relation:'suspected',evidenceSpan:'대출 상품을 안내하겠습니다',reason:'승인된 이상거래 확인과 다른 상품 권유입니다.'},policyVersion:input.policy.version,contextRevision:1}:undefined;
+   const live=stage==='active'||stage==='warning',event=stage==='warning'?{status:'analyzed',signals:[{category:'인증번호 요구',evidenceSpan:'인증번호를 알려주세요',explanation:'인증번호는 전화로 전달하지 마세요.'}],analyzerVersion:'risk-context-2',assessments:[{code:'OTP',source:'rules',result:'detected',explanation:'인증 비밀 전달 요구 (합성 상태)',evidence:[{segmentId:'visual',revision:1,quote:'인증번호를 알려주세요',state:'active'}]}],policyVersion:input.policy.version,contextRevision:1}:undefined;
    root.render(h(ServiceWorkspace,{role:'recipient',roleName:'수신자',account:null,notice:h('p',{className:'workspace-preview'},'UI 시각 검토용 합성 상태 · 실제 통화/음성/권한 검증 아님'),queue:null,contact:h(ServiceContactSummary,{institutionUri:'https://bank.example',policy:input.policy,role:'recipient',active:live,intent:{id:'visual-only',recipientId:'synthetic-recipient',agentId:'synthetic-agent',status:stage==='ended'?'cancelled':'open'},attempt:{id:'visual-attempt',status:stage==='ended'?'ended':live?'accepted':'authorized'}}),verification:h('dl',{className:'service-verification'},...['기관 승인·권한','현재 연결','음성 분석'].map((name,i)=>h('div',{key:name},h('dt',null,name),h('dd',null,[stage==='ended'?'권한 회수됨 (합성 관측)':'기관 승인 확인 (합성 관측)',live?'통화 중 (합성 관측)':stage==='ended'?'기관 요청으로 종료 (합성 관측)':'연결 전',live?'분석 동의 상태 (합성 관측)':'분석 중단/미동의'][i])))),controls:h('div',{id:'visual-controls'}),analysis:h(ServiceAnalysisPanel,{event}),operations:null,notifications:null,audio:null}));
    requestAnimationFrame(()=>{const target=host.querySelector('#visual-controls');if(target){const controls=sourceControls.cloneNode(true) as HTMLElement;controls.dataset.connected=String(live);controls.dataset.active=String(live);target.replaceChildren(controls);}});
   };

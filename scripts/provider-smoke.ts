@@ -1,10 +1,11 @@
+import {riskSnapshot,validateRiskOutput} from '../services/api/src/risk-assessment.js';
 // Never part of light/CI. These commands incur real provider usage only after separate approval.
 if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='media'||process.env.CALLSIGN_PROVIDER_CONFIRMATION!=='CONSENTED-SAMPLE-WITH-BUDGET')throw new Error('PAID_PROVIDER_EXECUTION_BLOCKED');
 import {readFile,writeFile,stat,lstat} from 'node:fs/promises';
 import {createHash,randomUUID} from 'node:crypto';
 import {bankPolicy} from '../packages/protocol/src/index.js';
 import {speechProviderConfiguration} from '../services/api/src/provider-configuration.js';
-import {analyzeServiceWithProvider} from '../services/api/src/service-analysis.js';
+import {analyzeRiskWithProvider} from '../services/api/src/service-analysis.js';
 import {assertEvaluationCostBudget} from './evaluate-service-analysis.js';
 import {execFileSync} from 'node:child_process';
 import {DeepgramStream} from '../services/api/src/transcription.js';
@@ -23,7 +24,7 @@ if(mode==='stt'){
   const stream=new DeepgramStream({apiKey:configuration.stt.apiKey??required('DEEPGRAM_API_KEY'),model:configuration.stt.model??required('DEEPGRAM_MODEL'),streamId:randomUUID(),maxBytes:1048576,maxDurationMs:30000,onReady:()=>{void(async()=>{let sequence=0;for(let i=0;i<sample.length&&!stopped;i+=32768){stream.push(sample.subarray(i,i+32768),++sequence);await new Promise(r=>setTimeout(r,250));}})().catch(()=>finish(new Error('SMOKE_STREAM_SEND_FAILED')));},onRevision:r=>{revisions++;if(r.final&&r.text.trim()){finals++;finish();}},onUnavailable:code=>finish(new Error(code))});stream.connect();
  });observations={revisions,finals,audioSeconds,connectionBudgetSeconds:30,providerCalls:1};
 }else{
- if(!configuration.llm)throw new Error('LLM_NOT_CONFIGURED');const result=await analyzeServiceWithProvider(configuration.llm,{text:sample.toString('utf8'),policy:bankPolicy,signal:AbortSignal.timeout(4000)});observations={signals:result.signals.length,providerCalls:1};
+ if(!configuration.llm)throw new Error('LLM_NOT_CONFIGURED');const units=riskSnapshot([{segmentId:'smoke',revision:1,text:sample.toString('utf8')}]);const result=validateRiskOutput(await analyzeRiskWithProvider(configuration.llm,{units,policy:bankPolicy,signal:AbortSignal.timeout(4000)}),units,bankPolicy);observations={signals:result.filter(r=>r.result==='detected').length,providerCalls:1};
 }
 await writeFile(output,JSON.stringify({mode,inputSha256:createHash('sha256').update(sample).digest('hex'),sampleBytes:sample.length,elapsedMs:Date.now()-started,observations,scope:'real-provider-contract-smoke-only-not-Korean-accuracy-or-call-e2e',audioStored:false,transcriptStored:false},null,2)+'\n',{flag:'wx',mode:0o600});
 process.stdout.write('Provider smoke completed. Only counts and input hash saved; this is not an accuracy or billing claim.\n');

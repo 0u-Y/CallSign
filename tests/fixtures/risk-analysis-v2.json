@@ -1,0 +1,146 @@
+{
+  "version": 2,
+  "provenance": "synthetic-not-human-reviewed",
+  "cases": [
+    {
+      "id": "dev-1",
+      "family": "explicit-1",
+      "split": "development",
+      "segments": [
+        "문자로 받은 인증번호를 저에게 알려주세요."
+      ],
+      "expected": {
+        "OTP": "detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "dev-2",
+      "family": "explicit-2",
+      "split": "development",
+      "segments": [
+        "지금 제 계좌로 100만 원을 송금하세요."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "dev-3",
+      "family": "explicit-3",
+      "split": "development",
+      "segments": [
+        "원격제어 앱을 설치해서 제 접속을 허용하세요."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "dev-4",
+      "family": "explicit-4",
+      "split": "development",
+      "segments": [
+        "확인이 끝날 때까지 은행이나 가족에게 이 통화를 확인하지 마세요."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "detected"
+      }
+    },
+    {
+      "id": "heldout-1",
+      "family": "heldout-family-1",
+      "split": "evaluation",
+      "segments": [
+        "휴대폰에 도착한 OTP를 불러 주시겠습니까?"
+      ],
+      "expected": {
+        "OTP": "detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "heldout-2",
+      "family": "heldout-family-2",
+      "split": "evaluation",
+      "segments": [
+        "제 계좌로 입금해 주세요."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "heldout-3",
+      "family": "heldout-family-3",
+      "split": "evaluation",
+      "segments": [
+        "AnyDesk 설치해 주시고 접속을 허용하세요."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "detected",
+        "SECRECY": "not-detected"
+      }
+    },
+    {
+      "id": "heldout-4",
+      "family": "heldout-family-4",
+      "split": "evaluation",
+      "segments": [
+        "경찰에게는 이 통화를 확인하지 마십시오."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "detected"
+      }
+    },
+    {
+      "id": "heldout-5",
+      "family": "heldout-family-5",
+      "split": "evaluation",
+      "segments": [
+        "그것만 부탁드립니다."
+      ],
+      "expected": {
+        "OTP": "undetermined",
+        "TRANSFER": "undetermined",
+        "REMOTE_CONTROL": "undetermined",
+        "SECRECY": "undetermined"
+      }
+    },
+    {
+      "id": "heldout-6",
+      "family": "heldout-family-6",
+      "split": "evaluation",
+      "segments": [
+        "가족에게 확인하셔도 됩니다."
+      ],
+      "expected": {
+        "OTP": "not-detected",
+        "TRANSFER": "not-detected",
+        "REMOTE_CONTROL": "not-detected",
+        "SECRECY": "not-detected"
+      }
+    }
+  ]
+}
