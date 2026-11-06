@@ -267,7 +267,7 @@
 .demo-shell .brand strong{font-size:24px}.demo-shell .recording-mark{width:36px;height:36px;border-radius:13px;background:#286bff;stroke:#fff;stroke-width:1.6;fill:none}
 .demo-shell .site-header nav{align-self:stretch;gap:30px;padding:0;background:none;border:0;border-radius:0;align-items:stretch}
 .demo-shell .site-header nav a{display:flex;align-items:center;border:0;border-radius:0;border-bottom:3px solid transparent;padding:0 16px;background:none;box-shadow:none;color:#7b889c;font-size:14px}
-.demo-shell .site-header nav a.active{border-bottom-color:#286bff;color:#286bff;background:none;box-shadow:none}
+.demo-shell .site-header nav a.active{border-bottom:3px solid #286bff;color:#286bff;background:none;box-shadow:none}
 .demo-shell .site-footer{padding:16px 40px 76px;font-size:11px;border:0;background:transparent;color:#8494aa}.demo-shell .site-footer .brand{display:none}.demo-shell .site-footer p{font-size:11px;max-width:none}
 .demo-recording-call{position:relative;padding-top:20px;padding-bottom:12px}
 .demo-recording-call .demo-heading{margin:0 0 22px;min-height:30px}.demo-recording-call .demo-heading h1{font-size:20px;line-height:1.5;margin:0}.demo-recording-call .demo-environment{display:none}
