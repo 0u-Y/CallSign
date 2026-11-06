@@ -87,3 +87,17 @@ it('finishes one in-flight request while coalescing appended final segments, wit
  await a.accept(rev('정정합니다. 상품 권유는 하지 않습니다.',2,'2'));expect(calls[1]!.signal.aborted).toBe(true);
  calls[1]!.complete(response('suspected','대출 상품을 권유합니다.'));await Promise.resolve();expect(events.at(-1)?.purpose.relation).not.toBe('suspected');
 });
+
+
+it('discards an old stream result after a new call context starts',async()=>{
+ vi.useFakeTimers();const pending:Array<{signal:AbortSignal;complete:(value:ReturnType<typeof response>)=>void}>=[];
+ const {a,events}=fixture(async(_text,_policy,signal)=>new Promise(resolve=>pending.push({signal,complete:resolve})),()=>Date.now());
+ await a.accept(rev('거래 확인입니다.'));const old=a.flush();
+ a.stop();a.start('another-call');const boundary=events.length;
+ await a.accept({...rev('새 거래 확인입니다.'),streamId:'another-call'});
+ expect(pending[0]!.signal.aborted).toBe(true);pending[0]!.complete(response('not-detected','거래 확인입니다.'));await old;
+ expect(events.slice(boundary).some(e=>e.status==='analyzed')).toBe(false);
+ await vi.advanceTimersByTimeAsync(300);expect(pending).toHaveLength(2);
+ pending[1]!.complete(response('not-detected','새 거래 확인입니다.'));await vi.advanceTimersByTimeAsync(1);
+ expect(events.at(-1)).toMatchObject({streamId:'another-call',status:'analyzed'});
+});

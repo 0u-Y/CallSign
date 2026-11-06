@@ -15,6 +15,7 @@ export async function requestOpenAI(input:Parameters<typeof requestAnthropic>[0]
  if(!response.ok)throw new Error('LLM_PROVIDER_HTTP_'+response.status);
  const raw=await response.text();if(raw.length>32768)throw new Error('LLM_RESPONSE_TOO_LARGE');
  if(signal.aborted)throw new Error('LLM_CANCELLED');
- const result=z.object({status:z.literal('completed'),output:z.array(z.object({type:z.literal('message'),role:z.literal('assistant'),content:z.array(z.object({type:z.literal('output_text'),text:z.string()})).min(1).max(8)})).min(1).max(8)}).parse(JSON.parse(raw));
+ let payload:unknown;try{payload=JSON.parse(raw);}catch{throw new Error('LLM_RESPONSE_JSON_INVALID');}
+ const result=z.object({status:z.literal('completed'),output:z.array(z.object({type:z.literal('message'),role:z.literal('assistant'),content:z.array(z.object({type:z.literal('output_text'),text:z.string()})).min(1).max(8)})).min(1).max(8)}).parse(payload);
  return result.output.flatMap(item=>item.content.map(part=>part.text)).join('');
 }

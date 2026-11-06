@@ -35,3 +35,24 @@ Registry 전역 고정 승인자 교체·기관별 승인자 집합·정족수 �
 과거 DB/application 복원·별도 cluster·EVM·세션 자연 만료·PBX 재시도는 당시 원본으로 연결하며 최신 이미지 전체 재실행으로 복사하지 않는다. 초기 시연의 철회 후 통화 유지 정책과 현재 종료 정책은 다르다. [과거 기록](archive/DEVELOPMENT-HISTORY-20261104.md)·[실행 절차](LOCAL-VALIDATION.md)에서 시점을 확인한다.
 
 정상 분석 drain과 quota pool 종료 순서는 회귀했지만 프로세스 강제 종료의 즉시 환불을 보장하지 않는다. 기존 worker는 예약 만료 후 보수 정산하며 실제 제공자 청구 대조는 별도다. 보존 대상 환경의 영향 여부는 미확인이고 balance를 임의 초기화하는 복구 절차는 없다.
+
+
+## 2026-11-06 Deepgram·분석 후속 점검
+
+- 저장소의 공통 `DeepgramStream`에 `mip_opt_out=true`를 강제했다. 일반 `/v3/audio`, 기존 finals `/v2/audio`, `provider-smoke.ts`가 같은 연결 코드를 사용한다. 환경 옵션으로 해제하지 않는다. **코드·오프라인 검증 완료와 실행 이미지 반영은 별도다.** 현재 실행 `7c5a839`에는 이 변경이 없다. 실제 제공자는 꺼져 있다.
+- [Deepgram 공식 처리 설명](https://developers.deepgram.com/trust-security/your-data)에 따르면 opt-out 요청의 음성·텍스트·전사는 처리 후 보관하지 않지만 요청 메타데이터·사용 로그는 남는다. 우리 앱의 메모리/로그/보호 시험 파일 보관과 별개다. 과거 요청에 소급되지 않는다.
+- 제공된 키로 프로젝트 메타데이터 GET은 200(1개 프로젝트), 해당 기간 요청 로그 GET은 **403**이었다. 원본 응답은 저장하지 않았다. 계정 강제 opt-out·과거 요청의 flag·실제 보관 여부는 **미확인**이다. 다음 승인된 유료 시험에서 Usage > Logs 또는 권한 있는 요청 메타데이터로 확인한다. 키 원문이나 새 광범위 키를 요구하지 않는다.
+- STT stop은 소켓 종료와 revision 텍스트 맵·카운터를 정리하며, 이전 소켓의 늦은 결과/error/close는 새 연결에 적용하지 않는다. 이는 메모리 참조 제거이며 물리 메모리의 보안 삭제를 보장하는 표현은 아니다.
+- 일반 분석 경로에서 원음/전사를 파일·application log에 쓰는 코드는 발견하지 못했다. 브라우저 recorder는 종료 후 마지막 blob을 전송하지 않고, 서버는 stop/권한 검사와 analyzer 세대로 늦은 결과를 폐기한다. 기본 요청 로그는 꺼져 있다. 분석 실패 로그에는 허용된 코드·임시 stream ID·요청 순번·시간만 남긴다. 보호 시험 입력과 UI 캡처에는 합성 음원·전사가 있을 수 있으므로 “어디에도 저장되지 않음”이라고 하지 않는다.
+
+| 분석 단계 | 현재 코드·증거 |
+|---|---|
+| STT partial/final | Deepgram adapter가 segment 위치·revision·final 중복을 검사. case24 실제 전사 수신 |
+| final 문맥·요청 | `ServiceRevisionAnalyzer`가 final만 선택, partial 재과금 방지, 후속 final 병합. `7c5a839`가 실행 이미지에 포함 |
+| OpenAI 응답·파싱·근거 | HTTP 상태 / 응답 JSON / 분석 JSON / schema / 근거 검증을 구분. case24의 완료 응답 단계는 미관측이며 어떤 단계에서 실패했는지 확정 불가 |
+| 서버 event | `isCurrent`와 재권한 확인 후 전송. 과거 실패의 완료 event는 없음 |
+| 브라우저·화면 | 현재 controller·분석 세대·contextRevision·정책 검사 뒤 표시. 기존 fixture와 오프라인 회귀이며 최신 실제 제공자 화면 성공은 미확인 |
+
+case29는 05:38:23.983Z 시작, 약29.2초 실행이며 browser 요청 실패 기록 순서는 sender claim → recipient workspace → recipient auth/me다. 각 실패의 시각은 원본에 없어 복원하지 않는다. case24(05:12:47.652Z)와 별개이며 그 당시 runtime은 `547290b`였다. 기존 netlink 표본은 14:19:12~14:20:15 KST(05:19 UTC), **case29와 동시 표본이 아니다**. Docker/Playwright 시작은 같은 호스트 wall clock이나 callback 지연 오차는 미측정이다. ingress access log와 API request log가 꺼져 있어 실패 요청의 서버 도착 여부도 미확인이다. `ERR_NETWORK_CHANGED`는 HTTP 401/503이나 PBX/TURN 장애 확정이 아니다.
+
+다음 승인된 관측은 통화보다 먼저 같은 인증 세션의 읽기 전용 auth/me·workspace를 제한 횟수 조회해 오류가 미디어 없이 재현되는지 확인한다. observer에 wall UTC 기준점과 단일 monotonic 경과시간·HTTP status를 추가했으며 원음·쿼리·cookie·헤더는 기록하지 않는다. 별도 시계의 netlink와 정확한 지연값을 계산하지 않는다. 이번에는 새 브라우저·통화·유료 호출을 실행하지 않았다.

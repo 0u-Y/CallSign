@@ -96,7 +96,7 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash s
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh resource-stop
 ```
 
-서버 start/restart는 이미 생성된21개 full ID의 소유권·고정 image·host network/미게시 port·강제 memory/swap 한도·restart=no와 정상 entrypoint를 확인한다. 활성 시험/초기화가 있거나 시작 여유32GiB·유효한 기존 monitor·미검토 중단 경계를 만족하지 못하면 실행하지 않는다. DB/Besu → IdP/Anchor → Witness/PBX/TURN → API/worker/ingress 순서로 시작하고 설정된 Docker health를 기다린다. 초기화·import·migration·seed·Compose up/build/pull은 실행하지 않는다. 부분 실패는 소유 profile을 중지하고 보호 `server-operation-*.json`·`.result.json`에 최초 단계/결과를 남기며 자동 재시도하지 않는다. STARTED는 컨테이너 기동 결과이므로 `/readiness`·공개 로그인·실제 통화는 별도로 확인한다. 이 경로의 실제 전체 restart 회귀는 아직 미실행이며 [현재 현황](FINALS-IMPLEMENTATION-PLAN.md#현재-상태와-다음-단계)을 따른다.
+서버 start/restart는 이미 생성된21개 full ID의 소유권·고정 image·host network/미게시 port·강제 memory/swap 한도·restart=no와 정상 entrypoint를 확인한다. 활성 시험/초기화가 있거나 시작 여유32GiB·유효한 기존 monitor·미검토 중단 경계를 만족하지 못하면 실행하지 않는다. DB/Besu → IdP/Anchor → Witness/PBX/TURN → API/worker/ingress 순서로 시작하고 설정된 Docker health를 기다린다. 초기화·import·migration·seed·Compose up/build/pull은 실행하지 않는다. 부분 실패는 소유 profile을 중지하고 보호 `server-operation-*.json`·`.result.json`에 최초 단계/결과를 남기며 자동 재시도하지 않는다. STARTED는 컨테이너 기동 결과이므로 `/readiness`·공개 로그인·실제 통화는 별도로 확인한다. 2026-11-06 동일 소유 환경의 일반 restart에서 영속 상태·계정·영수증 보존과 readiness를 확인했으며 [현재 현황](FINALS-IMPLEMENTATION-PLAN.md#현재-상태와-다음-단계)을 따른다.
 
 기본 bridge/published-port Compose의 개발 서버 start/restart 차단과 기존 AWS guard는 유지한다. 서버 모드는 새 환경의 NEW나 삭제된 컨테이너 재생성 도구가 아니다. 만료/자원 중단 뒤에는 원본 stop·review를 보존하고 해당 중단에 대한 새 명시적 승인을 받은 뒤에만 기존 `deployment-control.mjs review`를 사용한다. 정상 restart에서 review를 새로 만들거나 latch를 지우지 않는다. 실제 제공자를 켜는 서버 설정에는 승인된 유한 `CALLSIGN_ANALYSIS_SMOKE_BUDGET`의 정확한 id·만료·STT초·연결수·LLM요청수와 issuer의 동일 설정이 필요하다. launcher는 해당 image config ID의 `org.callsign.analysis-smoke-budget=v1`을 image inspect로 확인하므로 container label만 추가하거나 이 guard를 모르는 과거 runtime에 env만 붙여 활성화할 수 없다. 키 존재만으로 활성화하지 않는다.
 
@@ -1041,3 +1041,12 @@ CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration CALLSIGN_HTTP_API_ONLY=true timeou
 
 <a id="최신-제품-후보의-사용인계-상태-2026-11-04"></a>
 [최신 제품 후보의 사용·인계 상태 (2026-11-04)](LOCAL-VALIDATION.md#최신-제품-후보의-사용인계-상태-2026-11-04)
+
+
+### Deepgram opt-out 수정본 반영 대기 (2026-11-06)
+
+현재 제공자 off와 실행 runtime `7c5a839`를 유지한다. 공통 STT URL·종료 정리·분석 오류 분류 수정은 backend 변경이므로 Git/Vercel 배포만으로 반영되지 않는다. 기존 보호 설정과 고정 runtime image config ID를 백업한 뒤, 승인된 오프라인 후보 build 절차로 새 소스 이미지를 만들고 파일/label 대응을 확인해야 한다.
+
+반영 직전에 활성 통화·처리 중 작업·현재 감시/중단 latch·기존 운영 만료(11월7일08:37 KST)를 다시 확인한다. 반영 승인을 받으면 provider off 상태에서 기존 운영 도구로 영향받는 앱을 교체하고 Anchor readiness 이후 worker를 시작한다. DB·chain·realm·키·trust·genesis·NEW는 변경하지 않는다. readiness/일반 기능 실패 시 제공자를 계속 끈 채 이전 config ID `sha256:c3c3a19c2cf175ba7105ff4ef3f866431d9b9dfba0d580123c35f24439c89b7b`와 보존 설정으로 되돌린다. 이전 이미지는 opt-out 패치가 없으므로 rollback 후 유료 분석을 켜지 않는다. 자원 중단 시 rollback 자동 기동도 금지한다. 원래 만료는 연장하지 않는다.
+
+A(새 업무·실제 음성·최신 UI 취소)는 분석 off로 별도 한정 실행하고, B(실제 STT/LLM)는 새 비용 승인과 opt-out 반영 뒤에만 실행한다. 요청 메타데이터 확인은 음성/전사 대신 `mip_opt_out`만 보존한다. opt-out의 가격 조건을 다시 확인해 한정 비용 계획에 반영한다. 이번 코드 점검은 두 시나리오의 실행 승인을 대신하지 않는다.

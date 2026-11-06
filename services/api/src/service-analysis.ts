@@ -16,7 +16,8 @@ export async function analyzeServiceWithAnthropic(input:Parameters<typeof reques
 export async function analyzeServiceWithOpenAI(input:Parameters<typeof requestAnthropic>[0]):Promise<ServiceAnalysis>{return checkedServiceAnalysis(await requestOpenAI(input,serviceAnalysisFormat),input.text);}
 export function analyzeServiceWithProvider(config:{provider:'openai'|'anthropic';apiKey:string;model:string},input:Omit<Parameters<typeof requestAnthropic>[0],'apiKey'|'model'>){return (config.provider==='openai'?analyzeServiceWithOpenAI:analyzeServiceWithAnthropic)({...input,apiKey:config.apiKey,model:config.model});}
 function checkedServiceAnalysis(content:string,text:string):ServiceAnalysis{
- const result=serviceAnalysisSchema.parse(JSON.parse(content));
+ let payload:unknown;try{payload=JSON.parse(content);}catch{throw new Error('LLM_ANALYSIS_JSON_INVALID');}
+ const result=serviceAnalysisSchema.parse(payload);
  if(result.signals.some(s=>/https?:\/\/|www\./i.test(s.explanation))||/https?:\/\/|www\./i.test(result.purpose?.reason??'')||result.signals.some(s=>!text.includes(s.evidenceSpan)||!currentRiskEvidence(text,s))||(result.purpose?.evidenceSpan&&(!text.includes(result.purpose.evidenceSpan)||!correctedSentences(text).join(' ').includes(result.purpose.evidenceSpan))))throw new Error('LLM_EVIDENCE_INVALID');
  // LLM advice is never a URL or product command.
  return {...result,recommendedAction:'별도 인증한 공식 업무 화면에서 확인하세요.',limitations:'최근 상대방 발화만 분석한 보조 안내이며 통화 전체의 안전 판정이 아닙니다.'};

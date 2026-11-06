@@ -63,14 +63,14 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
             if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
             const quotaId=`llm:${streamId}:${requests}`;await options.quota.reserve(quotaId,actor.institutionId,'llm-requests',1,[...analysisScopes(actor.institutionId,actor.userId,attemptId,'llm-requests',20,a.now()),...budgetScopes('llm-requests',budget?.llmRequests??20)],expiresAt);
             if(signal.aborted||stopped){await settle(quotaId,0);throw new Error('ANALYSIS_CANCELLED');}
-            let cancel:(()=>void)|undefined,invoked=false;
+            let cancel:(()=>void)|undefined,invoked=false;const requestStarted=performance.now();
             try{assertBudget();if(!await allowed())throw new Error('ANALYSIS_AUTHORITY_UNKNOWN');if(signal.aborted||stopped)throw new Error('ANALYSIS_CANCELLED');
               const cancelled=new Promise<never>((_,reject)=>{cancel=()=>reject(new Error('ANALYSIS_CANCELLED'));signal.addEventListener('abort',cancel,{once:true});});
               invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(text,policy,signal):analyzeServiceWithProvider(configuration!.llm!,{text,policy,signal}),cancelled]));
             }catch(error){
-              const reason=signal.aborted?'CANCELLED':error instanceof Error&&/^LLM_(?:PROVIDER_HTTP_[45][0-9]{2}|EVIDENCE_INVALID|RESPONSE_TOO_LARGE|INPUT_TOO_LARGE|CANCELLED|UNAVAILABLE)$/.test(error.message)?error.message:error instanceof Error&&error.name==='TimeoutError'?'TIMEOUT':error instanceof Error&&error.name==='ZodError'?'RESPONSE_SCHEMA_INVALID':'UNCLASSIFIED';
+              const reason=signal.aborted?'CANCELLED':error instanceof Error&&/^LLM_(?:PROVIDER_HTTP_[45][0-9]{2}|EVIDENCE_INVALID|RESPONSE_TOO_LARGE|RESPONSE_JSON_INVALID|ANALYSIS_JSON_INVALID|INPUT_TOO_LARGE|CANCELLED|UNAVAILABLE)$/.test(error.message)?error.message:error instanceof Error&&error.name==='TimeoutError'?'TIMEOUT':error instanceof Error&&error.name==='ZodError'?'RESPONSE_SCHEMA_INVALID':'UNCLASSIFIED';
               // The normal entrypoint disables request logging; emit only these allowlisted diagnostics.
-              process.stderr.write(JSON.stringify({code:'ANALYSIS_PROVIDER_REQUEST_FAILED',reason})+'\n');throw error;
+              process.stderr.write(JSON.stringify({code:'ANALYSIS_PROVIDER_REQUEST_FAILED',reason,streamId,requestNumber:requests,elapsedMs:Math.round(performance.now()-requestStarted)})+'\n');throw error;
             }finally{if(cancel)signal.removeEventListener('abort',cancel);await settle(quotaId,invoked?1:0);}
           })()):undefined;
           analyzer=new ServiceRevisionAnalyzer(initial.policy,event=>{if(stopped||!analyzer?.isCurrent(event))return;void allowed().then(current=>{if(!stopped&&analyzer?.isCurrent(event))send({type:'risk',event:current?event:{...event,status:'unavailable',engine:'authority-unavailable',purpose:{relation:'undetermined',evidenceSpan:'',reason:'현재 권한·정책의 최신성을 확인할 수 없습니다. 기존 규칙 근거만 참고하세요.'}}});}).catch(stop);},llm);analyzer.start(streamId);

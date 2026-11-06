@@ -11,7 +11,8 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
  test.skip(!origin||!senderState||!recipientState||!intentId||!digest,'NOT-RUN: explicitly approved PBX stack, registered URI trust and separately authenticated roles required');
  const waves=[process.env.CALLSIGN_MEDIA_SENDER_WAV,process.env.CALLSIGN_MEDIA_RECIPIENT_WAV];
  if(waves.some(w=>!w)||waves[0]===waves[1])throw new Error('DISTINCT_SYNTHETIC_WAV_FILES_REQUIRED_NO_HUMAN_MICROPHONE');
- const diagnostics:unknown[]=[];const note=(value:unknown)=>{if(diagnostics.length<150)diagnostics.push(value);};
+ const diagnostics:unknown[]=[],diagnosticsStarted=performance.now();const note=(value:Record<string,unknown>)=>{if(diagnostics.length<150)diagnostics.push({observerElapsedMs:performance.now()-diagnosticsStarted,...value});};
+ note({clock:'observer-performance.now',wallUtc:new Date().toISOString()});
  const browsers:Browser[]=[],contexts:BrowserContext[]=[];let finishAnalysis:(()=>Promise<void>)|undefined;
  try{
   for(let i=0;i<2;i++){const b=await playwright.chromium.launch({headless:true,args:['--use-fake-device-for-media-stream','--use-file-for-fake-audio-capture='+waves[i],...callTrialBrowserArgs(process.env)],...(process.env.CALLSIGN_BROWSER_PATH?{executablePath:process.env.CALLSIGN_BROWSER_PATH}:{})});browsers.push(b);contexts.push(await b.newContext({storageState:[senderState,recipientState][i]!,permissions:['microphone'],...(pagePath==='/demo/call'?{viewport:i===0?{width:1366,height:768}:{width:390,height:844}}:{})}));}
@@ -26,7 +27,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   for(const [role,page] of [['sender',sender],['recipient',receiver]] as const){
    page.on('console',message=>{if(message.type()==='warning'&&(message.text().startsWith('CallSign SIP negotiation failed')||message.text().startsWith('CallSign ICE diagnostic')||message.text().startsWith('CallSign call verification failed')))note({role,connectionDiagnostic:message.text()});});
    page.on('requestfailed',request=>{const path=new URL(request.url()).pathname;if(path.startsWith('/api/'))note({role,path,requestFailed:true,networkCode:/^net::ERR_[A-Z_]+$/.test(request.failure()?.errorText??'')?request.failure()?.errorText:'UNCLASSIFIED',aborted:request.failure()?.errorText==='net::ERR_ABORTED'});});
-   page.on('response',response=>{const path=new URL(response.url()).pathname;if(path.startsWith('/api/')&&response.status()>=400)void response.json().then(body=>note({role,path,status:response.status(),code:/^[A-Z_]{3,80}$/.test(body?.error?.code??'')?body.error.code:'UNKNOWN'})).catch(()=>{});});
+   page.on('response',response=>{const path=new URL(response.url()).pathname;if(['/api/v3/auth/me','/api/v3/workspace','/api/v3/claim'].includes(path))note({role,path,httpStatus:response.status()});if(path.startsWith('/api/')&&response.status()>=400)void response.json().then(body=>note({role,path,status:response.status(),code:/^[A-Z_]{3,80}$/.test(body?.error?.code??'')?body.error.code:'UNKNOWN'})).catch(()=>{});});
    page.on('websocket',socket=>{if(new URL(socket.url()).pathname!=='/pbx/ws')return;socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;try{const message=parseSip(frame.payload);note({role,sip:message.start.startsWith('SIP/2.0')?message.start.split(' ').slice(0,2).join(' '):message.start.split(' ')[0],hasRecordRoute:message.headers.has('record-route'),sdp:message.headers.get('content-type')?.[0]==='application/sdp'});}catch(error){note({role,parseError:error instanceof Error?error.message:'UNKNOWN'});}});socket.on('close',()=>note({role,sipSocketClosed:true}));});
   }
   await sender.goto(`${origin}${pagePath}`);

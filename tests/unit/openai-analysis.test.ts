@@ -56,3 +56,9 @@ it('rejects a model converting negation or quoted examples into a current reques
 it('reports provider HTTP status without exposing its response body',async()=>{
  await expect(analyzeServiceWithOpenAI({...input,fetcher:async()=>new Response('private provider diagnostic',{status:429})})).rejects.toThrow(/^LLM_PROVIDER_HTTP_429$/);
 });
+
+
+it('distinguishes invalid provider envelopes from invalid analysis JSON without exposing either body',async()=>{
+ await expect(analyzeServiceWithOpenAI({...input,fetcher:async()=>new Response('private invalid envelope')})).rejects.toThrow(/^LLM_RESPONSE_JSON_INVALID$/);
+ await expect(analyzeServiceWithOpenAI({...input,fetcher:async()=>Response.json({status:'completed',output:[{type:'message',role:'assistant',content:[{type:'output_text',text:'private invalid analysis'}]}]})})).rejects.toThrow(/^LLM_ANALYSIS_JSON_INVALID$/);
+});
