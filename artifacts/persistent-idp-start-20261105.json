@@ -888,6 +888,21 @@
     ],
     "scope": "Same-host Chromium over public production; no API interception, no call, media or AI; not active-call revocation proof",
     "screenshots": "Protected public-work-actions-27 desktop/mobile files opened and reviewed; long account IDs dominate layout",
-    "consoleNetworkFailures": 0
+    "consoleNetworkFailures": 0,
+    "visualFollowup": {
+      "source": "151b2c38951ee1387c62c25025672e0b6d51b45b",
+      "productionDeployment": "dpl_FZD4VuVVHhtcjpPHSWQbmiWk1mrn",
+      "publicPreview": false,
+      "case": 28,
+      "result": "PASS",
+      "readOnly": true,
+      "checks": [
+        "Cancelled work remains cancelled",
+        "Long account IDs abbreviated without inventing names; full values remain in details",
+        "Desktop 1366x768, mobile390x844, narrow683x384: no horizontal overflow",
+        "All three actual authenticated captures opened and reviewed"
+      ],
+      "limits": "Narrow viewport is zoom-layout emulation, not browser zoom. No active call or AI in this check."
+    }
   }
 }
