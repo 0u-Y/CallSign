@@ -7,7 +7,7 @@ export function RecoveryReviewPanel({state,permissions,action,post,reload,busy=f
  const [request,setRequest]=useState<RecoveryReview['request']>(),[signatures,setSignatures]=useState<Record<string,string>>({}),[message,setMessage]=useState('');
  const evidence=recoveryEvidence(state,request?hashCanonical(request):undefined);
  const now=Math.floor(Date.now()/1000);let review:RecoveryReview|undefined,invalid='';
- if(request&&state&&!evidence.activation)try{review=verifyRecoveryRequest(request,state,now);}catch(e){invalid=(e as Error).message;}
+ if(request&&state&&!evidence.signers.length)try{review=verifyRecoveryRequest(request,state,now);}catch(e){invalid=(e as Error).message;}
  async function read(file:File|undefined){if(!file||file.size>65536)throw new Error('64KB 이하의 공개 JSON 파일을 선택하세요.');try{return JSON.parse(await file.text()) as unknown;}catch{throw new Error('공개 요청 또는 서명 JSON 파일을 선택하세요. 개인키는 웹에 넣지 않습니다.');}}
  async function importRequest(file:File|undefined){if(!state)throw new Error('현재 기관 상태를 먼저 조회하세요.');const next=verifyRecoveryRequest(await read(file),state,Math.floor(Date.now()/1000));setRequest(next.request);setSignatures({});setMessage('현재 기관·원장 세대·서명 대상을 확인했습니다. 각 승인자의 공개 서명 파일을 가져오세요.');}
  async function importSignature(file:File|undefined){if(!state||!review)throw new Error('유효한 현재 복구 요청을 먼저 가져오세요.');const next=await verifyRecoverySignature(await read(file),review,state.approvers,Math.floor(Date.now()/1000));if(signatures[next.signer])throw new Error('이 승인키의 서명은 이미 가져왔습니다. 서로 다른 승인키가 필요합니다.');setSignatures({...signatures,[next.signer]:next.signature});setMessage('같은 복구 요청의 등록 승인키 서명을 로컬에서 검증했습니다. 아직 서버 제출 전입니다.');}
