@@ -719,3 +719,5 @@ Public recheck boundary: actual OIDC login/callback succeeded in the earlier rea
 ### 2026-11-07 연락 준비 오류: 만료 업무 표시 결함
 
 실제 상담원 폼 로그인 후 읽기 전용 workspace(200)를 확인했다. 26개 업무 중 open21개 모두 expiresAt이 관측 시각보다 과거였다. 서버 activeIntent는 이 상태를 INTENT_NOT_ACTIVE로 거절하지만 프런트는 status=open만 보고 진행 중/준비 가능으로 표시했다. 만료 입력을 거절해야 하는 contactPreparation 회귀가 수정 전 실패했다. 공통 표시·업무 필터·요약·연락 준비/상세 발신 버튼에 유효기간을 반영하고 해당 서버 오류 안내를 구체화했다. 기존 업무/DB/권한을 변경하거나 새 통화·제공자 호출을 실행하지 않았다. 사용자 요청의 실제 HTTP 오류 코드는 과거 로그에서 확인하지 못했으므로 그 코드 자체를 관측했다고 주장하지 않는다. 근거: `.local/contact-failure-20261107/read/result.json`; 원본 workspace는 보호 파일로만 보존.
+
+2026-11-07 사용자 요청으로 합성 계정에 안정적인 한국어 시연 이름을 표시한다. 같은 callsign-demo issuer/subject는 업무·검색·담당자 선택·연락 화면에서 같은 이름이며 raw ID와 권한은 변경하지 않는다. demo-bank/demo-center의 표시명은 시그널카드/시그널 콜센터다. 업무 건수·상태·유효기간·통화 기록을 추가하거나 성공으로 바꾸지 않는다. 여러 업무가 같은 고객인 기존 데이터는 같은 이름으로 유지한다.

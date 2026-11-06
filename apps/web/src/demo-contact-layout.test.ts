@@ -11,12 +11,12 @@ it('uses an honest short address label while preserving full identity and prohib
  const uri='https://callsign-demo.example/institutions/demo-bank';
  const html=renderToStaticMarkup(createElement(ServiceContactSummary,{institutionUri:uri,policy:bankPolicy,role:'recipient',compact:true,active:true,intent:{id:'work',agentId:'agent',recipientId:'recipient',status:'open'},attempt:{id:'attempt',status:'accepted'}}));
  const header=html.slice(0,html.indexOf('</header>'));
- expect(header).toContain('등록 주소 식별명 · demo-bank');expect(header).not.toContain('https://');
+ expect(header).toContain('기관 표시 · 시그널카드');expect(header).not.toContain('https://');
  expect(html.indexOf(uri)).toBeGreaterThan(html.indexOf('<details'));
  const visible=html.slice(0,html.indexOf('<details'));
  expect(html.slice(html.indexOf('<details'))).toContain('인증번호 요구');expect(visible).toContain('분석은 별도 동의');
  expect(html).toContain('href="/official"');
- expect(html).toContain('확인된 기관 표시명을 대신하지 않습니다');expect(html).toContain('업무 식별자');
+ expect(html).toContain('시연 기관은 합성 이름으로 표시합니다');expect(html).toContain('업무 식별자');
 });
 it('keeps compact empty analysis distinct from completed results',()=>{
  const html=renderToStaticMarkup(createElement(ServiceAnalysisPanel,{compact:true}));
