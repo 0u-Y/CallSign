@@ -46,6 +46,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   attempt=await sender.getByLabel('선택한 통화 시도',{exact:true}).inputValue();await receiver.goto(`${origin}${pagePath}`);if(pagePath==='/demo/call')await receiver.getByLabel('확인할 업무',{exact:true}).selectOption(intentId!);await receiver.getByLabel('선택한 통화 시도',{exact:true}).selectOption(attempt);
   await sender.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();await receiver.getByRole('button',{name:'마이크 준비 및 PBX 등록'}).click();
   }
+  if(pagePath==='/demo/call')for(const page of [sender,receiver]){const details=page.locator('.demo-flow-details');if(await details.count()&&await details.getAttribute('open')===null)await details.locator('summary').click();}
   await expect(connection(sender)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});await expect(connection(receiver)).toHaveText('PBX 등록 완료: 양측 연결 준비를 기다립니다',{timeout:15000});
   await sender.getByRole('button',{name:'양측 웹으로 발신'}).click();
   const observed=(page:Page)=>page.evaluate(async()=>{let sent=0,received=0,energy=0,samples=0;for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers)for(const r of (await pc.getStats()).values())if(r.kind==='audio'){if(r.type==='outbound-rtp')sent+=Number(r.bytesSent??0);if(r.type==='inbound-rtp'){received+=Number(r.bytesReceived??0);energy+=Number(r.totalAudioEnergy??0);samples+=Number(r.totalSamplesReceived??0);}}return {sent,received,energy,samples};});
@@ -90,7 +91,7 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
      const context=await browsers[0]!.newContext({storageState:state});contexts.push(context);const page=await context.newPage();
      const [response]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/workspace'),page.goto(`${origin}/demo/work`)]);expect(response.ok()).toBe(true);
      const data=await response.json(),index=data.intents.findIndex((work:{id:string})=>work.id===intentId);expect(index).toBeGreaterThanOrEqual(0);
-     await page.locator('.work-select').nth(index).click();await page.getByRole('button',{name:'선택 업무 취소',exact:true}).click();
+     await page.getByRole('searchbox',{name:'고객·담당자·업무 검색'}).fill(intentId!);await expect(page.locator('.work-select')).toHaveCount(1);await page.locator('.work-select').click();await page.getByRole('button',{name:'선택 업무 취소',exact:true}).click();
      const [cancelled]=await Promise.all([page.waitForResponse(r=>new URL(r.url()).pathname==='/api/v3/cancel'&&r.request().method()==='POST'),page.getByRole('button',{name:'이 업무 취소 요청',exact:true}).click()]);expect(cancelled.ok()).toBe(true);
      note({managementAction:'work-cancel',source:'actual-independent-institution-work-ui',status:cancelled.status()});
      await testInfo.attach('institution-cancelled-work',{body:await page.screenshot({fullPage:true}),contentType:'image/png'});
