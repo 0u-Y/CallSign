@@ -14,7 +14,7 @@ assert check(sample,1,10)=='APPROVED_PERIOD_ENDED'
 });
 
 it('rechecks an exiting container instead of treating missing live cgroup data as zero',()=>{
- const check=`import ast,json,pathlib
+ const check=`import ast,json,pathlib,subprocess
 from types import SimpleNamespace
 source=ast.parse(pathlib.Path('scripts/monitor-deployment.py').read_text());function=next(n for n in source.body if isinstance(n,ast.FunctionDef)and n.name=='container_memory')
 running={'id':'owned','pid':123,'state':'running','oom':False,'memory':512,'swap':512,'restart':'no'}
@@ -27,7 +27,7 @@ class File:
   if mode=='permission':raise PermissionError()
   return {'/proc/123/cgroup':'0::/owned','/sys/fs/cgroup/owned/memory.current':'128','/sys/fs/cgroup/owned/memory.events':'oom 0\\noom_kill 0'}[self.path]
 def inspect(*args,**kwargs):return json.dumps(next(records))
-scope={'json':json,'subprocess':SimpleNamespace(check_output=inspect,PIPE=-1),'Path':File,'process_start':lambda pid:'same-start'}
+scope={'json':json,'subprocess':SimpleNamespace(check_output=inspect,PIPE=-1,CalledProcessError=subprocess.CalledProcessError,TimeoutExpired=subprocess.TimeoutExpired),'Path':File,'process_start':lambda pid:'same-start'}
 exec(compile(ast.Module(body=[function],type_ignores=[]),'<monitor-memory>','exec'),scope)
 measure=scope['container_memory']
 mode='normal';records=iter([running]);assert measure('owned',{})==128
@@ -41,6 +41,12 @@ mode='permission';records=iter([running])
 try:measure('owned',{})
 except PermissionError:pass
 else:raise AssertionError('permission failure ignored')
+def failed(*args,**kwargs):raise subprocess.CalledProcessError(1,['docker','inspect'],stderr='Error: No such object: owned')
+scope['subprocess'].check_output=failed
+try:measure('owned',{})
+except RuntimeError as error:assert str(error)=='OWNED_CONTAINER_DISAPPEARED'
+else:raise AssertionError('disappeared container accepted as zero')
+scope['subprocess'].check_output=inspect
 mode='normal';records=iter([dict(running,pid=0)])
 try:measure('owned',{})
 except RuntimeError:pass

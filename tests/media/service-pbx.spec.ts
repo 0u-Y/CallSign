@@ -67,13 +67,13 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   if(process.env.CALLSIGN_MEDIA_ANALYSIS_MODE==='fixture')finishAnalysis=await exerciseServiceCallAnalysis(receiver,await analysisControl(process.env),observation);
   await testInfo.attach('two-way-decoded-audio',{body:JSON.stringify({sender:await observed(sender),recipient:await observed(receiver)}),contentType:'application/json'});
   observation.mark(process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'termination-request':'revocation-request');
-  if(process.env.CALLSIGN_TRIAL_MODE==='work-cancel'){
+  if(['work-cancel','emergency-stop'].includes(process.env.CALLSIGN_TRIAL_MODE??'')){
    const state=process.env.CALLSIGN_MEDIA_INSTITUTION_STORAGE;if(!state)throw Error('INDEPENDENT_INSTITUTION_SESSION_REQUIRED');
    const institution=await playwright.request.newContext({storageState:state});
    try{
     const me=await institution.get(`${origin}/api/v3/auth/me?purpose=work`);expect(me.ok()).toBe(true);const auth=await me.json();
     const workspace=await institution.get(`${origin}/api/v3/workspace`);expect(workspace.ok()).toBe(true);expect((await workspace.json()).actor.role).toBe('institution');
-    const cancelled=await institution.post(`${origin}/api/v3/cancel`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:{intentId}});expect(cancelled.ok()).toBe(true);note({workCancellation:'actual-independent-institution-api',status:cancelled.status()});
+    const stopping=process.env.CALLSIGN_TRIAL_MODE==='emergency-stop';const cancelled=await institution.post(`${origin}/api/v3/${stopping?'management/suspend':'cancel'}`,{headers:{origin:new URL(origin!).origin,'x-csrf-token':auth.csrfToken,'idempotency-key':crypto.randomUUID()},data:stopping?{}:{intentId}});expect(cancelled.ok()).toBe(true);note({managementAction:stopping?'emergency-stop':'work-cancel',source:'actual-independent-institution-api',status:cancelled.status()});
    }finally{await institution.dispose();}
   }else await sender.getByRole('button',{name:process.env.CALLSIGN_TRIAL_MODE==='normal-end'?'통화 종료':'로그아웃 및 연결 회수',exact:true}).click();await expect(receiver.locator('dt').filter({hasText:/^현재 연결$/}).locator('..').locator('dd').filter({hasText:/^통화 종료:/})).toBeVisible({timeout:10000});observation.mark('ui-recalled');
   await expect.poll(()=>receiver.evaluate(()=>(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers.every(pc=>pc.connectionState==='closed'&&pc.getSenders().every(s=>!s.track||s.track.readyState==='ended')))).toBe(true);

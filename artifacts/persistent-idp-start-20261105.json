@@ -671,6 +671,22 @@
       "cancel used real institution API; institution button interaction not covered",
       "full stop and joint recovery still pending"
     ],
-    "temporaryBrowserContainers": "removed by exact IDs; persistent services retained"
+    "temporaryBrowserContainers": "removed by exact IDs; persistent services retained",
+    "governanceFollowup": {
+      "case21": "PASS: actual relay call then independently authenticated institution suspend; both audio paths stopped and PBX cleanup observed",
+      "singleRecoverySignature": "HTTP 400; not EVM rejection",
+      "twoIndependentRecoverySignatures": "submitted and ledger epoch3 confirmed",
+      "approvalV2": "generated protected inactive key; activation NOT_RUN",
+      "trustV2": "prepared, not applied",
+      "serviceState": "STOPPED by mandatory container-memory observation error 2026-11-06T02:26:19Z; no automatic restart",
+      "stopCause": "CalledProcessError; historical container ID/stderr missing, exact cause unconfirmed",
+      "remaining": [
+        "manual restart approval",
+        "key activation and trust publication",
+        "new delegation and call",
+        "actual AI budget approval"
+      ],
+      "originalEvidencePreserved": true
+    }
   }
 }

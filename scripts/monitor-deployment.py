@@ -25,9 +25,15 @@ def resource_reason(sample, owned_bytes, expires_ns):
 
 def container_memory(cid, env):
     def inspect():
-        details = json.loads(subprocess.check_output(['docker', 'inspect', '--format',
-            '{"id":{{json .Id}},"pid":{{.State.Pid}},"state":{{json .State.Status}},"oom":{{.State.OOMKilled}},"memory":{{.HostConfig.Memory}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}}}',
-            cid], env=env, timeout=10, stderr=subprocess.PIPE, text=True))
+        try:
+            details = json.loads(subprocess.check_output(['docker', 'inspect', '--format',
+                '{"id":{{json .Id}},"pid":{{.State.Pid}},"state":{{json .State.Status}},"oom":{{.State.OOMKilled}},"memory":{{.HostConfig.Memory}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}}}',
+                cid], env=env, timeout=10, stderr=subprocess.PIPE, text=True))
+        except subprocess.CalledProcessError as error:
+            missing = f'No such object: {cid}' in (error.stderr or '') or f'No such container: {cid}' in (error.stderr or '')
+            raise RuntimeError('OWNED_CONTAINER_DISAPPEARED' if missing else 'OWNED_CONTAINER_INSPECT_FAILED') from None
+        except subprocess.TimeoutExpired:
+            raise RuntimeError('OWNED_CONTAINER_INSPECT_TIMEOUT') from None
         if details['id'] != cid or details['oom']:
             raise RuntimeError('OWNED_CONTAINER_IDENTITY_OR_OOM')
         if not details['memory'] or details['swap'] != details['memory'] or details['restart'] != 'no':
@@ -88,6 +94,7 @@ def main():
     log = root / 'resources.jsonl'
     phase = 'host-observation'
     error_type = None
+    observing = None
     def interrupted(_signum, _frame):
         raise RuntimeError('MONITOR_INTERRUPTED')
     signal.signal(signal.SIGTERM, interrupted)
@@ -95,6 +102,7 @@ def main():
         began = time.monotonic()
         while True:
             phase = 'host-observation'
+            observing = None
             row = watch.update(host_sample())
             if not (root / 'initial-sample.json').exists():
                 (root / 'initial-sample.json').write_text(json.dumps(row) + '\n')
@@ -107,6 +115,7 @@ def main():
             for service in status['services']:
                 phase = 'owned-container-memory'
                 cid = service['id']
+                observing = {'id': cid, 'service': service['service']}
                 used = container_memory(cid, safe_env)
                 owned_bytes += used
                 containers.append({'id': cid, 'service': service['service'], 'memoryBytes': used})
@@ -132,7 +141,7 @@ def main():
         error_type = type(error).__name__
     finally:
         record = {'reason': reason, 'recordedAt': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-                  'phase': phase, 'errorType': error_type, 'automaticRestart': False, 'containersStopped': False}
+                  'phase': phase, 'errorType': error_type, 'observingContainer': observing, 'automaticRestart': False, 'containersStopped': False}
         (root / 'stop.json').write_text(json.dumps(record) + '\n')
         errors = []
         for action in ['latch', 'stop']:
