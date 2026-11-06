@@ -17,6 +17,7 @@ export function contactPreparation(w:Workspace,intentId:string,attemptId:string,
  if(candidates.length>1&&!attempt)throw new Error('진행 중인 통화 시도가 여러 개입니다. 연결 준비 상세에서 선택하세요.');
  if(w.actor.role==='recipient'&&(!attempt||attempt.status==='created'))throw new Error('상담원의 연락 승인을 기다린 뒤 다시 준비하세요.');
  const credentials=choices.credentials.filter(c=>c.state==='registered');
+ if(w.actor.role==='gateway'&&digest&&!credentials.some(c=>c.digest===digest))throw new Error('선택 위임이 철회됐거나 현재 업무의 등록 후보가 아닙니다. 다시 선택하세요.');
  const credential=credentials.find(c=>c.digest===digest)??(credentials.length===1?credentials[0]:undefined);
  if(w.actor.role==='gateway'&&!credential)throw new Error(credentials.length?'위임이 여러 개입니다. 연결 준비 상세에서 사용할 위임을 선택하세요.':'등록된 위임이 없습니다. 기관 담당자에게 위임 상태를 확인하세요.');
  return {intent,attempt,credential};
