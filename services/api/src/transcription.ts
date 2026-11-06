@@ -64,7 +64,7 @@ export class DeepgramStream {
   connect() {
     if (!this.options.apiKey || !this.options.model || this.socket) throw new Error("STT_UNAVAILABLE_OR_ALREADY_CONNECTED");
     const url = new URL("wss://api.deepgram.com/v1/listen");
-    for (const [key, value] of Object.entries({ model: this.options.model, language: "ko", interim_results: "true", punctuate: "true" })) url.searchParams.set(key, value);
+    for (const [key, value] of Object.entries({ model: this.options.model, language: "ko", interim_results: "true", punctuate: "true", mip_opt_out: "true" })) url.searchParams.set(key, value);
     const socket = this.options.factory?.(url.href, this.options.apiKey) ?? new WebSocket(url, { headers: { authorization: `Token ${this.options.apiKey}` }, handshakeTimeout: 3000, maxPayload: 65536 });
     this.socket = socket;
     socket.on("open", () => { if (this.socket === socket) this.options.onReady?.(); });
@@ -82,8 +82,8 @@ export class DeepgramStream {
         this.options.onRevision({ streamId: this.options.streamId, segmentId, revision, final: data.is_final, text, source: "remote" });
       } catch { this.options.onUnavailable("STT_RESPONSE_INVALID"); this.stop(); }
     });
-    socket.on("error", () => { this.options.onUnavailable("STT_CONNECTION_FAILED"); this.stop(); });
-    socket.on("close", () => { if (this.socket) { this.options.onUnavailable("STT_CLOSED_RECONNECT_REQUIRES_NEW_STREAM"); this.stop(); } });
+    socket.on("error", () => { if (this.socket === socket) { this.options.onUnavailable("STT_CONNECTION_FAILED"); this.stop(); } });
+    socket.on("close", () => { if (this.socket === socket) { this.options.onUnavailable("STT_CLOSED_RECONNECT_REQUIRES_NEW_STREAM"); this.stop(); } });
   }
   push(chunk: Uint8Array, sequence: number) {
     if (!Number.isSafeInteger(sequence) || sequence !== this.sequence + 1 || !chunk.byteLength || chunk.byteLength > 262144) throw new Error("AUDIO_SEQUENCE_INVALID");
@@ -92,5 +92,5 @@ export class DeepgramStream {
     if (socket.bufferedAmount > 524288 || this.bytes + chunk.byteLength > (this.options.maxBytes ?? 12000000)) { this.stop(); throw new Error("STT_BACKPRESSURE_OR_BUDGET"); }
     this.sequence = sequence; this.bytes += chunk.byteLength; socket.send(chunk);
   }
-  stop() { clearTimeout(this.timer); clearInterval(this.keepAlive); const socket = this.socket; this.socket = null; socket?.terminate(); }
+  stop() { clearTimeout(this.timer); clearInterval(this.keepAlive); const socket = this.socket; this.socket = null; this.revisions.clear(); this.bytes = 0; this.sequence = 0; socket?.terminate(); }
 }

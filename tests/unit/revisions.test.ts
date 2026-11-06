@@ -44,7 +44,7 @@ it("adapts streaming STT revisions, enforces sequence/backpressure and stops cal
   const { DeepgramStream } = await import("../../services/api/src/transcription.js");
   class FakeSocket extends EventEmitter { readyState = 0; bufferedAmount = 0; sent: unknown[] = []; send(value: unknown) { this.sent.push(value); } close() { this.readyState = 3; } terminate() { this.readyState = 3; } }
   const socket = new FakeSocket(); const revisions: unknown[] = [];
-  const stt = new DeepgramStream({ apiKey: "fixture-key", model: "fixture-model", streamId: "stream-a", onRevision: r => revisions.push(r), onUnavailable: () => {}, factory: (url, key) => { expect(url).toContain("wss://api.deepgram.com/v1/listen"); expect(key).toBe("fixture-key"); return socket as never; } });
+  const stt = new DeepgramStream({ apiKey: "fixture-key", model: "fixture-model", streamId: "stream-a", onRevision: r => revisions.push(r), onUnavailable: () => {}, factory: (url, key) => { expect(new URL(url).origin + new URL(url).pathname).toBe("wss://api.deepgram.com/v1/listen"); expect(new URL(url).searchParams.get("mip_opt_out")).toBe("true"); expect(key).toBe("fixture-key"); return socket as never; } });
   try {
     stt.connect(); expect(() => stt.push(new Uint8Array([1]),1)).toThrow("STT_NOT_READY"); socket.readyState = 1;
     stt.push(new Uint8Array([1]),1); expect(() => stt.push(new Uint8Array([1]),1)).toThrow("AUDIO_SEQUENCE_INVALID");
@@ -61,4 +61,22 @@ it("adapts streaming STT revisions, enforces sequence/backpressure and stops cal
 it("distinguishes secrecy demands from instructions not to share an OTP", () => {
   expect(analyzeWithRules("아무에게도 말하지 마세요. OTP는 알려주지 마세요.").signals.map(s => s.category)).toEqual(["비밀 유지 강요"]);
   expect(analyzeWithRules("이 내용을 비밀로 하지 마세요.").signals).toEqual([]);
+});
+
+
+it("clears STT context on stop and ignores old socket events after reconnect", async () => {
+  const {EventEmitter}=await import('node:events');
+  const {DeepgramStream}=await import('../../services/api/src/transcription.js');
+  class Socket extends EventEmitter {readyState=1;bufferedAmount=0;sent=0;send(){this.sent++;}terminate(){this.readyState=3;}}
+  const sockets=[new Socket(),new Socket()],revisions:any[]=[],failures:string[]=[];let opened=0;
+  const stream=new DeepgramStream({apiKey:'fixture',model:'model&mip_opt_out=false',streamId:'stream',onRevision:r=>revisions.push(r),onUnavailable:c=>failures.push(c),factory:url=>{expect(new URL(url).searchParams.getAll('mip_opt_out')).toEqual(['true']);return sockets[opened++] as never;}});
+  const result=Buffer.from(JSON.stringify({type:'Results',start:0,duration:1,is_final:true,channel:{alternatives:[{transcript:'synthetic only'}]}}));
+  try {
+    stream.connect();sockets[0]!.emit('message',result);stream.push(new Uint8Array([1]),1);stream.stop();
+    expect(()=>stream.push(new Uint8Array([1]),1)).toThrow('STT_NOT_READY');
+    stream.connect();sockets[0]!.emit('message',result);sockets[0]!.emit('error',new Error('late'));sockets[0]!.emit('close');
+    expect(failures).toEqual([]);expect(revisions).toHaveLength(1);
+    sockets[1]!.emit('message',result);expect(revisions).toHaveLength(2);expect(revisions[1].revision).toBe(1);
+    stream.push(new Uint8Array([1]),1);expect(sockets[1]!.sent).toBe(1);
+  } finally {stream.stop();}
 });
