@@ -1,0 +1,274 @@
+{
+  "checkedAt": "2026-11-06T17:27:00+09:00",
+  "design": {
+    "path": "docs/CallSign_Recording_Demo.html",
+    "sha256": "4430eb14109d9c61968eb3ee2dbc5a062caa86a22444adf00e04ca1e115ca505",
+    "originalPreserved": true,
+    "rendered": [
+      "work1440",
+      "work390",
+      "call1440",
+      "call390",
+      "governance1440",
+      "governance390"
+    ]
+  },
+  "frontendSource": "db32c55571c6ddb50e89aad404e8459fe4af2064",
+  "backendSource": "e267dbf7a0d44eb76b61f3297c07907b34ea50ad",
+  "runtimeImageConfigId": "sha256:17572369cea1623d7e11a0fbfa52c37523fbb35bcb20cd479e0267a0c9ef5bf5",
+  "registryManifestDigest": null,
+  "backendResume": {
+    "existingContainers": 21,
+    "newMonitor": "resume-20261106T1705",
+    "originalStopAndPersistentDataPreserved": true,
+    "expiresKst": "2026-11-07T08:37:00+09:00",
+    "providerConfig": "none",
+    "apiReadinessPorts": {
+      "14100": 200,
+      "14101": 200,
+      "14102": 200
+    }
+  },
+  "offline": {
+    "focusedUnitTests": 16,
+    "webAndLightTypecheck": "PASS",
+    "sourceHygiene": "PASS",
+    "fixtureScope": "Intercepted synthetic HTTP UI, not authentication/media/provider proof",
+    "fixtureResult": "Protected .local/recording-demo-20261106/fixture/fixture-result.json",
+    "safeStop": "Individually verified persistent IDs only; strict start/status remain; mixed/foreign IDs excluded",
+    "trialBudgetBoundary": "Actual guard AST tested at combined 16GiB and above: persistent cgroup + trial cgroup + host RSS"
+  },
+  "case31": {
+    "logicalExecutions": 1,
+    "workCreated": 0,
+    "callsStarted": 0,
+    "successes": 0,
+    "startFailures": 1,
+    "automaticRetries": 0,
+    "providersCalled": 0,
+    "failure": "Public work page entry; pending response promise reported page closed and masked original exception",
+    "cause": "UNKNOWN",
+    "containerRemoved": true,
+    "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc",
+    "relatedReadonlyDiagnosis": {
+      "scope": "Read-only browser entry, no work or call creation",
+      "requests": [],
+      "http": 200,
+      "authenticated": true
+    },
+    "nextCheck": "Explicit additional approval only; fixed diagnostic capture before closing page; no automatic call retry"
+  },
+  "databaseAudit": {
+    "status": "PASS",
+    "failures": [],
+    "expectedRetained": "Consumed receipts/journal, settled usage, valid or expired session records and signer lease history are retained; expiry alone is not authorization proof. Future retries/current claims are reported, not deleted.",
+    "observations": {
+      "migrations": {
+        "0000_initial": "4cb135b91a09198f9b25fa6a1fdb47f20634943d808b9f0b7901006adf6589d2",
+        "0001_finals_authority": "bb6f9f9e7e369b30986367db1517ac3c5ef5e32135799eae4e8347d861ba70c6",
+        "0002_session_scopes": "242cf3d029b8f0e9a674a903dbc581b27ea6d22c462c855f3cb5e157574547f9",
+        "0003_service_runtime": "5aa4820abd736a4e4537aa202b3a19ac340cda76beb0949a0dfd94b2db9ef151",
+        "0004_worker_recovery": "0997c784dfdc7dc195e802a238bccef3a773bd5d7220a0ee4984f05585c5a982",
+        "0005_account_management": "08c14b3e3e930028df1537535811d46a3cfca8efe5179be82e3d734c2b786efc",
+        "0006_backup_drain": "b2596f6ac7c7f2873c93ae46b9dcda3f66c9993d0883816acbd0524797e103ac",
+        "0007_pbx_lease_locks": "bc3cb0af6861deb15857b659ae590a9717841b2c653934b47cd7a8601c64b45e",
+        "0008_pjsip_contact_qualification": "812544f445cba8e2a70e7438ac54861419914d6b2ed5840ca3ab5d570b0ea23e",
+        "0009_pjsip_boolean_fields": "6b3a6c3fa9d498cac7112386c81d39814052cba61214871dc724f4953ed4f43a",
+        "0010_operation_lookup_indexes": "604fff15eea0b436667d87dd1b9d35f912b06aa9cfd466afda5fd61ccec18f53",
+        "0011_operational_cursor_read": "0069577fb77055750a91e9afe044dfb074c5be348a1f9e2c1a41ceb700733874"
+      },
+      "institutions": 1,
+      "attempts": 26,
+      "nonterminalAttempts": 0,
+      "cancelledWork": 2,
+      "sessions": {
+        "validByExpiry": 10,
+        "expired": 32
+      },
+      "outbox": {
+        "done": 192
+      },
+      "overduePending": 0,
+      "pendingDiagnostics": [],
+      "expiredClaims": 0,
+      "futureRetries": 0,
+      "signerLeases": {
+        "current": 0,
+        "expired": 0
+      },
+      "reservedReservations": 0,
+      "expiredReservations": 0,
+      "reservationStates": {
+        "settled": 12
+      },
+      "reservedBalance": 0,
+      "consumptionReceipts": 13,
+      "consumptionJournal": 20,
+      "recoveryGates": {
+        "ready": 1
+      }
+    },
+    "scope": "Persistent owned DB read-only snapshot after case31 start failure; no row changes"
+  },
+  "limitations": [
+    "No real call or UI cancellation completed in case31",
+    "Actual STT to completed OpenAI result still unverified; provider OFF",
+    "Server-hosted browsers are not independent external devices",
+    "No new recovery or AWS validation"
+  ],
+  "publicUI": {
+    "authenticatedSources": [
+      "78f6bc74477cea472a57932a043bea0bae3ca451",
+      "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+    ],
+    "roles": [
+      "institution",
+      "gateway",
+      "recipient",
+      "approver"
+    ],
+    "widths": [
+      1440,
+      390
+    ],
+    "drawerWhite": true,
+    "cssZoom2x": true,
+    "temporarySessionsLoggedOut": true,
+    "noNewCallsOrProviderRequests": true,
+    "originalFullPass": {
+      "scope": "Actual authenticated public API read-only UI; no call, microphone, media or paid provider requests",
+      "checks": [
+        {
+          "role": "institution",
+          "route": "work",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "institution",
+          "route": "work",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "role": "institution",
+          "route": "governance",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "institution",
+          "route": "governance",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "role": "gateway",
+          "route": "call",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "gateway",
+          "route": "call",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "role": "recipient",
+          "route": "call",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "recipient",
+          "route": "call",
+          "width": 390,
+          "overflow": false
+        },
+        {
+          "role": "approver",
+          "route": "governance",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "approver",
+          "route": "governance",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "temporarySessionsLoggedOut": true
+    },
+    "followupFailure": "Observer incorrectly expected node data for approver; preserved final-ui-check failure, no product permission bypass",
+    "approverBoundary": {
+      "status": "PASS",
+      "permissionBoundary": "Approver has no institution.recover: health API403 and restricted UI; previous observer incorrectly expected node data",
+      "paidCalls": 0
+    },
+    "mobileFix": {
+      "status": "PASS",
+      "source": "97249b068dfda409866dac686c31af905c07bffb",
+      "keyboardHorizontalScroll": true,
+      "documentOverflow": false
+    },
+    "screenshots": [
+      {
+        "path": "institution-work-1440-final.png",
+        "sha256": "f6be1bf8692990dfb38fa27de0487329202a7bd3add31931604c100a58ec7f0e",
+        "source": "97249b068dfda409866dac686c31af905c07bffb"
+      },
+      {
+        "path": "institution-work-390-fixed.png",
+        "sha256": "ab3333ca967af520468db32bc69b4daa5ca9a72c8281b58703dc90c3b449e1d2",
+        "source": "97249b068dfda409866dac686c31af905c07bffb"
+      },
+      {
+        "path": "work-details-1440.png",
+        "sha256": "3da2a5c31f0f2e9578347cd927397b158c2a55174d7c576d9c7be20c7a35cce4",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      },
+      {
+        "path": "work-details-390.png",
+        "sha256": "a74d99fe85f8094b3389a109fdf35173b3e563f2c592a6c896b5d67fc1718f53",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      },
+      {
+        "path": "gateway-call-1440.png",
+        "sha256": "01d5d2134bbe88b898888dede6ce02e0d03bf619de9aa73fdecfc23634d49bf0",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      },
+      {
+        "path": "recipient-call-390.png",
+        "sha256": "48dfb89837aeb63f460eaf7bcdde8bee82fd5a7689646b7f146cccbb4410b9ab",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      },
+      {
+        "path": "institution-governance-1440.png",
+        "sha256": "ac13fa81eb1a6328c6f224546347f4005475dbc17d6fc4b89f58487be4257866",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      },
+      {
+        "path": "approver-governance-390.png",
+        "sha256": "a34748784990cd1066d3510624ec516b4930158f7eda1f82e95f388520fcf609",
+        "source": "6062670ddf1378fd5c6df44210e1ed8d7e7b46fc"
+      }
+    ],
+    "finalStatusTextDelta": "db32c55 changes only disabled analysis summary wording; typecheck passed, no paid calls"
+  },
+  "resourceObservations": {
+    "call31-check": {
+      "peakCombinedOwnedBytes": 4910403584,
+      "minimumAvailableBytes": 43960467456,
+      "resourceStop": false,
+      "sampleCount": 15
+    },
+    "readonly-entry-check": {
+      "peakCombinedOwnedBytes": 4879810560,
+      "minimumAvailableBytes": 44046831616,
+      "resourceStop": false,
+      "sampleCount": 15
+    }
+  }
+}

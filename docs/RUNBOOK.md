@@ -34,6 +34,8 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 지속 자원 감시는 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure python3 scripts/monitor-deployment.py --env-file PRIVATE_DEPLOYMENT_ENV --output PRIVATE_NEW_MONITOR_DIR`로 시작한다. 60초 사전 관측과 살아 있는 monitor의 `ready.json`을 확인한 뒤 기동하며 이 표시는 제품 readiness가 아니다. 5초마다 검증된 소유 컨테이너의 cgroup 메모리와 호스트 PSI/swap/OOM을 확인한다. 로그는10MiB씩 두 파일로 제한한다. 중단 시 최초 사유를 보존하고 소유 애플리케이션→DB 순서로 중지한다. 자동 재기동하지 않으며 감시 종료도 서비스를 중지한다. 준비 시간을 포함해 감시 시작부터 최대24시간으로 제한한다.
 
+시험 browser는 지속 Compose project와 다른 project 및 `lifecycle=trial`/고유 run-id를 사용한다. 시험 guard는 지속 관측량에 시험 cgroup과 host controller/browser RSS를 합산한다. start/status의 전체 소유권 검사는 엄격하게 유지한다. latch/stop은 각각 확인된 persistent 자원만 중지하고 혼합·불명확 자원은 제외 코드를 남긴다. 시험 정리는 별도로 full ID·project·deployment·lifecycle·run-id를 모두 대조한다.
+
 자원 중단 뒤 사용자가 명시적으로 재개하면 `deployment-control.mjs review`에 보호 env와 `CALLSIGN_RESOURCE_REVIEW_REFERENCE`를 전달한다. 각 승인은 해당 중단 파일의 SHA에 연결된 새 review 파일로 남는다. 원본 중단·이전 review를 삭제하거나 덮어쓰지 않으며, 이후 중단은 다시 기동을 차단한다.
 
 첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 이것은 최초 기동 당시 실패다. 이후 사용자 명시적 재개와 새로운 SHA 연결 review를 거쳐 정상 로그인·API 기동을 확인했으며, 원본 중단 파일은 그대로 보존한다.
@@ -50,7 +52,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 - 기관 담당자: `/demo/work`에서 업무 만들기 → 등록 콜센터·고객 계정·담당 상담원을 선택한다. 목적은 현재 이상거래 정책으로 고정된다. 선택 가능한 계정 목록은 소속 조회 권한이 있을 때만 제공되며 표시 이름이 없는 응답은 실제 ID로 대조한다. 응답 유실 후에는 같은 입력으로 재시도해 기존 멱등키를 유지한다.
 - 위임 관리: 업무 배정과 별개로 콜센터의 위임을 발급·철회한다. 등록 대기를 완료로 보지 않는다. 선택 업무 취소는 확인 후 해당 업무에만 요청하며, 상세의 회수 관측에서 서버 적용과 PBX 관측을 따로 확인한다.
-- 상담원: 배정 업무 선택 → 연락 검증으로 이동 → 새 통화 시도 → 등록 위임 선택 → 개별 연락 승인. 수신자도 같은 시도를 선택하고 양측이 마이크/PBX 준비를 마치면 상담원이 발신한다. 수신자의 수락·분석 동의는 별도이며, 전사/분석은 수신자의 인증 화면에서만 보인다. 세 탭 이동은 통화 controller와 audio DOM을 유지한다.
+- 상담원: 배정 업무 선택 → 연락 검증으로 이동 → **연락 준비**. 등록 위임이나 진행 시도가 여럿일 때만 연결 준비 상세에서 선택한다. 수신자는 같은 업무에서 **연락 받을 준비**를 누른다. 각자 마이크 권한을 확인하고 PBX 준비가 끝나면 상담원이 **양측 웹으로 발신**, 수신자가 **통화 수락 및 검증 시작**을 누른다. 수신자의 수락·분석 동의는 별도이며, 전사/분석은 수신자의 인증 화면에서만 보인다. 세 탭 이동은 통화 controller와 audio DOM을 유지한다.
 - 공동 승인자: `/demo/governance`에서 공개 요청 파일의 대상·변경 내용·만료를 검토하고 각자 보호 키로 별도 서명한다. 공개 서명 파일만 가져오며, 서로 다른 유효 서명 2개가 필요하다. 접수·원장 확정·Witness·서버 적용을 따로 확인하고 복구 후 새 위임·업무로 연락한다. 기존 통화는 부활하지 않는다.
 
 UI만 격리 검증할 때는 설치된 의존성으로 웹을 build한 뒤 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration node tests/ui/demo-workspace.mjs`를 실행한다. 이 명령은 별도 승인이 있는 frontend 시험용이다. loopback 정적 서버와 설치 Chromium을 사용하고 모든 API를 합성 응답으로 가로채며 외부 요청은 차단한다. 지속 backend에서 취소·정지·계정 변경을 시험하지 않는다. 캡처는 `.impeccable/review/`에 생성된다.

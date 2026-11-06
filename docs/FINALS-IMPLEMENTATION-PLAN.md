@@ -4,6 +4,12 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 Recording 적용과 동일 기한 재개
+
+Recording 원본을 직접 렌더링하고 업무 표·상태 검색·흰 상세 drawer·휴대폰 구성, 순차 연락 준비를 실제 API/controller에 반영했다. 독립 역할·마이크·분석 동의 경계는 유지한다. 혼합 label 때문에 안전 중단까지 막히던 경로는 latch/stop에서 개별 소유권이 확인된 persistent 자원만 처리하도록 수정했다. start/status는 계속 전체 불일치를 거절한다. trial project 분리·full ID 정리·persistent+trial+host 합산 예산을 실제 launcher/guard에 적용했다.
+
+새 감시와 기존21개 서비스의 재개, 공개 실제 역할 로그인·조회·Recording 화면을 확인했다. case31은 업무 생성 전 브라우저 진입에서 실패해 통화 시작0건으로 보존했고 재시도하지 않았다. 실패 전 대기 Promise가 종료 오류로 원인을 가리는 진단 누락을 보완했다. 별도 GET-only 동일 컨테이너 진단은200/인증 화면이지만 최초 원인은 미확정이다. read-only DB 감사는 활성통화·예약·기한 지난 pending/claim0, outbox done192·영수증13이었다. 유료 제공자 OFF, 기존 만료 유지. [화면·실행 경계](../artifacts/demo-ui-20261106/recording/result.json).
+
 ## 2026-11-06 조회 대기 중 분석 철회
 
 일반 UI action의 busy/pending이 철회 버튼까지 막고, controller가 동의 응답 전에 analysisWanted를 켜는 결함을 오프라인으로 재현했다. 철회는 일반 작업 대기와 분리해 즉시 로컬 녹음/전송을 정리한다. 동의 쓰기는 controller 내 순서대로 보내고, 실패 또는 이전 generation 응답은 분석을 켜거나 최신 상태를 덮지 않는다. 반복 철회 클릭은 같은 controller의 진행 요청을 공유한다. 신규 회귀3건은 수정 전 실패·수정 후 통과, 기존 controller 포함8건 통과. 실제 provider·브라우저 회귀는 서비스 중단 및 비용 승인 대기로 미실행이며, 서버 저장소의 응답 유실 처리 전체를 이번 단위 시험으로 입증하지 않는다.

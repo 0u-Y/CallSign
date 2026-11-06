@@ -4,7 +4,7 @@
 
 | CallSign 문제 | 공식 패턴 | 적용·제외 |
 |---|---|---|
-| 선택 연락의 핵심 정보가 흩어짐 | [GOV.UK summary list](https://design-system.service.gov.uk/components/summary-list/) | 이름/값 `dl`로 요약. 업무 목록은 기존 `ul` 유지 |
+| 선택 연락의 핵심 정보가 흩어짐 | [GOV.UK summary list](https://design-system.service.gov.uk/components/summary-list/) | 이름/값 `dl`로 요약. 업무 목록은 최신 Recording 시안에 따라 표로 표시 |
 | 원시 ID와 관리 양식이 과밀 | [GOV.UK details](https://design-system.service.gov.uk/components/details/) | 기술 근거·계정 관리만 접음. 경고·승인·만료·서명 문맥은 기본 표시 |
 | 상담원에게 다음 행동이 불명확 | [Twilio Flex task views](https://www.twilio.com/docs/flex/onboarding-guide/explore-the-built-in-flex-ui-views) | 현재 업무와 실제 가능한 통화 행동을 묶음. CRM/다채널 UI는 추가하지 않음 |
 | 목록과 선택 업무가 분리됨 | [Cloudscape split view](https://cloudscape.design/patterns/resource-management/view/split-view/) | 선택 업무 요약을 갱신. 상시2열/다중 비교 패널은 모바일 복잡성 때문에 제외 |
