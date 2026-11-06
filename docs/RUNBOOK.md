@@ -1105,3 +1105,17 @@ Use independent institution, gateway and recipient browser profiles. Credentials
 Filming providers are ON under quantity ID `public-risk-filming-20261106-goal`:180STT seconds,3connections,12LLM requests (each stream reserves at most60seconds and invokes at most4requests), expiry2026-11-07 22:02:42KST. The existing OpenAI USD1 cost ID is not reset; pending reservations remain charged against availability. The limits are local controls, not a supplier invoice guarantee. Budget/expiry ends analysis availability; do not substitute synthetic results. Current usage and execution evidence are in [the current state table](guide/05-IMPLEMENTATION-STATUS.md). That provider expiry is separate from the current `persistent-observe-v1` service lifetime (until user stop or a retained integrity/OOM stop). Stop/restart commands above preserve data; do not restart after a safety stop without its review and authorization.
 
 V24 analysis verification is incomplete: case51 was rejected by evidence-context validation; case52 suffered network-change errors before PBX termination. The last remaining provider connection is reserved for the user, not another unattended trial. A completed v18 analysis is historical evidence, not proof of the new keypad path. If local Korean speech is unavailable, use the displayed text; there is no paid voice fallback. The keypad is a web consent control, not PBX DTMF.
+
+### 촬영자 로컬 세션 준비 (실제 OIDC)
+
+촬영할 노트북에 저장소의 설치된 Node 22·pnpm 의존성·Chromium과 보호된 합성 계정 파일을 준비한다. 자격 파일은 소유자만 읽을 수 있는 0600 파일로 두고 화면 공유·Git·Vercel 환경 변수에 올리지 않는다. 운영자가 지정한 합성 계정만 사용한다. 다음 명령은 **촬영자 노트북에서** 실행한다. 서버의 브라우저에서 준비하면 노트북의 쿠키와 마이크 권한이 생기지 않는다.
+
+```bash
+CALLSIGN_RECORDING_PREP_ENABLED=1 pnpm demo:prepare --credentials /private/path/login-credentials.protected.json
+```
+
+열리는 로컬 `CallSign 촬영 준비` 창에서 **촬영 세션 준비**를 누른다. 도구는 기존 OIDC 폼 로그인을 기관·상담원·수신자별 독립 Chromium 사용자 프로필에서 수행하고, `/demo/call`의 역할과 진행 중 업무 조회를 확인한다. 프로필은 로컬 `.local/recording-browser-profiles/{institution,gateway,recipient}`에 0700으로 보관한다. 같은 origin의 탭 세 개는 하나의 `ip_session` 쿠키를 공유하므로 역할 격리가 아니다. 이 도구는 로그인 화면 외에 발신·동의·마이크 권한·유료 분석·정지/복구를 자동 실행하지 않는다. `준비 실패`나 `업무 상태 확인 필요`가 나타나면 해당 역할의 현재 세션·backend 상태를 확인하고 **다시 준비**를 누른다. 현재 사용 중인 역할 세션을 무단 로그아웃하지 않도록 촬영 전 사용한다.
+
+촬영자는 기관 창 `/demo/work`에서 실제 업무를 고르고, 상담원·수신자 창 `/demo/call`에서 같은 업무와 통화 시도를 확인한다. 통화·분석·철회는 두 창의 실제 버튼·마이크 권한·동의가 필요하다. 기관 정지·복구는 `/demo/governance`에서 실제 권한과 독립 서명 자료가 준비된 경우에만 실행한다. 공동 승인자 서명은 이 세 프로필 준비에 포함되지 않는다. 촬영 모드는 각 역할 창에서 F/`촬영 화면`으로 전환하고 ESC로 편집 화면에 돌아온다. 브라우저 프로필과 계정 파일은 보호 자격으로 취급한다.
+
+준비 도구의 점검 명령은 `CALLSIGN_RECORDING_PREP_ENABLED=1 pnpm demo:prepare --credentials /private/path/login-credentials.protected.json --check`다. 이 명령은 설치 Chromium을 headless로 열어 실제 로그인·업무 조회를 확인한 뒤 닫는다. UI/CSS 변경은 해당 화면 직접 캡처와 웹 빌드, 동작 변경은 인접 UI 회귀, 인증·통화·분석 변경은 영향 범위 검사, 최종 배포는 기존 `pnpm light` CI와 공개 SHA·역할별 진입을 확인한다. 기존 필수 CI는 유지한다.

@@ -23,6 +23,7 @@
     "ledger:deploy": "node scripts/restricted.mjs chain bash -c 'tsx scripts/deploy-registry.ts'",
     "trust:generate": "tsx scripts/prepare-finals.ts trust",
     "submission:build": "tsx scripts/generate-submission.ts && libreoffice --headless --convert-to pdf --outdir submission submission/CallSign_\uae30\ud68d\uc81c\uc548\uc11c.pptx",
+    "demo:prepare": "node scripts/prepare-recording-session.mjs",
     "demo:record": "node scripts/restricted.mjs media bash -c 'playwright test tests/e2e/demo-record.spec.ts --project=chromium'",
     "demo:down": "node scripts/restricted.mjs infrastructure bash -c 'docker compose -f infra/compose/docker-compose.yml down'",
     "test:report": "tsx scripts/write-test-report.ts",
