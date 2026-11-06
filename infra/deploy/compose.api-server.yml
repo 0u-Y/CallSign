@@ -48,6 +48,7 @@ services:
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA}/trust', target: /trust, read_only: true, bind: {create_host_path: false}}
   worker:
     <<: *app
+    image: ${CALLSIGN_WORKER_IMAGE:-${CALLSIGN_APP_IMAGE:?reviewed runtime}}
     entrypoint: [pnpm, worker]
     env_file: ${CALLSIGN_WORKER_ENV_FILE:?protected worker environment}
     healthcheck: {disable: true}
