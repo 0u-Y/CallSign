@@ -1,7 +1,9 @@
+import {contactWorkState} from './workPresentation.js';
 import type {Workspace} from './serviceWorkspace.js';
 export function contactPreparation(w:Workspace,intentId:string,attemptId:string,digest:string){
  const intent=w.intents.find(i=>i.id===intentId);
  if(!intent||intent.status!=='open')throw new Error('진행 중인 업무를 선택하세요. 취소된 업무로 연락할 수 없습니다.');
+ if(contactWorkState(intent)==='expired')throw new Error('업무 유효기간이 만료됐습니다. 기관 담당자가 새 업무를 생성·배정한 뒤 다시 선택하세요.');
  if(!['gateway','recipient'].includes(w.actor.role)||(w.actor.role==='gateway'?intent.agentId:intent.recipientId)!==w.actor.userId)throw new Error('본인에게 배정된 연락만 준비할 수 있습니다.');
  const candidates=w.attempts.filter(a=>a.intentId===intent.id&&['created','authorized','consumed','accepted'].includes(a.status));
  const attempt=candidates.find(a=>a.id===attemptId)??(candidates.length===1?candidates[0]:undefined);

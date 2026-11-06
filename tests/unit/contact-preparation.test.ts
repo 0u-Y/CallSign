@@ -20,3 +20,7 @@ it('rejects cancelled or reassigned work and requires an approved attempt for re
  w.attempts=[{id:'a',intentId:'work',status:'authorized'}];w.credentials=[];
  expect(contactPreparation(w,'work','','').attempt?.id).toBe('a');
 });
+it('rejects an open work item whose deadline has passed before preparing an attempt',()=>{
+ const w=workspace();w.intents[0]!.expiresAt=Math.floor(Date.now()/1000)-1;
+ expect(()=>contactPreparation(w,'work','','')).toThrow('유효기간');
+});

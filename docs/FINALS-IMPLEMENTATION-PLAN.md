@@ -715,3 +715,7 @@ Public recheck boundary: actual OIDC login/callback succeeded in the earlier rea
 원본 실행 증거: `.local/v24-exact/reference-complete/steps.json`, 94개 단계 캡처 및 영상. 네 장면과 공동 관리를 실제 키/버튼으로 진행했으며 시뮬레이션 근거다. 로그인 실패는 사용자 지시에 따라 UI 선행조건에서 제외하고 별도 미확인으로 유지한다.
 
 관련 검증: 실제 Space 키 입력 director fixture, 휴대폰9상태·키패드1440/390 fixture, 업무 전체 fixture(`.local/v24-exact/workspace-accessible/fixture-result.json`)가 통과했다. 발신 중복·연결 후 늦은 발신 응답을 포함한14개 단위 검사 통과. 실제 통화·제공자 호출 근거는 아니며 backend 재시작 없음. 원본 `drawer.png`는 실제 drawer가 열린 장면이 아니므로 drawer 일치 증거로 사용하지 않는다. 공개 배포 후 독립 역할 폼 로그인·조회·Space 취소 검토만 재확인한다.
+
+### 2026-11-07 연락 준비 오류: 만료 업무 표시 결함
+
+실제 상담원 폼 로그인 후 읽기 전용 workspace(200)를 확인했다. 26개 업무 중 open21개 모두 expiresAt이 관측 시각보다 과거였다. 서버 activeIntent는 이 상태를 INTENT_NOT_ACTIVE로 거절하지만 프런트는 status=open만 보고 진행 중/준비 가능으로 표시했다. 만료 입력을 거절해야 하는 contactPreparation 회귀가 수정 전 실패했다. 공통 표시·업무 필터·요약·연락 준비/상세 발신 버튼에 유효기간을 반영하고 해당 서버 오류 안내를 구체화했다. 기존 업무/DB/권한을 변경하거나 새 통화·제공자 호출을 실행하지 않았다. 사용자 요청의 실제 HTTP 오류 코드는 과거 로그에서 확인하지 못했으므로 그 코드 자체를 관측했다고 주장하지 않는다. 근거: `.local/contact-failure-20261107/read/result.json`; 원본 workspace는 보호 파일로만 보존.

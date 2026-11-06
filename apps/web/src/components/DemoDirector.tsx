@@ -34,7 +34,7 @@ export function DemoDirector({root,enabled,role,status,connected,scene,identity}
    const button=selector?host.querySelector<HTMLButtonElement|HTMLInputElement>(selector):null;
    return button&&!button.matches(':disabled')&&button.getClientRects().length?button:null;
   }
-  function refresh(){const t=target();setReady(!!t&&!locked);setLabel(locked?'조작 준비 중':t?(t instanceof HTMLInputElement?'녹음 파일 선택':t.getAttribute('aria-label')||t.textContent||'다음 조작'):host.querySelector('.work-confirm')?'영향 범위를 확인하고 취소 요청을 직접 선택하세요':status.dialing?'수신자 창에서 수락 대기':role==='institution'?'발신은 상담원 창에서 진행하세요':connected&&!status.active&&role==='recipient'?'상담원 창에서 발신 대기':status.active?'수신자 창의 키패드 선택 또는 상대 발언 대기':'진행 중인 업무를 선택하세요');}
+  function refresh(){const t=target();setReady(!!t&&!locked);setLabel(locked?'조작 준비 중':t?(t instanceof HTMLInputElement?'녹음 파일 선택':t.getAttribute('aria-label')||t.textContent||'다음 조작'):host.querySelector('.work-confirm')?'영향 범위를 확인하고 취소 요청을 직접 선택하세요':status.dialing?'수신자 창에서 수락 대기':host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')?.title?host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')!.title:role==='institution'?'발신은 상담원 창에서 진행하세요':connected&&!status.active&&role==='recipient'?'상담원 창에서 발신 대기':status.active?'수신자 창의 키패드 선택 또는 상대 발언 대기':'진행 중인 업무를 선택하세요');}
   function run(){const t=target();if(!t||locked)return;t.scrollIntoView({block:'nearest',behavior:'auto'});
    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
    const area=t.closest('.demo-recipient')?'recipient':t.closest('.demo-institution-strip')?'institution':'sender';const focusDelay=!reduced&&host.dataset.directorFocus!==area?950:0;host.dataset.directorFocus=area;
