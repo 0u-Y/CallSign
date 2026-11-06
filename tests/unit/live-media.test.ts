@@ -31,3 +31,10 @@ it('discards a file source when a call closes during asynchronous playback setup
  const media=new LiveMedia([],()=>{},()=>({addTrack:()=>sender,close(){}})as unknown as RTCPeerConnection);await media.prepareMicrophone(async()=>({getTracks:()=>[microphone],getAudioTracks:()=>[microphone]})as unknown as MediaStream);await media.accept();
  const pending=media.playRecording(new File(['audio'],'sample.webm'));await Promise.resolve();media.close();ready();await expect(pending).rejects.toThrow('MEDIA_CLOSED');expect(sender.replaceTrack).toHaveBeenCalledOnce();expect(fileTrack.enabled).toBe(false);expect(fileTrack.stop).toHaveBeenCalledOnce();create.mockRestore();revoke.mockRestore();vi.unstubAllGlobals();
 });
+it('uses the selected physical input for the call sender and never prepares it twice',async()=>{
+ vi.stubGlobal('MediaStream',class{addTrack(){}getTracks(){return [];}});
+ const track={enabled:true,kind:'audio',readyState:'live',onended:null,stop:vi.fn()},stream={getTracks:()=>[track],getAudioTracks:()=>[track]} as unknown as MediaStream;
+ const getUserMedia=vi.fn(async(constraints:MediaStreamConstraints)=>{expect(constraints.audio).toMatchObject({deviceId:{exact:'chosen-mic'}});return stream});
+ const media=new LiveMedia([],()=>{},()=>({addTrack:()=>({replaceTrack:vi.fn()}),close:vi.fn()})as unknown as RTCPeerConnection);
+ await media.prepareMicrophone(getUserMedia,'chosen-mic');await expect(media.prepareMicrophone(getUserMedia,'chosen-mic')).rejects.toThrow('MICROPHONE_SESSION_INVALID');expect(getUserMedia).toHaveBeenCalledTimes(1);media.close();expect(track.stop).toHaveBeenCalledTimes(1);vi.unstubAllGlobals();
+});

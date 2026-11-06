@@ -20,10 +20,10 @@ export function DemoDirector({root,enabled,role,status,connected,scene,identity}
   function target():HTMLButtonElement|HTMLInputElement|null{
    if(document.querySelector('[role="dialog"]')||host.querySelector('.work-confirm')||status.dialing||status.ending||status.accepting||status.terminal||status.error)return null;
    let selector='';
-   if(role==='institution'&&scene===3)selector='.work-cancel-open';
-   else if(!connected)selector='.contact-prepare';
+   if(scene>=3)return null;
+   if(!connected)selector='.contact-prepare';
    else if(!status.active)selector=role==='gateway'?'.call-dial':role==='recipient'&&status.incoming?'.call-accept':'';
-   else if(role==='gateway')selector='.call-audio-source input[type=file]';
+   else if(role==='gateway')return null;
    else if(role==='recipient'){
     const choice=host.querySelector('.call-consent-keypad')?.getAttribute('data-choice');
     if(host.querySelector('.call-dial-screen'))return null;
@@ -34,19 +34,19 @@ export function DemoDirector({root,enabled,role,status,connected,scene,identity}
    const button=selector?host.querySelector<HTMLButtonElement|HTMLInputElement>(selector):null;
    return button&&!button.matches(':disabled')&&button.getClientRects().length?button:null;
   }
-  function refresh(){const t=target();setReady(!!t&&!locked);setLabel(locked?'조작 준비 중':t?(t instanceof HTMLInputElement?'녹음 파일 선택':t.getAttribute('aria-label')||t.textContent||'다음 조작'):host.querySelector('.work-confirm')?'영향 범위를 확인하고 취소 요청을 직접 선택하세요':status.dialing?'수신자 창에서 수락 대기':host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')?.title?host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')!.title:role==='institution'?'발신은 상담원 창에서 진행하세요':connected&&!status.active&&role==='recipient'?'상담원 창에서 발신 대기':status.active?'수신자 창의 키패드 선택 또는 상대 발언 대기':'진행 중인 업무를 선택하세요');}
+  function refresh(){const t=target();setReady(!!t&&!locked);setLabel(locked?'조작 준비 중':t?(t.getAttribute('aria-label')||t.textContent||'다음 조작'):scene>=3?'기관 창에서 정지·복구 상태를 확인하세요':status.dialing?'수신자 창에서 수락 대기':host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')?.title?host.querySelector<HTMLButtonElement>('.contact-prepare:disabled')!.title:role==='institution'?'발신은 상담원 창에서 진행하세요':connected&&!status.active&&role==='recipient'?'상담원 창에서 발신 대기':status.active&&role==='gateway'?'마이크로 말씀하세요':status.active?'수신자 창의 키패드 선택 또는 상대 발언 대기':'진행 중인 업무를 선택하세요');}
   function run(){const t=target();if(!t||locked)return;t.scrollIntoView({block:'nearest',behavior:'auto'});
    const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
    const area=t.closest('.demo-recipient')?'recipient':t.closest('.demo-institution-strip')?'institution':'sender';const focusDelay=!reduced&&host.dataset.directorFocus!==area?950:0;host.dataset.directorFocus=area;
    const perform=()=>{if(!t.isConnected||target()!==t||document.querySelector('[role="dialog"]')){locked=false;refresh();return;}
    if(!reduced){const box=t.getBoundingClientRect(),cue=document.createElement('span');cue.className='recording-click-cue';cue.setAttribute('aria-hidden','true');cue.style.left=`${box.left+box.width*.72}px`;cue.style.top=`${box.top+box.height*.55}px`;cue.innerHTML='<svg viewBox="0 0 24 28"><path d="M3 2v20l5-5 4 8 4-2-4-8h8Z"/></svg>';document.body.append(cue);cues.add(cue);const animation=cue.animate([{opacity:0,transform:'translate(5px,7px)'},{opacity:1,transform:'translate(0,0)',offset:.2},{opacity:1,transform:'scale(.86)',offset:.5},{opacity:0,transform:'scale(1)'}],{duration:1050});animation.onfinish=()=>{cue.remove();cues.delete(cue);};}
-   // File pickers require the current user gesture; stopping media/analysis must never wait for staging.
-   const immediate=reduced||t instanceof HTMLInputElement||t.matches('.phone-end,.call-analysis,.service-end');
+   // Stopping media and analysis must never wait for staging.
+   const immediate=reduced||t.matches('.phone-end,.call-analysis,.service-end');
    if(immediate){t.click();locked=false;refresh();return;}
    actionTimer=setTimeout(()=>{actionTimer=undefined;if(t.isConnected&&target()===t&&!document.querySelector('[role="dialog"]'))t.click();locked=false;refresh();},520);};
    locked=true;refresh();
    // Preserve the source's focus-then-pointer sequence, without delaying safety controls or user-gesture file pickers.
-   if(focusDelay&&!(t instanceof HTMLInputElement)&&!t.matches('.phone-end,.call-analysis,.service-end'))focusTimer=setTimeout(()=>{focusTimer=undefined;perform();},focusDelay);else perform();
+   if(focusDelay&&!t.matches('.phone-end,.call-analysis,.service-end'))focusTimer=setTimeout(()=>{focusTimer=undefined;perform();},focusDelay);else perform();
   }
   function down(event:KeyboardEvent){if(event.code!=='Space'||event.ctrlKey||event.altKey||event.metaKey||event.shiftKey||event.defaultPrevented)return;
    if(event.target instanceof Element&&event.target.closest('input,select,textarea,button,a,summary,[contenteditable]:not([contenteditable="false"]),[role="dialog"]'))return;

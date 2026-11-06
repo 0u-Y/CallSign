@@ -42,9 +42,9 @@ export class LiveMedia {
     this.peer.ontrack = e => { if (e.track.kind === "audio") {e.track.enabled=this.remoteAccepted;this.remote.addTrack(e.track);} };
     this.peer.onconnectionstatechange = () => { if (["disconnected", "failed", "closed"].includes(this.peer.connectionState)) { this.invalidate("연결 변경: 새 통화 시도와 재검증이 필요합니다."); this.close(); } };
   }
-  async prepareMicrophone(getUserMedia = (constraints: MediaStreamConstraints) => navigator.mediaDevices.getUserMedia(constraints)) {
+  async prepareMicrophone(getUserMedia = (constraints: MediaStreamConstraints) => navigator.mediaDevices.getUserMedia(constraints),deviceId?:string) {
     if (this.microphone || this.closed) throw new Error("MICROPHONE_SESSION_INVALID");
-    const stream = await getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
+    const stream = await getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true,...(deviceId?{deviceId:{exact:deviceId}}:{}) }, video: false });
     for (const track of stream.getTracks()) track.enabled = false;
     if (this.closed) { stream.getTracks().forEach(t => t.stop()); throw new Error("MEDIA_CLOSED"); }
     this.microphone = stream;

@@ -68,7 +68,8 @@ await control.exposeFunction('prepareCallsSign',async()=>{
    if(!canPrepare)await selectWork(openPages.gateway,shared);
    await selectWork(openPages.recipient,shared);
    for(const role of ['gateway','recipient'])if(captureDir)await openPages[role].screenshot({path:resolve(captureDir,`${role}.png`),fullPage:true});
-   for(const item of result)if(item.role!=='institution')item.status=canPrepare?'로그인됨 · 같은 업무 선택됨 · 연락 준비 가능':'로그인됨 · 같은 업무 선택됨 · 연락 준비 불가(위임·권한 확인)';
+   const reason=canPrepare?'':(await openPages.gateway.locator('.call-setup p[role=status]').first().innerText()).trim();
+   for(const item of result)if(item.role!=='institution')item.status=canPrepare?'로그인됨 · 같은 업무 선택됨 · 연락 준비 가능':`로그인됨 · 같은 업무 선택됨 · ${reason||'연락 준비 불가'}`;
   }else for(const item of result)if(item.role!=='institution')item.status='로그인됨 · 공통 진행 중 업무 없음';
   return result;
   }catch(error){await Promise.allSettled(contexts.splice(0).map(x=>x.close()));throw error;}

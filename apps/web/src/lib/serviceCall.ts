@@ -25,7 +25,7 @@ export class ServiceCall {
   private minimumLeaseSequence=1;private generation=0;private analysisWanted=false;private analysisContextRevision=0;
   private readonly visibility=()=>{if(document.hidden){this.sip?.pause();this.stopAnalysis('document-hidden');this.show({connection:'화면 비활성: 음성 일시 정지, 다시 열면 재검증',active:false});}else this.schedule(0);};
   private view:ServiceCallStatus={connection:'연결 준비 중: 마이크 송신 차단',authority:'기관 승인 확인 전',analysis:'동의 전: 분석 중단',active:false};
-  constructor(private readonly o:{role:'gateway'|'recipient';attemptId:string;intentId:string;recipientId:string;agentId:string;key:SigningKeyPair;trust:ServiceTrust;runtimePolicy:RuntimePolicy;status:(s:ServiceCallStatus)=>void;remote:(s:MediaStream)=>void;risk:(e:unknown)=>void}){}
+  constructor(private readonly o:{role:'gateway'|'recipient';attemptId:string;intentId:string;recipientId:string;agentId:string;key:SigningKeyPair;trust:ServiceTrust;runtimePolicy:RuntimePolicy;microphoneDeviceId?:string;status:(s:ServiceCallStatus)=>void;remote:(s:MediaStream)=>void;risk:(e:unknown)=>void}){}
   private show(p:Partial<ServiceCallStatus>){if(!this.stopped){this.view={...this.view,...p,...(p.active?{dialing:false}:{}),...(p.active&&this.view.connectedAt===undefined?{connectedAt:performance.now()}:{})};this.o.status({...this.view});}}
   private async get<T>(path:string){const value=await api<T>(path,{signal:AbortSignal.any([this.abort.signal,AbortSignal.timeout(4000)])});this.alive();return value;}
   private alive(allowEnding=false){if(this.stopped||this.ending&&!allowEnding)throw new Error('CALL_CLOSED');}
@@ -45,7 +45,7 @@ export class ServiceCall {
     },message=>{if(this.ending)return;this.show({connection:message,...(message==='PBX 협상 완료: 승인 확인 전 음성 차단'?{incoming:!this.wantAccept}:{})});if(/종료|실패|재검증|초과/.test(message)&&!this.stopped)void this.end('failed','pbx-disconnected').catch(()=>this.finish('pbx-disconnected'));});
     let iceStarted=performance.now();this.sip.media.peer.addEventListener('iceconnectionstatechange',()=>{const state=this.sip?.media.peer.iceConnectionState;if(state==='checking')iceStarted=performance.now();if(state==='connected'||state==='completed')this.measure('ice',performance.now()-iceStarted);if(state==='failed')this.measure('ice',performance.now()-iceStarted,'failure');});
     this.sip.media.peer.addEventListener('track',()=>{if(!this.stopped)this.o.remote(this.sip!.media.remote);});
-    await this.sip.start();this.alive();this.measure('pbx',performance.now()-this.connectionStarted);document.addEventListener('visibilitychange',this.visibility);this.show({connection:'PBX 등록 완료: 양측 연결 준비를 기다립니다'});this.schedule(0);
+    await this.sip.start(this.o.microphoneDeviceId);this.alive();this.measure('pbx',performance.now()-this.connectionStarted);document.addEventListener('visibilitychange',this.visibility);this.show({connection:'PBX 등록 완료: 양측 연결 준비를 기다립니다'});this.schedule(0);
   }catch(e){this.measure('pbx',performance.now()-this.connectionStarted,'failure');await this.fail(e);throw e;}}
   private get role(){return this.o.role==='gateway'?'sender' as const:'recipient' as const;}
   private async getIce(){return (await this.post<{iceServers:RTCIceServer[]}>('/v3/turn',{attemptId:this.o.attemptId})).iceServers;}

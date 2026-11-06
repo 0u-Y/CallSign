@@ -1,6 +1,7 @@
 import {execFileSync,spawn} from 'node:child_process';
 import {createHash,randomUUID} from 'node:crypto';
 import {readFile,writeFile,lstat,realpath,readdir,chmod} from 'node:fs/promises';
+import {createReadStream} from 'node:fs';
 import {resolve,relative,dirname} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {stageNames,stages,type ValidationStage} from './validation-stages.js';
@@ -22,7 +23,7 @@ export async function validationIdentity(env:Record<string,string|undefined>,env
  if(Object.keys(environment).some(k=>!['version','environmentId','kind','deploymentId','publicFiles'].includes(k))||(environment.publicFiles!==undefined&&(!Array.isArray(environment.publicFiles)||environment.publicFiles.length>20||environment.publicFiles.some(v=>typeof v!=='string'||v.length>512)))||environment.version!==1||!/^[a-zA-Z0-9._:-]{3,100}$/.test(environment.environmentId)||!['offline','disposable-test','cloud-test'].includes(environment.kind))throw new Error('EXPLICIT_ENVIRONMENT_IDENTITY_REQUIRED');
  const git=(args:string[])=>execFileSync('git',args,{encoding:'utf8',maxBuffer:16*1024*1024});
  const paths=[...new Set(git(['ls-files','-z','--cached','--others','--exclude-standard']).split('\0').filter(Boolean))].sort(),files:Record<string,string>={};
- for(const path of paths){if(path==='.env.example'){files[path]=sha(await readFile(path));continue;}if(path.startsWith('artifacts/')||path.endsWith('.md')||/(^|\/)(keys?|secrets?|node_modules|\.git)(\/|$)|(^|\/)\.env(\.|$)|\.(pem|key|p12|pfx)$/.test(path))continue;const info=await lstat(path);if(info.isSymbolicLink())throw new Error('SOURCE_SYMLINK_REVIEW_REQUIRED');if(info.isFile()){if(info.size>2*1024*1024)throw new Error('SOURCE_TOO_LARGE_FOR_IDENTITY');files[path]=sha(await readFile(path));}}
+ for(const path of paths){if(path==='.env.example'){files[path]=sha(await readFile(path));continue;}if(path.startsWith('artifacts/')||path.endsWith('.md')||/(^|\/)(keys?|secrets?|node_modules|\.git)(\/|$)|(^|\/)\.env(\.|$)|\.(pem|key|p12|pfx)$/.test(path))continue;const info=await lstat(path);if(info.isSymbolicLink())throw new Error('SOURCE_SYMLINK_REVIEW_REQUIRED');if(info.isFile()){if(info.size>2*1024*1024){if(!/^docs\/CallSign_(?:Recording_Demo(?:_[A-Za-z0-9]+)*|Demo_Design)\.html$/.test(path)||info.size>16*1024*1024)throw new Error('SOURCE_TOO_LARGE_FOR_IDENTITY');const digest=createHash('sha256');for await(const chunk of createReadStream(path))digest.update(chunk);files[path]=digest.digest('hex');}else files[path]=sha(await readFile(path));}}
  const publicFiles:Record<string,string>={};const artifactPath=env.REGISTRY_ARTIFACT_PATH??(await inspectionEnvironment('.env.example',{})).REGISTRY_ARTIFACT_PATH;if(artifactPath){publicName(artifactPath);publicFiles[artifactPath]=sha(await bytes(artifactPath));}for(const path of [...new Set([...(environment.publicFiles??[]),...['VALIDATION_DEPLOYMENT_PATH','VALIDATION_TRUST_PATH'].map(k=>env[k]).filter((v):v is string=>!!v)])]){publicName(path);publicFiles[path]=sha(await bytes(path));}
  // Configuration values (including secret references/values) influence identity but are never emitted.
  const declaredSettings=new Set(Object.keys((await inspectionEnvironment('.env.example',{}))));
