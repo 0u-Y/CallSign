@@ -83,4 +83,5 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
       send({type:'ready',source:'remote-only',persistence:'disabled',consentGeneration:generation});
     }catch(error){send({type:'unavailable',code:error instanceof Error&&error.message.startsWith('ANALYSIS_SMOKE_BUDGET_')?'ANALYSIS_LIMIT':'AUDIO_UNAUTHORIZED'});stop();}
   });
+ return ()=>({mode:options.providers?'fixture' as const:!(configuration?.stt.apiKey&&configuration.stt.model)?'disabled' as const:budget&&a.now()>=budget.expiresAt?'expired' as const:'configured' as const,speech:!!(options.providers||(configuration?.stt.apiKey&&configuration.stt.model)),model:!!(options.providers?.analyze||configuration?.llm)});
 }

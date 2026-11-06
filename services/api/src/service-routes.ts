@@ -9,7 +9,7 @@ import { activeIntent, membership, requirePermission, type Actor, type Authority
 import { ServiceAuthority } from './service-authority.js';
 
 const id = z.string().min(3).max(200), digest = z.string().regex(/^[0-9a-f]{64}$/), jws = z.string().max(32768);
-export function registerServiceRoutes(app: FastifyInstance, options: { authority: ServiceAuthority; store: AuthorityStore; sessionId?(request:FastifyRequest):Promise<string>; actorFor(request: FastifyRequest, write?: boolean, purpose?: 'work' | 'official'): Promise<Actor> }) {
+export function registerServiceRoutes(app: FastifyInstance, options: { authority: ServiceAuthority; store: AuthorityStore; analysisAvailability?:()=>{mode:'fixture'|'disabled'|'expired'|'configured';speech:boolean;model:boolean}; sessionId?(request:FastifyRequest):Promise<string>; actorFor(request: FastifyRequest, write?: boolean, purpose?: 'work' | 'official'): Promise<Actor> }) {
   const { authority: a, actorFor, store } = options;
   const requestId = (r: FastifyRequest) => z.string().min(8).max(200).parse(r.headers['idempotency-key']);
   app.get('/v3/workspace', async r => {
@@ -21,7 +21,7 @@ export function registerServiceRoutes(app: FastifyInstance, options: { authority
     // Lists carry display fields only; proofs and negotiated transport stay in the access-checked call context.
     const publicAttempts = attempts.map(({id,intentId,agentId,status,profile,firstConnectBy,callEndBy,reason}) => ({id,intentId,agentId,status,profile,firstConnectBy,callEndBy,reason}));
     const publicAuthorizations = auths.map(({payload,cancelled})=>({authorizationId:payload.authorizationId,attemptId:payload.attemptId,cancelled}));
-    return { actor, institutionUri:record.institutionUri??record.did, policy: record.policy, intents, attempts: publicAttempts, authorizations: publicAuthorizations, credentials, permissions: record.members[actor.userId]?.permissions ?? [], runtimePolicy:a.policy, services: actor.role === 'institution' ? Object.keys(record.services) : [], defaultProfile: 'asterisk-webrtc-v3', scenario: '모의 금융기관 이상거래 확인', mode: 'provider-code-unverified' };
+    return { analysisAvailability:options.analysisAvailability?.(), actor, institutionUri:record.institutionUri??record.did, policy: record.policy, intents, attempts: publicAttempts, authorizations: publicAuthorizations, credentials, permissions: record.members[actor.userId]?.permissions ?? [], runtimePolicy:a.policy, services: actor.role === 'institution' ? Object.keys(record.services) : [], defaultProfile: 'asterisk-webrtc-v3', scenario: '모의 금융기관 이상거래 확인', mode: 'provider-code-unverified' };
   });
   app.get('/v3/management/recalls',async r=>{const actor=await actorFor(r),query=z.object({intentId:id.optional()}).strict().parse(r.query);return store.recalls?store.recalls(actor,a.now(),query.intentId):recallSnapshot(await store.read(actor.institutionId),actor,a.now(),query.intentId);});
   app.post('/v3/intents', async r => { const b = z.object({id,recipientId:id,agentId:id,serviceUri:registeredUriSchema,expiresAt:z.number().int().positive()}).strict().parse(r.body); return a.createIntent(await actorFor(r,true),requestId(r),{id:b.id,recipientId:b.recipientId,agentId:b.agentId,serviceDid:b.serviceUri,expiresAt:b.expiresAt}); });

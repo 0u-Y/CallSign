@@ -56,3 +56,14 @@
 업무·통화·공동 관리 작업면은 하나의 parent route 아래 유지한다. 숨긴 작업면을 unmount하지 않고 audio를 공통 위치에 두어 탐색만으로 controller를 닫지 않는다. 새로고침은 기존 WebRTC를 복원한 것처럼 표시하지 않는다. 실제 브라우저/미디어 검증 범위는 [현황표](docs/guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 합성 API fixture의 브라우저 시각 검토는 실제 미디어 검증을 대신하지 않는다.
 
 시각 확인 자료는 [연락 desktop](artifacts/service-hardening-20261105/latest-demo-call-1366.png), [390px](artifacts/service-hardening-20261105/latest-demo-call-390.png), [공동 관리](artifacts/service-hardening-20261105/latest-demo-governance-1366.png), [합성 경고 컴포넌트](artifacts/service-hardening-20261105/design-html-component-warning-390.png)다. 이 과거 제품 캡처는 API 미연결·로그인 전 화면이며 인증된 세션이나 현재 공개 연결 상태의 증거가 아니다. 경고 컴포넌트는 합성 props를 사용한 시각 검토 전용으로 실제 로그인·API·통화 결과가 아니다. 이 자료로 공개 로그인, WebRTC 연결이나 분석 제공자 품질의 통과를 주장하지 않는다.
+
+
+## Refined v5.1 최종 시안 반영 — 2026-11-06
+
+사용자가 최종 `CallSign_Demo_UX_Refined.html`과 같다고 확인한 파일은 현재 `docs/CallSign_Demo_Design.html`이다. 제목 `CallSign — Demo v5.1 · Refined`, SHA-256 `b4fa5a04a71ead8cd6acb745e5bc8a03f7dac124de4998bdc611545f4b52f867`을 기준으로 직접 렌더링했다. 원본은 사용자 미추적 자료로 보존한다.
+
+실제 `/demo/call`은 왼쪽 업무·연결 준비, 중앙 연결 상태·전사, 오른쪽 수신자 경고·통화 제어로 연결한다. `/demo/governance`는 독립 서명·2×2 실제 노드 관측·서비스 적용을 분리한다. 시안에 별도 업무 관리 화면은 없어 `/demo/work`에는 같은 팔레트·간격·버튼·명시적 선택 강조를 적용한다. 전체 역할 선택·합성 성공·가짜 합의·클릭 경고는 이식하지 않는다. 실제 서명 파일 검토와 PBX 준비는 제품에 필요한 단계로 유지한다.
+
+제공자 상태는 인증된 `/v3/workspace.analysisAvailability`의 설정·만료 관측을 표시한다. 이는 연결 성공·남은 quota·모델 품질의 보장이 아니다. 꺼짐/기간 만료면 동의 시작을 비활성화하되 철회·통화 종료를 막지 않는다. 구버전 backend나 조회 실패는 미확인으로 표시한다. 상세 drawer는 portal 바깥에서도 흰 배경·명시적 글자색을 갖고, 선택 업무는 파란 배경·테두리·선택됨 문구로 구분한다.
+
+완료 기준에 **최종 데모 디자인의 실제 웹 반영**을 포함한다. 합성 API 브라우저 회귀, 실제 인증 API 조회, 실제 통화·유료 분석 검증은 각각 따로 기록한다. UI 변경에서 controller·audio DOM·서명/권한 검사를 교체하지 않는다.

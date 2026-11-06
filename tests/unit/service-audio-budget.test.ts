@@ -56,3 +56,11 @@ it('releases a connection reservation if shutdown wins before external invocatio
  const reserve=vi.fn<QuotaStore['reserve']>(async()=>{entered();await held;}),f=await fixture(reserve);
  try{f.start();await waiting;const closing=f.close();release();await closing;expect(f.stream).not.toHaveBeenCalled();expect(reserve).toHaveBeenCalledOnce();expect(f.settle.mock.calls).toHaveLength(1);expect(f.settle.mock.calls[0]![1]).toBe(0);}finally{release();await f.close();}
 });
+
+it('reports provider-off without exposing credentials or opening a stream',async()=>{
+ for(const key of ['DEEPGRAM_API_KEY','DEEPGRAM_API_KEY_FILE','DEEPGRAM_MODEL','OPENAI_API_KEY','OPENAI_API_KEY_FILE','ANTHROPIC_API_KEY','ANTHROPIC_API_KEY_FILE','CALLSIGN_ANALYSIS_SMOKE_BUDGET'])vi.stubEnv(key,'');
+ vi.stubEnv('CALLSIGN_ANALYSIS_PROVIDER','disabled');
+ const f=await serviceFixture();const app={addHook:vi.fn(),get:vi.fn()} as unknown as Parameters<typeof registerServiceAudio>[0];
+ const status=await registerServiceAudio(app,{authority:f.authority,actorFor:async()=>f.receiver,sessionId:async()=> 'session',connections:new SessionConnections(),origin:'https://test.example',quota:{reserve:vi.fn(),settle:vi.fn(),close:async()=>{}}});
+ expect(status()).toEqual({mode:'disabled',speech:false,model:false});
+});
