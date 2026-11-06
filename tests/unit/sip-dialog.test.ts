@@ -18,3 +18,16 @@ async function fixture(){
 }
 it('reports a dialog once after matching ACK and refuses another dialog BYE',async()=>{const t=await fixture();try{t.socket.receive(t.request('INVITE',10));await flush();const response=parseSip(t.socket.sent.at(-1)!);const tag=response.headers.get('to')![0]!.split(';tag=')[1]!;t.socket.receive(t.request('ACK',10,tag));t.socket.receive(t.request('ACK',10,tag));await flush();expect(t.report).toHaveBeenCalledOnce();t.socket.receive(t.request('BYE',11,'wrong-tag'));await flush();expect(t.socket.sent.at(-1)).toContain('481');expect(t.socket.readyState).toBe(1);t.socket.receive(t.request('BYE',11,tag));await flush();expect(t.socket.sent.at(-1)).toContain('200 OK');expect(t.socket.sent.filter(m=>m.startsWith('BYE'))).toHaveLength(0);expect(t.socket.readyState).toBe(3);}finally{t.sip.close();}});
 it('handles CANCEL while SDP work is pending and never reports an accepted session',async()=>{const t=await fixture();let resolve:(value:{type:string;sdp:string})=>void=()=>{};media.answer=()=>new Promise(r=>{resolve=r;});try{t.socket.receive(t.request('INVITE',10));await flush();t.socket.receive(t.request('CANCEL',10));await flush();expect(t.socket.sent.some(m=>m.includes('487 Request Terminated'))).toBe(true);resolve({type:'answer',sdp:'local-sdp'});await flush();expect(t.report).not.toHaveBeenCalled();expect(t.socket.readyState).toBe(3);}finally{t.sip.close();}});
+it('waits for complete ICE after an early candidate and still refuses unfinished gathering',async()=>{
+ vi.useFakeTimers();const t=await fixture();const events=new EventTarget();
+ media.peer.iceGatheringState='gathering';media.peer.addEventListener=events.addEventListener.bind(events);media.peer.removeEventListener=events.removeEventListener.bind(events);
+ try{
+  t.socket.receive(t.request('INVITE',10));await flush();await vi.advanceTimersByTimeAsync(6000);
+  expect(t.socket.readyState).toBe(1);expect(t.socket.sent.some(s=>s.startsWith('SIP/2.0 200 OK')&&s.includes('application/sdp'))).toBe(false);
+  media.peer.iceGatheringState='complete';events.dispatchEvent(new Event('icegatheringstatechange'));await flush();
+  expect(t.socket.sent.some(s=>s.startsWith('SIP/2.0 200 OK')&&s.includes('application/sdp'))).toBe(true);
+ }finally{t.sip.close();vi.useRealTimers();}
+ const u=await fixture();vi.useFakeTimers();media.peer.iceGatheringState='gathering';media.peer.addEventListener=events.addEventListener.bind(events);media.peer.removeEventListener=events.removeEventListener.bind(events);
+ const warning=vi.spyOn(console,'warn').mockImplementation(()=>{});
+ try{u.socket.receive(u.request('INVITE',10));await flush();await vi.advanceTimersByTimeAsync(15000);await flush();expect(u.socket.readyState).toBe(3);expect(u.report).not.toHaveBeenCalled();}finally{u.sip.close();warning.mockRestore();vi.useRealTimers();}
+});
