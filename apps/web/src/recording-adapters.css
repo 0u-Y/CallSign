@@ -97,3 +97,18 @@
 .work-detail>details{border-top:1px solid #e7ecf2;padding:18px 0;font-size:12px}
 .work-detail .work-cancel-open{width:100%;background:#fff0f2;color:#e83954;font-size:12px}
 .demo-drawer-overlay:has(+.work-detail){backdrop-filter:blur(3px)}
+
+/* The sender observes its own controller; it does not impersonate the recipient. */
+#callsign-recording .demo-observer-label{position:absolute;left:16px;right:16px;top:48px;text-align:center;color:#d5dce9;font-size:12px;line-height:1.5;z-index:2;margin:0}
+#callsign-recording .sender-person strong{overflow-wrap:anywhere;font-size:24px;line-height:1.35}
+.work-credential-details code{font-size:13px}
+#callsign-recording .demo-phone-waiting .lock-bottom{position:absolute;left:15px;right:15px;bottom:30px}
+#callsign-recording .demo-phone-waiting .call-consent-idle{display:none}
+#callsign-recording .demo-phone-live #demo-analysis-result{top:150px;bottom:280px}
+#callsign-recording .demo-phone-live:has(.call-consent-keypad[data-choice=pending]) #demo-analysis-result{bottom:320px}
+#callsign-recording .phone .ios-dial-screen>.button{font-size:11px;min-height:24px;padding:3px;margin:0 auto 5px;color:white;background:transparent}
+#callsign-recording .phone .ios-dial-screen .ars-keyboard{row-gap:8px}
+
+#callsign-recording .recording-visibility{position:fixed;bottom:14px;right:16px;z-index:32;font-size:11px;min-height:32px}
+#callsign-recording [data-recording-clean=true]>.demo-heading,#callsign-recording [data-recording-clean=true]>.demo-tools,#callsign-recording [data-recording-clean=true]>.demo-director{display:none}
+@media(max-width:950px){#callsign-recording .recording-visibility{position:static;align-self:flex-end;margin:4px 0}}
