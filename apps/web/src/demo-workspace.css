@@ -209,3 +209,53 @@
 .call-dial-screen>p{margin:4px 0;text-align:center;font-size:12px}
 .demo-workspace .call-dial-screen>.secondary{background:transparent;color:#edf4f0;border:1px solid #ffffff40;min-height:44px;padding:8px}
 .demo-workspace .call-dial-screen>.service-end{margin:6px auto;min-height:80px}
+
+/* v24 uses a fixed handset scene; workflow details stay in the surrounding workspace. */
+.demo-workspace .demo-recipient,.demo-phone-live:has(.call-dial-screen){position:relative;height:570px;min-height:570px;max-height:570px;overflow:hidden;background:radial-gradient(ellipse at 25% 12%,#596b65,#354b43 47%,#1d3029);color:#eff6f2}
+.demo-workspace .demo-call-identity{text-align:center;padding:8px 0}
+.demo-workspace .demo-call-identity h2{font-size:26px;font-weight:500;line-height:1.25;margin:5px 0 9px;color:white;overflow-wrap:anywhere}
+.demo-workspace .demo-call-identity .demo-phone-connection{font-size:12px;letter-spacing:1px;padding:0;margin:12px 0 5px;border:0;color:#d6e2db}
+.demo-workspace .demo-call-identity .demo-approval{display:inline-flex;align-items:center;gap:6px;font-size:11px;padding:5px 10px;border-radius:20px;margin:0;background:#ffffff14;color:#edf4ff}
+.demo-workspace .demo-call-identity>p{font-size:12px;color:#d6e2db}
+.demo-lock-clock{text-align:center;padding-top:32px}.demo-workspace .demo-lock-clock p{font-size:16px;color:#edf4f0;margin:0}.demo-lock-clock time{display:block;font-size:66px;line-height:1.3;font-weight:400;letter-spacing:-2px;font-variant-numeric:tabular-nums}.demo-lock-clock span{display:block;margin-top:235px;font-size:12px;color:#e1ebe6}
+.demo-workspace .demo-phone-home{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:110px;background:#f0f5f1}
+.demo-phone-waiting>#demo-analysis-result,.demo-phone-waiting>.service-call-controls{display:none}
+.demo-workspace .demo-phone-live .service-call-controls{position:static;padding:0;margin:0;display:block}
+.demo-phone-live .call-consent-keypad{display:contents}
+.demo-phone-live .consent-feedback{position:absolute;bottom:205px;left:20px;right:20px;max-height:105px;overflow:auto;text-align:center;font-size:11px}
+.demo-workspace .consent-feedback p,.demo-workspace .consent-feedback h3{font-size:12px;line-height:1.6;margin:5px 0;color:#e1ebe6}
+.demo-workspace .consent-feedback .button{font-size:11px;min-height:44px;padding:8px;color:#fff;background:none;border:0;text-decoration:underline}
+.demo-phone-live .consent-granted{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+.demo-workspace .demo-phone-live .phone-media-buttons{position:absolute;left:16px;right:16px;bottom:111px;margin:0;gap:8px}
+.demo-workspace .demo-phone-live .phone-media-buttons .button{min-height:82px;gap:7px;font-size:12px;padding:0}
+.demo-workspace .demo-phone-live .call-consent-keypad>.phone-end{position:absolute;bottom:43px;left:calc(50% - 34px);width:68px;min-height:62px;padding:0;margin:0}
+.demo-phone-live .phone-end>span:last-child{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+.demo-workspace .demo-phone-live .call-consent-keypad>.call-analysis{position:absolute;left:16px;right:16px;bottom:12px;width:calc(100% - 32px);min-height:30px;margin:0;padding:4px;background:none;border:0;color:#e1ebe6;font-size:11px;text-decoration:underline}
+.demo-phone-live #demo-analysis-result{position:absolute;top:155px;left:20px;right:20px;bottom:255px;max-height:none;overflow:auto;scrollbar-gutter:stable}
+.demo-phone-live #demo-analysis-result:has(.analysis-before){display:none}
+.demo-workspace .demo-phone-live .service-analysis{border:0;border-radius:0;background:transparent;padding:0;font-size:12px}
+.demo-workspace .demo-phone-live .service-analysis h2{font-size:16px}.demo-workspace .demo-phone-live .service-analysis :is(p,small,summary){font-size:12px}
+.demo-phone-live .call-continuation{position:absolute;bottom:200px;left:20px;right:20px;background:#20362c;z-index:5;font-size:11px}.demo-phone-live .call-continuation:not([open]){display:none}
+.demo-phone-live:has(.call-dial-screen)>.demo-call-identity{visibility:hidden}
+.demo-phone-live .call-dial-screen{inset:48px 16px 22px;padding:0;background:transparent;border-radius:0;overflow:auto}
+.demo-phone-live .call-dial-screen .call-keypad-digit{height:44px;min-height:44px;font-size:30px;line-height:44px}
+.demo-phone-live .call-dial-screen .call-keypad-grid{grid-template-columns:repeat(3,60px);width:226px;max-width:100%;gap:8px 23px;margin:8px auto}
+.demo-workspace .call-keypad-grid .button{display:flex;flex-direction:column;align-items:center;justify-content:center;width:60px;height:60px;min-height:60px;font-size:30px;line-height:1.05;border:0}
+.demo-workspace .call-keypad-grid small{font-size:9px;min-height:10px;letter-spacing:1.5px;color:inherit}
+.demo-workspace .call-dial-footer{position:relative;display:flex;align-items:center;justify-content:center;min-height:64px;margin-top:auto}
+.demo-workspace .call-dial-footer>.service-end{padding:0;border:0;background:none;color:white;min-height:60px}
+.call-dial-footer>.service-end>span:last-child{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}
+.call-dial-footer .phone-control-icon{background:#ff453a;color:white}.call-dial-footer svg{transform:rotate(135deg)}
+.demo-workspace .call-dial-footer>.quiet{position:absolute;right:0;min-height:44px;padding:8px 0;color:white;background:none;font-size:13px}
+.demo-workspace .call-dial-screen>.call-withdraw{min-height:32px;padding:5px;color:#e1ebe6;background:none;border:0;text-decoration:underline;font-size:11px}
+.consent-information-dialog{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(460px,calc(100vw - 32px));max-height:80vh;overflow:auto;background:white;color:#243449;border-radius:20px;padding:24px;box-shadow:0 16px 48px #102c2530}
+.consent-information-dialog h2{font-size:22px}.consent-information-dialog p{font-size:14px;line-height:1.7}.consent-information-dialog .button{min-height:44px}
+.demo-call-disclosure{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:16px;font-size:12px;color:#53677b}.demo-call-disclosure .demo-provider-state{font-size:12px!important;margin:0}
+.demo-incoming-avatar{display:grid;place-items:center;width:80px;height:80px;border-radius:50%;background:#ffffff16;margin:30px auto}
+.demo-phone-incoming .service-call-controls{position:absolute;bottom:42px;left:18px;right:18px;background:none;border:0;display:flex;justify-content:space-between;padding:0}
+.demo-phone-incoming .service-call-controls>h2,.demo-phone-incoming .call-consent-idle,.demo-phone-incoming .call-continuation{display:none}
+.demo-phone-incoming .call-accept,.demo-phone-incoming .call-decline{width:105px;min-height:64px;border-radius:32px;color:white;font-size:13px!important}.demo-phone-incoming .call-accept{background:#23834b}.demo-phone-incoming .call-decline{background:#c6342d}
+
+.demo-workspace .demo-call-identity .demo-phone-connection time{font-size:12px}
+
+.demo-phone-live:has(.call-consent-keypad[data-choice=pending]) #demo-analysis-result{bottom:320px}

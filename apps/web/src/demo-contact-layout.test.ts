@@ -27,5 +27,5 @@ it('keeps actual verification before recipient analysis and phone controls',()=>
  const html=renderToStaticMarkup(createElement(MemoryRouter,null,createElement(DemoWorkspace,{role:'recipient',roleName:'수신자',account:null,notice:null,queue:null,contact:null,verification:createElement('div',{'data-check':'verification'}),controls:createElement('button',{'data-check':'phone-controls'},'통화 종료'),analysis:createElement('section',{'data-check':'analysis'}),operations:null,notifications:null,audio:null,governance:false,connected:true,connection:'검증된 실제 상태',end:()=>{},canObserve:false,identity:'scoped-work',stale:false})));
  expect(html.indexOf('data-check="verification"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));
  expect(html.indexOf('data-check="analysis"')).toBeLessThan(html.indexOf('data-check="phone-controls"'));
- expect(html).toContain('현재 역할의 조회 범위');expect(html).toContain('진행 통화 종료');
+ expect(html).toContain('인증된 역할: 수신자');expect(html).toContain('진행 통화 종료');
 });

@@ -82,3 +82,18 @@ Reference: `docs/CallSign_Recording_Demo_ShortVoice_v24.html`, SHA-256 `381f86b8
 The dark receiver handset has a monotonic call clock, real sender mute, a separate web keypad and supported output-device selection. Digits1/2 call the existing authenticated consent operation;9 only replays local Korean guidance. Missing local speech falls back to readable text, not network TTS. Guidance playback temporarily gates the sender and restores the user's latest mute preference. There are no keypad tones or PBX DTMF claims. Extended external-processing information remains available. The main recording layout may scroll because actual authority/error/evidence controls are retained; the reference's simulated success shortcuts are not used.
 
 The keypad shows pending/error status inside its own surface. Closing it restores focus after React commits visibility changes. Termination/withdrawal remain available independently of consent requests. Provider-off and unsupported audio output are explicit. Local component fixtures are not real-call evidence; deployment and changed-flow evidence are tracked in the implementation plan.
+
+## V24 handset interaction correction (2026-11-07)
+
+The duplicate `CallSign_Recording_Demo_ShortVoice_v24 (1).html` has the same verified v24 hash. Earlier implementation preserved functionality but did not reproduce the handset scene structure; circular buttons alone were insufficient.
+
+| Reference interaction | Product implementation | Necessary difference |
+|---|---|---|
+| Lock screen → incoming → connected | Fixed570px handset, local clock, actual incoming/controller state | No invented network/battery or caller identity |
+| Clock and caller identity above controls | Actual connected clock and registered institution identifier | Full identity and policy remain in evidence drawer |
+| Voice-only consent, text fallback | Local guidance, processing-information dialog, explicit keypad choice | No false “audio is not collected” copy; no paid TTS |
+|9replays and leaves keypad | Replay closes keypad without consent request | No PBX DTMF claim |
+|1/2selection | Existing authenticated consent/withdrawal controller | No timer-generated success |
+| Fixed controls and analysis surface | Bounded scrolling evidence, stable end/withdraw controls | Error/OFF/permission states remain visible |
+
+Independent actors remain independent authenticated sessions. Scene navigation never executes a fabricated call, management signature or provider result. Work/governance APIs and the audio/controller lifecycle are reused.
