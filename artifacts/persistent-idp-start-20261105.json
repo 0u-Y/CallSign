@@ -854,10 +854,23 @@
         200,
         200
       ],
-      "scope": "Ordinary restart of owned existing containers; not RESTORE, not an external microphone test"
+      "scope": "Ordinary restart of owned existing containers; not RESTORE, not an external microphone test",
+      "publicOidcRolesAfterRestart": [
+        "gateway",
+        "recipient",
+        "institution"
+      ]
     },
     "externalDevices": "User deferred external-device verification; no external-device success claimed",
     "visual": "Actual mobile analysis-failure screenshot opened. Full-page fixed-position overlap needs viewport confirmation; not independently established as a layout defect.",
-    "service": "21 persistent services retained; original expiry2026-11-07T08:37:38+09:00; automatic resource-stop restart remains disabled"
+    "service": "21 persistent services retained; original expiry2026-11-07T08:37:38+09:00; automatic resource-stop restart remains disabled",
+    "afterBudget": {
+      "providerConfig": "none",
+      "reason": "Bounded approval3 STT connection and LLM request ceilings consumed; no automatic paid retries",
+      "providerKeyMountsRemoved": true,
+      "protectedOriginalKeys": "preserved",
+      "persistentServices": "retained",
+      "serverCheck": "PASS"
+    }
   }
 }

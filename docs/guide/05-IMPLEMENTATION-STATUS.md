@@ -1,6 +1,6 @@
 # 05. 구현 및 검증 현황
 
-확인일 **2026-11-06(KST)** · 공개 frontend **`8a6d52a`**, 실행 runtime 제품 소스 **`7c5a839`**. 사용자 재개 승인 뒤 지속 서비스 21개를 다시 기동했고 실제 공개 OIDC 로그인과 복구 후 새 통화를 확인했다. 공개 metadata는 `publicPreview=false`, 복구 epoch3/승인키2의 trust와 일치한다. **실제 음성 전사는 수신했지만 완료된 분석 결과는 관측하지 못했으므로 전체 데모 완료가 아니다.** 상세 근거는 [승인 후 실행](../../artifacts/persistent-idp-start-20261105.json)의 `approvedResume20261106`을 따른다.
+확인일 **2026-11-06(KST)** · 공개 frontend **`8a6d52a`**, 실행 runtime 제품 소스 **`7c5a839`**. 사용자 재개 승인 뒤 지속 서비스 21개를 다시 기동했고 실제 공개 OIDC 로그인과 복구 후 새 통화를 확인했다. 공개 metadata는 `publicPreview=false`, 복구 epoch3/승인키2의 trust와 일치한다. **실제 음성 전사는 수신했지만 완료된 분석 결과는 관측하지 못했으므로 전체 데모 완료가 아니다. 승인된 호출 수 소진 후 provider 연결을 껐으며, 로그인·업무·통화는 유지한다.** 상세 근거는 [승인 후 실행](../../artifacts/persistent-idp-start-20261105.json)의 `approvedResume20261106`을 따른다.
 
 현재 목표는 **서버컴의 전용 지속 데모**다. Vercel frontend·서버컴 backend/인프라·외부 Deepgram/OpenAI 배치를 사용한다. AWS 운영·학교 서버 비의존 요구는 이번 완료 조건에서 제외한다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
 
