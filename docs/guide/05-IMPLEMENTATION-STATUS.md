@@ -1,8 +1,8 @@
 # 05. 구현 및 검증 현황
 
-확인일 **2026-11-06(KST)** · 실행 근거 대조 main **`627db2878f169249a410fa0742ed729292a47103`** · 역할별 UI 소스 **`e52b565`**. 실행 기록과 소스 검토, 격리 frontend fixture 검증을 구분한다. 이 UI 세션은 지속 backend·공개 통화·제공자를 실행하지 않았다. 실행 환경의 생존 여부는 별도 확인해야 한다.
+확인일 **2026-11-06(KST)** · 공개 frontend·local/remote main 확인 **`1036a1af9b182ca6e200c3cc0c932ee5c633ecac`** · 역할별 UI 소스 **`e52b565`**. 실행 기록과 소스 검토, 격리 frontend fixture 검증을 구분한다. 이 UI 세션은 지속 backend·공개 통화·제공자를 실행하지 않았다. 공개 metadata는 위 SHA·`publicPreview=false`이며 두 데모 경로 HTTP 200과 해당 CI 성공을 확인했다. **지속 backend는 관측 오류로 중지된 상태이며 현재 로그인·통화 시연은 불가능하다.**
 
-현재 목표는 **서버컴의 전용 지속 데모**다. AWS 이전은 후속이다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
+현재 목표는 **서버컴의 전용 지속 데모**다. Vercel frontend·서버컴 backend/인프라·외부 Deepgram/OpenAI 배치를 사용한다. AWS 운영·학교 서버 비의존 요구는 이번 완료 조건에서 제외한다. 실행 상태는 이 표 한 곳에서 관리하고, 기동·중지·보존 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리), 제품 제약은 [알려진 한계](../KNOWN-LIMITATIONS.md)를 따른다.
 
 ## 현재 작업표
 
@@ -15,8 +15,8 @@
 | 역할별 데모 UI — UI-001~004 | `/demo/work` 업무·위임 관리, `/demo/call` 상담원/수신자 제어·중앙 근거, `/demo/governance` 독립 서명·노드/적용 관측. R2~R4 수정. [격리 UI 회귀·캡처](../../artifacts/demo-ui-20261106/result.json) | fixture는 실제 backend 쓰기·현재 공개 음성/분석 성공의 증거가 아님. 계정 표시 이름·위임 상세 유효기간은 현재 목록 응답에 없어 임의 생성하지 않음 |
 | 공동 승인·복구 — GOVERNANCE-001/002 | 고정 관리키 2-of-3, 원장 확정·Witness 확인·키 활성화 코드. 내부 선택 실행에서 정지·공동 복구·새 연락과 구 권한 무효 유지 확인 | 공개 case21 기관 정지·양측 음성 중단 PASS. 독립 2개 서명 제출과 원장 epoch3 확정 기록. 새 승인키 활성화·trust 게시·새 위임/연락은 미실행. 단독 복구 HTTP 400은 EVM 거절 증거가 아님 |
 | 백업·복원 — DB-003, OPS-005 | 일반 entrypoint의 암호화 전체 백업, 별도 DB/정지 chain 복원, 현재 Anchor 대조, 복원 후 통화·SQL 감사 기록 | 같은 호스트의 선택 경계. 독립 장애 영역·장기 부하·모든 crash 지점은 미검증 |
-| 지속 운영 — OPS-004/006 | 소유 identity·DB/volume 보존, 감시·중단 latch·명시 재개 코드와 중단/재개 기록 | 최신 저장 기록은 2026-11-06 02:26:19Z container-memory 관측 오류로 중단. 원인 미확정·자동 재개 금지. 이후 생존은 이 세션에서 확인하지 않음 |
-| 전달·이전 — OPS-003/007 | 고정 Release/GHCR와 원격 수령 기록 보존 | 과거 이미지가 현재 main/backend/frontend와 같다고 추정하지 않음. AWS 실행·독립 reader는 후속 |
+| 지속 운영 — OPS-004/006 | 소유 identity·DB/volume 보존, 감시·중단 latch·명시 재개 코드와 중단/재개 기록 | 최신 저장 기록은 2026-11-06 02:26:19Z container-memory 관측 오류로 중단. 원인 미확정·자동 재개 금지. 읽기 전용 Docker 조회에서 소유 지속 서비스 실행 0개 확인. 원본 중단·데이터 보존, 재가동 1회 승인 대기. 기존 만료 11월 7일 08:37 KST 유지 |
+| 전달·이전 — OPS-003/007 | 고정 Release/GHCR와 원격 수령 기록 보존 | 과거 이미지가 현재 main/backend/frontend와 같다고 추정하지 않음. AWS 실행·독립 reader는 이번 범위 밖 |
 
 후속 공개 통화 근거: 같은 기동 기록의 `normalPublicCall20261106`은 frontend `20cbd65` / runtime `0a62aef`에서 양방향 합성 음원과 정상 종료를 관측했다. 종료 후 observer가 ended를 failed로 바꾸려 한 원본 FAIL은 유지한다. 별도 읽기 대조의 PBX 부재 PASS는 재실행 성공이 아니다. 실제 제공자 호출은 0회다.
 

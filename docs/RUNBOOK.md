@@ -2,7 +2,7 @@
 
 ### 공개 프런트엔드와 실제 통화 배포 구분
 
-현재 시연 진입은 `/demo/work`(업무 관리), `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 현재 [공개 연락 화면](https://callsign-rouge.vercel.app/demo/call)과 [공동 관리 화면](https://callsign-rouge.vercel.app/demo/governance)은 실제 로그인·업무 API 연결 모드다. 별도로 생성하는 public preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+현재 시연 진입은 `/demo/work`(업무 관리), `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 현재 [공개 연락 화면](https://callsign-rouge.vercel.app/demo/call)과 [공동 관리 화면](https://callsign-rouge.vercel.app/demo/governance)은 실제 로그인·업무 API 연결 모드다. 별도로 생성하는 public preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. 현재 확정 배치는 Vercel frontend와 기존 서버컴의 지속 backend이며, AWS 이전은 이번 범위 밖이다. 현재 배치의 metadata/trust/PBX 인증서와 frontend pin을 일치시킨다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
 
 시연 준비와 조작은 다음 순서다. 실제 실행 여부는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 먼저 확인한다.
 
@@ -44,7 +44,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 현재 Vercel은 HTTP API rewrite와 `api/audio.ts`의 native WebSocket relay를 사용한다. 분석은 같은 origin의 cookie·CSRF·Origin 경계를 유지하며, SIP는 전용 Funnel WSS로 직접 연결한다. WebSocket 접속/거절은 실제 분석 동의·전사 성공과 별개다. HTTP rewrite 성공을 TURN 음성 성공으로 확대하지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
 
-현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 보호 파일 `.local/persistent-demo-connect-20261105T073906Z/oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 현재 세 API의 `/health`·`/readiness`는200을 확인했다. 과거 PBX 미준비503은 당시 기록이며, readiness200도 실제 사용자 통화 완료와 구분한다.
+현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 보호 파일 `.local/persistent-demo-connect-20261105T073906Z/oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 기존 실행에서 세 API의 `/health`·`/readiness` 200을 확인했다. 현재 가용성은 현황표와 실제 status로 확인한다. 과거 PBX 미준비503은 당시 기록이며, readiness200도 실제 사용자 통화 완료와 구분한다.
 
 ### 역할별 웹 조작
 
@@ -117,6 +117,8 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 정책 결합·정정된 근거·동의/epoch/binding·timeout·취소·quota는 공통 orchestration을 유지한다. 거절/불완전 출력/제공자 실패는 분석 불가이며 기존 규칙 경고를 지우거나 안전 판정으로 바꾸지 않는다. 정상 서비스가 합성 제공자를 자동 선택하지 않는다.
 
 ### AWS로 전환할 때
+
+이 절차는 과거 준비 내용으로 보존하며 현재 서버컴 지속 데모의 실행·완료 범위에는 포함하지 않는다.
 
 같은 제품 이미지에 공개 주소·OIDC·TLS·영속 mount·보호 provider 파일만 환경별로 공급한다. 새 identity NEW는 새 키/genesis/기관/trust/웹을 생성한다. 기존 상태 이전은 source drain/fence → 일관된 암호화 백업 → source writer 중지 확인 → 별도 target RESTORE/현재 독립 Anchor 대조 → 새 외부 endpoint/trust 검증 → 사용자 전환 순서다. 같은 identity의 source와 target을 동시에 쓰기 상태로 열지 않는다. 되돌리기도 최신 journal/Anchor 일치와 단일 writer를 확인한 뒤 수행하며 과거 백업으로 gate를 초기화하지 않는다.
 
