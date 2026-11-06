@@ -673,3 +673,16 @@ Compared the v24(1) volume table with the real workspace contract. The26existing
 Local queue harness failures (browser bundler aliases/CSS imports, opaque-origin session storage) are preserved separately; corrected the harness to use the existing fixture origin/style strategy. The owner selector also received an explicit accessible label. These checks do not claim a new call or backend data repair.
 
 Queue browser regression passed: unique work labels, combined state/owner/search filters, selection, create/detail separation and empty state at1440/390px. Synthetic captures reviewed directly; production read-only verification follows the source deployment.
+
+### 2026-11-07 — v24 interaction and typography alignment
+
+Reference: user-provided `docs/CallSign_Recording_Demo_ShortVoice_v24 (1).html`, SHA-256 `381f86b8f299d3b2f1f1c135bf7ccaa503ba3dfc72e204f52139fedddc5e9f7d` (the unnumbered copy is identical). Inspected appended render/director/ARS overrides, not only the initial markup. Original source files remain untracked and preserved.
+
+| Surface / role | Difference and implementation | Evidence / remaining boundary |
+| --- | --- | --- |
+| Work / permitted actors | Source fonts, compact full-width table, state/owner/search/page controls, white details; actual ID suffixes, no fictional customers. | Synthetic three-role viewport and drawer checks. Correction to the preceding entry: workspace returns `expiresAt`; the frontend type omitted it. The table now displays the returned work deadline, not a call approval deadline. |
+| Call / gateway and recipient | Space routes to the existing permitted control with a staged pointer cue. Cancels queued actions on work identity/route changes; typing, native controls, dialogs and repeated keydown are excluded. Media stop/withdrawal and file picker do not wait for staging. | Actual keyboard fixture (no calls): direct click/Space, repeat, typing, dialog, disabled, route and identity cancellation. Consent remains an explicit keypad choice. Institution cannot act for another session. |
+| Central flow / recipient | Preparation text follows the existing prepare controller. Actual transcript and completed analysis events now select separate flow scenes instead of always falling through to connected. Packet motion is presentational, never a success timer. | Focused scene tests; live media/provider revalidation not run in this UI change. |
+| Governance / authorized actors | Current-state strip, independent signature review and propagation panels; actual four-node observation retained, technical management folded away. Stop has an explicit scope confirmation. | No stop/recover command executed. Local imported signature count, receipt, ledger, Witness and current institution state remain separate. |
+
+Font assets are extracted from the supplied design. No runtime/provider/backend files changed; no identity or data reset. A new frontend deployment does not replace the existing backend source or count as a new live-call proof. Earlier public browser run reached the actual OIDC callback then failed in work-details verification; its original failure is retained under `.local/v24-review/login-controls-followup-20261107/`. Fixture evidence is under `.local/v24-review/current-fixture/`, `confirmed-fixture/` and `phone-final/`; runtime/resource guard results remain separate.

@@ -1,0 +1,108 @@
+/* Typography and geometry from the user-supplied v24 Recording HTML.
+   Its simulated records, timers and role-switching are deliberately not imported. */
+@font-face{font-family:RecordingUI;src:url('./assets/recording-0.woff') format('woff');font-weight:400;font-display:swap}
+@font-face{font-family:RecordingUI;src:url('./assets/recording-1.woff') format('woff');font-weight:600 900;font-display:swap}
+.demo-shell{font-family:RecordingUI,Arial,sans-serif;font-size:14px;color:#202d3e;background:#f7f8fa}
+.demo-shell :is(button,input,select,textarea){font-family:inherit}
+.demo-shell .site-header{padding:0 40px;gap:70px}
+.demo-shell .site-header nav{gap:18px}
+.demo-shell .site-header nav a{padding-inline:15px}
+.demo-shell .brand strong{font-size:24px;font-weight:700;letter-spacing:-1px}
+.demo-shell .demo-workspace{max-width:1440px;margin:auto;padding:24px 40px 0;position:relative}
+.demo-shell .demo-heading{margin:0 0 28px;min-height:58px}
+.demo-shell .demo-heading h1{font-size:28px;line-height:1.3;margin:0}
+.demo-shell .demo-heading p{font-size:13px;color:#718095;margin:8px 0 0}
+.demo-shell .demo-environment{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.demo-shell .demo-tools{position:absolute;right:40px;top:4px;display:flex;justify-content:flex-end;gap:18px;margin:0;font-size:11px;z-index:5}
+.demo-shell .demo-tools>details:not([open]) summary,.demo-shell .demo-tools>.button{font-size:11px;padding:4px 0;min-height:0}
+.demo-shell .demo-preparation[open]{position:absolute;right:0;top:0;width:min(440px,calc(100vw - 40px));max-height:75vh;overflow:auto;background:white;border:1px solid #e3e8ef;border-radius:12px;padding:18px;box-shadow:0 12px 28px #20344a15}
+.demo-shell .demo-preparation p{font-size:12px;line-height:1.6}
+.demo-shell .site-footer{max-width:1440px;margin:auto;display:flex;justify-content:space-between;gap:20px;padding:18px 40px 28px;font-size:10px;color:#718095}
+.demo-shell .workspace-scope{display:none}
+.demo-shell .service-notifications{font-size:12px}
+.demo-shell .demo-recording-call{padding-top:16px}
+.demo-shell .demo-recording-call .demo-heading{min-height:28px;margin-bottom:12px}
+.demo-shell .demo-recording-call .demo-heading h1{font-size:21px}
+.demo-shell .demo-recording-call .demo-scene-tabs{margin-bottom:12px}
+.demo-shell .demo-recording-call .demo-call-grid{gap:30px;grid-template-columns:260px minmax(270px,1fr) 334px;align-items:center}
+.demo-shell .demo-recording-call .demo-institution{height:530px;min-height:530px;margin-top:20px;align-self:start}
+.demo-shell .demo-recording-call .demo-flow-copy h2{font-size:23px!important}
+.demo-shell .demo-recording-call .demo-phone-waiting{height:570px;min-height:570px}
+.demo-shell .demo-recording-call .demo-institution-strip{padding:12px 20px;margin-top:16px}
+.demo-shell .demo-recording-call .demo-call-disclosure{font-size:10px}
+.demo-shell .work-management{position:relative}
+.demo-shell .work-management .work-list{border-radius:16px;min-height:470px}
+.demo-shell .work-list-heading{position:absolute;right:0;top:-73px;padding:0;margin:0;gap:10px}
+.demo-shell .work-list-title{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.demo-shell .work-list-heading .button{font-size:12px;min-height:38px;padding:10px 16px}
+.demo-shell .work-status-tabs{gap:27px;padding:0 26px}
+.demo-shell .work-status-tabs button{font-size:13px;padding:19px 2px;border-bottom-width:2px}
+.demo-shell .work-status-tabs span{font-size:10px;padding:2px 5px}
+.demo-shell .work-management .work-filters{padding:16px 24px;align-items:center}
+.demo-shell .work-filters label{font-size:0}
+.demo-shell .work-filters input,.demo-shell .work-filters select{font-size:12px;min-height:38px;padding:10px 12px}
+.demo-shell .work-filters label:first-child{max-width:320px}
+.demo-shell .work-management .work-table{font-size:12px}
+.demo-shell .work-management .work-table th{font-size:11px;padding:14px 20px;font-weight:500}
+.demo-shell .work-management .work-table td{padding:13px 20px;border-color:#edf0f4}
+.demo-shell .work-table small{font-size:10px!important;margin-top:4px}
+.demo-shell .work-management .work-table-scroll{max-height:460px}
+.demo-shell .work-management .work-state{font-size:11px;padding:4px 8px}
+.demo-shell .work-management .work-select{font-size:12px;padding:5px;min-height:28px}
+.demo-shell .work-management .work-pagination{padding:15px 20px;font-size:12px;gap:14px}
+.demo-shell .work-pagination .button,.demo-shell .work-pagination select{min-height:28px;font-size:12px;padding:5px 10px}
+.demo-shell .work-management .work-data-note{font-size:10px;padding-top:8px}
+.demo-shell .work-management .work-list>details{padding-block:8px;font-size:10px}
+.demo-shell .demo-governance-grid{display:flex;flex-direction:column;gap:16px}
+.demo-shell .demo-commands{display:flex;flex-direction:column;padding:0;background:transparent;border:0}
+.demo-shell .recording-advanced-management{order:3;font-size:12px}
+.demo-shell .recording-administration{display:flex;flex-direction:column;padding:0;background:transparent;border:0;gap:20px}
+.demo-shell .recording-administration>details{order:3;font-size:12px}
+.demo-shell .recording-gov-summary{background:white;border:1px solid #e3e8ef;border-radius:16px;padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.demo-shell .recording-gov-summary small{color:#718095;font-size:12px}
+.demo-shell .recording-gov-summary h2{font-size:25px;margin:8px 0}
+.demo-shell .recording-gov-summary p{font-size:13px;color:#718095;margin:0}
+.demo-shell .recovery-review{border:0;padding:0;margin:0;min-width:0}
+.demo-shell .recovery-review>legend{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.demo-shell .recording-recovery-grid{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(440px,1.35fr);gap:24px}
+.demo-shell .recording-recovery-grid>section{background:#fff;border:1px solid #e3e8ef;border-radius:20px;padding:25px;min-width:0}
+.demo-shell .recording-recovery-grid h2{font-size:19px;margin:0 0 14px;display:flex;align-items:center;gap:12px}
+.demo-shell .recording-recovery-grid h2 small{font-size:12px;color:#246afa;font-weight:400}
+.demo-shell .recording-recovery-grid p{font-size:12px;color:#718095;line-height:1.7}
+.demo-shell .recording-approval-count{display:flex;gap:8px;align-items:baseline;margin:22px 0 12px}
+.demo-shell .recording-approval-count strong{font-size:32px;font-weight:500}
+.demo-shell .recording-approval-count span{font-size:13px;color:#718095}
+.demo-shell .recovery-review .approver-list{display:block;margin:16px 0;padding:0}
+.demo-shell .recovery-review .approver-list article{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid #edf0f4}
+.demo-shell .approver-list .avatar{margin:0;width:32px;height:32px;background:#f0f4fa;color:#60738c;flex-shrink:0}
+.demo-shell .approver-list strong{font-size:13px}.demo-shell .approver-list small{font-size:10px;color:#718095;margin-top:4px}
+.demo-shell .recording-recovery-grid label{font-size:12px;overflow-wrap:anywhere}
+.demo-shell .recording-recovery-grid input[type=file]{font-size:11px;width:100%;padding:8px;border:1px solid #e3e8ef;border-radius:8px}
+.demo-shell .recording-recovery-grid details{font-size:12px;color:#52647c;margin-top:16px}
+.demo-shell .recording-recovery-process ol{padding:0;list-style:none;margin:12px 0 20px}
+.demo-shell .recording-recovery-process li{display:flex;gap:15px;align-items:center;padding:15px 0;border-bottom:1px solid #edf0f4}
+.demo-shell .recording-recovery-process li>span{display:grid;place-items:center;border-radius:50%;width:29px;height:29px;background:#f1f3f7;color:#8390a2;flex-shrink:0;font-size:12px}
+.demo-shell .recording-recovery-process li strong{font-size:14px}
+.demo-shell .recording-recovery-process li p{font-size:11px;margin:4px 0 0}
+.demo-shell .recording-recovery-process li>small{margin-left:auto;font-size:11px;color:#718095}
+.demo-shell .recording-recovery-note{padding:12px;background:#f6f8fb;border-radius:8px}
+.demo-shell .demo-ledger,.demo-shell .demo-governance-outcome{padding:12px 0;border:0;background:transparent;font-size:12px}
+@media(max-width:850px){.demo-shell .site-header{padding:12px 20px 0;gap:10px}.demo-shell .demo-workspace{padding:24px 20px 0}.demo-shell .demo-tools{right:20px;top:4px}.demo-shell .demo-heading h1{font-size:23px}.demo-shell .demo-recording-work .demo-heading{margin-bottom:80px}.demo-shell .work-list-heading{top:-65px;left:0;right:auto}.demo-shell .work-management .work-filters{padding:16px;gap:10px}.demo-shell .work-filters label:first-child{max-width:none}.demo-shell .work-status-tabs{padding:0 16px;gap:20px}.demo-shell .recording-recovery-grid{grid-template-columns:1fr}.demo-shell .recording-recovery-grid>section{padding:20px}.demo-shell .demo-recording-call .demo-call-grid{display:flex;flex-direction:column}.demo-shell .demo-recording-call .demo-institution{height:auto;min-height:0;width:100%;margin-top:0}.demo-shell .site-footer{padding:18px 20px;flex-wrap:wrap}.demo-shell .demo-recording-call .demo-tools{position:relative;right:auto;top:auto}.demo-shell .recording-gov-summary{padding:20px;gap:12px}}
+@media(prefers-reduced-motion:reduce){.demo-shell *,.demo-shell *::before,.demo-shell *::after{animation:none!important;transition:none!important}}
+.recording-click-cue{position:fixed;z-index:10000;pointer-events:none;width:34px;height:40px;transform-origin:3px 2px}.recording-click-cue svg{width:100%;height:100%;fill:#20314c;stroke:white;stroke-width:1.5;filter:drop-shadow(0 2px 3px #17243b30)}
+.demo-shell [data-director-focus=sender] .demo-institution,.demo-shell [data-director-focus=recipient] .demo-recipient{outline:2px solid #246afa44;outline-offset:5px;transition:outline-color .4s}
+.demo-shell .demo-flow-packet{width:10px;height:10px;top:50%;left:8px;box-shadow:0 0 0 4px #246afa14;animation:recording-to-recipient 1500ms cubic-bezier(.4,0,.2,1) both}
+.demo-shell :is(.demo-flow-accepting,.demo-flow-analyzing) .demo-flow-packet{animation-name:recording-from-recipient}
+.demo-shell :is(.demo-flow-error,.demo-flow-ended,.demo-flow-ready,.demo-flow-unavailable) .demo-flow-packet{display:none}
+@keyframes recording-to-recipient{0%{left:8px;opacity:0;transform:scale(.6)}12%,85%{opacity:1;transform:scale(1)}100%{left:calc(100% - 8px);opacity:0;transform:scale(.6)}}
+@keyframes recording-from-recipient{0%{left:calc(100% - 8px);opacity:0;transform:scale(.6)}12%,85%{opacity:1;transform:scale(1)}100%{left:50%;opacity:0;transform:scale(.6)}}
+@media(prefers-reduced-motion:reduce){.demo-shell .demo-flow-packet{display:none}.recording-click-cue{display:none}}
+
+.demo-shell .recording-administration{max-width:none;width:100%}
+.demo-shell .recording-recovery-grid>section{padding:20px 24px}
+.demo-shell .recording-recovery-grid .recording-recovery-context{margin:8px 0}
+.demo-shell .recording-recovery-grid .approver-list{gap:0;margin:8px 0}
+.demo-shell .recording-recovery-grid .approver-list article{padding:9px 0}
+.demo-shell .recording-approval-count{margin:12px 0 8px}
+.demo-shell .recording-recovery-grid p{margin:8px 0}
+@media(max-width:850px){.demo-shell .demo-tools{position:relative;right:auto;top:auto;margin:0 0 12px;flex-wrap:wrap}.demo-shell .recording-recovery-grid>section{padding:18px}.demo-shell .demo-recording-work .demo-heading{margin-bottom:16px}}

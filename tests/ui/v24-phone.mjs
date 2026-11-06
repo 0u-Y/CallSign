@@ -7,7 +7,8 @@ if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration')throw Error('IS
 const require=createRequire(import.meta.url),{build}=await import(createRequire(require.resolve('tsx')).resolve('esbuild'));
 const built=await build({entryPoints:['tests/ui/v24-phone-fixture.tsx'],alias:{punycode:resolve('apps/web/src/lib/unicodeEscapes.ts')},bundle:true,write:false,outdir:'.local/unused-v24',format:'iife',jsx:'automatic',nodePaths:[resolve('apps/web/node_modules')]});
 const base=(await readFile('apps/web/src/styles.css','utf8')).replace(/^@import .*;$/gm,'');
-const css=base+await readFile('apps/web/src/service.css','utf8')+await readFile('apps/web/src/demo-workspace.css','utf8');
+let recording=await readFile('apps/web/src/recording-reference.css','utf8');for(const n of [0,1])recording=recording.replace(`./assets/recording-${n}.woff`,`data:font/woff;base64,${(await readFile(`apps/web/src/assets/recording-${n}.woff`)).toString('base64')}`);
+const css=base+await readFile('apps/web/src/service.css','utf8')+await readFile('apps/web/src/demo-workspace.css','utf8')+recording;
 const out=process.env.CALLSIGN_UI_OUTPUT??'.local/v24-review/phone';await mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true});
 try{for(const width of [1440,390]){const page=await browser.newPage({viewport:{width,height:1000}});page.setDefaultTimeout(10000);page.on('pageerror',e=>console.error('FIXTURE_PAGE_ERROR',e.message));await page.route('**/*',r=>r.request().url()==='https://callsign-fixture.invalid/'?r.fulfill({contentType:'text/html; charset=utf-8',body:`<style>${css}</style><div id="root"></div>`}):r.abort());await page.goto('https://callsign-fixture.invalid/');await page.addScriptTag({content:built.outputFiles.find(f=>f.path.endsWith('.js')).text});

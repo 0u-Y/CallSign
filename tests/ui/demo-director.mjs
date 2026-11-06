@@ -6,6 +6,7 @@ const require=createRequire(import.meta.url),{build}=await import(createRequire(
 const result=await build({entryPoints:['tests/ui/demo-director-fixture.tsx'],bundle:true,write:false,format:'iife',jsx:'automatic',nodePaths:[resolve('apps/web/node_modules')]});
 const browser=await chromium.launch({headless:true});
 try{const page=await browser.newPage();await page.setContent('<div id="root"></div>');await page.addScriptTag({content:result.outputFiles[0].text});const count=page.getByRole('status',{name:'calls'});const body=()=>page.locator('body').evaluate(e=>{document.activeElement?.blur();e.focus();});
+await body();await page.keyboard.press('Space');await page.getByRole('button',{name:'identity',exact:true}).click();await page.waitForTimeout(600);await expect(count).toHaveText('0');
 await body();await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.down('Space');await expect(count).toHaveText('1');await page.keyboard.up('Space');await page.keyboard.press('Space');await expect(count).toHaveText('2');
 await page.getByRole('textbox',{name:'typing'}).fill('a');await page.keyboard.press('Space');await expect(count).toHaveText('2');await expect(page.getByRole('textbox',{name:'typing'})).toHaveValue('a ');
 await page.getByLabel('editable').click();await page.keyboard.press('Space');await expect(count).toHaveText('2');

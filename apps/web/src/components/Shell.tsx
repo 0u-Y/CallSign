@@ -15,7 +15,7 @@ export function Shell() {
         <strong>프런트엔드 미리보기</strong><span>API 미연결 · 로그인과 실제 통화는 사용할 수 없습니다. <a href="https://github.com/0u-Y/CallSign/blob/main/docs/RUNBOOK.md">실제 서비스 배포 안내</a></span>
       </aside>}
       <main id="main"><Outlet /></main>
-      <footer className="site-footer"><Brand compact /><p>모의 금융기관의 연락 확인 서비스를 개발하고 있습니다. 실제 금융기관·통신사와 연동되지 않았습니다.</p></footer>
+      <footer className="site-footer">{demo?<><span>{publicPreview?'합성 기관 · API 미연결':'합성 기관 · 역할별 인증'}</span><span>기관 승인은 통화 내용의 안전 보장이 아닙니다.</span></>:<><Brand compact /><p>모의 금융기관의 연락 확인 서비스를 개발하고 있습니다. 실제 금융기관·통신사와 연동되지 않았습니다.</p></>}</footer>
     </div>
   );
 }

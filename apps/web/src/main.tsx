@@ -9,6 +9,7 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.js";
 import "./styles.css";
 import "./demo-workspace.css";
+import "./recording-reference.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 2_000 } } });
 

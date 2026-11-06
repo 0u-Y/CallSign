@@ -25,3 +25,9 @@ it('does not turn acceptance, withdrawal, or termination pending into a fresh in
  expect(callScene({...idle,ending:true},true,true).id).toBe('ending');
  expect(callScene({...idle,ending:false,terminal:true,analysisWithdrawn:true},true,true).id).toBe('ended');
 });
+
+it('distinguishes actual transcript processing and completed events from media connection',()=>{
+ expect(callScene({...idle,active:true,analysis:'상대 음성 전사 수신'},false,false).id).toBe('analyzing');
+ expect(callScene({...idle,active:true,analysis:'상대 발화 분석 결과 수신'},false,false).id).toBe('analyzed');
+ expect(callScene({...idle,active:true,analysis:'상대 발화 분석 결과 수신',analysisWithdrawn:true},false,false).id).toBe('withdrawn');
+});
