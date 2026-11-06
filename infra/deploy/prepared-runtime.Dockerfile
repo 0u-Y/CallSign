@@ -4,6 +4,7 @@ ARG PREPARED_RUNTIME_IMAGE
 FROM ${PREPARED_RUNTIME_IMAGE} AS prepared-runtime
 ARG SOURCE_COMMIT
 LABEL org.callsign.source-commit=${SOURCE_COMMIT}
+LABEL org.callsign.analysis-smoke-budget=v1
 COPY packages packages
 COPY services services
 COPY scripts scripts
