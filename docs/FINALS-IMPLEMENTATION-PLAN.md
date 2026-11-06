@@ -7,13 +7,17 @@
 | 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
 |---|---|---|---|
 | 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 공개 연결 모드; 통화·분석 미검증 |
-| 공개 API·분석 WSS | 직접 Funnel HTTPS/WSS 진단 성공. [Vercel rewrite](../artifacts/vercel-ingress-transport-20261105.json)는 HTTPS200/WSS404 | 실제 backend 인증·cookie·CSRF·WS 연결 | HTTP는 Vercel same-origin rewrite 연결; 인증 WSS는 별도 미검증 |
+| 공개 API·분석 WSS | 실제 HTTP API 연결·native WSS relay 배포. Origin/비인증 거절 확인; 과거 단순 rewrite WSS404와 구분 | 인증 음성 WS와 실제 분석 이벤트 확인 | HTTP same-origin 연결·native 분석 WS relay 배포. 실제 인증 음성 WS는 미검증 |
 | 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
-| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 지속 backend·미디어 경로 미검증 |
+| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 SIP/ICE·ACK 확인; 수락 뒤 최초 검증 실패 조사 중 |
 | 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
 | 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
 | DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
 | 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
+
+## 2026-11-06 공개 통화 협상 진단
+
+공개 SIP 등록·INVITE 이후 5초 ICE 완료 대기가 종료 원인이었다. 사용 불가 interface 오류와 relay 후보를 분리 관측하고, 완료 필수 조건을 유지한 15초 대기로 양측 ICE 완료·ACK를 확인했다. 관련 단위6건·타입 검사 통과, `b59fd16` Production/CI 확인. 이후 수락 뒤 `verification-unavailable`로 종료되어 최초 수신자 실패를 추가 진단 중이며, 상대 측 `PBX_BINDING_CONTEXT_INVALID`는 원인으로 확정하지 않는다. 후속 첫 오류 진단에서는 한쪽 relay 미획득·15초 ICE_TIMEOUT도 남았다. 이번 논리적 시도6건은 모두 미완료/실패로 보존했고 자동 재시도는 없다. 내부 서버 브라우저가 검증한 공개 DNS 경로를 사용했으며 독립 외부 네트워크·음성 디코딩·실제 AI 성공은 아니다. [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 publicMediaInvestigation20261106을 따른다. 지속 서비스·영속 자료는 유지하고 종료된 임시 브라우저 helper10개만 full ID로 정리했다.
 
 ## 2026-11-06 공개 로그인과 제품 API 연결
 

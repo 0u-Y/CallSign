@@ -464,5 +464,74 @@
     ],
     "paidProviderCalls": 0,
     "scope": "Real public IdP and Vercel product cookie/CSRF/role/API/DB flows. Does not establish media, AI or full-stack readiness."
+  },
+  "publicMediaInvestigation20261106": {
+    "status": "PARTIAL",
+    "frontendSource": "2d3d718df38666dcbd3255d9a9278ddfa1888493",
+    "runtimeSource": "0a62aefde46e5edd8e8cf65ec4636ed74b06a232",
+    "runtimeImageConfigId": "sha256:a3718bcb3470e0c0cbb82967372bd36ef93fbdf8994934135464f7febf15adbd",
+    "scope": "Server-hosted independent browser sessions using verified public Funnel DNS resolution; not independent external networks or human microphone verification. Real persistent APIs, ledger, Witness, PBX and TLS TURN. No provider calls.",
+    "confirmed": [
+      "Normal API health/readiness and persistent monitor live",
+      "Real institution registration after existing Keycloak basic auth_time scope correction; no recent-auth check removed",
+      "Real signed delegation and three-signature Witness response",
+      "Both SIP registrations, real INVITE and complete ICE gathering followed by ACK after bounded 15-second gather wait",
+      "No audio transmission permitted before recipient acceptance in the final diagnostic",
+      "Final diagnostic failed after acceptance before decoded audio verification; PBX cleanup readback confirmed"
+    ],
+    "attempts": [
+      {
+        "id": "4",
+        "outcome": "failure",
+        "boundary": "ICE_TIMEOUT at five seconds"
+      },
+      {
+        "id": "5",
+        "outcome": "failure",
+        "boundary": "Observer registration wait five seconds shorter than product ten seconds; no dial"
+      },
+      {
+        "id": "6",
+        "outcome": "failure",
+        "boundary": "ICE_TIMEOUT; 701 interface errors and one relay candidate"
+      },
+      {
+        "id": "7",
+        "outcome": "failure",
+        "boundary": "Same ICE timeout; interface-unavailable errors classified"
+      },
+      {
+        "id": "8",
+        "outcome": "failure",
+        "boundary": "ICE completion and ACK pass; verification-unavailable after acceptance. Sender secondary PBX_BINDING_CONTEXT_INVALID; first recipient error not yet identified"
+      },
+      {
+        "id": "9",
+        "outcome": "failure",
+        "boundary": "Sender ICE completion/ACK; recipient ICE_TIMEOUT at fifteen seconds without relay candidate. No completed call."
+      }
+    ],
+    "completeCalls": 0,
+    "automaticRetries": 0,
+    "changes": [
+      "Registration observer now waits fifteen seconds against product ten-second deadline",
+      "ICE completion remains mandatory, bounded wait changed from five to fifteen seconds; actual ACK now observed",
+      "Safe ICE and verification error diagnostics exclude addresses, SDP, credentials and payload"
+    ],
+    "remaining": [
+      "Isolate intermittent microphone-permission ICE gathering, then identify first post-accept verification failure; secondary binding error is not a confirmed root cause",
+      "Decode both distinct audio inputs through actual public TURN/PBX path",
+      "Verify navigation, file switching, recall, recovery and real provider flow"
+    ],
+    "temporaryHelpersRemoved": 10,
+    "persistentServicesAndDataPreserved": true,
+    "isolatedMicrophoneIce": {
+      "gatheringState": "complete",
+      "completedAfterMs": 2719.4000000953674,
+      "interfaceErrorCount": 17,
+      "relayCandidates": 1,
+      "scope": "Single server-hosted browser with synthetic microphone permission, real public TLS TURN; candidate gathering only, no call/audio success claim",
+      "interpretation": "Interface-unavailable errors alone do not establish the cause; isolated gather completes despite them. Concurrent product negotiation remains unresolved."
+    }
   }
 }
