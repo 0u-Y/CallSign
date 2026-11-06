@@ -1,5 +1,5 @@
 const key='callsign-login-return';
-const paths=new Set(['/service','/demo','/demo/work','/demo/call','/demo/governance']);
+const paths=new Set(['/service','/demo','/demo/work','/demo/call','/demo/governance','/demo/filming']);
 // Keep return navigation in this tab and bind it to the actual OIDC request state.
 export function rememberLoginReturn(url:string,path:string,storage:Pick<Storage,'getItem'|'setItem'|'removeItem'>,now=Date.now()){
  const state=new URL(url).searchParams.get('state');

@@ -38,3 +38,8 @@ it('uses the selected physical input for the call sender and never prepares it t
  const media=new LiveMedia([],()=>{},()=>({addTrack:()=>({replaceTrack:vi.fn()}),close:vi.fn()})as unknown as RTCPeerConnection);
  await media.prepareMicrophone(getUserMedia,'chosen-mic');await expect(media.prepareMicrophone(getUserMedia,'chosen-mic')).rejects.toThrow('MICROPHONE_SESSION_INVALID');expect(getUserMedia).toHaveBeenCalledTimes(1);media.close();expect(track.stop).toHaveBeenCalledTimes(1);vi.unstubAllGlobals();
 });
+it('receives remote audio without requesting a second physical microphone',async()=>{
+ const getUserMedia=vi.fn();vi.stubGlobal('MediaStream',class{private tracks:unknown[]=[];addTrack(t:unknown){this.tracks.push(t);}getTracks(){return this.tracks;}});vi.stubGlobal('navigator',{mediaDevices:{getUserMedia}});
+ const transceiver=vi.fn(),peer={addTransceiver:transceiver,addTrack:vi.fn(),close:vi.fn()} as unknown as RTCPeerConnection;
+ const media=new LiveMedia([],()=>{},()=>peer);media.prepareReceiveOnly();expect(transceiver).toHaveBeenCalledWith('audio',{direction:'recvonly'});await media.accept();expect(getUserMedia).not.toHaveBeenCalled();expect(peer.addTrack).not.toHaveBeenCalled();media.close();vi.unstubAllGlobals();
+});

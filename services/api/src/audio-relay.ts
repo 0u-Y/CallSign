@@ -4,9 +4,9 @@ import WebSocket,{WebSocketServer} from 'ws';
 export function audioRelayTarget(path:string,backendOrigin:string){
  const backend=new URL(backendOrigin),request=new URL(path,'https://relay.invalid');
  if(backend.protocol!=='https:'||backend.origin!==backendOrigin||backend.username||backend.password)throw Error('FIXED_HTTPS_BACKEND_REQUIRED');
- if(!['/api/audio','/api/v3/audio'].includes(request.pathname)||request.searchParams.size!==1||request.searchParams.getAll('attemptId').length!==1)throw Error('AUDIO_ROUTE_INVALID');
+ if(!['/api/audio','/api/v3/audio'].includes(request.pathname)||request.searchParams.getAll('attemptId').length!==1||![...request.searchParams.keys()].every(key=>key==='attemptId'||key==='filmingRole')||request.searchParams.getAll('filmingRole').length>1||(request.searchParams.has('filmingRole')&&request.searchParams.get('filmingRole')!=='recipient'))throw Error('AUDIO_ROUTE_INVALID');
  const attempt=request.searchParams.get('attemptId');if(!attempt||attempt.length<3||attempt.length>200)throw Error('AUDIO_ATTEMPT_REQUIRED');
- backend.protocol='wss:';backend.pathname='/api/v3/audio';backend.search=new URLSearchParams({attemptId:attempt}).toString();return backend;
+ backend.protocol='wss:';backend.pathname='/api/v3/audio';backend.search=new URLSearchParams({attemptId:attempt,...(request.searchParams.has('filmingRole')?{filmingRole:'recipient'}:{})}).toString();return backend;
 }
 export function createAudioRelay(options:{origin:string;backendOrigin:string}){
  const origin=new URL(options.origin);if(origin.protocol!=='https:'||origin.origin!==options.origin||origin.username||origin.password)throw Error('FIXED_HTTPS_ORIGIN_REQUIRED');

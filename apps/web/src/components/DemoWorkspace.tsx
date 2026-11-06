@@ -15,6 +15,7 @@ function PhoneStatus(){return <div className="phonestatus" aria-hidden="true"><s
 
 export function DemoWorkspace(p:Props){
  const root=useRef<HTMLDivElement>(null);
+ const integrated=location.pathname.startsWith("/filming/");
  const navigate=useNavigate();
  const [scene,setScene]=useState(0);
  useEffect(()=>{if(!p.governance)setScene(current=>current===3?0:current);},[p.governance]);
@@ -29,7 +30,7 @@ export function DemoWorkspace(p:Props){
   <nav className="film-menu" aria-label="촬영 장면"><small>촬영 준비</small>{scenes.map((name,i)=><button key={name} type="button" className={(p.governance?i===3:p.workActive?i===0:scene===i)?'active':''} aria-current={(p.governance?i===3:p.workActive?i===0:scene===i)?'page':undefined} onClick={()=>chooseScene(i)}>{String(i+1).padStart(2,'0')} {name}</button>)}</nav>
 
   {p.notice}
-  <DemoDirector identity={p.identity} root={root} enabled={!p.workActive&&!p.governance} role={p.role} status={status} connected={p.connected} scene={scene}/>
+  <DemoDirector identity={p.identity} root={root} enabled={!integrated&&!p.workActive&&!p.governance} role={p.role} status={status} connected={p.connected} scene={scene}/>
   <div className="demo-live-bar" role="status" hidden={!p.connected}><span>진행 중인 연락 · {p.connection}</span><button className="button service-end" disabled={!p.connected} onClick={p.end}>진행 통화 종료</button></div>
   <section hidden={!p.workActive} aria-label="업무 관리 화면">{p.work}</section>
   <section hidden={p.governance||p.workActive} aria-label="연락과 통화 화면" data-attention={flow.focus}>
@@ -53,7 +54,7 @@ export function DemoWorkspace(p:Props){
    <details className="demo-evidence"><summary>이번 연락의 확인 근거</summary><p>{p.stale?'최신 업무 조회 실패 · 이전 성공 상태로 판단하지 마세요.':p.observedAt?`업무 응답 관측: ${new Date(p.observedAt).toLocaleTimeString('ko-KR')}`:'업무·승인·소비·연결의 실제 응답을 아직 관측하지 않았습니다.'}</p><p>현재 연결과 분석 상태는 위 통화 controller의 관측입니다. PBX 자원 부재는 상대 음성 중단의 증거와 구분합니다.</p>
     <details><summary>분석 발화 준비 · 입력과 근거의 한계</summary><p>정상: “어제 해외 결제는 본인이 하셨나요?”</p><p>위험 요구: “문자로 받은 인증번호를 알려주세요.”</p><p>분석 범위 밖: “저금리 대출 상품도 안내해드리겠습니다.” 목적 이탈은 현재 분석하지 않습니다.</p><p>로컬 한국어 합성 음원의 직접 STT 시험과 실제 통화 입력은 별도입니다. 상담원은 연결된 통화에 녹음 파일을 송출하거나 마이크로 발화할 수 있습니다.  수신자의 분석 동의 후 상대 track만 전달합니다. 이 문장을 누르거나 읽는 것만으로 분석 결과를 만들지 않습니다.</p></details></details>
   </section>
-  <section hidden={!p.governance} aria-label="공동 관리 화면">{p.operations?<><div className="demo-governance-grid"><section className="demo-commands">{p.operations}</section></div><details className="demo-evidence"><summary>원장 · Witness · 서비스 관측 상세</summary><LedgerObservation enabled={p.governance&&p.canObserve&&!p.stale} identity={p.identity}/>{p.outcome}<p>복구는 종료된 통화와 철회된 승인을 되살리지 않습니다. 새 권한에 맞는 새 업무·통화 시도를 준비하세요.</p></details></>:<div className="governance-access"><h2>공동 관리 권한이 필요합니다</h2><p>{p.roleName||'현재 계정'}은 기관 상태와 독립 서명을 조회할 수 없습니다. 기관 관리자 또는 공동 승인자의 독립 로그인 창에서 확인하세요.</p><NavLink className="button primary" to="/demo/work">배정 업무로 돌아가기</NavLink></div>}</section>
+  <section hidden={!p.governance} aria-label="공동 관리 화면">{p.operations?<><div className="demo-governance-grid"><section className="demo-commands">{p.operations}</section></div>{integrated&&<details><summary>기관 업무 관리</summary>{p.work}</details>}<details className="demo-evidence"><summary>원장 · Witness · 서비스 관측 상세</summary><LedgerObservation enabled={p.governance&&p.canObserve&&!p.stale} identity={p.identity}/>{p.outcome}<p>복구는 종료된 통화와 철회된 승인을 되살리지 않습니다. 새 권한에 맞는 새 업무·통화 시도를 준비하세요.</p></details></>:<div className="governance-access"><h2>공동 관리 권한이 필요합니다</h2><p>{p.roleName||'현재 계정'}은 기관 상태와 독립 서명을 조회할 수 없습니다. 기관 관리자 또는 공동 승인자의 독립 로그인 창에서 확인하세요.</p><NavLink className="button primary" to="/demo/work">배정 업무로 돌아가기</NavLink></div>}</section>
   <div className="demo-tools"><details className="demo-preparation"><summary>계정 · 연결</summary><p>{p.role?`현재 역할: ${p.roleName}`:'로그인 후 역할을 확인하세요.'}</p><p>조작은 현재 로그인한 역할의 권한으로만 실행됩니다. 다른 역할은 독립 브라우저 프로필에서 로그인하세요. 이 화면은 다른 역할의 세션을 공유하지 않습니다.</p><div className="workspace-account">{p.account}</div><NavLink to="/official">별도 인증한 공식 업무 열기</NavLink><p>장면 선택과 Space는 현재 역할의 실제 조작만 실행합니다. 다른 역할 창과 별도로 사용하세요.</p><p>선택 업무: {p.identity||'미선택'}</p></details>
   <Dialog.Root><Dialog.Trigger asChild><button className="button quiet">상세 확인 근거 열기</button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="demo-drawer-overlay"/><Dialog.Content className="demo-evidence-drawer"><Dialog.Title>현재 실행의 확인 근거</Dialog.Title><Dialog.Description>현재 로그인 역할에 허용된 정보만 표시합니다. 이 창을 여는 동작은 통화·승인·권한을 변경하지 않습니다.</Dialog.Description><dl><dt>역할</dt><dd>{p.roleName}</dd><dt>선택 문맥</dt><dd>{p.identity||'미선택'}</dd><dt>업무 조회 현재성</dt><dd>{p.stale?'조회 실패 · 과거 성공 미표시':p.observedAt?new Date(p.observedAt).toLocaleTimeString('ko-KR'):'미관측'}</dd><dt>연결 controller 상태</dt><dd>{p.connection}</dd></dl><p>개별 서명·nonce·만료·hash는 해당 업무 또는 공동 변경의 검토 상세에서 확인하세요. 노드 조회만으로 Witness나 PBX 회수 성공을 확인하지 않습니다.</p>{p.contact}{p.analysisAvailability}{p.evidence}<Dialog.Close asChild><button className="button secondary">확인 근거 닫기</button></Dialog.Close></Dialog.Content></Dialog.Portal></Dialog.Root></div>
   <div className="demo-audio">{p.audio}</div>{p.notifications}

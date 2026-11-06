@@ -35,6 +35,7 @@ export class LiveMedia {
     finally {this.switching=false;}
   }
   private remoteAccepted = false;
+  private receiveOnly = false;
   private closed = false;
   readonly remote = new MediaStream();
   constructor(iceServers: RTCIceServer[], private readonly invalidate: (reason: string) => void, factory = (config: RTCConfiguration) => new RTCPeerConnection(config)) {
@@ -55,7 +56,13 @@ export class LiveMedia {
     if (this.closed) throw new Error("MEDIA_CLOSED");
     for (const track of stream.getTracks()) track.onended = () => { this.invalidate("마이크 장치가 종료됐습니다."); this.close(); };
   }
+  prepareReceiveOnly() {
+    if (this.closed || this.microphone || this.receiveOnly) throw new Error('MEDIA_SESSION_INVALID');
+    this.peer.addTransceiver('audio', { direction: 'recvonly' });
+    this.receiveOnly = true;
+  }
   async accept(startMuted=false) {
+    if (this.receiveOnly && !this.closed) { this.accepted=true;this.remoteAccepted=true;for(const incoming of this.remote.getTracks())incoming.enabled=true;return; }
     if (this.closed || !this.microphone || !this.sender) throw new Error("MICROPHONE_NOT_READY");
     const track = this.microphone.getAudioTracks()[0]; if (!track || track.readyState === "ended") throw new Error("MICROPHONE_UNAVAILABLE");
     if(this.accepted)return;
@@ -77,7 +84,7 @@ export class LiveMedia {
 
 export function streamRemoteAudio(stream: MediaStream, attemptId: string, onEvent: (value: unknown) => void, version: 2 | 3 = 2) {
   if (!MediaRecorder.isTypeSupported("audio/webm;codecs=opus") || !stream.getAudioTracks().length) throw new Error("REMOTE_AUDIO_RECORDING_UNSUPPORTED");
-  const url = new URL(`/api/v${version}/audio?attemptId=${encodeURIComponent(attemptId)}`, location.origin); url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
+  const url = new URL(`/api/v${version}/audio?attemptId=${encodeURIComponent(attemptId)}`, location.origin);if(version===3&&location.pathname==='/filming/recipient')url.searchParams.set('filmingRole','recipient');url.protocol = location.protocol === "https:" ? "wss:" : "ws:";
   const socket = new WebSocket(url); const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus", audioBitsPerSecond: 32000 }); let stopped = false;
   socket.onmessage = event => {
     if (stopped) return;

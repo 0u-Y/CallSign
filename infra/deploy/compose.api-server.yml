@@ -28,6 +28,7 @@ x-app: &app
 services:
   platform:
     <<: *app
+    image: ${CALLSIGN_PLATFORM_IMAGE:-${CALLSIGN_APP_IMAGE:?reviewed runtime}}
     env_file: ${CALLSIGN_PLATFORM_ENV_FILE:?protected platform environment}
   issuer:
     <<: *app

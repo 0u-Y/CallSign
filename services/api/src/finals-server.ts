@@ -39,6 +39,7 @@ import { liveAttemptFor, membership, workspaceFor, type Actor } from "./finals-m
 import { postgresAuthorityStore } from "./finals-store.js";
 import { finalsEnvironment } from "./finals-config.js";
 import { assertCsrf, assertRecentAuthentication, HttpError, newToken, sessionForRequest, tokenHash } from "./auth.js";
+import {filmingActor} from './filming-actor.js';
 import { createDatabase } from "./db.js";
 import { oidcLoginUses, sessions, users } from "./schema.js";
 import { sessionCookie, type SessionPolicy } from "./auth.js";
@@ -89,7 +90,7 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
   app.get("/health", async () => ({ status: "alive", role: env.SERVICE_ROLE, protocolVersion: 3 }));
   const forward = async (target: string, path: string, request: FastifyRequest, token: string, overrideBody?: unknown) => {
     const response = await fetch(new URL(path, target), { method: request.method, signal: AbortSignal.timeout(4000), redirect: "error", headers: {
-      "content-type": "application/json", "x-correlation-id":String(request.headers["x-correlation-id"]??""), "x-service-token": token, cookie: request.headers.cookie ?? "", origin: request.headers.origin ?? "", "x-csrf-token": String(request.headers["x-csrf-token"] ?? ""), "idempotency-key": String(request.headers["idempotency-key"] ?? ""),
+      "content-type": "application/json", "x-correlation-id":String(request.headers["x-correlation-id"]??""), "x-service-token": token, cookie: request.headers.cookie ?? "", origin: request.headers.origin ?? "", "x-csrf-token": String(request.headers["x-csrf-token"] ?? ""), "idempotency-key": String(request.headers["idempotency-key"] ?? ""), "x-callsign-filming-role": String(request.headers["x-callsign-filming-role"] ?? ""),
     }, ...(["GET", "HEAD"].includes(request.method) ? {} : { body: JSON.stringify(overrideBody ?? request.body) }) });
     const value = await response.text(); if (value.length > 131072) throw new HttpError(503, "UPSTREAM_TOO_LARGE");
     return { response, value };
@@ -185,7 +186,10 @@ export async function buildFinalsServer(env = finalsEnvironment(process.env), ad
     authenticate(request.headers["x-service-token"], ["/v2/sender-context", "/v3/sender-context"].includes(request.url) ? env.SENDER_INTERNAL_TOKEN! : env.PLATFORM_INTERNAL_TOKEN);
     const session = await scopedSession(request, purpose); if (write) assertCsrf(request, session, env.WEB_ORIGIN);
     if(write&&(request.url.startsWith("/v3/management/")||request.url==="/v3/credentials"||request.url==="/v3/revoke"||purpose==="official"))assertRecentAuthentication(session);
-    const actor = { userId: session.userId, role: session.role, institutionId: env.INSTITUTION_ID,membershipGeneration:session.membershipGeneration??0 }; const currentRecord=await store.read(actor.institutionId);membership(currentRecord, actor, ["institution", "gateway", "recipient", "approver"]);assertMembershipGeneration(session,currentRecord.members[actor.userId]!);
+    const baseActor = { userId: session.userId, role: session.role, institutionId: env.INSTITUTION_ID,membershipGeneration:session.membershipGeneration??0 }; const currentRecord=await store.read(baseActor.institutionId);membership(currentRecord, baseActor, ["institution", "gateway", "recipient", "approver"]);assertMembershipGeneration(session,currentRecord.members[baseActor.userId]!);
+    const requestedRole=request.headers['x-callsign-filming-role']||(request.url.startsWith('/v3/audio?')?new URL(request.url,'http://local').searchParams.get('filmingRole')??undefined:undefined);
+    if(purpose!=='work'&&requestedRole)throw new HttpError(403,'FILMING_OFFICIAL_FORBIDDEN');
+    const actor=filmingActor(baseActor,requestedRole||undefined,currentRecord,{enabled:process.env.CALLSIGN_FILMING_ENABLED==='true',operatorId:process.env.CALLSIGN_FILMING_OPERATOR_USER_ID,gatewayId:process.env.CALLSIGN_FILMING_GATEWAY_USER_ID,recipientId:process.env.CALLSIGN_FILMING_RECIPIENT_USER_ID});
     if(!chargedRequests.has(request)){await quota.chargeRequest(actor.institutionId,actor.userId,Math.floor(Date.now()/1000),requestLimit);chargedRequests.add(request);}return actor;
   };
   const pbxSigningKey = process.env.ARI_URL ? await readSigningKey(required("PBX_EVIDENCE_KEY_PATH")) : undefined;

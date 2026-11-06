@@ -42,7 +42,7 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
     const send=(value:unknown)=>{if(!stopped&&socket.readyState===WebSocket.OPEN){if(socket.bufferedAmount>524288){stop();return;}socket.send(JSON.stringify(value));}};
     const stop=()=>{if(stopped)return;stopped=true;frames.length=0;queuedBytes=0;stops.delete(stop);unwatch?.();stt?.stop();analyzer?.stop();socket.close(1000,'analysis stopped');if(reserved)void settle(reservation,providerStartedAt?Math.min(streamSeconds,Math.ceil((Date.now()-providerStartedAt)/1000)):0).catch(()=>{});if(connectionReserved)void settle(connectionReservation,providerStartedAt?1:0).catch(()=>{});};stops.add(stop);socket.on('close',stop);
     try{
-      const actor=await actorFor(request),{attemptId}=z.object({attemptId:z.string().min(3).max(200)}).strict().parse(request.query);
+      const actor=await actorFor(request),{attemptId}=z.object({attemptId:z.string().min(3).max(200),filmingRole:z.literal('recipient').optional()}).strict().parse(request.query);
       if(actor.role!=='recipient'||request.headers.origin!==options.origin)throw new Error('AUDIO_FORBIDDEN');
       const initial=await a.options.store.read(actor.institutionId),context=a.party(initial,actor,attemptId),generation=context.attempt.consent?.generation,policyDigest=assertAnalysisPolicy(initial,context.attempt),session=context.attempt.sessionId,connectionGeneration=context.attempt.generation;
       const allowed=async()=>{assertBudget();await actorFor(request);const record=await a.options.store.read(actor.institutionId),{attempt,intent}=a.party(record,actor,attemptId);activeIntent(record,intent.id,actor,a.now());a.state(record);

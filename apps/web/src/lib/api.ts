@@ -4,6 +4,8 @@ let csrfToken = sessionStorage.getItem("ip_csrf") ?? "";
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
+  const filmingRole=location.pathname.match(/^\/filming\/(gateway|recipient)$/)?.[1];
+  if(filmingRole&&path.startsWith('/v3/')&&!path.startsWith('/v3/auth/'))headers.set('x-callsign-filming-role',filmingRole);
   if (init.body && !headers.has("content-type")) headers.set("content-type", "application/json");
   if (init.method && !["GET", "HEAD", "OPTIONS"].includes(init.method.toUpperCase()) && csrfToken && !headers.has("x-csrf-token")) headers.set("x-csrf-token", csrfToken);
   for (let attempt = 0; ; attempt++) {

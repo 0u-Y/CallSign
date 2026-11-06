@@ -5,11 +5,12 @@ import { Brand } from "./Brand.js";
 import { publicPreview } from "../config.js";
 
 export function Shell() {
-  const path=useLocation().pathname;const demo=path.startsWith('/demo');
+  const path=useLocation().pathname;const filmingChild=path.startsWith('/filming/');const demo=path.startsWith('/demo')||filmingChild;
   const [recording,setRecording]=useState(false),[guide,setGuide]=useState(false);
   useEffect(()=>{if(!demo)return;const down=(event:KeyboardEvent)=>{if(event.defaultPrevented||event.repeat||event.ctrlKey||event.metaKey||event.altKey)return;if(event.target instanceof Element&&event.target.closest('input,select,textarea,a,summary,[contenteditable]:not([contenteditable="false"]),[role="dialog"]'))return;if(document.querySelector('[role="dialog"]'))return;if(event.key.toLowerCase()==='f'){event.preventDefault();setRecording(v=>!v);}else if(event.key==='Escape')setRecording(false);};document.addEventListener('keydown',down);return()=>document.removeEventListener('keydown',down);},[demo]);
+  useEffect(()=>{if(!filmingChild)return;const down=(event:KeyboardEvent)=>{if(event.code!=='Space'||event.repeat||event.ctrlKey||event.metaKey||event.altKey||event.shiftKey)return;if(event.target instanceof Element&&event.target.closest('input,select,textarea,summary,[contenteditable],[role="dialog"]'))return;if(document.querySelector('[role="dialog"]'))return;event.preventDefault();window.parent.postMessage('callsign-filming-space',location.origin);};document.addEventListener('keydown',down,true);return()=>document.removeEventListener('keydown',down,true);},[filmingChild]);
   return (
-    <div id={demo?'callsign-recording':undefined} className={`app-shell${publicPreview ? " public-preview" : ""}${demo?` demo-shell ${recording?'recording':''} ${path==='/demo/call'?'callpage':path==='/demo/work'?'workpage':'govpage'}`:""}`}>
+    <div id={demo?'callsign-recording':undefined} className={`app-shell${publicPreview ? " public-preview" : ""}${demo?` demo-shell ${recording?'recording':''} ${filmingChild?'filming-child ':''}${path==='/demo/call'?'callpage':path==='/demo/work'?'workpage':'govpage'}`:""}`}>
       <a className="skip-link" href="#main">본문으로 건너뛰기</a>
       <header className={demo?"site-header top":"site-header"}>
         <NavLink to="/" className="brand-link"><Brand compact={demo} recording={demo}/></NavLink>

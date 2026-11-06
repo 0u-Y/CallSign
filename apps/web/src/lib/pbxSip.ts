@@ -34,7 +34,7 @@ export class PbxSip {
   constructor(readonly credentials:{username:string;password:string;realm:string;sipDomain:string;wssUrl:string},iceServers:RTCIceServer[],readonly report:(value:{callId:string;localSdp:string;remoteSdp:string})=>Promise<void>,readonly status:(status:string)=>void){this.media=new LiveMedia(iceServers,reason=>{status(reason);this.close();});}
   get callId(){return this.invite?h(this.invite,'call-id'):undefined;}
   get isRegistered(){return this.registered;}
-  async start(deviceId?:string){await this.media.prepareMicrophone(undefined,deviceId);if(this.closed)return;const socket=new WebSocket(this.credentials.wssUrl,'sip');this.socket=socket;
+  async start(deviceId?:string,receiveOnly=false){if(receiveOnly)this.media.prepareReceiveOnly();else await this.media.prepareMicrophone(undefined,deviceId);if(this.closed)return;const socket=new WebSocket(this.credentials.wssUrl,'sip');this.socket=socket;
     socket.onopen=()=>{this.status('SIP 등록 중');this.register();};socket.onerror=()=>{this.status('PBX 연결 실패');this.close();};socket.onclose=()=>{this.status('PBX 연결 종료');this.close();};
     const registered=new Promise<void>((resolve,reject)=>{this.registeredResolve=resolve;this.registeredReject=reject;});
     socket.onmessage=event=>{if(typeof event.data!=='string'){this.close();return;}if(event.data!=='\r\n\r\n'&&event.data.startsWith('CANCEL ')){try{this.cancel(parseSip(event.data));}catch{this.close();}return;}this.queue=this.queue.then(async()=>{if(this.closed)return;if(event.data==='\r\n\r\n'){socket.send('\r\n');return;}await this.receive(parseSip(String(event.data)));}).catch(error=>{console.warn('CallSign SIP negotiation failed',sipFailureCode(error));this.status('SIP 협상 실패: 재검증 필요');this.close();});};

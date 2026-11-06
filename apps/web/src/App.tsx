@@ -4,6 +4,7 @@ import { Shell } from "./components/Shell.js";
 import { ComparePage, DesignSystemPage, EvidencePage, GatewayPage, GovernancePage, InstitutionPage, OfficialPage } from "./pages/Operations.js";
 import { DemoPage, LandingPage, ReceiverPage } from "./pages/Experience.js";
 import { FinalsPage, FinalsOfficialPage } from "./pages/Finals.js";
+import { FilmingPage } from "./pages/Filming.js";
 import { ServicePage, ServiceOfficialPage } from "./pages/Service.js";
 import { publicPreview, finalsProfile, serviceProfile } from "./config.js";
 
@@ -20,7 +21,11 @@ export function App() {
           <Route path="demo/work" />
           <Route path="demo/call" />
           <Route path="demo/governance" />
+          <Route path="filming/gateway" />
+          <Route path="filming/recipient" />
+          <Route path="filming/institution" />
         </Route>
+        <Route path="demo/filming" element={<FilmingPage />} />
         <Route path="finals" element={localOnly(<FinalsPage />)} />
         <Route path="legacy/demo" element={<DemoPage />} />
         <Route path="receiver" element={localOnly(serviceProfile ? <Navigate to="/service" replace /> : finalsProfile ? <Navigate to="/finals" replace /> : <ReceiverPage />)} />
