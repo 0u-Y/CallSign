@@ -17,6 +17,6 @@ export function ServiceAdministration({permissions,action,post,busy=false}:{busy
  <label><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)}/>활성 계정</label>{role==='institution'&&permissions.filter(p=>p!=='governance.approve').map(p=><label key={p}><input type="checkbox" checked={grants.includes(p)} onChange={e=>setGrants(e.target.checked?[...grants,p]:grants.filter(v=>v!==p))}/>{p}</label>)}
  <button className="button secondary" disabled={!issuer||!subject||!name} onClick={()=>void action(async()=>{await post('/v3/management/accounts',{issuer,subject,displayName:name,role,active,permissions:grants,...(role==='gateway'?{serviceUri:service}:{})});await load();})}>계정 등록·변경 및 이전 세션 회수</button><p>공동 승인자는 이 화면에서 생성하거나 권한을 부여할 수 없습니다. 공동 승인자의 키 등록은 별도 초기 신뢰 설정 절차를 따릅니다.</p>
  {state&&<ul>{state.members.map(m=><li key={m.id}>{m.id} · {m.role} · {m.active===false?'비활성':'활성'}</li>)}</ul>}</fieldset></details>}
- <RecoveryReviewPanel busy={busy||!!failure} state={state} permissions={permissions} action={action} post={post} reload={load}/>
- <details className="service-secondary"><summary>공식 경로·업무 정책 공동 변경</summary><ConfigurationReviewPanel busy={busy||!!failure} state={state} permissions={permissions} action={action} post={post} reload={load}/></details></section>;
+ <RecoveryReviewPanel loadError={!!failure} busy={busy||!!failure} state={state} permissions={permissions} action={action} post={post} reload={load}/>
+ <details className="service-secondary"><summary>공식 경로·업무 정책 공동 변경</summary><ConfigurationReviewPanel loadError={!!failure} busy={busy||!!failure} state={state} permissions={permissions} action={action} post={post} reload={load}/></details></section>;
 }
