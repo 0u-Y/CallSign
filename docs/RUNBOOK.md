@@ -2,7 +2,7 @@
 
 ### 공개 프런트엔드와 실제 통화 배포 구분
 
-현재 시연 진입은 `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 현재 [공개 연락 화면](https://callsign-rouge.vercel.app/demo/call)과 [공동 관리 화면](https://callsign-rouge.vercel.app/demo/governance)은 실제 로그인·업무 API 연결 모드다. 별도로 생성하는 public preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+현재 시연 진입은 `/demo/work`(업무 관리), `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 현재 [공개 연락 화면](https://callsign-rouge.vercel.app/demo/call)과 [공동 관리 화면](https://callsign-rouge.vercel.app/demo/governance)은 실제 로그인·업무 API 연결 모드다. 별도로 생성하는 public preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
 
 시연 준비와 조작은 다음 순서다. 실제 실행 여부는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 먼저 확인한다.
 
@@ -20,7 +20,7 @@
 
 Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 당시 미연결 화면 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json), 이후 공개 연결의 확인 범위는 현황표에 연결한다.
 
-인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo/call`·`/demo/governance`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
+인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo/work`·`/demo/call`·`/demo/governance`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
 
 
 
@@ -38,13 +38,22 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 이것은 최초 기동 당시 실패다. 이후 사용자 명시적 재개와 새로운 SHA 연결 review를 거쳐 정상 로그인·API 기동을 확인했으며, 원본 중단 파일은 그대로 보존한다.
 
-첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
+첨부 디자인의 색감과 휴대폰 구성을 실제 `/demo/work`·`/demo/call`·`/demo/governance`에서 사용한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
 
 사용자가 전용 노드 등록과 해당 노드의 Funnel 권한·HTTPS 인증서 발급을 완료했다. 등록 링크 재승인을 요구하거나 기존 전체 구성원용 정책을 추가하지 않는다. 보존 identity로 실제 등록/권한을 조회하고, 진단 성공과 제품 backend·미디어 연결을 구분한다. [Funnel의 TLS 종료 TCP 전달](https://tailscale.com/docs/reference/tailscale-cli/funnel#use-a-tcp-forwarder)은 사용할 수 있는 전송 옵션이며, TURN 연동·외부 relay 성공을 입증한 것은 아니다.
 
 현재 Vercel은 HTTP API rewrite와 `api/audio.ts`의 native WebSocket relay를 사용한다. 분석은 같은 origin의 cookie·CSRF·Origin 경계를 유지하며, SIP는 전용 Funnel WSS로 직접 연결한다. WebSocket 접속/거절은 실제 분석 동의·전사 성공과 별개다. HTTP rewrite 성공을 TURN 음성 성공으로 확대하지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
 
 현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 보호 파일 `.local/persistent-demo-connect-20261105T073906Z/oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 현재 세 API의 `/health`·`/readiness`는200을 확인했다. 과거 PBX 미준비503은 당시 기록이며, readiness200도 실제 사용자 통화 완료와 구분한다.
+
+### 역할별 웹 조작
+
+- 기관 담당자: `/demo/work`에서 업무 만들기 → 등록 콜센터·고객 계정·담당 상담원을 선택한다. 목적은 현재 이상거래 정책으로 고정된다. 선택 가능한 계정 목록은 소속 조회 권한이 있을 때만 제공되며 표시 이름이 없는 응답은 실제 ID로 대조한다. 응답 유실 후에는 같은 입력으로 재시도해 기존 멱등키를 유지한다.
+- 위임 관리: 업무 배정과 별개로 콜센터의 위임을 발급·철회한다. 등록 대기를 완료로 보지 않는다. 선택 업무 취소는 확인 후 해당 업무에만 요청하며, 상세의 회수 관측에서 서버 적용과 PBX 관측을 따로 확인한다.
+- 상담원: 배정 업무 선택 → 연락 검증으로 이동 → 새 통화 시도 → 등록 위임 선택 → 개별 연락 승인. 수신자도 같은 시도를 선택하고 양측이 마이크/PBX 준비를 마치면 상담원이 발신한다. 수신자의 수락·분석 동의는 별도이며, 전사/분석은 수신자의 인증 화면에서만 보인다. 세 탭 이동은 통화 controller와 audio DOM을 유지한다.
+- 공동 승인자: `/demo/governance`에서 공개 요청 파일의 대상·변경 내용·만료를 검토하고 각자 보호 키로 별도 서명한다. 공개 서명 파일만 가져오며, 서로 다른 유효 서명 2개가 필요하다. 접수·원장 확정·Witness·서버 적용을 따로 확인하고 복구 후 새 위임·업무로 연락한다. 기존 통화는 부활하지 않는다.
+
+UI만 격리 검증할 때는 설치된 의존성으로 웹을 build한 뒤 `CALLSIGN_ALLOW_EXTERNAL_EXECUTION=integration node tests/ui/demo-workspace.mjs`를 실행한다. 이 명령은 별도 승인이 있는 frontend 시험용이다. loopback 정적 서버와 설치 Chromium을 사용하고 모든 API를 합성 응답으로 가로채며 외부 요청은 차단한다. 지속 backend에서 취소·정지·계정 변경을 시험하지 않는다. 캡처는 `.impeccable/review/`에 생성된다.
 
 ### 브라우저부터 실제 서비스까지
 

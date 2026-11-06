@@ -4,6 +4,12 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 문서 통합과 역할별 UI
+
+문서 `09af92b`·`f0f4e4a`를 최신 실행 기록과 병합했다. 별도 문서 worktree에서 R2 관리 조회 실패/늦은 응답, R3 미조회와 실패의 거짓 빈 목록, R4 callback 실패 Promise 잔류를 수정했다. 업무 관리·연락 검증·공동 관리의 실제 API 연결과 역할 제한을 재사용하며 controller·미디어·분석 내부 구현과 지속 운영 설정은 변경하지 않았다.
+
+변경 검사와 실행 근거·캡처는 [UI 검증 기록](../artifacts/demo-ui-20261106/result.json), 현재 판정은 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 아래 읽기 전용 감사의 R2~R4는 당시 발견 기록이며 이 후속 수정으로 처리했다. 공개 통화 성공 범위는 다른 개발 세션의 기록과 구분한다.
+
 ## 2026-11-06 실제 공개 경로 통화와 병렬 보완
 
 `20cbd65` frontend·기존 `0a62aef` runtime에서 승인·소비·lease와 양방향 서로 다른 합성 음원 디코딩, 페이지 이동 유지, 정상 종료·양측 음성 중단을 확인했다. 원래 시험은 종료 후 정리 코드가 이미 ended인 통화를 failed로 바꾸려 해 FAIL이었으며 그대로 보존했다. 같은 통화의 후속 읽기 조회는 ended/user-ended·소비 영수증·PBX 부재 및 ARI channel/bridge0을 확인했다. 검사 기준은 낮추지 않았고, Chromium 권고대로 합성 WAV의 capture processing만 시험 경계에서 끈 결과다. 독립 외부 단말·사람 마이크·실제 STT/LLM 성공은 아니다. 상세는 [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 normalPublicCall20261106을 따른다.
