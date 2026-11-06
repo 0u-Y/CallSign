@@ -1,0 +1,7 @@
+import {expect,it} from 'vitest';
+import {workEvidence} from './workEvidence.js';
+import type {Workspace} from './serviceWorkspace.js';
+const intent={id:'work',status:'open',agentId:'agent',recipientId:'recipient',serviceDid:'service'};
+const workspace={intents:[intent],credentials:[{digest:'registered',state:'registered',vc:{credentialSubject:{id:'service'}}},{digest:'old',state:'revoked',vc:{credentialSubject:{id:'service'}}}],attempts:[{id:'ended',intentId:'work',status:'ended'},{id:'foreign',intentId:'another',status:'accepted'}],authorizations:[{authorizationId:'old-approval',attemptId:'ended',cancelled:true}]} as unknown as Workspace;
+it('separates delegation candidates, historical approval and actual call state',()=>{const e=workEvidence(workspace,intent);expect(e.candidates.map(c=>c.digest)).toEqual(['registered']);expect(e.historical.map(c=>c.digest)).toEqual(['old']);expect(e.delegation).toContain('유효성 미확인');expect(e.call).toBe('종료 기록 있음');expect(e.authorization).toContain('현재 유효성 별도 확인');});
+it('keeps expired work, unobserved authorizations and a never-connected attempt distinct',()=>{expect(workEvidence(workspace,{...intent,expiresAt:1}).permission).toContain('만료');const w={...workspace,attempts:[{id:'created',intentId:'work',status:'created'}]};delete w.authorizations;expect(workEvidence(w,intent).authorization).toBe('승인 기록 미조회');expect(workEvidence(w,intent).call).toBe('연결 상태 확인 필요');});
