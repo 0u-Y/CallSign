@@ -37,7 +37,7 @@ describe('product controller identity pinning before SIP enrollment',()=>{
  it('sends one terminal request and stops verification while explicit termination is pending',async()=>{
   let release!:()=>void;mocked.holdOutcome=new Promise<void>(resolve=>{release=resolve;});
   const c=controller();Object.assign(c,{context:{attempt:{status:'accepted'}},sip:{pause:vi.fn(),close:vi.fn()}});
-  const first=c.end();await Promise.resolve();const second=c.end();await Promise.resolve();
+  const first=c.end();await Promise.resolve();expect(Reflect.get(c,'view').ending).toBe(true);expect(Reflect.get(c,'view').active).toBe(false);const second=c.end();await Promise.resolve();
   try{expect(mocked.requests.filter(p=>p==='/v3/outcome')).toHaveLength(1);await (Reflect.get(c,'tick').bind(c) as ()=>Promise<void>)();expect(mocked.requests.filter(p=>p.startsWith('/v3/call-context'))).toHaveLength(0);}finally{release();await Promise.all([first,second]);}
  });
 
@@ -49,7 +49,7 @@ describe('product controller identity pinning before SIP enrollment',()=>{
   expect(mocked.requests.filter(p=>p==='/v3/consent')).toHaveLength(1);
   release();await Promise.all([grant,withdraw]);
   expect(begin).not.toHaveBeenCalled();expect(mocked.requests.filter(p=>p==='/v3/consent')).toHaveLength(2);
-  expect(Reflect.get(c,'view').analysis).toContain('동의 철회');
+  expect(Reflect.get(c,'view').analysis).toContain('동의 철회');expect(Reflect.get(c,'view').analysisWithdrawn).toBe(true);
  });
  it('does not restart analysis after a late grant response crosses a local stop',async()=>{
   let release!:()=>void;mocked.holdConsent=new Promise<void>(resolve=>{release=resolve;});
@@ -62,7 +62,7 @@ describe('product controller identity pinning before SIP enrollment',()=>{
   const c=controller(),begin=vi.fn();Object.assign(c,{beginAnalysis:begin,view:{active:true}});
   await expect(c.analysis(true)).rejects.toThrow('CONSENT_REJECTED');
   expect(Reflect.get(c,'analysisWanted')).toBe(false);expect(begin).not.toHaveBeenCalled();
-  mocked.holdConsent=undefined;await c.analysis(false);expect(Reflect.get(c,'view').analysis).toContain('동의 철회');
+  mocked.holdConsent=undefined;await c.analysis(false);expect(Reflect.get(c,'view').analysis).toContain('동의 철회');expect(Reflect.get(c,'view').analysisWithdrawn).toBe(true);
  });
 
 });

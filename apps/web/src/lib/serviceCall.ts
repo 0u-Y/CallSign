@@ -10,7 +10,7 @@ export interface CallContext {
   attempt:ServiceAttempt; authorization?:Signed<StartAuthorization>&{serviceProofJws:string};
   credential?:{vc:ServiceCredential;jws:string}; receipt?:Signed<ServiceReceipt>; policy:PurposePolicy;
 }
-export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
+export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; invitationVerified?:boolean; incoming?:boolean; accepting?:boolean; ending?:boolean; analysisWithdrawn?:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
 // One controller owns one attempt and one ephemeral browser key. Reconnection starts a new attempt.
 export class ServiceCall {
   private sip:PbxSip|undefined; private stopped=false;private ending=false;private polling=false; private timer:ReturnType<typeof setTimeout>|undefined;
@@ -42,7 +42,7 @@ export class ServiceCall {
       const context=await this.read(),t=context.attempt;if(!t.recipientKey)throw new Error('RECIPIENT_ENROLLMENT_REQUIRED');
       const now=Math.floor(Date.now()/1000),jws=await this.sign({...this.base(context),type:'PbxBrowserReport',role:this.role,attemptId:t.id,sessionId:t.sessionId,connectionGeneration:t.generation,...report,recipientNonce:t.recipientKey.nonce,issuedAt:now,expiresAt:Math.min(t.firstConnectBy,now+30)});
       await this.post('/v3/pbx/report',{attemptId:t.id,jws});
-    },message=>{if(this.ending)return;this.show({connection:message});if(/종료|실패|재검증|초과/.test(message)&&!this.stopped)void this.end('failed','pbx-disconnected').catch(()=>this.finish('pbx-disconnected'));});
+    },message=>{if(this.ending)return;this.show({connection:message,...(message==='PBX 협상 완료: 승인 확인 전 음성 차단'?{incoming:!this.wantAccept}:{})});if(/종료|실패|재검증|초과/.test(message)&&!this.stopped)void this.end('failed','pbx-disconnected').catch(()=>this.finish('pbx-disconnected'));});
     let iceStarted=performance.now();this.sip.media.peer.addEventListener('iceconnectionstatechange',()=>{const state=this.sip?.media.peer.iceConnectionState;if(state==='checking')iceStarted=performance.now();if(state==='connected'||state==='completed')this.measure('ice',performance.now()-iceStarted);if(state==='failed')this.measure('ice',performance.now()-iceStarted,'failure');});
     this.sip.media.peer.addEventListener('track',()=>{if(!this.stopped)this.o.remote(this.sip!.media.remote);});
     await this.sip.start();this.alive();this.measure('pbx',performance.now()-this.connectionStarted);document.addEventListener('visibilitychange',this.visibility);this.show({connection:'PBX 등록 완료: 양측 연결 준비를 기다립니다'});this.schedule(0);
@@ -53,7 +53,7 @@ export class ServiceCall {
   private base(c:CallContext){const a=c.authorization!.payload;return {protocol:'callsign',version:3,networkId:a.networkId,registryAddress:a.registryAddress};}
   private sign(payload:Record<string,unknown>){return signPayload(payload,{privateKey:this.o.key.privateKey,kid:hashCanonical(this.o.key.publicJwk)});}
   async dial(){await this.post('/v3/pbx/dial',{attemptId:this.o.attemptId});this.show({connection:'상대 연결 대기'});}
-  accept(){this.alive();if(this.o.role!=='recipient')throw new Error('RECIPIENT_REQUIRED');this.wantAccept=true;this.show({connection:'수락: 양측 세션 검증 중'});}
+  accept(){this.alive();if(this.o.role!=='recipient')throw new Error('RECIPIENT_REQUIRED');this.wantAccept=true;this.show({connection:'수락: 양측 세션 검증 중',incoming:false,accepting:true});}
   chooseContinuation(value:boolean){this.choicePending=true;this.continuation=value;if(!value){this.sip?.pause();this.stopAnalysis();this.show({active:false});}this.show({authority:value?'권한 확인 불가: 사용자가 통화 유지를 선택함':'권한 확인 불가: 음성 일시 정지'});}
   async playRecording(file:File){if(!this.view.active||this.stopped||!this.sip)throw new Error('CALL_NOT_ACTIVE');await this.sip.media.playRecording(file,()=>{if(!this.stopped)this.show({audioSource:'녹음 종료 · 마이크로 전환할 수 있습니다'});});if(!this.stopped)this.show({audioSource:'녹음 파일 송출 중'});}
   async useMicrophone(){if(!this.view.active||this.stopped||!this.sip)throw new Error('CALL_NOT_ACTIVE');await this.sip.media.useMicrophone();if(!this.stopped)this.show({audioSource:'마이크 입력'});}
@@ -70,7 +70,7 @@ export class ServiceCall {
       const verified=await verifyServiceInvitation({authorizationJws:c.authorization.jws,vcJws:c.credential.jws,serviceProofJws:c.authorization.serviceProofJws,trust:this.o.trust,policy:c.policy,recipientId:this.o.recipientId,sessionId:t.sessionId,attemptId:t.id,now});this.alive();
       if(this.role==='sender'&&hashCanonical(verified.proof.browserPublicKey)!==hashCanonical(this.o.key.publicJwk))throw new Error('SENDER_BROWSER_KEY_CHANGED');
       if(this.role==='recipient'&&(t.recipientKey?.nonce!==this.nonce||hashCanonical(t.recipientKey.publicKey)!==hashCanonical(this.o.key.publicJwk)))throw new Error('RECIPIENT_BROWSER_KEY_CHANGED');
-      this.completed.add('invitation');this.show({authority:'기관 승인 서명 확인: 통화 내용의 안전 보장은 아님'});
+      this.completed.add('invitation');this.show({invitationVerified:true,authority:'기관 승인 서명 확인: 통화 내용의 안전 보장은 아님'});
     }
     this.binding=t.binding??this.binding;
     if(!this.binding)this.binding=await this.post<ServiceBinding>('/v3/binding',{attemptId:t.id});
@@ -115,7 +115,7 @@ export class ServiceCall {
     if(!t.mediaReady?.[this.role]){const jws=await this.possession(c,`media-ready:${hashCanonical(b)}`);await this.post('/v3/ready',{attemptId:t.id,jws},'media-ready');return;}
     if(stage==='prepared'&&this.role==='recipient'&&t.mediaReady.sender&&t.mediaReady.recipient){await this.evidence('bridged');return;}
     if(stage==='bridged'){
-      if(document.hidden)return;await this.sip.accept();this.alive();if(document.hidden||performance.now()>=expires){this.sip.pause();this.stopAnalysis('verification-expired-or-hidden');this.show({authority:'검증 유효기간 경과 또는 화면 비활성: 음성 정지',active:false});return;}this.sip.media.resume(this.muted);this.measure('media-ready',performance.now()-this.connectionStarted);this.show({connection:'양측 세션과 PBX 연결 검증 후 통화 중',active:true});
+      if(document.hidden)return;await this.sip.accept();this.alive();if(document.hidden||performance.now()>=expires){this.sip.pause();this.stopAnalysis('verification-expired-or-hidden');this.show({authority:'검증 유효기간 경과 또는 화면 비활성: 음성 정지',active:false});return;}this.sip.media.resume(this.muted);this.measure('media-ready',performance.now()-this.connectionStarted);this.show({connection:'양측 세션과 PBX 연결 검증 후 통화 중',active:true,incoming:false,accepting:false});
       if(this.analysisWanted&&!this.audioStop&&this.role==='recipient')await this.beginAnalysis();
     }
   }
@@ -128,15 +128,15 @@ export class ServiceCall {
     const request=this.consentQueue.then(()=>this.post('/v3/consent',{attemptId:this.o.attemptId,granted},`consent:${crypto.randomUUID()}`));
     this.consentQueue=request.catch(()=>{});await request;
     if(this.stopped||this.ending||generation!==this.generation)return;
-    this.analysisWanted=granted;this.show({analysis:granted?'원격 음성 분석 연결 대기':'동의 철회: 분석·전송 중단'});
+    this.analysisWanted=granted;this.show({analysisWithdrawn:!granted,analysis:granted?'원격 음성 분석 연결 대기':'동의 철회: 분석·전송 중단'});
     if(granted&&this.view.active)await this.beginAnalysis();
   }
   private async beginAnalysis(){if(!this.sip||this.stopped||!this.analysisWanted||document.hidden)return;const generation=++this.generation;this.analysisContextRevision=0;this.audioStop=streamRemoteAudio(this.sip.media.remote,this.o.attemptId,event=>{if(this.stopped||generation!==this.generation||!this.analysisWanted)return;const value=event as {type?:string;code?:string;engine?:string;llm?:string;contextRevision?:number;event?:{status?:string;contextRevision?:number}};if(value.type==='unavailable'){this.stopAnalysis('provider-unavailable');this.show({analysis:value.code==='ANALYSIS_LIMIT'?'분석 입력 한도: 현재 분석을 중단했습니다. 통화와 동의 상태를 확인하세요':'분석 중단: 동의·권한·제공자 상태를 확인할 수 없어 전송과 결과 표시를 중단했습니다'});return;}else if(value.type==='revision'&&value.contextRevision!==undefined&&value.contextRevision>this.analysisContextRevision){this.analysisContextRevision=value.contextRevision;this.o.risk({type:'context-changed'});this.show({analysis:'상대 발화 수정: 새 문맥 분석 중'});}if(value.event?.contextRevision!==undefined){if(value.event.contextRevision<this.analysisContextRevision)return;this.analysisContextRevision=value.event.contextRevision;}if(value.event?.status==='unavailable')this.show({analysis:'언어 모델 분석 장애: 이전 근거와 최신 실패를 구분해 확인하세요'});else if(value.event?.status==='analyzed')this.show({analysis:'상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님'});else if(value.type==='provider-ready')this.show({analysis:`상대 음성 전사 ${value.engine} · 분석 ${value.llm}`});this.o.risk(event);},3);}
   private stopAnalysis(reason='consent-or-call-ended'){if(this.audioStop)console.info('CallSign analysis stopped',reason);this.analysisWanted=false;this.generation++;this.audioStop?.();this.audioStop=undefined;this.o.risk({type:'clear'});this.show({analysis:'분석 중단: 음성 전송 없음'});}
   async end(outcome:'ended'|'declined'|'failed'='ended',reason='user-ended'){
-    if(this.stopped||this.ending)return;this.ending=true;clearTimeout(this.timer);clearTimeout(this.deadline);if(outcome==='ended'&&this.context?.attempt.status!=='accepted')outcome=this.role==='recipient'?'declined':'failed';this.sip?.pause();this.stopAnalysis();this.show({connection:'종료 요청 중: 음성 전송 차단',active:false});try{await this.post('/v3/outcome',{attemptId:this.o.attemptId,outcome,reason},`outcome:${outcome}`);}finally{this.finish(reason);}
+    if(this.stopped||this.ending)return;this.ending=true;clearTimeout(this.timer);clearTimeout(this.deadline);if(outcome==='ended'&&this.context?.attempt.status!=='accepted')outcome=this.role==='recipient'?'declined':'failed';this.sip?.pause();this.stopAnalysis();this.show({connection:'종료 요청 중: 음성 전송 차단',active:false,incoming:false,accepting:false,ending:true});try{await this.post('/v3/outcome',{attemptId:this.o.attemptId,outcome,reason},`outcome:${outcome}`);}finally{this.finish(reason);}
   }
   private async fail(e:unknown){if(this.stopped||this.ending)return;const message=e instanceof Error?e.message:'CALL_UNAVAILABLE';console.warn('CallSign call verification failed',e instanceof ApiError&&/^[A-Z][A-Z0-9_]{2,80}$/.test(e.code)?e.code:/^[A-Z][A-Z0-9_]{2,80}$/.test(message)?message:'CALL_UNAVAILABLE');this.show({error:message,authority:'검증 중단',active:false});try{await this.end('failed','verification-unavailable');}catch{this.finish(message);}}
-  private finish(reason:string){if(this.stopped)return;this.stopped=true;if(typeof document!=='undefined')document.removeEventListener('visibilitychange',this.visibility);this.abort.abort();clearTimeout(this.timer);clearTimeout(this.deadline);this.stopAnalysis();this.sip?.close();this.o.status({...this.view,connection:`통화 종료: ${reason}`,authority:'통화 종료: 현재 연결 검증 표시 해제',analysis:'분석 중단: 음성 전송 없음',active:false,terminal:true,terminalReason:reason});}
+  private finish(reason:string){if(this.stopped)return;this.stopped=true;if(typeof document!=='undefined')document.removeEventListener('visibilitychange',this.visibility);this.abort.abort();clearTimeout(this.timer);clearTimeout(this.deadline);this.stopAnalysis();this.sip?.close();this.o.status({...this.view,connection:`통화 종료: ${reason}`,authority:'통화 종료: 현재 연결 검증 표시 해제',analysis:'분석 중단: 음성 전송 없음',active:false,incoming:false,accepting:false,ending:false,invitationVerified:false,terminal:true,terminalReason:reason});}
   close(){this.finish('local-session-closed');}
 }

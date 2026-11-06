@@ -68,3 +68,9 @@
 제공자 상태는 인증된 `/v3/workspace.analysisAvailability`의 설정·만료 관측을 표시한다. 이는 연결 성공·남은 quota·모델 품질의 보장이 아니다. 꺼짐/기간 만료면 동의 시작을 비활성화하되 철회·통화 종료를 막지 않는다. 구버전 backend나 조회 실패는 미확인으로 표시한다. 상세 drawer는 portal 바깥에서도 흰 배경·명시적 글자색을 갖고, 선택 업무는 파란 배경·테두리·선택됨 문구로 구분한다.
 
 완료 기준에 **최종 데모 디자인의 실제 웹 반영**을 포함한다. 합성 API 브라우저 회귀, 실제 인증 API 조회, 실제 통화·유료 분석 검증은 각각 따로 기록한다. UI 변경에서 controller·audio DOM·서명/권한 검사를 교체하지 않는다.
+
+## 촬영 v18 적용 중 (2026-11-06)
+
+Current visual authority: `docs/CallSign_Recording_Demo_Approval_v18.html`, SHA-256 `1e4deaf666cbb395bca032d0c658f6e29947ac545dfbe1674faf60877a3f2c10`. Rendered the original and opened desktop ready/incoming captures. Earlier Recording/Refined files are historical references. The first capture defaulted to the work page; corrected call-page captures are explicitly suffixed `-v2`, preserving the originals.
+
+The four scene selectors only choose filming instructions. They do not grant consent, change actors or advance service state. Center movement follows observed controller state. The approval badge requires successful invitation signature verification; a workspace row alone is insufficient. Incoming styling follows an actual PBX invitation. Receiver evidence remains restricted to the receiver session. Independent browser profiles provide the filming composition; no merged authentication is introduced. Reduced-motion disables packet animation, and no animation blocks termination or withdrawal. Visual comparison and authenticated deployment verification are still pending.

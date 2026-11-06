@@ -37,3 +37,13 @@ it('separates official authentication, permission and lookup failures without ex
  }
  expect(officialLookupError(new Error('private diagnostic'))).not.toContain('private diagnostic');
 });
+
+it('keeps detected evidence visible and discloses undetermined results without labeling them safe',()=>{
+ if(event.analyzerVersion!=='risk-context-2')throw new Error('EXPECTED_RISK_FIXTURE');
+ const mixed=serviceAnalysisEventSchema.parse({...event,assessments:[...event.assessments,{code:'TRANSFER',source:'llm',result:'undetermined',explanation:'대상 문맥이 부족합니다.',evidence:[]}]});
+ const html=renderToStaticMarkup(createElement(ServiceAnalysisPanel,{event:mixed,compact:true}));
+ expect(html.indexOf('&lt;script&gt;')).toBeLessThan(html.indexOf('class="analysis-other-results"'));
+ expect(html).toContain('<summary>미탐지·판단 불가 결과 1건 · 판단 불가 포함</summary>');
+ expect(html.indexOf('대상 문맥이 부족합니다.')).toBeGreaterThan(html.indexOf('class="analysis-other-results"'));
+ expect(html).not.toContain('안전합니다');
+});
