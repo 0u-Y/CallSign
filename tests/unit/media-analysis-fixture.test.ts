@@ -19,13 +19,17 @@ it('observes frames and aborts without retaining audio or treating synthetic res
 it('records bounded lifecycle metadata without audio or transcript payloads',async()=>{
  const document=new EventTarget();Object.assign(document,{hidden:false});
  class Recorder extends EventTarget{constructor(..._args:unknown[]){super();}}
- const window={MediaRecorder:Recorder} as any;vi.stubGlobal('window',window);vi.stubGlobal('document',document);
+ class Socket extends EventTarget{constructor(..._args:unknown[]){super();}}
+ const window={MediaRecorder:Recorder,WebSocket:Socket} as any;vi.stubGlobal('window',window);vi.stubGlobal('document',document);vi.stubGlobal('location',{href:'https://test.invalid'});
  try{
   await installAnalysisTrackObserver({addInitScript:async(fn:()=>void)=>fn()} as never);
   const recorder=new window.MediaRecorder({getAudioTracks:()=>[{id:'remote-only-track'}]});
   recorder.dispatchEvent(new Event('start'));Object.assign(document,{hidden:true});document.dispatchEvent(new Event('visibilitychange'));recorder.dispatchEvent(new Event('stop'));
   expect(window.callSignRecorderTracks).toEqual([['remote-only-track']]);
   expect(window.callSignAnalysisLifecycle.map((x:any)=>[x.stage,x.hidden])).toEqual([['recorder-start',false],['visibility',true],['recorder-stop',true]]);
+  recorder.dispatchEvent(Object.assign(new Event('dataavailable'),{data:new Blob(['private-audio'])}));expect(window.callSignAudioChunks).toEqual({count:1,bytes:13});
+  const socket=new window.WebSocket('wss://test.invalid/api/v3/audio');socket.dispatchEvent(Object.assign(new Event('close'),{code:1005,wasClean:true,reason:'must-not-log'}));
+  expect(window.callSignAnalysisLifecycle.at(-1)).toMatchObject({stage:'audio-ws-close',code:1005,wasClean:true});expect(JSON.stringify(window.callSignAnalysisLifecycle)).not.toMatch(/private-audio|must-not-log/);
   for(let n=0;n<120;n++)recorder.dispatchEvent(new Event('stop'));
   expect(window.callSignAnalysisLifecycle).toHaveLength(100);expect(Object.keys(window.callSignAnalysisLifecycle[0]).sort()).toEqual(['atMs','hidden','stage']);
  }finally{vi.unstubAllGlobals();}

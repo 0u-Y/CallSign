@@ -82,17 +82,18 @@ export class ServiceCall {
       await this.evidence('prepared');await this.post('/v3/consume',{attemptId:t.id,binding:b,senderProof:t.possessions.sender,recipientProof:t.possessions.recipient});return;
     }
     if(this.role==='recipient'&&['consumed','accepted'].includes(t.status)&&this.wantAccept&&(this.choicePending||!t.lease||t.lease.payload.expiresAt-now<=Math.max(5,this.o.runtimePolicy.leaseSeconds/2))){
-      if(!t.renewal||t.renewal.expiresAt<=now||t.renewal.sequence<=(t.lease?.payload.sequence??0)){await this.post('/v3/lease-challenge',{attemptId:t.id},`challenge:${t.lease?.payload.sequence??0}:${Math.floor(now/15)}`);return;}
+      if(!t.renewal||t.renewal.expiresAt<=now||t.renewal.sequence<=(t.lease?.payload.sequence??0)){await this.post('/v3/lease-challenge',{attemptId:t.id},`challenge:${t.lease?.payload.sequence??0}:${Math.floor(now/15)}`);}
     }
     const round=t.renewal;
     if(round&&round.expiresAt>now&&round.sequence>(t.lease?.payload.sequence??0)){
       if(round.priorLeaseHash!==hashCanonical(t.lease?.payload??c.receipt?.payload))throw new Error('RENEWAL_HISTORY_CHANGED');
       if(!round.proofs[this.role]){
         const {proofs:_,...fields}=round,jws=await this.sign({...this.base(c),type:'LeaseRenewalProof',role:this.role,authorizationId:c.authorization.payload.authorizationId,sessionId:t.sessionId,bindingHash:hashCanonical(b),...fields});this.alive();
-        await this.post('/v3/lease-proof',{attemptId:t.id,jws},`renew-proof:${round.nonce}`);return;
+        await this.post('/v3/lease-proof',{attemptId:t.id,jws},`renew-proof:${round.nonce}`);
       }
-      if(this.role==='recipient'&&this.wantAccept&&round.proofs.sender&&round.proofs.recipient){await this.post('/v3/lease',{attemptId:t.id,sequence:round.sequence,nonce:round.nonce,proofJws:round.proofs.recipient,senderProof:round.proofs.sender,choice:this.continuation?'continue':'pause'},`lease:${round.nonce}`);this.choicePending=false;return;}
+      if(this.role==='recipient'&&this.wantAccept&&round.proofs.sender&&round.proofs.recipient){await this.post('/v3/lease',{attemptId:t.id,sequence:round.sequence,nonce:round.nonce,proofJws:round.proofs.recipient,senderProof:round.proofs.sender,choice:this.continuation?'continue':'pause'},`lease:${round.nonce}`);this.choicePending=false;}
     }
+    // Renewal writes do not replace fresh verification of the still-current lease.
     if(!t.lease||!c.receipt)return;
     if(now>=t.lease.payload.expiresAt)throw new Error('LEASE_EXPIRED_REVALIDATION_REQUIRED');
     if(['new','connecting'].includes(this.sip.media.peer.connectionState)){

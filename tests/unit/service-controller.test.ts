@@ -3,7 +3,7 @@ import type { SigningKeyPair, RuntimePolicy } from '../../packages/protocol/src/
 import type { ServiceTrust } from '../../packages/verifier/src/index.js';
 const mocked=vi.hoisted(()=>({context:{} as Record<string,unknown>,requests:[] as string[],ids:[] as unknown[],failClaim:false,holdOutcome:undefined as Promise<void>|undefined,holdConsent:undefined as Promise<void>|undefined}));
 vi.mock('../../apps/web/src/lib/api.js',()=>({ApiError:class extends Error{},api:vi.fn(async(path:string,init?:RequestInit)=>{mocked.requests.push(path);if(path==='/v3/consent'&&mocked.holdConsent)await mocked.holdConsent;if(path==='/v3/outcome'&&mocked.holdOutcome)await mocked.holdOutcome;if(path==='/v3/claim'){mocked.ids.push((init?.headers as Record<string,string>)?.['idempotency-key']);if(mocked.failClaim){mocked.failClaim=false;throw new TypeError('response lost');}}return path.startsWith('/v3/call-context')?mocked.context:{};})}));
-import {hashSdp,extractSingleSdpFingerprint} from '../../packages/protocol/src/index.js';
+import {hashCanonical,hashSdp,extractSingleSdpFingerprint} from '../../packages/protocol/src/index.js';
 import { ServiceCall } from '../../apps/web/src/lib/serviceCall.js';
 describe('product controller identity pinning before SIP enrollment',()=>{
  beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.holdOutcome=undefined;mocked.holdConsent=undefined;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
@@ -66,3 +66,13 @@ describe('product controller identity pinning before SIP enrollment',()=>{
  });
 
 });
+
+ it.each(['challenge','proof','lease'] as const)('rechecks current transport while progressing renewal %s',async phase=>{
+  mocked.requests=[];const now=Math.floor(Date.now()/1000),sdp='v=0\r\na=fingerprint:sha-256 '+Array(32).fill('AA').join(':')+'\r\n',lease={payload:{expiresAt:now+20,sequence:1}};
+  const renewal={nonce:'round',expiresAt:now+15,sequence:2,priorLeaseHash:hashCanonical(lease.payload),proofs:phase==='lease'?{sender:'s',recipient:'r'}:{sender:'s'}};
+  mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session',status:'accepted',firstConnectBy:now+60,callEndBy:now+180,binding:{recipientSdpHash:hashSdp(sdp),recipientFingerprint:extractSingleSdpFingerprint(sdp)},pbx:{reports:{sender:{},recipient:{}}},lease,...(phase==='challenge'?{}:{renewal})},authorization:{payload:{recipientId:'recipient'}},credential:{},receipt:{}};
+  const c=new ServiceCall({role:'recipient',attemptId:'attempt',intentId:'intent',recipientId:'recipient',agentId:'agent',runtimePolicy:{leaseSeconds:60} as RuntimePolicy,status:()=>{},risk:()=>{}} as never);
+  Object.assign(c,{completed:new Set(['invitation']),wantAccept:true,sign:async()=>'unit-signature',sip:{callId:'call',media:{peer:{connectionState:'failed',localDescription:{sdp}}},pause:vi.fn()}});
+  await expect(Reflect.get(c,'tick').call(c)).rejects.toThrow('PBX_TRANSPORT_NOT_CONNECTED');
+  expect(mocked.requests).toContain('/v3/lease'+(phase==='lease'?'':'-'+phase));
+ });
