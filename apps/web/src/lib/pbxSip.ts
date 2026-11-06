@@ -21,6 +21,9 @@ export async function sipDigest(challenge:string,credentials:{username:string;pa
   return `Digest username="${credentials.username}", realm="${credentials.realm}", nonce="${fields.nonce}", uri="${uri}", algorithm=SHA-256, response="${response}", qop=auth, nc=${nc}, cnonce="${cnonce}"${fields.opaque?`, opaque="${fields.opaque}"`:''}`;
 }
 export function sipFailureCode(error:unknown){
+ if(error instanceof Error&&'code' in error&&typeof error.code==='string'&&/^[A-Z][A-Z0-9_]{2,80}$/.test(error.code))return error.code;
+ if(error instanceof Error&&error.name==='TimeoutError')return 'CONTROL_REQUEST_TIMEOUT';
+ if(error instanceof Error&&error.name==='AbortError')return 'CONTROL_REQUEST_ABORTED';
  if(error instanceof Error&&/^[A-Z][A-Z0-9_]{2,80}$/.test(error.message))return error.message;
  if(error instanceof Error&&error.name==='OperationError')return 'SDP_OPERATION_ERROR';
  return 'SIP_NEGOTIATION_FAILED';

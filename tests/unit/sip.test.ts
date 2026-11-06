@@ -18,6 +18,9 @@ it('uses registered realm and SHA-256 digest auth with qop, rejecting weaker cha
 
 it('keeps a bounded SIP failure code without logging SDP, credentials or arbitrary provider messages',()=>{
  expect(sipFailureCode(new Error('ICE_TIMEOUT'))).toBe('ICE_TIMEOUT');
+ const timeout=new Error('private request');timeout.name='TimeoutError';expect(sipFailureCode(timeout)).toBe('CONTROL_REQUEST_TIMEOUT');
+ expect(sipFailureCode(Object.assign(new Error('private response body'),{code:'PBX_REPORT_FORBIDDEN'}))).toBe('PBX_REPORT_FORBIDDEN');
+ expect(sipFailureCode(Object.assign(new Error('private response body'),{code:'password=secret'}))).toBe('SIP_NEGOTIATION_FAILED');
  expect(sipFailureCode(new Error('password=private-value; SDP session detail'))).toBe('SIP_NEGOTIATION_FAILED');
  const error=new Error('raw SDP must stay private');error.name='OperationError';expect(sipFailureCode(error)).toBe('SDP_OPERATION_ERROR');
 });
