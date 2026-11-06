@@ -8,7 +8,7 @@ it('renders explicit choices and external processing details without creating co
 });
 it('keeps withdrawal available during a temporary media pause and provider outage',()=>{
  const html=renderToStaticMarkup(createElement(CallConsentKeypad,{active:false,connected:true,available:false,withdrawn:false,onEnd:vi.fn(),onConsent:vi.fn()}));
- expect(html).toContain('현재 사용할 수 없습니다');expect(html).toMatch(/<button class="button quiet call-analysis">분석 동의 철회·삭제<\/button>/);
+ expect(html).toContain('현재 사용할 수 없습니다');expect(html).toMatch(/<button class="button quiet call-analysis">분석 동의 철회<\/button>/);
 });
 it('keeps disconnected handset free of inactive media and consent controls',()=>{
  const html=renderToStaticMarkup(createElement(CallConsentKeypad,{active:false,connected:false,available:true,withdrawn:false,onEnd:vi.fn(),onConsent:vi.fn()}));
