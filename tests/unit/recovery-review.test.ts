@@ -52,6 +52,7 @@ it('keeps submitted approval, successful receipt and matching activation separat
  expect(recoveryEvidence(state).activation).toBeUndefined();
  state.recovery.ledger={transactionHash:`0x${'d'.repeat(64)}`,block:'42',confirmedAt:now};
  expect(recoveryEvidence(state).ledger?.block).toBe('42');
+ state.observedEpoch='3';expect(recoveryEvidence(state).signers).toHaveLength(2);
  state.recovery.activation={epoch:'3',keyVersion:2,verifiedAt:now};
  expect(recoveryEvidence(state).activation).toBeUndefined();
  Object.assign(state,{status:'active',epoch:'3',observedEpoch:'3'});
