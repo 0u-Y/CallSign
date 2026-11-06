@@ -71,5 +71,10 @@
     "productionMetadata": "0835b810041f6152409870a28602213726f8dd69",
     "publicPreview": false,
     "scope": "Metadata only; no authenticated browser/model verification."
+  },
+  "withdrawalTargetRegression": {
+    "before": "FAIL: cancellation of TRANSFER in a later segment incorrectly marked prior OTP demand withdrawn",
+    "after": "PASS: 33 focused risk assessment/lifecycle tests and API typecheck",
+    "scope": "Rule regression only; no model calls, runtime changes or media trials"
   }
 }

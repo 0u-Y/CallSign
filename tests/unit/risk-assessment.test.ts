@@ -78,3 +78,10 @@ it('uses the same risk-only prompt for Anthropic and rejects a token-limited res
   if(stop==='end_turn')expect(JSON.parse(await pending)).toHaveProperty('assessments');else await expect(pending).rejects.toThrow('LLM_RESPONSE_INCOMPLETE');
  }
 });
+it('does not withdraw one risk type when a later segment cancels a different request',()=>{
+ const units=snapshot('인증번호를 읽어주세요.','인증번호를 읽어주세요. 송금 요청은 취소합니다.');
+ const otp=ruleRiskAssessments(units,bankPolicy).find(r=>r.code==='OTP')!;
+ expect(otp.evidence.every(e=>e.state==='active')).toBe(true);
+ const mixed=snapshot('인증번호를 읽어주세요.','인증번호 요청은 유지하고 송금 요청은 취소합니다.');
+ expect(ruleRiskAssessments(mixed,bankPolicy).find(r=>r.code==='OTP')!.evidence[0]!.state).toBe('active');
+});

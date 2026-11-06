@@ -23,8 +23,13 @@ function spoken(text:string){return text.replace(quoted,quote=>' '.repeat(quote.
 function sentences(text:string){return text.match(/(?:“[^”]*”|‘[^’]*’|"[^"]*"|'[^']*'|[^.!?。\n])+[.!?。]?/g)??[];}
 function prevention(text:string){return /(?:알려|말씀|말하|읽어|보내|송금|입금|설치|허용|응하|따르).{0,16}(?:안\s*됩|않|마세요|마십시오|금지)|필요\s*없/.test(text);}
 function explicitWithdrawal(text:string,code:RiskAssessment['code']){
- const plain=spoken(text);
- return subjects[code].test(plain)&&/(?:요청|요구).{0,12}(?:취소합니다|철회합니다|취소할게요|하지\s*않겠습니다)/.test(plain);
+ return sentences(text).some(sentence=>{
+  const plain=spoken(sentence),withdrawal=/(?:요청|요구)(?:은|는|을|를)?\s*(?:취소합니다|철회합니다|취소할게요|하지\s*않겠습니다)[.!。]?\s*$/.exec(plain);
+  if(!withdrawal)return false;
+  // Bind cancellation to its closest named request, not another risk mentioned elsewhere in the segment.
+  const prefix=plain.slice(0,withdrawal.index),targets=Object.entries(subjects).flatMap(([kind,pattern])=>[...prefix.matchAll(new RegExp(pattern.source,pattern.flags+'g'))].map(match=>({kind,index:match.index,end:match.index+match[0].length}))).sort((a,b)=>b.index-a.index);
+  return targets[0]?.kind===code&&prefix.length-targets[0].end<=12;
+ });
 }
 function hasDemand(text:string,code:RiskAssessment['code']){
  const rows=sentences(text);
