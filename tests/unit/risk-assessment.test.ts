@@ -71,3 +71,10 @@ it('preserves split demands and does not apply an earlier withdrawal to a new re
  const renewed=ruleRiskAssessments(snapshot('인증번호 요청은 취소합니다. 인증번호를 읽어주세요.'),bankPolicy);expect(renewed[0]?.evidence[0]?.state).toBe('active');
  for(const text of ['그 앱을 설치해주세요.','그 계좌를 확인해주세요.'])expect(ruleRiskAssessments(snapshot(text),bankPolicy).some(r=>r.result==='detected')).toBe(false);
 });
+it('uses the same risk-only prompt for Anthropic and rejects a token-limited response even if its JSON parses',async()=>{
+ const {requestAnthropic}=await import('../../services/api/src/transcription.js');const units=snapshot('인증번호를 읽어주세요.');
+ for(const stop of ['end_turn','max_tokens']){
+  const pending=requestAnthropic({apiKey:'synthetic',model:'synthetic',text:units[0]!.text,policy:bankPolicy,signal:new AbortController().signal,fetcher:async(_url,init)=>{const body=JSON.parse(init!.body as string);expect(body.system).toBe(RISK_SYSTEM_PROMPT);expect(JSON.parse(body.messages[0].content).utterances).toEqual(units);expect(body.max_tokens).toBe(700);return Response.json({stop_reason:stop,content:[{type:'text',text:JSON.stringify(output(units))}]});}},'ignored legacy purpose instructions',units);
+  if(stop==='end_turn')expect(JSON.parse(await pending)).toHaveProperty('assessments');else await expect(pending).rejects.toThrow('LLM_RESPONSE_INCOMPLETE');
+ }
+});

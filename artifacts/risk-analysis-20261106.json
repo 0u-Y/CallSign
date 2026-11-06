@@ -37,6 +37,12 @@
       "command": "service-evaluation and demo-contact-layout regression plus light typecheck",
       "result": "PASS",
       "tests": 8
+    },
+    {
+      "command": "risk-assessment and revisions regressions plus API typecheck",
+      "tests": 38,
+      "result": "PASS",
+      "scope": "Includes final Anthropic request prompt and truncated-response rejection; offline only."
     }
   ],
   "actualProviderCalls": 0,
