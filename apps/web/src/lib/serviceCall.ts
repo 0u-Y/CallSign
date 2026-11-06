@@ -121,7 +121,7 @@ export class ServiceCall {
   async end(outcome:'ended'|'declined'|'failed'='ended',reason='user-ended'){
     if(this.stopped)return;if(outcome==='ended'&&this.context?.attempt.status!=='accepted')outcome=this.role==='recipient'?'declined':'failed';this.sip?.pause();this.stopAnalysis();try{await this.post('/v3/outcome',{attemptId:this.o.attemptId,outcome,reason},`outcome:${outcome}`);}finally{this.finish(reason);}
   }
-  private async fail(e:unknown){if(this.stopped)return;const message=e instanceof Error?e.message:'CALL_UNAVAILABLE';this.show({error:message,authority:'검증 중단',active:false});try{await this.end('failed','verification-unavailable');}catch{this.finish(message);}}
+  private async fail(e:unknown){if(this.stopped)return;const message=e instanceof Error?e.message:'CALL_UNAVAILABLE';console.warn('CallSign call verification failed',/^[A-Z][A-Z0-9_]{2,80}$/.test(message)?message:'CALL_UNAVAILABLE');this.show({error:message,authority:'검증 중단',active:false});try{await this.end('failed','verification-unavailable');}catch{this.finish(message);}}
   private finish(reason:string){if(this.stopped)return;this.stopped=true;if(typeof document!=='undefined')document.removeEventListener('visibilitychange',this.visibility);this.abort.abort();clearTimeout(this.timer);clearTimeout(this.deadline);this.stopAnalysis();this.sip?.close();this.o.status({...this.view,connection:`통화 종료: ${reason}`,authority:'통화 종료: 현재 연결 검증 표시 해제',analysis:'분석 중단: 음성 전송 없음',active:false,terminal:true,terminalReason:reason});}
   close(){this.finish('local-session-closed');}
 }

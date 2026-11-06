@@ -8,9 +8,9 @@ describe('product controller identity pinning before SIP enrollment',()=>{
  beforeEach(()=>{mocked.requests=[];mocked.ids=[];mocked.failClaim=false;mocked.context={attempt:{id:'attempt',intentId:'intent',agentId:'agent',sessionId:'session'},authorization:{payload:{recipientId:'recipient'}}};});
  function controller(){return new ServiceCall({role:'recipient',attemptId:'attempt',intentId:'intent',recipientId:'recipient',agentId:'agent',key:{} as SigningKeyPair,trust:{} as ServiceTrust,runtimePolicy:{} as RuntimePolicy,status:()=>{},remote:()=>{},risk:()=>{}});}
  it('rejects an authorization for another recipient instead of using its recipient as the expectation',async()=>{
-  mocked.context.authorization={payload:{recipientId:'someone-else'}};
+  const warning=vi.spyOn(console,'warn').mockImplementation(()=>{});mocked.context.authorization={payload:{recipientId:'someone-else'}};
   await expect(controller().connect()).rejects.toThrow('CALL_CONTEXT_IDENTITY_CHANGED');
-  expect(mocked.requests).not.toContain('/v3/pbx/endpoint');expect(mocked.requests).not.toContain('/v3/enroll');
+  expect(mocked.requests).not.toContain('/v3/pbx/endpoint');expect(mocked.requests).not.toContain('/v3/enroll');expect(warning).toHaveBeenCalledWith('CallSign call verification failed','CALL_CONTEXT_IDENTITY_CHANGED');warning.mockRestore();
  });
  it('rejects context moved to a different assigned task before opening media',async()=>{
   mocked.context.attempt={id:'attempt',intentId:'another-intent',agentId:'agent',sessionId:'session'};
