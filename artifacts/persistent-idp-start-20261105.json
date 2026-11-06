@@ -872,5 +872,22 @@
       "persistentServices": "retained",
       "serverCheck": "PASS"
     }
+  },
+  "publicWorkUi20261106": {
+    "source": "a58093225f53dffe4f07636165498180139e402c",
+    "runtimeSource": "7c5a83936a6435d03dcaabbf287e418d3b5d1436",
+    "case": 27,
+    "result": "PASS",
+    "logicalAttempts": 1,
+    "automaticRetries": 0,
+    "checks": [
+      "Existing real OIDC institution session accepted at public Vercel",
+      "Create new work through actual UI",
+      "Cancel that selected work through confirmation UI",
+      "Server workspace reports cancelled; other initial work statuses unchanged"
+    ],
+    "scope": "Same-host Chromium over public production; no API interception, no call, media or AI; not active-call revocation proof",
+    "screenshots": "Protected public-work-actions-27 desktop/mobile files opened and reviewed; long account IDs dominate layout",
+    "consoleNetworkFailures": 0
   }
 }
