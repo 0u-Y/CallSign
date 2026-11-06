@@ -2,18 +2,7 @@
 
 ## 현재 상태와 다음 단계
 
-아래 날짜별 기록과 시험 수치는 당시 소스·환경의 결과다. 현재 공개 사용 가능 여부는 이 표를 기준으로 보고, 원본 실패·후속 결과는 각 증거에서 확인한다. AWS 이전은 현재 목표에서 제외한다.
-
-| 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
-|---|---|---|---|
-| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 공개 연결 모드; 통화·분석 미검증 |
-| 공개 API·분석 WSS | 실제 HTTP API 연결·native WSS relay 배포. Origin/비인증 거절 확인; 과거 단순 rewrite WSS404와 구분 | 인증 음성 WS와 실제 분석 이벤트 확인 | HTTP same-origin 연결·native 분석 WS relay 배포. 실제 인증 음성 WS는 미검증 |
-| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
-| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 SIP/ICE·ACK 확인; 수락 뒤 최초 검증 실패 조사 중 |
-| 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
-| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
-| DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
-| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
+현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
 ## 2026-11-06 공개 통화 협상 진단
 

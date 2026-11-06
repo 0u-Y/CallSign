@@ -4,10 +4,21 @@
 
 현재 시연 진입은 `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
 
-시연 준비/조작: 독립 브라우저 프로필로 기관·상담원·수신자·공동 승인자를 로그인한다. `/demo/call`의 준비 패널에서 현재 역할을 확인하고 기관 업무 생성/선택 → 상담원 새 시도·개별 승인 → 양측 마이크/PBX 등록 → 발신·수락 → 수신자 분석 동의 순서로 진행한다. 조회 장애에도 공통 진행 통화 종료를 사용할 수 있다. `/demo/governance`에서 권한자가 기관을 정지하고 실제 관리 상태/회수를 확인한다. 복구는 현재 epoch/nonce/만료의 요청을 각 독립 승인자가 별도 도구로 서명하고 공동 복구 상세에서 제출한다. API 거절은 계약 거절로 설명하지 않는다. 새 키/trust 활성화와 새 업무 가능 여부를 확인하며 과거 소비·종료 기록은 지우지 않는다. 공개 API 미연결 배포에서는 이 조작을 실행할 수 없다. 실제 실행·fixture·미검증 경계는 현황/후보 기록을 따른다.
+시연 준비와 조작은 다음 순서다. 실제 실행 여부는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 먼저 확인한다.
+
+1. 운영자가 제공한 보호 계정 자료에서 기관·상담원·수신자·공동 승인자의 로그인을 확인하고 **서로 다른 브라우저 프로필**을 준비한다. 이메일/표시 이름 대신 제품 내부 계정 ID를 업무에 입력한다. 계정 ID는 로그인 후 ‘내 계정 식별자’에서 확인한다. 보호 비밀번호·서명키는 문서나 화면 공유에 포함하지 않는다.
+2. ‘로그인 · 역할 연결 · 실행 준비’에서 업무 계정으로 로그인한다. 기관은 등록 콜센터를 고르고 수신자/상담원 ID로 업무를 생성한다. 위임 증서가 없으면 발급하고 **원장 등록됨**을 확인한다. 공동 승인자는 연락 업무 담당자와 별개다.
+3. 상담원은 배정 업무에서 새 통화 시도를 만들고 해당 콜센터의 위임 증서를 선택해 개별 연락 승인을 받는다. 양측은 **같은 시도**를 선택한다. 승인한 상담원 브라우저를 새로고침하면 단기키를 잃으므로 새 시도가 필요하다.
+4. 양측이 마이크 권한과 PBX 등록을 마친 뒤 상담원이 발신하고 수신자가 수락한다. 수락은 검증 성공과 다르며 양측 연결 검증·음성 수신을 따로 확인한다. 120초 시작 창을 넘긴 시도는 재사용하지 않는다.
+5. 수신자는 상대 음성 분석에 별도로 동의한다. 분석 준비에는 제공자 설정·동의·남은 승인 예산이 필요하다. 동의 철회·화면 비활성 뒤에는 전송 중단 상태를 확인하고 필요하면 다시 동의한다. 경고 없음이나 분석 장애는 안전 판정이 아니다.
+6. 업무 취소 또는 기관 정지 후 요청 접수·서버 적용·PBX 회수 관측을 구분한다. 조회 장애에도 공통 통화 종료를 사용할 수 있다. 공동 복구는 현재 epoch/nonce/만료의 요청을 독립 승인자들이 서명해 제출한다. API 접수→원장 확정→Witness 확인→새 키/trust 활성화→새 위임·새 연락 순서이며 구 승인·소비·종료 기록을 지우지 않는다.
+
+후속 main `1e6a090`의 공동 복구 화면은 **공개 복구 요청 파일 → 각 승인자의 공개 서명 파일 → 로컬 검증 → 복구 권한자의 제출** 순서다. 서명키는 별도 도구에 두며 화면의 서명 수가 로그인한 사람의 키 소유나 원장 확정을 뜻하지 않는다. 기준 `20cbd65`의 JSON 직접 제출 화면과 구분한다. 최신 운영자의 화면 버전을 확인하고 사용한다.
+
+계정·마이크·현재 trust pin·공개 HTTPS/API·SIP WSS·ICE/TURN·감시·분석 relay/provider 입력 중 빠진 조건이 있으면 해당 단계의 준비 미완료로 설명한다. 과거 합성 fixture를 실시간 결과처럼 대신 표시하지 않는다.
 
 
-Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 현재 확인과 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json)에 연결한다.
+Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview와 실제 직접 경로 렌더링을 함께 확인한다. 이 파일이 없거나 HTML fallback이면 배포 SHA 미확인이다. 저장소 vercel.json은 의도한 설정이며 원격 Root Directory·연결 브랜치가 같다는 증거가 아니다. 기존 프로젝트 ID만으로는 조회/게시할 수 없고 별도 token 보호 파일 참조가 필요하다. 당시 미연결 화면 캡처는 [재설계 근거](../artifacts/service-redesign-20261104.json), 이후 공개 연결의 확인 범위는 현황표에 연결한다.
 
 인증 참조를 제공할 수 없다면 기존 프로젝트 대시보드의 Deployments → Create Deployment에서 **확인할 전체 Git SHA**를 지정한다([공식 Git reference 배포](https://vercel.com/docs/git#creating-a-deployment-from-a-git-reference)). 프로젝트/환경과 배포 SHA를 함께 기록하고 오래된 deployment의 Redeploy를 대신 사용하지 않는다. 저장소 의도는 Root Directory `.`, Vite, `vercel.json`의 pnpm workspace build와 `apps/web/dist`이며 원격 설정을 확인하기 전 임의 변경하지 않는다. 먼저 Preview의 실제 `/service`·`/official`·`/demo/call`·`/demo/governance`·JSON build metadata·정적 자원을 확인하고 같은 검증 배포를 공개 주소에 반영한다. 연결 브랜치·환경·queued 원인은 프로젝트 접근 권한으로 확인해야 하며 대시보드 정보가 없으면 추정하지 않는다.
 
@@ -15,7 +26,7 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 ## 지속 서비스와 시험 환경의 분리
 
-현재 공개 Vercel은 실제 로그인·업무 API에 연결돼 있다. 기관·상담원·수신자·승인자의 공개 브라우저 로그인과 업무 조회·로그아웃을 확인했다. 전용 Funnel의 HTTPS/WSS 진단과 별개로 제품 분석 WSS·PBX/TURN·외부 음성은 미검증이다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
+공개 로그인·API·미디어·분석의 확인 날짜와 실행 소스는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 전용 Funnel의 HTTPS/WSS 진단은 제품의 통화·분석 검증과 구분한다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
 
 전용 userspace 노드의 등록·Funnel 권한·HTTPS 활성화와 보존 identity를 재사용한다. `scripts/prepare-demo-ingress.py`는 등록 준비 도구이며 지속 backend launcher가 아니다. Tailscale Funnel의 TLS/TCP 성공으로 TURN relay·외부 브라우저 음성 성공을 주장하지 않는다. Vercel rewrite의 실제 진단은 [관측 기록](../artifacts/vercel-ingress-transport-20261105.json)을 따른다.
 
@@ -25,28 +36,28 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 자원 중단 뒤 사용자가 명시적으로 재개하면 `deployment-control.mjs review`에 보호 env와 `CALLSIGN_RESOURCE_REVIEW_REFERENCE`를 전달한다. 각 승인은 해당 중단 파일의 SHA에 연결된 새 review 파일로 남는다. 원본 중단·이전 review를 삭제하거나 덮어쓰지 않으며, 이후 중단은 다시 기동을 차단한다.
 
-첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 공개 로그인은 미실행이며 이 중단 뒤 재개는 별도 확인 대상이다.
+첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 이는 최초 준비 시점의 기록이다. 이후 명시 재개·공개 로그인 결과는 같은 증거의 날짜별 후속 항목과 현황표를 따른다.
 
 첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
 
 사용자가 전용 노드 등록과 해당 노드의 Funnel 권한·HTTPS 인증서 발급을 완료했다. 등록 링크 재승인을 요구하거나 기존 전체 구성원용 정책을 추가하지 않는다. 보존 identity로 실제 등록/권한을 조회하고, 진단 성공과 제품 backend·미디어 연결을 구분한다. [Funnel의 TLS 종료 TCP 전달](https://tailscale.com/docs/reference/tailscale-cli/funnel#use-a-tcp-forwarder)은 사용할 수 있는 전송 옵션이며, TURN 연동·외부 relay 성공을 입증한 것은 아니다.
 
-Vercel은 [현재 공식 문서](https://vercel.com/docs/functions/websockets)에서 native WebSocket Function을 지원하지만 현재 저장소는 정적 SPA이고 API/WS proxy를 구현·검증한 상태가 아니다. HTTP rewrite만으로 SIP·분석 WSS나 TURN을 확인했다고 쓰지 않는다. 같은 origin의 cookie·CSRF·Origin을 유지하고 실제 backend와 trust가 준비되기 전 미연결 Production을 실제 모드로 바꾸지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
+저장소의 `vercel.json`은 업무 HTTP를 backend로 rewrite하고 분석 경로를 `api/audio.ts`의 relay에 연결한다. relay는 같은 origin·cookie·CSRF·Origin 경계를 유지하는 코드이며, 배포 설정만으로 실제 Upgrade101·분석 성공을 입증하지 않는다. SIP는 별도 공개 WSS, 음성은 ICE/TURN 경로를 사용한다. 실제 backend와 trust가 준비된 빌드만 실제 모드로 제공한다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
 
-현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 기존 보호 `oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. PBX 미준비에 따른 전체 readiness503을 health200과 구분한다.
+현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 기존 보호 `oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 일부 의존성이 준비되지 않았을 때의 전체 readiness503을 health200과 구분한다.
 
 ### 브라우저부터 실제 서비스까지
 
 | 연결 | 현재 소비 코드/계약 | 지속 환경에서 필요한 확인 |
 |---|---|---|
-| frontend → API | api.ts의 상대 `/api/v3/*`, credentials include | 같은 공개 origin의 인증된 HTTPS 경로. 현재 Vercel rewrite는 SPA fallback뿐이며 API proxy가 아님 |
-| frontend → 분석 | liveMedia.ts의 같은 origin `/api/v3/audio` WSS | 실제 Upgrade101·인증 cookie·Origin·동의. HTTP200만으로 WSS 성공 처리 금지 |
+| frontend → API | api.ts의 상대 `/api/v3/*`, credentials include | 같은 공개 origin의 인증된 HTTPS 경로. `vercel.json`의 `/api/v3/:path*` backend rewrite와 JSON 응답 확인 |
+| frontend → 분석 | liveMedia.ts의 같은 origin `/api/v3/audio` WSS | `/api/v3/audio` → `api/audio.ts` relay. 실제 Upgrade101·인증 cookie·Origin·동의 확인. HTTP200은 성공 근거가 아님 |
 | 로그인 → callback | 업무/공식 별도 client·audience, PKCE, 둘 다 `WEB_ORIGIN/service` | 실제 issuer/JWKS/token URL과 합성 역할 계정. 공개 시험 OIDC fixture 금지 |
-| 브라우저 → PBX signaling | `/pbx/ws` WSS→Asterisk, SIP subprotocol | 실제 TLS·인증과 signaling 도달성. ARI는 공개하지 않음 |
+| 브라우저 → PBX signaling | 발급된 PBX endpoint의 WSS→Asterisk, SIP subprotocol | 실제 TLS·인증과 signaling 도달성. ARI는 공개하지 않음 |
 | 브라우저 ↔ 음성 | PBX RTP UDP10000–10099, TURN3478 TCP/UDP·5349 TCP·relay49160–49200 UDP | 승인한 공개 주소·NAT/UDP 경로·외부 두 단말. Vercel HTTP proxy가 UDP를 전달한다고 가정하지 않음 |
 | 내부 서비스 | PostgreSQL5432·Besu8545·Witness4201–4204·Anchor4300 TLS | 사설 연결/권한 유지. DB/RPC/Witness 관리/ARI 외부 공개 금지 |
 
-세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 이 정적 프로젝트에서 backend·분석·SIP까지 전달됐다는 증거는 별도로 필요하다. 공개 경로가 준비되기 전 Production의 preview 제한/CSP/마이크 차단을 해제하지 않는다.
+세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 이 SPA와 relay 구성에서 backend·분석·SIP까지 전달됐다는 증거는 별도로 필요하다. 공개 경로 전환 시 preview 모드·CSP의 허용 origin·마이크 `(self)` 정책을 함께 대조하며 인증 보호를 완화하지 않는다.
 
 현재 서버의 API/Witness는 `LISTEN_HOST=127.0.0.1`을 명시해야 한다. 이 값의 기본은 기존 container 배포를 위해 `0.0.0.0`이며 host-mode에서 기본값으로 시작하지 않는다. 실제 listener/port 충돌을 먼저 확인한다. Besu의 고정 peer 준비는 `prepare-besu-peers.ts --apply --host-loopback`을 명시할 때만127.0.0.1의 서로 다른30311~30314를 생성한다. 기존 private-network prefix 검사는 유지한다. 이 준비는 노드 기동이 아니며 P2P의 실제 bind interface와 RPC listen도 별도로 loopback에 고정해야 한다.
 
@@ -75,7 +86,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 선택 overlay `infra/deploy/compose.providers.yml`은 두 보호 파일만 issuer에 read-only mount한다. CALLSIGN_PROVIDER_CONFIG=deepgram-openai를 보호 CFG에서 명시해야 deployment.sh가 연결한다. 기본 none은 mount하지 않는다. 모델은 OPENAI_MODEL·DEEPGRAM_MODEL로 별도 지정하며 API 키의 존재를 운영 비용 승인으로 간주하지 않는다. 기존 Anthropic 경로는 명시/기존 설정에서만 유지하고 OpenAI 오류의 자동 fallback으로 사용하지 않는다.
 
-서비스 분석 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개다. 첫 smoke의 총$0.10·LLM 최대6요청·STT2연결×30초·재시도0 계획만 승인됐다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 현재 첫 계획의 LLM 요청 수는 timeout 포함 소진했다. 동의한 로컬 합성 한국어 음원의 직접 전사도 확인했지만 빈 전사·오인식과 목적 관계 label 불일치가 있어 품질 PASS가 아니다. timeout의 실제 과금은 미확인이며 추정 비용을 청구 상한 보장으로 쓰지 않는다. 최신 사용량·실행 분모는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 따른다. 지속 서비스의 추가 AI 실행에는 별도 제한 계획이 필요하다.
+서비스 분석 모델은 OpenAI gpt-5.4-mini-2026-03-17(Responses JSON schema, reasoning none, 출력700토큰)과 Deepgram nova-3/ko다. Codex 개발 도구와 별개다. 첫 smoke의 총$0.10·LLM 최대6요청·STT2연결×30초·재시도0 계획만 승인됐다([OpenAI 가격](https://developers.openai.com/api/docs/models/gpt-5.4-mini), [Deepgram 가격](https://deepgram.com/pricing)). 현재 첫 계획의 LLM 요청 수는 timeout 포함 소진했다. 동의한 로컬 합성 한국어 음원의 직접 전사도 확인했지만 빈 전사·오인식과 목적 관계 label 불일치가 있어 품질 PASS가 아니다. timeout의 실제 과금은 미확인이며 추정 비용을 청구 상한 보장으로 쓰지 않는다. 최신 사용량·실행 분모는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 따른다. 지속 서비스의 추가 AI 실행에는 별도 제한 계획이 필요하다. 후속 main `1b11274`는 `CALLSIGN_ANALYSIS_SMOKE_BUDGET`의 만료·STT 연결 수/초·LLM 요청 수를 영속 quota에 연결한다. 이 코드 추가는 새 예산 승인이나 실제 제공자 호출 성공이 아니다. 설정 형식은 같은 소스의 `services/api/src/provider-configuration.ts`와 운영자가 승인한 보호 입력을 대조한다.
 
 평가 CLI는 기존 비용 guard에 CALLSIGN_EVALUATION_MAX_REQUESTS를 추가해6 이하 계획을 선언할 수 있다. provider-smoke는 기존 결과 파일을 호출 전에 거절하고 STT 입력은 설치 ffprobe로30초 이하 단일 오디오인지 검사한다. 도구/동의 입력이 없으면 중단한다. 숫자 선언은 실제 invoice 강제 상한이 아니며 실제 가격·보관/학습 정책·계정 지출 제한은 실행 전 대조한다. OpenAI store:false도 제공자의 모든 보관을 없앤다는 보장이 아니다.
 
@@ -118,7 +129,7 @@ STT는 기존 Deepgram stream의 language=ko를 유지한다. 실제 `/service` 
 
 최종 경로는 **Git 저장소(소스·도구) → GitHub Releases(공개 배포 파일) → 비공개 GHCR(서비스 이미지)**다. 개발 서버는 대회에서 사용하지 않는다. 대용량 image tar·운영/시험 보호 입력은 Git 또는 공개 Release에 넣지 않는다. 새 대회 identity/키/genesis/계약/기관/합성 계정은 AWS의 NEW 절차로 생성한다.
 
-- 최신 첨부 디자인/분석 **준비 후보**: `aws-demo-design-preparation-20261105t111610z`. 새 runtime의 비공개 게시·원격 수령을 확인했다. 전체 통화는 시작40GiB 조건 미달로 자원 생성 전 차단됐으며 공개 인증/미디어는 미연결이다. Release 발행·첨부물 수령 상태는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 확인한다. 아래 수령 예시는 이 준비 후보이며 이전 이미지의 통합 PASS를 전용하지 않는다.
+- 2026-11-05 첨부 디자인/분석 **준비 후보**: `aws-demo-design-preparation-20261105t111610z`. 새 runtime의 비공개 게시·원격 수령을 확인했다. 전체 통화는 시작40GiB 조건 미달로 자원 생성 전 차단됐으며 공개 인증/미디어는 미연결이다. Release 발행·첨부물 수령 상태는 [후보 기록](../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 확인한다. 아래 수령 예시는 이 준비 후보이며 이전 이미지의 통합 PASS를 전용하지 않는다.
 - 이전 실제 서비스/복원 검증 후보: [aws-restore-candidate-20261104t180638z](https://github.com/0u-Y/CallSign/releases/tag/aws-restore-candidate-20261104t180638z). runtime은 새 제품 종료 수정과 UI를 포함하고, 전체 RESTORE·별도 합성 분석 경로의 실제 검증은 위 후속 기록을 따른다. 비공개 GHCR와 공개5파일 게시·실제 원격 재수령을 완료했다. 정확한 source/digest·checksum은 단일 후보 기록의 serviceHardeningFollowup에서 확인한다.
 - 이전 감사/복원 도구 사전 후보: [aws-recovery-tools-20261104t154909z](https://github.com/0u-Y/CallSign/releases/tag/aws-recovery-tools-20261104t154909z). [후보 기록의 recoveryTools](../artifacts/product-candidate-20261104.json)에서 같은 runtime digest·새 observer/비용 검사 도구·공개5파일 수령을 확인한다. 원본 DB 감사와 정상5회는 PASS이나 전체 RESTORE는 도구 수정 후 자원 중단으로 BLOCKED다. 기존 runtime 안의 이전 평가 CLI에는 새 숫자 비용 검사가 없으므로 해당 평가에는 새 observer CLI를 사용한다.
 - 이전 선택 통화 검증 사전 후보: [aws-media-candidate-20261104t142900z](https://github.com/0u-Y/CallSign/releases/tag/aws-media-candidate-20261104t142900z). 소스·실제 manifest digest·아키텍처·공개 checksum·원격 수령은 [단일 후보 기록](../artifacts/product-candidate-20261104.json)과 Release의 `images.json`을 따른다. 로컬 config ID를 registry digest로 쓰지 않는다.

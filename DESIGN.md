@@ -50,7 +50,7 @@
 | 노드 4개·블록 hash | 기존 `/v3/management/health`·서버 RPC 검사 | institution.recover, read-only | 화면 활성 시 5초 polling·취소/늦은 응답 폐기 | 미관측·stale·조회 실패; validator 소속 미확인 |
 | Witness·명령 전파 | 기존 서버 검증/관리 작업 결과만 | 기존 actor 범위 | 기존 처리 결과 | 노드 health로 3-of-4를 대체하지 않음 |
 
-네 노드의 같은 높이 hash만 비교한다. URL·자격·peer 토폴로지는 보내지 않고 개별 합의 투표를 만들지 않는다. 현재 actor의 세션만 조작하며 다른 actor 쿠키를 수집하지 않는다. 관람자는 공개 frontend의 API 미연결 상태를 본다. 새 read-only 집계 권한을 임의로 추가하지 않았다.
+네 노드의 같은 높이 hash만 비교한다. URL·자격·peer 토폴로지는 보내지 않고 개별 합의 투표를 만들지 않는다. 현재 actor의 세션만 조작하며 다른 actor 쿠키를 수집하지 않는다. 관람자에게 보이는 연결 상태는 [현황표](docs/guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 새 read-only 집계 권한을 임의로 추가하지 않았다.
 
 통화 작업면과 관리 작업면은 하나의 parent route 아래 유지한다. 숨긴 작업면을 unmount하지 않고 audio를 공통 위치에 두어 탐색만으로 controller를 닫지 않는다. 새로고침은 기존 WebRTC를 복원한 것처럼 표시하지 않는다. 실제 브라우저/미디어 검증 범위는 최신 실행 기록을 따른다.
 

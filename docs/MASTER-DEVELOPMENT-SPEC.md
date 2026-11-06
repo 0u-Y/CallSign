@@ -1,17 +1,10 @@
 # CallSign 전체 개발 명세
 
-5차 반영의 역할별 안내·평가/측정 보완은 [2026-11-04 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-five-20261104)을 따른다. 소스·오프라인 검증이며 최신 후보의 실제 통화/외부 AI/AWS 완료를 뜻하지 않는다.
-
-DB-001/003·TEST-001/004·AI-003/005·UI-006의 최신 실제 SQL/인증·HTTP/WS·Chromium 검증과 초기 quota 실패/수정은 [2026-11-03 통합 기록](FINALS-IMPLEMENTATION-PLAN.md#http-pressure-integration-20261103)을 따른다. 고유 사례 HTTP11/WS14/Chromium9의 fixture/component host 경계와 실제 인프라 미검증을 구분하며 완료 기준은 유지한다.
-
-종료 경합 회귀와 실제 ServiceCall 분석/회수의 다음 실행 범위는 [검토 기록](FINALS-IMPLEMENTATION-PLAN.md#main-review-20261103)을 따른다. 새 경로의 오프라인 확인을 실제 통화/모델 품질 완료로 확대하지 않는다.
-
-4차 반영의 추가 소스 범위는 GOVERNANCE-001/002·BUSINESS-003·CALL-005/006·AI-001~005·UI-001/006·OPS-003/006/007·TEST-003/004에 연결한다. 정책 결합/문맥·회수 운영 조회·통화별 집계는 [반영표](mentoring/README.md)와 [현재 검사 기록](FINALS-IMPLEMENTATION-PLAN.md#mentoring-fourth-20261102)을 따른다. 후속 SQL/브라우저 검증은 위 최신 기록을 따르며 실제 ARI/제공자/AWS와 새 산출물 발행은 미검증이다. 기존 완료 조건은 유지한다.
-
+요구 ID·완료 조건은 아래 본문을 유지한다. 날짜별 구현/검증 메모의 “현재”, “미검증”은 해당 기록 시점을 뜻하며, 최신 상태는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 따른다. 4·5차 변경 이력은 [멘토링 반영표](mentoring/README.md)와 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)에 연결한다.
 
 이 문서는 요구사항 ID와 완료 조건의 기준이다. 설명·현황·운영 절차의 역할은 [문서 안내](README.md)에서 구분한다. 현재 구현과 실제 실행/fixture/미검증 범위는 [현황표](guide/05-IMPLEMENTATION-STATUS.md), 원래 SHA·날짜·실패·결과는 [개발 기록](FINALS-IMPLEMENTATION-PLAN.md)과 연결된 원본 증거를 따른다. 시험 개수로 전체 완성률을 계산하지 않는다.
 
-대회 배포 대상은 AWS이며 개발 서버는 runtime 의존성이 아니다. [고정 Release와 수령/NEW/재개·복구](RUNBOOK.md#aws-competition)는 RUNBOOK에서 관리한다. 아래 날짜별 설계/검토 메모는 해당 시점의 요구·이행 기록이며 현재 실행 결과를 복사하는 영역이 아니다. 사용자 지시와 AGENTS가 실행 허용 범위를 정한다.
+현재 목표는 서버컴의 지속 데모이며 AWS 단독 배포 요구는 후속 이전 범위로 보존한다. [고정 Release와 수령/NEW/재개·복구](RUNBOOK.md#aws-competition)는 RUNBOOK에서 관리한다. 아래 날짜별 설계/검토 메모는 해당 시점의 요구·이행 기록이며 현재 실행 결과를 복사하는 영역이 아니다. 사용자 지시와 AGENTS가 실행 허용 범위를 정한다.
 
 ## 서비스 설계 원칙
 
@@ -36,7 +29,7 @@ DB-001/003·TEST-001/004·AI-003/005·UI-006의 최신 실제 SQL/인증·HTTP/W
 - 저장소: <https://github.com/0u-Y/CallSign>. 경로는 저장소 루트를 기준으로 표기한다.
 - 최초 조사 HEAD: `7aa26d90b9156c245e160283b1477360a6697cec`. 당시에는 미커밋 변경이 있어 이 시작 커밋만으로 구현을 재현할 수 없었다. 이후 사용자의 명시적 커밋·push 요청에 따라 기능별로 보존했으며, 이후 코드·시험 기준은 `ab0ec1cc55de26b9be832aa874d786beb9c8921c`였다. 2026-10-27 연결 작업 시작은 `a9d67f0b4b50a022b0e20de1e4071ec49cdcbd8a`이며 당시에는 미커밋 코드·문서 변경을 포함했다. 이후 커밋·게시와 추가 검증은 아래 날짜별 현행 기준 및 진행표를 따른다. 당시 검증 artifact의 미커밋 표시는 그 실행 시점의 provenance로 보존한다.
 - 조사 근거는 코드·라우트·설정·시험 소스와 저장된 결과다. 이전 보고서의 ‘구현 완료’를 그대로 승계하지 않았다. 초기 명세 작성에서는 파일 읽기·검색·공식 문서 조사·문서 작성만 수행했다. 이후 사용자의 구현 요청으로 진행한 오프라인 개발은 §2.1에 별도 반영한다. 서비스·실환경 실행 제한은 그대로 유지한다.
-- 환경 목표: 현재 서버컴은 개발·빌드·검증에만 사용하고 대회는 AWS 단독 실행한다. 기본은 새 AWS 대회 identity이며 시험 chain/DB의 이전을 요구하지 않는다. 서버 RAM64GB는 실측 AWS 요구 사양이나 병렬 부하 허가를 뜻하지 않는다.
+- 환경 목표: 현재 서버컴의 전용 지속 데모를 우선한다. 아래 AWS 단독 실행 요구는 후속 이전 목표다. 기본은 새 AWS 대회 identity이며 시험 chain/DB의 이전을 요구하지 않는다. 서버 RAM64GB는 실측 AWS 요구 사양이나 병렬 부하 허가를 뜻하지 않는다.
 - [AGENTS.md](../AGENTS.md)의 제한을 유지한다. 별도 사용자 요청 전 Besu/Anvil/Hardhat, DB/witness/API/웹 전체 스택/Asterisk/TURN/Media Edge 기동, Compose up/down, 이미지 pull/build, migration·체인 초기화·계약 배포·seed, 통합·실통화·장애·부하 시험, STT/LLM 호출·모델 다운로드·추론, GCP 변경을 하지 않는다. 기존 프로세스·컨테이너·볼륨·키·증거를 변경/삭제하지 않고 다른 터미널·원격·CI로 우회하지 않는다.
 - 원본 PPTX의 slide XML을 읽어 기획 내용과 후속 변경을 대조했다. PDF·렌더·기존 영상의 존재와 문서상 provenance를 확인했으며 이번에 재생·렌더·시연 검증하지 않았다. **3회차 멘토링 원문과 최신 제출 양식은 원문 확인 필요**다.
 

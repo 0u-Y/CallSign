@@ -771,3 +771,132 @@ API/worker 저장소의 SQL statement timeout 5초·lock timeout 2초와 제한�
 운영 경로 정합성도 보완했다. 호스트에 내부 DB/RPC를 공개하지 않은 구성에서 관리 CLI를 실행할 수 있도록 명시적 operations profile의 migration-runner/registry-deployer를 추가했다. 일반 기동에는 포함하지 않고 자격·mount를 제한했다. app runtime과 web pin 빌드 stage를 분리해 최초 계약 배포/trust 생성의 순환 의존을 제거했다. 실제 이미지/컨테이너 실행은 하지 않았다. Compose 변수의 `.env.example` 누락 회귀도 검사한다.
 
 실행 허가 후의 검증도 내부망에서 수행할 수 있도록 별도 validation profile의 test-runner를 구성했다. TEST_DATABASE_URL만 사용하고 기본 운영 DB 자격/키를 전달하지 않는다. 실제 시험 DB·컨테이너 기동이나 시험 실행은 하지 않았다.
+
+
+## 2026-11-06 문서 대조 전 현황 스냅샷
+
+아래는 `20cbd659783ab08791fbbb0abefc939a016391aa`의 가이드 현황 및 한계 상단을 옮긴 원문이다. 공개 연결 이전 설명과 이후 기록이 섞여 있어 현행 안내에서 분리했다. 당시 실패·판정은 보존하며 현재 상태는 [현황표](../guide/05-IMPLEMENTATION-STATUS.md)를 따른다.
+
+# 05. 구현 및 검증 현황
+
+최신 데모는 사용자 제공 HTML의 기관 조작–처리 과정–수신자 핸드폰과 공동 관리 배치를 기존 controller/API에 이식했다. 실제 로컬 제품의 미연결 화면과 명시적 component fixture의 경고를 직접 검토했다. 인증·WebRTC 성공과 구분한다. 부정/인용 근거 검사·문장 분리와 Vercel 마이크 정책을 수정했으며 모델 목적 판정의 불일치는 남아 있다. [단일 후보 기록](../../artifacts/product-candidate-20261104.json)의 designHtmlIntegration이 이번 상태의 기준이다. 새 이미지·전체 경로 결과는 실행 후에만 갱신한다.
+
+
+## 현재 작업표
+
+| 요구사항 | 현재 구현 | 실행 근거 | 남은 작업 | 완료 조건 | 차단 입력 |
+|---|---|---|---|---|---|
+| UI-001/006 역할별 업무·공식 확인 | 실제 업무/API·공식 조회 상태와 독립 통화 종료 | [HTTP·실제 역할별 캡처](../../artifacts/service-hardening-20261105/result.json) | 공개 실제 backend 연결 | 새 UI-only 원격 모바일/확대 PASS; 로그인/통화는 미연결 | 공개 TLS/WSS/UDP·OIDC·지속 감시 범위 |
+| CALL-005/006·AI-001/005 | ServiceCall/remote track·동의·정책 결합 | [최신 일반/합성 분석 경로](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup | 이전 분석/프로세스 실패의 원인 미확정 | 재발 시 보존한 exit·WS·lease 관측으로 원인 확인 | 미재현 원인을 추정 확정하지 않음 |
+| OPS-004 복원·DB 감사 | 일관된 암호화 백업·별도 DB/chain 복원·독립 Anchor | 같은 기록의 restore: 전체 RESTORE·복원 후 통화·원본/대상 SQL 감사 PASS | 별도 장애 영역 운영 검증 | 실제 AWS 저장소/Anchor 배치와 복구 | AWS 환경 |
+| OPS-006/007 전달·AWS | 고정 Release/GHCR·입력 검사·NEW/재개/RESTORE | [후보 대응](../../artifacts/product-candidate-20261104.json) | 별도 reader·AWS 실행 | 새 후보 게시·공개/이미지 원격 수령 PASS; reader는 별도 | 독립 reader, AWS 환경 입력 |
+| AI-003 실제 제공자 평가 | OpenAI adapter·Deepgram/ko·동의/취소·quota·비용 선검사 | 실제 OpenAI 텍스트·직접 Deepgram 합성 음성: 계약 관측·품질 제한 | 실제 통화 remote track의 STT·분석 전체 경로 | 텍스트 출력 원본·사용량 보존; 모델 품질 PASS 아님 | 공개 연결·후속 AI 제한 계획, 지속 비용/보관 조건 별도 |
+
+지속 환경 A는 첫 IdP 준비 실행 후 관측 결함을 수정하고 중지한 상태다. 등록·HTTPS/WSS·이미지 준비는 확인했으며 공개 로그인과 전체 backend는 미완료다. 현재 운영 조건·차단은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리)을 따른다. RAM은 기동 시점의 사전 관측으로 판단하며 이후의 한 표본으로 과거 중단이나 기동 적합성을 소급 확정하지 않는다. 새 provider 코드의 전체 원장/미디어 검증은 미실행이다. 아래 일반 entrypoint/복원/합성 분석 PASS는 이전 제품 소스의 선택 경로이며 새 OpenAI 실제 품질 증거가 아니다. [현재 준비 상태](../../artifacts/product-candidate-20261104.json)의 persistentServicePreparation을 따른다.
+
+일반 entrypoint/분석 미사용 복원 계획의4통화와 별도 합성 분석 계획의3통화는 각각 PASS다. 원본과 복원 대상 DB를 삭제 전에 read-only 감사했다. 과거5회 정상 반복·이전4개 사례·이번 진단 재실행을 합쳐 성공률을 만들지 않는다. 단독 복구400은 HTTP schema 거절이고 이번 EVM 정족수 거절 증거는 아니다.
+
+실제 authenticated390px·데스크톱과 통화 화면을 열어 검토했다. Vercel 공개 frontend는 최신 main의 API 미연결 화면이며 실제 로그인/통화 backend는 없다. 후속 원격 브라우저는 전체 시험의 host1GiB를 적용하다1.20GiB에서 중단했다. UI3GiB로 소급 PASS하거나 자동 재시작하지 않았다. 해당 실패를 보존하고 새 승인 UI-only의 공개 데스크톱/390px·CSS 확대를 후속 검증했다. 인증된 로컬 화면과 API 미연결 공개 화면은 구분한다.
+
+이 표는 SLA나 모든 장애 조합의 보장이 아니다. 과거 분석 중단/PBX 종료·누락 baseline의 원인 미확정은 유지하며, 현재 equal baseline으로 과거 상태를 입증하지 않는다. 원본은 위 기록 및 [이전 미디어 결과](../../artifacts/media-final-20261104.json)를 따른다.
+
+[서비스 가이드](../guide/README.md) · [신뢰·보안](../guide/04-TRUST-AND-SECURITY.md) · [알려진 한계](../KNOWN-LIMITATIONS.md)
+
+현재 시연 진입점은 `/demo/call`·`/demo/governance`이며 기존 `/service` → `/v3` 로직과 `/official` 인증 문맥을 재사용합니다. 아래의 이전 초기 미디어 후보는6e3cd23이며 후속 후보·실행 기록과 구분합니다. 현재 상태의 근거는 [제품 후보 실행 기록](../FINALS-IMPLEMENTATION-PLAN.md#product-runtime-20261104)과 [원본 결과](../../artifacts/product-runtime-validation-20261104.json)입니다. 시험 개수로 완성률을 계산하지 않습니다.
+
+## 이전 실제 미디어 후보에서 확인한 범위
+
+| 영역 | 구현·검증 | 남은 경계 |
+|---|---|---|
+| 역할별 업무·인증 | 기관/상담원/수신자 안내, 업무·위임·승인, 세션/CSRF·기관 격리·계정 전환·회수 오류 표시를 실제 SQL·HTTP·WS·Chromium에서 선택 검증 | 로컬 OIDC fixture이며 실제 외부 IdP/MFA 아님 |
+| 권한 계약·공동 관리 | 실제 Besu4·Witness4에서 긴급 정지·2명 공동 복구·epoch/키 세대 반영, 과거 통화/승인/VC 비활성 유지 확인 | 단독 복구는 HTTP schema에서 거절. 같은 호스트이며 독립 운영·native proof 아님 |
+| 승인·소비·lease·통화 | 최신 runtime·제품 ServiceCall에서 서로 다른 합성 음원 양방향 수신/디코딩, 업무 취소·정지 뒤 양측 음성 중단·PBX 부재·추가 lease 거절·quota 정리 확인 | 로컬 TURN relay이며 AWS 외부 NAT·사람 마이크·모든 브라우저/장애 조합 아님 |
+| 위험·목적 분석 | 동의 후 remote track→인증 WS→분석→실제 ServiceCall 패널, 철회·정정·늦은 결과 차단. 분석 결과 수신 후 상단 “분석 중” 잔류를 수정 | STT/LLM은 명시적 fixture. 한국어 품질·보관/청구·실제 제공자 취소 미검증 |
+| 로컬 배포 후보 | 최신 runtime·공개/observer 묶음·checksum 생성, 일반 issuer entrypoint 확인,5종 인프라 재사용 | 새 GHCR/Release 미게시. AWS 최종 웹 미생성 |
+
+아래 후보 당시 HTTP11·WS17·Chromium9는37개 고유 사례입니다. Chromium 중1개 component host 분석 패널은 실제 ServiceCall 통화 시험과 별개입니다. 초기 중단·선택자 실패·선택 재실행·readiness를 고유 사례에 중복 합산하지 않습니다. 최종 runtime의 통화2사례는 work-cancel·emergency-stop이며 정상 반복 성공률이나 SLA를 뜻하지 않습니다.
+
+## 과거 증거를 사용하는 범위
+
+| 근거 | 당시 확인한 범위 |
+|---|---|
+| [DB](../../artifacts/local-postgres-result-20261029.json)·[앱 복구](../../artifacts/persistent-recovery-20261030.json)·[백업 경계](../../artifacts/backup-boundaries-20261030.json) | SQL 경합/응답 유실, HTTPS Anchor CAS·재시작, 오래된 백업 차단·별도 cluster 복원. 최신 소스로 전체 재실행한 결과가 아님 |
+| [계약](../../artifacts/contract-validation-20261030.json)·[원장 연결](../../artifacts/isolated-runtime-connection-20261101.json) | 로컬 EVM/서명 호환과 실제 원장/API 연결. 같은 호스트 범위 |
+| [전달물 NEW 리허설](../../artifacts/delivery-only-rehearsal-20261102.json) | 이전 이미지의 신규 초기화·정책/키 복구·세션 자연 만료·PBX 재시도·장치 오류 선택 경계 |
+| [이전 HTTP 통합](../../artifacts/http-pressure-integration-20261103.json) | 분석 종료/quota drain 수정·동일 DB 재실행. 당시 source와 fixture 한계를 따름 |
+| [GHCR](../../artifacts/ghcr-images-20261102.json)·[Release 수령](../../artifacts/ghcr-delivery-20261102.json) | 이전 bootstrap6종의 원격 manifest/config/layer 수령. 최신 후보의 게시 영수증이 아님 |
+
+과거 날짜별 본문은 [이력 보관본](../archive/DEVELOPMENT-HISTORY-20261104.md)에 보존합니다. 원본 실패·SHA·시험 결과를 최신 값으로 고치지 않습니다. light CI는 통합 실행·실음성·AWS 검증을 대신하지 않습니다.
+
+## 보존된 AWS 이전 절차 (현재 목표 제외)
+
+[RUNBOOK의 고정 전달 기준](../RUNBOOK.md#github-delivery-20261102)과 최신 후보 기록의 source/digest·원격 수령 판정을 함께 사용합니다. 게시용 인증과 AWS reader 인증을 분리합니다.
+
+AWS 위치/예산·도메인/TLS·OIDC·역할별 보호 참조·reader 권한은 [입력 계약](../RUNBOOK.md#aws-input-contract)을 따릅니다. AWS NEW가 만든 계약 metadata·공개 trust·PBX 인증서 뒤에 최종 웹을 생성합니다. 생성될 계약 주소·genesis hash·trust pin을 미리 요구하지 않습니다. 개발 서버는 runtime 의존성이 아닙니다.
+
+[NEW·재개·RESTORE](../RUNBOOK.md#aws-competition)를 구별하고 키·genesis·epoch·소비 이력·Anchor를 초기화해 재개하지 않습니다. 외부 제공자·AWS 검증과 코드 미구현은 [알려진 한계](../KNOWN-LIMITATIONS.md), 요구 ID·완료 조건은 [MASTER](../MASTER-DEVELOPMENT-SPEC.md)를 따릅니다.
+
+# 현재 구현의 한계
+
+## 첨부 디자인·실제 제공자 후속
+
+사용자 HTML의 배치·핸드폰 프레임을 실제 데모 컴포넌트로 이식했다. 원본 시안의 타이머 성공·가상 승인자 전환·상태 초기화는 이식하지 않았다. 실제 로컬 제품의 API 미연결 화면과 명시적 component fixture 경고 화면을 구분해 캡처·검토했다. 공개 인증·실제 통화 성공을 뜻하지 않는다.
+
+부정·인용 발언을 LLM 위험 근거로 수용하는 결함, 인용 속 마침표·정정 단어로 규칙 경고를 만들거나 지우는 결함을 수정했다. Vercel의 마이크 전면 차단은 같은 origin에서 사용자 조작으로 요청할 수 있도록 수정했다. 카메라·위치는 계속 차단한다. 최신 실행·비용·화면 근거는 [후보 기록](../../artifacts/product-candidate-20261104.json)의 designHtmlIntegration을 따른다.
+
+직접 Deepgram에 보낸 로컬 합성 한국어 음원은 전사를 반환했지만 빈 전사와 오인식이 있었다. 후속 OpenAI 정상 문장은 오경고가 없었으나 대출 권유는 설명과 목적 관계 label이 불일치했다. 앞선 진단 timeout의 과금은 미확인이다. 이를 모델 품질 PASS나 실제 remote-track 경로 성공으로 표시하지 않으며 원래 요청·실패 분모를 유지한다. 최초 smoke의 LLM 요청 수는 소진됐고 지속 AI의 무제한 과금은 허용하지 않았다.
+
+전용 ingress 등록·Funnel 권한·HTTPS 활성화는 확인했다. 직접 HTTPS/WSS 진단은 성공했지만 제품 인증·외부 음성 경로는 아직 검증하지 않았다. Keycloak 이미지 수신·로드와 NEW import 명령 exit0을 확인했으며, 관측 도구의 healthcheck 없는 컨테이너 조회 결함을 수정한 뒤 소유 자원을 중지했다. 최초 오류·영속 DB·중단 기록은 보존했다. 공개 로그인은 미실행이다.
+
+## 새 데모 화면 검증 경계
+
+`/demo/call`·`/demo/governance`를 실제 서비스 controller/API에 연결했다. 브라우저 합성 API 응답으로 역할별 배치·탐색·조회 실패 경계를 확인했지만 실제 세션·WebRTC 통화·원장 검증은 아니다. 이후 축약한 최신 표시를 실제 Production의 desktop/390px/CSS2배에서 다시 캡처하고 직접 검토했다. 독립 검토도 API 미연결 화면의 가독성에 한해 ship 판정이다. 인증된 조작·실제 통화 검증은 아니다. 두 자원 중단과 fixture 실패를 보존한다. 상세는 [현재 후보](../../artifacts/product-candidate-20261104.json)의 persistentDemoConnection과 persistentServicePreparation.demoUi를 따른다.
+
+## 지속 공개 서비스 준비
+
+현재 Vercel은 API 미연결이다. 실제 지속 운영 조건은 승인됐지만 첫 IdP 준비 실행의 관측 오류 뒤 재개 확인이 필요하다. Vercel rewrite의 HTTPS200/WSS404와 Funnel 직접 WSS 성공은 [진단 기록](../../artifacts/vercel-ingress-transport-20261105.json)을 따른다. 현재 연결 구성과 운영 조건은 [RUNBOOK](../RUNBOOK.md#지속-서비스와-시험-환경의-분리) 한 곳에서 관리한다. 공개 미디어·로그인·실제 remote-track 분석이 남아 있으며 AWS reader는 현재 데모의 선행조건이 아니다.
+
+OpenAI·Deepgram 키는 명시적 보호 파일로 제공돼 서버 로딩을 확인했다. OpenAI adapter/공통 취소·근거·quota 처리를 구현하고 첫 smoke $0.10 계획은 승인됐다. 사용자가 제공한 합성 한국어 텍스트3건을 실제 OpenAI에 전송했다(재시도0, 입력1403/출력370토큰, 가격 기준 추정$0.00271725, 실제 청구 미확인). 출력 계약은 통과했지만 정상 문장의 인증번호 경고와 목적 이탈 판단 불가가 나와 품질 PASS가 아니다. 당시 Deepgram은 키 인증 HTTP200만 확인했고 음성 전송은 없었다. 이후 합성 음원의 실제 전사와 한계는 위 후속 기록을 따른다. 실제 모델 품질·계정 사용 가능성·보관/청구·지속 운영 비용 조건을 확인했다고 쓰지 않는다. 새 제품의 이전 이미지 통합 PASS 전용은 금지한다.
+
+새 UI-only 원격 브라우저에서 공개 데스크톱/390px·CSS2배 확대와 focus를 확인하고 캡처를 열어 검토했다. 이는 공개 로그인·통화 검증이 아니다. 과거1GiB 자원 중단과 새 승인 실행은 별도 기록이다.
+
+## 2026-11-05 현재 검증 경계
+
+[최신 감사·복원](../../artifacts/restore-audit-20261105.json)의 serviceHardeningFollowup은 일반 entrypoint에서 암호화 전체 백업, 별도 DB/정지 chain 상태 복원, live Anchor 대조, 복원 후 새 통화와 원본/대상 DB 감사를 통과했다. 다른 binding 재사용·오래된 백업/현재 Anchor·잘못된 키·누락 metadata 거절도 확인했다. 같은 호스트·한 기관의 선택 경로이며 독립 장애 영역이나 모든 복구 조합의 보장은 아니다.
+
+별도 합성 분석3통화는 실제 ServiceCall·음성·WS·동의 철회·업무 취소·기관 정지/공동 복구를 통과했다. 최초 JSON 성공/프로세스 비정상 종료와 목적 이탈 배지 미표시 실패는 보존하며 원인은 미확정이다. 이후 통과를 그 실패의 해결 증거로 바꾸지 않는다. 과거 누락 interface baseline도 미확인이다.
+
+[최신 UI 캡처](../../artifacts/service-hardening-20261105/result.json)는 인증된 역할별 실제 화면과 별도 공개 frontend를 구분한다. 원격 브라우저 후속 확인은 host1GiB 적용 중1.20GiB에서 자원 중단했다. 당시 최신 원격 모바일/확대는 미완료였고 자동 재기동하지 않았다. 이후 새 승인 UI-only 결과는 위 후속 기록을 따른다. Vercel API 미연결, 독립 reader·실제 AI·AWS 입력 부족은 남아 있다.
+
+## 이전 후보의 실제 실행 한계 (2026-11-04)
+
+당시 runtime59b4379는 후속 승인 batch에서 정상 반복2회·조회 장애 중 종료·work-cancel·emergency-stop·실제 공동 복구를 확인했다. [이번 실행](../../artifacts/media-final-20261104.json)은 이전 분석 중단/PBX 종료를 재현하지 못했으며 그 원인은 여전히 미확정이다. 과거 exit code/컨테이너 로그 누락을 이후 관측 보완으로 소급 해소하지 않는다. 당시 미실행이던 RESTORE/DB 감사는 위 후속 기록을 따른다. 소표본 안정성/부하·독립 AWS reader·외부 AI 품질은 미확인이다.
+
+
+확인한 경로와 실행 소스는 [구현·검증 현황](../guide/05-IMPLEMENTATION-STATUS.md), 실패와 당시 조건은 [개발 기록](../FINALS-IMPLEMENTATION-PLAN.md)에서 관리한다. 이 문서는 현재 남은 제약만 설명한다. 과거 NOT_RUN·swap 중단·이전 후보 결과를 최신 상태로 해석하지 않는다.
+
+## 제출 후보와 외부 환경
+
+- [현재 후보](../../artifacts/product-candidate-20261104.json)의 serviceHardeningFollowup은 새 runtime/공개 묶음의 게시·원격 수령과 선택 RESTORE/미디어를 연결한다. AWS·독립 reader·실제 모델 품질·일반 신뢰도 완료판은 아니다. 이전 발행/실행 판정과 원인 미확정 실패는 보존한다.
+- [재설계 UI](../../artifacts/service-redesign-20261104.json)·[역할별 실제 UI 실행](../../artifacts/service-ui-validation-20261104.json)과 새 runtime의 정상 통화 화면을 구분한다. Vercel 공개 frontend는 후속 재배포에서 최신 소스의 경로·정적 자원·JSON metadata를 HTTP로 확인했다([배포 근거](../../artifacts/product-candidate-20261104.json)의 `vercelRedeployment`). 이번 재배포의 브라우저 상호작용은 미실행이며 공개 frontend는 API 미연결 상태다.
+- 새59b4379 이미지의 실제 조회 장애 중 종료·work-cancel·emergency-stop·공동 복구는 후속 batch에서 별도로 확인했다. 정상 반복 성공률·부하/SLA·모든 장애 조합은 미검증이다. 단독 복구400은 HTTP schema 거절이며 이번 EVM 정족수 거절 증거가 아니다.
+- 로컬 OIDC/STT/LLM은 명시적 fixture다. 실제 IdP/MFA, 한국어 STT/분석 품질, 제공자 보관·청구·취소 동작은 미검증이다. 합성30사례는 사람 미검토 상태다. 원격 수신 오디오만 사용하므로 고객 앞선 발언을 알 수 없고 문맥 부족에 판단 불가를 허용한다.
+- AWS 리전/예산·공개 origin/TLS/OIDC·PBX/TURN 공개 주소·영속 저장소·독립 Anchor 배치·별도 GHCR reader가 필요하다. [입력 계약](../RUNBOOK.md#aws-input-contract)을 따른다. 계약 주소·genesis hash·trust pin은 NEW 산출물이다.
+- AWS 최종 웹은 실제 metadata/trust/PBX 인증서 뒤에 생성한다. 로컬 시험 웹·bootstrap 전달을 AWS 배포 완료로 표시하지 않는다. Vercel은 현재 공개 preview 설정이며 실제 AWS 인증/통화 연결을 확인하지 않았다.
+- 같은 호스트/namespace의 Besu4·Witness4·TURN은 독립 기관 운영·호스트 장애·외부 NAT 통과의 증거가 아니다. 40GiB 시작/24GiB 관측 예산과5초 표본 최대는 이번 실행 정책·관측이며 최소 사양이나 peak가 아니다.
+
+
+### 같은 기준의 개발 진행표 상단
+
+아래 날짜별 기록과 시험 수치는 당시 소스·환경의 결과다. 현재 공개 사용 가능 여부는 이 표를 기준으로 보고, 원본 실패·후속 결과는 각 증거에서 확인한다. AWS 이전은 현재 목표에서 제외한다.
+
+| 요구사항 | 현재 구현·실행 근거 | 다음 완료 조건 | 차단 조건 |
+|---|---|---|---|
+| 두 데모 화면 | 최신 HTML 이식·desktop/390px/확대·focus 검토. 공개 `/demo/call`·`/demo/governance` 제공 | 인증·실제 통화 상태에서 같은 화면 검토 | 공개 연결 모드; 통화·분석 미검증 |
+| 공개 API·분석 WSS | 실제 HTTP API 연결·native WSS relay 배포. Origin/비인증 거절 확인; 과거 단순 rewrite WSS404와 구분 | 인증 음성 WS와 실제 분석 이벤트 확인 | HTTP same-origin 연결·native 분석 WS relay 배포. 실제 인증 음성 WS는 미검증 |
+| 실제 로그인 | 사용자 수동 재개 후 기존 DB·Keycloak 정상 기동, local readiness UP·공개 realm discovery200·관리 경로404. [원본 실패와 후속 결과](../../artifacts/persistent-idp-start-20261105.json) 구분 | Production 역할별 브라우저 로그인·업무 조회·로그아웃 확인 | 공식 업무 별도 세션·통화는 후속; realm import 반복 금지 |
+| 음성·통화 수명 | 기존 실제 PBX 통화 증거와 [로컬 WebRTC 녹음 전환](../../artifacts/recording-switch-20261105.json) 구분 | 외부 브라우저·PBX/TURN·페이지 이동 중 실제 음성/종료 | 공개 SIP/ICE·ACK 확인; 수락 뒤 최초 검증 실패 조사 중 |
+| 실제 분석 | 제공자 adapter·근거/정정 회귀. 최초 OpenAI6시도 소진, 직접 STT의 빈 전사/오인식 보존 | 상대 track→STT→분석→실제 패널·철회 | 추가 호출 예산 승인 필요 |
+| 취소·정지·공동 복구 | 과거 격리 스택의 실제 회수·독립 승인 복구 증거 보존 | 지속 공개 환경에서 새 업무·통화로 확인 | backend·공개 로그인 선행 |
+| DB 종료 경계 | 단계별 실행의 overdue pending1건 원인 미확정. 제한 진단·worker drain 보완 | 해당 경계 재현·삭제 전 감사 | 원본 DB 없음; 수동 DELETE/완료 처리 금지 |
+| 지속 운영 | 시작32GiB·여유16GiB·전체16GiB·최대24시간 승인. 관측/소유권 회귀 | 감시와 정상 서비스 유지·상태/중지/재시작 인계 | IdP·ingress·Besu4·Witness4·제품 DB/Anchor·API 실행 중; 중단 뒤 자동 재기동 금지 |
