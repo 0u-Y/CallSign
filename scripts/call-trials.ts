@@ -1,9 +1,23 @@
 import {readFile,writeFile,mkdir,lstat} from 'node:fs/promises';
 import {resolve,join} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {isIP} from 'node:net';
 import {aggregateCallTrials,callTrySchema,trialPlanSchema,type CallTry} from './evaluate-performance.js';
 import {execute} from './validation-runner.js';
 export function assertCallTrialExecution(env:NodeJS.ProcessEnv){if(env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='media'||env.CALLSIGN_TRIAL_CONFIRMATION!=='BOUNDED-SYNTHETIC-CALLS')throw new Error('CALL_TRIAL_EXECUTION_BLOCKED');}
+export function assertCallTrialTarget(target:{deploymentId:string;trustPin:string},env:NodeJS.ProcessEnv){
+ if(target.deploymentId!==env.CALLSIGN_VALIDATION_DEPLOYMENT_ID||target.trustPin!==env.CALLSIGN_VALIDATION_TRUST_PIN)throw new Error('CALL_TRIAL_TARGET_MISMATCH');
+ if(env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION==='OWNED_PUBLIC_DEMO'){
+  if(!target.deploymentId.startsWith('callsign-live-'))throw new Error('OWNED_PERSISTENT_DEMO_REQUIRED');
+ }else if(!target.deploymentId.startsWith('test:'))throw new Error('ISOLATED_TEST_OR_EXPLICIT_PERSISTENT_DEMO_REQUIRED');
+}
+export function callTrialBrowserArgs(env:NodeJS.ProcessEnv){
+ const ip=env.CALLSIGN_MEDIA_PUBLIC_DNS_IPV4;if(!ip)return [];
+ if(env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||isIP(ip)!==4)throw new Error('EXPLICIT_PUBLIC_DEMO_DNS_REQUIRED');
+ const origin=new URL(env.CALLSIGN_MEDIA_SIGNALING_ORIGIN??'');
+ if(origin.protocol!=='https:'||origin.origin!==env.CALLSIGN_MEDIA_SIGNALING_ORIGIN||origin.username||origin.password)throw new Error('FIXED_PUBLIC_SIGNALING_ORIGIN_REQUIRED');
+ return [`--host-resolver-rules=MAP ${origin.hostname} ${ip}`];
+}
 export async function callTrials(planPath:string,output:string,run=false){
  if(run)assertCallTrialExecution(process.env);
  const bytes=await readFile(planPath);if(bytes.length>32768)throw new Error('TRIAL_PLAN_TOO_LARGE');const plan=trialPlanSchema.parse(JSON.parse(bytes.toString()));

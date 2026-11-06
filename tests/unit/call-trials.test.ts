@@ -1,6 +1,6 @@
 import {expect,it} from 'vitest';
 import {aggregateCallTrials,type CallTry} from '../../scripts/evaluate-performance.js';
-import {assertCallTrialExecution,callTrials} from '../../scripts/call-trials.js';
+import {assertCallTrialExecution,assertCallTrialTarget,callTrialBrowserArgs,callTrials} from '../../scripts/call-trials.js';
 const plan={environmentId:'test:offline-fixture',environment:'local',transport:'turn',sourceSha256:'a'.repeat(64),images:['sha256:'+'b'.repeat(64)],fixtures:['synthetic-audio'],normalAttempts:5,maxRetries:1,perTryTimeoutMs:1000,totalTimeoutMs:10000};
 const trial=(outcome:CallTry['outcome'],success=false):CallTry=>({observer:'observer',outcome,finishedMs:900,events:success?[{id:'a',observer:'observer',phase:'verification-visible',atMs:200},{id:'b',observer:'observer',phase:'remote-decoded-both',atMs:300},{id:'cleanup',observer:'observer',phase:'resources-reclaimed',atMs:800}]:[]});
 it('keeps failure, timeout and unfinished logical attempts in the denominator while counting retries separately',()=>{
@@ -31,4 +31,20 @@ it('distinguishes missing and reversed intervals and keeps PBX absence separate 
  const t=trial('failure');t.events=[{id:'request',observer:'observer',phase:'revocation-request',atMs:300},{id:'server',observer:'observer',phase:'server-applied',atMs:200},{id:'pbx',observer:'observer',phase:'pbx-absent',atMs:400}];
  const row=aggregateCallTrials(plan,[{id:'one',tries:[t]}],'synthetic').attempts[0]!.tries[0]!;
  expect(row.latencyMs.revocationToServer).toBeNull();expect(row.unmeasured['revocation-request:server-applied']).toBe('reversed-order');expect(row.latencyMs.revocationToPbx).toBe(100);expect(row.latencyMs.revocationToAudio).toBeNull();expect(row.unmeasured['revocation-request:audio-reclaimed']).toBe('missing-endpoint');
+});
+
+it('keeps test identities as the default and requires an exact pinned persistent-demo opt in',()=>{
+ const target={deploymentId:'callsign-live-owned',trustPin:'a'.repeat(64)},env={CALLSIGN_VALIDATION_DEPLOYMENT_ID:target.deploymentId,CALLSIGN_VALIDATION_TRUST_PIN:target.trustPin};
+ expect(()=>assertCallTrialTarget(target,env)).toThrow('ISOLATED_TEST');
+ const approved={...env,CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION:'OWNED_PUBLIC_DEMO'};
+ expect(()=>assertCallTrialTarget(target,approved)).not.toThrow();
+ expect(()=>assertCallTrialTarget({...target,trustPin:'b'.repeat(64)},approved)).toThrow('TARGET_MISMATCH');
+ expect(()=>assertCallTrialTarget({...target,deploymentId:'other-production'},{...approved,CALLSIGN_VALIDATION_DEPLOYMENT_ID:'other-production'})).toThrow('OWNED_PERSISTENT');
+ expect(()=>assertCallTrialTarget({deploymentId:'test:isolated',trustPin:target.trustPin},{...env,CALLSIGN_VALIDATION_DEPLOYMENT_ID:'test:isolated'})).not.toThrow();
+});
+
+it('scopes a public DNS override to the owned demo browser without disabling TLS or local-network checks',()=>{
+ expect(callTrialBrowserArgs({})).toEqual([]);
+ expect(()=>callTrialBrowserArgs({CALLSIGN_MEDIA_PUBLIC_DNS_IPV4:'1.1.1.1'})).toThrow('EXPLICIT_PUBLIC_DEMO_DNS');
+ expect(callTrialBrowserArgs({CALLSIGN_MEDIA_PUBLIC_DNS_IPV4:'1.1.1.1',CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION:'OWNED_PUBLIC_DEMO',CALLSIGN_MEDIA_SIGNALING_ORIGIN:'https://owned.example'})).toEqual(['--host-resolver-rules=MAP owned.example 1.1.1.1']);
 });
