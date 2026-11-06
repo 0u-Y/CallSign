@@ -85,15 +85,15 @@
 .demo-evidence-drawer.work-detail{width:min(480px,100vw);padding:28px;border-radius:20px 0 0 20px;font-size:12px}
 .work-detail>h2{font-size:18px;margin:0 40px 20px 0}
 .work-detail>p[id]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
-.work-detail .work-detail-close{position:absolute;right:28px;top:28px;border-radius:50%;width:32px;height:32px;min-height:0;padding:0;background:#eef2f8;font-size:24px}
+.work-detail .work-detail-close{margin:0;position:absolute;right:28px;top:28px;border-radius:50%;width:32px;height:32px;min-height:0;padding:0;background:#eef2f8;font-size:24px}
 .work-detail .work-detail-heading{display:block;border:0;padding:0;margin:0 0 24px}
 .work-detail .work-detail-heading h2{font-size:28px;margin:18px 0 12px}
 .work-detail .work-detail-heading p{font-size:12px;color:#718095}
 .work-detail .work-facts{display:block;margin:0 0 22px;padding:0}
 .work-detail .work-facts>div{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid #e7ecf2}
-.work-detail .work-facts dt{font-size:12px;color:#718095;font-weight:400}
+.work-detail .work-facts dt{margin:0;font-size:12px;color:#718095;font-weight:400}
 .work-detail .work-facts dd{font-size:12px;margin:0;font-weight:500;text-align:right;overflow-wrap:anywhere}
-.work-detail .work-detail-contact{display:flex;justify-content:center;min-height:38px;font-size:12px;margin-bottom:12px}
+.work-detail .work-detail-contact{margin-top:0;display:flex;justify-content:center;min-height:38px;font-size:12px;margin-bottom:12px}
 .work-detail>details{border-top:1px solid #e7ecf2;padding:18px 0;font-size:12px}
 .work-detail .work-cancel-open{width:100%;background:#fff0f2;color:#e83954;font-size:12px}
 .demo-drawer-overlay:has(+.work-detail){backdrop-filter:blur(3px)}
