@@ -31,13 +31,19 @@ export async function exerciseServiceCallAnalysis(page:Page,control:Awaited<Retu
  return async()=>{await expect.poll(async()=>(await control({op:'state'})).streams.every(s=>s.stopped)).toBe(true);await expect.poll(async()=>(await control({op:'state'})).requests[2]?.aborted).toBe(true);const state=await control({op:'state'});await control({op:'resolve',request:2,mode:'suspected'});expect((await control({op:'state'})).streams.map(s=>s.frames)).toEqual(state.streams.map(s=>s.frames));await expect(panel.locator('strong')).toHaveCount(0);};
 }
 
+async function grantProductAnalysis(page:Page){
+ if(new URL(page.url()).pathname!=='/demo/call'){await page.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();return;}
+ let consentRequests=0;const observe=(request:import('@playwright/test').Request)=>{if(new URL(request.url()).pathname==='/api/v3/consent')consentRequests++;};page.on('request',observe);
+ try{await page.getByRole('button',{name:'키패드',exact:true}).click();await page.getByRole('button',{name:'9번 다시 듣기',exact:true}).click();expect(consentRequests).toBe(0);expect(await page.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);await page.getByRole('button',{name:'1번 동의',exact:true}).click();await expect(page.getByText('분석 동의 확인됨',{exact:true})).toBeVisible();expect(consentRequests).toBe(1);}finally{page.off('request',observe);}
+}
+
 export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observer:CallObserver,capture:(events:unknown[])=>Promise<void>){
  const audio=process.env.CALLSIGN_MEDIA_PAID_AUDIO;
  if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-completion2'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
  let revisions=0,analyses=0,sent=0;const started=performance.now(),events:unknown[]=[];
  recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;const closed=(type:string)=>{if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type});};socket.on('close',()=>closed('close'));socket.on('socketerror',()=>closed('socketerror'));socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed'&&value.event.engine==='rules+llm')analyses++;});});
  expect(await recipient.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);
- await recipient.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();
+ await grantProductAnalysis(recipient);
  try{
   await expect.poll(()=>recipient.evaluate(()=>{const w=window as any,peers=w.callSignTestPeers as RTCPeerConnection[],remote=peers.flatMap(p=>p.getReceivers().map(r=>r.track.id)),local=peers.flatMap(p=>p.getSenders().flatMap(s=>s.track?[s.track.id]:[]));return w.callSignRecorderTracks.length>0&&w.callSignRecorderTracks.flat().every((id:string)=>remote.includes(id)&&!local.includes(id));})).toBe(true);
   const [chooser]=await Promise.all([sender.waitForEvent('filechooser'),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(audio);

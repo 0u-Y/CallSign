@@ -63,12 +63,16 @@ test('URI PBX path: no microphone transmission before acceptance, signed connect
   for(const [page,remoteHz,ownHz] of [[sender,990,660],[receiver,660,990]] as const){await expect.poll(async()=>{const x=await decoded(page,remoteHz,ownHz);note({role:page===sender?'sender':'recipient',frequencyEnergy:x});return x.remote>.003&&x.remote>x.own*3;}).toBe(true);}
   for(const page of [sender,receiver]){const relayed=await page.evaluate(async()=>{const results:boolean[]=[];for(const pc of (window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers){const stats=await pc.getStats();for(const item of stats.values())if(item.type==='transport'&&item.selectedCandidatePairId){const pair=stats.get(item.selectedCandidatePairId);results.push(stats.get(pair?.localCandidateId)?.candidateType==='relay'||stats.get(pair?.remoteCandidateId)?.candidateType==='relay');}}return results;});expect(relayed.length).toBeGreaterThan(0);if(process.env.CALLSIGN_EXPECT_TRANSPORT)expect(relayed.every(v=>v===(process.env.CALLSIGN_EXPECT_TRANSPORT==='turn'))).toBe(true);}
   observation.mark('remote-decoded-both');
+  if(pagePath==='/demo/call'&&process.env.CALLSIGN_TRIAL_MODE==='normal-end'&&process.env.CALLSIGN_MEDIA_ANALYSIS_MODE!=='paid-smoke'){
+   await receiver.getByRole('button',{name:'키패드',exact:true}).click();await receiver.getByRole('button',{name:'2번 미동의',exact:true}).click();await expect(receiver.getByText('미동의 · 일반 통화 유지',{exact:true})).toBeVisible();expect(await receiver.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);await expect.poll(async()=>(await decoded(receiver,660,990)).remote).toBeGreaterThan(.003);note({analysisChoice:'declined-no-recorder-call-continues'});
+  }
   if(process.env.CALLSIGN_MEDIA_RECORDING_WAV){
    const [chooser]=await Promise.all([sender.waitForEvent('filechooser',{timeout:10000}),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(process.env.CALLSIGN_MEDIA_RECORDING_WAV);
    await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).toBeVisible();
    await expect.poll(async()=>{const value=await decoded(receiver,440,660);return value.remote>.003&&value.remote>value.own*3;}).toBe(true);
    await sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true}).click();
    await expect.poll(async()=>{const value=await decoded(receiver,660,440);return value.remote>.003&&value.remote>value.own*3;}).toBe(true);note({recordingSwitch:'actual-sender-track-to-remote-440Hz-and-back-to-microphone-660Hz'});
+   await sender.getByRole('button',{name:'음소거',exact:true}).click();await expect.poll(async()=>(await decoded(receiver,660,440)).remote).toBeLessThan(.001);await sender.getByRole('button',{name:'음소거 해제',exact:true}).click();await expect.poll(async()=>(await decoded(receiver,660,440)).remote).toBeGreaterThan(.003);note({mute:'remote-decoded-silence-and-microphone-return'});
   }
   if(pagePath==='/demo/call'){
    await sender.evaluate(()=>{(window as unknown as {savedCallPeers:RTCPeerConnection[];callSignTestPeers:RTCPeerConnection[]}).savedCallPeers=[...(window as unknown as {callSignTestPeers:RTCPeerConnection[]}).callSignTestPeers];});
