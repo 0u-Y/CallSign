@@ -70,7 +70,7 @@ export function validateRiskOutput(value:unknown,units:RiskUnit[],policy:Purpose
   const selected=a.evidenceIds.map(id=>{const unit=units.find(u=>u.id===id);if(!unit?.text.trim())throw Error('LLM_EVIDENCE_ID_INVALID');return unit;});
   if(new Set(a.evidenceIds).size!==a.evidenceIds.length||(a.result==='detected'&&!selected.length))throw Error('LLM_EVIDENCE_REQUIRED');
   // These guards reject known negation/quotation failures; they do not prove a model's semantic judgment.
-  if(a.result==='detected'&&contradictsDemand(units.filter(u=>selected.includes(u)).map(u=>u.text).join(' '),a.code))throw Error('LLM_EVIDENCE_CONTEXT_INVALID');
+  if(a.result==='detected'&&contradictsDemand(units.filter(u=>selected.includes(u)).map(u=>u.text).join(' '),a.code))throw new Error('LLM_EVIDENCE_CONTEXT_INVALID',{cause:{riskCode:a.code,evidenceIds:a.evidenceIds}});
   return {code:a.code,result:a.result,source:'llm',explanation:a.explanation,evidence:selected.map(u=>riskEvidenceFor(u,units,a.code))};
  });
 }

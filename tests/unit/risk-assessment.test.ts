@@ -85,3 +85,9 @@ it('does not withdraw one risk type when a later segment cancels a different req
  const mixed=snapshot('인증번호를 읽어주세요.','인증번호 요청은 유지하고 송금 요청은 취소합니다.');
  expect(ruleRiskAssessments(mixed,bankPolicy).find(r=>r.code==='OTP')!.evidence[0]!.state).toBe('active');
 });
+
+it('keeps rejected evidence diagnostics text-free while preserving the rejection',()=>{
+ const units=snapshot('인증번호를 다른 사람에게 알려주면 안 됩니다.');
+ try{validateRiskOutput(output(units),units,bankPolicy);throw Error('expected rejection');}
+ catch(error){expect(error).toBeInstanceOf(Error);expect((error as Error).message).toBe('LLM_EVIDENCE_CONTEXT_INVALID');expect((error as Error).cause).toEqual({riskCode:'OTP',evidenceIds:['u0']});expect(JSON.stringify((error as Error).cause)).not.toContain(units[0]!.text);}
+});

@@ -1,19 +1,19 @@
 # 05. 구현 및 검증 현황
 
-## Current filming state — 2026-11-06 22:15 KST
+## Current filming state — 2026-11-06 23:24 KST
 
-Frontend product `f104759` is deployed in Vercel Production (`publicPreview=false`); CI run42221342135 succeeded. Issuer product `d5c959c` remains pinned independently. The following replaces earlier current-state claims; historical failures below remain evidence of their original executions.
+V24 product frontend and issuer source `a36e6e6` are deployed. Production metadata has `publicPreview=false`; CI42232474427 succeeded. Issuer local config ID is `sha256:436fb7d1a24293f166ece59e20fee623061ca290411f8f3f9075460e5768838e` (not a registry manifest digest). Issuer-only replacement preserved data, cost reservations and operating expiry; readiness200. Prior failures below remain historical evidence.
 
-| Requirement | Actual evidence | Remaining boundary |
+| Boundary | Evidence | Limit |
 |---|---|---|
-| v18 UI | Original v18 SHA256 `1e4deaf666cbb395bca032d0c658f6e29947ac545dfbe1674faf60877a3f2c10`; product components, fixture states and authenticated1440/390px captures | Independent actor profiles, no mock authority; external devices deferred |
-| A: normal call | case46: new work/approval/acceptance, two-way decoded TURN relay audio, page continuity, normal end, both audio stopped and PBX absent | Server-host browsers with synthetic audio, not a general SLA |
-| B: actual analysis | case48: remote audio → Deepgram → OpenAI completed OTP evidence/explanation → recipient UI → withdrawal → call remains live → normal end | Actual late response after withdrawal not observed; offline rejection regression separate; not model-quality certification |
-| C: institution UI cancel | case47: exact work selected/cancelled in UI, authority blocked, both audio stopped, PBX absent, new attempt409 | Latest lease checks included; no unnecessary governance replay |
-| Persistent operation | Existing21 services renewed without NEW; platform/issuer/sender readiness200, fresh OIDC sessions and workspace reads for3roles | Ends **2026-11-07 22:03:42 KST**; original stop/review preserved, pressure guards unchanged |
-| Filming analysis | **ON** `deepgram-openai`;180STT seconds,3connections,12LLM requests; expires **2026-11-07 22:02:42 KST** | Shared OpenAI USD1 ID unchanged; activation snapshot used$0.025929, reserved$0.019879, remaining$0.954192; estimates, not invoices |
+| V24 UI | Original ShortVoice_v24 SHA verified; actual components, dark phone, elapsed clock, keypad1/2/9 and local-voice fallback;1440/390px fixtures and authenticated public captures | Headless Korean voice unavailable; no spoken-duration claim; final authenticated capture completed at a36e6e6; one management request aborted during navigation, subsequent node view loaded |
+| V24 normal/media | Case49 PASS: new actual work/call, two-way decoded relay audio, key2/no recorder, file440Hz→mic660Hz, mute/unmute, page continuity, normal end | Server-host browsers, not external devices |
+| V24 institution cancellation | Case50 PASS: actual UI cancellation, both audio stopped, PBX absent, cancelled-work409 | One logical attempt, no analysis consent |
+| Actual risk analysis | Earlier v18 case48 PASS: remote track→Deepgram→OpenAI→evidence display→withdrawal→live call→normal end | V24 case51: key9→1/remote transcription succeeded, but completed output rejected as LLM_EVIDENCE_CONTEXT_INVALID; FAIL, no retry |
+| Filming quotas | Same total180STT seconds/3connections/12LLM requests; corrected per-stream share60seconds/4requests | After case51:135seconds/2connections/9requests remain; OpenAI used29735/reserved19879microUSD (available950386); estimates, not invoices. Totals never reset; provider expiry2026-11-07 22:02:42KST |
+| Persistent operation |21 services, monitor active; expiry2026-11-07 22:03:42KST | Original stop records preserved; no automatic restart after resource stop |
 
-Evidence: protected previous resume `resume-20261106T1705/public-call-smoke-{46-recording-goal,47-recording-goal,48-analysis-completion}`; current resume pointer `.local/current-persistent-resume.path`, renewal/filming receipts; `.local/v18-review/final-authenticated-settled/`. Recordings/transcripts/credentials remain local. See [operator commands](../RUNBOOK.md#소유-자원과-운영-명령). Network-change root cause remains undetermined despite successful subsequent calls.
+Evidence: current resume pointer `.local/current-persistent-resume.path`, `public-call-smoke-49-v24-decline-recording`, `public-call-smoke-50-v24-cancel`, `v24-budget-runtime`; `.local/v24-review/`. Earlier case46/47/48 remain in `resume-20261106T1705`. Credentials/audio/transcripts remain protected. [Operator commands](../RUNBOOK.md#소유-자원과-운영-명령). Network-change root cause remains undetermined.
 
 ## Historical snapshots before the final filming run
 
