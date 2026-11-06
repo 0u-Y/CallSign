@@ -52,8 +52,12 @@ export function existingServerStages(records,env,issuerImage){
  return selected;
 }
 export function assertLiveServerMonitor(ready,sample,observed){
- if(ready.deploymentId!==observed.deploymentId||ready.pid!==observed.pid||String(ready.processStart)!==String(observed.processStart)||sample.observerPid!==ready.pid||!Number.isFinite(observed.ageSeconds)||observed.ageSeconds<0||observed.ageSeconds>20||!Number.isFinite(observed.nowNs)||!Number.isFinite(sample.monotonicNs)||observed.nowNs-sample.monotonicNs<0||observed.nowNs-sample.monotonicNs>20e9||!Number.isFinite(ready.expiresMonotonicNs)||ready.expiresMonotonicNs<=observed.nowNs||sample.stop||!Number.isFinite(sample.memAvailableBytes)||sample.memAvailableBytes<(observed.starting?32:16)*1024**3||!Number.isFinite(sample.ownedBytes)||sample.ownedBytes<0||sample.ownedBytes>16*1024**3)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+ const diagnostic=observed.resourcePolicy==='persistent-observe-v1';
+ if((ready.policy??'bounded-v1')!==(observed.resourcePolicy??'bounded-v1')||ready.deploymentId!==observed.deploymentId||ready.pid!==observed.pid||String(ready.processStart)!==String(observed.processStart)||sample.observerPid!==ready.pid||!Number.isFinite(observed.ageSeconds)||observed.ageSeconds<0||observed.ageSeconds>20||!Number.isFinite(observed.nowNs)||!Number.isFinite(sample.monotonicNs)||observed.nowNs-sample.monotonicNs<0||observed.nowNs-sample.monotonicNs>20e9)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+ if(diagnostic){if(ready.expiresMonotonicNs!==null)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');return;}
+ if(!Number.isFinite(ready.expiresMonotonicNs)||ready.expiresMonotonicNs<=observed.nowNs||sample.stop||!Number.isFinite(sample.memAvailableBytes)||sample.memAvailableBytes<(observed.starting?32:16)*1024**3||!Number.isFinite(sample.ownedBytes)||sample.ownedBytes<0||sample.ownedBytes>16*1024**3)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
 }
+
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  try{
   const [command,file,...compose]=process.argv.slice(2);
@@ -100,7 +104,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
     const stat=readFileSync(`/proc/${ready.pid}/stat`,'utf8'),processStart=stat.slice(stat.lastIndexOf(')')+2).split(' ')[19];
     const args=readFileSync(`/proc/${ready.pid}/cmdline`,'utf8').split('\0');
     if(!args.some(v=>v.endsWith('/monitor-deployment.py'))||args[args.indexOf('--env-file')+1]!==resolve(file)||args[args.indexOf('--output')+1]!==monitorDir)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
-    assertLiveServerMonitor(ready,sample,{deploymentId:env.DEPLOYMENT_ID,pid:ready.pid,processStart,ageSeconds:(Date.now()-log.mtime)/1000,starting,nowNs:Number(process.hrtime.bigint())});return ready;
+    assertLiveServerMonitor(ready,sample,{deploymentId:env.DEPLOYMENT_ID,pid:ready.pid,processStart,ageSeconds:(Date.now()-log.mtime)/1000,starting,resourcePolicy:env.CALLSIGN_RESOURCE_POLICY,nowNs:Number(process.hrtime.bigint())});return ready;
    };
    const ready=monitor(true);
    if(command==='server-check'){console.log(JSON.stringify({deploymentId:env.DEPLOYMENT_ID,services:stages.flat().length,monitorPid:ready.pid,expiresMonotonicNs:ready.expiresMonotonicNs,scope:'Existing container and live monitor checks only; no restart or complete readiness claim'}));process.exit(0);}
@@ -143,6 +147,6 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
    }
   }
   if(excludedCount)console.error('UNOWNED_RESOURCES_EXCLUDED_FROM_STOP');
-  if(command==='status')console.log(JSON.stringify({project,deploymentId:env.DEPLOYMENT_ID,resourceStopLatched:latched,priorResourceStopReviewed:reviewed,services:records.map(r=>({service:r.labels['com.docker.compose.service'],id:r.id,state:r.state,health:r.health})),scope:'Owned containers only; health is not complete readiness; resource monitor availability is not established by this command.'}));
+  if(command==='status')console.log(JSON.stringify({project,deploymentId:env.DEPLOYMENT_ID,resourceStopLatched:latched,resourcePolicy:env.CALLSIGN_RESOURCE_POLICY??'bounded-v1',priorResourceStopReviewed:reviewed,services:records.map(r=>({service:r.labels['com.docker.compose.service'],id:r.id,state:r.state,health:r.health})),scope:'Owned containers only; health is not complete readiness; resource monitor availability is not established by this command.'}));
  }catch(error){console.error(error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'DEPLOYMENT_CONTROL_FAILED');process.exitCode=78;}
 }

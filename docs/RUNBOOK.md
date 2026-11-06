@@ -26,6 +26,26 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 ## 지속 서비스와 시험 환경의 분리
 
+### 현재 정책: persistent-observe-v1 (2026-11-07 사용자 변경)
+
+이 항목은 아래 과거 24시간/RAM·압박 중단 규정보다 우선한다. 보호 deployment env에 `CALLSIGN_RESOURCE_POLICY=persistent-observe-v1`을 설정하고 같은 `--policy persistent-observe-v1`로 새 monitor를 시작한다. 시작 RAM32GiB·여유16GiB·합산16GiB·호스트 swap/PSI/메모리 관측 실패는 진단값이며 기동 거절/자동 중지 사유가 아니다. 운영 만료는 없고 사용자 중지까지 유지한다. 기존 정책을 사용하는 다른 시험/배포의 기본값은 변경하지 않는다.
+
+기존 stop/latch는 `review`로 SHA에 연결해 검토하고 원본을 보존한다. 새 monitor 경로와 정책 승인을 기록한다. 이전 살아 있는 monitor는 소유 PID/start를 확인한 뒤 정상 종료(stop 포함)하고 동일 container의 `server-start`를 사용한다. NEW·seed·키/DB 초기화는 없다. 살아 있는 monitor 신원·최근 heartbeat와 소유권, image/entrypoint, 컨테이너 강제 한도, 실제 OOM·데이터 오류 검사는 유지한다. 메모리 관측 누락은 null/오류로 기록하며 0/PASS로 대체하지 않는다.
+
+서비스 restart policy는 `no`로 유지한다. 자동 복구 루프나 부팅 자동 시작은 추가하지 않으며, 일반 프로세스 장애는 상태/health에 표시하고 원인 확인 후 수동 재개한다. 따라서 재시작 폭주가 없다. 자원 수치만으로 중지하지 않지만 소유권 오류·실제 컨테이너 OOM·운영자의 monitor 종료는 명시적 중지 경로를 따른다. 자원 로그는 기존 10MiB×2 순환과 컨테이너 로그 상한을 유지한다.
+
+```sh
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure python3 scripts/monitor-deployment.py --env-file PRIVATE_DEPLOYMENT_ENV --output PRIVATE_NEW_MONITOR_DIR --policy persistent-observe-v1
+CALLSIGN_DEPLOYMENT_TARGET=server CALLSIGN_MONITOR_DIR=PRIVATE_NEW_MONITOR_DIR node scripts/deployment-control.mjs server-check PRIVATE_DEPLOYMENT_ENV docker compose
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_DEPLOYMENT_TARGET=server CALLSIGN_MONITOR_DIR=PRIVATE_NEW_MONITOR_DIR node scripts/deployment-control.mjs server-start PRIVATE_DEPLOYMENT_ENV docker compose
+node scripts/deployment-control.mjs status PRIVATE_DEPLOYMENT_ENV docker compose
+node scripts/deployment-control.mjs stop PRIVATE_DEPLOYMENT_ENV docker compose
+```
+
+`stop`은 영속 데이터를 삭제하지 않는다. monitor까지 종료하려면 ready.json의 PID와 `/proc/PID/stat` 시작값·명령 경로를 대조한 뒤 그 PID에 SIGTERM을 보낸다. 감시 정상 종료는 소유 서비스도 중지하고 원본 stop를 기록한다. 다음 재개는 검토 후 새 monitor 세대로 실행한다. 호스트 OOM·swap·네트워크·전역 서비스는 변경하지 않는다.
+
+### 과거 정책과 기존 운영 근거
+
 공개 로그인·API·미디어·분석의 확인 날짜와 실행 소스는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 전용 Funnel의 HTTPS/WSS 진단은 제품의 통화·분석 검증과 구분한다. 기존443은 다른 서비스 소유다. 사용자 승인 지속 조건은 시작 가용32GiB·실행 여유16GiB·소유 전체 관측16GiB·기존 구성요소 한도/압박 중단 유지·최대24시간이다. 전체 시험의 기본40GiB guard와 별개다.
 
 전용 userspace 노드의 등록·Funnel 권한·HTTPS 활성화와 보존 identity를 재사용한다. `scripts/prepare-demo-ingress.py`는 등록 준비 도구이며 지속 backend launcher가 아니다. Tailscale Funnel의 TLS/TCP 성공으로 TURN relay·외부 브라우저 음성 성공을 주장하지 않는다. Vercel rewrite의 실제 진단은 [관측 기록](../artifacts/vercel-ingress-transport-20261105.json)을 따른다.

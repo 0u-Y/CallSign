@@ -12,7 +12,9 @@ import time
 from validation_resources import host_sample, SwapWatch, PRESSURE_POLICY, process_start
 
 
-def resource_reason(sample, owned_bytes, expires_ns):
+def resource_reason(sample, owned_bytes, expires_ns, policy="bounded-v1"):
+    if policy == "persistent-observe-v1":
+        return None
     if sample['stop']:
         return sample['stop']['reason']
     if sample['memAvailableBytes'] < 16 * 1024**3:
@@ -84,6 +86,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--policy', choices=['bounded-v1', 'persistent-observe-v1'], default='bounded-v1')
     parser.add_argument('--expires-monotonic-ns', type=int, help='Preserve an earlier approved deadline on this host boot; never extend 24 hours')
     args = parser.parse_args()
     if os.environ.get('CALLSIGN_ALLOW_EXTERNAL_EXECUTION') != 'infrastructure':
@@ -99,11 +102,16 @@ def main():
     def command(action):
         return control_command(control, action, env_file, safe_env)
     command('check')
+    configured = json.loads(command('status'))
+    if configured['resourcePolicy'] != args.policy:
+        raise SystemExit('MONITOR_POLICY_CONFIGURATION_MISMATCH')
     watch = SwapWatch(PRESSURE_POLICY)
     # Starting the expiry clock now gives at most the approved 24h, including preparation.
     expires_ns = time.monotonic_ns() + 24 * 3600 * 10**9
     if args.expires_monotonic_ns is not None:
         expires_ns = min(expires_ns, args.expires_monotonic_ns)
+    if args.policy == 'persistent-observe-v1':
+        expires_ns = None
     reason = None
     ready = False
     log = root / 'resources.jsonl'
@@ -118,7 +126,14 @@ def main():
         while True:
             phase = 'host-observation'
             observing = None
-            row = watch.update(host_sample())
+            try:
+                row = watch.update(host_sample())
+            except (OSError, ValueError, KeyError, TypeError, StopIteration):
+                if args.policy != 'persistent-observe-v1':
+                    raise
+                row = {'monotonicNs': time.monotonic_ns(), 'observerPid': os.getpid(),
+                       'observerRssBytes': 0, 'stop': None, 'memAvailableBytes': None,
+                       'observationError': 'HOST_MEMORY_UNOBSERVED'}
             if not (root / 'initial-sample.json').exists():
                 (root / 'initial-sample.json').write_text(json.dumps(row) + '\n')
             phase = 'owned-container-status'
@@ -131,24 +146,33 @@ def main():
                 phase = 'owned-container-memory'
                 cid = service['id']
                 observing = {'id': cid, 'service': service['service']}
-                used = container_memory(cid, safe_env)
-                owned_bytes += used
+                try:
+                    used = container_memory(cid, safe_env)
+                except (OSError, ValueError, KeyError, TypeError, StopIteration, RuntimeError) as error:
+                    measurement = not isinstance(error, RuntimeError) or str(error) in [
+                        'OWNED_CONTAINER_INSPECT_FAILED', 'OWNED_CONTAINER_INSPECT_TIMEOUT',
+                        'OWNED_PROCESS_STATE_UNOBSERVED', 'OWNED_PROCESS_CHANGED_DURING_OBSERVATION']
+                    if args.policy != 'persistent-observe-v1' or not measurement:
+                        raise
+                    used = None
+                owned_bytes = owned_bytes + used if owned_bytes is not None and used is not None else None
                 containers.append({'id': cid, 'service': service['service'], 'memoryBytes': used})
-            row.update(ownedBytes=owned_bytes, containers=containers)
+            row.update(ownedBytes=owned_bytes, containers=containers, resourcePolicy=args.policy,
+                       serviceStates=[{'service': s['service'], 'state': s['state'], 'health': s.get('health')} for s in status['services']])
             if log.exists() and log.stat().st_size >= 10 * 1024**2:
                 (root / 'resources.previous.jsonl').unlink(missing_ok=True)
                 log.rename(root / 'resources.previous.jsonl')
             with log.open('a') as output:
                 output.write(json.dumps(row) + '\n')
-            reason = resource_reason(row, owned_bytes, expires_ns)
-            if not ready and row['memAvailableBytes'] < 32 * 1024**3:
+            reason = resource_reason(row, owned_bytes, expires_ns, args.policy)
+            if args.policy != 'persistent-observe-v1' and not ready and row['memAvailableBytes'] < 32 * 1024**3:
                 reason = reason or 'START_32_GIB_REQUIRED'
             if reason:
                 break
             if not ready and time.monotonic() - began >= 60:
                 (root / 'ready.json').write_text(json.dumps({'pid': os.getpid(), 'processStart': process_start(os.getpid()),
-                    'deploymentId': status['deploymentId'], 'expiresMonotonicNs': expires_ns,
-                    'scope': 'Resource preflight only; not application readiness'}) + '\n')
+                    'deploymentId': status['deploymentId'], 'expiresMonotonicNs': expires_ns, 'policy': args.policy,
+                    'scope': 'Observer identity established; resource values diagnostic in persistent-observe-v1; not application readiness'}) + '\n')
                 ready = True
             time.sleep(5)
     except BaseException as error:

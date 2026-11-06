@@ -95,3 +95,12 @@ it('pins an independently updated issuer without accepting changes to other app 
  const platform=records.find(r=>r.labels['com.docker.compose.service']==='platform')!;platform.image=image;platform.imageReference=image;
  expect(()=>existingServerStages(records,{...env,CALLSIGN_ISSUER_IMAGE:image})).toThrow('EXISTING_SERVER_IMAGE_MISMATCH');
 });
+
+it('accepts explicit diagnostic-only operation without weakening monitor identity or freshness',()=>{
+ const ready={deploymentId:'demo',pid:123,processStart:'456',policy:'persistent-observe-v1',expiresMonotonicNs:null};
+ const sample={observerPid:123,monotonicNs:100e9,stop:{reason:'SUSTAINED_SWAP_OUT'},memAvailableBytes:null,ownedBytes:null};
+ const observed={deploymentId:'demo',pid:123,processStart:'456',ageSeconds:1,nowNs:101e9,starting:true,resourcePolicy:'persistent-observe-v1'};
+ expect(()=>assertLiveServerMonitor(ready,sample,observed)).not.toThrow();
+ for(const change of [{resourcePolicy:'bounded-v1'},{pid:999},{ageSeconds:21}])expect(()=>assertLiveServerMonitor(ready,sample,{...observed,...change})).toThrow();
+ expect(()=>assertLiveServerMonitor({...ready,policy:'bounded-v1'},sample,observed)).toThrow();
+});
