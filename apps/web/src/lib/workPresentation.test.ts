@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {shortRecordId,contactWorkState,demoAccountLabel,demoOrganizationLabel} from './workPresentation.js';
+import {shortRecordId,contactWorkState,compareContactWork,demoAccountLabel,demoOrganizationLabel} from './workPresentation.js';
 describe('real work identifiers',()=>{
  it('distinguishes common trial prefixes without assigning fictional identities',()=>{const ids=['public-demo-first-01234567','public-demo-next-12345678'];expect(ids.map(id=>shortRecordId(id,ids))).toEqual(['01234567','12345678']);});
  it('expands colliding suffixes and keeps short IDs intact',()=>{const ids=['first-12345678','other-12345678'] as const;expect(shortRecordId(ids[0],ids)).not.toBe(shortRecordId(ids[1],ids));expect(shortRecordId('abc',['abc'])).toBe('abc');});
@@ -19,4 +19,10 @@ it('keeps synthetic aliases stable across work records and leaves non-demo ident
  expect(demoAccountLabel(id,'상담원')).toMatch(/상담$/);
  expect(demoAccountLabel('real-account','고객')).toContain('고객 ·');
  expect(demoOrganizationLabel('demo-bank')).toBe('시그널카드');expect(demoOrganizationLabel('other')).toBe('other');
+});
+
+it('shows actionable work before history and keeps expired work expired',()=>{
+ const rows=[{status:'cancelled',expiresAt:500},{status:'open',expiresAt:99},{status:'open',expiresAt:200},{status:'open',expiresAt:300}];
+ expect([...rows].sort((a,b)=>compareContactWork(a,b,100)).map(x=>x.expiresAt)).toEqual([300,200,500,99]);
+ expect(rows[0]?.status).toBe('cancelled');
 });
