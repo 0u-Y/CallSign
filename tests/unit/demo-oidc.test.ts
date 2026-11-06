@@ -2,6 +2,7 @@ import {it,expect} from 'vitest';
 import {demoOidcInputs} from '../../scripts/prepare-demo-oidc.js';
 it('separates real public OIDC clients and synthetic identities without assigning caller-controlled roles or signing keys',()=>{
  const first=demoOidcInputs('https://frontend.callsign.demo','https://identity.callsign.demo/idp'),second=demoOidcInputs('https://frontend.callsign.demo','https://identity.callsign.demo/idp');
+ for(const client of first.realm.clients)expect(client.defaultClientScopes).toEqual(['basic','profile']);
  expect(first.realm.clients.map(c=>c.clientId)).toEqual(['callsign-work','callsign-official']);
  for(const client of first.realm.clients){expect(client.redirectUris).toEqual(['https://frontend.callsign.demo/service']);expect(client.webOrigins).toEqual(['https://frontend.callsign.demo']);expect(client.attributes['pkce.code.challenge.method']).toBe('S256');expect(client.directAccessGrantsEnabled||client.implicitFlowEnabled||client.serviceAccountsEnabled).toBe(false);}
  expect(new Set(first.credentials.map(x=>x.subject)).size).toBe(6);expect(new Set(first.credentials.map(x=>x.password)).size).toBe(6);expect(first.credentials[0]!.password).not.toBe(second.credentials[0]!.password);
