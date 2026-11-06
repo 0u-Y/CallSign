@@ -78,7 +78,7 @@ UI만 격리 검증할 때는 설치된 의존성으로 웹을 build한 뒤 `CAL
 
 배포 Compose의 서비스/volume에는 `org.callsign.lifecycle=persistent`와 고유 `org.callsign.deployment-id`를 붙인다. 시험은 별도 run ID/DB/키이며 full runner의 ephemeral label 또는 HTTP의 callsign.test marker를 사용한다. 시험 도구는 persistent label을 거절한다. 실제 운영 중인 환경을 ownership.json에 넣어 시험 cleanup을 적용하지 않는다.
 
-현재 `callsign-demo-live`/`callsign-live-20261105`의 일반 서비스는21개이며 영속 DB·chain·Anchor·IdP를 유지한다. 종료된 `oidc-init`·migration·browser helper는 일반 재시작 대상이 아니다. 현재 감시의 만료는 **2026-11-07 08:37 KST**다. 기존 monitor PID/start·최근 표본·monotonic 만료를 확인하며 새 monitor를 띄워 승인 기간을 연장하지 않는다.
+현재 `callsign-demo-live`/`callsign-live-20261105`의 일반 서비스는21개이며 영속 DB·chain·Anchor·IdP를 유지한다. issuer만 독립 갱신했다면 `CALLSIGN_APP_IMAGE`는 나머지 앱의 기존 고정값을 유지하고 `CALLSIGN_ISSUER_IMAGE`에 검토한 issuer 이미지 고정값을 설정한다. Compose와 기존 컨테이너 재시작 검사는 같은 선택 규칙을 사용하며 다른 서비스의 이미지 불일치를 허용하지 않는다. 종료된 `oidc-init`·migration·browser helper는 일반 재시작 대상이 아니다. 현재 감시의 만료는 **2026-11-07 08:37 KST**다. 기존 monitor PID/start·최근 표본·monotonic 만료를 확인하며 새 monitor를 띄워 승인 기간을 연장하지 않는다.
 
 저장소 루트에서 다음 보호 참조를 사용한다. env 내용이나 비밀번호를 출력하지 않는다.
 

@@ -31,6 +31,7 @@ services:
     env_file: ${CALLSIGN_PLATFORM_ENV_FILE:?protected platform environment}
   issuer:
     <<: *app
+    image: ${CALLSIGN_ISSUER_IMAGE:-${CALLSIGN_APP_IMAGE:?reviewed runtime}}
     env_file: ${CALLSIGN_ISSUER_ENV_FILE:?protected issuer environment}
     volumes:
       - {type: bind, source: '${CALLSIGN_PRODUCT_DATA:?prepared product inputs}/issuer', target: /keys/issuer, read_only: true, bind: {create_host_path: false}}

@@ -87,3 +87,11 @@ else if(a[0]==='inspect')console.log(JSON.stringify(a.slice(1).map(id=>{const r=
   expect(results.find(r=>r.status==='FAILED')).toMatchObject({stopped:true,automaticRestart:false,reason:'SERVER_START_DEPENDENCY_FAILED'});
  }finally{child.kill('SIGTERM');await new Promise<void>(resolve=>{if(child.exitCode!==null||child.signalCode!==null)resolve();else child.once('exit',()=>resolve());});rmSync(root,{recursive:true,force:true});}
 });
+it('pins an independently updated issuer without accepting changes to other app images',()=>{
+ const {env,records}=fixture(),image='sha256:'+'2'.repeat(64),issuer=records.find(r=>r.labels['com.docker.compose.service']==='issuer')!;
+ issuer.image=image;issuer.imageReference=image;
+ expect(()=>existingServerStages(records,env)).toThrow('EXISTING_SERVER_IMAGE_MISMATCH');
+ expect(existingServerStages(records,{...env,CALLSIGN_ISSUER_IMAGE:image}).flat()).toHaveLength(21);
+ const platform=records.find(r=>r.labels['com.docker.compose.service']==='platform')!;platform.image=image;platform.imageReference=image;
+ expect(()=>existingServerStages(records,{...env,CALLSIGN_ISSUER_IMAGE:image})).toThrow('EXISTING_SERVER_IMAGE_MISMATCH');
+});
