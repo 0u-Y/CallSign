@@ -75,3 +75,15 @@ it('does not cancel or rebill finalized context for interim speech in a differen
  await vi.advanceTimersByTimeAsync(300);
  expect(provider).toHaveBeenCalledOnce();expect(events.at(-1)?.status).toBe('analyzed');
 });
+
+it('finishes one in-flight request while coalescing appended final segments, without publishing stale context',async()=>{
+ vi.useFakeTimers();const calls:Array<{signal:AbortSignal;complete:(value:ReturnType<typeof response>)=>void}>=[];
+ const provider=vi.fn(async(_text:string,_policy:unknown,signal:AbortSignal)=>new Promise<ReturnType<typeof response>>(complete=>calls.push({signal,complete})));
+ const {a,events}=fixture(provider,()=>Date.now());await a.accept(rev('거래 확인입니다.',1,'0'));const pending=a.flush();
+ await a.accept(rev('추가 안내입니다.',1,'1'));await a.accept(rev('대출 상품을 권유합니다.',1,'2'));
+ expect(calls[0]!.signal.aborted).toBe(false);
+ calls[0]!.complete(response('not-detected','거래 확인입니다.'));await pending;expect(events.at(-1)?.status).not.toBe('analyzed');
+ await vi.advanceTimersByTimeAsync(300);expect(provider).toHaveBeenCalledTimes(2);
+ await a.accept(rev('정정합니다. 상품 권유는 하지 않습니다.',2,'2'));expect(calls[1]!.signal.aborted).toBe(true);
+ calls[1]!.complete(response('suspected','대출 상품을 권유합니다.'));await Promise.resolve();expect(events.at(-1)?.purpose.relation).not.toBe('suspected');
+});

@@ -69,7 +69,8 @@ export async function registerServiceAudio(app:FastifyInstance,options:{authorit
               invoked=true;return await measurements.measure('llm',()=>Promise.race([options.providers?.analyze?options.providers.analyze(text,policy,signal):analyzeServiceWithProvider(configuration!.llm!,{text,policy,signal}),cancelled]));
             }catch(error){
               const reason=signal.aborted?'CANCELLED':error instanceof Error&&/^LLM_(?:PROVIDER_HTTP_[45][0-9]{2}|EVIDENCE_INVALID|RESPONSE_TOO_LARGE|INPUT_TOO_LARGE|CANCELLED|UNAVAILABLE)$/.test(error.message)?error.message:error instanceof Error&&error.name==='TimeoutError'?'TIMEOUT':error instanceof Error&&error.name==='ZodError'?'RESPONSE_SCHEMA_INVALID':'UNCLASSIFIED';
-              app.log.warn({code:'ANALYSIS_PROVIDER_REQUEST_FAILED',reason});throw error;
+              // The normal entrypoint disables request logging; emit only these allowlisted diagnostics.
+              process.stderr.write(JSON.stringify({code:'ANALYSIS_PROVIDER_REQUEST_FAILED',reason})+'\n');throw error;
             }finally{if(cancel)signal.removeEventListener('abort',cancel);await settle(quotaId,invoked?1:0);}
           })()):undefined;
           analyzer=new ServiceRevisionAnalyzer(initial.policy,event=>{if(stopped||!analyzer?.isCurrent(event))return;void allowed().then(current=>{if(!stopped&&analyzer?.isCurrent(event))send({type:'risk',event:current?event:{...event,status:'unavailable',engine:'authority-unavailable',purpose:{relation:'undetermined',evidenceSpan:'',reason:'현재 권한·정책의 최신성을 확인할 수 없습니다. 기존 규칙 근거만 참고하세요.'}}});}).catch(stop);},llm);analyzer.start(streamId);

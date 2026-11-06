@@ -34,11 +34,11 @@ export function purposeAuthorityCurrent(attempt:import('./service-state.js').Ser
 export class ServiceRevisionAnalyzer {
  private readonly policy:PurposePolicy;private readonly segments=new Map<string,TranscriptRevision&{at:number;order:number}>();
  private readonly seen=new Map<string,{revision:number;final:boolean;order:number}>();private streamId='';private active=false;private version=0;private calls=0;
- private controller=new AbortController();private timer:ReturnType<typeof setTimeout>|undefined;private expiry:ReturnType<typeof setTimeout>|undefined;
+ private controller=new AbortController();private runningController:AbortController|undefined;private timer:ReturnType<typeof setTimeout>|undefined;private expiry:ReturnType<typeof setTimeout>|undefined;
  private running=false;private queued=false;private eventSequence=0;private analysisContext='';
  constructor(policy:PurposePolicy,private readonly emit:(e:ServiceAnalysisEvent)=>void,private readonly llm?: (text:string,policy:PurposePolicy,signal:AbortSignal)=>Promise<ServiceAnalysis>,private readonly now=()=>performance.now()) {this.policy=structuredClone(policy);}
  start(streamId:string){this.stop();this.streamId=streamId;this.active=true;this.calls=0;this.analysisContext='';this.seen.clear();}
- stop(){clearTimeout(this.timer);clearTimeout(this.expiry);this.controller.abort();this.version++;this.queued=false;if(this.active)this.publish('withdrawn','stopped',[],unknown('동의 철회 또는 통화 종료로 분석을 중단했습니다.'));this.active=false;this.segments.clear();this.seen.clear();}
+ stop(){clearTimeout(this.timer);clearTimeout(this.expiry);this.controller.abort();this.runningController?.abort();this.version++;this.queued=false;if(this.active)this.publish('withdrawn','stopped',[],unknown('동의 철회 또는 통화 종료로 분석을 중단했습니다.'));this.active=false;this.segments.clear();this.seen.clear();}
  get contextRevision(){return this.version;}
  isCurrent(event:ServiceAnalysisEvent){return this.active&&event.streamId===this.streamId&&event.contextRevision===this.version&&event.eventSequence===this.eventSequence;}
  private ordered(){return [...this.segments.values()].sort((a,b)=>/^\d+(?:\.\d+)?$/.test(a.segmentId)&&/^\d+(?:\.\d+)?$/.test(b.segmentId)?Number(a.segmentId)-Number(b.segmentId):a.order-b.order);}
@@ -53,17 +53,19 @@ export class ServiceRevisionAnalyzer {
   const segment=transcriptRevisionSchema.parse(value);if(!this.active||segment.streamId!==this.streamId)throw new Error('ANALYSIS_CONSENT_REQUIRED');
   const old=this.seen.get(segment.segmentId);if(old&&(segment.revision<=old.revision||(old.final&&!segment.final)))return false;
   if(!old&&this.seen.size>=256)throw new Error('TRANSCRIPT_SESSION_LIMIT');
+  const previousContext=this.context();
   const order=old?.order??this.seen.size;this.seen.set(segment.segmentId,{revision:segment.revision,final:segment.final,order});this.segments.set(segment.segmentId,{...segment,at:this.now(),order});
   for(const [id,s]of this.segments)if(s.at+ANALYSIS_LIMITS.retentionMs<=this.now())this.segments.delete(id);
   while(this.segments.size>ANALYSIS_LIMITS.segments)this.segments.delete(this.ordered()[0]!.segmentId);
   while([...this.segments.values()].reduce((n,s)=>n+s.text.length+1,0)>ANALYSIS_LIMITS.characters){const first=this.ordered()[0]!.segmentId;if(this.segments.size===1){this.segments.get(first)!.text=this.segments.get(first)!.text.slice(-3999);break;}this.segments.delete(first);}
-  this.changed(segment.final?'analyzing':'partial');return true;
+  const context=this.context(),appendOnly=context.length>previousContext.length&&previousContext.every((s,i)=>s.segmentId===context[i]!.segmentId&&s.revision===context[i]!.revision&&s.text===context[i]!.text);
+  this.changed(segment.final?'analyzing':'partial',appendOnly);return true;
  }
- private changed(status:'analyzing'|'partial'){
+ private changed(status:'analyzing'|'partial',appendOnly=false){
   const context=hashCanonical(this.context().map(s=>({segmentId:s.segmentId,revision:s.revision,text:s.text})));
   // Interim speech outside the finalized context must not cancel or rebill its analysis.
   if(context!==this.analysisContext){
-   this.analysisContext=context;this.version++;this.controller.abort();this.controller=new AbortController();clearTimeout(this.timer);
+   this.analysisContext=context;this.version++;if(!appendOnly){this.controller.abort();this.runningController?.abort();}this.controller=new AbortController();clearTimeout(this.timer);
    this.queued=!!this.text();this.timer=setTimeout(()=>{void this.flush();},ANALYSIS_LIMITS.debounceMs);this.timer.unref?.();
   }
   clearTimeout(this.expiry);
@@ -73,7 +75,7 @@ export class ServiceRevisionAnalyzer {
  }
  async flush(){
   clearTimeout(this.timer);if(!this.active||!this.queued||this.running)return;this.queued=false;
-  const version=this.version,controller=this.controller,text=this.text();this.running=true;
+  const version=this.version,controller=this.controller,text=this.text();this.running=true;this.runningController=controller;
   try{
    if(!this.llm||this.calls>=ANALYSIS_LIMITS.requests)throw new Error(this.llm?'request-limit':'not-configured');this.calls++;
    const result=serviceAnalysisSchema.parse(await this.llm(text,structuredClone(this.policy),controller.signal));
@@ -81,6 +83,6 @@ export class ServiceRevisionAnalyzer {
    const purpose=result.purpose?.relation==='not-detected'&&!result.purpose.evidenceSpan?undefined:result.purpose;
    if(this.active&&version===this.version&&!controller.signal.aborted)this.publish(purpose?'analyzed':'unavailable','rules+llm',mergePolicySignals(this.policy,text,this.rules(),result.signals),purpose??unknown('목적 판단을 뒷받침하는 발화 근거가 없습니다. 공식 업무에서 확인하세요.'));
   }catch(error){if(this.active&&version===this.version&&!controller.signal.aborted)this.publish('unavailable',error instanceof Error&&['request-limit','not-configured'].includes(error.message)?error.message:'rules-fallback',this.rules(),unknown('목적 분석을 수행할 수 없습니다. 확인 가능한 규칙 근거만 표시합니다.'));}
-  finally{this.running=false;if(this.active&&this.queued){this.timer=setTimeout(()=>{void this.flush();},ANALYSIS_LIMITS.debounceMs);this.timer.unref?.();}}
+  finally{this.running=false;this.runningController=undefined;if(this.active&&this.queued){this.timer=setTimeout(()=>{void this.flush();},ANALYSIS_LIMITS.debounceMs);this.timer.unref?.();}}
  }
 }
