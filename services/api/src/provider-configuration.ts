@@ -1,5 +1,13 @@
 import {open} from 'node:fs/promises';
 import {constants} from 'node:fs';
+import {z} from 'zod';
+
+const smokeBudgetSchema=z.object({id:z.string().regex(/^[A-Za-z0-9_-]{3,80}$/),expiresAt:z.number().int().positive().max(Number.MAX_SAFE_INTEGER),sttSeconds:z.number().int().min(1).max(300),connections:z.number().int().min(1).max(3),llmRequests:z.number().int().min(0).max(20)}).strict();
+// Quantity ceilings share a durable approval ID; they are not a provider billing guarantee.
+export function analysisSmokeBudget(env:NodeJS.ProcessEnv=process.env){
+ if(!env.CALLSIGN_ANALYSIS_SMOKE_BUDGET)return undefined;
+ try{if(env.CALLSIGN_ANALYSIS_SMOKE_BUDGET.length>1024)throw new Error();return smokeBudgetSchema.parse(JSON.parse(env.CALLSIGN_ANALYSIS_SMOKE_BUDGET));}catch{throw new Error('ANALYSIS_SMOKE_BUDGET_INVALID');}
+}
 
 export async function providerCredential(env:NodeJS.ProcessEnv,name:string){
  const file=env[name+'_FILE'],value=env[name];
