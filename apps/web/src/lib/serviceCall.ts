@@ -93,9 +93,13 @@ export class ServiceCall {
     }
     if(!t.lease||!c.receipt)return;
     if(now>=t.lease.payload.expiresAt)throw new Error('LEASE_EXPIRED_REVALIDATION_REQUIRED');
+    if(['new','connecting'].includes(this.sip.media.peer.connectionState)){
+      if(now>=t.firstConnectBy)throw new Error('CALL_WINDOW_EXPIRED');
+      this.sip.pause();if(this.audioStop)this.stopAnalysis();this.show({connection:'음성 연결 중: 검증 전 송신 차단',active:false});return;
+    }
     const verificationStarted=performance.now();this.verificationStarted=verificationStarted;
     const stage=t.pbx.state==='bridged'?'bridged':'prepared';
-    const e=await this.evidence(stage),observed=await observePbxTransport(this.sip.media.peer,this.sip.callId);this.alive();
+    const observed=await observePbxTransport(this.sip.media.peer,this.sip.callId),e=await this.evidence(stage);this.alive();
     let state:StateBundle|undefined;
     if(t.lease.payload.authority==='current')state=await this.get<StateBundle>(`/v3/state?digest=${c.authorization.payload.vcDigest}`);
     const result=await verifyServicePackage({authorizationJws:c.authorization.jws,vcJws:c.credential.jws,serviceProofJws:c.authorization.serviceProofJws,receiptJws:c.receipt.jws,leaseJws:t.lease.jws,leaseNonce:t.lease.payload.nonce,binding:b,trust:this.o.trust,policy:c.policy,...(state?{state}:{}),role:this.role,stage,allowUnverifiedContinuation:this.continuation,...(this.previouslyVerified?{previousVerifiedBindingHash:this.previouslyVerified}:{}),recipientId:this.o.recipientId,sessionId:t.sessionId,recipientPublicKey:t.recipientKey!.publicKey,recipientNonce:t.recipientKey!.nonce,connectionGeneration:t.generation,now:Math.floor(Date.now()/1000),monotonicMs:performance.now(),guard:this.guard,minimumLeaseSequence:this.minimumLeaseSequence,observed,pbxEvidenceJws:e.jws});this.alive();
