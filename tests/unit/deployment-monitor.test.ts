@@ -54,3 +54,17 @@ else:raise AssertionError('unobserved running process counted as zero')
 `;
  expect(()=>execFileSync('python3',['-c',check],{stdio:'pipe'})).not.toThrow();
 });
+
+it('allows an earlier resume deadline without granting another full operating period',()=>{
+ const code=`import ast,pathlib
+from types import SimpleNamespace
+module=ast.parse(pathlib.Path('scripts/monitor-deployment.py').read_text());main=next(n for n in module.body if isinstance(n,ast.FunctionDef) and n.name=='main')
+assignment=next(n for n in main.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='expires_ns' for t in n.targets))
+condition=main.body[main.body.index(assignment)+1]
+for requested,expected in [(None,100+24*3600*10**9),(150,150),(50,50),(10**20,100+24*3600*10**9)]:
+ scope={'time':SimpleNamespace(monotonic_ns=lambda:100),'args':SimpleNamespace(expires_monotonic_ns=requested)}
+ exec(compile(ast.Module(body=[assignment,condition],type_ignores=[]),'<deadline>','exec'),scope)
+ assert scope['expires_ns']==expected
+`;
+ expect(()=>execFileSync('python3',['-c',code],{stdio:'pipe'})).not.toThrow();
+});

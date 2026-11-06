@@ -71,6 +71,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env-file', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--expires-monotonic-ns', type=int, help='Preserve an earlier approved deadline on this host boot; never extend 24 hours')
     args = parser.parse_args()
     if os.environ.get('CALLSIGN_ALLOW_EXTERNAL_EXECUTION') != 'infrastructure':
         raise SystemExit('PERSISTENT_DEPLOYMENT_APPROVAL_REQUIRED')
@@ -89,6 +90,8 @@ def main():
     watch = SwapWatch(PRESSURE_POLICY)
     # Starting the expiry clock now gives at most the approved 24h, including preparation.
     expires_ns = time.monotonic_ns() + 24 * 3600 * 10**9
+    if args.expires_monotonic_ns is not None:
+        expires_ns = min(expires_ns, args.expires_monotonic_ns)
     reason = None
     ready = False
     log = root / 'resources.jsonl'
