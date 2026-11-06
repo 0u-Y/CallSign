@@ -1060,7 +1060,7 @@ Refined UI 후속 반영(2026-11-06): runtime 소스 `e267dbf`, config ID `sha25
 같은 UI 검증에서 운영 노드 조회503(`42501`)을 발견했다. `117e674`의 기존 migration runner로 `0011_operational_cursor_read`를 소유 지속 DB에 적용했다. issuer는 event cursor의 조회 세 열만 읽고 쓰기 권한은 없다. 공개 health200·네 노드 응답 확인. 실행 앱 코드 `e267dbf`는 그대로이며 migration 파일/적용 이력의 소스는 별도로 기록한다.
 
 
-### 실제 분석 완료 최소 시험 — 승인 대기 (2026-11-06)
+### Historical: 실제 분석 완료 최소 시험 — 당시 승인 대기 (2026-11-06)
 
 기존 Recording UI를 사용한다. 새 업무/통화1회, 자동 재시도0, 외부 단말/공동 복구/추가 TTS 없음. 먼저 수정 runtime의 issuer 반영 승인과 현재 활성통화0·감시/기한을 확인한다. DB/chain/realm/키는 그대로 두며 다른 정상 서비스를 편의상 재시작하지 않는다. 실패 시 기존 issuer image/config로 복귀하되 자원 중단이면 재기동하지 않는다.
 
@@ -1077,9 +1077,11 @@ Refined UI 후속 반영(2026-11-06): runtime 소스 `e267dbf`, config ID `sha25
 
 Use independent institution, gateway and recipient browser profiles. Credentials remain in the protected `oidc-persistent-inputs/login-credentials.protected.json`; never publish them. Open `/demo/work` for institution and `/demo/call` for the other actors. Scene selectors explain the recording; they do not execute commands.
 
-1. Normal contact: institution `업무 만들기` and assignment → gateway selects that work and prepares contact → recipient accepts → confirm audio → `통화 종료`.
-2. Risk: in a connected call, recipient explicitly consents to analysis; send the approved synthetic audio through the call and inspect the actual transcript, OTP evidence and explanation.
-3. Withdrawal: recipient withdraws analysis consent; analysis input stops while the call remains available. End the call separately.
+1. Normal contact: institution `업무 만들기` and assignment → gateway selects that work and prepares contact → recipient accepts → `키패드` → `2번 미동의` → confirm audio → `통화 종료`.
+2. Risk: in a connected call, recipient opens `키패드`, optionally uses `9번 다시 듣기`, then selects `1번 동의`; send the approved synthetic audio through the call and inspect the actual transcript, OTP evidence and explanation.
+3. Withdrawal: recipient selects `분석 동의 철회·삭제`; analysis input stops while the call remains available. End the call separately.
 4. Work cancellation: institution selects the exact active work and confirms cancellation; wait for actual authority/media termination rather than treating request acceptance as completion.
 
 Filming providers are ON under quantity ID `public-risk-filming-20261106-goal`:180STT seconds,3connections,12LLM requests (each stream reserves at most60seconds and invokes at most4requests), expiry2026-11-07 22:02:42KST. The existing OpenAI USD1 cost ID is not reset; pending reservations remain charged against availability. The limits are local controls, not a supplier invoice guarantee. Budget/expiry ends analysis availability; do not substitute synthetic results. Current usage and execution evidence are in [the current state table](guide/05-IMPLEMENTATION-STATUS.md). The service expiry is one minute later. Stop/restart commands above preserve data; do not restart after a safety stop without its review and authorization.
+
+V24 analysis verification is incomplete: case51 was rejected by evidence-context validation; case52 suffered network-change errors before PBX termination. The last remaining provider connection is reserved for the user, not another unattended trial. A completed v18 analysis is historical evidence, not proof of the new keypad path. If local Korean speech is unavailable, use the displayed text; there is no paid voice fallback. The keypad is a web consent control, not PBX DTMF.

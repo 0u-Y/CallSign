@@ -37,6 +37,11 @@ async function grantProductAnalysis(page:Page){
  try{await page.getByRole('button',{name:'키패드',exact:true}).click();await page.getByRole('button',{name:'9번 다시 듣기',exact:true}).click();expect(consentRequests).toBe(0);expect(await page.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);await page.getByRole('button',{name:'1번 동의',exact:true}).click();await expect(page.getByText('분석 동의 확인됨',{exact:true})).toBeVisible();expect(consentRequests).toBe(1);}finally{page.off('request',observe);}
 }
 
+export async function finishPaidAnalysis(primaryError:unknown,cleanup:()=>Promise<void>){
+ try{await cleanup();}catch(error){if(primaryError===undefined)throw error;}
+ if(primaryError!==undefined)throw primaryError;
+}
+
 export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observer:CallObserver,capture:(events:unknown[])=>Promise<void>){
  const audio=process.env.CALLSIGN_MEDIA_PAID_AUDIO;
  if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-completion2'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
@@ -44,6 +49,7 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
  recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;const closed=(type:string)=>{if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type});};socket.on('close',()=>closed('close'));socket.on('socketerror',()=>closed('socketerror'));socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:Math.round(performance.now()-started),utc:new Date().toISOString(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed'&&value.event.engine==='rules+llm')analyses++;});});
  expect(await recipient.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);
  await grantProductAnalysis(recipient);
+ let primaryError:unknown;
  try{
   await expect.poll(()=>recipient.evaluate(()=>{const w=window as any,peers=w.callSignTestPeers as RTCPeerConnection[],remote=peers.flatMap(p=>p.getReceivers().map(r=>r.track.id)),local=peers.flatMap(p=>p.getSenders().flatMap(s=>s.track?[s.track.id]:[]));return w.callSignRecorderTracks.length>0&&w.callSignRecorderTracks.flat().every((id:string)=>remote.includes(id)&&!local.includes(id));})).toBe(true);
   const [chooser]=await Promise.all([sender.waitForEvent('filechooser'),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(audio);
@@ -54,11 +60,12 @@ export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observ
   await expect(finding).toBeVisible();await expect(finding.locator('q').first()).toContainText(/\S/);
   await expect(finding.getByText('적용 기준·근거 정보',{exact:true})).toBeVisible();
   await expect(recipient.getByText('상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님',{exact:true})).toBeVisible();observer.mark('warning-visible');
- }finally{
-  try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,chunks:(window as any).callSignAudioChunks,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{
-  await recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true}).click();
-  const stop=sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true});if(await stop.isVisible())await stop.click();
+ }catch(error){primaryError=error;}finally{
+  await finishPaidAnalysis(primaryError,async()=>{try{events.push({type:'browser-lifecycle',sentFrames:sent,...await recipient.evaluate(()=>({clock:'recipient-performance.now',nowMs:performance.now(),hidden:document.hidden,chunks:(window as any).callSignAudioChunks,lifecycle:(window as any).callSignAnalysisLifecycle}))});await capture(events);}finally{
+  try{const withdraw=recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true});if(!await withdraw.isVisible())throw Error('ANALYSIS_WITHDRAWAL_CONTROL_UNAVAILABLE');await withdraw.click();}finally{
+   const stop=sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true});if(await stop.isVisible())await stop.click();
   }
+  }});
  }
  const before=sent;await recipient.waitForTimeout(1500);expect(sent).toBe(before);
  await expect(recipient.locator('.service-analysis strong')).toHaveCount(0);

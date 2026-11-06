@@ -1,19 +1,19 @@
 # 05. 구현 및 검증 현황
 
-## Current filming state — 2026-11-06 23:24 KST
+## Current filming state — 2026-11-06 23:37 KST
 
-V24 product frontend and issuer source `a36e6e6` are deployed. Production metadata has `publicPreview=false`; CI42232474427 succeeded. Issuer local config ID is `sha256:436fb7d1a24293f166ece59e20fee623061ca290411f8f3f9075460e5768838e` (not a registry manifest digest). Issuer-only replacement preserved data, cost reservations and operating expiry; readiness200. Prior failures below remain historical evidence.
+V24 product frontend and issuer source `4f1d89a` are deployed. Production metadata has `publicPreview=false`; CI42234103433 succeeded. Issuer local config ID is `sha256:a5de1985f5c3f1dd72c23f7bb973a600c089ea15726a6737d8afed94fdf6aa31` (not a registry manifest digest). Issuer-only replacement preserved data, cost reservations and operating expiry; readiness200. Prior failures below remain historical evidence.
 
 | Boundary | Evidence | Limit |
 |---|---|---|
 | V24 UI | Original ShortVoice_v24 SHA verified; actual components, dark phone, elapsed clock, keypad1/2/9 and local-voice fallback;1440/390px fixtures and authenticated public captures | Headless Korean voice unavailable; no spoken-duration claim; final authenticated capture completed at a36e6e6; one management request aborted during navigation, subsequent node view loaded |
 | V24 normal/media | Case49 PASS: new actual work/call, two-way decoded relay audio, key2/no recorder, file440Hz→mic660Hz, mute/unmute, page continuity, normal end | Server-host browsers, not external devices |
 | V24 institution cancellation | Case50 PASS: actual UI cancellation, both audio stopped, PBX absent, cancelled-work409 | One logical attempt, no analysis consent |
-| Actual risk analysis | Earlier v18 case48 PASS: remote track→Deepgram→OpenAI→evidence display→withdrawal→live call→normal end | V24 case51: key9→1/remote transcription succeeded, but completed output rejected as LLM_EVIDENCE_CONTEXT_INVALID; FAIL, no retry |
-| Filming quotas | Same total180STT seconds/3connections/12LLM requests; corrected per-stream share60seconds/4requests | After case51:135seconds/2connections/9requests remain; OpenAI used29735/reserved19879microUSD (available950386); estimates, not invoices. Totals never reset; provider expiry2026-11-07 22:02:42KST |
+| Actual risk analysis | Earlier v18 case48 PASS: remote track→Deepgram→OpenAI→evidence display→withdrawal→live call→normal end | V24 case51 failed evidence-context validation. Diagnostic case52 received transcription/2model usage responses, then network-change errors and PBX BYE ended the call before completion. Neither is a full v24 analysis PASS |
+| Filming quotas | Same total180STT seconds/3connections/12LLM requests; corrected per-stream share60seconds/4requests | After case52:123seconds/1connection/7requests remain (last connection capped at60seconds/4requests); OpenAI used32158/reserved19879microUSD (available947963); estimates, not invoices. Totals never reset; provider expiry2026-11-07 22:02:42KST |
 | Persistent operation |21 services, monitor active; expiry2026-11-07 22:03:42KST | Original stop records preserved; no automatic restart after resource stop |
 
-Evidence: current resume pointer `.local/current-persistent-resume.path`, `public-call-smoke-49-v24-decline-recording`, `public-call-smoke-50-v24-cancel`, `v24-budget-runtime`; `.local/v24-review/`. Earlier case46/47/48 remain in `resume-20261106T1705`. Credentials/audio/transcripts remain protected. [Operator commands](../RUNBOOK.md#소유-자원과-운영-명령). Network-change root cause remains undetermined.
+Evidence: current resume pointer `.local/current-persistent-resume.path`, `public-call-smoke-49-v24-decline-recording`, `public-call-smoke-50-v24-cancel`, `v24-budget-runtime`, `v24-evidence-runtime`, `public-call-smoke-51-v24-analysis`, `public-call-smoke-52-v24-analysis-diagnostic`; `.local/v24-review/`. Earlier case46/47/48 remain in `resume-20261106T1705`. Credentials/audio/transcripts remain protected. [Operator commands](../RUNBOOK.md#소유-자원과-운영-명령). Network-change root cause remains undetermined.
 
 ## Historical snapshots before the final filming run
 
