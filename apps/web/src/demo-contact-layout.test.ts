@@ -7,19 +7,20 @@ import {ServiceContactSummary} from './components/ServiceContactSummary.js';
 import {ServiceAnalysisPanel} from './components/ServiceAnalysisPanel.js';
 import {DemoWorkspace} from './components/DemoWorkspace.js';
 vi.hoisted(()=>vi.stubGlobal('sessionStorage',{getItem:()=>null}));
-it('uses an honest short address label while preserving full identity and visible prohibited requests',()=>{
+it('uses an honest short address label while preserving full identity and prohibited requests in details',()=>{
  const uri='https://callsign-demo.example/institutions/demo-bank';
  const html=renderToStaticMarkup(createElement(ServiceContactSummary,{institutionUri:uri,policy:bankPolicy,role:'recipient',compact:true,active:true,intent:{id:'work',agentId:'agent',recipientId:'recipient',status:'open'},attempt:{id:'attempt',status:'accepted'}}));
  const header=html.slice(0,html.indexOf('</header>'));
  expect(header).toContain('등록 주소 식별명 · demo-bank');expect(header).not.toContain('https://');
  expect(html.indexOf(uri)).toBeGreaterThan(html.indexOf('<details'));
  const visible=html.slice(0,html.indexOf('<details'));
- expect(visible).toContain('인증번호 요구');expect(visible).toContain('분석은 별도 동의');
+ expect(html.slice(html.indexOf('<details'))).toContain('인증번호 요구');expect(visible).toContain('분석은 별도 동의');
+ expect(html).toContain('href="/official"');
  expect(html).toContain('확인된 기관 표시명을 대신하지 않습니다');expect(html).toContain('업무 식별자');
 });
-it('keeps the compact empty analysis honest and its authenticated official action available',()=>{
+it('keeps compact empty analysis distinct from completed results',()=>{
  const html=renderToStaticMarkup(createElement(ServiceAnalysisPanel,{compact:true}));
- expect(html).toContain('아직 분석 결과 없음');expect(html).toContain('href="/official"');expect(html).toContain('민감한 요구는 수행하지 말고');
+ expect(html).toContain('아직 분석 결과 없음');expect(html).toContain('동의와 실행 상태를 위에서 확인');
  expect(html).not.toContain('안전한 통화');
 });
 it('keeps actual verification and analysis central and recipient controls in the phone',()=>{

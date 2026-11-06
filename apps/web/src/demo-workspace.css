@@ -26,7 +26,7 @@
 .demo-workspace :is(input,select,textarea){max-width:100%;min-width:0;font:inherit}
 .demo-workspace :is(p,label,summary,.button){font-size:16px}
 .demo-workspace small,.demo-workspace .field-help{font-size:14px}
-.demo-workspace button{white-space:normal;min-height:44px}
+.demo-workspace button{white-space:normal;min-height:44px}.demo-workspace .button{line-height:1.4;padding-block:10px}
 .demo-workspace [hidden]{display:none!important}
 .demo-workspace :is(dd,code,p,small){overflow-wrap:anywhere}
 .demo-workspace .demo-call-grid{grid-template-columns:254px minmax(0,1fr) 334px;gap:36px;align-items:start}
