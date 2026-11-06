@@ -1,0 +1,277 @@
+{
+  "design": {
+    "file": "docs/CallSign_Demo_Design.html",
+    "title": "CallSign — Demo v5.1 · Refined",
+    "userConfirmedFinal": true,
+    "sha256": "b4fa5a04a71ead8cd6acb745e5bc8a03f7dac124de4998bdc611545f4b52f867"
+  },
+  "frontendSource": "ea13da3504faf362eed8b237e519a4f6f26505c5",
+  "runtimeSource": "e267dbf7a0d44eb76b61f3297c07907b34ea50ad",
+  "runtimeConfigId": "sha256:17572369cea1623d7e11a0fbfa52c37523fbb35bcb20cd479e0267a0c9ef5bf5",
+  "registryManifestClaim": false,
+  "actualPublicReadOnly": {
+    "scope": "Actual authenticated public API read-only UI; no call, microphone, media or paid provider requests",
+    "checks": [
+      {
+        "role": "institution",
+        "route": "work",
+        "width": 1440,
+        "overflow": false
+      },
+      {
+        "role": "institution",
+        "route": "work",
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "role": "institution",
+        "route": "governance",
+        "width": 1440,
+        "overflow": false
+      },
+      {
+        "role": "institution",
+        "route": "governance",
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "role": "gateway",
+        "route": "call",
+        "width": 1440,
+        "overflow": false
+      },
+      {
+        "role": "gateway",
+        "route": "call",
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "role": "recipient",
+        "route": "call",
+        "width": 1440,
+        "overflow": false
+      },
+      {
+        "role": "recipient",
+        "route": "call",
+        "width": 390,
+        "overflow": false
+      },
+      {
+        "role": "approver",
+        "route": "governance",
+        "width": 1440,
+        "overflow": false
+      },
+      {
+        "role": "approver",
+        "route": "governance",
+        "width": 390,
+        "overflow": false
+      }
+    ],
+    "temporarySessionsLoggedOut": true
+  },
+  "fixture": {
+    "source": "Working tree before e267dbf; later heading-wrap and compact-identity adjustments verified against deployed sources",
+    "checks": 14,
+    "scope": "Synthetic HTTP responses: create/select/cancel, account race, errors, keyboard/drawer, audio DOM continuity. Not actual WebRTC continuity."
+  },
+  "runtimeReadiness": [
+    200,
+    200,
+    200
+  ],
+  "provider": "none",
+  "newPaidCalls": 0,
+  "newCalls": 0,
+  "actualProductWrites": false,
+  "login": "Real HTTP OIDC PKCE flow followed by isolated authenticated browser contexts; not a new interactive browser login-form test",
+  "viewport": [
+    1440,
+    390
+  ],
+  "zoom": "CSS 2x, not browser-native zoom",
+  "dbReadOnly": {
+    "receipts": 13,
+    "journal": 19,
+    "users": 6,
+    "activeCalls": 0,
+    "reservations": 0,
+    "reservedBalance": 0,
+    "outbox": {
+      "done": 187
+    }
+  },
+  "persistentExpiry": "2026-11-07T08:37:00+09:00",
+  "limits": [
+    "No new actual call/cancel/recovery command or paid analysis",
+    "External user devices remain unverified",
+    "Real independent signatures and role-specific data remain distinct from the design mock",
+    "Initial CI e267dbf failed obsolete layout assertions; retained as historical failure"
+  ],
+  "finalProductSource": "117e674731971b3c0385d3ae66fbf2d014624418",
+  "migration": {
+    "id": "0011_operational_cursor_read",
+    "sourceHash": "0069577fb77055750a91e9afe044dfb074c5be348a1f9e2c1a41ceb700733874",
+    "appliedVia": "Existing guarded migrate-finals runner; historical hashes checked",
+    "scope": "SELECT deployment_id, block_number, block_hash only; INSERT/UPDATE/DELETE remain false",
+    "before": {
+      "http": 503,
+      "sqlCode": "42501",
+      "missingPrivilege": "issuer event_cursor read"
+    },
+    "after": {
+      "http": 200,
+      "durationSeconds": 0.31,
+      "nodes": [
+        {
+          "node": 1,
+          "status": "current",
+          "height": "9329"
+        },
+        {
+          "node": 2,
+          "status": "current",
+          "height": "9329"
+        },
+        {
+          "node": 3,
+          "status": "current",
+          "height": "9329"
+        },
+        {
+          "node": 4,
+          "status": "current",
+          "height": "9329"
+        }
+      ],
+      "error": null
+    }
+  },
+  "runtimeMigrationNote": "Running server source e267dbf unchanged; migration runner/source 117e674 applied separately to owned DB. No new runtime build for migration-only follow-up.",
+  "governanceFollowup": {
+    "source": "3e1a71902a18cb9fdec20525ae0c3cb06a94b876",
+    "layout": {
+      "scope": "Actual authenticated public API read-only UI; no call, microphone, media or paid provider requests",
+      "checks": [
+        {
+          "role": "institution",
+          "route": "governance",
+          "width": 1440,
+          "overflow": false
+        },
+        {
+          "role": "institution",
+          "route": "governance",
+          "width": 390,
+          "overflow": false
+        }
+      ],
+      "temporarySessionsLoggedOut": true
+    },
+    "nodeHealthRecapture": {
+      "source": "117e674731971b3c0385d3ae66fbf2d014624418",
+      "status": "FAIL",
+      "reason": "Authenticated-role UI wait exceeded 15 seconds; root cause not established; no call created",
+      "resourceStop": false
+    },
+    "freshSessionCheck": {
+      "source": "117e674731971b3c0385d3ae66fbf2d014624418",
+      "result": {
+        "scope": "Actual authenticated public API read-only UI; no call, microphone, media or paid provider requests",
+        "checks": [
+          {
+            "role": "institution",
+            "route": "governance",
+            "width": 1440,
+            "overflow": false
+          },
+          {
+            "role": "institution",
+            "route": "governance",
+            "width": 390,
+            "overflow": false
+          }
+        ],
+        "temporarySessionsLoggedOut": true
+      },
+      "transport": [
+        {
+          "path": "/api/v3/auth/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/workspace",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/management/recalls",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/management",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/notifications",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/management/jobs",
+          "status": 200
+        },
+        {
+          "path": "/api/v3/management/health",
+          "status": 200
+        }
+      ],
+      "priorTimeoutCause": "Unconfirmed; fresh-session success does not establish cause"
+    }
+  },
+  "captures": [
+    {
+      "file": "approver-governance-390.png",
+      "sha256": "a34748784990cd1066d3510624ec516b4930158f7eda1f82e95f388520fcf609"
+    },
+    {
+      "file": "gateway-call-1440.png",
+      "sha256": "afaafb44ec19fcd348ae3e744a38f9c361511f06819039be59c1d4e47c144391"
+    },
+    {
+      "file": "institution-governance-1440.png",
+      "sha256": "18ebf76b87743bbd35a098dbc528028714c5f307ec8ae4d31bd8544da6211019"
+    },
+    {
+      "file": "institution-governance-390.png",
+      "sha256": "e744f395ce65fadbd6c607bfe77bb6f13d8a1607e7985cf1a27ed4f3c2f632ac"
+    },
+    {
+      "file": "institution-work-1440.png",
+      "sha256": "b460f29076f5c4587de9e890131a1acbb91e0ab53e1174b0594f42513451162d"
+    },
+    {
+      "file": "institution-work-390.png",
+      "sha256": "0d587c9f8af9457e71d22bd51d3a2ecae086999541138239dbf6e50ecb2e1271"
+    },
+    {
+      "file": "recipient-call-1440.png",
+      "sha256": "dc965ed9bf0c06a7f0d44e87d99b940f3487510958c9a1c0358ecc830bc46e97"
+    },
+    {
+      "file": "recipient-call-390.png",
+      "sha256": "f7e0fb129c125921fc50a2b46b49ea7aa5490c999f333837707b848b3dd963c3"
+    },
+    {
+      "file": "recipient-details-390.png",
+      "sha256": "3f604fc5f119cf65dd353316a32cb87d7839978995cf00f5a0bbd997fa637bdf"
+    },
+    {
+      "file": "work-zoom.png",
+      "sha256": "d7ea2da555ac24e8655d8437961955dda874490d8a203b6fcc47a52dd6066431"
+    }
+  ]
+}
