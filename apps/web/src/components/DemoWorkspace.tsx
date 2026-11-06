@@ -4,7 +4,7 @@ import {useEffect,useState,useRef,type ComponentProps} from 'react';
 import {DemoCallFlow,callScene} from './DemoCallFlow.js';
 import type {ServiceCallStatus} from '../lib/serviceCall.js';
 import {NavLink} from 'react-router-dom';
-import {Phone,ShieldCheck,ArrowRight,Building2,UserRound} from 'lucide-react';
+import {Phone,ShieldCheck,ArrowRight,UserRound} from 'lucide-react';
 import type {ServiceWorkspace} from './ServiceWorkspace.js';
 import {LedgerObservation} from './LedgerObservation.js';
 
@@ -31,7 +31,7 @@ export function DemoWorkspace(p:Props){
   <section hidden={!p.workActive} aria-label="업무 관리 화면">{p.work}</section>
   <section hidden={p.governance||p.workActive} aria-label="연락과 통화 화면" data-attention={flow.focus}>
    <nav className="demo-scene-tabs scene-tabs" aria-label="촬영 장면 안내">{scenes.map((name,i)=><button key={name} className={scene===i?'active':''} aria-pressed={scene===i} onClick={()=>setScene(i)}><b aria-hidden="true">0{i+1}</b>{name}</button>)}</nav><p className="demo-scene-hint">{['업무를 선택해 연락을 준비하세요. 수락과 분석 동의는 수신자가 직접 합니다.','실제 발언을 전달하고 수신자 화면의 위험 근거를 확인하세요.','수신자가 분석 동의를 철회한 뒤 일반 통화가 유지되는지 확인하세요.','기관의 독립 로그인 창에서 선택 업무를 취소하고 실제 회수 결과를 확인하세요.'][scene]} 장면 선택은 실제 상태를 변경하지 않습니다.</p>
-   <div className="demo-call-grid stage"><aside className="demo-institution panel sender"><header className="demo-sender-heading sender-brand"><div className="demo-bank-mark sender-symbol"><Building2 size={22} aria-hidden="true"/></div><div><h2>{p.phoneTitle||'기관 확인 전'}</h2><small>{p.roleName} 워크스페이스 · 합성 시연 표시</small></div></header>
+   <div className="demo-call-grid stage"><aside className="demo-institution panel sender"><header className="demo-sender-heading sender-brand"><div className="demo-bank-mark sender-symbol"><img className="callsign-logo" src="/callsign-logo.png" alt="" width={40} height={40}/></div><div><h2>{p.phoneTitle||'기관 확인 전'}</h2><small>{p.roleName} 워크스페이스 · 합성 시연 표시</small></div></header>
      <div className="sender-main">{p.callSummary?<><div className="demo-contact-person sender-person"><span><UserRound size={22}/></span><div><small>연락 대상</small><strong>{p.callSummary.recipient}</strong></div></div><div className="sender-purpose"><small>연락 목적</small><h3 className="demo-purpose">{p.callSummary.purpose}</h3></div><dl className="demo-agent-line sender-meta"><dt>담당 상담원</dt><dd>{p.callSummary.agent}</dd></dl><div className="demo-approval-tile sender-approval"><small>이번 연락 승인</small><strong>{status.invitationVerified?'연결 승인 검증됨':p.callSummary.state==='진행 중'?'발신 시 확인':p.callSummary.state}</strong></div></>:<p className="demo-empty-selection">진행할 업무를 선택하세요.</p>}
      <details key={p.callSummary?.id??'none'} className="demo-work-picker" open={!p.callSummary}><summary>연락 업무 선택</summary>{p.queue||<p>계정 연결 후 허용된 업무를 선택하세요.</p>}</details>
      <div className="demo-sender-actions sender-controls">{p.preparation}{p.role==='gateway'&&p.controls}{p.role==='institution'&&<><NavLink className="button primary" to="/demo/work">업무 관리</NavLink><small>발신은 상담원 창에서 진행합니다.</small></>}</div></div></aside>

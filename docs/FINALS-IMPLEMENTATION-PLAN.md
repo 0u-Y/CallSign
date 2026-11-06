@@ -739,3 +739,7 @@ Public recheck boundary: actual OIDC login/callback succeeded in the earlier rea
 ### 2026-11-07 v24 통합 QA 후속
 
 전용 UI worktree에서 병행 화면 변경을 정상 병합하고 main `4e94781`을 게시했다. 해당 CI/Production 확인, light92파일504테스트 및 실제 컴포넌트/합성 응답 QA를 통과했다. 상담원 실제 폼 로그인·callback/me/workspace200·원래 업무 경로 복귀는 확인했으나 다음 재검사는 JS asset ERR_NETWORK_CHANGED로 실패했다. 원인 미확정이며 실제 발신0·유료0이다. 사용자 승인 동일 조건 재개1회 뒤 기존 개발 세션의 감시 전환과 공개 시험 단일 담당 요청에 따라 공개 브라우저를 닫고 공유 종료 파일을 남겼다. 이 세션은 새 감시 정책을 변경하지 않았다. 전체 상태별 PASS/FAIL/BLOCKED/NOT_RUN·증거·촬영 인계는 [v24 검토](V24-PUBLIC-UI-REVIEW.md#전체-qa-추적표)를 따른다. UI/공개 음성/AI 전체 완료 판정은 아니다.
+
+### 2026-11-07 사용자 로고 적용
+
+사용자 `docs/LOGO.png`의 원본 바이트를 웹 공개 asset으로 복사하여 공통 Brand, 연락 흐름 중앙, 상담원 카드와 favicon에 적용했다. 원본 HTML/PNG는 보존했다. 웹 build·타입 검사 및 1440/1920/390px 합성 UI 회귀를 확인했다. 통화·운영·분석 동작은 변경하지 않았다.
