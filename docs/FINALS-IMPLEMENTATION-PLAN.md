@@ -4,6 +4,12 @@
 
 현재 구현·실행 범위는 [기준 SHA와 확인 날짜가 있는 현황표](guide/05-IMPLEMENTATION-STATUS.md)에서 관리한다. 이 문서의 날짜별 “현재”·PASS·미완료는 당시 소스·환경의 기록이다. 과거 실패와 후속 성공은 각각 보존한다. 이전 상단 표는 [이력 보관본](archive/DEVELOPMENT-HISTORY-20261104.md#같은-기준의-개발-진행표-상단)에 옮겼다.
 
+## 2026-11-06 실제 공개 경로 통화와 병렬 보완
+
+`20cbd65` frontend·기존 `0a62aef` runtime에서 승인·소비·lease와 양방향 서로 다른 합성 음원 디코딩, 페이지 이동 유지, 정상 종료·양측 음성 중단을 확인했다. 원래 시험은 종료 후 정리 코드가 이미 ended인 통화를 failed로 바꾸려 해 FAIL이었으며 그대로 보존했다. 같은 통화의 후속 읽기 조회는 ended/user-ended·소비 영수증·PBX 부재 및 ARI channel/bridge0을 확인했다. 검사 기준은 낮추지 않았고, Chromium 권고대로 합성 WAV의 capture processing만 시험 경계에서 끈 결과다. 독립 외부 단말·사람 마이크·실제 STT/LLM 성공은 아니다. 상세는 [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 normalPublicCall20261106을 따른다.
+
+서로 다른 파일 소유 범위로 공동 복구 요청/공개 서명 검토 화면, 유한 AI 승인 ID quota, 기존21개 자원의 guard 적용 start/restart를 병렬 보완했다. 실제 통화 캡처에서 확인한 긴 URI·제어 위치·중복 안내도 줄였다. 새 UI·녹음 파일 송출·실제 재시작은 아직 후속 실행 대상이며 AI는 기존 한도 소진으로 추가 승인 전까지 비활성이다. 현재 DB 순간 읽기 조회에서 overdue outbox·만료 claim·미정산 예약은0이지만 과거 pending1건의 원인은 원본 부족으로 계속 미확정이다.
+
 ## 2026-11-06 공개 통화 협상 진단
 
 공개 SIP 등록·INVITE 이후 5초 ICE 완료 대기가 종료 원인이었다. 사용 불가 interface 오류와 relay 후보를 분리 관측하고, 완료 필수 조건을 유지한 15초 대기로 양측 ICE 완료·ACK를 확인했다. 관련 단위6건·타입 검사 통과, `b59fd16` Production/CI 확인. 이후 수락 뒤 `verification-unavailable`로 종료되어 최초 수신자 실패를 추가 진단 중이며, 상대 측 `PBX_BINDING_CONTEXT_INVALID`는 원인으로 확정하지 않는다. 후속 첫 오류 진단에서는 한쪽 relay 미획득·15초 ICE_TIMEOUT도 남았다. 이번 논리적 시도6건은 모두 미완료/실패로 보존했고 자동 재시도는 없다. 내부 서버 브라우저가 검증한 공개 DNS 경로를 사용했으며 독립 외부 네트워크·음성 디코딩·실제 AI 성공은 아니다. [기동 증거](../artifacts/persistent-idp-start-20261105.json)의 publicMediaInvestigation20261106을 따른다. 지속 서비스·영속 자료는 유지하고 종료된 임시 브라우저 helper10개만 full ID로 정리했다.

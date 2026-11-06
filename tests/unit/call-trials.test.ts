@@ -46,5 +46,5 @@ it('keeps test identities as the default and requires an exact pinned persistent
 it('scopes a public DNS override to the owned demo browser without disabling TLS or local-network checks',()=>{
  expect(callTrialBrowserArgs({})).toEqual([]);
  expect(()=>callTrialBrowserArgs({CALLSIGN_MEDIA_PUBLIC_DNS_IPV4:'1.1.1.1'})).toThrow('EXPLICIT_PUBLIC_DEMO_DNS');
- expect(callTrialBrowserArgs({CALLSIGN_MEDIA_PUBLIC_DNS_IPV4:'1.1.1.1',CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION:'OWNED_PUBLIC_DEMO',CALLSIGN_MEDIA_SIGNALING_ORIGIN:'https://owned.example'})).toEqual(['--host-resolver-rules=MAP owned.example 1.1.1.1']);
+ expect(callTrialBrowserArgs({CALLSIGN_MEDIA_PUBLIC_DNS_IPV4:'1.1.1.1',CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION:'OWNED_PUBLIC_DEMO',CALLSIGN_MEDIA_SIGNALING_ORIGIN:'https://owned.example'})).toEqual(['--webrtc-ip-handling-policy=default_public_interface_only','--host-resolver-rules=MAP owned.example 1.1.1.1']);
 });

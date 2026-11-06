@@ -3,6 +3,7 @@ services:
   issuer:
     environment:
       CALLSIGN_ANALYSIS_PROVIDER: openai
+      CALLSIGN_ANALYSIS_SMOKE_BUDGET: ${CALLSIGN_ANALYSIS_SMOKE_BUDGET:-}
       OPENAI_MODEL: ${OPENAI_MODEL:?reviewed service analysis model, separate from Codex}
       OPENAI_API_KEY: ''
       OPENAI_API_KEY_FILE: /run/providers/openai.key

@@ -533,5 +533,86 @@
       "scope": "Single server-hosted browser with synthetic microphone permission, real public TLS TURN; candidate gathering only, no call/audio success claim",
       "interpretation": "Interface-unavailable errors alone do not establish the cause; isolated gather completes despite them. Concurrent product negotiation remains unresolved."
     }
+  },
+  "normalPublicCall20261106": {
+    "status": "USER_FLOW_VERIFIED_ORIGINAL_OBSERVER_FAIL_PRESERVED",
+    "frontendSource": "20cbd659783ab08791fbbb0abefc939a016391aa",
+    "runtimeSource": "0a62aefde46e5edd8e8cf65ec4636ed74b06a232",
+    "runtimeImageConfigId": "sha256:a3718bcb3470e0c0cbb82967372bd36ef93fbdf8994934135464f7febf15adbd",
+    "scope": "Two independently authenticated server-hosted browser sessions using the actual public Funnel HTTPS/WSS/TLS TURN path. Synthetic WAV microphones with capture processing disabled per Chromium calibration guidance. Not independent external networks, human microphone quality, or actual provider analysis.",
+    "actualChecks": [
+      "Institution approval, independent browser keys, one-time consumption and signed receipt",
+      "Actual renewal lease1, media-ready proofs, selected relay ICE and native DTLS on both legs",
+      "Distinct660Hz and990Hz remote decoded spectra above unchanged thresholds, before-accept audio blocked",
+      "Route navigation preserves the same connected native peers and decoded audio",
+      "Normal user-ended state, both remote audio stopped, same-call API cleanup readback and zero ARI channels/bridges"
+    ],
+    "firstToneAmplitude": {
+      "senderRemote": 0.0093023,
+      "recipientRemote": 0.0090933
+    },
+    "originalObserverResult": "FAIL: finally attempted failed outcome after ended and received TERMINAL_STATE_CONFLICT; original log retained",
+    "followup": {
+      "status": "PASS",
+      "scope": "Read-only followup of the same uniquely matched normal call, not a rerun or replacement of original observer failure",
+      "originalEarlyAttemptReceiptEmpty": true,
+      "identitySource": "Unique work and actor-visible attempt within original container creation window, retained API records",
+      "attemptStatus": "ended",
+      "reason": "user-ended",
+      "receiptPresent": true,
+      "leaseSequence": 1,
+      "mediaReadyRoles": [
+        "sender",
+        "recipient"
+      ],
+      "cleanup": {
+        "source": "ari-delete-readback",
+        "status": "pbx-absent",
+        "attempts": 3,
+        "observedAt": 1793929024
+      },
+      "ariCounts": {
+        "channels": 0,
+        "bridges": 0
+      },
+      "observedAt": 1793929583
+    },
+    "originalEarlyAttemptReceipt": "Empty due observer reading selected value before async creation; matched existing unique actor/work/time window for read-only followup; no history edit",
+    "newObserverFixes": [
+      "Await real attempt creation response before storing attempt identity",
+      "Bound authorization response wait",
+      "Save pre-cleanup diagnostics and partial observations before cleanup",
+      "Preserve existing terminal result and verify actual PBX absence instead of overwriting ended",
+      "Use the current Chrome default-public-interface option only in the explicit server-hosted public-check profile"
+    ],
+    "newProductFixes": [
+      "Wait while native WebRTC is still connecting without enabling audio; initial connection deadline and DTLS/binding checks remain required",
+      "Stop duplicate termination and late verification while user end is pending"
+    ],
+    "newCodeRetest": "NOT_RUN at this record; newer compact UI/file-input/restart still require current-source verification",
+    "providerCallsThisInvestigation": 0
+  },
+  "liveDbReadOnly20261106": {
+    "scope": "Point-in-time read-only live owned DB, not final quiescent audit or historical pending1 resolution",
+    "observedAt": "2026-11-06T01:53:47Z",
+    "outbox": {
+      "done": 102,
+      "pending": 0,
+      "processing": 0,
+      "failed": 0
+    },
+    "expiredClaims": 0,
+    "nonterminalAttempts": 0,
+    "terminalPbxNotEnded": 0,
+    "unsettledReservations": 0,
+    "receipts": 7,
+    "journals": 9,
+    "consumptionsMissingJournal": 0,
+    "authSessionRetention": {
+      "unexpiredByTimestamp": 3,
+      "expired": 3,
+      "meaning": "Retained work sessions; expiry count is not current authorization proof"
+    },
+    "historicalPendingOne": "UNKNOWN: original job details unavailable; current zero does not retroactively resolve prior FAIL"
   }
 }

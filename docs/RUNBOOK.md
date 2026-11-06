@@ -2,7 +2,7 @@
 
 ### 공개 프런트엔드와 실제 통화 배포 구분
 
-현재 시연 진입은 `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 공개 preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
+현재 시연 진입은 `/demo/call`(연락·통화)과 `/demo/governance`(공동 관리)이며 `/demo`도 연락 화면을 연다. `/service`는 업무 화면과 OIDC callback, `/official`은 별도 공식 인증을 유지한다. 현재 [공개 연락 화면](https://callsign-rouge.vercel.app/demo/call)과 [공동 관리 화면](https://callsign-rouge.vercel.app/demo/governance)은 실제 로그인·업무 API 연결 모드다. 별도로 생성하는 public preview 빌드는 API 미연결을 표시하고 로그인/통화를 수행하지 않는다. 공개 `/legacy/demo`는 `/service`로 이동한다. 과거 발표 컴포넌트는 소스 이력으로 보존한다. AWS 실제 서비스는 대상 metadata/trust/PBX 인증서에 맞춘 웹을 동일 origin 인증 계약에 따라 제공한다. Vercel URL 유지를 위해 cookie·Origin·CSRF·WSS 조건을 완화하지 않는다.
 
 시연 준비와 조작은 다음 순서다. 실제 실행 여부는 [현황표](guide/05-IMPLEMENTATION-STATUS.md)를 먼저 확인한다.
 
@@ -36,28 +36,28 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 자원 중단 뒤 사용자가 명시적으로 재개하면 `deployment-control.mjs review`에 보호 env와 `CALLSIGN_RESOURCE_REVIEW_REFERENCE`를 전달한다. 각 승인은 해당 중단 파일의 SHA에 연결된 새 review 파일로 남는다. 원본 중단·이전 review를 삭제하거나 덮어쓰지 않으며, 이후 중단은 다시 기동을 차단한다.
 
-첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 이는 최초 준비 시점의 기록이다. 이후 명시 재개·공개 로그인 결과는 같은 증거의 날짜별 후속 항목과 현황표를 따른다.
+첫 지속 IdP 준비에서는 DB가 healthy가 됐고 NEW import 명령이 exit0으로 종료됐다. healthcheck가 없는 컨테이너를 읽는 기존 Docker template 오류로 감시/자동 중지가 실패해, 조회식을 수정한 뒤 소유 컨테이너를 중지했다. 영속 DB·원본 오류·latch는 보존했다. [실제 결과](../artifacts/persistent-idp-start-20261105.json). 이것은 최초 기동 당시 실패다. 이후 사용자 명시적 재개와 새로운 SHA 연결 review를 거쳐 정상 로그인·API 기동을 확인했으며, 원본 중단 파일은 그대로 보존한다.
 
 첨부 디자인은 실제 `/demo/call`·`/demo/governance`에 이식한다. 화면의 탐색은 명령이 아니며 시안의 타이머·전체 상태 초기화·승인자 전환은 실행 도구로 사용하지 않는다. 서로 다른 actor는 독립 브라우저 프로필로 로그인하고 실제 업무 생성→발신/수락→분석 동의→취소/회수를 수행한다. 새 반복은 새 업무·시도로 진행한다. 공개 frontend의 API 미연결 안내가 있으면 이 조작을 실행할 수 없다.
 
 사용자가 전용 노드 등록과 해당 노드의 Funnel 권한·HTTPS 인증서 발급을 완료했다. 등록 링크 재승인을 요구하거나 기존 전체 구성원용 정책을 추가하지 않는다. 보존 identity로 실제 등록/권한을 조회하고, 진단 성공과 제품 backend·미디어 연결을 구분한다. [Funnel의 TLS 종료 TCP 전달](https://tailscale.com/docs/reference/tailscale-cli/funnel#use-a-tcp-forwarder)은 사용할 수 있는 전송 옵션이며, TURN 연동·외부 relay 성공을 입증한 것은 아니다.
 
-저장소의 `vercel.json`은 업무 HTTP를 backend로 rewrite하고 분석 경로를 `api/audio.ts`의 relay에 연결한다. relay는 같은 origin·cookie·CSRF·Origin 경계를 유지하는 코드이며, 배포 설정만으로 실제 Upgrade101·분석 성공을 입증하지 않는다. SIP는 별도 공개 WSS, 음성은 ICE/TURN 경로를 사용한다. 실제 backend와 trust가 준비된 빌드만 실제 모드로 제공한다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
+현재 Vercel은 HTTP API rewrite와 `api/audio.ts`의 native WebSocket relay를 사용한다. 분석은 같은 origin의 cookie·CSRF·Origin 경계를 유지하며, SIP는 전용 Funnel WSS로 직접 연결한다. WebSocket 접속/거절은 실제 분석 동의·전사 성공과 별개다. HTTP rewrite 성공을 TURN 음성 성공으로 확대하지 않는다. 마이크 정책은 첫-party `(self)`만 허용하며 사용자 동작 전 요청하지 않는다.
 
-현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 기존 보호 `oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 일부 의존성이 준비되지 않았을 때의 전체 readiness503을 health200과 구분한다.
+현재 로그인은 `/demo/call` → **로그인 · 역할 연결 · 실행 준비** → **업무 계정 로그인**에서 진행한다. 합성 계정은 보호 파일 `.local/persistent-demo-connect-20261105T073906Z/oidc-persistent-inputs/login-credentials.protected.json`에서 확인하고 역할별 독립 브라우저 프로필을 쓴다. 비밀번호는 Git·채팅에 옮기지 않는다. 현재 서버는 `compose.data-server.yml`의 별도 loopback 제품/Anchor DB와 `compose.api-server.yml`의 일반 제품 entrypoint를 사용한다. 현재 세 API의 `/health`·`/readiness`는200을 확인했다. 과거 PBX 미준비503은 당시 기록이며, readiness200도 실제 사용자 통화 완료와 구분한다.
 
 ### 브라우저부터 실제 서비스까지
 
 | 연결 | 현재 소비 코드/계약 | 지속 환경에서 필요한 확인 |
 |---|---|---|
-| frontend → API | api.ts의 상대 `/api/v3/*`, credentials include | 같은 공개 origin의 인증된 HTTPS 경로. `vercel.json`의 `/api/v3/:path*` backend rewrite와 JSON 응답 확인 |
-| frontend → 분석 | liveMedia.ts의 같은 origin `/api/v3/audio` WSS | `/api/v3/audio` → `api/audio.ts` relay. 실제 Upgrade101·인증 cookie·Origin·동의 확인. HTTP200은 성공 근거가 아님 |
-| 로그인 → callback | 업무/공식 별도 client·audience, PKCE, 둘 다 `WEB_ORIGIN/service` | 실제 issuer/JWKS/token URL과 합성 역할 계정. 공개 시험 OIDC fixture 금지 |
-| 브라우저 → PBX signaling | 발급된 PBX endpoint의 WSS→Asterisk, SIP subprotocol | 실제 TLS·인증과 signaling 도달성. ARI는 공개하지 않음 |
-| 브라우저 ↔ 음성 | PBX RTP UDP10000–10099, TURN3478 TCP/UDP·5349 TCP·relay49160–49200 UDP | 승인한 공개 주소·NAT/UDP 경로·외부 두 단말. Vercel HTTP proxy가 UDP를 전달한다고 가정하지 않음 |
-| 내부 서비스 | PostgreSQL5432·Besu8545·Witness4201–4204·Anchor4300 TLS | 사설 연결/권한 유지. DB/RPC/Witness 관리/ARI 외부 공개 금지 |
+| frontend → API | `https://callsign-rouge.vercel.app/api/v3/*` → Funnel `/api/v3/*` → loopback Platform14100 | 실제 로그인 cookie·CSRF·역할별 업무 조회 확인 |
+| frontend → 분석 | 같은 origin `/api/v3/audio` WSS → `api/audio.ts` → Funnel → 제품 분석 WS | Upgrade·거절 경계와 실제 동의된 음성/제공자 분석을 구분 |
+| 로그인 → callback | `https://callsign-demo-l-fixed.tail37b235.ts.net/idp/realms/callsign-demo`, 업무/공식 별도 client·audience·PKCE, callback `WEB_ORIGIN/service` | 기존 Keycloak realm/계정 재사용. 관리 경로는 공개하지 않음 |
+| 브라우저 → PBX signaling | `wss://callsign-demo-l-fixed.tail37b235.ts.net/pbx/ws` → loopback38088/ws, SIP subprotocol | 정확한 Vercel Origin만 허용. ARI TLS38089는 내부 전용 |
+| 브라우저 ↔ 음성 | `turns:callsign-demo-l-fixed.tail37b235.ts.net:8443?transport=tcp` → TLS 종료 → loopback coturn13478 → 소유 relay49160–49200 UDP/PBX10000–10099 UDP | 공개 client leg는 TLS/TCP다. TURN↔PBX의 기존 호스트 주소와 실제 선택 ICE·양측 음성을 별도로 확인 |
+| 내부 서비스 | 제품 DB54339·Anchor DB54349·OIDC DB54329, Besu RPC18541–18544·Witness14201–14204·Anchor14300 TLS | loopback/최소권한 유지. DB/RPC/Witness 관리/ARI 외부 공개 금지 |
 
-세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 이 SPA와 relay 구성에서 backend·분석·SIP까지 전달됐다는 증거는 별도로 필요하다. 공개 경로 전환 시 preview 모드·CSP의 허용 origin·마이크 `(self)` 정책을 함께 대조하며 인증 보호를 완화하지 않는다.
+세션 cookie는 HttpOnly/SameSite strict, OIDC state는 lax이며 변경 요청의 Origin/CSRF 검사를 유지한다. API base URL만 다른 사이트로 바꾸거나 cookie를 완화해 해결하지 않는다. Vercel의 [외부 rewrites](https://vercel.com/docs/routing/rewrites)와 [현재 WebSocket 문서](https://vercel.com/docs/functions/websockets)를 참고하되, 실제 제공자 분석·SIP·음성은 각각의 실행 근거가 필요하다. 현재 허용된 전용 WSS origin만 CSP에 포함하며 브라우저 보안/TLS 검증을 끄지 않는다.
 
 현재 서버의 API/Witness는 `LISTEN_HOST=127.0.0.1`을 명시해야 한다. 이 값의 기본은 기존 container 배포를 위해 `0.0.0.0`이며 host-mode에서 기본값으로 시작하지 않는다. 실제 listener/port 충돌을 먼저 확인한다. Besu의 고정 peer 준비는 `prepare-besu-peers.ts --apply --host-loopback`을 명시할 때만127.0.0.1의 서로 다른30311~30314를 생성한다. 기존 private-network prefix 검사는 유지한다. 이 준비는 노드 기동이 아니며 P2P의 실제 bind interface와 RPC listen도 별도로 loopback에 고정해야 한다.
 
@@ -67,16 +67,31 @@ Vercel 배포를 확인할 때 `/build-meta.json`의 commit/target/publicPreview
 
 배포 Compose의 서비스/volume에는 `org.callsign.lifecycle=persistent`와 고유 `org.callsign.deployment-id`를 붙인다. 시험은 별도 run ID/DB/키이며 full runner의 ephemeral label 또는 HTTP의 callsign.test marker를 사용한다. 시험 도구는 persistent label을 거절한다. 실제 운영 중인 환경을 ownership.json에 넣어 시험 cleanup을 적용하지 않는다.
 
-기존 deployment.sh는 다음 명령을 제공한다. **이 명령으로 현재 서버에 지속 서비스가 이미 생긴 것은 아니다.** start/restart는 현재 서버의 네트워크 보존과 호환되지 않는 일반 Compose 경로를 차단하며, AWS 경로는 기존 별도 승인/mount/preflight를 유지한다.
+현재 `callsign-demo-live`/`callsign-live-20261105`의 일반 서비스는21개이며 영속 DB·chain·Anchor·IdP를 유지한다. 종료된 `oidc-init`·migration·browser helper는 일반 재시작 대상이 아니다. 현재 감시의 만료는 **2026-11-07 08:37 KST**다. 기존 monitor PID/start·최근 표본·monotonic 만료를 확인하며 새 monitor를 띄워 승인 기간을 연장하지 않는다.
+
+저장소 루트에서 다음 보호 참조를 사용한다. env 내용이나 비밀번호를 출력하지 않는다.
 
 ```bash
+CFG=.local/persistent-demo-connect-20261105T073906Z/live-20261105/deployment.env
+MONITOR_DIR="$(cat .local/current-persistent-resume.path)/monitor"
 CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh status
+# 읽기 전용 재기동 사전 확인: 실제 동작이나 NEW를 실행하지 않음
+CALLSIGN_DEPLOYMENT_TARGET=server CALLSIGN_MONITOR_DIR="$MONITOR_DIR" \
+  node scripts/deployment-control.mjs server-check "$CFG" docker compose
+# 진행 통화/시험을 종료한 뒤 실행. 같은 container ID와 영속 상태만 재사용
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_DEPLOYMENT_TARGET=server \
+  CALLSIGN_MONITOR_DIR="$MONITOR_DIR" CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh start
+CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_DEPLOYMENT_TARGET=server \
+  CALLSIGN_MONITOR_DIR="$MONITOR_DIR" CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh restart
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh stop
 CALLSIGN_ALLOW_EXTERNAL_EXECUTION=infrastructure CALLSIGN_ENV_FILE="$CFG" bash scripts/deployment.sh resource-stop
-# 승인·입력·자원 조건을 충족한 실제 배포 환경에서만 기존 start/restart 사용
 ```
 
-status는 역할·deployment label이 맞는 서비스 ID/state/health만 출력한다. health와 전체 readiness는 다르며 monitor 생존을 증명하지 않는다. stop은 검사한 full container ID로 앱/worker/미디어를 먼저, DB/chain을 뒤에 중지하고 volume·키·genesis를 삭제하지 않는다. resource-stop은 보호 설정 디렉터리의 resource-stop.json을 먼저 보존하고 동일하게 중지한다. start/restart는 이 latch가 있으면 거절한다. stop/status는 latch 뒤에도 가능하다. 도구에 자동 latch 삭제·seed·NEW·prune는 없다. restart는 검토한 같은 이미지/영속 상태를 사용하고 초기화하지 않는다.
+서버 start/restart는 이미 생성된21개 full ID의 소유권·고정 image·host network/미게시 port·강제 memory/swap 한도·restart=no와 정상 entrypoint를 확인한다. 활성 시험/초기화가 있거나 시작 여유32GiB·유효한 기존 monitor·미검토 중단 경계를 만족하지 못하면 실행하지 않는다. DB/Besu → IdP/Anchor → Witness/PBX/TURN → API/worker/ingress 순서로 시작하고 설정된 Docker health를 기다린다. 초기화·import·migration·seed·Compose up/build/pull은 실행하지 않는다. 부분 실패는 소유 profile을 중지하고 보호 `server-operation-*.json`·`.result.json`에 최초 단계/결과를 남기며 자동 재시도하지 않는다. STARTED는 컨테이너 기동 결과이므로 `/readiness`·공개 로그인·실제 통화는 별도로 확인한다. 이 경로의 실제 전체 restart 회귀는 아직 미실행이며 [현재 현황](FINALS-IMPLEMENTATION-PLAN.md#현재-상태와-다음-단계)을 따른다.
+
+기본 bridge/published-port Compose의 개발 서버 start/restart 차단과 기존 AWS guard는 유지한다. 서버 모드는 새 환경의 NEW나 삭제된 컨테이너 재생성 도구가 아니다. 만료/자원 중단 뒤에는 원본 stop·review를 보존하고 해당 중단에 대한 새 명시적 승인을 받은 뒤에만 기존 `deployment-control.mjs review`를 사용한다. 정상 restart에서 review를 새로 만들거나 latch를 지우지 않는다. 실제 제공자를 켜는 서버 설정에는 승인된 유한 `CALLSIGN_ANALYSIS_SMOKE_BUDGET`의 정확한 id·만료·STT초·연결수·LLM요청수와 issuer의 동일 설정이 필요하다. launcher는 해당 image config ID의 `org.callsign.analysis-smoke-budget=v1`을 image inspect로 확인하므로 container label만 추가하거나 이 guard를 모르는 과거 runtime에 env만 붙여 활성화할 수 없다. 키 존재만으로 활성화하지 않는다.
+
+status는 역할·deployment label이 맞는 서비스 ID/state/health만 출력한다. health와 전체 readiness는 다르며 monitor 생존을 증명하지 않는다. stop은 검사한 full container ID로 앱/worker/미디어를 먼저, DB/chain을 뒤에 중지하고 volume·키·genesis를 삭제하지 않는다. resource-stop은 보호 설정 디렉터리의 resource-stop.json을 먼저 보존하고 동일하게 중지한다. start/restart는 이 latch가 있으면 거절한다. stop/status는 latch 뒤에도 가능하다. 도구에 자동 latch 삭제·seed·NEW·prune는 없다. 서버 restart는 검토한 같은 이미지/영속 상태와 기존 감시 만료를 사용하며 초기화하지 않는다.
 
 Compose 로그는 각 실행 overlay의 json-file 크기/개수 제한을 유지한다. 지속 감시는 위24시간 승인 안에서만 사용하며 준비 시간을 포함해 더 일찍 만료될 수 있다. 정상 종료 중 사라진 cgroup은 같은 full container ID의 종료와 OOM/강제 한도를 Docker에서 재확인할 때만0으로 집계한다. 실행 중 관측 누락·권한 오류·identity 변경은 중단 사유다. 시험90분을 무기한 운영 허가로 해석하거나 restart policy로 자원 중단을 무력화하지 않는다.
 

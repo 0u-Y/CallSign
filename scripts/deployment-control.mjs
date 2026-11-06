@@ -4,6 +4,7 @@ import {existsSync,lstatSync,readFileSync,writeFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {parseEnv} from 'node:util';
 import {pathToFileURL} from 'node:url';
+import {immutableImageReference} from './image-reference.mjs';
 
 export const deploymentServices=['platform','issuer','sender','worker','web','https','witness1','witness2','witness3','witness4','asterisk','turn','besu1','besu2','besu3','besu4','postgres','oidc','oidc-db','oidc-init','anchor','anchor-db','migration-runner','browser-check'];
 export function assertManagedDeployment(records,project,deploymentId){
@@ -13,13 +14,47 @@ export function assertManagedDeployment(records,project,deploymentId){
   if(labels['com.docker.compose.project']!==project||labels['org.callsign.deployment-id']!==deploymentId||labels['org.callsign.lifecycle']!=='persistent'||labels['org.callsign.run-id']||!deploymentServices.includes(labels['com.docker.compose.service']))throw Error('DEPLOYMENT_RESOURCE_IDENTITY_MISMATCH');
  }
 }
+export const serverStartStages=[['oidc-db','postgres','anchor-db','besu1','besu2','besu3','besu4'],['oidc','anchor'],['witness1','witness2','witness3','witness4','turn','asterisk'],['platform','issuer','sender','worker','web','https']];
+export function existingServerStages(records,env,issuerImage){
+ assertManagedDeployment(records,env.CALLSIGN_PROJECT,env.DEPLOYMENT_ID);
+ const images={postgres:'POSTGRES_IMAGE','anchor-db':'POSTGRES_IMAGE','oidc-db':'POSTGRES_IMAGE',oidc:'KEYCLOAK_IMAGE',https:'CALLSIGN_INGRESS_IMAGE',web:'CALLSIGN_INGRESS_IMAGE',asterisk:'ASTERISK_IMAGE',turn:'TURN_IMAGE'};
+ const selected=serverStartStages.map(stage=>stage.map(service=>{
+  const matches=records.filter(r=>r.labels['com.docker.compose.service']===service);
+  if(matches.length!==1)throw Error('EXISTING_SERVER_SERVICE_REQUIRED');const r=matches[0],key=images[service]??(service.startsWith('besu')?'BESU_IMAGE':'CALLSIGN_APP_IMAGE');
+  if(!/^[0-9a-f]{64}$/.test(r.id)||!immutableImageReference(env[key])||r.imageReference!==env[key]||!/^sha256:[0-9a-f]{64}$/.test(r.image)||(env[key].startsWith('sha256:')&&r.image!==env[key]))throw Error('EXISTING_SERVER_IMAGE_MISMATCH');
+  const memoryCap=(service.startsWith('besu')?3072:service==='oidc'?1024:['anchor','https','web','turn'].includes(service)?256:512)*1024**2,cpuCap=(service.startsWith('witness')||['anchor','https','web','turn'].includes(service)?0.5:1)*1e9;
+  if(r.network!=='host'||!Object.hasOwn(r,'ports')||Object.keys(r.ports??{}).length||r.privileged!==false||!Number.isSafeInteger(r.memory)||r.memory<=0||r.memory>memoryCap||!Number.isSafeInteger(r.cpu)||r.cpu<=0||r.cpu>cpuCap||r.swap!==r.memory||r.restart!=='no')throw Error('EXISTING_SERVER_ISOLATION_REQUIRED');
+  if(!['created','exited','running'].includes(r.state)||r.oom)throw Error('EXISTING_SERVER_STATE_INVALID');
+  const entry=[...(r.entrypoint??[]),...(r.command??[])];
+  if(!entry.length||entry.some(v=>['import','--import-realm','seed','--seed','init','--init','new','--new','start-dev'].includes(v))||(service==='oidc'&&!entry.includes('start')))throw Error('EXISTING_SERVER_NORMAL_ENTRYPOINT_REQUIRED');
+  return r;
+ }));
+ if(records.some(r=>['browser-check','migration-runner','oidc-init'].includes(r.labels['com.docker.compose.service'])&&['running','restarting','paused'].includes(r.state)))throw Error('ACTIVE_DEPLOYMENT_TRIAL_OR_INITIALIZATION');
+ const issuer=selected.flat().find(r=>r.labels['com.docker.compose.service']==='issuer');if(!Array.isArray(issuer.environment))throw Error('PERSISTENT_PROVIDER_CONFIGURATION_UNOBSERVED');const issuerEnv=Object.fromEntries(issuer.environment.map(v=>{const i=v.indexOf('=');return [v.slice(0,i),v.slice(i+1)];}));
+ const mode=env.CALLSIGN_PROVIDER_CONFIG??'none';if(!['none','deepgram-openai'].includes(mode))throw Error('PROVIDER_CONFIGURATION_INVALID');
+ if(mode==='none'&&['OPENAI_API_KEY','OPENAI_API_KEY_FILE','DEEPGRAM_API_KEY','DEEPGRAM_API_KEY_FILE','ANTHROPIC_API_KEY','ANTHROPIC_API_KEY_FILE'].some(k=>issuerEnv[k]))throw Error('PERSISTENT_PROVIDER_CONFIGURATION_MISMATCH');
+ if(mode==='deepgram-openai'){
+  let budget;try{
+   const raw=env.CALLSIGN_ANALYSIS_SMOKE_BUDGET;if(typeof raw!=='string'||raw.length>1024)throw Error();budget=JSON.parse(raw);
+   const fields=['id','expiresAt','sttSeconds','connections','llmRequests'];
+   if(!budget||Array.isArray(budget)||typeof budget!=='object'||Object.keys(budget).length!==fields.length||Object.keys(budget).some(k=>!fields.includes(k))||typeof budget.id!=='string'||!(/^[A-Za-z0-9_-]{3,80}$/).test(budget.id)||!Number.isSafeInteger(budget.expiresAt)||budget.expiresAt<=0||!Number.isInteger(budget.sttSeconds)||budget.sttSeconds<1||budget.sttSeconds>300||!Number.isInteger(budget.connections)||budget.connections<1||budget.connections>3||!Number.isInteger(budget.llmRequests)||budget.llmRequests<0||budget.llmRequests>20)throw Error();
+  }catch{throw Error('PERSISTENT_ANALYSIS_BUDGET_REQUIRED');}
+  if(budget.expiresAt<=Date.now()/1000||issuerEnv.CALLSIGN_ANALYSIS_SMOKE_BUDGET!==env.CALLSIGN_ANALYSIS_SMOKE_BUDGET||issuerEnv.CALLSIGN_ANALYSIS_PROVIDER!=='openai')throw Error('PERSISTENT_ANALYSIS_BUDGET_REQUIRED');
+  // Container labels can be overridden; the feature must belong to the pinned image config itself.
+  if(issuerImage?.id!==issuer.image||issuerImage?.labels?.['org.callsign.analysis-smoke-budget']!=='v1')throw Error('PERSISTENT_ANALYSIS_RUNTIME_REQUIRED');
+ }
+ return selected;
+}
+export function assertLiveServerMonitor(ready,sample,observed){
+ if(ready.deploymentId!==observed.deploymentId||ready.pid!==observed.pid||String(ready.processStart)!==String(observed.processStart)||sample.observerPid!==ready.pid||!Number.isFinite(observed.ageSeconds)||observed.ageSeconds<0||observed.ageSeconds>20||!Number.isFinite(observed.nowNs)||!Number.isFinite(sample.monotonicNs)||observed.nowNs-sample.monotonicNs<0||observed.nowNs-sample.monotonicNs>20e9||!Number.isFinite(ready.expiresMonotonicNs)||ready.expiresMonotonicNs<=observed.nowNs||sample.stop||!Number.isFinite(sample.memAvailableBytes)||sample.memAvailableBytes<(observed.starting?32:16)*1024**3||!Number.isFinite(sample.ownedBytes)||sample.ownedBytes<0||sample.ownedBytes>16*1024**3)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
  try{
   const [command,file,...compose]=process.argv.slice(2);
-  if(!['status','check','owned','latch','stop','review'].includes(command)||!file||compose[0]!=='docker'||compose[1]!=='compose')throw Error('DEPLOYMENT_CONTROL_ARGUMENTS_INVALID');
+  if(!['status','check','owned','latch','stop','review','server-check','server-start','server-restart'].includes(command)||!file||compose[0]!=='docker'||compose[1]!=='compose')throw Error('DEPLOYMENT_CONTROL_ARGUMENTS_INVALID');
   const env={...parseEnv(readFileSync(file,'utf8')),...process.env},project=env.CALLSIGN_PROJECT||'callsign-finals';
   const ids=execFileSync('docker',['ps','--all','--no-trunc','--quiet','--filter','label=com.docker.compose.project='+project],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split(/\s+/).filter(Boolean);
-  const format='{"id":{{json .Id}},"labels":{{json .Config.Labels}},"state":{{json .State.Status}},"health":{{if (index .State "Health")}}{{json (index .State "Health").Status}}{{else}}null{{end}}}';
+  const format='{"id":{{json .Id}},"labels":{{json .Config.Labels}},"state":{{json .State.Status}},"health":{{if (index .State "Health")}}{{json (index .State "Health").Status}}{{else}}null{{end}},"image":{{json .Image}},"imageReference":{{json .Config.Image}},"network":{{json .HostConfig.NetworkMode}},"ports":{{json .HostConfig.PortBindings}},"privileged":{{json .HostConfig.Privileged}},"memory":{{.HostConfig.Memory}},"cpu":{{.HostConfig.NanoCpus}},"swap":{{.HostConfig.MemorySwap}},"restart":{{json .HostConfig.RestartPolicy.Name}},"oom":{{.State.OOMKilled}},"entrypoint":{{json .Config.Entrypoint}},"command":{{json .Config.Cmd}},"environment":{{json .Config.Env}}}';
   const records=ids.length?execFileSync('docker',['inspect','--format',format,...ids],{encoding:'utf8',timeout:15000,stdio:['ignore','pipe','pipe']}).trim().split('\n').map(line=>JSON.parse(line)):[];
   assertManagedDeployment(records,project,env.DEPLOYMENT_ID);
   if(!env.FINALS_DATA_DIR)throw Error('PERSISTENT_STATE_DIRECTORY_REQUIRED');
@@ -39,7 +74,47 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).hr
    reviewPath=resolve(env.FINALS_DATA_DIR,`resource-stop.review-${index+1}.json`);
   }
   const latched=existsSync(latch);
-  if(command==='check'&&latched)throw Error('RESOURCE_STOP_LATCHED_OPERATOR_REVIEW_REQUIRED');
+  if(['check','server-check','server-start','server-restart'].includes(command)&&latched)throw Error('RESOURCE_STOP_LATCHED_OPERATOR_REVIEW_REQUIRED');
+  if(command.startsWith('server-')){
+   if(env.CALLSIGN_DEPLOYMENT_TARGET!=='server')throw Error('PERSISTENT_SERVER_TARGET_REQUIRED');
+   const config=lstatSync(file);if(!config.isFile()||config.isSymbolicLink()||config.uid!==process.getuid()||(config.mode&0o077))throw Error('OWNED_PROTECTED_SERVER_CONFIGURATION_REQUIRED');protectedState();
+   let issuerImage;
+   if(env.CALLSIGN_PROVIDER_CONFIG==='deepgram-openai'){
+    const issuer=records.find(r=>r.labels['com.docker.compose.service']==='issuer');if(!/^sha256:[0-9a-f]{64}$/.test(issuer?.image??''))throw Error('EXISTING_SERVER_IMAGE_MISMATCH');
+    issuerImage=JSON.parse(execFileSync('docker',['image','inspect','--format','{"id":{{json .Id}},"labels":{{json .Config.Labels}}}',issuer.image],{encoding:'utf8',timeout:10000,stdio:['ignore','pipe','pipe']}));
+   }
+   const stages=existingServerStages(records,env,issuerImage),monitorDir=resolve(process.env.CALLSIGN_MONITOR_DIR??env.CALLSIGN_MONITOR_DIR??'');
+   const monitor=(starting=false)=>{
+    const directory=lstatSync(monitorDir);if(!directory.isDirectory()||directory.isSymbolicLink()||directory.uid!==process.getuid()||(directory.mode&0o077)||existsSync(resolve(monitorDir,'stop.json')))throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+    const read=(name,max)=>{const path=resolve(monitorDir,name),info=lstatSync(path);if(!info.isFile()||info.isSymbolicLink()||info.uid!==process.getuid()||info.size>max)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');return {text:readFileSync(path,'utf8'),mtime:info.mtimeMs};};
+    const ready=JSON.parse(read('ready.json',4096).text),log=read('resources.jsonl',11*1024**2),sample=JSON.parse(log.text.trim().split('\n').at(-1));
+    if(!Number.isSafeInteger(ready.pid)||ready.pid<1||lstatSync(`/proc/${ready.pid}`).uid!==process.getuid())throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+    const stat=readFileSync(`/proc/${ready.pid}/stat`,'utf8'),processStart=stat.slice(stat.lastIndexOf(')')+2).split(' ')[19];
+    const args=readFileSync(`/proc/${ready.pid}/cmdline`,'utf8').split('\0');
+    if(!args.some(v=>v.endsWith('/monitor-deployment.py'))||args[args.indexOf('--env-file')+1]!==resolve(file)||args[args.indexOf('--output')+1]!==monitorDir)throw Error('LIVE_APPROVED_SERVER_MONITOR_REQUIRED');
+    assertLiveServerMonitor(ready,sample,{deploymentId:env.DEPLOYMENT_ID,pid:ready.pid,processStart,ageSeconds:(Date.now()-log.mtime)/1000,starting,nowNs:Number(process.hrtime.bigint())});return ready;
+   };
+   const ready=monitor(true);
+   if(command==='server-check'){console.log(JSON.stringify({deploymentId:env.DEPLOYMENT_ID,services:stages.flat().length,monitorPid:ready.pid,expiresMonotonicNs:ready.expiresMonotonicNs,scope:'Existing container and live monitor checks only; no restart or complete readiness claim'}));process.exit(0);}
+   if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='infrastructure')throw Error('PERSISTENT_SERVER_START_APPROVAL_REQUIRED');
+   const output=resolve(env.FINALS_DATA_DIR,`server-operation-${Date.now()}-${process.pid}`);protectedState();
+   const baseline={command,deploymentId:env.DEPLOYMENT_ID,configSha256:createHash('sha256').update(readFileSync(file)).digest('hex'),monitorPid:ready.pid,expiresMonotonicNs:ready.expiresMonotonicNs,ids:stages.flat().map(r=>r.id)};
+   writeFileSync(output+'.json',JSON.stringify(baseline)+'\n',{flag:'wx',mode:0o600});
+   const stop=()=>{let failed=false;for(const stage of [...stages].reverse()){const ids=stage.map(r=>r.id);try{if(ids.length)execFileSync('docker',['stop','--time','15',...ids],{timeout:60000,stdio:['ignore','ignore','pipe']});}catch{failed=true;}}if(failed)throw Error('SERVER_STOP_INCOMPLETE');};
+   let phase='validated',started=[];
+   try{
+    if(command==='server-restart'){phase='stop';stop();}
+    for(const stage of stages){monitor();phase=stage.map(r=>r.labels['com.docker.compose.service']).join(',');execFileSync('docker',['start',...stage.map(r=>r.id)],{timeout:30000,stdio:['ignore','ignore','pipe']});started.push(...stage.map(r=>r.id));
+     const deadline=Date.now()+60000;
+     while(true){monitor();const current=JSON.parse(execFileSync('docker',['inspect',...stage.map(r=>r.id)],{encoding:'utf8',timeout:10000,stdio:['ignore','pipe','pipe']}));
+      if(current.some(r=>!r.State.Running||r.State.OOMKilled||r.State.Health?.Status==='unhealthy'))throw Error('SERVER_START_DEPENDENCY_FAILED');
+      if(current.every(r=>!r.State.Health||r.State.Health.Status==='healthy'))break;
+      if(Date.now()>=deadline)throw Error('SERVER_START_READINESS_TIMEOUT');Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,500);
+     }
+    }
+    const result={status:'STARTED',phase,started,scope:'Existing containers started; verify application readiness and user flow separately'};writeFileSync(output+'.result.json',JSON.stringify(result)+'\n',{flag:'wx',mode:0o600});console.log(JSON.stringify(result));
+   }catch(error){let stopped=false;try{stop();stopped=true;}catch{}writeFileSync(output+'.result.json',JSON.stringify({status:'FAILED',phase,started,stopped,reason:error instanceof Error&&/^[A-Z_]+$/.test(error.message)?error.message:'SERVER_START_FAILED',automaticRestart:false})+'\n',{flag:'wx',mode:0o600});throw error;}
+  }
   if(command==='review'){
    const reference=process.env.CALLSIGN_RESOURCE_REVIEW_REFERENCE;
    if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='infrastructure'||!reference||reference.length<8||reference.length>200||/[\r\n]/.test(reference))throw Error('EXPLICIT_OPERATOR_RESOURCE_REVIEW_REQUIRED');

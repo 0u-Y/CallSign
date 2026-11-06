@@ -7,9 +7,13 @@ if [[ "$command" != status && "${CALLSIGN_ALLOW_EXTERNAL_EXECUTION:-}" != infras
 deployment_target="$(node --input-type=module - "$CALLSIGN_ENV_FILE" <<'JS'
 import {readFileSync} from 'node:fs';import {parseEnv} from 'node:util';
 const value=process.env.CALLSIGN_DEPLOYMENT_TARGET??parseEnv(readFileSync(process.argv[2],'utf8')).CALLSIGN_DEPLOYMENT_TARGET??'';
-if(!['','aws'].includes(value))throw new Error('DEPLOYMENT_TARGET_INVALID');process.stdout.write(value);
+if(!['','aws','server'].includes(value))throw new Error('DEPLOYMENT_TARGET_INVALID');process.stdout.write(value);
 JS
 )"
+# Server mode can only reuse reviewed existing host-network containers; it never invokes Compose up.
+if [[ "$deployment_target" == server && ( "$command" == start || "$command" == restart ) ]]; then
+  exec node scripts/deployment-control.mjs "server-$command" "$CALLSIGN_ENV_FILE" docker compose
+fi
 compose=(docker compose --env-file "$CALLSIGN_ENV_FILE" -f infra/deploy/compose.yml -f infra/deploy/compose.pbx.yml --profile https --profile pbx --profile media)
 if [[ "$deployment_target" == aws ]]; then
   [[ "$command" == status || "${CALLSIGN_AWS_TARGET_CONFIRMATION:-}" == AWS-ONLY ]] || { echo 'BLOCKED: AWS target confirmation required; never run on development host' >&2; exit 78; }

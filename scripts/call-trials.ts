@@ -16,7 +16,8 @@ export function callTrialBrowserArgs(env:NodeJS.ProcessEnv){
  if(env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||isIP(ip)!==4)throw new Error('EXPLICIT_PUBLIC_DEMO_DNS_REQUIRED');
  const origin=new URL(env.CALLSIGN_MEDIA_SIGNALING_ORIGIN??'');
  if(origin.protocol!=='https:'||origin.origin!==env.CALLSIGN_MEDIA_SIGNALING_ORIGIN||origin.username||origin.password)throw new Error('FIXED_PUBLIC_SIGNALING_ORIGIN_REQUIRED');
- return [`--host-resolver-rules=MAP ${origin.hostname} ${ip}`];
+ // Restrict this server-hosted public check to its default interface, excluding unrelated host NICs.
+ return ['--webrtc-ip-handling-policy=default_public_interface_only',`--host-resolver-rules=MAP ${origin.hostname} ${ip}`];
 }
 export async function callTrials(planPath:string,output:string,run=false){
  if(run)assertCallTrialExecution(process.env);

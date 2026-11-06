@@ -2,15 +2,9 @@ import { createPublicClient, createWalletClient, fallback, http, keccak256, pars
 import { privateKeyToAccount } from "viem/accounts";
 import { z } from "zod";
 
-// Match OpenZeppelin ECDSA.recover(bytes): exactly 65 bytes, low S, and v=27/28.
-export function assertEvmSignature(signature:string){if(!/^0x[0-9a-fA-F]{128}(1[bBcC])$/.test(signature)||BigInt(`0x${signature.slice(66,130)}`)>0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0n||BigInt(`0x${signature.slice(66,130)}`)===0n)throw new Error('EVM_SIGNATURE_NON_CANONICAL');}
-export const recoveryV2Schema = z.object({ institutionId: z.string().regex(/^0x[0-9a-fA-F]{64}$/), expectedEpoch: z.string().regex(/^\d+$/), newAdministrator: z.string().regex(/^0x[0-9a-fA-F]{40}$/), newApprovalPublicKey: z.string().regex(/^0x[0-9a-fA-F]{64}$/), newEmergencyStopper: z.string().regex(/^0x[0-9a-fA-F]{40}$/), nonce: z.string().regex(/^0x[0-9a-fA-F]{64}$/), deadline: z.string().regex(/^\d+$/) }).strict();
-export type RecoveryV2 = z.infer<typeof recoveryV2Schema>;
-export function recoveryTypedData(chainId: number, registry: Hex, request: RecoveryV2) {
-  return { domain: { name: "CallSign Registry", version: "1", chainId, verifyingContract: registry },
-    types: { RecoverInstitution: [{ name: "actionType", type: "bytes32" }, { name: "institutionId", type: "bytes32" }, { name: "expectedEpoch", type: "uint64" }, { name: "newAdministrator", type: "address" }, { name: "newApprovalPublicKey", type: "bytes32" }, { name: "newEmergencyStopper", type: "address" }, { name: "nonce", type: "bytes32" }, { name: "deadline", type: "uint64" }] }, primaryType: "RecoverInstitution",
-    message: { actionType: keccak256(stringToHex("RECOVER_INSTITUTION")), ...request, institutionId: request.institutionId as Hex, expectedEpoch: BigInt(request.expectedEpoch), newAdministrator: request.newAdministrator as Hex, newApprovalPublicKey: request.newApprovalPublicKey as Hex, newEmergencyStopper: request.newEmergencyStopper as Hex, nonce: request.nonce as Hex, deadline: BigInt(request.deadline) } } as const;
-}
+import {assertEvmSignature,recoveryV2Schema,recoveryTypedData,type RecoveryV2} from '@callsign/protocol';
+export {assertEvmSignature,recoveryV2Schema,recoveryTypedData,type RecoveryV2} from '@callsign/protocol';
+
 export async function verifyRecoveryApprovers(input: { chainId: number; registry: Hex; request: RecoveryV2; signatures: Hex[]; approvers: string[]; now: number }) {
   const request = recoveryV2Schema.parse(input.request);
   if (BigInt(request.deadline) <= BigInt(input.now) || BigInt(request.deadline) > BigInt(input.now + 600)) throw new Error("RECOVERY_EXPIRED_OR_TOO_LONG");
