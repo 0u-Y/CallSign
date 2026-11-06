@@ -80,7 +80,7 @@
 #callsign-recording .demo-recording-call .demo-institution.sender{display:flex;flex-direction:column}
 #callsign-recording .demo-institution .sender-main{overflow-y:auto}
 #callsign-recording .demo-institution .sender-controls{height:auto;min-height:0;position:sticky;bottom:-20px;background:white;padding:8px 0 20px}
-#callsign-recording .demo-institution-strip.institution{overflow:visible;position:relative;z-index:31}
+#callsign-recording .demo-institution-strip.institution{overflow:visible;position:relative}
 /* Radix portals retain their own scope outside the recording root. */
 .demo-evidence-drawer.work-detail{width:min(480px,100vw);padding:28px;border-radius:20px 0 0 20px;font-size:12px}
 .work-detail>h2{font-size:18px;margin:0 40px 20px 0}
