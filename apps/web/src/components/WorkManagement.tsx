@@ -1,4 +1,4 @@
-import {shortRecordId,contactWorkState,demoAccountLabel,demoOrganizationLabel} from '../lib/workPresentation.js';
+import {shortRecordId,contactWorkState,compareContactWork,demoAccountLabel,demoOrganizationLabel} from '../lib/workPresentation.js';
 import {WorkCancel} from './WorkCancel.js';
 import * as Dialog from '@radix-ui/react-dialog';
 import {useEffect,useState} from 'react';
@@ -20,7 +20,7 @@ export function WorkManagement(p:{workspace:Workspace;active:boolean;busy:boolea
  const workNumber=(id:string)=>shortRecordId(id,w.intents.map(i=>i.id));
  const person=(id:string,role:'고객'|'상담원')=>demoAccountLabel(id,role);
  const agents=[...new Set(w.intents.map(i=>i.agentId))];
- const visible=w.intents.filter(i=>(filter==='all'||contactWorkState(i)===filter)&&(owner==='all'||i.agentId===owner)&&[i.id,i.recipientId,i.agentId,person(i.recipientId,'고객'),person(i.agentId,'상담원')].some(v=>v.toLowerCase().includes(search.toLowerCase())));
+ const visible=w.intents.filter(i=>(filter==='all'||contactWorkState(i)===filter)&&(owner==='all'||i.agentId===owner)&&[i.id,i.recipientId,i.agentId,person(i.recipientId,'고객'),person(i.agentId,'상담원')].some(v=>v.toLowerCase().includes(search.toLowerCase()))).sort((a,b)=>compareContactWork(a,b));
  const pages=Math.max(1,Math.ceil(visible.length/pageSize)),currentPage=Math.min(page,pages-1);
  const choose=(id:string)=>{setDetailOpen(true);setCreating(false);setNewAgent('');p.select(id);};
  function accountInput(role:'recipient'|'gateway',value:string,onChange:(v:string)=>void){const choices=members?.filter(m=>m.role===role&&(role!=='gateway'||m.serviceDid===p.service));return choices?.length?<select aria-label={role==='gateway'?'담당 상담원':'고객 계정'} value={value} onChange={e=>onChange(e.target.value)}><option value="">계정 선택</option>{choices.map(m=><option key={m.id} value={m.id} title={m.id}>{person(m.id,role==='gateway'?'상담원':'고객')}</option>)}</select>:<input aria-label={role==='gateway'?'담당 상담원':'고객 계정'} value={value} onChange={e=>onChange(e.target.value)} placeholder="기관에서 확인한 계정 ID"/>;}

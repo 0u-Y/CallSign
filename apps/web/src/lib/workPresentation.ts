@@ -17,3 +17,8 @@ export function demoAccountLabel(id:string,role:'고객'|'상담원'){
  return role==='상담원'?`${family}상담`:`${family}*${['민','영','준','희','현','진','우','연'][(hash>>>3)%8]}`;
 }
 export function demoOrganizationLabel(name:string){return name==='demo-bank'?'시그널카드':name==='demo-center'?'시그널 콜센터':name;}
+
+// Keep actionable work ahead of preserved history; do not mutate API data.
+export function compareContactWork(a:{status:string;expiresAt?:number},b:{status:string;expiresAt?:number},now=Math.floor(Date.now()/1000)){
+ return Number(contactWorkState(b,now)==='open')-Number(contactWorkState(a,now)==='open')||(b.expiresAt??0)-(a.expiresAt??0);
+}
