@@ -1,0 +1,5 @@
+import {expect,it} from 'vitest';
+import {rememberLoginReturn,takeLoginReturn} from './loginReturn.js';
+const storage=()=>{const values=new Map<string,string>();return {getItem:(k:string)=>values.get(k)??null,setItem:(k:string,v:string)=>values.set(k,v),removeItem:(k:string)=>values.delete(k)};};
+it('returns once to the original allowed route only after the matching callback',()=>{const s=storage();rememberLoginReturn('https://idp.example/login?state=request','/demo/work',s,100);expect(takeLoginReturn('request',s,101)).toBe('/demo/work');expect(takeLoginReturn('request',s,102)).toBeUndefined();});
+it('rejects external, malformed, expired and mismatched return requests',()=>{for(const path of ['https://evil.test','//evil.test','/demo/work?next=evil','/demo/../other']){const s=storage();rememberLoginReturn('https://idp.example/?state=x',path,s,100);expect(takeLoginReturn('x',s,101)).toBeUndefined();}for(const [state,now] of [['wrong',101],['x',600101],['x',99]] as const){const s=storage();rememberLoginReturn('https://idp.example/?state=x','/demo/call',s,100);expect(takeLoginReturn(state,s,now)).toBeUndefined();}});

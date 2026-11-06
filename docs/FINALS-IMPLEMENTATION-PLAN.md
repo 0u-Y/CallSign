@@ -731,3 +731,5 @@ Public recheck boundary: actual OIDC login/callback succeeded in the earlier rea
 검증: fixture 브라우저 검색 Space, 페이지/선택 유지, drawer Escape·포커스·스크롤 잠금, F/Escape, 공동 관리 역할 경계 및 Space 무명령, 1440/1920/390px 확인은 `.local/all-ui-20261107/fixture-confirm/result.json` PASS(서버 쓰기 0건). 이후 카드 폭·승인자 가로 배치·제목 CSS 충돌을 추가 수정하고 웹 build/타입·관련 단위 검사를 수행했다. 최종 CSS 이후 브라우저 재캡처는 미실행이며 이전 캡처를 최종 일치 증거로 쓰지 않는다.
 
 승인된 1회 재개는 기존 21개 container ID와 영속 데이터를 보존해 readiness 3개 200까지 확인했다. 새 감시는 2026-11-07 04:15:33 KST `SUSTAINED_SWAP_OUT`으로 다시 안전 중지했고 cleanupErrors는 없다. 원본 latch/새 중단 증거를 보존했으며 자동 재개하지 않았다. 따라서 최종 인증된 공개 UI 검증은 미완료다. 제공자 설정은 기존 Deepgram/OpenAI 구성 그대로이며 OFF라고 기록하지 않는다. 이번 통화·취소·정지·복구·유료 호출은 0건이다. 운영 만료 2026-11-07 22:03:42 KST를 연장하지 않았다.
+
+게시 직전 원격 main `70f44f6`의 연락 준비 만료 검사·로그인 복귀 경로·휴대폰 변경을 정상 병합했다. 중복 F 핸들러는 공통 Shell 촬영 전환 하나로 합치고 원격의 독립 수신자 관측 안내는 유지했다. 병합본 관련 단위 25개, 웹 타입/build, 소스 검사 통과. 원격 변경의 실제 통화 승인 기록은 이번 읽기 전용 재개 승인과 별개이며 이 작업에서 실행하지 않았다.
