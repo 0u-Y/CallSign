@@ -1,0 +1,23 @@
+import {createRequire} from 'node:module';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {chromium,expect} from '@playwright/test';
+import assert from 'node:assert/strict';
+if(process.env.CALLSIGN_ALLOW_EXTERNAL_EXECUTION!=='integration')throw Error('ISOLATED_UI_APPROVAL_REQUIRED');
+const require=createRequire(import.meta.url),{build}=await import(createRequire(require.resolve('tsx')).resolve('esbuild'));
+const built=await build({entryPoints:['tests/ui/consent-keypad-fixture.tsx'],bundle:true,write:false,format:'iife',jsx:'automatic',nodePaths:[resolve('apps/web/node_modules')]});
+const out=process.env.CALLSIGN_UI_OUTPUT??'.local/v24-review/keypad';await mkdir(out,{recursive:true});
+const browser=await chromium.launch({headless:true});
+try{const page=await browser.newPage({viewport:{width:390,height:900}});await page.route('**/*',r=>r.abort());
+ const css=await readFile('apps/web/src/demo-workspace.css','utf8');
+ await page.setContent(`<style>${css}</style><div id="root"></div>`);await page.addScriptTag({content:built.outputFiles[0].text});
+ const calls=()=>page.evaluate(()=>window.keypadFixture.calls);
+ await page.getByRole('button',{name:'키패드',exact:true}).click();await page.getByRole('button',{name:'9번 다시 듣기'}).click();assert.deepEqual(await calls(),[]);
+ await page.getByRole('button',{name:'2번 미동의'}).click();await expect(page.getByText('미동의 · 일반 통화 유지',{exact:true})).toBeVisible();assert.deepEqual(await calls(),[false]);
+ await page.getByRole('button',{name:'안내 확인 후 다시 선택'}).click();await page.getByRole('button',{name:'키패드',exact:true}).click();await page.getByRole('button',{name:'1번 동의'}).click();await expect(page.getByText('서버 동의 확인 중',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'1번 동의'})).toBeDisabled();
+ await page.getByRole('button',{name:'분석 동의 철회·삭제'}).click();await page.evaluate(()=>window.keypadFixture.resolve());await expect(page.getByText('분석 철회 · 일반 통화 유지',{exact:true})).toBeVisible();assert.deepEqual(await calls(),[false,true,false]);
+ await page.getByRole('button',{name:'안내 확인 후 다시 선택'}).click();await page.getByRole('button',{name:'키패드',exact:true}).click();await page.screenshot({path:`${out}/keypad-390.png`,fullPage:true});await page.keyboard.press('Escape');await expect(page.getByRole('button',{name:'키패드',exact:true})).toBeFocused();
+ await page.getByRole('button',{name:'fixture off'}).click();await page.getByRole('button',{name:'키패드',exact:true}).click();await expect(page.getByRole('button',{name:'1번 동의'})).toBeDisabled();
+ await page.getByRole('region',{name:'통화 키패드'}).getByRole('button',{name:'통화 종료',exact:true}).click();await expect(page.getByText('통화 연결 후 분석을 선택할 수 있습니다.',{exact:true})).toBeVisible();assert.deepEqual(await calls(),[false,true,false]);
+ await writeFile(`${out}/result.json`,JSON.stringify({scope:'Synthetic component and consent promise; no real API/media/provider',status:'PASS',checks:['9 no request','2 no grant','pending duplicate disabled','withdraw wins late grant','Escape focus return','provider off blocks grant','end accessible']}));
+}finally{await browser.close();}

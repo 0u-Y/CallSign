@@ -107,3 +107,89 @@
 
 /* The persistent live bar owns viewport-level termination; focus scaling must not relocate this control. */
 .demo-workspace .service-call-controls .service-end.is-live{position:static;box-shadow:none}
+
+/* v24 keeps controls in document flow so focus transforms cannot displace a pointer target. */
+.demo-workspace .demo-recipient.demo-phone-live{background:radial-gradient(ellipse at 25% 12%,#596b65,#354b43 47%,#1d3029);color:#fff}
+.demo-phone-live .demo-phone-app,.demo-phone-live .demo-view-scope,.demo-phone-live .demo-phone-connection{color:#fff;text-align:center}
+.demo-phone-live .demo-phone-connection time{font-variant-numeric:tabular-nums;font-size:24px}
+.demo-workspace .demo-phone-live .service-call-controls{background:transparent;color:white;padding:12px 0}
+.demo-phone-live .service-call-controls>h2{font-size:16px;color:white}
+.demo-phone-live .call-mute,.demo-phone-live .call-keypad-toggle{background:#ffffff20;color:white;border:1px solid #ffffff40;border-radius:28px}
+.demo-workspace .demo-phone-live .service-end{background:#ff453a;color:white;border-radius:28px;position:static}
+.call-consent-keypad{margin-top:12px;min-width:0}
+.call-consent-keypad>p,.call-consent-keypad details{font-size:13px;line-height:1.6}
+.call-consent-keypad details{padding:10px;background:#ffffff12;border-radius:12px;margin:8px 0}
+.call-dial-screen{padding:16px 0;color:inherit}
+.call-keypad-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:240px;margin:16px auto}
+.demo-workspace .call-keypad-grid .button{border-radius:50%;aspect-ratio:1;padding:0;min-height:52px;background:#ffffff20;color:white;font-size:28px;border:1px solid #ffffff30}
+.demo-workspace .call-keypad-grid .button:disabled{opacity:.35}
+.demo-workspace .call-keypad-grid .button:focus-visible{outline:3px solid #8cb7ff;outline-offset:3px}
+.demo-phone-live .call-consent-keypad>button{margin:5px 3px}
+.demo-workspace .demo-phone-live{position:relative;min-height:650px}
+.demo-phone-live:has(.call-dial-screen)>.workspace-contact,
+.demo-phone-live:has(.call-dial-screen)>#demo-analysis-result,
+.demo-phone-live:has(.call-dial-screen)>.demo-provider-state{visibility:hidden}
+.demo-phone-live .call-dial-screen{position:absolute;inset:70px 18px 28px;z-index:4;background:#293e34;border-radius:22px;padding:18px;color:white;overflow:auto}
+.demo-phone-live .call-dial-screen>.service-end{display:block;min-width:60px;margin:12px auto}
+.demo-phone-live:has(.call-dial-screen) .service-call-controls>.service-end,
+.demo-phone-live:has(.call-dial-screen) .service-call-controls>.call-mute,
+.demo-phone-live:has(.call-dial-screen) .service-call-controls>.call-speaker{visibility:hidden}
+
+.phone-media-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 16px}
+.demo-workspace .phone-media-buttons .button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:0;border-radius:22px;min-height:82px;padding:12px 4px;background:#ffffff18;color:inherit;font-size:12px}
+.phone-media-buttons svg{width:24px;height:24px}.demo-workspace .phone-media-buttons [aria-pressed=true]{background:#fff;color:#263e34}
+.demo-workspace .phone-media-buttons .button:disabled{opacity:.45}.phone-media-buttons .button:focus-visible,.call-consent-keypad>.button:focus-visible{outline:3px solid #91baff;outline-offset:3px}
+.output-support-note{display:block;font-size:11px;line-height:1.5;opacity:.8;text-align:center}
+.demo-workspace .call-consent-keypad>.phone-end{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;width:100%;margin:20px 0 12px;border:0;font-weight:700}
+.call-consent-keypad>.call-analysis{width:100%;min-height:44px}.demo-phone-live .call-consent-keypad>.secondary{color:#fff;background:#ffffff16;border-color:#ffffff40}
+.call-dial-screen>.secondary{min-height:44px}.call-dial-screen>.service-end{min-height:52px}.call-dial-screen>.service-end svg{width:20px;height:20px;margin-right:8px}
+.demo-workspace .demo-phone-live .service-analysis{color:#203047}
+.demo-workspace .demo-phone-live .service-contact h2,.demo-workspace .demo-phone-live .service-contact .contact-institution{color:#fff}
+.demo-workspace .demo-phone-live .service-contact .contact-work-state,.demo-phone-live .service-next-action{color:#e3ece7}
+.demo-phone-live .demo-approval{color:#b8f0d0;border:1px solid #ffffff30;border-radius:12px;padding:10px 12px}
+.demo-phone-live .service-contact details{color:#e3ece7;font-size:12px}.demo-phone-live .service-contact .service-summary-list dd{color:inherit}
+/* Dark handset text must override the shared light workspace paragraph palette. */
+.demo-workspace .demo-phone-live>.demo-phone-app span,
+.demo-workspace .demo-phone-live>.demo-provider-state,
+.demo-workspace .demo-phone-live .service-contact header p,
+.demo-workspace .demo-phone-live .call-consent-keypad p{color:#edf4f0}
+.demo-workspace .demo-phone-live .workspace-contact{padding:12px 0}
+.demo-workspace .demo-phone-live .service-contact h2{font-size:22px;margin-bottom:8px}
+.demo-workspace .demo-phone-live .service-contact details{margin-top:4px}
+.demo-workspace .demo-phone-live .demo-view-scope{font-size:11px;margin:4px 0}
+.demo-workspace .demo-phone-live .demo-phone-connection{padding:10px 0;margin:10px 0}
+.demo-workspace .demo-phone-live .service-call-controls{border:0;margin:0;padding:4px 0}
+.demo-phone-live:has(.call-dial-screen){height:760px;min-height:760px}
+.demo-phone-live:has(.call-dial-screen)>.workspace-contact,
+.demo-phone-live:has(.call-dial-screen)>#demo-analysis-result,
+.demo-phone-live:has(.call-dial-screen)>.demo-provider-state,
+.demo-phone-live:has(.call-dial-screen)>.demo-approval,
+.demo-phone-live:has(.call-dial-screen)>.demo-phone-connection{display:none}
+.demo-phone-live:has(.call-dial-screen) .call-consent-keypad>p,
+.demo-phone-live:has(.call-dial-screen) .call-consent-keypad>details,
+.demo-phone-live:has(.call-dial-screen) .phone-media-buttons,
+.demo-phone-live:has(.call-dial-screen) .output-support-note{visibility:hidden}
+.service-call-controls>.call-consent-keypad{flex-basis:100%;width:100%}
+.demo-workspace .demo-phone-live .service-analysis{background:#ffffff0c;border-color:#ffffff24;color:#edf4f0}
+.demo-workspace .demo-phone-live .service-analysis h2,.demo-workspace .demo-phone-live .service-analysis p,.demo-workspace .demo-phone-live .service-analysis small{color:inherit}
+.demo-workspace .demo-phone-live .service-analysis.has-warning{background:#593d36;border-color:#ffab8750;color:#efd4c8}
+.demo-workspace .demo-phone-live .service-analysis.has-warning h2{color:#ffd1b9}
+.demo-workspace .demo-phone-live .service-analysis a{color:inherit}
+.demo-workspace .demo-phone-live .analysis-before{color:#d5e3db;font-size:12px;margin:8px 0}
+.demo-workspace .demo-phone-live .demo-phone-app{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin:8px 0}
+.demo-workspace .demo-phone-live .demo-phone-app span{font-size:11px}
+.demo-workspace .demo-phone-live .contact-work-state{margin-bottom:8px}
+.demo-workspace .demo-phone-live .service-next-action{font-size:12px;margin-bottom:6px}
+.demo-workspace .demo-phone-live .call-consent-keypad{margin-top:4px}
+.demo-workspace .demo-phone-live .call-consent-keypad>p{margin:6px 0;font-size:12px}
+.demo-workspace .demo-phone-live .phone-media-buttons{margin:12px 0 10px}
+.demo-workspace .demo-phone-live .output-support-note{font-size:10px}
+/* Connected calls no longer repeat the preparation heading or role already shown above. */
+.demo-phone-live>.demo-view-scope{display:none}
+.demo-phone-live .service-call-controls>h2{display:none}
+.demo-phone-live #demo-analysis-result{max-height:250px;overflow:auto;scrollbar-gutter:stable}
+.demo-phone-live .demo-provider-state{font-size:11px;margin:4px 0}
+.demo-phone-live .call-consent-keypad details{margin:4px 0;padding:4px 10px}
+.demo-workspace .demo-phone-live .service-contact details>summary{font-size:11px;min-height:36px;padding:6px 0}
+.demo-workspace .demo-heading h1{font-size:24px}.demo-workspace .demo-heading{margin-bottom:12px}.demo-workspace .demo-heading p{margin-bottom:8px}
+.demo-workspace .demo-scene-hint{min-height:0;font-size:12px!important;margin-bottom:18px}

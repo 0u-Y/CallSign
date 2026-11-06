@@ -10,7 +10,7 @@ export interface CallContext {
   attempt:ServiceAttempt; authorization?:Signed<StartAuthorization>&{serviceProofJws:string};
   credential?:{vc:ServiceCredential;jws:string}; receipt?:Signed<ServiceReceipt>; policy:PurposePolicy;
 }
-export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; invitationVerified?:boolean; incoming?:boolean; accepting?:boolean; ending?:boolean; analysisWithdrawn?:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
+export interface ServiceCallStatus { connection:string; authority:string; analysis:string; active:boolean; connectedAt?:number; invitationVerified?:boolean; incoming?:boolean; accepting?:boolean; ending?:boolean; analysisWithdrawn?:boolean; audioSource?:string; error?:string;terminal?:boolean;terminalReason?:string }
 // One controller owns one attempt and one ephemeral browser key. Reconnection starts a new attempt.
 export class ServiceCall {
   private sip:PbxSip|undefined; private stopped=false;private ending=false;private polling=false; private timer:ReturnType<typeof setTimeout>|undefined;
@@ -26,7 +26,7 @@ export class ServiceCall {
   private readonly visibility=()=>{if(document.hidden){this.sip?.pause();this.stopAnalysis('document-hidden');this.show({connection:'화면 비활성: 음성 일시 정지, 다시 열면 재검증',active:false});}else this.schedule(0);};
   private view:ServiceCallStatus={connection:'연결 준비 중: 마이크 송신 차단',authority:'기관 승인 확인 전',analysis:'동의 전: 분석 중단',active:false};
   constructor(private readonly o:{role:'gateway'|'recipient';attemptId:string;intentId:string;recipientId:string;agentId:string;key:SigningKeyPair;trust:ServiceTrust;runtimePolicy:RuntimePolicy;status:(s:ServiceCallStatus)=>void;remote:(s:MediaStream)=>void;risk:(e:unknown)=>void}){}
-  private show(p:Partial<ServiceCallStatus>){if(!this.stopped){this.view={...this.view,...p};this.o.status({...this.view});}}
+  private show(p:Partial<ServiceCallStatus>){if(!this.stopped){this.view={...this.view,...p,...(p.active&&this.view.connectedAt===undefined?{connectedAt:performance.now()}:{})};this.o.status({...this.view});}}
   private async get<T>(path:string){const value=await api<T>(path,{signal:AbortSignal.any([this.abort.signal,AbortSignal.timeout(4000)])});this.alive();return value;}
   private alive(allowEnding=false){if(this.stopped||this.ending&&!allowEnding)throw new Error('CALL_CLOSED');}
   private async post<T>(path:string,body:unknown,action=path):Promise<T>{

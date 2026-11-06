@@ -17,3 +17,10 @@ it('replaces the analyzing indicator on a current result and ignores older conte
  expect(f.status).toHaveBeenLastCalledWith(expect.objectContaining({analysis:'상대 발화 분석 결과 수신 · 통화 전체 안전 판정 아님'}));const count=f.status.mock.calls.length;
  provider.onEvent?.({type:'risk',event:{contextRevision:1,status:'unavailable',signals:[]}});expect(f.status).toHaveBeenCalledTimes(count);
 });
+
+it('retains the actual first media-ready clock through status refresh and temporary pause',()=>{
+ const f=fixture();const access=f.call as unknown as {show(p:Record<string,unknown>):void};
+ access.show({active:false});expect(f.status.mock.lastCall?.[0].connectedAt).toBeUndefined();
+ access.show({active:true});const start=f.status.mock.lastCall?.[0].connectedAt;expect(start).toEqual(expect.any(Number));
+ access.show({active:false});access.show({active:true});expect(f.status.mock.lastCall?.[0].connectedAt).toBe(start);
+});
