@@ -24,3 +24,26 @@ export async function exerciseServiceCallAnalysis(page:Page,control:Awaited<Retu
  await page.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();await expect.poll(async()=>(await control({op:'state'})).streams.length).toBe(2);await control({op:'emit',stream:1,revision:1});await expect.poll(async()=>(await control({op:'state'})).requests.length).toBe(3);
  return async()=>{await expect.poll(async()=>(await control({op:'state'})).streams.every(s=>s.stopped)).toBe(true);await expect.poll(async()=>(await control({op:'state'})).requests[2]?.aborted).toBe(true);const state=await control({op:'state'});await control({op:'resolve',request:2,mode:'suspected'});expect((await control({op:'state'})).streams.map(s=>s.frames)).toEqual(state.streams.map(s=>s.frames));await expect(panel.locator('strong')).toHaveCount(0);};
 }
+
+export async function exercisePaidCallAnalysis(sender:Page,recipient:Page,observer:CallObserver,capture:(events:unknown[])=>Promise<void>){
+ const audio=process.env.CALLSIGN_MEDIA_PAID_AUDIO;
+ if(process.env.CALLSIGN_MEDIA_PERSISTENT_DEMO_CONFIRMATION!=='OWNED_PUBLIC_DEMO'||process.env.CALLSIGN_MEDIA_PAID_APPROVAL!=='public-audio-20261106-approval2'||!audio)throw Error('EXPLICIT_PAID_SMOKE_APPROVAL_REQUIRED');
+ let revisions=0,analyses=0,sent=0;const events:unknown[]=[];
+ recipient.on('websocket',socket=>{if(!new URL(socket.url()).pathname.endsWith('/v3/audio'))return;socket.on('framesent',()=>{sent++;});socket.on('framereceived',frame=>{if(typeof frame.payload!=='string')return;const value=JSON.parse(frame.payload);if(events.length<100)events.push({elapsedMs:performance.now(),type:value.type,status:value.event?.status,engine:value.event?.engine,code:value.code,final:value.revision?.final,contextRevision:value.event?.contextRevision});if(value.type==='revision')revisions++;if(value.type==='risk'&&value.event?.status==='analyzed')analyses++;});});
+ expect(await recipient.evaluate(()=>(window as any).callSignRecorderTracks.length)).toBe(0);
+ await recipient.getByRole('button',{name:'상대 음성 분석에 동의',exact:true}).click();
+ try{
+  await expect.poll(()=>recipient.evaluate(()=>{const w=window as any,peers=w.callSignTestPeers as RTCPeerConnection[],remote=peers.flatMap(p=>p.getReceivers().map(r=>r.track.id)),local=peers.flatMap(p=>p.getSenders().flatMap(s=>s.track?[s.track.id]:[]));return w.callSignRecorderTracks.length>0&&w.callSignRecorderTracks.flat().every((id:string)=>remote.includes(id)&&!local.includes(id));})).toBe(true);
+  const [chooser]=await Promise.all([sender.waitForEvent('filechooser'),sender.getByLabel('녹음 파일 송출 (최대 20MB)',{exact:true}).click()]);await chooser.setFiles(audio);
+  await expect(sender.getByText('녹음 파일 송출 중',{exact:true})).toBeVisible();
+  await expect.poll(()=>revisions,{timeout:20000}).toBeGreaterThan(0);observer.mark('transcript');
+  await expect.poll(()=>analyses,{timeout:20000}).toBeGreaterThan(0);observer.mark('analysis');
+ }finally{
+  try{await capture(events);}finally{
+  await recipient.getByRole('button',{name:'분석 동의 철회·삭제',exact:true}).click();
+  const stop=sender.getByRole('button',{name:'파일 송출 중지 · 마이크 사용',exact:true});if(await stop.isVisible())await stop.click();
+  }
+ }
+ const before=sent;await recipient.waitForTimeout(1500);expect(sent).toBe(before);
+ await expect(recipient.locator('.service-analysis strong')).toHaveCount(0);
+}
